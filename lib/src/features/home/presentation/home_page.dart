@@ -1,3 +1,5 @@
+// Home page shows the tickets saved 
+// Top left has profile
 import 'package:flutter/material.dart';
 
 class HomePage extends StatefulWidget {
