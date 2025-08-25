@@ -1,5 +1,3 @@
-Here’s a polished **README.md** draft for your repo:
-
 ---
 
 # 👜 Namma Wallet
