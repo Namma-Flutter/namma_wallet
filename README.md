@@ -1,5 +1,3 @@
----
-
 # 👜 Namma Wallet
 
 **Namma Wallet** is an open-source application that lets you **save, organize, and view your tickets** — from SETC and bus tickets to train tickets or any other type of pass. The app parses ticket data and generates a **beautiful digital ticket design** right inside the app.
