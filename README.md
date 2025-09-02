@@ -20,7 +20,7 @@ Unlike Apple Wallet or Google Wallet, which support only specific formats, **Nam
 
 ### Prerequisites
 
-* Flutter SDK (latest stable)
+* Flutter SDK - 3.35.2
 * Android Studio / Xcode (for building mobile apps)
 * XCode 16.4.0
 
@@ -37,14 +37,6 @@ flutter pub get
 # Run the app
 flutter run
 ```
-
----
-
-## 🛠 Tech Stack
-
-* **Flutter** – 3.32.4
-* **Dart** – Application logic.
-* **Open Source Libraries** – flutter_gemma
 
 ---
 
