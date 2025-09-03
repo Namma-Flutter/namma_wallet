@@ -18,6 +18,8 @@ dependencies:
   file_picker: ^8.1.4
   flutter:
     sdk: flutter
+  google_fonts: ^6.3.1
+  qr_flutter: ^4.1.0
   syncfusion_flutter_pdf: ^27.2.4
   uuid: ^4.5.1
 
