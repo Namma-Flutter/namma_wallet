@@ -26,37 +26,40 @@ class SMSService {
     final to = extractMatch(r'To\s*[:\s]*([^,]+)', text);
     final tripCode = extractMatch(r'Trip Code\s*:\s*(\S+)', text);
     final journeyDate = parseDate(
-        extractMatch(r'Journey Date\s*:\s*(\d{2}/\d{2}/\d{4})', text));
+      extractMatch(r'Journey Date\s*:\s*(\d{2}/\d{2}/\d{4})', text),
+    );
     final departureTime = extractMatch(r'Time\s*:\s*(\d{2}:\d{2})', text);
-    final seatNumber = extractMatch(r'Seat No\.\s*:\s*(\S+)', text);
     final classOfService = extractMatch(r'Class\s*:\s*(.*?)(?=,)', text);
     final passengerPickupPoint =
         extractMatch(r'Boarding at\s*:\s*(.*?)(?=\.|$)', text);
 
-    return createGooglePass(BusTicket(
-      corporation: corporation,
-      pnrNumber: pnrNumber,
-      serviceStartPlace: from,
-      serviceEndPlace: to,
-      tripCode: tripCode,
-      journeyDate: journeyDate,
-      serviceStartTime: departureTime,
-      // seatNumber: seatNumber,
-      classOfService: classOfService,
-      passengerPickupPoint: passengerPickupPoint,
-    ));
+    return createGooglePass(
+      BusTicket(
+        corporation: corporation,
+        pnrNumber: pnrNumber,
+        serviceStartPlace: from,
+        serviceEndPlace: to,
+        tripCode: tripCode,
+        journeyDate: journeyDate,
+        serviceStartTime: departureTime,
+        // seatNumber: seatNumber,
+        classOfService: classOfService,
+        passengerPickupPoint: passengerPickupPoint,
+      ),
+    );
   }
 
   String createGooglePass(BusTicket busTicket) {
     // Generate pass
-    String passId = const Uuid().v4();
-    String passClass = 'tnstc';
-    String issuerId = '3388000000022803339';
-    String issuerEmail = 'warriorharish95668@gmail.com';
+    final String passId = const Uuid().v4();
+    final String passClass = 'tnstc';
+    final String issuerId = '3388000000022803339';
+    final String issuerEmail = 'warriorharish95668@gmail.com';
 
     // Ensure origin_name is set based on destination
     String originName = (busTicket.serviceStartPlace ?? 'MNH').toAreaCode();
-    String destinationName = (busTicket.serviceEndPlace ?? 'CHN').toAreaCode();
+    final String destinationName =
+        (busTicket.serviceEndPlace ?? 'CHN').toAreaCode();
 
     // Check if destination is provided and origin is missing, then set originName to a default value
     if (destinationName.isNotEmpty && originName.isEmpty) {
@@ -64,14 +67,14 @@ class SMSService {
     }
 
     // Variables for JSON fields
-    String ticketNumber = busTicket.pnrNumber ?? '';
-    String tripId = busTicket.tripCode ?? '';
-    String journeyDate = busTicket.journeyDate?.toIso8601String() ?? '';
-    String fareAmount = busTicket.totalFare?.toString() ?? '0.0';
-    String serviceClass = busTicket.classOfService ?? '';
+    final String ticketNumber = busTicket.pnrNumber ?? '';
+    final String tripId = busTicket.tripCode ?? '';
+    final String journeyDate = busTicket.journeyDate?.toIso8601String() ?? '';
+    final String fareAmount = busTicket.totalFare?.toString() ?? '0.0';
+    final String serviceClass = busTicket.classOfService ?? '';
 
     // Create JSON string with variables
-    return """
+    return '''
 {
   "iss": "$issuerEmail",
   "aud": "google",
@@ -128,7 +131,7 @@ class SMSService {
       }
     ]
   }
-}""";
+}''';
   }
 }
 
@@ -139,21 +142,21 @@ extension ShortFormExtension on String {
   /// "KUMBAKONAM" -> "KUM"
   String toAreaCode() {
     // Split the string into words
-    List<String> words = split(RegExp(r'[\s\-\.]+'));
+    final List<String> words = split(RegExp(r'[\s\-\.]+'));
 
     // Handle special cases for specific names
-    if (toUpperCase().contains("CHENNAI")) {
-      return "CHE";
+    if (toUpperCase().contains('CHENNAI')) {
+      return 'CHE';
     }
-    if (toUpperCase().contains("KUMBAKONAM")) {
-      return "KUM";
+    if (toUpperCase().contains('KUMBAKONAM')) {
+      return 'KUM';
     }
 
     // General rule: Return first three characters of the first word
     // and first three characters of the second word (if present)
-    String firstPart =
+    final String firstPart =
         words.isNotEmpty ? words.first.substring(0, 3).toUpperCase() : '';
-    String secondPart =
+    final String secondPart =
         words.length > 1 ? words[1].substring(0, 3).toUpperCase() : '';
 
     return [firstPart, secondPart].where((part) => part.isNotEmpty).join(' ');

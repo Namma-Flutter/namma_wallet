@@ -22,23 +22,23 @@ class _HomePageState extends State<HomePage> {
   String? busTicket;
 
   Future<void> onPDFExtractPressed() async {
-    File? pdf = await FilePickerService().pickFile();
+    final File? pdf = await FilePickerService().pickFile();
     if (pdf == null) {
-      print('File not picked');
+      debugPrint('File not picked');
       return;
     }
-    String text = PDFService().extractTextFrom(pdf);
+    final String text = PDFService().extractTextFrom(pdf);
     // extractedText = text;
     setState(() {});
-    print(text);
-    BusTicket ticket = parseTicket(text);
-    print(ticket.toString());
+    debugPrint(text);
+    final BusTicket ticket = parseTicket(text);
+    debugPrint(ticket.toString());
   }
 
   Future<void> onSMSExtractPressed() async {
-    ClipboardData? data = await Clipboard.getData('text/plain');
-    String ticket = data?.text ??
-        "TNSTC Corporation:SETC , PNR NO.:T60856763 , From:CHENNAI-PT DR. M.G.R. BS To KUMBAKONAM , Trip Code:2300CHEKUMLB , Journey Date:10/01/2025 , Time:23:55 , Seat No.:4 UB, .Class:NON AC LOWER BIRTH SEATER , Boarding at:KOTTIVAKKAM(RTO OFFICE) . For e-Ticket: Download from View Ticket. Please carry your photo ID during journey. T&C apply. https://www.radiantinfo.com";
+    final ClipboardData? data = await Clipboard.getData('text/plain');
+    final String ticket = data?.text ??
+        'TNSTC Corporation:SETC , PNR NO.:T60856763 , From:CHENNAI-PT DR. M.G.R. BS To KUMBAKONAM , Trip Code:2300CHEKUMLB , Journey Date:10/01/2025 , Time:23:55 , Seat No.:4 UB, .Class:NON AC LOWER BIRTH SEATER , Boarding at:KOTTIVAKKAM(RTO OFFICE) . For e-Ticket: Download from View Ticket. Please carry your photo ID during journey. T&C apply. https://www.radiantinfo.com';
 
     busTicket = SMSService().parseTicket(ticket);
     debugPrint(busTicket);
@@ -47,33 +47,31 @@ class _HomePageState extends State<HomePage> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Text(extractedText),
-        FloatingActionButton.extended(
-          onPressed: onSMSExtractPressed,
-          label: const Text('SMS'),
-        ),
-        FloatingActionButton.extended(
-          onPressed: onPDFExtractPressed,
-          label: const Text('PDF'),
-        ),
-        if (busTicket != null)
-          AddToGoogleWalletButton(
-            pass: busTicket!,
-            onError: (Object error) => _onError(context, error),
-            onSuccess: () => _onSuccess(context),
-            onCanceled: () => _onCanceled(context),
+  Widget build(BuildContext context) => Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(extractedText),
+          FloatingActionButton.extended(
+            onPressed: onSMSExtractPressed,
+            label: const Text('SMS'),
           ),
-      ],
-    );
-  }
+          FloatingActionButton.extended(
+            onPressed: onPDFExtractPressed,
+            label: const Text('PDF'),
+          ),
+          if (busTicket != null)
+            AddToGoogleWalletButton(
+              pass: busTicket!,
+              onError: (Object error) => _onError(context, error),
+              onSuccess: () => _onSuccess(context),
+              onCanceled: () => _onCanceled(context),
+            ),
+        ],
+      );
 
   void _onError(BuildContext context, Object error) {
-    print(error);
+    debugPrint(error.toString());
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         backgroundColor: Colors.red,
