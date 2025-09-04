@@ -3,25 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
-void main() {
-  runApp(MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Document Scanner',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-      ),
-      home: ScannerScreen(),
-      debugShowCheckedModeBanner: false,
-    );
-  }
-}
-
 class ScannerScreen extends StatefulWidget {
   @override
   _ScannerScreenState createState() => _ScannerScreenState();
@@ -91,6 +72,11 @@ class _ScannerScreenState extends State<ScannerScreen> {
                     label: 'Camera',
                     isSelected: currentIndex == 0,
                     onTap: () {
+                      if (currentIndex == 0) {
+                        // leaving camera tab → stop camera
+                        cameraController.stop();
+                        isScanning = false;
+                      }
                       setState(() => currentIndex = 0);
                       if (currentIndex == 0) {
                         _startScanning();
@@ -101,13 +87,25 @@ class _ScannerScreenState extends State<ScannerScreen> {
                     icon: Icons.text_fields,
                     label: 'Text',
                     isSelected: currentIndex == 1,
-                    onTap: () => setState(() => currentIndex = 1),
+                    onTap: () {
+                      if (currentIndex == 0) {
+                        cameraController.stop();
+                        isScanning = false;
+                      }
+                      setState(() => currentIndex = 1);
+                    },
                   ),
                   _buildBottomButton(
                     icon: Icons.attach_file,
                     label: 'Upload',
                     isSelected: currentIndex == 2,
-                    onTap: () => setState(() => currentIndex = 2),
+                    onTap: () {
+                      if (currentIndex == 0) {
+                        cameraController.stop();
+                        isScanning = false;
+                      }
+                      setState(() => currentIndex = 2);
+                    },
                   ),
                 ],
               ),
