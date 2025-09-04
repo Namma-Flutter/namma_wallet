@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:namma_wallet/src/features/calendar/presentation/calendar_page.dart';
-import 'package:namma_wallet/src/features/home/presentation/home_page.dart';
 import 'package:namma_wallet/src/features/profile/presentation/profile_page.dart';
+
+import 'features/ticket_parser/presentation/ticket_scanner_page.dart';
 
 class NammaWalletApp extends StatefulWidget {
   const NammaWalletApp({super.key});
@@ -44,7 +45,7 @@ class _NammaWalletAppState extends State<NammaWalletApp> {
             ],
           ),
           body: <Widget>[
-            const HomePage(),
+            ScannerScreen(),
             const CalendarPage(),
             const ProfilePage(),
           ][currentPageIndex],
