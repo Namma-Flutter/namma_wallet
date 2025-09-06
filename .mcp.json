@@ -1,0 +1,33 @@
+{
+    "mcpServers": {
+        "context7": {
+            "command": "npx",
+            "args": [
+                "-y",
+                "@upstash/context7-mcp@latest"
+            ]
+        },
+        "dart": {
+            "command": "fvm",
+            "args": [
+                "dart",
+                "mcp-server"
+            ]
+        },
+        "serena": {
+            "type": "stdio",
+            "command": "uvx",
+            "args": [
+                "--from",
+                "git+https://github.com/oraios/serena",
+                "serena",
+                "start-mcp-server",
+                "--context",
+                "ide-assistant",
+                "--project",
+                "/Users/harish/Developer/flutter/namma_wallet"
+            ],
+            "env": {}
+        }
+    }
+}
