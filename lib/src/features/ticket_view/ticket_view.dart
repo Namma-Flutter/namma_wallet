@@ -67,38 +67,40 @@ class _TicketViewState extends State<TicketView> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildRow(
-                  getValueOrDefault(widget.ticket.corporation),
-                  getValueOrDefault(widget.ticket.service),
+                BuildRow(
+                  title1: getValueOrDefault(widget.ticket.corporation),
+                  title2: getValueOrDefault(widget.ticket.service),
                 ),
                 const SizedBox(height: 16),
-                _buildFromToRow(),
+                const BuildFromToRow(),
                 const SizedBox(height: 16),
-                _buildRow(
-                  'Journey Date',
-                  'Time',
-                  getValueOrDefault(widget.ticket.journeyDate),
-                  getValueOrDefault(widget.ticket.time),
+                BuildRow(
+                  title1: 'Journey Date',
+                  title2: 'Time',
+                  value1: getValueOrDefault(widget.ticket.journeyDate),
+                  value2: getValueOrDefault(widget.ticket.time),
                 ),
                 const SizedBox(height: 16),
-                _buildRow(
-                  'PNR No.',
-                  'Trip Code',
-                  getValueOrDefault(widget.ticket.pnrNo),
-                  getValueOrDefault(widget.ticket.tripCode),
+                BuildRow(
+                  title1: 'PNR No.',
+                  title2: 'Trip Code',
+                  value1: getValueOrDefault(widget.ticket.pnrNo),
+                  value2: getValueOrDefault(widget.ticket.tripCode),
                 ),
                 const SizedBox(height: 16),
-                _buildLabelValue(
-                    'Seat Numbers',
-                    widget.ticket.seatNumbers.isEmpty
+                BuildLabelValue(
+                    label: 'Seat Numbers',
+                    value: widget.ticket.seatNumbers.isEmpty
                         ? "--"
                         : widget.ticket.seatNumbers.join(', ')),
                 const SizedBox(height: 16),
-                _buildLabelValue(
-                    'Class', getValueOrDefault(widget.ticket.ticketClass)),
+                BuildLabelValue(
+                    label: 'Class',
+                    value: getValueOrDefault(widget.ticket.ticketClass)),
                 const SizedBox(height: 16),
-                _buildLabelValue(
-                    'Boarding At', getValueOrDefault(widget.ticket.boardingAt)),
+                BuildLabelValue(
+                    label: 'Boarding At',
+                    value: getValueOrDefault(widget.ticket.boardingAt)),
               ],
             ),
           ),
@@ -126,85 +128,6 @@ class _TicketViewState extends State<TicketView> {
           )
         ],
       ),
-    );
-  }
-
-  Widget _buildFromToRow() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('From', style: Paragraph02(color: Shades.s0).regular),
-              Text(
-                getValueOrDefault(widget.ticket.from),
-                style: HeadingH6(color: Shades.s0).semiBold,
-                textAlign: TextAlign.start,
-                overflow: TextOverflow.clip,
-              ),
-            ],
-          ),
-        ),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text('To', style: Paragraph02(color: Shades.s0).regular),
-              Text(
-                getValueOrDefault(widget.ticket.to),
-                style: HeadingH6(color: Shades.s0).semiBold,
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildRow(String title1, String title2,
-      [String? value1, String? value2]) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              if (value1 == null)
-                Text(title1, style: HeadingH5(color: Shades.s0).bold)
-              else
-                _buildLabelValue(title1, value1, CrossAxisAlignment.start),
-            ],
-          ),
-        ),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: value1 == null
-                ? CrossAxisAlignment.end
-                : CrossAxisAlignment.end,
-            children: [
-              if (value2 == null)
-                Text(title2, style: HeadingH5(color: Shades.s0).bold)
-              else
-                _buildLabelValue(title2, value2, CrossAxisAlignment.end),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildLabelValue(String label, String value,
-      [CrossAxisAlignment alignment = CrossAxisAlignment.start]) {
-    return Column(
-      crossAxisAlignment: alignment,
-      children: [
-        Text(label, style: Paragraph02(color: Shades.s0).regular),
-        Text(value, style: HeadingH6(color: Shades.s0).semiBold),
-      ],
     );
   }
 }
