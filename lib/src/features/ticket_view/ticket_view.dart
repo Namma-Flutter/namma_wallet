@@ -67,38 +67,38 @@ class _TicketViewState extends State<TicketView> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                BuildRow(
+                TicketRowWidget(
                   title1: getValueOrDefault(widget.ticket.corporation),
                   title2: getValueOrDefault(widget.ticket.service),
                 ),
                 const SizedBox(height: 16),
-                const BuildFromToRow(),
+                const TicketFromToRowWidget(),
                 const SizedBox(height: 16),
-                BuildRow(
+                TicketRowWidget(
                   title1: 'Journey Date',
                   title2: 'Time',
                   value1: getValueOrDefault(widget.ticket.journeyDate),
                   value2: getValueOrDefault(widget.ticket.time),
                 ),
                 const SizedBox(height: 16),
-                BuildRow(
+                TicketRowWidget(
                   title1: 'PNR No.',
                   title2: 'Trip Code',
                   value1: getValueOrDefault(widget.ticket.pnrNo),
                   value2: getValueOrDefault(widget.ticket.tripCode),
                 ),
                 const SizedBox(height: 16),
-                BuildLabelValue(
+                TicketLabelValueWidget(
                     label: 'Seat Numbers',
                     value: widget.ticket.seatNumbers.isEmpty
                         ? "--"
                         : widget.ticket.seatNumbers.join(', ')),
                 const SizedBox(height: 16),
-                BuildLabelValue(
+                TicketLabelValueWidget(
                     label: 'Class',
                     value: getValueOrDefault(widget.ticket.ticketClass)),
                 const SizedBox(height: 16),
-                BuildLabelValue(
+                TicketLabelValueWidget(
                     label: 'Boarding At',
                     value: getValueOrDefault(widget.ticket.boardingAt)),
               ],

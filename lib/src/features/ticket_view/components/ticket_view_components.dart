@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../../../../styles/styles.dart';
 
-class BuildLabelValue extends StatelessWidget {
-  const BuildLabelValue(
+class TicketLabelValueWidget extends StatelessWidget {
+  const TicketLabelValueWidget(
       {super.key,
       required this.label,
       required this.value,
@@ -25,8 +25,8 @@ class BuildLabelValue extends StatelessWidget {
   }
 }
 
-class BuildRow extends StatelessWidget {
-  const BuildRow(
+class TicketRowWidget extends StatelessWidget {
+  const TicketRowWidget(
       {super.key,
       required this.title1,
       required this.title2,
@@ -44,14 +44,14 @@ class BuildRow extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Expanded(
-          child: BuildLabelValue(
+          child: TicketLabelValueWidget(
             label: title1,
             value: value1 ?? '',
             alignment: CrossAxisAlignment.start,
           ),
         ),
         Expanded(
-          child: BuildLabelValue(
+          child: TicketLabelValueWidget(
             label: title2,
             value: value2 ?? '',
             alignment: CrossAxisAlignment.end,
@@ -62,8 +62,8 @@ class BuildRow extends StatelessWidget {
   }
 }
 
-class BuildFromToRow extends StatelessWidget {
-  const BuildFromToRow({super.key});
+class TicketFromToRowWidget extends StatelessWidget {
+  const TicketFromToRowWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
