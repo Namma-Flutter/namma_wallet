@@ -4,6 +4,7 @@ import 'package:card_stack_widget/card_stack_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:namma_wallet/src/core/widgets/snackbar_widget.dart';
 import 'package:namma_wallet/src/features/home/data/model/card_model.dart';
 import 'package:namma_wallet/src/features/home/data/model/other_card_model.dart';
 import 'package:namma_wallet/src/features/home/presentation/widget/other_card_widget.dart';
@@ -33,12 +34,14 @@ class _HomePageState extends State<HomePage> {
       final String response =
           await rootBundle.loadString('assets/data/cards.json');
       final data = await json.decode(response) as List;
+      if (!mounted) return;
       setState(() {
         _walletCards = data.map((card) => WalletCard.fromJson(card)).toList();
         _isLoading = false;
       });
     } catch (e) {
-      print("Error loading card data: $e");
+      if (!mounted) return;
+      showSnackbar(context, "Error loading card data: $e");
       setState(() {
         _isLoading = false;
       });
@@ -49,7 +52,6 @@ class _HomePageState extends State<HomePage> {
     try {
       final String response =
           await rootBundle.loadString('assets/data/other_cards.json');
-      print("Other cards JSON: $response");
       final data = await json.decode(response) as List;
       if (!mounted) return;
       setState(() {
@@ -57,7 +59,7 @@ class _HomePageState extends State<HomePage> {
       });
     } catch (e) {
       if (!mounted) return;
-      print("Error loading other card data: $e");
+      showSnackbar(context, "Error loading other card data: $e");
     }
   }
 
@@ -73,8 +75,7 @@ class _HomePageState extends State<HomePage> {
       return CardModel(
         backgroundColor: card.color,
         radius: const Radius.circular(20),
-        shadowColor: Colors.black.withOpacity(0.2),
-        // The margin is now controlled by the parent widget structure
+        shadowColor: Colors.black.withAlpha(20),
         margin: EdgeInsets.zero,
         child: WalletCardWidget(card: card),
       );
@@ -87,7 +88,6 @@ class _HomePageState extends State<HomePage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Padded content above the card stack
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
                 child: Column(
@@ -155,8 +155,6 @@ class _HomePageState extends State<HomePage> {
                   ],
                 ),
               ),
-
-              // Full-width card stack
               _isLoading
                   ? const Center(child: CircularProgressIndicator())
                   : _walletCards.isEmpty
@@ -177,15 +175,12 @@ class _HomePageState extends State<HomePage> {
                                 const Duration(milliseconds: 150),
                           ),
                         ),
-
-              // Padded content below the card stack
               Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const SizedBox(
-                        height: 16), // Adjust for the removed top padding
+                    const SizedBox(height: 16),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
