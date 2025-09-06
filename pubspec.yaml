@@ -15,6 +15,7 @@ environment:
 dependencies:
   add_to_google_wallet: ^0.0.5
   cupertino_icons: ^1.0.8
+  dart_mappable: ^4.6.0
   file_picker: ^8.1.4
   flutter:
     sdk: flutter
@@ -24,6 +25,8 @@ dependencies:
   uuid: ^4.5.1
 
 dev_dependencies:
+  build_runner: ^2.4.0
+  dart_mappable_builder: ^4.6.0
   flutter_lints: ^4.0.0
   flutter_test:
     sdk: flutter

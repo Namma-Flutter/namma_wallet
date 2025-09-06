@@ -7,7 +7,7 @@ import 'components/components.dart';
 
 class TicketView extends StatefulWidget {
   const TicketView({super.key, required this.ticket});
-  final TicketModel ticket;
+  final TNSTCModel ticket;
 
   @override
   State<TicketView> createState() => _TicketViewState();

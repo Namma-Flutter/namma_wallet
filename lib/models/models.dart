@@ -1,1 +1,1 @@
-export 'ticket_model.dart';
+export 'tnstc_model.dart';
