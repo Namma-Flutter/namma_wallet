@@ -49,11 +49,14 @@ class _HomePageState extends State<HomePage> {
     try {
       final String response =
           await rootBundle.loadString('assets/data/other_cards.json');
+      print("Other cards JSON: $response");
       final data = await json.decode(response) as List;
+      if (!mounted) return;
       setState(() {
         _otherCards = data.map((card) => OtherCard.fromJson(card)).toList();
       });
     } catch (e) {
+      if (!mounted) return;
       print("Error loading other card data: $e");
     }
   }
