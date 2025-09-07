@@ -17,11 +17,11 @@ class OtherCard {
 
   factory OtherCard.fromJson(Map<String, dynamic> json) {
     return OtherCard(
-      icon: json['icon'],
-      title: json['title'],
-      subtitle: json['subtitle'],
-      date: json['date'],
-      price: json['price'],
+      icon: json['icon'] as String,
+      title: json['title'] as String,
+      subtitle: json['subtitle'] as String,
+      date: json['date'] as String,
+      price: json['price'] as String,
     );
   }
 }

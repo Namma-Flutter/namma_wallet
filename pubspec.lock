@@ -270,14 +270,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  flutter_lints:
-    dependency: "direct dev"
-    description:
-      name: flutter_lints
-      sha256: "3f41d009ba7172d5ff9be5f6e6e6abb4300e263aab8866d2a0842ed2a70f8f0c"
-      url: "https://pub.dev"
-    source: hosted
-    version: "4.0.0"
   flutter_plugin_android_lifecycle:
     dependency: transitive
     description:
@@ -408,14 +400,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.2"
-  lints:
-    dependency: transitive
-    description:
-      name: lints
-      sha256: "976c774dd944a42e83e2467f4cc670daef7eed6295b10b36ae8c85bcbf828235"
-      url: "https://pub.dev"
-    source: hosted
-    version: "4.0.0"
   logging:
     dependency: transitive
     description:
@@ -765,6 +749,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.2.0"
+  very_good_analysis:
+    dependency: "direct dev"
+    description:
+      name: very_good_analysis
+      sha256: e479fbc0941009262343db308133e121bf8660c2c81d48dd8e952df7b7e1e382
+      url: "https://pub.dev"
+    source: hosted
+    version: "9.0.0"
   vm_service:
     dependency: transitive
     description:

@@ -13,8 +13,7 @@ class NammaWalletApp extends StatefulWidget {
 class _NammaWalletAppState extends State<NammaWalletApp> {
   int currentPageIndex = 0;
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
+  Widget build(BuildContext context) => MaterialApp(
         title: 'NammaWallet',
         home: Scaffold(
           bottomNavigationBar: NavigationBar(
@@ -48,6 +47,5 @@ class _NammaWalletAppState extends State<NammaWalletApp> {
             const CalendarPage(),
             const ProfilePage(),
           ][currentPageIndex],
-        ));
-  }
+        ),);
 }

@@ -1,5 +1,6 @@
+// Home page shows the tickets saved
+// Top left has profile
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:card_stack_widget/card_stack_widget.dart';
 import 'package:flutter/material.dart';
@@ -37,37 +38,37 @@ class _HomePageState extends State<HomePage> {
   }
 
   Map<String, dynamic> staticTnstcJson = {
-    "corporation": "TNSTC",
-    "service": "SETC",
-    "pnr_no": "T63736642",
-    "from": "CHENNAI-PT DR. M.G.R. BS",
-    "to": "KUMBAKONAM",
-    "trip_code": "2145CHEKUMAB",
-    "journey_date": "11/02/2025",
-    "time": "22:35",
-    "seat_numbers": ["20", "21"],
-    "class": "AC SLEEPER SEATER",
-    "boarding_at": "KOTTIVAKKAM(RTO OFFICE)",
+    'corporation': 'TNSTC',
+    'service': 'SETC',
+    'pnr_no': 'T63736642',
+    'from': 'CHENNAI-PT DR. M.G.R. BS',
+    'to': 'KUMBAKONAM',
+    'trip_code': '2145CHEKUMAB',
+    'journey_date': '11/02/2025',
+    'time': '22:35',
+    'seat_numbers': ['20', '21'],
+    'class': 'AC SLEEPER SEATER',
+    'boarding_at': 'KOTTIVAKKAM(RTO OFFICE)',
   };
 
   Future<void> onPDFExtractPressed() async {
-    File? pdf = await FilePickerService().pickFile();
+    final pdf = await FilePickerService().pickFile();
     if (pdf == null) {
-      print('File not picked');
+      debugPrint('File not picked');
       return;
     }
-    String text = PDFService().extractTextFrom(pdf);
+    final text = PDFService().extractTextFrom(pdf);
     // extractedText = text;
     setState(() {});
-    print(text);
-    BusTicket ticket = parseTicket(text);
-    print(ticket.toString());
+    debugPrint(text);
+    final ticket = parseTicket(text);
+    debugPrint(ticket.toString());
   }
 
   Future<void> onSMSExtractPressed() async {
-    ClipboardData? data = await Clipboard.getData('text/plain');
-    String ticket = data?.text ??
-        "TNSTC Corporation:SETC , PNR NO.:T60856763 , From:CHENNAI-PT DR. M.G.R. BS To KUMBAKONAM , Trip Code:2300CHEKUMLB , Journey Date:10/01/2025 , Time:23:55 , Seat No.:4 UB, .Class:NON AC LOWER BIRTH SEATER , Boarding at:KOTTIVAKKAM(RTO OFFICE) . For e-Ticket: Download from View Ticket. Please carry your photo ID during journey. T&C apply. https://www.radiantinfo.com";
+    final data = await Clipboard.getData('text/plain');
+    final ticket = data?.text ??
+        'TNSTC Corporation:SETC , PNR NO.:T60856763 , From:CHENNAI-PT DR. M.G.R. BS To KUMBAKONAM , Trip Code:2300CHEKUMLB , Journey Date:10/01/2025 , Time:23:55 , Seat No.:4 UB, .Class:NON AC LOWER BIRTH SEATER , Boarding at:KOTTIVAKKAM(RTO OFFICE) . For e-Ticket: Download from View Ticket. Please carry your photo ID during journey. T&C apply. https://www.radiantinfo.com';
 
     busTicket = SMSService().parseTicket(ticket);
     debugPrint(busTicket);
@@ -77,17 +78,18 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> _loadCardData() async {
     try {
-      final String response =
-          await rootBundle.loadString('assets/data/cards.json');
+      final response = await rootBundle.loadString('assets/data/cards.json');
       final data = await json.decode(response) as List;
       if (!mounted) return;
       setState(() {
-        _walletCards = data.map((card) => WalletCard.fromJson(card)).toList();
+        _walletCards = data
+            .map((card) => WalletCard.fromJson(card as Map<String, dynamic>))
+            .toList();
         _isLoading = false;
       });
     } catch (e) {
       if (!mounted) return;
-      showSnackbar(context, "Error loading card data: $e");
+      showSnackbar(context, 'Error loading card data: $e');
       setState(() {
         _isLoading = false;
       });
@@ -96,16 +98,18 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> _loadOtherCardsData() async {
     try {
-      final String response =
+      final response =
           await rootBundle.loadString('assets/data/other_cards.json');
       final data = await json.decode(response) as List;
       if (!mounted) return;
       setState(() {
-        _otherCards = data.map((card) => OtherCard.fromJson(card)).toList();
+        _otherCards = data
+            .map((card) => OtherCard.fromJson(card as Map<String, dynamic>))
+            .toList();
       });
     } catch (e) {
       if (!mounted) return;
-      showSnackbar(context, "Error loading other card data: $e");
+      showSnackbar(context, 'Error loading other card data: $e');
     }
   }
 
@@ -116,7 +120,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _onError(BuildContext context, Object error) {
-    print(error);
+    debugPrint(error.toString());
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         backgroundColor: Colors.red,
@@ -144,7 +148,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final List<CardModel> cardStackList = _walletCards.map((card) {
+    final cardStackList = _walletCards.map((card) {
       return CardModel(
         backgroundColor: card.color,
         radius: const Radius.circular(20),
@@ -229,29 +233,29 @@ class _HomePageState extends State<HomePage> {
               ),
 
               //* Top 3 card list
-              _isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : _walletCards.isEmpty
-                      ? const Center(child: Text('No cards found.'))
-                      : SizedBox(
-                          height: 350,
-                          child: CardStackWidget(
-                            cardList: cardStackList,
-                            opacityChangeOnDrag: true,
-                            swipeOrientation: CardOrientation.both,
-                            cardDismissOrientation: CardOrientation.both,
-                            positionFactor: 3,
-                            scaleFactor: 1.5,
-                            alignment: Alignment.center,
-                            reverseOrder: false,
-                            animateCardScale: true,
-                            dismissedCardDuration:
-                                const Duration(milliseconds: 150),
-                          ),
+              if (_isLoading)
+                const Center(child: CircularProgressIndicator())
+              else
+                _walletCards.isEmpty
+                    ? const Center(child: Text('No cards found.'))
+                    : SizedBox(
+                        height: 350,
+                        child: CardStackWidget(
+                          cardList: cardStackList,
+                          opacityChangeOnDrag: true,
+                          swipeOrientation: CardOrientation.both,
+                          cardDismissOrientation: CardOrientation.both,
+                          positionFactor: 3,
+                          scaleFactor: 1.5,
+                          alignment: Alignment.center,
+                          animateCardScale: true,
+                          dismissedCardDuration:
+                              const Duration(milliseconds: 150),
                         ),
+                      ),
               //* Other Cards Section
               Padding(
-                padding: const EdgeInsets.all(16.0),
+                padding: const EdgeInsets.all(16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -293,7 +297,7 @@ class _HomePageState extends State<HomePage> {
               ),
               //* Action buttons section
               Padding(
-                padding: const EdgeInsets.all(16.0),
+                padding: const EdgeInsets.all(16),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
