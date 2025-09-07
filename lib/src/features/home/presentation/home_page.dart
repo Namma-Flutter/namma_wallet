@@ -159,54 +159,16 @@ class _HomePageState extends State<HomePage> {
     }).toList();
 
     return Scaffold(
-      backgroundColor: Colors.white,
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              //* User info section
               Padding(
-                padding: const EdgeInsets.fromLTRB(16, 25, 16, 0),
+                padding: const EdgeInsets.all(8),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            //* Date
-                            Text(
-                              getFormattedDate(),
-                              style: TextStyle(
-                                color: Colors.grey[600],
-                                fontSize: 16,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            //* User name
-                            const Text(
-                              'Hello, Justin',
-                              style: TextStyle(
-                                fontSize: 32,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
-                              ),
-                            ),
-                          ],
-                        ),
-                        //* User avatar
-                        const CircleAvatar(
-                          radius: 25,
-                          backgroundImage:
-                              NetworkImage('https://i.pravatar.cc/150?img=32'),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 32),
-                    //* Tickets section
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
