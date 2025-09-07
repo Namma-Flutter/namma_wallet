@@ -24,6 +24,10 @@ Unlike Apple Wallet or Google Wallet, which support only specific formats, **Nam
 * Android Studio / Xcode (for building mobile apps)
 * XCode 16.4.0
 
+### App architecture
+
+* https://codewithandrea.com/articles/flutter-app-architecture-riverpod-introduction/
+
 ### Setup
 
 ```bash
