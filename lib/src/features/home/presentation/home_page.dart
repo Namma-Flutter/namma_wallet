@@ -8,8 +8,8 @@ import 'package:intl/intl.dart';
 import 'package:namma_wallet/src/core/widgets/snackbar_widget.dart';
 import 'package:namma_wallet/src/features/home/data/model/card_model.dart';
 import 'package:namma_wallet/src/features/home/data/model/other_card_model.dart';
-import 'package:namma_wallet/src/features/home/presentation/widget/other_card_widget.dart';
 import 'package:namma_wallet/src/features/home/presentation/widget/ticket_card_widget.dart';
+import 'package:namma_wallet/src/features/home/presentation/widget/wallet_card_widget.dart';
 import 'package:namma_wallet/src/features/pdf_extract/application/file_picker_service.dart';
 import 'package:namma_wallet/src/features/pdf_extract/application/pdf_service.dart';
 import 'package:namma_wallet/src/features/sms_extract/application/sms_service.dart';
@@ -284,7 +284,7 @@ class _HomePageState extends State<HomePage> {
                       itemCount: _otherCards.length,
                       itemBuilder: (context, index) {
                         final card = _otherCards[index];
-                        return BuildOtherCardWidget(card: card);
+                        return BuildTicketCardWidget(card: card);
                       },
                       separatorBuilder: (context, index) => const Divider(),
                     ),
