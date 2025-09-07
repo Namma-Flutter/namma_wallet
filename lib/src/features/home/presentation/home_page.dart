@@ -5,10 +5,13 @@ import 'dart:io';
 import 'package:add_to_google_wallet/widgets/add_to_google_wallet_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:namma_wallet/models/models.dart';
 import 'package:namma_wallet/src/features/pdf_extract/application/file_picker_service.dart';
 import 'package:namma_wallet/src/features/pdf_extract/application/pdf_service.dart';
 import 'package:namma_wallet/src/features/sms_extract/application/sms_service.dart';
 import 'package:namma_wallet/src/features/ticket_parser/application/tnstc_ticket_parser.dart';
+
+import '../../ticket_view/ticket_view.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -20,6 +23,20 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   String extractedText = 'None';
   String? busTicket;
+
+  Map<String, dynamic> staticTnstcJson = {
+    "corporation": "TNSTC",
+    "service": "SETC",
+    "pnr_no": "T63736642",
+    "from": "CHENNAI-PT DR. M.G.R. BS",
+    "to": "KUMBAKONAM",
+    "trip_code": "2145CHEKUMAB",
+    "journey_date": "11/02/2025",
+    "time": "22:35",
+    "seat_numbers": ["20", "21"],
+    "class": "AC SLEEPER SEATER",
+    "boarding_at": "KOTTIVAKKAM(RTO OFFICE)",
+  };
 
   Future<void> onPDFExtractPressed() async {
     final File? pdf = await FilePickerService().pickFile();
@@ -67,6 +84,29 @@ class _HomePageState extends State<HomePage> {
               onSuccess: () => _onSuccess(context),
               onCanceled: () => _onCanceled(context),
             ),
+        ElevatedButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => TicketView(
+                      ticket: TNSTCModel(
+                          corporation: staticTnstcJson['corporation']!,
+                          service: staticTnstcJson['service']!,
+                          pnrNo: staticTnstcJson['pnr_no']!,
+                          from: staticTnstcJson['from']!,
+                          to: staticTnstcJson['to']!,
+                          tripCode: staticTnstcJson['trip_code']!,
+                          journeyDate: staticTnstcJson['journey_date']!,
+                          time: staticTnstcJson['time']!,
+                          seatNumbers: List<String>.from(
+                              staticTnstcJson['seat_numbers']!),
+                          ticketClass: staticTnstcJson['class']!,
+                          boardingAt: staticTnstcJson['boarding_at']!)),
+                ),
+              );
+            },
+            child: const Text('TicketView'))
         ],
       );
 

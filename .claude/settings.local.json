@@ -1,0 +1,36 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find:*)",
+      "Bash(grep:*)",
+      "Bash(fvm flutter pub run build_runner build:*)",
+      "Bash(fvm flutter pub:*)",
+      "Bash(fvm flutter:*)",
+      "Bash(mv:*)",
+      "Bash(rm:*)",
+      "Bash(sed:*)",
+      "Bash(rg:*)",
+      "Bash(mkdir:*)",
+      "mcp__serena__onboarding",
+      "mcp__serena__check_onboarding_performed",
+      "mcp__serena__list_dir",
+      "mcp__serena__get_symbols_overview",
+      "mcp__serena__find_symbol",
+      "mcp__serena__search_for_pattern",
+      "mcp__serena__find_file",
+      "mcp__serena__write_memory"
+    ],
+    "deny": []
+  },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "context7",
+    "serena",
+    "dart"
+  ],
+  "statusLine": {
+    "type": "command",
+    "command": "bun x ccusage statusline",
+    "padding": 0
+  }
+}
