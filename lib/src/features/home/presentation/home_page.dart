@@ -150,7 +150,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     final cardStackList = _walletCards.map((card) {
       return CardModel(
-        backgroundColor: card.color,
+        backgroundColor: card.color ?? Colors.grey,
         radius: const Radius.circular(20),
         shadowColor: Colors.black.withAlpha(20),
         margin: EdgeInsets.zero,
