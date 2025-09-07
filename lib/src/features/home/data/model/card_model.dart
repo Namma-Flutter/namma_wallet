@@ -15,20 +15,20 @@ class WalletCard {
 
   factory WalletCard.fromJson(Map<String, dynamic> json) {
     return WalletCard(
-      type: json['type'] as String,
-      name: json['name'] as String,
-      brand: json['brand'] as String,
-      balance: json['balance'] as String,
-      number: json['number'] as String,
+      type: json['type'] as String?,
+      name: json['name'] as String?,
+      brand: json['brand'] as String?,
+      balance: json['balance'] as String?,
+      number: json['number'] as String?,
       color: Color(
           int.parse(json['color'].replaceFirst('0x', '') as String, radix: 16)),
     );
   }
-  final String id;
-  final String type;
+  final String? id;
+  final String? type;
   final String? name;
   final String? brand;
   final String? balance;
   final String? number;
-  final Color color;
+  final Color? color;
 }

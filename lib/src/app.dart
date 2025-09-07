@@ -4,6 +4,8 @@ import 'package:namma_wallet/src/features/home/presentation/home_page.dart';
 import 'package:namma_wallet/src/features/messages/presentation/messages_page.dart';
 import 'package:namma_wallet/src/features/profile/presentation/profile_page.dart';
 
+import 'package:namma_wallet/src/features/ticket_parser/presentation/ticket_scanner_page.dart';
+
 class NammaWalletApp extends StatefulWidget {
   const NammaWalletApp({super.key});
 
@@ -42,16 +44,21 @@ class _NammaWalletAppState extends State<NammaWalletApp> {
                 label: 'Messages',
               ),
               NavigationDestination(
-                selectedIcon: Icon(Icons.person),
-                icon: Icon(Icons.person_outline),
-                label: 'Profile',
+                selectedIcon: Icon(Icons.qr_code),
+                icon: Icon(Icons.qr_code_scanner_outlined),
+                label: 'Scanner',
+              ),
+              NavigationDestination(
+                selectedIcon: Icon(Icons.more),
+                icon: Icon(Icons.more_outlined),
+                label: 'More',
               ),
             ],
           ),
           body: <Widget>[
             const HomePage(),
             const CalendarPage(),
-            const MessagesPage(),
+            ScannerScreen(),
             const ProfilePage(),
           ][currentPageIndex],
         ),
