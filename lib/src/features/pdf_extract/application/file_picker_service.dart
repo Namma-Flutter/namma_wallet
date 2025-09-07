@@ -5,7 +5,7 @@ import 'package:file_picker/file_picker.dart';
 class FilePickerService {
   Future<File?> pickFile() async {
     // TODO: Multi file pick
-    FilePickerResult? result = await FilePicker.platform.pickFiles();
+    final FilePickerResult? result = await FilePicker.platform.pickFiles();
     File? file;
     if (result != null) {
       file = File(result.files.single.path!);

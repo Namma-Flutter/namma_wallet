@@ -1,29 +1,6 @@
 import 'dart:core';
 
 class BusTicket {
-  final String? corporation;
-  final String? pnrNumber;
-  final DateTime? journeyDate;
-  final String? routeNo;
-  final String? serviceStartPlace;
-  final String? serviceEndPlace;
-  final String? serviceStartTime;
-  final String? passengerStartPlace;
-  final String? passengerEndPlace;
-  final String? passengerPickupPoint;
-  final DateTime? passengerPickupTime;
-  final String? platformNumber;
-  final String? classOfService;
-  final String? tripCode;
-  final String? obReferenceNumber;
-  final int? numberOfSeats;
-  final String? bankTransactionNumber;
-  final String? busIdNumber;
-  final String? passengerCategory;
-  final PassengerInfo? passengerInfo;
-  final String? idCardType;
-  final String? idCardNumber;
-  final double? totalFare;
 
   BusTicket({
     this.corporation,
@@ -50,10 +27,32 @@ class BusTicket {
     this.idCardNumber,
     this.totalFare,
   });
+  final String? corporation;
+  final String? pnrNumber;
+  final DateTime? journeyDate;
+  final String? routeNo;
+  final String? serviceStartPlace;
+  final String? serviceEndPlace;
+  final String? serviceStartTime;
+  final String? passengerStartPlace;
+  final String? passengerEndPlace;
+  final String? passengerPickupPoint;
+  final DateTime? passengerPickupTime;
+  final String? platformNumber;
+  final String? classOfService;
+  final String? tripCode;
+  final String? obReferenceNumber;
+  final int? numberOfSeats;
+  final String? bankTransactionNumber;
+  final String? busIdNumber;
+  final String? passengerCategory;
+  final PassengerInfo? passengerInfo;
+  final String? idCardType;
+  final String? idCardNumber;
+  final double? totalFare;
 
   @override
-  String toString() {
-    return 'BusTicket(\n'
+  String toString() => 'BusTicket(\n'
         'Corporation: $corporation,\n'
         'PNR Number: $pnrNumber,\n'
         'Journey Date: $journeyDate,\n'
@@ -78,15 +77,9 @@ class BusTicket {
         'ID Card Number: $idCardNumber,\n'
         'Total Fare: $totalFare\n'
         ')';
-  }
 }
 
 class PassengerInfo {
-  final String name;
-  final int age;
-  final String type; // "Adult" or "Child"
-  final String gender;
-  final String seatNumber;
 
   PassengerInfo({
     required this.name,
@@ -95,17 +88,20 @@ class PassengerInfo {
     required this.gender,
     required this.seatNumber,
   });
+  final String name;
+  final int age;
+  final String type; // "Adult" or "Child"
+  final String gender;
+  final String seatNumber;
 
   @override
-  String toString() {
-    return 'PassengerInfo(\n'
+  String toString() => 'PassengerInfo(\n'
         'Name: $name,\n'
         'Age: $age,\n'
         'Type: $type,\n'
         'Gender: $gender,\n'
         'Seat Number: $seatNumber\n'
         ')';
-  }
 }
 
 BusTicket parseTicket(String text) {
@@ -139,7 +135,7 @@ BusTicket parseTicket(String text) {
     final hour = int.parse(timeParts[0]);
     final minute = int.parse(timeParts[1]);
     return DateTime(
-        year, month, day, hour, minute); // Construct DateTime object
+        year, month, day, hour, minute,); // Construct DateTime object
   }
 
   int parseAge(String text) {
@@ -154,7 +150,7 @@ BusTicket parseTicket(String text) {
   final pnrNumber = extractMatch(r'PNR Number\s*:\s*(\S+)', text);
   final journeyDate = parseDate(
       extractMatch(r'Date of Journey\s*:\s*(\d{2}/\d{2}/\d{4})', text)
-          .replaceAll('/', '-'));
+          .replaceAll('/', '-'),);
   final routeNo = extractMatch(r'Route No\s*:\s*(\S+)', text);
   final serviceStartPlace =
       extractMatch(r'Service Start Place\s*:\s*(.*)', text);
@@ -168,8 +164,8 @@ BusTicket parseTicket(String text) {
   final passengerPickupPoint =
       extractMatch(r'Passenger Pickup Point\s*:\s*(.*)', text);
   final passengerPickupTime = parseDateTime(extractMatch(
-          r'Passenger Pickup Time\s*:\s*(\d{2}/\d{2}/\d{4} \d{2}:\d{2})', text)
-      .replaceAll('/', '-'));
+          r'Passenger Pickup Time\s*:\s*(\d{2}/\d{2}/\d{4} \d{2}:\d{2})', text,)
+      .replaceAll('/', '-'),);
   final platformNumber = extractMatch(r'Platform Number\s*:\s*(\S+)', text);
   final classOfService = extractMatch(r'Class of Service\s*:\s*(.*)', text);
   final tripCode = extractMatch(r'Trip Code\s*:\s*(\S+)', text);
@@ -183,7 +179,7 @@ BusTicket parseTicket(String text) {
   final passengerCategory =
       extractMatch(r'Passenger category\s*:\s*(.*)', text);
   final passengerName = extractMatch(
-      r'Name\s+Age\s+Adult/Child\s+Gender\s+Seat No\.\n(.*)\s+\d+', text);
+      r'Name\s+Age\s+Adult/Child\s+Gender\s+Seat No\.\n(.*)\s+\d+', text,);
   final passengerAge = parseAge(text);
   final passengerType = extractMatch(r'Adult|Child', text);
   final passengerGender = extractMatch(r'(M|F)', text);
