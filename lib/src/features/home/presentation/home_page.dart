@@ -284,7 +284,7 @@ class _HomePageState extends State<HomePage> {
                       itemCount: _otherCards.length,
                       itemBuilder: (context, index) {
                         final card = _otherCards[index];
-                        return BuildTicketCardWidget(card: card);
+                        return TicketCardWidget(card: card);
                       },
                       separatorBuilder: (context, index) => const Divider(),
                     ),
