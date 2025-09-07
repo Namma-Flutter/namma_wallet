@@ -83,7 +83,7 @@ class _HomePageState extends State<HomePage> {
       if (!mounted) return;
       setState(() {
         _walletCards = data
-            .map((card) => WalletCard.fromJson(card as Map<String, dynamic>))
+            .map((card) => WalletCard.fromJson(card as Map<String, String?>))
             .toList();
         _isLoading = false;
       });

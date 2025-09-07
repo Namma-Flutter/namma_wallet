@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:namma_wallet/src/features/calendar/presentation/calendar_page.dart';
 import 'package:namma_wallet/src/features/home/presentation/home_page.dart';
+import 'package:namma_wallet/src/features/messages/presentation/messages_page.dart';
 import 'package:namma_wallet/src/features/profile/presentation/profile_page.dart';
 
 class NammaWalletApp extends StatefulWidget {
@@ -33,19 +34,26 @@ class _NammaWalletAppState extends State<NammaWalletApp> {
               NavigationDestination(
                 selectedIcon: Icon(Icons.calendar_month),
                 icon: Icon(Icons.calendar_month_outlined),
-                label: 'Calender',
+                label: 'Calendar',
+              ),
+              NavigationDestination(
+                selectedIcon: Icon(Icons.message),
+                icon: Icon(Icons.message_outlined),
+                label: 'Messages',
               ),
               NavigationDestination(
                 selectedIcon: Icon(Icons.person),
                 icon: Icon(Icons.person_outline),
-                label: 'Messages',
+                label: 'Profile',
               ),
             ],
           ),
           body: <Widget>[
             const HomePage(),
             const CalendarPage(),
+            const MessagesPage(),
             const ProfilePage(),
           ][currentPageIndex],
-        ),);
+        ),
+      );
 }
