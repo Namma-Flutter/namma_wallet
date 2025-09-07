@@ -12,6 +12,10 @@ Please ensure the following before submitting your PR:
 - [ ] **Model classes must be generated using [`dart_mappable`](https://pub.dev/packages/dart_mappable)**.  
   Do not hand-write `toJson` / `fromJson` or equality methods—always rely on code generation (`build_runner`).
 
+- [ ] **Follow [Conventional Commits](https://www.conventionalcommits.org/) and branch naming conventions.**  
+  Example commit: `feat: add login screen`  
+  Example branch: `feature/login-screen`
+
 - [ ] **Code is formatted** before committing.  
   Run `flutter format .` (or ensure your IDE does this automatically).
 
