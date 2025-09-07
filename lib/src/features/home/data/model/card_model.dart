@@ -1,7 +1,9 @@
 // Data model for our cards
 import 'dart:ui';
+import 'package:uuid/uuid.dart';
 
 class WalletCard {
+  final String id;
   final String type;
   final String? name;
   final String? brand;
@@ -16,7 +18,7 @@ class WalletCard {
     this.balance,
     this.number,
     required this.color,
-  });
+  }) : id = const Uuid().v4();
 
   factory WalletCard.fromJson(Map<String, dynamic> json) {
     return WalletCard(

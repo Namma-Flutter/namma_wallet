@@ -1,12 +1,10 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:add_to_google_wallet/widgets/add_to_google_wallet_button.dart';
 import 'package:card_stack_widget/card_stack_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
-import 'package:namma_wallet/models/tnstc_model.dart';
 import 'package:namma_wallet/src/core/widgets/snackbar_widget.dart';
 import 'package:namma_wallet/src/features/home/data/model/card_model.dart';
 import 'package:namma_wallet/src/features/home/data/model/other_card_model.dart';
@@ -16,7 +14,6 @@ import 'package:namma_wallet/src/features/pdf_extract/application/file_picker_se
 import 'package:namma_wallet/src/features/pdf_extract/application/pdf_service.dart';
 import 'package:namma_wallet/src/features/sms_extract/application/sms_service.dart';
 import 'package:namma_wallet/src/features/ticket_parser/application/tnstc_ticket_parser.dart';
-import 'package:namma_wallet/src/features/ticket_view/ticket_view.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -301,47 +298,48 @@ class _HomePageState extends State<HomePage> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(extractedText),
-                    FloatingActionButton.extended(
-                      onPressed: onSMSExtractPressed,
-                      label: const Text('SMS'),
+                    const FloatingActionButton.extended(
+                      // onPressed: onSMSExtractPressed,
+                      onPressed: null,
+                      label: Text('SMS'),
                     ),
-                    FloatingActionButton.extended(
-                      onPressed: onPDFExtractPressed,
-                      label: const Text('PDF'),
-                    ),
-                    if (busTicket != null)
-                      AddToGoogleWalletButton(
-                        pass: busTicket!,
-                        onError: (Object error) => _onError(context, error),
-                        onSuccess: () => _onSuccess(context),
-                        onCanceled: () => _onCanceled(context),
-                      ),
-                    ElevatedButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => TicketView(
-                                  ticket: TNSTCModel(
-                                      corporation:
-                                          staticTnstcJson['corporation']!,
-                                      service: staticTnstcJson['service']!,
-                                      pnrNo: staticTnstcJson['pnr_no']!,
-                                      from: staticTnstcJson['from']!,
-                                      to: staticTnstcJson['to']!,
-                                      tripCode: staticTnstcJson['trip_code']!,
-                                      journeyDate:
-                                          staticTnstcJson['journey_date']!,
-                                      time: staticTnstcJson['time']!,
-                                      seatNumbers: List<String>.from(
-                                          staticTnstcJson['seat_numbers']!),
-                                      ticketClass: staticTnstcJson['class']!,
-                                      boardingAt:
-                                          staticTnstcJson['boarding_at']!)),
-                            ),
-                          );
-                        },
-                        child: const Text('TicketView'))
+                    // FloatingActionButton.extended(
+                    //   onPressed: onPDFExtractPressed,
+                    //   label: const Text('PDF'),
+                    // ),
+                    // if (busTicket != null)
+                    //   AddToGoogleWalletButton(
+                    //     pass: busTicket!,
+                    //     onError: (Object error) => _onError(context, error),
+                    //     onSuccess: () => _onSuccess(context),
+                    //     onCanceled: () => _onCanceled(context),
+                    //   ),
+                    // ElevatedButton(
+                    //     onPressed: () {
+                    //       Navigator.push(
+                    //         context,
+                    //         MaterialPageRoute(
+                    //           builder: (context) => TicketView(
+                    //               ticket: TNSTCModel(
+                    //                   corporation:
+                    //                       staticTnstcJson['corporation']!,
+                    //                   service: staticTnstcJson['service']!,
+                    //                   pnrNo: staticTnstcJson['pnr_no']!,
+                    //                   from: staticTnstcJson['from']!,
+                    //                   to: staticTnstcJson['to']!,
+                    //                   tripCode: staticTnstcJson['trip_code']!,
+                    //                   journeyDate:
+                    //                       staticTnstcJson['journey_date']!,
+                    //                   time: staticTnstcJson['time']!,
+                    //                   seatNumbers: List<String>.from(
+                    //                       staticTnstcJson['seat_numbers']!),
+                    //                   ticketClass: staticTnstcJson['class']!,
+                    //                   boardingAt:
+                    //                       staticTnstcJson['boarding_at']!)),
+                    //         ),
+                    //       );
+                    //     },
+                    //     child: const Text('TicketView'))
                   ],
                 ),
               ),
