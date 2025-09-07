@@ -2,16 +2,13 @@
 // Top left has profile
 import 'dart:convert';
 
-import 'package:card_stack_widget/card_stack_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:namma_wallet/models/travel_model.dart';
 import 'package:namma_wallet/src/core/widgets/snackbar_widget.dart';
-import 'package:namma_wallet/src/features/home/data/model/card_model.dart';
 import 'package:namma_wallet/src/features/home/data/model/other_card_model.dart';
 import 'package:namma_wallet/src/features/home/presentation/widget/ticket_card_widget.dart';
-import 'package:namma_wallet/src/features/home/presentation/widget/wallet_card_widget.dart';
 import 'package:namma_wallet/src/features/pdf_extract/application/file_picker_service.dart';
 import 'package:namma_wallet/src/features/pdf_extract/application/pdf_service.dart';
 import 'package:namma_wallet/src/features/sms_extract/application/sms_service.dart';
@@ -25,7 +22,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  List<TravelModel> _travelTickets = [];
+  final List<TravelModel> _travelTickets = [];
   List<OtherCard> _otherCards = [];
   bool _isLoading = true;
   String extractedText = 'None';
@@ -79,13 +76,14 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> _loadTicketData() async {
     try {
-      final response = await rootBundle.loadString('assets/data/cards.json');
+      final response =
+          await rootBundle.loadString('assets/data/mocked_tickets.json');
       final data = await json.decode(response) as List;
       if (!mounted) return;
       setState(() {
-        _travelTickets = data
-            .map((card) => WalletCard.fromJson(card as Map<String, dynamic>))
-            .toList();
+        // _travelTickets = data
+        //     .map((card) => TravelModelMapper.fromJson(card as Map<String, dynamic>))
+        //     .toList();
         _isLoading = false;
       });
     } catch (e) {
@@ -150,13 +148,14 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final cardStackList = _travelTickets.map((card) {
-      return CardModel(
-        backgroundColor: card.color ?? Colors.grey,
-        radius: const Radius.circular(20),
-        shadowColor: Colors.black.withAlpha(20),
-        margin: EdgeInsets.zero,
-        child: WalletCardWidget(card: card),
-      );
+      // return CardModel(
+      //   backgroundColor: card.color ?? Colors.grey,
+      //   radius: const Radius.circular(20),
+      //   shadowColor: Colors.black.withAlpha(20),
+      //   margin: EdgeInsets.zero,
+      //   child: WalletCardWidget(card: card),
+      // );
+      return const SizedBox.shrink();
     }).toList();
 
     return Scaffold(
@@ -201,21 +200,22 @@ class _HomePageState extends State<HomePage> {
               else
                 _travelTickets.isEmpty
                     ? const Center(child: Text('No cards found.'))
-                    : SizedBox(
-                        height: 350,
-                        child: CardStackWidget(
-                          cardList: cardStackList,
-                          opacityChangeOnDrag: true,
-                          swipeOrientation: CardOrientation.both,
-                          cardDismissOrientation: CardOrientation.both,
-                          positionFactor: 3,
-                          scaleFactor: 1.5,
-                          alignment: Alignment.center,
-                          animateCardScale: true,
-                          dismissedCardDuration:
-                              const Duration(milliseconds: 150),
-                        ),
-                      ),
+                    // : SizedBox(
+                    //     height: 350,
+                    //     child: CardStackWidget(
+                    //       cardList: cardStackList,
+                    //       opacityChangeOnDrag: true,
+                    //       swipeOrientation: CardOrientation.both,
+                    //       cardDismissOrientation: CardOrientation.both,
+                    //       positionFactor: 3,
+                    //       scaleFactor: 1.5,
+                    //       alignment: Alignment.center,
+                    //       animateCardScale: true,
+                    //       dismissedCardDuration:
+                    //           const Duration(milliseconds: 150),
+                    //     ),
+                    //   ),
+                    : const SizedBox.shrink(),
               //* Other Cards Section
               Padding(
                 padding: const EdgeInsets.all(16),
