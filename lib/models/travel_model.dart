@@ -1,9 +1,9 @@
 import 'package:dart_mappable/dart_mappable.dart';
 
-part 'tnstc_model.mapper.dart';
+part 'travel_model.mapper.dart';
 
 @MappableClass()
-class TNSTCModel with TNSTCModelMappable {
+class TravelModel with TravelModelMappable {
   @MappableField(key: 'corporation')
   final String corporation;
 
@@ -37,7 +37,7 @@ class TNSTCModel with TNSTCModelMappable {
   @MappableField(key: 'boarding_at')
   final String boardingAt;
 
-  const TNSTCModel({
+  const TravelModel({
     required this.corporation,
     required this.service,
     required this.pnrNo,
@@ -50,5 +50,4 @@ class TNSTCModel with TNSTCModelMappable {
     required this.ticketClass,
     required this.boardingAt,
   });
-  
 }

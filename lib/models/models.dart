@@ -1,1 +1,1 @@
-export 'tnstc_model.dart';
+export 'travel_model.dart';

@@ -5,77 +5,77 @@
 // ignore_for_file: unused_element, unnecessary_cast, override_on_non_overriding_member
 // ignore_for_file: strict_raw_type, inference_failure_on_untyped_parameter
 
-part of 'tnstc_model.dart';
+part of 'travel_model.dart';
 
-class TNSTCModelMapper extends ClassMapperBase<TNSTCModel> {
-  TNSTCModelMapper._();
+class TravelModelMapper extends ClassMapperBase<TravelModel> {
+  TravelModelMapper._();
 
-  static TNSTCModelMapper? _instance;
-  static TNSTCModelMapper ensureInitialized() {
+  static TravelModelMapper? _instance;
+  static TravelModelMapper ensureInitialized() {
     if (_instance == null) {
-      MapperContainer.globals.use(_instance = TNSTCModelMapper._());
+      MapperContainer.globals.use(_instance = TravelModelMapper._());
     }
     return _instance!;
   }
 
   @override
-  final String id = 'TNSTCModel';
+  final String id = 'TravelModel';
 
-  static String _$corporation(TNSTCModel v) => v.corporation;
-  static const Field<TNSTCModel, String> _f$corporation = Field(
+  static String _$corporation(TravelModel v) => v.corporation;
+  static const Field<TravelModel, String> _f$corporation = Field(
     'corporation',
     _$corporation,
   );
-  static String _$service(TNSTCModel v) => v.service;
-  static const Field<TNSTCModel, String> _f$service = Field(
+  static String _$service(TravelModel v) => v.service;
+  static const Field<TravelModel, String> _f$service = Field(
     'service',
     _$service,
   );
-  static String _$pnrNo(TNSTCModel v) => v.pnrNo;
-  static const Field<TNSTCModel, String> _f$pnrNo = Field(
+  static String _$pnrNo(TravelModel v) => v.pnrNo;
+  static const Field<TravelModel, String> _f$pnrNo = Field(
     'pnrNo',
     _$pnrNo,
     key: r'pnr_no',
   );
-  static String _$from(TNSTCModel v) => v.from;
-  static const Field<TNSTCModel, String> _f$from = Field('from', _$from);
-  static String _$to(TNSTCModel v) => v.to;
-  static const Field<TNSTCModel, String> _f$to = Field('to', _$to);
-  static String _$tripCode(TNSTCModel v) => v.tripCode;
-  static const Field<TNSTCModel, String> _f$tripCode = Field(
+  static String _$from(TravelModel v) => v.from;
+  static const Field<TravelModel, String> _f$from = Field('from', _$from);
+  static String _$to(TravelModel v) => v.to;
+  static const Field<TravelModel, String> _f$to = Field('to', _$to);
+  static String _$tripCode(TravelModel v) => v.tripCode;
+  static const Field<TravelModel, String> _f$tripCode = Field(
     'tripCode',
     _$tripCode,
     key: r'trip_code',
   );
-  static String _$journeyDate(TNSTCModel v) => v.journeyDate;
-  static const Field<TNSTCModel, String> _f$journeyDate = Field(
+  static String _$journeyDate(TravelModel v) => v.journeyDate;
+  static const Field<TravelModel, String> _f$journeyDate = Field(
     'journeyDate',
     _$journeyDate,
     key: r'journey_date',
   );
-  static String _$time(TNSTCModel v) => v.time;
-  static const Field<TNSTCModel, String> _f$time = Field('time', _$time);
-  static List<String> _$seatNumbers(TNSTCModel v) => v.seatNumbers;
-  static const Field<TNSTCModel, List<String>> _f$seatNumbers = Field(
+  static String _$time(TravelModel v) => v.time;
+  static const Field<TravelModel, String> _f$time = Field('time', _$time);
+  static List<String> _$seatNumbers(TravelModel v) => v.seatNumbers;
+  static const Field<TravelModel, List<String>> _f$seatNumbers = Field(
     'seatNumbers',
     _$seatNumbers,
     key: r'seat_numbers',
   );
-  static String _$ticketClass(TNSTCModel v) => v.ticketClass;
-  static const Field<TNSTCModel, String> _f$ticketClass = Field(
+  static String _$ticketClass(TravelModel v) => v.ticketClass;
+  static const Field<TravelModel, String> _f$ticketClass = Field(
     'ticketClass',
     _$ticketClass,
     key: r'class',
   );
-  static String _$boardingAt(TNSTCModel v) => v.boardingAt;
-  static const Field<TNSTCModel, String> _f$boardingAt = Field(
+  static String _$boardingAt(TravelModel v) => v.boardingAt;
+  static const Field<TravelModel, String> _f$boardingAt = Field(
     'boardingAt',
     _$boardingAt,
     key: r'boarding_at',
   );
 
   @override
-  final MappableFields<TNSTCModel> fields = const {
+  final MappableFields<TravelModel> fields = const {
     #corporation: _f$corporation,
     #service: _f$service,
     #pnrNo: _f$pnrNo,
@@ -89,8 +89,8 @@ class TNSTCModelMapper extends ClassMapperBase<TNSTCModel> {
     #boardingAt: _f$boardingAt,
   };
 
-  static TNSTCModel _instantiate(DecodingData data) {
-    return TNSTCModel(
+  static TravelModel _instantiate(DecodingData data) {
+    return TravelModel(
       corporation: data.dec(_f$corporation),
       service: data.dec(_f$service),
       pnrNo: data.dec(_f$pnrNo),
@@ -108,62 +108,62 @@ class TNSTCModelMapper extends ClassMapperBase<TNSTCModel> {
   @override
   final Function instantiate = _instantiate;
 
-  static TNSTCModel fromMap(Map<String, dynamic> map) {
-    return ensureInitialized().decodeMap<TNSTCModel>(map);
+  static TravelModel fromMap(Map<String, dynamic> map) {
+    return ensureInitialized().decodeMap<TravelModel>(map);
   }
 
-  static TNSTCModel fromJson(String json) {
-    return ensureInitialized().decodeJson<TNSTCModel>(json);
+  static TravelModel fromJson(String json) {
+    return ensureInitialized().decodeJson<TravelModel>(json);
   }
 }
 
-mixin TNSTCModelMappable {
+mixin TravelModelMappable {
   String toJson() {
-    return TNSTCModelMapper.ensureInitialized().encodeJson<TNSTCModel>(
-      this as TNSTCModel,
+    return TravelModelMapper.ensureInitialized().encodeJson<TravelModel>(
+      this as TravelModel,
     );
   }
 
   Map<String, dynamic> toMap() {
-    return TNSTCModelMapper.ensureInitialized().encodeMap<TNSTCModel>(
-      this as TNSTCModel,
+    return TravelModelMapper.ensureInitialized().encodeMap<TravelModel>(
+      this as TravelModel,
     );
   }
 
-  TNSTCModelCopyWith<TNSTCModel, TNSTCModel, TNSTCModel> get copyWith =>
-      _TNSTCModelCopyWithImpl<TNSTCModel, TNSTCModel>(
-        this as TNSTCModel,
+  TravelModelCopyWith<TravelModel, TravelModel, TravelModel> get copyWith =>
+      _TravelModelCopyWithImpl<TravelModel, TravelModel>(
+        this as TravelModel,
         $identity,
         $identity,
       );
   @override
   String toString() {
-    return TNSTCModelMapper.ensureInitialized().stringifyValue(
-      this as TNSTCModel,
+    return TravelModelMapper.ensureInitialized().stringifyValue(
+      this as TravelModel,
     );
   }
 
   @override
   bool operator ==(Object other) {
-    return TNSTCModelMapper.ensureInitialized().equalsValue(
-      this as TNSTCModel,
+    return TravelModelMapper.ensureInitialized().equalsValue(
+      this as TravelModel,
       other,
     );
   }
 
   @override
   int get hashCode {
-    return TNSTCModelMapper.ensureInitialized().hashValue(this as TNSTCModel);
+    return TravelModelMapper.ensureInitialized().hashValue(this as TravelModel);
   }
 }
 
-extension TNSTCModelValueCopy<$R, $Out>
-    on ObjectCopyWith<$R, TNSTCModel, $Out> {
-  TNSTCModelCopyWith<$R, TNSTCModel, $Out> get $asTNSTCModel =>
-      $base.as((v, t, t2) => _TNSTCModelCopyWithImpl<$R, $Out>(v, t, t2));
+extension TravelModelValueCopy<$R, $Out>
+    on ObjectCopyWith<$R, TravelModel, $Out> {
+  TravelModelCopyWith<$R, TravelModel, $Out> get $asTravelModel =>
+      $base.as((v, t, t2) => _TravelModelCopyWithImpl<$R, $Out>(v, t, t2));
 }
 
-abstract class TNSTCModelCopyWith<$R, $In extends TNSTCModel, $Out>
+abstract class TravelModelCopyWith<$R, $In extends TravelModel, $Out>
     implements ClassCopyWith<$R, $In, $Out> {
   ListCopyWith<$R, String, ObjectCopyWith<$R, String, String>> get seatNumbers;
   $R call({
@@ -179,17 +179,17 @@ abstract class TNSTCModelCopyWith<$R, $In extends TNSTCModel, $Out>
     String? ticketClass,
     String? boardingAt,
   });
-  TNSTCModelCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
+  TravelModelCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
 
-class _TNSTCModelCopyWithImpl<$R, $Out>
-    extends ClassCopyWithBase<$R, TNSTCModel, $Out>
-    implements TNSTCModelCopyWith<$R, TNSTCModel, $Out> {
-  _TNSTCModelCopyWithImpl(super.value, super.then, super.then2);
+class _TravelModelCopyWithImpl<$R, $Out>
+    extends ClassCopyWithBase<$R, TravelModel, $Out>
+    implements TravelModelCopyWith<$R, TravelModel, $Out> {
+  _TravelModelCopyWithImpl(super.value, super.then, super.then2);
 
   @override
-  late final ClassMapperBase<TNSTCModel> $mapper =
-      TNSTCModelMapper.ensureInitialized();
+  late final ClassMapperBase<TravelModel> $mapper =
+      TravelModelMapper.ensureInitialized();
   @override
   ListCopyWith<$R, String, ObjectCopyWith<$R, String, String>>
   get seatNumbers => ListCopyWith(
@@ -226,7 +226,7 @@ class _TNSTCModelCopyWithImpl<$R, $Out>
     }),
   );
   @override
-  TNSTCModel $make(CopyWithData data) => TNSTCModel(
+  TravelModel $make(CopyWithData data) => TravelModel(
     corporation: data.get(#corporation, or: $value.corporation),
     service: data.get(#service, or: $value.service),
     pnrNo: data.get(#pnrNo, or: $value.pnrNo),
@@ -241,8 +241,8 @@ class _TNSTCModelCopyWithImpl<$R, $Out>
   );
 
   @override
-  TNSTCModelCopyWith<$R2, TNSTCModel, $Out2> $chain<$R2, $Out2>(
+  TravelModelCopyWith<$R2, TravelModel, $Out2> $chain<$R2, $Out2>(
     Then<$Out2, $R2> t,
-  ) => _TNSTCModelCopyWithImpl<$R2, $Out2>($value, $cast, t);
+  ) => _TravelModelCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }
 

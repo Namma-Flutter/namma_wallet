@@ -6,6 +6,7 @@ import 'package:card_stack_widget/card_stack_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:namma_wallet/models/travel_model.dart';
 import 'package:namma_wallet/src/core/widgets/snackbar_widget.dart';
 import 'package:namma_wallet/src/features/home/data/model/card_model.dart';
 import 'package:namma_wallet/src/features/home/data/model/other_card_model.dart';
@@ -24,7 +25,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  List<WalletCard> _walletCards = [];
+  List<TravelModel> _travelTickets = [];
   List<OtherCard> _otherCards = [];
   bool _isLoading = true;
   String extractedText = 'None';
@@ -33,7 +34,7 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    _loadCardData();
+    _loadTicketData();
     _loadOtherCardsData();
   }
 
@@ -76,13 +77,13 @@ class _HomePageState extends State<HomePage> {
     setState(() {});
   }
 
-  Future<void> _loadCardData() async {
+  Future<void> _loadTicketData() async {
     try {
       final response = await rootBundle.loadString('assets/data/cards.json');
       final data = await json.decode(response) as List;
       if (!mounted) return;
       setState(() {
-        _walletCards = data
+        _travelTickets = data
             .map((card) => WalletCard.fromJson(card as Map<String, dynamic>))
             .toList();
         _isLoading = false;
@@ -148,7 +149,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final cardStackList = _walletCards.map((card) {
+    final cardStackList = _travelTickets.map((card) {
       return CardModel(
         backgroundColor: card.color ?? Colors.grey,
         radius: const Radius.circular(20),
@@ -198,7 +199,7 @@ class _HomePageState extends State<HomePage> {
               if (_isLoading)
                 const Center(child: CircularProgressIndicator())
               else
-                _walletCards.isEmpty
+                _travelTickets.isEmpty
                     ? const Center(child: Text('No cards found.'))
                     : SizedBox(
                         height: 350,

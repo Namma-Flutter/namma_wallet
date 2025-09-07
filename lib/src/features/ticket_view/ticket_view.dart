@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:namma_wallet/models/models.dart';
+import 'package:namma_wallet/src/features/ticket_view/components/components.dart';
 import 'package:namma_wallet/styles/styles.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
-import '../../../models/models.dart';
-import 'components/components.dart';
-
 class TicketView extends StatefulWidget {
-  const TicketView({super.key, required this.ticket});
-  final TNSTCModel ticket;
+  const TicketView({required this.ticket, super.key});
+  final TravelModel ticket;
 
   @override
   State<TicketView> createState() => _TicketViewState();
@@ -16,7 +15,7 @@ class TicketView extends StatefulWidget {
 class _TicketViewState extends State<TicketView> {
   // Helper method to handle empty values
   String getValueOrDefault(String? value) {
-    return (value?.isEmpty ?? true) ? "--" : value!;
+    return (value?.isEmpty ?? true) ? '--' : value!;
   }
 
   @override
@@ -91,7 +90,7 @@ class _TicketViewState extends State<TicketView> {
                 TicketLabelValueWidget(
                     label: 'Seat Numbers',
                     value: widget.ticket.seatNumbers.isEmpty
-                        ? "--"
+                        ? '--'
                         : widget.ticket.seatNumbers.join(', ')),
                 const SizedBox(height: 16),
                 TicketLabelValueWidget(
@@ -121,8 +120,7 @@ class _TicketViewState extends State<TicketView> {
             child: Center(
               child: QrImageView(
                 data: getValueOrDefault(widget.ticket.pnrNo),
-                version: QrVersions.auto,
-                size: 200.0,
+                size: 200,
               ),
             ),
           )
