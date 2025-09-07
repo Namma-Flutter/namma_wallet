@@ -440,14 +440,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.0"
-  package_config:
-    dependency: transitive
-    description:
-      name: package_config
-      sha256: f096c55ebb7deb7e384101542bfba8c52696c1b56fca2eb62827989ef2353bbc
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.2.0"
   mobile_scanner:
     dependency: "direct main"
     description:
@@ -456,6 +448,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "7.0.1"
+  package_config:
+    dependency: transitive
+    description:
+      name: package_config
+      sha256: f096c55ebb7deb7e384101542bfba8c52696c1b56fca2eb62827989ef2353bbc
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.2.0"
   path:
     dependency: transitive
     description:
