@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
-
-import '../../../../styles/styles.dart';
+import 'package:namma_wallet/styles/styles.dart';
 
 class TicketLabelValueWidget extends StatelessWidget {
   const TicketLabelValueWidget(
-      {super.key,
-      required this.label,
+      {required this.label,
       required this.value,
+      super.key,
       this.alignment = CrossAxisAlignment.start});
 
   final String label;
@@ -18,8 +17,8 @@ class TicketLabelValueWidget extends StatelessWidget {
     return Column(
       crossAxisAlignment: alignment,
       children: [
-        Text(label, style: Paragraph02(color: Shades.s0).regular),
-        Text(value, style: HeadingH6(color: Shades.s0).semiBold),
+        Text(label, style: Paragraph02(color: Shades.s100).regular),
+        Text(value, style: HeadingH6(color: Shades.s100).semiBold),
       ],
     );
   }
@@ -27,9 +26,9 @@ class TicketLabelValueWidget extends StatelessWidget {
 
 class TicketRowWidget extends StatelessWidget {
   const TicketRowWidget(
-      {super.key,
-      required this.title1,
+      {required this.title1,
       required this.title2,
+      super.key,
       this.value1,
       this.value2});
 
@@ -47,7 +46,6 @@ class TicketRowWidget extends StatelessWidget {
           child: TicketLabelValueWidget(
             label: title1,
             value: value1 ?? '',
-            alignment: CrossAxisAlignment.start,
           ),
         ),
         Expanded(
@@ -63,7 +61,10 @@ class TicketRowWidget extends StatelessWidget {
 }
 
 class TicketFromToRowWidget extends StatelessWidget {
-  const TicketFromToRowWidget({super.key});
+  const TicketFromToRowWidget(
+      {required this.from, required this.to, super.key});
+  final String from;
+  final String to;
 
   @override
   Widget build(BuildContext context) {
@@ -75,10 +76,10 @@ class TicketFromToRowWidget extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('From', style: Paragraph02(color: Shades.s0).regular),
+              Text('From', style: Paragraph02(color: Shades.s100).regular),
               Text(
-                '--',
-                style: HeadingH6(color: Shades.s0).semiBold,
+                from.isNotEmpty ? from : '--',
+                style: HeadingH6(color: Shades.s100).semiBold,
                 textAlign: TextAlign.start,
                 overflow: TextOverflow.clip,
               ),
@@ -89,10 +90,10 @@ class TicketFromToRowWidget extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              Text('To', style: Paragraph02(color: Shades.s0).regular),
+              Text('To', style: Paragraph02(color: Shades.s100).regular),
               Text(
-                '--',
-                style: HeadingH6(color: Shades.s0).semiBold,
+                to.isNotEmpty ? to : '--',
+                style: HeadingH6(color: Shades.s100).semiBold,
               ),
             ],
           ),

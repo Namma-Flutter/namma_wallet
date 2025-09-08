@@ -57,7 +57,8 @@ class _TicketViewState extends State<TicketView> {
             margin: const EdgeInsets.only(top: 16, left: 16, right: 16),
             padding: const EdgeInsets.all(24),
             decoration: const BoxDecoration(
-              color: AppColor.periwinkleBlue,
+              // color: AppColor.periwinkleBlue,
+              color: Color(0xffE7FC57),
               borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(16),
                 topRight: Radius.circular(16),
@@ -71,7 +72,10 @@ class _TicketViewState extends State<TicketView> {
                   title2: getValueOrDefault(widget.ticket.service),
                 ),
                 const SizedBox(height: 16),
-                const TicketFromToRowWidget(),
+                TicketFromToRowWidget(
+                  from: widget.ticket.from,
+                  to: widget.ticket.to,
+                ),
                 const SizedBox(height: 16),
                 TicketRowWidget(
                   title1: 'Journey Date',
@@ -111,7 +115,8 @@ class _TicketViewState extends State<TicketView> {
             margin: const EdgeInsets.only(bottom: 16, left: 16, right: 16),
             padding: const EdgeInsets.all(24),
             decoration: const BoxDecoration(
-              color: AppColor.periwinkleBlue,
+              // color: AppColor.periwinkleBlue,
+              color: Color(0xffE7FC57),
               borderRadius: BorderRadius.only(
                 bottomLeft: Radius.circular(16),
                 bottomRight: Radius.circular(16),
