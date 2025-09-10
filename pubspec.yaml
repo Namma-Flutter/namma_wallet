@@ -26,6 +26,8 @@ dependencies:
   intl: ^0.19.0
   card_stack_widget: ^0.1.6
   mobile_scanner: ^7.0.1
+  flutter_gemma: ^0.10.5
+  
 
 dev_dependencies:
   build_runner: ^2.4.0
