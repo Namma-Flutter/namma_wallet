@@ -1,36 +1,69 @@
 import 'package:flutter/material.dart';
-import 'package:namma_wallet/src/features/home/data/model/other_card_model.dart';
+import 'package:namma_wallet/src/features/home/data/model/event_model.dart';
+import 'package:namma_wallet/styles/styles.dart';
 
-class TicketCardWidget extends StatelessWidget {
-  const TicketCardWidget({
+class EventCardWidget extends StatelessWidget {
+  const EventCardWidget({
+    required this.event,
     super.key,
-    required this.card,
   });
 
-  final OtherCard card;
+  final EventModel event;
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      leading: Icon(getIconData(card.icon), color: Colors.blue),
-      title: Text(card.title),
-      subtitle: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(card.subtitle),
-          const SizedBox(height: 4),
-          Text(card.date, style: TextStyle(color: Colors.grey[600])),
-        ],
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+          color: AppColor.secondaryColor,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          spacing: 12,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    //* Event title
+                    Text(
+                      event.eventName ?? 'xxx xxx',
+                      style: const TextStyle(color: AppColor.whiteColor),
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                    ),
+
+                    //* Date & Time
+                    Text(
+                      event.dateTime?.toString() ?? 'xxx xxx',
+                      style: const TextStyle(color: AppColor.whiteColor),
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                    ),
+                  ],
+                ),
+                //* Event icon
+                Icon(
+                  event.eventIcon,
+                  color: AppColor.whiteColor,
+                )
+              ],
+            ),
+            //* Address
+            Text(
+              event.venue ?? 'xxx xxx',
+              style: const TextStyle(color: AppColor.whiteColor),
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
+            ),
+          ],
+        ),
       ),
-      trailing: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(card.price, style: const TextStyle(fontWeight: FontWeight.bold)),
-          const SizedBox(width: 4),
-          const Icon(Icons.arrow_forward_ios, size: 14),
-        ],
-      ),
-      onTap: () {},
     );
   }
 }

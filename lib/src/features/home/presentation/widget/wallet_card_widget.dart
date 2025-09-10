@@ -1,6 +1,7 @@
 // A dedicated, reusable widget for rendering the content of a wallet card.
 import 'package:flutter/material.dart';
 import 'package:namma_wallet/models/travel_model.dart';
+import 'package:namma_wallet/src/features/home/presentation/widget/hilight_widget.dart';
 import 'package:namma_wallet/src/features/ticket_view/ticket_view.dart';
 
 class TravelTicketCard extends StatelessWidget {
@@ -17,7 +18,7 @@ class TravelTicketCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(30),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.25),
+              color: Colors.black.withAlpha(25),
               blurRadius: 8,
               spreadRadius: 1,
               offset: const Offset(0, 6),
@@ -129,8 +130,17 @@ class TravelTicketCard extends StatelessWidget {
 
           //*  See more action button
           Row(
-            mainAxisAlignment: MainAxisAlignment.end,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
+              //* Status
+              const Text(
+                'Confirmed',
+                style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                    color: Colors.black87),
+              ),
+
               //* See more button
               ElevatedButton(
                 onPressed: () {
@@ -154,39 +164,6 @@ class TravelTicketCard extends StatelessWidget {
             ],
           )
         ],
-      ),
-    );
-  }
-}
-
-class HighlightChipsWidget extends StatelessWidget {
-  const HighlightChipsWidget(
-      {required this.label, required this.bgColor, super.key, this.icon});
-  final Color bgColor;
-  final IconData? icon;
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(50), color: bgColor),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              icon,
-              size: 20,
-            ),
-            if (icon != null)
-              const SizedBox(
-                width: 5,
-              ),
-            Text(label),
-          ],
-        ),
       ),
     );
   }

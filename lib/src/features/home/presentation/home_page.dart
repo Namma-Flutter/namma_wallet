@@ -10,13 +10,14 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:namma_wallet/models/travel_model.dart';
 import 'package:namma_wallet/src/core/widgets/snackbar_widget.dart';
-import 'package:namma_wallet/src/features/home/data/model/other_card_model.dart';
+import 'package:namma_wallet/src/features/home/data/model/event_model.dart';
 import 'package:namma_wallet/src/features/home/presentation/widget/ticket_card_widget.dart';
 import 'package:namma_wallet/src/features/home/presentation/widget/wallet_card_widget.dart';
 import 'package:namma_wallet/src/features/pdf_extract/application/file_picker_service.dart';
 import 'package:namma_wallet/src/features/pdf_extract/application/pdf_service.dart';
 import 'package:namma_wallet/src/features/sms_extract/application/sms_service.dart';
 import 'package:namma_wallet/src/features/ticket_parser/application/tnstc_ticket_parser.dart';
+import 'package:namma_wallet/styles/styles.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -27,7 +28,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   List<TravelModel> _travelTickets = [];
-  List<OtherCard> _otherCards = [];
+  List<EventModel> _eventTickets = [];
   bool _isLoading = true;
   String extractedText = 'None';
   String? busTicket;
@@ -102,13 +103,14 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> _loadOtherCardsData() async {
     try {
-      final response =
-          await rootBundle.loadString('assets/data/other_cards.json');
+      final response = await rootBundle
+          .loadString('assets/data/event_tickets_mocked_data.json');
       final data = await json.decode(response) as List;
       if (!mounted) return;
       setState(() {
-        _otherCards = data
-            .map((card) => OtherCard.fromJson(card as Map<String, dynamic>))
+        _eventTickets = data
+            .map((card) =>
+                EventModelMapper.fromMap(card as Map<String, dynamic>))
             .toList();
       });
     } catch (e) {
@@ -167,33 +169,16 @@ class _HomePageState extends State<HomePage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Padding(
-                padding: const EdgeInsets.all(8),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        //* Tickets heading
-                        const Text(
-                          'Your tickets',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
-                          ),
-                        ),
-                        //* More button
-                        TextButton(
-                          onPressed: () {},
-                          child: const Text('Show More',
-                              style: TextStyle(color: Colors.blue)),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                  ],
+              userProfileWidget(),
+              const Padding(
+                padding: EdgeInsets.all(16),
+                child: Text(
+                  'Tickets',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
                 ),
               ),
 
@@ -221,44 +206,34 @@ class _HomePageState extends State<HomePage> {
                           ),
                         ),
                       ),
+
               //* Other Cards Section
               Padding(
                 padding: const EdgeInsets.all(16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const SizedBox(height: 16),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        //* Card title
-                        const Text(
-                          'Other Cards',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
-                          ),
-                        ),
-                        //* More button
-                        TextButton(
-                          onPressed: () {},
-                          child: const Text('Show More',
-                              style: TextStyle(color: Colors.blue)),
-                        ),
-                      ],
+                    //* Event heading
+                    const Text(
+                      'Events',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
                     ),
                     const SizedBox(height: 16),
                     //* More cards list view
-                    ListView.separated(
+                    ListView.builder(
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
-                      itemCount: _otherCards.length,
+                      itemCount: _eventTickets.length,
                       itemBuilder: (context, index) {
-                        final card = _otherCards[index];
-                        return TicketCardWidget(card: card);
+                        final event = _eventTickets[index];
+                        return EventCardWidget(
+                          event: event,
+                        );
                       },
-                      separatorBuilder: (context, index) => const Divider(),
                     ),
                   ],
                 ),
@@ -318,6 +293,38 @@ class _HomePageState extends State<HomePage> {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget userProfileWidget() {
+    return Padding(
+      padding: const EdgeInsets.only(top: 16, right: 16, left: 16),
+      child: Row(
+        spacing: 16,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          //* Name
+          const Expanded(
+            child: Text(
+              'Namma Wallet',
+              style: TextStyle(
+                  color: AppColor.blackColor,
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold),
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
+            ),
+          ),
+
+          //* Profile
+          CircleAvatar(
+            radius: 28,
+            backgroundImage: const NetworkImage(
+                'https://avatars.githubusercontent.com/u/583231?v=4'),
+            backgroundColor: Colors.grey[200],
+          ),
+        ],
       ),
     );
   }

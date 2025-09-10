@@ -4,6 +4,19 @@ part 'travel_model.mapper.dart';
 
 @MappableClass()
 class TravelModel with TravelModelMappable {
+  const TravelModel({
+    required this.corporation,
+    required this.service,
+    required this.pnrNo,
+    required this.from,
+    required this.to,
+    required this.tripCode,
+    required this.journeyDate,
+    required this.time,
+    required this.seatNumbers,
+    required this.ticketClass,
+    required this.boardingAt,
+  });
   @MappableField(key: 'corporation')
   final String corporation;
 
@@ -36,18 +49,4 @@ class TravelModel with TravelModelMappable {
 
   @MappableField(key: 'boarding_at')
   final String boardingAt;
-
-  const TravelModel({
-    required this.corporation,
-    required this.service,
-    required this.pnrNo,
-    required this.from,
-    required this.to,
-    required this.tripCode,
-    required this.journeyDate,
-    required this.time,
-    required this.seatNumbers,
-    required this.ticketClass,
-    required this.boardingAt,
-  });
 }
