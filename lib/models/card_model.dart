@@ -8,7 +8,6 @@ enum Type { event, busTicket, trainTicket, generic,none}
 class GenericDetailsModel {
  final String primaryText;
  final String secondaryText;
- final String? discription;
  final DateTime startTime;
  final DateTime? endTime;
  final String location;
@@ -21,15 +20,15 @@ class GenericDetailsModel {
     required this.location,
      this.type=Type.none,
     this.endTime,
-    this.extras,
-    this.discription
+    this.extras
   });
 
   GenericDetailsModel.fromTrainTicket(TNSTCModel ticket):
     primaryText='${ticket.from} → ${ticket.to}',
     secondaryText='${ticket.corporation} → ${ticket.service}',
     startTime=DateTime.parse(ticket.journeyDate),
+    endTime=DateTime.parse(ticket.journeyDate),  // + duration
     location=ticket.boardingAt,
     type=Type.trainTicket,
-    extras=ticket.toJson(); // to be fixed
+    extras={}; // to be fixed
 }
