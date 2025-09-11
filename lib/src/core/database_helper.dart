@@ -31,6 +31,7 @@ class DatabaseHelper {
       },
     );
   }
+  
 
   Future<void> _createSchema(Database db) async {
     // users table
