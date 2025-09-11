@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:namma_wallet/src/core/database_helper.dart';
+import 'package:namma_wallet/src/core/services/database_helper.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
