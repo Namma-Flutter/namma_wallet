@@ -273,13 +273,6 @@ class _HomePageState extends State<HomePage> {
                     //   onPressed: onPDFExtractPressed,
                     //   label: const Text('PDF'),
                     // ),
-                    // if (busTicket != null)
-                    //   AddToGoogleWalletButton(
-                    //     pass: busTicket!,
-                    //     onError: (Object error) => _onError(context, error),
-                    //     onSuccess: () => _onSuccess(context),
-                    //     onCanceled: () => _onCanceled(context),
-                    //   ),
                     // ElevatedButton(
                     //     onPressed: () {
                     //       Navigator.push(

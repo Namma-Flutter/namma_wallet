@@ -13,7 +13,6 @@ environment:
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
 dependencies:
-  add_to_google_wallet: ^0.0.5
   cupertino_icons: ^1.0.8
   dart_mappable: ^4.6.0
   file_picker: ^8.1.4
