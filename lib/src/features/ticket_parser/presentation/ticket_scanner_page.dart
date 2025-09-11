@@ -2,10 +2,13 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:namma_wallet/src/features/sms_extract/application/sms_service.dart';
 
 class ScannerScreen extends StatefulWidget {
+  const ScannerScreen({super.key});
+
   @override
-  _ScannerScreenState createState() => _ScannerScreenState();
+  State<ScannerScreen> createState() => _ScannerScreenState();
 }
 
 class _ScannerScreenState extends State<ScannerScreen> {
@@ -37,7 +40,7 @@ class _ScannerScreenState extends State<ScannerScreen> {
           children: [
             // Top navigation bar
             const Padding(
-              padding: EdgeInsets.all(16.0),
+              padding: EdgeInsets.all(16),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -168,7 +171,7 @@ class _ScannerScreenState extends State<ScannerScreen> {
 
   Widget _buildCameraScreen() {
     return Padding(
-      padding: const EdgeInsets.all(24.0),
+      padding: const EdgeInsets.all(24),
       child: Column(
         children: [
           Expanded(
@@ -404,7 +407,7 @@ class _ScannerScreenState extends State<ScannerScreen> {
 
   Widget _buildTextScreen() {
     return Padding(
-      padding: const EdgeInsets.all(24.0),
+      padding: const EdgeInsets.all(24),
       child: Column(
         children: [
           Expanded(
@@ -451,30 +454,36 @@ class _ScannerScreenState extends State<ScannerScreen> {
               const SizedBox(width: 12),
               ElevatedButton(
                 onPressed: _clearText,
-                child: const Icon(Icons.clear),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.red[100],
                   foregroundColor: Colors.red[800],
                   padding: const EdgeInsets.all(12),
                 ),
+                child: const Icon(Icons.clear),
               ),
             ],
           ),
           const SizedBox(height: 16),
-          Container(
-            width: double.infinity,
-            height: 50,
-            decoration: BoxDecoration(
-              color: Colors.blue,
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: const Center(
-              child: Text(
-                'Process Text',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
+          GestureDetector(
+            onTap: () {
+              final ticket = SMSService().parseTicket(textController.text);
+              print('Parsed Ticket: $ticket');
+            },
+            child: Container(
+              width: double.infinity,
+              height: 50,
+              decoration: BoxDecoration(
+                color: Colors.blue,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: const Center(
+                child: Text(
+                  'Process Text',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
               ),
             ),
@@ -486,7 +495,7 @@ class _ScannerScreenState extends State<ScannerScreen> {
 
   Widget _buildUploadScreen() {
     return Padding(
-      padding: const EdgeInsets.all(24.0),
+      padding: const EdgeInsets.all(24),
       child: Column(
         children: [
           Expanded(
@@ -623,9 +632,9 @@ class _ScannerScreenState extends State<ScannerScreen> {
   }
 
   void _onQRCodeDetected(BarcodeCapture capture) {
-    final List<Barcode> barcodes = capture.barcodes;
+    final barcodes = capture.barcodes;
     if (barcodes.isNotEmpty && barcodes.first.displayValue != null) {
-      final String scannedData = barcodes.first.displayValue!;
+      final scannedData = barcodes.first.displayValue!;
       if (qrResult != scannedData) {
         setState(() {
           qrResult = scannedData;
@@ -671,9 +680,9 @@ class _ScannerScreenState extends State<ScannerScreen> {
     cameraController.toggleTorch();
   }
 
-  void _pasteFromClipboard() async {
+  Future<void> _pasteFromClipboard() async {
     try {
-      ClipboardData? data = await Clipboard.getData('text/plain');
+      final data = await Clipboard.getData('text/plain');
       if (data != null && data.text != null) {
         setState(() {
           textController.text = data.text!;
@@ -691,15 +700,15 @@ class _ScannerScreenState extends State<ScannerScreen> {
     });
   }
 
-  void _pickFile() async {
+  Future<void> _pickFile() async {
     try {
-      FilePickerResult? result = await FilePicker.platform.pickFiles(
+      final result = await FilePicker.platform.pickFiles(
         type: FileType.custom,
         allowedExtensions: ['pdf', 'jpg', 'jpeg', 'png'],
       );
 
       if (result != null) {
-        PlatformFile file = result.files.first;
+        final file = result.files.first;
         setState(() {
           uploadedFileName = file.name;
         });

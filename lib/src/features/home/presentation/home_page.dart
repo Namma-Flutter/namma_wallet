@@ -14,7 +14,9 @@ import 'package:namma_wallet/src/features/home/presentation/widget/wallet_card_w
 import 'package:namma_wallet/src/features/pdf_extract/application/file_picker_service.dart';
 import 'package:namma_wallet/src/features/pdf_extract/application/pdf_service.dart';
 import 'package:namma_wallet/src/features/sms_extract/application/sms_service.dart';
-import 'package:namma_wallet/src/features/ticket_parser/application/tnstc_ticket_parser.dart';
+import 'package:namma_wallet/src/features/ticket_parser/tnstc/application/tnstc_ticket_parser.dart';
+import 'package:namma_wallet/src/features/ticket_parser/tnstc/domain/tnstc_model.dart';
+import 'package:namma_wallet/src/features/ticket_parser/tnstc/presentation/tnstc_ticket_widget.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -28,7 +30,7 @@ class _HomePageState extends State<HomePage> {
   List<OtherCard> _otherCards = [];
   bool _isLoading = true;
   String extractedText = 'None';
-  String? busTicket;
+  TNSTCTicketModel? busTicket;
 
   @override
   void initState() {
@@ -71,8 +73,8 @@ class _HomePageState extends State<HomePage> {
         'TNSTC Corporation:SETC , PNR NO.:T60856763 , From:CHENNAI-PT DR. M.G.R. BS To KUMBAKONAM , Trip Code:2300CHEKUMLB , Journey Date:10/01/2025 , Time:23:55 , Seat No.:4 UB, .Class:NON AC LOWER BIRTH SEATER , Boarding at:KOTTIVAKKAM(RTO OFFICE) . For e-Ticket: Download from View Ticket. Please carry your photo ID during journey. T&C apply. https://www.radiantinfo.com';
 
     busTicket = SMSService().parseTicket(ticket);
-    debugPrint(busTicket);
-    // extractedText = busTicket.toString();
+    debugPrint(busTicket.toString());
+    extractedText = busTicket.toString();
     setState(() {});
   }
 
@@ -118,33 +120,6 @@ class _HomePageState extends State<HomePage> {
     final formatter = DateFormat('EEEE, MMM, dd');
     return formatter.format(now);
   }
-
-  void _onError(BuildContext context, Object error) {
-    debugPrint(error.toString());
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        backgroundColor: Colors.red,
-        content: Text(error.toString()),
-      ),
-    );
-  }
-
-  void _onSuccess(BuildContext context) =>
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          backgroundColor: Colors.green,
-          content:
-              Text('Pass has been successfully added to the Google Wallet.'),
-        ),
-      );
-
-  void _onCanceled(BuildContext context) =>
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          backgroundColor: Colors.yellow,
-          content: Text('Adding a pass has been canceled.'),
-        ),
-      );
 
   @override
   Widget build(BuildContext context) {
@@ -257,17 +232,29 @@ class _HomePageState extends State<HomePage> {
                   ],
                 ),
               ),
+
+              // Display parsed ticket if available
+              if (busTicket != null) TNSTCTicketWidget(ticket: busTicket!),
+
               //* Action buttons section
               Padding(
                 padding: const EdgeInsets.all(16),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(extractedText),
-                    const FloatingActionButton.extended(
-                      // onPressed: onSMSExtractPressed,
-                      onPressed: null,
-                      label: Text('SMS'),
+                    Expanded(
+                      child: Text(
+                        busTicket != null
+                            ? 'Ticket parsed successfully!'
+                            : extractedText,
+                        style: const TextStyle(fontSize: 14),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    FloatingActionButton.extended(
+                      onPressed: onSMSExtractPressed,
+                      label: const Text('SMS'),
                     ),
                     // FloatingActionButton.extended(
                     //   onPressed: onPDFExtractPressed,
