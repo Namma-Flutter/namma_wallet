@@ -13,7 +13,7 @@ class GenericDetailsModel {
   final DateTime? endTime;
   final String location;
   final Extras? extras;
-  final List<Tags>? tags;
+  final List<Tag>? tags;
   GenericDetailsModel(
       {required this.primaryText,
       required this.secondaryText,
@@ -25,17 +25,17 @@ class GenericDetailsModel {
       this.extras});
 
   GenericDetailsModel.fromTrainTicket(TNSTCModel ticket)
-      : primaryText = 'ticket.pnrNo',
+      : primaryText = '${ticket.pnrNo}',
         secondaryText = '${ticket.from} → ${ticket.to}',
         startTime = DateTime.parse(ticket.journeyDate),
-        endTime = DateTime.parse(ticket.journeyDate), //todo: + duration
+        endTime = DateTime.parse(ticket.journeyDate), // + duration
         location = ticket.boardingAt,
         type = EntryType.trainTicket,
         tags=[  
-          Tags(value: ticket.tripCode, icon: Icons.confirmation_number),
-          Tags(value: ticket.pnrNo, icon: Icons.train),
-          Tags(value: ticket.time, icon: Icons.access_time),
-          Tags(value: ticket.seatNumbers.join(' | '), icon: Icons.event_seat),
+          Tag(value: ticket.tripCode, icon: Icons.confirmation_number),
+          Tag(value: ticket.pnrNo, icon: Icons.train),
+          Tag(value: ticket.time, icon: Icons.access_time),
+          Tag(value: ticket.seatNumbers.join(', '), icon: Icons.event_seat),
         ],
         extras = null; // to be filled by all the other details
 
@@ -55,7 +55,7 @@ class GenericDetailsModel {
         },
         tags = json['tags'] != null
             ? (json['tags'] as List)
-                .map((e) => Tags.fromJson(e as Map<String, dynamic>))
+                .map((e) => Tag.fromJson(e as Map<String, dynamic>))
                 .toList()
             : null,
         extras = json['extras'] != null
@@ -63,12 +63,12 @@ class GenericDetailsModel {
             : null;
 }
 
-class Tags {
-  Tags({required this.value, this.icon});
+class Tag {
+  Tag({required this.value, this.icon});
   final IconData? icon; 
   final String value;
 
-  Tags.fromJson(Map<String, dynamic> json)
+  Tag.fromJson(Map<String, dynamic> json)
       : icon = switch (json['icon']) {
           'location' => Icons.location_on,
           'duration' => Icons.access_time,
