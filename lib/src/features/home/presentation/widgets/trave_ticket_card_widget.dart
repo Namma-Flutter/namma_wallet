@@ -1,8 +1,10 @@
 // A dedicated, reusable widget for rendering the content of a wallet card.
 import 'package:flutter/material.dart';
+import 'package:namma_wallet/src/core/helper/date_time_converter.dart';
 import 'package:namma_wallet/src/features/home/data/model/generic_details_model.dart';
 import 'package:namma_wallet/src/features/home/presentation/widgets/hilight_widget.dart';
 import 'package:namma_wallet/src/features/ticket_view/ticket_view.dart';
+import 'package:namma_wallet/src/features/ticket_view/widgets/ticket_view_widget.dart';
 import 'package:namma_wallet/styles/styles.dart';
 
 class TravelTicketCardWidget extends StatelessWidget {
@@ -37,77 +39,51 @@ class TravelTicketCardWidget extends StatelessWidget {
             children: [
               //* Service profile
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                spacing: 10,
                 children: [
-                  Row(
-                    spacing: 10,
-                    children: [
-                      //* Service logo
-                      CircleAvatar(
-                          radius: 20,
-                          backgroundColor: AppColor.whiteColor,
-                          child: Icon(ticket.type == EntryType.busTicket
-                              ? ticket.type == EntryType.busTicket
-                                  ? Icons.airport_shuttle_outlined
-                                  : Icons.badge_outlined
-                              : Icons.tram_outlined)),
+                  //* Service icon
+                  CircleAvatar(
+                      radius: 20,
+                      backgroundColor: AppColor.whiteColor,
+                      child: Icon(ticket.type == EntryType.busTicket
+                          ? ticket.type == EntryType.busTicket
+                              ? Icons.airport_shuttle_outlined
+                              : Icons.badge_outlined
+                          : Icons.tram_outlined)),
 
-                      //* Secondary text
-                      Text(ticket.secondaryText),
-
-                      //* Serive name
-                      // Text(
-                      //   ticket.service,
-                      //   style: const TextStyle(
-                      //       fontSize: 20,
-                      //       fontWeight: FontWeight.w500,
-                      //       color: Colors.black45),
-                      //   overflow: TextOverflow.ellipsis,
-                      //   maxLines: 1,
-                      // ),
-                    ],
+                  //* Secondary text
+                  Flexible(
+                    child: Text(
+                      ticket.secondaryText.isNotEmpty
+                          ? ticket.secondaryText
+                          : 'xxx xxx',
+                      style: Paragraph02(color: Shades.s100).regular,
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                    ),
                   ),
-
-                  //* Passanger count
-                  // HighlightChipsWidget(
-                  //   bgColor: const Color(0xffCADC56),
-                  //   label: ticket.seatNumbers.length.toString(),
-                  //   icon: Icons.people_outlined,
-                  // ),
                 ],
               ),
 
-              //* From and To - Trip
-              Wrap(
-                crossAxisAlignment: WrapCrossAlignment.center,
-                children: [
-                  //* From
-                  Text(
-                    ticket.primaryText,
-                    style: const TextStyle(
-                        fontSize: 25,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black54),
-                  ),
+              //* From to To
+              if (ticket.primaryText.isNotEmpty)
+                Text(
+                  ticket.primaryText,
+                  style: const TextStyle(
+                      fontSize: 25,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black54),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
 
-                  // //* Arrow Icon
-                  // const Icon(Icons.arrow_forward_outlined,
-                  //     color: Colors.black54),
-
-                  // //* To
-                  // Text(
-                  //   ticket.to,
-                  //   style: const TextStyle(
-                  //       fontSize: 25,
-                  //       fontWeight: FontWeight.bold,
-                  //       color: Colors.black54),
-                  // ),
-                ],
+              //* Date - Time
+              TicketRowWidget(
+                title1: 'Journey Date',
+                title2: 'Time',
+                value1: getTime(ticket.startTime),
+                value2: getDate(ticket.startTime),
               ),
-
-              Text(ticket.startTime.toString()),
-              if (ticket.endTime != null) Text(ticket.endTime.toString()),
-              Text(ticket.location),
 
               //* Highlights
               if (ticket.tags != null && ticket.tags!.isNotEmpty)
@@ -115,32 +91,11 @@ class TravelTicketCardWidget extends StatelessWidget {
                   spacing: 10,
                   runSpacing: 8,
                   children: [
-                    ...ticket.tags!.map((tag) => HighlightChipsWidget(
+                    ...ticket.tags!.take(2).map((tag) => HighlightChipsWidget(
                           bgColor: const Color(0xffCADC56),
                           label: tag.value ?? 'xxx',
                           icon: tag.iconData ?? Icons.star_border_rounded,
                         ))
-
-                    // //* PNR no.
-                    // HighlightChipsWidget(
-                    //   bgColor: const Color(0xffCADC56),
-                    //   label: ticket.pnrNo,
-                    //   icon: Icons.train,
-                    // ),
-
-                    // //* Date
-                    // HighlightChipsWidget(
-                    //   bgColor: const Color(0xffCADC56),
-                    //   label: ticket.journeyDate,
-                    //   icon: Icons.calendar_month_outlined,
-                    // ),
-
-                    // //* Time
-                    // HighlightChipsWidget(
-                    //   bgColor: const Color(0xffCADC56),
-                    //   label: ticket.time,
-                    //   icon: Icons.access_time_outlined,
-                    // ),
                   ],
                 ),
             ],
@@ -148,15 +103,27 @@ class TravelTicketCardWidget extends StatelessWidget {
 
           //*  See more action button
           Row(
+            spacing: 15,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              //* Status
-              const Text(
-                'Confirmed',
-                style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                    color: Colors.black87),
+              //* Location
+              Expanded(
+                child: Row(
+                  children: [
+                    const Icon(Icons.location_on_outlined),
+                    Expanded(
+                      child: Text(
+                        ticket.location,
+                        style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                            color: Colors.black87),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                      ),
+                    ),
+                  ],
+                ),
               ),
 
               //* See more button
