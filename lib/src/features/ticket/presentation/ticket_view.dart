@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:namma_wallet/styles/styles.dart';
+import 'package:namma_wallet/src/core/styles/styles.dart';
+import 'package:namma_wallet/src/features/ticket/presentation/widgets/custom_ticket_shape_line.dart';
+import 'package:namma_wallet/src/features/ticket/presentation/widgets/ticket_view_components.dart';
+import 'package:namma_wallet/src/features/tnstc/domain/tnstc_model.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
-import '../../../models/models.dart';
-import 'components/components.dart';
-
 class TicketView extends StatefulWidget {
-  const TicketView({super.key, required this.ticket});
-  final TNSTCModel ticket;
+  const TicketView({required this.ticket, super.key});
+  final TNSTCTicketModel ticket;
 
   @override
   State<TicketView> createState() => _TicketViewState();
@@ -16,7 +16,7 @@ class TicketView extends StatefulWidget {
 class _TicketViewState extends State<TicketView> {
   // Helper method to handle empty values
   String getValueOrDefault(String? value) {
-    return (value?.isEmpty ?? true) ? "--" : value!;
+    return (value?.isEmpty ?? true) ? '--' : value!;
   }
 
   @override
@@ -69,38 +69,47 @@ class _TicketViewState extends State<TicketView> {
               children: [
                 TicketRowWidget(
                   title1: getValueOrDefault(widget.ticket.corporation),
-                  title2: getValueOrDefault(widget.ticket.service),
+                  title2: getValueOrDefault(widget.ticket.routeNo),
                 ),
                 const SizedBox(height: 16),
-                const TicketFromToRowWidget(),
+                TicketFromToRowWidget(
+                  fromLocation: widget.ticket.displayFrom,
+                  toLocation: widget.ticket.displayTo,
+                ),
                 const SizedBox(height: 16),
                 TicketRowWidget(
                   title1: 'Journey Date',
-                  title2: 'Time',
-                  value1: getValueOrDefault(widget.ticket.journeyDate),
-                  value2: getValueOrDefault(widget.ticket.time),
+                  title2: 'Service Time',
+                  value1: widget.ticket.displayDate,
+                  value2: getValueOrDefault(widget.ticket.serviceStartTime),
                 ),
                 const SizedBox(height: 16),
                 TicketRowWidget(
                   title1: 'PNR No.',
                   title2: 'Trip Code',
-                  value1: getValueOrDefault(widget.ticket.pnrNo),
+                  value1: widget.ticket.displayPnr,
                   value2: getValueOrDefault(widget.ticket.tripCode),
                 ),
                 const SizedBox(height: 16),
                 TicketLabelValueWidget(
                     label: 'Seat Numbers',
                     value: widget.ticket.seatNumbers.isEmpty
-                        ? "--"
-                        : widget.ticket.seatNumbers.join(', ')),
+                        ? '--'
+                        : widget.ticket.seatNumbers),
                 const SizedBox(height: 16),
                 TicketLabelValueWidget(
-                    label: 'Class',
-                    value: getValueOrDefault(widget.ticket.ticketClass)),
+                    label: 'Class', value: widget.ticket.displayClass),
                 const SizedBox(height: 16),
                 TicketLabelValueWidget(
-                    label: 'Boarding At',
-                    value: getValueOrDefault(widget.ticket.boardingAt)),
+                    label: 'Boarding Point',
+                    value: getValueOrDefault(widget.ticket.boardingPoint)),
+                const SizedBox(height: 16),
+                TicketRowWidget(
+                  title1: 'Total Fare',
+                  title2: 'Passengers',
+                  value1: widget.ticket.displayFare,
+                  value2: widget.ticket.numberOfSeats?.toString() ?? '1',
+                ),
               ],
             ),
           ),
@@ -120,9 +129,8 @@ class _TicketViewState extends State<TicketView> {
             ),
             child: Center(
               child: QrImageView(
-                data: getValueOrDefault(widget.ticket.pnrNo),
-                version: QrVersions.auto,
-                size: 200.0,
+                data: widget.ticket.displayPnr,
+                size: 200,
               ),
             ),
           )

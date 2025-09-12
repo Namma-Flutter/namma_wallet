@@ -1,4 +1,4 @@
-import 'package:namma_wallet/src/features/ticket_parser/tnstc/application/tnstc_ticket_parser.dart';
+import 'package:namma_wallet/src/features/tnstc/application/tnstc_ticket_parser.dart';
 
 class TNSTCSMSParser {
   static TNSTCTicket parseTicket(String smsText) {

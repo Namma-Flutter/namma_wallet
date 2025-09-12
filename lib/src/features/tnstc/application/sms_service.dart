@@ -1,6 +1,6 @@
-import 'package:namma_wallet/src/features/ticket_parser/tnstc/application/tnstc_sms_parser.dart';
-import 'package:namma_wallet/src/features/ticket_parser/tnstc/application/tnstc_ticket_parser.dart' as old_parser;
-import 'package:namma_wallet/src/features/ticket_parser/tnstc/domain/tnstc_model.dart';
+import 'package:namma_wallet/src/features/tnstc/application/tnstc_sms_parser.dart';
+import 'package:namma_wallet/src/features/tnstc/application/tnstc_ticket_parser.dart' as old_parser;
+import 'package:namma_wallet/src/features/tnstc/domain/tnstc_model.dart';
 
 class SMSService {
   TNSTCTicketModel parseTicket(String text) {

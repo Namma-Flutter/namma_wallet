@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:namma_wallet/src/features/sms_extract/application/sms_service.dart';
-import 'package:namma_wallet/src/features/ticket_parser/tnstc/application/tnstc_pdf_parser.dart';
-import 'package:namma_wallet/src/features/ticket_parser/tnstc/application/tnstc_sms_parser.dart';
+import 'package:namma_wallet/src/features/tnstc/application/sms_service.dart';
+import 'package:namma_wallet/src/features/tnstc/application/tnstc_pdf_parser.dart';
+import 'package:namma_wallet/src/features/tnstc/application/tnstc_sms_parser.dart';
 
 void main() {
   group('TNSTC SMS Parser Tests', () {

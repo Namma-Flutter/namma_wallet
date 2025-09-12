@@ -3,18 +3,18 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
-import 'package:namma_wallet/src/features/pdf_extract/application/pdf_service.dart';
-import 'package:namma_wallet/src/features/sms_extract/application/sms_service.dart';
-import 'package:namma_wallet/src/features/ticket_parser/tnstc/application/tnstc_pdf_parser.dart';
+import 'package:namma_wallet/src/features/tnstc/application/pdf_service.dart';
+import 'package:namma_wallet/src/features/tnstc/application/sms_service.dart';
+import 'package:namma_wallet/src/features/tnstc/application/tnstc_pdf_parser.dart';
 
-class ScannerScreen extends StatefulWidget {
-  const ScannerScreen({super.key});
+class ScannerView extends StatefulWidget {
+  const ScannerView({super.key});
 
   @override
-  State<ScannerScreen> createState() => _ScannerScreenState();
+  State<ScannerView> createState() => _ScannerViewState();
 }
 
-class _ScannerScreenState extends State<ScannerScreen> {
+class _ScannerViewState extends State<ScannerView> {
   int currentIndex = 0;
   MobileScannerController cameraController = MobileScannerController();
   TextEditingController textController = TextEditingController();
@@ -617,16 +617,17 @@ class _ScannerScreenState extends State<ScannerScreen> {
                   // Extract PDF text using Syncfusion
                   final pdfFile = File(uploadedFilePath!);
                   final extractedText = PDFService().extractTextFrom(pdfFile);
-                  
+
                   // Parse ticket using extracted text
                   final ticket = TNSTCPDFParser.parseTicket(extractedText);
                   print('Extracted Text: $extractedText');
                   print('Parsed Ticket: $ticket');
-                  
+
                   // Show success message
                   if (mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('PDF processed successfully!')),
+                      const SnackBar(
+                          content: Text('PDF processed successfully!')),
                     );
                   }
                 } catch (e) {

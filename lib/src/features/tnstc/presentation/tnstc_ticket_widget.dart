@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:namma_wallet/src/features/ticket_parser/tnstc/domain/tnstc_model.dart';
+import 'package:namma_wallet/src/features/tnstc/domain/tnstc_model.dart';
 
 class TNSTCTicketWidget extends StatelessWidget {
   const TNSTCTicketWidget({

@@ -46,10 +46,6 @@ class InterFonts {
 }
 
 class Display01 {
-  Color color;
-  late TextStyle semiBold;
-  late TextStyle bold;
-  late TextStyle extraBold;
 
   Display01({required this.color}) {
     semiBold = InterFonts.getAppFont(
@@ -74,13 +70,13 @@ class Display01 {
       color: color,
     );
   }
-}
-
-class Display02 {
   Color color;
   late TextStyle semiBold;
   late TextStyle bold;
   late TextStyle extraBold;
+}
+
+class Display02 {
 
   Display02({required this.color}) {
     semiBold = InterFonts.getAppFont(
@@ -105,13 +101,13 @@ class Display02 {
       color: color,
     );
   }
-}
-
-class HeadingH1 {
   Color color;
   late TextStyle semiBold;
   late TextStyle bold;
   late TextStyle extraBold;
+}
+
+class HeadingH1 {
 
   HeadingH1({required this.color}) {
     semiBold = InterFonts.getAppFont(
@@ -136,13 +132,13 @@ class HeadingH1 {
       color: color,
     );
   }
-}
-
-class HeadingH1Small {
   Color color;
   late TextStyle semiBold;
   late TextStyle bold;
   late TextStyle extraBold;
+}
+
+class HeadingH1Small {
 
   HeadingH1Small({required this.color}) {
     semiBold = InterFonts.getAppFont(
@@ -167,13 +163,13 @@ class HeadingH1Small {
       color: color,
     );
   }
-}
-
-class HeadingH2 {
   Color color;
   late TextStyle semiBold;
   late TextStyle bold;
   late TextStyle extraBold;
+}
+
+class HeadingH2 {
 
   HeadingH2({required this.color}) {
     semiBold = InterFonts.getAppFont(
@@ -198,13 +194,13 @@ class HeadingH2 {
       color: color,
     );
   }
-}
-
-class HeadingH2Small {
   Color color;
   late TextStyle semiBold;
   late TextStyle bold;
   late TextStyle extraBold;
+}
+
+class HeadingH2Small {
 
   HeadingH2Small({required this.color}) {
     semiBold = InterFonts.getAppFont(
@@ -229,13 +225,13 @@ class HeadingH2Small {
       color: color,
     );
   }
-}
-
-class HeadingH3 {
   Color color;
   late TextStyle semiBold;
   late TextStyle bold;
   late TextStyle extraBold;
+}
+
+class HeadingH3 {
 
   HeadingH3({required this.color}) {
     semiBold = InterFonts.getAppFont(
@@ -260,13 +256,13 @@ class HeadingH3 {
       color: color,
     );
   }
-}
-
-class HeadingH3Small {
   Color color;
   late TextStyle semiBold;
   late TextStyle bold;
   late TextStyle extraBold;
+}
+
+class HeadingH3Small {
 
   HeadingH3Small({required this.color}) {
     semiBold = InterFonts.getAppFont(
@@ -291,13 +287,13 @@ class HeadingH3Small {
       color: color,
     );
   }
-}
-
-class HeadingH4 {
   Color color;
   late TextStyle semiBold;
   late TextStyle bold;
   late TextStyle extraBold;
+}
+
+class HeadingH4 {
 
   HeadingH4({required this.color}) {
     semiBold = InterFonts.getAppFont(
@@ -322,13 +318,13 @@ class HeadingH4 {
       color: color,
     );
   }
-}
-
-class HeadingH4Small {
   Color color;
   late TextStyle semiBold;
   late TextStyle bold;
   late TextStyle extraBold;
+}
+
+class HeadingH4Small {
 
   HeadingH4Small({required this.color}) {
     semiBold = InterFonts.getAppFont(
@@ -353,13 +349,13 @@ class HeadingH4Small {
       color: color,
     );
   }
-}
-
-class HeadingH5 {
   Color color;
   late TextStyle semiBold;
   late TextStyle bold;
   late TextStyle extraBold;
+}
+
+class HeadingH5 {
 
   HeadingH5({required this.color}) {
     semiBold = InterFonts.getAppFont(
@@ -384,13 +380,13 @@ class HeadingH5 {
       color: color,
     );
   }
-}
-
-class HeadingH5Small {
   Color color;
   late TextStyle semiBold;
   late TextStyle bold;
   late TextStyle extraBold;
+}
+
+class HeadingH5Small {
 
   HeadingH5Small({required this.color}) {
     semiBold = InterFonts.getAppFont(
@@ -415,14 +411,13 @@ class HeadingH5Small {
       color: color,
     );
   }
-}
-
-class HeadingH6 {
   Color color;
   late TextStyle semiBold;
   late TextStyle bold;
   late TextStyle extraBold;
-  late TextStyle regular;
+}
+
+class HeadingH6 {
 
   HeadingH6({required this.color}) {
     regular = InterFonts.getAppFont(
@@ -454,13 +449,14 @@ class HeadingH6 {
       color: color,
     );
   }
-}
-
-class HeadingH6Small {
   Color color;
   late TextStyle semiBold;
   late TextStyle bold;
   late TextStyle extraBold;
+  late TextStyle regular;
+}
+
+class HeadingH6Small {
 
   HeadingH6Small({required this.color}) {
     semiBold = InterFonts.getAppFont(
@@ -485,12 +481,13 @@ class HeadingH6Small {
       color: color,
     );
   }
+  Color color;
+  late TextStyle semiBold;
+  late TextStyle bold;
+  late TextStyle extraBold;
 }
 
 class SubHeading {
-  Color color;
-  late TextStyle regular;
-  late TextStyle semiBold;
 
   SubHeading({required this.color}) {
     regular = InterFonts.getAppFont(
@@ -506,12 +503,12 @@ class SubHeading {
       color: color,
     );
   }
-}
-
-class Paragraph01 {
   Color color;
   late TextStyle regular;
   late TextStyle semiBold;
+}
+
+class Paragraph01 {
 
   Paragraph01({required this.color}) {
     regular = InterFonts.getAppFont(
@@ -527,12 +524,12 @@ class Paragraph01 {
       color: color,
     );
   }
-}
-
-class Paragraph02 {
   Color color;
   late TextStyle regular;
   late TextStyle semiBold;
+}
+
+class Paragraph02 {
 
   Paragraph02({required this.color}) {
     regular = InterFonts.getAppFont(
@@ -548,14 +545,12 @@ class Paragraph02 {
       color: color,
     );
   }
-}
-
-class Paragraph03 {
   Color color;
   late TextStyle regular;
   late TextStyle semiBold;
-  TextDecoration? decoration;
-  Color? decorationColor;
+}
+
+class Paragraph03 {
 
   Paragraph03({required this.color, this.decoration, this.decorationColor}) {
     regular = InterFonts.getAppFont(
@@ -573,13 +568,14 @@ class Paragraph03 {
         color: color,
         decoration: decoration);
   }
-}
-
-class Caption {
   Color color;
   late TextStyle regular;
   late TextStyle semiBold;
-  late TextStyle semiBoldCaps;
+  TextDecoration? decoration;
+  Color? decorationColor;
+}
+
+class Caption {
 
   Caption({required this.color}) {
     regular = InterFonts.getAppFont(
@@ -602,12 +598,13 @@ class Caption {
       color: color,
     );
   }
-}
-
-class Footer {
   Color color;
   late TextStyle regular;
   late TextStyle semiBold;
+  late TextStyle semiBoldCaps;
+}
+
+class Footer {
 
   Footer({required this.color}) {
     regular = InterFonts.getAppFont(
@@ -625,4 +622,7 @@ class Footer {
       color: color,
     );
   }
+  Color color;
+  late TextStyle regular;
+  late TextStyle semiBold;
 }

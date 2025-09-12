@@ -72,3 +72,11 @@ Key packages:
 - Uses `flutter_lints` for linting rules
 - Standard Flutter/Dart conventions
 - Analysis options configured in `analysis_options.yaml`
+
+### Naming Conventions
+- **Views**: Use "view" suffix for main/page widgets (e.g., `HomeView`, `TicketListView`)
+  - File naming: `home_view.dart`, `ticket_list_view.dart`
+  - Class naming: `class HomeView extends StatefulWidget`
+- **Widgets**: Use "widget" suffix for smaller reusable components (e.g., `TicketCardWidget`, `ButtonWidget`)
+  - File naming: `ticket_card_widget.dart`, `button_widget.dart`
+  - Class naming: `class TicketCardWidget extends StatelessWidget`

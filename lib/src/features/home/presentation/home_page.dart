@@ -7,16 +7,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:namma_wallet/src/core/widgets/snackbar_widget.dart';
-import 'package:namma_wallet/src/features/home/data/model/card_model.dart';
-import 'package:namma_wallet/src/features/home/data/model/other_card_model.dart';
+import 'package:namma_wallet/src/features/common/file_picker_service.dart';
+import 'package:namma_wallet/src/features/home/domain/card_model.dart';
+import 'package:namma_wallet/src/features/home/domain/other_card_model.dart';
 import 'package:namma_wallet/src/features/home/presentation/widget/ticket_card_widget.dart';
 import 'package:namma_wallet/src/features/home/presentation/widget/wallet_card_widget.dart';
-import 'package:namma_wallet/src/features/pdf_extract/application/file_picker_service.dart';
-import 'package:namma_wallet/src/features/pdf_extract/application/pdf_service.dart';
-import 'package:namma_wallet/src/features/sms_extract/application/sms_service.dart';
-import 'package:namma_wallet/src/features/ticket_parser/tnstc/application/tnstc_ticket_parser.dart';
-import 'package:namma_wallet/src/features/ticket_parser/tnstc/domain/tnstc_model.dart';
-import 'package:namma_wallet/src/features/ticket_parser/tnstc/presentation/tnstc_ticket_widget.dart';
+import 'package:namma_wallet/src/features/tnstc/application/pdf_service.dart';
+import 'package:namma_wallet/src/features/tnstc/application/sms_service.dart';
+import 'package:namma_wallet/src/features/tnstc/application/tnstc_ticket_parser.dart';
+import 'package:namma_wallet/src/features/tnstc/domain/tnstc_model.dart';
+import 'package:namma_wallet/src/features/tnstc/presentation/tnstc_ticket_widget.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
