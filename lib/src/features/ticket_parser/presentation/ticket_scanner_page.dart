@@ -1,8 +1,11 @@
+import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:namma_wallet/src/features/pdf_extract/application/pdf_service.dart';
 import 'package:namma_wallet/src/features/sms_extract/application/sms_service.dart';
+import 'package:namma_wallet/src/features/ticket_parser/tnstc/application/tnstc_pdf_parser.dart';
 
 class ScannerScreen extends StatefulWidget {
   const ScannerScreen({super.key});
@@ -16,6 +19,7 @@ class _ScannerScreenState extends State<ScannerScreen> {
   MobileScannerController cameraController = MobileScannerController();
   TextEditingController textController = TextEditingController();
   String? uploadedFileName;
+  String? uploadedFilePath;
   String? qrResult;
   bool isScanning = true;
 
@@ -606,22 +610,52 @@ class _ScannerScreenState extends State<ScannerScreen> {
             ),
           ),
           const SizedBox(height: 32),
-          Container(
-            width: double.infinity,
-            height: 50,
-            decoration: BoxDecoration(
-              color: Colors.blue,
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Center(
-              child: Text(
-                uploadedFileName != null
-                    ? 'Process File'
-                    : 'Choose File to Upload',
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
+          GestureDetector(
+            onTap: () async {
+              if (uploadedFilePath != null) {
+                try {
+                  // Extract PDF text using Syncfusion
+                  final pdfFile = File(uploadedFilePath!);
+                  final extractedText = PDFService().extractTextFrom(pdfFile);
+                  
+                  // Parse ticket using extracted text
+                  final ticket = TNSTCPDFParser.parseTicket(extractedText);
+                  print('Extracted Text: $extractedText');
+                  print('Parsed Ticket: $ticket');
+                  
+                  // Show success message
+                  if (mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('PDF processed successfully!')),
+                    );
+                  }
+                } catch (e) {
+                  print('Error processing PDF: $e');
+                  if (mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Error processing PDF: $e')),
+                    );
+                  }
+                }
+              }
+            },
+            child: Container(
+              width: double.infinity,
+              height: 50,
+              decoration: BoxDecoration(
+                color: Colors.blue,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Center(
+                child: Text(
+                  uploadedFileName != null
+                      ? 'Process File'
+                      : 'Choose File to Upload',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
               ),
             ),
@@ -711,6 +745,7 @@ class _ScannerScreenState extends State<ScannerScreen> {
         final file = result.files.first;
         setState(() {
           uploadedFileName = file.name;
+          uploadedFilePath = file.path;
         });
         print('File selected: ${file.name}');
         print('File path: ${file.path}');
