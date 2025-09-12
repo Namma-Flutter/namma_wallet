@@ -50,5 +50,4 @@ class TNSTCModel with TNSTCModelMappable {
     required this.ticketClass,
     required this.boardingAt,
   });
-  
 }
