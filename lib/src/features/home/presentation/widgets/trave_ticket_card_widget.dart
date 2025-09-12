@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:namma_wallet/src/features/home/data/model/generic_details_model.dart';
 import 'package:namma_wallet/src/features/home/presentation/widgets/hilight_widget.dart';
 import 'package:namma_wallet/src/features/ticket_view/ticket_view.dart';
+import 'package:namma_wallet/styles/styles.dart';
 
 class TravelTicketCardWidget extends StatelessWidget {
   const TravelTicketCardWidget({required this.ticket, super.key});
@@ -24,7 +25,9 @@ class TravelTicketCardWidget extends StatelessWidget {
               offset: const Offset(0, 6),
             ),
           ],
-          color: const Color(0xffE7FC57)),
+          color: ticket.type == EntryType.busTicket
+              ? AppColor.limeYellowThikColor
+              : AppColor.limeYellowColor),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -42,12 +45,15 @@ class TravelTicketCardWidget extends StatelessWidget {
                       //* Service logo
                       CircleAvatar(
                           radius: 20,
-                          backgroundColor: Colors.grey,
+                          backgroundColor: AppColor.whiteColor,
                           child: Icon(ticket.type == EntryType.busTicket
                               ? ticket.type == EntryType.busTicket
                                   ? Icons.airport_shuttle_outlined
                                   : Icons.badge_outlined
                               : Icons.tram_outlined)),
+
+                      //* Secondary text
+                      Text(ticket.secondaryText),
 
                       //* Serive name
                       // Text(
@@ -99,8 +105,6 @@ class TravelTicketCardWidget extends StatelessWidget {
                 ],
               ),
 
-              //* Secondary text
-              Text(ticket.secondaryText),
               Text(ticket.startTime.toString()),
               if (ticket.endTime != null) Text(ticket.endTime.toString()),
               Text(ticket.location),

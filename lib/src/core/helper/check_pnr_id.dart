@@ -3,7 +3,7 @@ import 'package:namma_wallet/src/features/home/data/model/generic_details_model.
 bool hasPnrOrId(GenericDetailsModel ticket) {
   return ticket.extras?.any((extra) {
         final title = extra.title?.toLowerCase();
-        return title == 'pnr' || title == 'id';
+        return title == 'pnr no.' || title == 'id';
       }) ??
       false;
 }
@@ -13,7 +13,7 @@ String? getPnrOrId(GenericDetailsModel ticket) {
 
   for (final extra in ticket.extras!) {
     final title = extra.title?.toLowerCase();
-    if (title == 'pnr' || title == 'id') {
+    if (title == 'PNR No.' || title == 'id') {
       return extra.value; // return the value of the matched field
     }
   }

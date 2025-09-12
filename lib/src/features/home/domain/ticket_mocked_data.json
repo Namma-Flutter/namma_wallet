@@ -38,15 +38,15 @@
     "location": "Mattuthavani Bus Stand",
     "type": "busTicket",
     "tags": [
-      { "value": "KA09AB1234", "icon": "directions_bus" },
+      { "value": "KA09AB1234", "icon": "directions_bus_outlined" },
       { "value": "Seat No: 21", "icon": "event_seat" }
     ],
     "extras": [
       { "title": "Class", "value": "Sleeper AC" },
-      { "title": "pnr", "value": "B123456" },
-      { "title": "tripCode", "value": "0400KUMCOICC01L" },
-      { "title": "seatNo", "value": "21" },
-      { "title": "boardingAt", "value": "Mattuthavani Bus Stand" }
+      { "title": "PNR No.", "value": "B123456" },
+      { "title": "Trip Code", "value": "0400KUMCOICC01L" },
+      { "title": "Seat No.", "value": "21" },
+      { "title": "Boarding At", "value": "Mattuthavani Bus Stand" }
     ]
   },
   {
@@ -56,15 +56,15 @@
     "location": "Gandhipuram Bus Stand",
     "type": "busTicket",
     "tags": [
-      { "value": "KL55XY9876", "icon": "directions_bus" },
+      { "value": "KL55XY9876", "icon": "directions_bus_outlined" },
       { "value": "Seat No: 12", "icon": "event_seat" }
     ],
     "extras": [
       { "title": "Class", "value": "Deluxe 2x2" },
-      { "title": "pnr", "value": "B654321" },
-      { "title": "tripCode", "value": "2330COIKOC001" },
-      { "title": "seatNo", "value": "12" },
-      { "title": "boardingAt", "value": "Gandhipuram Bus Stand" }
+      { "title": "PNR No.", "value": "B654321" },
+      { "title": "Trip Code", "value": "2330COIKOC001" },
+      { "title": "Seat No.", "value": "12" },
+      { "title": "Boarding At", "value": "Gandhipuram Bus Stand" }
     ]
   },
   {
@@ -80,10 +80,10 @@
     ],
     "extras": [
       { "title": "Coach", "value": "AC 2-Tier" },
-      { "title": "pnr", "value": "T987654321" },
-      { "title": "tripCode", "value": "0600MASNDLS001" },
-      { "title": "seatNo", "value": "B2-45" },
-      { "title": "boardingAt", "value": "Chennai Central" }
+      { "title": "PNR No.", "value": "T987654321" },
+      { "title": "Trip Code", "value": "0600MASNDLS001" },
+      { "title": "Seat No.", "value": "B2-45" },
+      { "title": "Boarding At", "value": "Chennai Central" }
     ]
   },
   {
@@ -99,10 +99,10 @@
     ],
     "extras": [
       { "title": "Coach", "value": "AC Chair Car" },
-      { "title": "pnr", "value": "T123987654" },
-      { "title": "tripCode", "value": "2215SBCSC001" },
-      { "title": "seatNo", "value": "C1-14" },
-      { "title": "boardingAt", "value": "Bangalore Cantt" }
+      { "title": "PNR No.", "value": "T123987654" },
+      { "title": "Trip Code", "value": "2215SBCSC001" },
+      { "title": "Seat No.", "value": "C1-14" },
+      { "title": "Boarding At", "value": "Bangalore Cantt" }
     ]
   }
 ]
