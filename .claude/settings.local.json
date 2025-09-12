@@ -18,14 +18,15 @@
       "mcp__serena__find_symbol",
       "mcp__serena__search_for_pattern",
       "mcp__serena__find_file",
-      "mcp__serena__write_memory"
+      "mcp__serena__write_memory",
+      "Bash(fvm dart:*)",
+      "mcp__dart__run_tests"
     ],
     "deny": []
   },
   "enableAllProjectMcpServers": true,
   "enabledMcpjsonServers": [
     "context7",
-    "serena",
     "dart"
   ],
   "statusLine": {
