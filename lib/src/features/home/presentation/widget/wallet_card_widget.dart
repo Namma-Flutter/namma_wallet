@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:namma_wallet/src/features/home/domain/card_model.dart';
 
 class WalletCardWidget extends StatelessWidget {
-
   const WalletCardWidget({required this.card, super.key});
   final WalletCard card;
 
@@ -24,7 +23,8 @@ class WalletCardWidget extends StatelessWidget {
 
 class PasporCard extends StatelessWidget {
   const PasporCard({
-    required this.card, super.key,
+    required this.card,
+    super.key,
   });
 
   final WalletCard card;
@@ -73,7 +73,8 @@ class PasporCard extends StatelessWidget {
 
 class AmexCard extends StatelessWidget {
   const AmexCard({
-    required this.card, super.key,
+    required this.card,
+    super.key,
   });
 
   final WalletCard card;
@@ -115,7 +116,8 @@ class AmexCard extends StatelessWidget {
 
 class PayCashCard extends StatelessWidget {
   const PayCashCard({
-    required this.card, super.key,
+    required this.card,
+    super.key,
   });
 
   final WalletCard card;

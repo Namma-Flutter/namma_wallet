@@ -170,10 +170,10 @@ void main() {
       // Verify both formats parse correctly
       expect(originalTicket.serviceStartTime, equals('23:55'));
       expect(newTicket.serviceStartTime, equals('21:00'));
-      
+
       expect(originalTicket.corporation, equals('SETC'));
       expect(newTicket.corporation, equals('SETC'));
-      
+
       expect(originalTicket.pnrNumber, equals('T60856763'));
       expect(newTicket.pnrNumber, equals('T69705233'));
     });
@@ -301,12 +301,12 @@ M
     test('should handle invalid dates gracefully', () {
       const smsText = 'Journey Date:invalid-date';
       final smsTicket = TNSTCSMSParser.parseTicket(smsText);
-      expect(smsTicket.journeyDate, isNotNull); 
+      expect(smsTicket.journeyDate, isNotNull);
       // Should fallback to current date
 
       const pdfText = 'Date of Journey : 32/13/2025'; // Invalid date
       final pdfTicket = TNSTCPDFParser.parseTicket(pdfText);
-      expect(pdfTicket.journeyDate, isNotNull); 
+      expect(pdfTicket.journeyDate, isNotNull);
       // Should fallback to current date
     });
   });
@@ -332,17 +332,17 @@ M
       expect(ticketModel.tripCode, equals('2100KUMCHELB'));
       expect(ticketModel.serviceStartTime, equals('21:00'));
       expect(ticketModel.classOfService, equals('NON AC LOWER BERTH SEATER'));
-      
+
       // Test date parsing
       expect(ticketModel.journeyDate?.day, equals(21));
       expect(ticketModel.journeyDate?.month, equals(10));
       expect(ticketModel.journeyDate?.year, equals(2025));
-      
+
       // Test passenger info conversion
       expect(ticketModel.passengers.length, equals(1));
       expect(ticketModel.passengers.first.seatNumber, equals('4LB'));
       expect(ticketModel.passengers.first.type, equals('Adult'));
-      
+
       // Test convenience getters
       expect(ticketModel.displayPnr, equals('T69705233'));
       expect(ticketModel.displayFrom, equals('KUMBAKONAM'));
@@ -436,13 +436,37 @@ M
     test('should handle seat number extraction with various formats', () {
       final testCases = [
         {'input': 'Seat No.:4LB .Class:NON AC', 'expected': '4LB', 'count': 1},
-        {'input': 'Seat No.:4 UB, .Class:NON AC', 'expected': '4 UB', 'count': 1},
+        {
+          'input': 'Seat No.:4 UB, .Class:NON AC',
+          'expected': '4 UB',
+          'count': 1
+        },
         {'input': 'Seat No.:20,21, .Class:AC', 'expected': '20,21', 'count': 2},
-        {'input': 'Seat No.:1A,2A,3A, .Class:SLEEPER', 'expected': '1A,2A,3A', 'count': 3},
-        {'input': 'Seat No.: .Class:AC', 'expected': '', 'count': 1}, // Empty seat
-        {'input': 'Seat No.:36-UB#10 .Class:NON AC', 'expected': '36-UB#10', 'count': 1}, // Complex format
-        {'input': 'Seat No.:13UB .Class:NON AC', 'expected': '13UB', 'count': 1}, // No space
-        {'input': 'Seat No.:12, .Class:NON AC', 'expected': '12', 'count': 1}, // Trailing comma
+        {
+          'input': 'Seat No.:1A,2A,3A, .Class:SLEEPER',
+          'expected': '1A,2A,3A',
+          'count': 3
+        },
+        {
+          'input': 'Seat No.: .Class:AC',
+          'expected': '',
+          'count': 1
+        }, // Empty seat
+        {
+          'input': 'Seat No.:36-UB#10 .Class:NON AC',
+          'expected': '36-UB#10',
+          'count': 1
+        }, // Complex format
+        {
+          'input': 'Seat No.:13UB .Class:NON AC',
+          'expected': '13UB',
+          'count': 1
+        }, // No space
+        {
+          'input': 'Seat No.:12, .Class:NON AC',
+          'expected': '12',
+          'count': 1
+        }, // Trailing comma
       ];
 
       for (final testCase in testCases) {
@@ -469,7 +493,8 @@ M
       expect(ticket.pnrNumber, equals('T58823886'));
       expect(ticket.serviceStartPlace, equals('CHENNAI-PT Dr.M.G.R. BS'));
       expect(ticket.serviceEndPlace, equals('KUMBAKONAM'));
-      expect(ticket.serviceStartTime, equals('23:55')); // Should extract time correctly
+      expect(ticket.serviceStartTime,
+          equals('23:55')); // Should extract time correctly
       expect(ticket.passengerInfo?.seatNumber, equals('4LB'));
       expect(ticket.classOfService, equals('NON AC LOWER BIRTH SEATER'));
     });
@@ -488,7 +513,8 @@ M
       expect(ticket.serviceStartPlace, equals('KUMBAKONAM'));
       expect(ticket.serviceEndPlace, equals('CHENNAI KALAIGNAR CBT'));
       expect(ticket.serviceStartTime, equals('20:30'));
-      expect(ticket.passengerInfo?.seatNumber, equals('12')); // Should remove trailing comma
+      expect(ticket.passengerInfo?.seatNumber,
+          equals('12')); // Should remove trailing comma
       expect(ticket.classOfService, equals('NON AC SLEEPER SEATER'));
     });
 
@@ -518,7 +544,8 @@ M
       expect(ticket.corporation, equals('SETC'));
       expect(ticket.pnrNumber, equals('T68439967'));
       expect(ticket.serviceStartTime, equals('22:55'));
-      expect(ticket.passengerInfo?.seatNumber, equals('13UB')); // No space between number and letters
+      expect(ticket.passengerInfo?.seatNumber,
+          equals('13UB')); // No space between number and letters
       expect(ticket.classOfService, equals('NON AC LOWER BERTH SEATER'));
     });
 

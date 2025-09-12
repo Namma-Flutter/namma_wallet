@@ -62,7 +62,6 @@ class CustomTicketShapeLine extends CustomPainter {
 }
 
 class DashedLinePainter extends CustomPainter {
-
   DashedLinePainter({
     this.padding = 0.0,
     this.dashLength = 8.0,

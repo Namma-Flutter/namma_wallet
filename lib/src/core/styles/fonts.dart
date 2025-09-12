@@ -46,7 +46,6 @@ class InterFonts {
 }
 
 class Display01 {
-
   Display01({required this.color}) {
     semiBold = InterFonts.getAppFont(
       fontSize: 72,
@@ -77,7 +76,6 @@ class Display01 {
 }
 
 class Display02 {
-
   Display02({required this.color}) {
     semiBold = InterFonts.getAppFont(
       fontSize: 60,
@@ -108,7 +106,6 @@ class Display02 {
 }
 
 class HeadingH1 {
-
   HeadingH1({required this.color}) {
     semiBold = InterFonts.getAppFont(
       fontSize: 48,
@@ -139,7 +136,6 @@ class HeadingH1 {
 }
 
 class HeadingH1Small {
-
   HeadingH1Small({required this.color}) {
     semiBold = InterFonts.getAppFont(
       fontSize: 34,
@@ -170,7 +166,6 @@ class HeadingH1Small {
 }
 
 class HeadingH2 {
-
   HeadingH2({required this.color}) {
     semiBold = InterFonts.getAppFont(
       fontSize: 39,
@@ -201,7 +196,6 @@ class HeadingH2 {
 }
 
 class HeadingH2Small {
-
   HeadingH2Small({required this.color}) {
     semiBold = InterFonts.getAppFont(
       fontSize: 33,
@@ -232,7 +226,6 @@ class HeadingH2Small {
 }
 
 class HeadingH3 {
-
   HeadingH3({required this.color}) {
     semiBold = InterFonts.getAppFont(
       fontSize: 33,
@@ -263,7 +256,6 @@ class HeadingH3 {
 }
 
 class HeadingH3Small {
-
   HeadingH3Small({required this.color}) {
     semiBold = InterFonts.getAppFont(
       fontSize: 28,
@@ -294,7 +286,6 @@ class HeadingH3Small {
 }
 
 class HeadingH4 {
-
   HeadingH4({required this.color}) {
     semiBold = InterFonts.getAppFont(
       fontSize: 28,
@@ -325,7 +316,6 @@ class HeadingH4 {
 }
 
 class HeadingH4Small {
-
   HeadingH4Small({required this.color}) {
     semiBold = InterFonts.getAppFont(
       fontSize: 23,
@@ -356,7 +346,6 @@ class HeadingH4Small {
 }
 
 class HeadingH5 {
-
   HeadingH5({required this.color}) {
     semiBold = InterFonts.getAppFont(
       fontSize: 23,
@@ -387,7 +376,6 @@ class HeadingH5 {
 }
 
 class HeadingH5Small {
-
   HeadingH5Small({required this.color}) {
     semiBold = InterFonts.getAppFont(
       fontSize: 19,
@@ -418,7 +406,6 @@ class HeadingH5Small {
 }
 
 class HeadingH6 {
-
   HeadingH6({required this.color}) {
     regular = InterFonts.getAppFont(
       fontSize: 19,
@@ -457,7 +444,6 @@ class HeadingH6 {
 }
 
 class HeadingH6Small {
-
   HeadingH6Small({required this.color}) {
     semiBold = InterFonts.getAppFont(
       fontSize: 16,
@@ -488,7 +474,6 @@ class HeadingH6Small {
 }
 
 class SubHeading {
-
   SubHeading({required this.color}) {
     regular = InterFonts.getAppFont(
       fontSize: 20,
@@ -509,7 +494,6 @@ class SubHeading {
 }
 
 class Paragraph01 {
-
   Paragraph01({required this.color}) {
     regular = InterFonts.getAppFont(
       fontSize: 18,
@@ -530,7 +514,6 @@ class Paragraph01 {
 }
 
 class Paragraph02 {
-
   Paragraph02({required this.color}) {
     regular = InterFonts.getAppFont(
       fontSize: 16,
@@ -551,7 +534,6 @@ class Paragraph02 {
 }
 
 class Paragraph03 {
-
   Paragraph03({required this.color, this.decoration, this.decorationColor}) {
     regular = InterFonts.getAppFont(
       fontSize: 14,
@@ -576,7 +558,6 @@ class Paragraph03 {
 }
 
 class Caption {
-
   Caption({required this.color}) {
     regular = InterFonts.getAppFont(
       fontSize: 12,
@@ -605,7 +586,6 @@ class Caption {
 }
 
 class Footer {
-
   Footer({required this.color}) {
     regular = InterFonts.getAppFont(
       fontSize: 10,

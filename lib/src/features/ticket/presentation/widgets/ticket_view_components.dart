@@ -4,7 +4,9 @@ import 'package:namma_wallet/src/core/styles/styles.dart';
 
 class TicketLabelValueWidget extends StatelessWidget {
   const TicketLabelValueWidget(
-      {required this.label, required this.value, super.key,
+      {required this.label,
+      required this.value,
+      super.key,
       this.alignment = CrossAxisAlignment.start});
 
   final String label;
@@ -25,7 +27,9 @@ class TicketLabelValueWidget extends StatelessWidget {
 
 class TicketRowWidget extends StatelessWidget {
   const TicketRowWidget(
-      {required this.title1, required this.title2, super.key,
+      {required this.title1,
+      required this.title2,
+      super.key,
       this.value1,
       this.value2});
 

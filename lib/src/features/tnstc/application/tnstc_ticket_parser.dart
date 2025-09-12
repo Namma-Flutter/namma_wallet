@@ -102,7 +102,8 @@ class PassengerInfo {
       ')';
 }
 
-@Deprecated('Use TNSTCPDFParser.parseTicket() for PDF parsing or TNSTCSMSParser.parseTicket() for SMS parsing')
+@Deprecated(
+    'Use TNSTCPDFParser.parseTicket() for PDF parsing or TNSTCSMSParser.parseTicket() for SMS parsing')
 TNSTCTicket parseTicket(String text) {
   String extractMatch(String pattern, String input, {int groupIndex = 1}) {
     final regex = RegExp(pattern, multiLine: true);
@@ -118,11 +119,11 @@ TNSTCTicket parseTicket(String text) {
 
   DateTime parseDate(String date) {
     if (date.isEmpty) return DateTime.now();
-    
+
     // Handle both '-' and '/' separators
     final parts = date.contains('/') ? date.split('/') : date.split('-');
     if (parts.length != 3) return DateTime.now();
-    
+
     try {
       final day = int.parse(parts[0]);
       final month = int.parse(parts[1]);
@@ -135,27 +136,26 @@ TNSTCTicket parseTicket(String text) {
 
   DateTime parseDateTime(String dateTime) {
     if (dateTime.isEmpty) return DateTime.now();
-    
+
     final parts = dateTime.split(' '); // Split into date and time
     if (parts.length != 2) return DateTime.now();
-    
+
     try {
       // Handle both '-' and '/' separators for date
-      final dateParts = parts[0].contains('/') 
-          ? parts[0].split('/') 
-          : parts[0].split('-');
+      final dateParts =
+          parts[0].contains('/') ? parts[0].split('/') : parts[0].split('-');
       if (dateParts.length != 3) return DateTime.now();
-      
+
       final day = int.parse(dateParts[0]);
       final month = int.parse(dateParts[1]);
       final year = int.parse(dateParts[2]);
-      
+
       final timeParts = parts[1].split(':'); // Split the time by ':'
       if (timeParts.length != 2) return DateTime.now();
-      
+
       final hour = int.parse(timeParts[0]);
       final minute = int.parse(timeParts[1]);
-      
+
       return DateTime(year, month, day, hour, minute);
     } on FormatException {
       return DateTime.now();
@@ -199,9 +199,8 @@ TNSTCTicket parseTicket(String text) {
   final obReferenceNumber =
       extractMatch(r'OB Reference No\.\s*:\s*(\S+)', text);
   final numberOfSeatsStr = extractMatch(r'No\. of Seats\s*:\s*(\d+)', text);
-  final numberOfSeats = numberOfSeatsStr.isNotEmpty 
-      ? int.tryParse(numberOfSeatsStr) ?? 1 
-      : 1;
+  final numberOfSeats =
+      numberOfSeatsStr.isNotEmpty ? int.tryParse(numberOfSeatsStr) ?? 1 : 1;
   final bankTransactionNumber =
       extractMatch(r'Bank Txn\. No\.\s*:\s*(\S+)', text);
   final busIdNumber = extractMatch(r'Bus ID No\.\s*:\s*(\S+)', text);
@@ -218,9 +217,8 @@ TNSTCTicket parseTicket(String text) {
   final idCardType = extractMatch(r'ID Card Type\s*:\s*(.*)', text);
   final idCardNumber = extractMatch(r'ID Card Number\s*:\s*(.*)', text);
   final totalFareStr = extractMatch(r'Total Fare\s*:\s*(\d+\.\d+)', text);
-  final totalFare = totalFareStr.isNotEmpty 
-      ? double.tryParse(totalFareStr) ?? 0.0 
-      : 0.0;
+  final totalFare =
+      totalFareStr.isNotEmpty ? double.tryParse(totalFareStr) ?? 0.0 : 0.0;
 
   final passengerInfo = PassengerInfo(
     name: passengerName,
@@ -260,7 +258,7 @@ TNSTCTicket parseTicket(String text) {
 // void main() {
 //   const ticketText = '''
 // E-Ticket/Reservation Voucher-H
- 
+
 // Corporation :
 // SETC
 // PNR Number :
@@ -286,8 +284,8 @@ TNSTCTicket parseTicket(String text) {
 // }
 
 // sample data
-// TNSTC Corporation:SETC , PNR NO.:T63736642 , From:CHENNAI-PT DR. M.G.R. 
-// BS To KUMBAKONAM , Trip Code:2145CHEKUMAB , Journey Date:11/02/2025 , 
-// Time:22:35 , Seat No.:20,21, .Class:AC SLEEPER SEATER , 
-// Boarding at:KOTTIVAKKAM(RTO OFFICE) . For e-Ticket: Download from 
+// TNSTC Corporation:SETC , PNR NO.:T63736642 , From:CHENNAI-PT DR. M.G.R.
+// BS To KUMBAKONAM , Trip Code:2145CHEKUMAB , Journey Date:11/02/2025 ,
+// Time:22:35 , Seat No.:20,21, .Class:AC SLEEPER SEATER ,
+// Boarding at:KOTTIVAKKAM(RTO OFFICE) . For e-Ticket: Download from
 // View Ticket. Please carry your photo ID during journey. T&C apply.

@@ -26,7 +26,8 @@ class TNSTCSMSParser {
     }
 
     // Extract fields using SMS-specific patterns
-    final corporation = extractMatch(r'Corporation\s*:\s*(.*?)(?=\s*,)', smsText);
+    final corporation =
+        extractMatch(r'Corporation\s*:\s*(.*?)(?=\s*,)', smsText);
     final pnrNumber = extractMatch(r'PNR NO\.\s*:\s*([^,\s]+)', smsText);
     final from = extractMatch(r'From\s*:\s*(.*?)(?=\s+To)', smsText);
     final to = extractMatch(r'To\s+([^,]+)', smsText);
@@ -34,16 +35,20 @@ class TNSTCSMSParser {
     final journeyDate = parseDate(
       extractMatch(r'Journey Date\s*:\s*(\d{2}/\d{2}/\d{4})', smsText),
     );
-    final departureTime = extractMatch(r'Time\s*:\s*(?:\d{2}/\d{2}/\d{4},)?\s*,?\s*(\d{2}:\d{2})', smsText);
-    final seatNumbers = extractMatch(r'Seat No\.\s*:\s*([0-9A-Z,\s\-#]+)', smsText)
-        .replaceAll(RegExp(r'[,\s]+$'), '');
-    final classOfService = extractMatch(r'Class\s*:\s*(.*?)(?=\s*[,\.]|\s*Boarding|\s*For\s+e-Ticket|$)', smsText);
+    final departureTime = extractMatch(
+        r'Time\s*:\s*(?:\d{2}/\d{2}/\d{4},)?\s*,?\s*(\d{2}:\d{2})', smsText);
+    final seatNumbers =
+        extractMatch(r'Seat No\.\s*:\s*([0-9A-Z,\s\-#]+)', smsText)
+            .replaceAll(RegExp(r'[,\s]+$'), '');
+    final classOfService = extractMatch(
+        r'Class\s*:\s*(.*?)(?=\s*[,\.]|\s*Boarding|\s*For\s+e-Ticket|$)',
+        smsText);
     final passengerPickupPoint =
         extractMatch(r'Boarding at\s*:\s*(.*?)(?=\s*\.|$)', smsText);
 
     // Calculate number of seats from seat numbers
-    final numberOfSeats = seatNumbers.isNotEmpty 
-        ? seatNumbers.split(',').where((s) => s.trim().isNotEmpty).length 
+    final numberOfSeats = seatNumbers.isNotEmpty
+        ? seatNumbers.split(',').where((s) => s.trim().isNotEmpty).length
         : 1;
 
     // Create passenger info with available data

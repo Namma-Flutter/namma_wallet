@@ -16,11 +16,11 @@ class TNSTCPDFParser {
 
     DateTime parseDate(String date) {
       if (date.isEmpty) return DateTime.now();
-      
+
       // Handle both '-' and '/' separators
       final parts = date.contains('/') ? date.split('/') : date.split('-');
       if (parts.length != 3) return DateTime.now();
-      
+
       try {
         final day = int.parse(parts[0]);
         final month = int.parse(parts[1]);
@@ -33,27 +33,26 @@ class TNSTCPDFParser {
 
     DateTime parseDateTime(String dateTime) {
       if (dateTime.isEmpty) return DateTime.now();
-      
+
       final parts = dateTime.split(' '); // Split into date and time
       if (parts.length != 2) return DateTime.now();
-      
+
       try {
         // Handle both '-' and '/' separators for date
-        final dateParts = parts[0].contains('/') 
-            ? parts[0].split('/') 
-            : parts[0].split('-');
+        final dateParts =
+            parts[0].contains('/') ? parts[0].split('/') : parts[0].split('-');
         if (dateParts.length != 3) return DateTime.now();
-        
+
         final day = int.parse(dateParts[0]);
         final month = int.parse(dateParts[1]);
         final year = int.parse(dateParts[2]);
-        
+
         final timeParts = parts[1].split(':'); // Split the time by ':'
         if (timeParts.length != 2) return DateTime.now();
-        
+
         final hour = int.parse(timeParts[0]);
         final minute = int.parse(timeParts[1]);
-        
+
         return DateTime(year, month, day, hour, minute);
       } on FormatException {
         return DateTime.now();
@@ -77,7 +76,8 @@ class TNSTCPDFParser {
     final routeNo = extractMatch(r'Route No\s*:\s*(\S+)', pdfText);
     final serviceStartPlace =
         extractMatch(r'Service Start Place\s*:\s*(.*)', pdfText);
-    final serviceEndPlace = extractMatch(r'Service End Place\s*:\s*(.*)', pdfText);
+    final serviceEndPlace =
+        extractMatch(r'Service End Place\s*:\s*(.*)', pdfText);
     final serviceStartTime =
         extractMatch(r'Service Start Time\s*:\s*(\d{2}:\d{2})', pdfText);
     final passengerStartPlace =
@@ -92,18 +92,20 @@ class TNSTCPDFParser {
         pdfText,
       ),
     );
-    final platformNumber = extractMatch(r'Platform Number\s*:\s*(\S+)', pdfText);
-    final classOfService = extractMatch(r'Class of Service\s*:\s*(.*)', pdfText);
+    final platformNumber =
+        extractMatch(r'Platform Number\s*:\s*(\S+)', pdfText);
+    final classOfService =
+        extractMatch(r'Class of Service\s*:\s*(.*)', pdfText);
     final tripCode = extractMatch(r'Trip Code\s*:\s*(\S+)', pdfText);
     final obReferenceNumber =
         extractMatch(r'OB Reference No\.\s*:\s*(\S+)', pdfText);
-    
+
     // Safe parsing for numbers
-    final numberOfSeatsStr = extractMatch(r'No\. of Seats\s*:\s*(\d+)', pdfText);
-    final numberOfSeats = numberOfSeatsStr.isNotEmpty 
-        ? int.tryParse(numberOfSeatsStr) ?? 1 
-        : 1;
-        
+    final numberOfSeatsStr =
+        extractMatch(r'No\. of Seats\s*:\s*(\d+)', pdfText);
+    final numberOfSeats =
+        numberOfSeatsStr.isNotEmpty ? int.tryParse(numberOfSeatsStr) ?? 1 : 1;
+
     final bankTransactionNumber =
         extractMatch(r'Bank Txn\. No\.\s*:\s*(\S+)', pdfText);
     final busIdNumber = extractMatch(r'Bus ID No\.\s*:\s*(\S+)', pdfText);
@@ -119,12 +121,11 @@ class TNSTCPDFParser {
     final passengerSeatNumber = extractMatch(r'\d+[A-Z]+', pdfText);
     final idCardType = extractMatch(r'ID Card Type\s*:\s*(.*)', pdfText);
     final idCardNumber = extractMatch(r'ID Card Number\s*:\s*(.*)', pdfText);
-    
+
     // Safe parsing for total fare
     final totalFareStr = extractMatch(r'Total Fare\s*:\s*(\d+\.\d+)', pdfText);
-    final totalFare = totalFareStr.isNotEmpty 
-        ? double.tryParse(totalFareStr) ?? 0.0 
-        : 0.0;
+    final totalFare =
+        totalFareStr.isNotEmpty ? double.tryParse(totalFareStr) ?? 0.0 : 0.0;
 
     final passengerInfo = PassengerInfo(
       name: passengerName,
