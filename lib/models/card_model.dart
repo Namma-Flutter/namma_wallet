@@ -31,7 +31,7 @@ class GenericDetailsModel {
         endTime = DateTime.parse(ticket.journeyDate), // + duration
         location = ticket.boardingAt,
         type = EntryType.trainTicket,
-        tags=[  
+        tags = [
           Tag(value: ticket.tripCode, icon: Icons.confirmation_number),
           Tag(value: ticket.pnrNo, icon: Icons.train),
           Tag(value: ticket.time, icon: Icons.access_time),
@@ -65,15 +65,15 @@ class GenericDetailsModel {
 
 class Tag {
   Tag({required this.value, this.icon});
-  final IconData? icon; 
+  final IconData? icon;
   final String value;
 
   Tag.fromJson(Map<String, dynamic> json)
       : icon = switch (json['icon']) {
           'location' => Icons.location_on,
           'duration' => Icons.access_time,
-          // add here more icons as needed 
-          // user IconData custom icons 
+          // add here more icons as needed
+          // user IconData custom icons
           _ => null,
         },
         value = json['value'] as String;
