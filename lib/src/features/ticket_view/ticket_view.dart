@@ -1,18 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:namma_wallet/models/models.dart';
-import 'package:namma_wallet/src/features/ticket_view/components/components.dart';
+import 'package:namma_wallet/src/core/helper/check_pnr_id.dart';
+import 'package:namma_wallet/src/core/helper/date_time_converter.dart';
+import 'package:namma_wallet/src/features/home/data/model/generic_details_model.dart';
+import 'package:namma_wallet/src/features/ticket_view/widgets/widget.dart';
 import 'package:namma_wallet/styles/styles.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
-class TicketView extends StatefulWidget {
+class TicketView extends StatelessWidget {
   const TicketView({required this.ticket, super.key});
-  final TravelModel ticket;
+  final GenericDetailsModel ticket;
 
-  @override
-  State<TicketView> createState() => _TicketViewState();
-}
-
-class _TicketViewState extends State<TicketView> {
   // Helper method to handle empty values
   String getValueOrDefault(String? value) {
     return (value?.isEmpty ?? true) ? '--' : value!;
@@ -67,43 +64,44 @@ class _TicketViewState extends State<TicketView> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                TicketRowWidget(
-                  title1: getValueOrDefault(widget.ticket.corporation),
-                  title2: getValueOrDefault(widget.ticket.service),
-                ),
+                // TicketRowWidget(
+                //   title1: getValueOrDefault(widget.ticket.corporation),
+                //   title2: getValueOrDefault(widget.ticket.service),
+                // ),
                 const SizedBox(height: 16),
-                TicketFromToRowWidget(
-                  from: widget.ticket.from,
-                  to: widget.ticket.to,
-                ),
+                // TicketFromToRowWidget(
+                //   from: widget.ticket.from,
+                //   to: widget.ticket.to,
+                // ),
+                Text(ticket.primaryText),
                 const SizedBox(height: 16),
                 TicketRowWidget(
                   title1: 'Journey Date',
                   title2: 'Time',
-                  value1: getValueOrDefault(widget.ticket.journeyDate),
-                  value2: getValueOrDefault(widget.ticket.time),
+                  value1: getValueOrDefault(getDate(ticket.startTime)),
+                  value2: getValueOrDefault(getTime(ticket.startTime)),
                 ),
                 const SizedBox(height: 16),
-                TicketRowWidget(
-                  title1: 'PNR No.',
-                  title2: 'Trip Code',
-                  value1: getValueOrDefault(widget.ticket.pnrNo),
-                  value2: getValueOrDefault(widget.ticket.tripCode),
-                ),
-                const SizedBox(height: 16),
-                TicketLabelValueWidget(
-                    label: 'Seat Numbers',
-                    value: widget.ticket.seatNumbers.isEmpty
-                        ? '--'
-                        : widget.ticket.seatNumbers.join(', ')),
-                const SizedBox(height: 16),
-                TicketLabelValueWidget(
-                    label: 'Class',
-                    value: getValueOrDefault(widget.ticket.ticketClass)),
-                const SizedBox(height: 16),
-                TicketLabelValueWidget(
-                    label: 'Boarding At',
-                    value: getValueOrDefault(widget.ticket.boardingAt)),
+                // TicketRowWidget(
+                //   title1: 'PNR No.',
+                //   title2: 'Trip Code',
+                //   value1: getValueOrDefault(ticket.pnrNo),
+                //   value2: getValueOrDefault(ticket.tripCode),
+                // ),
+                // const SizedBox(height: 16),
+                // TicketLabelValueWidget(
+                //     label: 'Seat Numbers',
+                //     value: ticket.seatNumbers.isEmpty
+                //         ? '--'
+                //         : ticket.seatNumbers.join(', ')),
+                // const SizedBox(height: 16),
+                // TicketLabelValueWidget(
+                //     label: 'Class',
+                //     value: getValueOrDefault(ticket.ticketClass)),
+                // const SizedBox(height: 16),
+                // TicketLabelValueWidget(
+                //     label: 'Boarding At',
+                //     value: getValueOrDefault(ticket.boardingAt)),
               ],
             ),
           ),
@@ -111,24 +109,26 @@ class _TicketViewState extends State<TicketView> {
             size: Size(MediaQuery.of(context).size.width * 0.95, 40),
             painter: CustomTicketShapeLine(),
           ),
-          Container(
-            margin: const EdgeInsets.only(bottom: 16, left: 16, right: 16),
-            padding: const EdgeInsets.all(24),
-            decoration: const BoxDecoration(
-              // color: AppColor.periwinkleBlue,
-              color: Color(0xffE7FC57),
-              borderRadius: BorderRadius.only(
-                bottomLeft: Radius.circular(16),
-                bottomRight: Radius.circular(16),
+          if (hasPnrOrId(ticket))
+            Container(
+              margin: const EdgeInsets.only(bottom: 16, left: 16, right: 16),
+              padding: const EdgeInsets.all(24),
+              decoration: const BoxDecoration(
+                // color: AppColor.periwinkleBlue,
+                color: Color(0xffE7FC57),
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(16),
+                  bottomRight: Radius.circular(16),
+                ),
               ),
-            ),
-            child: Center(
-              child: QrImageView(
-                data: getValueOrDefault(widget.ticket.pnrNo),
-                size: 200,
+              child: Center(
+                child: QrImageView(
+                  // data: getValueOrDefault(ticket.pnrNo),
+                  data: getPnrOrId(ticket) ?? 'xxx',
+                  size: 200,
+                ),
               ),
-            ),
-          )
+            )
         ],
       ),
     );

@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:namma_wallet/src/features/home/data/model/event_model.dart';
+import 'package:namma_wallet/src/core/helper/date_time_converter.dart';
+import 'package:namma_wallet/src/features/home/data/model/generic_details_model.dart';
 import 'package:namma_wallet/styles/styles.dart';
 
-class EventCardWidget extends StatelessWidget {
-  const EventCardWidget({
-    required this.event,
+class EventTicketCardWidget extends StatelessWidget {
+  const EventTicketCardWidget({
+    required this.ticket,
     super.key,
   });
 
-  final EventModel event;
+  final GenericDetailsModel ticket;
 
   @override
   Widget build(BuildContext context) {
@@ -30,33 +31,48 @@ class EventCardWidget extends StatelessWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    //* Event title
+                    //* ticket title
                     Text(
-                      event.eventName ?? 'xxx xxx',
+                      ticket.primaryText ?? 'xxx xxx',
                       style: const TextStyle(color: AppColor.whiteColor),
                       overflow: TextOverflow.ellipsis,
                       maxLines: 1,
                     ),
 
                     //* Date & Time
-                    Text(
-                      event.dateTime?.toString() ?? 'xxx xxx',
-                      style: const TextStyle(color: AppColor.whiteColor),
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 1,
+                    Row(
+                      children: [
+                        Text(
+                          // ticket.dateTime?.toString() ?? 'xxx xxx',
+                          getTime(ticket.startTime),
+                          style: const TextStyle(color: AppColor.whiteColor),
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                        ),
+                        const Text(' - '),
+                        Text(
+                          // ticket.dateTime?.toString() ?? 'xxx xxx',
+                          getDate(ticket.startTime),
+                          style: const TextStyle(color: AppColor.whiteColor),
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                        ),
+                      ],
                     ),
                   ],
                 ),
-                //* Event icon
-                Icon(
-                  event.eventIcon,
+                //* ticket icon
+                const Icon(
+                  // ticket.eventIcon,
+                  Icons.star,
                   color: AppColor.whiteColor,
                 )
               ],
             ),
             //* Address
             Text(
-              event.venue ?? 'xxx xxx',
+              // ticket.venue ?? 'xxx xxx',
+              ticket.location,
               style: const TextStyle(color: AppColor.whiteColor),
               overflow: TextOverflow.ellipsis,
               maxLines: 1,

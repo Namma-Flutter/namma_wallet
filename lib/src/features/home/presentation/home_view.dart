@@ -7,17 +7,12 @@ import 'package:card_stack_widget/model/card_orientation.dart';
 import 'package:card_stack_widget/widget/card_stack_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:intl/intl.dart';
-import 'package:namma_wallet/models/travel_model.dart';
 import 'package:namma_wallet/src/core/widgets/snackbar_widget.dart';
-import 'package:namma_wallet/src/features/home/data/model/event_model.dart';
+import 'package:namma_wallet/src/features/home/data/model/generic_details_model.dart';
 import 'package:namma_wallet/src/features/home/presentation/widget/ticket_card_widget.dart';
-import 'package:namma_wallet/src/features/home/presentation/widget/wallet_card_widget.dart';
-import 'package:namma_wallet/src/features/pdf_extract/application/file_picker_service.dart';
-import 'package:namma_wallet/src/features/pdf_extract/application/pdf_service.dart';
-import 'package:namma_wallet/src/features/sms_extract/application/sms_service.dart';
-import 'package:namma_wallet/src/features/ticket_parser/application/tnstc_ticket_parser.dart';
-import 'package:namma_wallet/styles/styles.dart';
+import 'package:namma_wallet/src/features/home/presentation/widgets/header_widget.dart';
+import 'package:namma_wallet/src/features/home/presentation/widgets/trave_ticket_card_widget.dart';
+import 'package:namma_wallet/src/features/ticket_view/ticket_view.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -27,71 +22,62 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  List<TravelModel> _travelTickets = [];
-  List<EventModel> _eventTickets = [];
   bool _isLoading = true;
   String extractedText = 'None';
   String? busTicket;
+  List<GenericDetailsModel> _allTickets = [];
+  final List<GenericDetailsModel> _busTickets = [];
+  final List<GenericDetailsModel> _trainTickets = [];
+  final List<GenericDetailsModel> _travelTickets = [];
+  final List<GenericDetailsModel> _eventTickets = [];
+  final List<GenericDetailsModel> _otherTickets = [];
 
   @override
   void initState() {
     super.initState();
     _loadTicketData();
-    _loadOtherCardsData();
-  }
-
-  Map<String, dynamic> staticTnstcJson = {
-    'corporation': 'TNSTC',
-    'service': 'SETC',
-    'pnr_no': 'T63736642',
-    'from': 'CHENNAI-PT DR. M.G.R. BS',
-    'to': 'KUMBAKONAM',
-    'trip_code': '2145CHEKUMAB',
-    'journey_date': '11/02/2025',
-    'time': '22:35',
-    'seat_numbers': ['20', '21'],
-    'class': 'AC SLEEPER SEATER',
-    'boarding_at': 'KOTTIVAKKAM(RTO OFFICE)',
-  };
-
-  Future<void> onPDFExtractPressed() async {
-    final pdf = await FilePickerService().pickFile();
-    if (pdf == null) {
-      debugPrint('File not picked');
-      return;
-    }
-    final text = PDFService().extractTextFrom(pdf);
-    // extractedText = text;
-    setState(() {});
-    debugPrint(text);
-    final ticket = parseTicket(text);
-    debugPrint(ticket.toString());
-  }
-
-  Future<void> onSMSExtractPressed() async {
-    final data = await Clipboard.getData('text/plain');
-    final ticket = data?.text ??
-        'TNSTC Corporation:SETC , PNR NO.:T60856763 , From:CHENNAI-PT DR. M.G.R. BS To KUMBAKONAM , Trip Code:2300CHEKUMLB , Journey Date:10/01/2025 , Time:23:55 , Seat No.:4 UB, .Class:NON AC LOWER BIRTH SEATER , Boarding at:KOTTIVAKKAM(RTO OFFICE) . For e-Ticket: Download from View Ticket. Please carry your photo ID during journey. T&C apply. https://www.radiantinfo.com';
-
-    busTicket = SMSService().parseTicket(ticket);
-    debugPrint(busTicket);
-    // extractedText = busTicket.toString();
-    setState(() {});
   }
 
   Future<void> _loadTicketData() async {
     try {
-      final response =
-          await rootBundle.loadString('assets/data/mocked_tickets.json');
+      final response = await rootBundle
+          .loadString('lib/src/features/home/domain/ticket_mocked_data.json');
       final data = await json.decode(response) as List<dynamic>;
       if (!mounted) return;
       setState(() {
-        _travelTickets = data
-            .map((ticket) =>
-                TravelModelMapper.fromMap(ticket as Map<String, dynamic>))
+        _allTickets = data
+            .map((ticket) => GenericDetailsModelMapper.fromMap(
+                ticket as Map<String, dynamic>))
             .toList();
         _isLoading = false;
       });
+      for (final ticket in _allTickets) {
+        // ticket.type.name == EntryType.busTicket.name
+        //     ? _busTickets.add(ticket)
+        //     : _trainTickets.add(ticket);
+        switch (ticket.type) {
+          // case EntryType.busTicket:
+          //   _busTickets.add(ticket);
+          //   // ignore: unnecessary_breaks
+          //   break;
+          // case EntryType.trainTicket:
+          //   _trainTickets.add(ticket);
+          //   // ignore: unnecessary_breaks
+          //   break;
+          case EntryType.busTicket || EntryType.trainTicket:
+            _travelTickets.add(ticket);
+            // ignore: unnecessary_breaks
+            break;
+          case EntryType.event:
+            _eventTickets.add(ticket);
+            // ignore: unnecessary_breaks
+            break;
+          default:
+            _otherTickets.add(ticket);
+            // ignore: unnecessary_breaks
+            break;
+        }
+      }
     } catch (e) {
       if (!mounted) return;
       showSnackbar(context, 'Error loading card data: $e');
@@ -101,56 +87,77 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  Future<void> _loadOtherCardsData() async {
-    try {
-      final response = await rootBundle
-          .loadString('assets/data/event_tickets_mocked_data.json');
-      final data = await json.decode(response) as List;
-      if (!mounted) return;
-      setState(() {
-        _eventTickets = data
-            .map((card) =>
-                EventModelMapper.fromMap(card as Map<String, dynamic>))
-            .toList();
-      });
-    } catch (e) {
-      if (!mounted) return;
-      showSnackbar(context, 'Error loading other card data: $e');
-    }
-  }
+  // Map<String, dynamic> staticTnstcJson = {
+  //   'corporation': 'TNSTC',
+  //   'service': 'SETC',
+  //   'pnr_no': 'T63736642',
+  //   'from': 'CHENNAI-PT DR. M.G.R. BS',
+  //   'to': 'KUMBAKONAM',
+  //   'trip_code': '2145CHEKUMAB',
+  //   'journey_date': '11/02/2025',
+  //   'time': '22:35',
+  //   'seat_numbers': ['20', '21'],
+  //   'class': 'AC SLEEPER SEATER',
+  //   'boarding_at': 'KOTTIVAKKAM(RTO OFFICE)',
+  // };
 
-  String getFormattedDate() {
-    final now = DateTime.now();
-    final formatter = DateFormat('EEEE, MMM, dd');
-    return formatter.format(now);
-  }
+  // Future<void> onPDFExtractPressed() async {
+  //   final pdf = await FilePickerService().pickFile();
+  //   if (pdf == null) {
+  //     debugPrint('File not picked');
+  //     return;
+  //   }
+  //   final text = PDFService().extractTextFrom(pdf);
+  //   // extractedText = text;
+  //   setState(() {});
+  //   debugPrint(text);
+  //   final ticket = parseTicket(text);
+  //   debugPrint(ticket.toString());
+  // }
 
-  void _onError(BuildContext context, Object error) {
-    debugPrint(error.toString());
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        backgroundColor: Colors.red,
-        content: Text(error.toString()),
-      ),
-    );
-  }
+  // Future<void> onSMSExtractPressed() async {
+  //   final data = await Clipboard.getData('text/plain');
+  //   final ticket = data?.text ??
+  //       'TNSTC Corporation:SETC , PNR NO.:T60856763 , From:CHENNAI-PT DR. M.G.R. BS To KUMBAKONAM , Trip Code:2300CHEKUMLB , Journey Date:10/01/2025 , Time:23:55 , Seat No.:4 UB, .Class:NON AC LOWER BIRTH SEATER , Boarding at:KOTTIVAKKAM(RTO OFFICE) . For e-Ticket: Download from View Ticket. Please carry your photo ID during journey. T&C apply. https://www.radiantinfo.com';
 
-  void _onSuccess(BuildContext context) =>
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          backgroundColor: Colors.green,
-          content:
-              Text('Pass has been successfully added to the Google Wallet.'),
-        ),
-      );
+  //   busTicket = SMSService().parseTicket(ticket);
+  //   debugPrint(busTicket);
+  //   // extractedText = busTicket.toString();
+  //   setState(() {});
+  // }
 
-  void _onCanceled(BuildContext context) =>
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          backgroundColor: Colors.yellow,
-          content: Text('Adding a pass has been canceled.'),
-        ),
-      );
+  // String getFormattedDate() {
+  //   final now = DateTime.now();
+  //   final formatter = DateFormat('EEEE, MMM, dd');
+  //   return formatter.format(now);
+  // }
+
+  // void _onError(BuildContext context, Object error) {
+  //   debugPrint(error.toString());
+  //   ScaffoldMessenger.of(context).showSnackBar(
+  //     SnackBar(
+  //       backgroundColor: Colors.red,
+  //       content: Text(error.toString()),
+  //     ),
+  //   );
+  // }
+
+  // void _onSuccess(BuildContext context) =>
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       const SnackBar(
+  //         backgroundColor: Colors.green,
+  //         content:
+  //             Text('Pass has been successfully added to the Google Wallet.'),
+  //       ),
+  //     );
+
+  // void _onCanceled(BuildContext context) =>
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       const SnackBar(
+  //         backgroundColor: Colors.yellow,
+  //         content: Text('Adding a pass has been canceled.'),
+  //       ),
+  //     );
 
   @override
   Widget build(BuildContext context) {
@@ -158,7 +165,16 @@ class _HomePageState extends State<HomePage> {
       return CardModel(
         radius: const Radius.circular(30),
         shadowColor: Colors.transparent,
-        child: TravelTicketCard(ticket: card),
+        child: InkWell(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => TicketView(ticket: card),
+                ),
+              );
+            },
+            child: TravelTicketCardWidget(ticket: card)),
       );
       // return const SizedBox.shrink();
     }).toList();
@@ -169,7 +185,7 @@ class _HomePageState extends State<HomePage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              userProfileWidget(),
+              const UserProfileWidget(),
               const Padding(
                 padding: EdgeInsets.all(16),
                 child: Text(
@@ -230,8 +246,19 @@ class _HomePageState extends State<HomePage> {
                       itemCount: _eventTickets.length,
                       itemBuilder: (context, index) {
                         final event = _eventTickets[index];
-                        return EventCardWidget(
-                          event: event,
+                        return InkWell(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    TicketView(ticket: _eventTickets[index]),
+                              ),
+                            );
+                          },
+                          child: EventTicketCardWidget(
+                            ticket: event,
+                          ),
                         );
                       },
                     ),
@@ -293,38 +320,6 @@ class _HomePageState extends State<HomePage> {
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  Widget userProfileWidget() {
-    return Padding(
-      padding: const EdgeInsets.only(top: 16, right: 16, left: 16),
-      child: Row(
-        spacing: 16,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          //* Name
-          const Expanded(
-            child: Text(
-              'Namma Wallet',
-              style: TextStyle(
-                  color: AppColor.blackColor,
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold),
-              overflow: TextOverflow.ellipsis,
-              maxLines: 1,
-            ),
-          ),
-
-          //* Profile
-          CircleAvatar(
-            radius: 28,
-            backgroundImage: const NetworkImage(
-                'https://avatars.githubusercontent.com/u/583231?v=4'),
-            backgroundColor: Colors.grey[200],
-          ),
-        ],
       ),
     );
   }
