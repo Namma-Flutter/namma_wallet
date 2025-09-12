@@ -3,11 +3,12 @@ import 'package:flutter/material.dart';
 import '../../../../styles/styles.dart';
 
 class TicketLabelValueWidget extends StatelessWidget {
-  const TicketLabelValueWidget(
-      {super.key,
-      required this.label,
-      required this.value,
-      this.alignment = CrossAxisAlignment.start});
+  const TicketLabelValueWidget({
+    super.key,
+    required this.label,
+    required this.value,
+    this.alignment = CrossAxisAlignment.start,
+  });
 
   final String label;
   final String value;
@@ -26,12 +27,13 @@ class TicketLabelValueWidget extends StatelessWidget {
 }
 
 class TicketRowWidget extends StatelessWidget {
-  const TicketRowWidget(
-      {super.key,
-      required this.title1,
-      required this.title2,
-      this.value1,
-      this.value2});
+  const TicketRowWidget({
+    super.key,
+    required this.title1,
+    required this.title2,
+    this.value1,
+    this.value2,
+  });
 
   final String title1;
   final String title2;
@@ -90,10 +92,7 @@ class TicketFromToRowWidget extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Text('To', style: Paragraph02(color: Shades.s0).regular),
-              Text(
-                '--',
-                style: HeadingH6(color: Shades.s0).semiBold,
-              ),
+              Text('--', style: HeadingH6(color: Shades.s0).semiBold),
             ],
           ),
         ),

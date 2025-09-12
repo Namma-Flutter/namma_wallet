@@ -16,45 +16,45 @@ class _NammaWalletAppState extends State<NammaWalletApp> {
   int currentPageIndex = 0;
   @override
   Widget build(BuildContext context) => MaterialApp(
-        title: 'NammaWallet',
-        home: Scaffold(
-          bottomNavigationBar: NavigationBar(
-            onDestinationSelected: (int index) {
-              setState(() {
-                currentPageIndex = index;
-              });
-            },
-            indicatorColor: Colors.amber,
-            selectedIndex: currentPageIndex,
-            destinations: const <Widget>[
-              NavigationDestination(
-                selectedIcon: Icon(Icons.home),
-                icon: Icon(Icons.home_outlined),
-                label: 'Home',
-              ),
-              NavigationDestination(
-                selectedIcon: Icon(Icons.calendar_month),
-                icon: Icon(Icons.calendar_month_outlined),
-                label: 'Calender',
-              ),
-              NavigationDestination(
-                selectedIcon: Icon(Icons.qr_code),
-                icon: Icon(Icons.qr_code_scanner_outlined),
-                label: 'Scanner',
-              ),
-              NavigationDestination(
-                selectedIcon: Icon(Icons.more),
-                icon: Icon(Icons.more_outlined),
-                label: 'More',
-              ),
-            ],
+    title: 'NammaWallet',
+    home: Scaffold(
+      bottomNavigationBar: NavigationBar(
+        onDestinationSelected: (int index) {
+          setState(() {
+            currentPageIndex = index;
+          });
+        },
+        indicatorColor: Colors.amber,
+        selectedIndex: currentPageIndex,
+        destinations: const <Widget>[
+          NavigationDestination(
+            selectedIcon: Icon(Icons.home),
+            icon: Icon(Icons.home_outlined),
+            label: 'Home',
           ),
-          body: <Widget>[
-            const HomePage(),
-            const CalendarPage(),
-            ScannerScreen(),
-            const ProfilePage(),
-          ][currentPageIndex],
-        ),
-      );
+          NavigationDestination(
+            selectedIcon: Icon(Icons.calendar_month),
+            icon: Icon(Icons.calendar_month_outlined),
+            label: 'Calender',
+          ),
+          NavigationDestination(
+            selectedIcon: Icon(Icons.qr_code),
+            icon: Icon(Icons.qr_code_scanner_outlined),
+            label: 'Scanner',
+          ),
+          NavigationDestination(
+            selectedIcon: Icon(Icons.more),
+            icon: Icon(Icons.more_outlined),
+            label: 'More',
+          ),
+        ],
+      ),
+      body: <Widget>[
+        const HomePage(),
+        const CalendarPage(),
+        ScannerScreen(),
+        const ProfilePage(),
+      ][currentPageIndex],
+    ),
+  );
 }

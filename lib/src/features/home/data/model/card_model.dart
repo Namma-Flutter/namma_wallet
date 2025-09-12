@@ -21,7 +21,8 @@ class WalletCard {
       balance: json['balance'] as String?,
       number: json['number'] as String?,
       color: Color(
-          int.parse(json['color'].replaceFirst('0x', '') as String, radix: 16)),
+        int.parse(json['color'].replaceFirst('0x', '') as String, radix: 16),
+      ),
     );
   }
   final String? id;

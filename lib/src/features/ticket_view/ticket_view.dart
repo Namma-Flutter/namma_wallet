@@ -39,8 +39,10 @@ class _TicketViewState extends State<TicketView> {
             ),
           ),
         ),
-        title:
-            Text('Ticket View', style: HeadingH6(color: Shades.s100).regular),
+        title: Text(
+          'Ticket View',
+          style: HeadingH6(color: Shades.s100).regular,
+        ),
         actions: const [
           Center(
             child: CircleAvatar(
@@ -49,7 +51,7 @@ class _TicketViewState extends State<TicketView> {
               child: Icon(Icons.more_horiz, size: 28),
             ),
           ),
-          SizedBox(width: 16)
+          SizedBox(width: 16),
         ],
       ),
       body: Column(
@@ -89,18 +91,21 @@ class _TicketViewState extends State<TicketView> {
                 ),
                 const SizedBox(height: 16),
                 TicketLabelValueWidget(
-                    label: 'Seat Numbers',
-                    value: widget.ticket.seatNumbers.isEmpty
-                        ? "--"
-                        : widget.ticket.seatNumbers.join(', ')),
+                  label: 'Seat Numbers',
+                  value: widget.ticket.seatNumbers.isEmpty
+                      ? "--"
+                      : widget.ticket.seatNumbers.join(', '),
+                ),
                 const SizedBox(height: 16),
                 TicketLabelValueWidget(
-                    label: 'Class',
-                    value: getValueOrDefault(widget.ticket.ticketClass)),
+                  label: 'Class',
+                  value: getValueOrDefault(widget.ticket.ticketClass),
+                ),
                 const SizedBox(height: 16),
                 TicketLabelValueWidget(
-                    label: 'Boarding At',
-                    value: getValueOrDefault(widget.ticket.boardingAt)),
+                  label: 'Boarding At',
+                  value: getValueOrDefault(widget.ticket.boardingAt),
+                ),
               ],
             ),
           ),
@@ -125,7 +130,7 @@ class _TicketViewState extends State<TicketView> {
                 size: 200.0,
               ),
             ),
-          )
+          ),
         ],
       ),
     );

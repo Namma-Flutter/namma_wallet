@@ -47,9 +47,7 @@ class _ScannerScreenState extends State<ScannerScreen> {
               ),
             ),
             // Main content area
-            Expanded(
-              child: _buildCurrentScreen(),
-            ),
+            Expanded(child: _buildCurrentScreen()),
             // Bottom navigation with three buttons
             Container(
               padding: const EdgeInsets.all(16),
@@ -191,10 +189,7 @@ class _ScannerScreenState extends State<ScannerScreen> {
                         width: MediaQuery.of(context).size.width * 0.6,
                         height: MediaQuery.of(context).size.width * 0.6,
                         decoration: BoxDecoration(
-                          border: Border.all(
-                            color: Colors.blue,
-                            width: 3,
-                          ),
+                          border: Border.all(color: Colors.blue, width: 3),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Stack(
@@ -209,9 +204,13 @@ class _ScannerScreenState extends State<ScannerScreen> {
                                 decoration: const BoxDecoration(
                                   border: Border(
                                     left: BorderSide(
-                                        color: Colors.blue, width: 4),
+                                      color: Colors.blue,
+                                      width: 4,
+                                    ),
                                     top: BorderSide(
-                                        color: Colors.blue, width: 4),
+                                      color: Colors.blue,
+                                      width: 4,
+                                    ),
                                   ),
                                 ),
                               ),
@@ -225,9 +224,13 @@ class _ScannerScreenState extends State<ScannerScreen> {
                                 decoration: const BoxDecoration(
                                   border: Border(
                                     right: BorderSide(
-                                        color: Colors.blue, width: 4),
+                                      color: Colors.blue,
+                                      width: 4,
+                                    ),
                                     top: BorderSide(
-                                        color: Colors.blue, width: 4),
+                                      color: Colors.blue,
+                                      width: 4,
+                                    ),
                                   ),
                                 ),
                               ),
@@ -241,9 +244,13 @@ class _ScannerScreenState extends State<ScannerScreen> {
                                 decoration: const BoxDecoration(
                                   border: Border(
                                     left: BorderSide(
-                                        color: Colors.blue, width: 4),
+                                      color: Colors.blue,
+                                      width: 4,
+                                    ),
                                     bottom: BorderSide(
-                                        color: Colors.blue, width: 4),
+                                      color: Colors.blue,
+                                      width: 4,
+                                    ),
                                   ),
                                 ),
                               ),
@@ -257,9 +264,13 @@ class _ScannerScreenState extends State<ScannerScreen> {
                                 decoration: const BoxDecoration(
                                   border: Border(
                                     right: BorderSide(
-                                        color: Colors.blue, width: 4),
+                                      color: Colors.blue,
+                                      width: 4,
+                                    ),
                                     bottom: BorderSide(
-                                        color: Colors.blue, width: 4),
+                                      color: Colors.blue,
+                                      width: 4,
+                                    ),
                                   ),
                                 ),
                               ),
@@ -325,10 +336,7 @@ class _ScannerScreenState extends State<ScannerScreen> {
                     ),
                     child: SelectableText(
                       qrResult!,
-                      style: TextStyle(
-                        color: Colors.blue[700],
-                        fontSize: 14,
-                      ),
+                      style: TextStyle(color: Colors.blue[700], fontSize: 14),
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -340,7 +348,8 @@ class _ScannerScreenState extends State<ScannerScreen> {
                           Clipboard.setData(ClipboardData(text: qrResult!));
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
-                                content: Text('Copied to clipboard!')),
+                              content: Text('Copied to clipboard!'),
+                            ),
                           );
                         },
                         icon: const Icon(Icons.copy, size: 16),
@@ -389,10 +398,7 @@ class _ScannerScreenState extends State<ScannerScreen> {
                 ),
                 child: IconButton(
                   onPressed: _toggleFlashlight,
-                  icon: Icon(
-                    Icons.flash_on,
-                    color: Colors.blue[800],
-                  ),
+                  icon: Icon(Icons.flash_on, color: Colors.blue[800]),
                 ),
               ),
             ],
@@ -422,10 +428,7 @@ class _ScannerScreenState extends State<ScannerScreen> {
                 expands: true,
                 decoration: InputDecoration(
                   hintText: 'Paste or type your text here...',
-                  hintStyle: TextStyle(
-                    color: Colors.grey[500],
-                    fontSize: 16,
-                  ),
+                  hintStyle: TextStyle(color: Colors.grey[500], fontSize: 16),
                   border: InputBorder.none,
                 ),
                 style: const TextStyle(fontSize: 16),
@@ -516,7 +519,9 @@ class _ScannerScreenState extends State<ScannerScreen> {
                         if (uploadedFileName != null) ...[
                           Container(
                             padding: const EdgeInsets.symmetric(
-                                horizontal: 16, vertical: 12),
+                              horizontal: 16,
+                              vertical: 12,
+                            ),
                             decoration: BoxDecoration(
                               color: Colors.blue[50],
                               borderRadius: BorderRadius.circular(8),
@@ -524,8 +529,11 @@ class _ScannerScreenState extends State<ScannerScreen> {
                             ),
                             child: Column(
                               children: [
-                                const Icon(Icons.check_circle,
-                                    color: Colors.green, size: 24),
+                                const Icon(
+                                  Icons.check_circle,
+                                  color: Colors.green,
+                                  size: 24,
+                                ),
                                 const SizedBox(height: 8),
                                 Text(
                                   'File Uploaded:',
@@ -549,7 +557,9 @@ class _ScannerScreenState extends State<ScannerScreen> {
                         ] else ...[
                           Container(
                             padding: const EdgeInsets.symmetric(
-                                horizontal: 24, vertical: 12),
+                              horizontal: 24,
+                              vertical: 12,
+                            ),
                             decoration: BoxDecoration(
                               border: Border.all(color: Colors.blue, width: 2),
                               borderRadius: BorderRadius.circular(8),
@@ -557,8 +567,11 @@ class _ScannerScreenState extends State<ScannerScreen> {
                             child: const Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Icon(Icons.upload,
-                                    color: Colors.blue, size: 20),
+                                Icon(
+                                  Icons.upload,
+                                  color: Colors.blue,
+                                  size: 20,
+                                ),
                                 SizedBox(width: 8),
                                 Text(
                                   'Upload File',
@@ -730,8 +743,9 @@ class DashedBorderPainter extends CustomPainter {
       canvas.drawLine(
         Offset(startX, 0),
         Offset(
-            startX + dashWidth > size.width ? size.width : startX + dashWidth,
-            0),
+          startX + dashWidth > size.width ? size.width : startX + dashWidth,
+          0,
+        ),
         paint,
       );
       startX += dashWidth + dashSpace;
@@ -743,10 +757,9 @@ class DashedBorderPainter extends CustomPainter {
       canvas.drawLine(
         Offset(size.width, startY),
         Offset(
-            size.width,
-            startY + dashWidth > size.height
-                ? size.height
-                : startY + dashWidth),
+          size.width,
+          startY + dashWidth > size.height ? size.height : startY + dashWidth,
+        ),
         paint,
       );
       startY += dashWidth + dashSpace;

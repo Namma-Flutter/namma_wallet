@@ -23,10 +23,7 @@ class WalletCardWidget extends StatelessWidget {
 }
 
 class PasporCard extends StatelessWidget {
-  const PasporCard({
-    super.key,
-    required this.card,
-  });
+  const PasporCard({super.key, required this.card});
 
   final WalletCard card;
 
@@ -43,11 +40,14 @@ class PasporCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(card.name!,
-                  style: const TextStyle(
-                      color: Colors.black87,
-                      fontSize: 20,
-                      fontWeight: FontWeight.w600)),
+              Text(
+                card.name!,
+                style: const TextStyle(
+                  color: Colors.black87,
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
@@ -57,9 +57,10 @@ class PasporCard extends StatelessWidget {
                 child: Text(
                   card.brand!,
                   style: const TextStyle(
-                      color: Colors.black87,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold),
+                    color: Colors.black87,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ],
@@ -73,10 +74,7 @@ class PasporCard extends StatelessWidget {
 }
 
 class AmexCard extends StatelessWidget {
-  const AmexCard({
-    super.key,
-    required this.card,
-  });
+  const AmexCard({super.key, required this.card});
 
   final WalletCard card;
 
@@ -93,17 +91,21 @@ class AmexCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(card.name!,
-                  style: const TextStyle(
-                      color: Colors.black87,
-                      fontSize: 20,
-                      fontWeight: FontWeight.w600)),
+              Text(
+                card.name!,
+                style: const TextStyle(
+                  color: Colors.black87,
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
               Text(
                 card.brand!,
                 style: const TextStyle(
-                    color: Colors.black54,
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold),
+                  color: Colors.black54,
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ],
           ),
@@ -116,10 +118,7 @@ class AmexCard extends StatelessWidget {
 }
 
 class PayCashCard extends StatelessWidget {
-  const PayCashCard({
-    super.key,
-    required this.card,
-  });
+  const PayCashCard({super.key, required this.card});
 
   final WalletCard card;
 
@@ -141,26 +140,33 @@ class PayCashCard extends StatelessWidget {
                 children: [
                   const Icon(Icons.apple, color: Colors.white, size: 28),
                   const SizedBox(width: 20),
-                  Text(card.name!,
-                      style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 20,
-                          fontWeight: FontWeight.w600)),
+                  Text(
+                    card.name!,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
                 ],
               ),
               Text(
                 card.balance!,
                 style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold),
+                  color: Colors.white,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ],
           ),
           Text(
             card.number!,
             style: const TextStyle(
-                color: Colors.white70, fontSize: 18, letterSpacing: 2),
+              color: Colors.white70,
+              fontSize: 18,
+              letterSpacing: 2,
+            ),
           ),
         ],
       ),

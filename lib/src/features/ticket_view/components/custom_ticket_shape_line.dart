@@ -84,11 +84,11 @@ class DashedLinePainter extends CustomPainter {
     this.cap = StrokeCap.butt,
     Color? color,
   }) : linePaint = Paint()
-          ..color = color ?? Colors.black
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = strokeWidth
-          ..strokeCap = cap
-          ..isAntiAlias = true;
+         ..color = color ?? Colors.black
+         ..style = PaintingStyle.stroke
+         ..strokeWidth = strokeWidth
+         ..strokeCap = cap
+         ..isAntiAlias = true;
 
   @override
   void paint(Canvas canvas, Size size) {

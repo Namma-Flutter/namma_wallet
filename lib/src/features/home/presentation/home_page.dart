@@ -67,7 +67,8 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> onSMSExtractPressed() async {
     final data = await Clipboard.getData('text/plain');
-    final ticket = data?.text ??
+    final ticket =
+        data?.text ??
         'TNSTC Corporation:SETC , PNR NO.:T60856763 , From:CHENNAI-PT DR. M.G.R. BS To KUMBAKONAM , Trip Code:2300CHEKUMLB , Journey Date:10/01/2025 , Time:23:55 , Seat No.:4 UB, .Class:NON AC LOWER BIRTH SEATER , Boarding at:KOTTIVAKKAM(RTO OFFICE) . For e-Ticket: Download from View Ticket. Please carry your photo ID during journey. T&C apply. https://www.radiantinfo.com';
 
     busTicket = SMSService().parseTicket(ticket);
@@ -98,8 +99,9 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> _loadOtherCardsData() async {
     try {
-      final response =
-          await rootBundle.loadString('assets/data/other_cards.json');
+      final response = await rootBundle.loadString(
+        'assets/data/other_cards.json',
+      );
       final data = await json.decode(response) as List;
       if (!mounted) return;
       setState(() {
@@ -122,10 +124,7 @@ class _HomePageState extends State<HomePage> {
   void _onError(BuildContext context, Object error) {
     debugPrint(error.toString());
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        backgroundColor: Colors.red,
-        content: Text(error.toString()),
-      ),
+      SnackBar(backgroundColor: Colors.red, content: Text(error.toString())),
     );
   }
 
@@ -133,8 +132,9 @@ class _HomePageState extends State<HomePage> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           backgroundColor: Colors.green,
-          content:
-              Text('Pass has been successfully added to the Google Wallet.'),
+          content: Text(
+            'Pass has been successfully added to the Google Wallet.',
+          ),
         ),
       );
 
@@ -184,8 +184,10 @@ class _HomePageState extends State<HomePage> {
                         //* More button
                         TextButton(
                           onPressed: () {},
-                          child: const Text('Show More',
-                              style: TextStyle(color: Colors.blue)),
+                          child: const Text(
+                            'Show More',
+                            style: TextStyle(color: Colors.blue),
+                          ),
                         ),
                       ],
                     ),
@@ -211,8 +213,9 @@ class _HomePageState extends State<HomePage> {
                           scaleFactor: 1.5,
                           alignment: Alignment.center,
                           animateCardScale: true,
-                          dismissedCardDuration:
-                              const Duration(milliseconds: 150),
+                          dismissedCardDuration: const Duration(
+                            milliseconds: 150,
+                          ),
                         ),
                       ),
               //* Other Cards Section
@@ -237,8 +240,10 @@ class _HomePageState extends State<HomePage> {
                         //* More button
                         TextButton(
                           onPressed: () {},
-                          child: const Text('Show More',
-                              style: TextStyle(color: Colors.blue)),
+                          child: const Text(
+                            'Show More',
+                            style: TextStyle(color: Colors.blue),
+                          ),
                         ),
                       ],
                     ),

@@ -30,8 +30,10 @@ class SMSService {
     );
     final departureTime = extractMatch(r'Time\s*:\s*(\d{2}:\d{2})', text);
     final classOfService = extractMatch(r'Class\s*:\s*(.*?)(?=,)', text);
-    final passengerPickupPoint =
-        extractMatch(r'Boarding at\s*:\s*(.*?)(?=\.|$)', text);
+    final passengerPickupPoint = extractMatch(
+      r'Boarding at\s*:\s*(.*?)(?=\.|$)',
+      text,
+    );
 
     return createGooglePass(
       BusTicket(
@@ -58,8 +60,8 @@ class SMSService {
 
     // Ensure origin_name is set based on destination
     String originName = (busTicket.serviceStartPlace ?? 'MNH').toAreaCode();
-    final String destinationName =
-        (busTicket.serviceEndPlace ?? 'CHN').toAreaCode();
+    final String destinationName = (busTicket.serviceEndPlace ?? 'CHN')
+        .toAreaCode();
 
     // Check if destination is provided and origin is missing, then set originName to a default value
     if (destinationName.isNotEmpty && originName.isEmpty) {
@@ -154,10 +156,12 @@ extension ShortFormExtension on String {
 
     // General rule: Return first three characters of the first word
     // and first three characters of the second word (if present)
-    final String firstPart =
-        words.isNotEmpty ? words.first.substring(0, 3).toUpperCase() : '';
-    final String secondPart =
-        words.length > 1 ? words[1].substring(0, 3).toUpperCase() : '';
+    final String firstPart = words.isNotEmpty
+        ? words.first.substring(0, 3).toUpperCase()
+        : '';
+    final String secondPart = words.length > 1
+        ? words[1].substring(0, 3).toUpperCase()
+        : '';
 
     return [firstPart, secondPart].where((part) => part.isNotEmpty).join(' ');
   }
