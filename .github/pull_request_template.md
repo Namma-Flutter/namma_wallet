@@ -17,7 +17,10 @@ Please ensure the following before submitting your PR:
   Example branch: `feature/login-screen`
 
 - [ ] **Code is formatted** before committing.  
-  Run `flutter format .` (or ensure your IDE does this automatically).
+  Run `fvm dart format .` (or ensure your IDE does this automatically).
+
+- [ ] **Follow naming conventions for widgets and views.**  
+  Use "view" suffix for main/page widgets (`HomeView`, file: `home_view.dart`) and "widget" suffix for smaller reusable components (`TicketCardWidget`, file: `ticket_card_widget.dart`).
 
 ---
 
