@@ -234,8 +234,9 @@ class _ModelDownloadScreenState extends State<ModelDownloadScreen> {
   }
 }
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  runApp(
-      const MaterialApp(home: ModelDownloadScreen(model: Model.gemma3_270M)));
-}
+/// For testing
+// void main() async {
+//   WidgetsFlutterBinding.ensureInitialized();
+//   runApp(
+//       const MaterialApp(home: ModelDownloadScreen(model: Model.gemma3_270M)));
+// }
