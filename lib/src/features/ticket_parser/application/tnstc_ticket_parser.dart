@@ -93,12 +93,7 @@ class PassengerInfo {
   final String seatNumber;
 
   @override
-<<<<<<< HEAD
-  String toString() =>
-      'PassengerInfo(\n'
-=======
   String toString() => 'PassengerInfo(\n'
->>>>>>> main
       'Name: $name,\n'
       'Age: $age,\n'
       'Type: $type,\n'
@@ -157,15 +152,8 @@ BusTicket parseTicket(String text) {
   final corporation = extractMatch(r'Corporation\s*:\s*(.*)', text);
   final pnrNumber = extractMatch(r'PNR Number\s*:\s*(\S+)', text);
   final journeyDate = parseDate(
-<<<<<<< HEAD
-    extractMatch(
-      r'Date of Journey\s*:\s*(\d{2}/\d{2}/\d{4})',
-      text,
-    ).replaceAll('/', '-'),
-=======
     extractMatch(r'Date of Journey\s*:\s*(\d{2}/\d{2}/\d{4})', text)
         .replaceAll('/', '-'),
->>>>>>> main
   );
   final routeNo = extractMatch(r'Route No\s*:\s*(\S+)', text);
   final serviceStartPlace = extractMatch(
@@ -173,24 +161,6 @@ BusTicket parseTicket(String text) {
     text,
   );
   final serviceEndPlace = extractMatch(r'Service End Place\s*:\s*(.*)', text);
-<<<<<<< HEAD
-  final serviceStartTime = extractMatch(
-    r'Service Start Time\s*:\s*(\d{2}:\d{2})',
-    text,
-  );
-  final passengerStartPlace = extractMatch(
-    r'Passenger Start Place\s*:\s*(.*)',
-    text,
-  );
-  final passengerEndPlace = extractMatch(
-    r'Passenger End Place\s*:\s*(.*)',
-    text,
-  );
-  final passengerPickupPoint = extractMatch(
-    r'Passenger Pickup Point\s*:\s*(.*)',
-    text,
-  );
-=======
   final serviceStartTime =
       extractMatch(r'Service Start Time\s*:\s*(\d{2}:\d{2})', text);
   final passengerStartPlace =
@@ -199,7 +169,6 @@ BusTicket parseTicket(String text) {
       extractMatch(r'Passenger End Place\s*:\s*(.*)', text);
   final passengerPickupPoint =
       extractMatch(r'Passenger Pickup Point\s*:\s*(.*)', text);
->>>>>>> main
   final passengerPickupTime = parseDateTime(
     extractMatch(
       r'Passenger Pickup Time\s*:\s*(\d{2}/\d{2}/\d{4} \d{2}:\d{2})',
