@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gemma/pigeon.g.dart';
 import 'package:namma_wallet/src/features/ai/fallback-parser/application/model_download_repo.dart';
 import 'package:namma_wallet/src/features/ai/fallback-parser/domain/enums/model_configs.dart';
+import 'package:namma_wallet/src/features/ai/fallback-parser/presentation/inference_screen.dart';
 
 /// Screen for downloading, managing, and using an AI model.
 class ModelDownloadScreen extends StatefulWidget {

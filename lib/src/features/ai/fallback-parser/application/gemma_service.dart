@@ -12,7 +12,7 @@ class GemmaLocalService {
   /// Add a user message to the chat history
   Future<void> addQuery(Message message) => _chat.addQuery(message);
 
-  /// Add message and get a **stream of responses** from the model
+  /// Add message and get a stream of responses from the model
   Future<Stream<ModelResponse>> processMessage(Message message) async {
     debugPrint('GemmaLocalService: processing "${message.text}"');
     await _chat.addQuery(message);

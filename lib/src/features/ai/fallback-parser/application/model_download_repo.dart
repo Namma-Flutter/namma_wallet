@@ -50,6 +50,8 @@ class ModelDownloadService {
       final filePath = await getFilePath();
       final file = File(filePath);
 
+      return file.existsSync();
+
       final headers = token.isNotEmpty
           ? {'Authorization': 'Bearer $token'}
           : <String, String>{};
