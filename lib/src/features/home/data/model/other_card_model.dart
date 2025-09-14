@@ -1,11 +1,6 @@
 import 'package:flutter/material.dart';
 
 class OtherCard {
-  final String icon;
-  final String title;
-  final String subtitle;
-  final String date;
-  final String price;
 
   OtherCard({
     required this.icon,
@@ -24,6 +19,11 @@ class OtherCard {
       price: json['price'] as String,
     );
   }
+  final String icon;
+  final String title;
+  final String subtitle;
+  final String date;
+  final String price;
 }
 
 IconData getIconData(String iconName) {

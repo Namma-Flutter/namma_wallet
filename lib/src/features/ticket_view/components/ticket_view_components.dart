@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 
-import '../../../../styles/styles.dart';
+import 'package:namma_wallet/styles/styles.dart';
 
 class TicketLabelValueWidget extends StatelessWidget {
   const TicketLabelValueWidget(
-      {super.key,
-      required this.label,
-      required this.value,
+      {required this.label, required this.value, super.key,
       this.alignment = CrossAxisAlignment.start});
 
   final String label;
@@ -27,9 +25,7 @@ class TicketLabelValueWidget extends StatelessWidget {
 
 class TicketRowWidget extends StatelessWidget {
   const TicketRowWidget(
-      {super.key,
-      required this.title1,
-      required this.title2,
+      {required this.title1, required this.title2, super.key,
       this.value1,
       this.value2});
 
@@ -47,7 +43,6 @@ class TicketRowWidget extends StatelessWidget {
           child: TicketLabelValueWidget(
             label: title1,
             value: value1 ?? '',
-            alignment: CrossAxisAlignment.start,
           ),
         ),
         Expanded(

@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:namma_wallet/src/features/home/data/model/card_model.dart';
 
 class WalletCardWidget extends StatelessWidget {
-  final WalletCard card;
 
-  const WalletCardWidget({super.key, required this.card});
+  const WalletCardWidget({required this.card, super.key});
+  final WalletCard card;
 
   @override
   Widget build(BuildContext context) {
@@ -24,8 +24,7 @@ class WalletCardWidget extends StatelessWidget {
 
 class PasporCard extends StatelessWidget {
   const PasporCard({
-    super.key,
-    required this.card,
+    required this.card, super.key,
   });
 
   final WalletCard card;
@@ -33,7 +32,7 @@ class PasporCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(20.0),
+      padding: const EdgeInsets.all(20),
       width: 400,
       height: 200,
       child: Column(
@@ -74,8 +73,7 @@ class PasporCard extends StatelessWidget {
 
 class AmexCard extends StatelessWidget {
   const AmexCard({
-    super.key,
-    required this.card,
+    required this.card, super.key,
   });
 
   final WalletCard card;
@@ -83,7 +81,7 @@ class AmexCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(20.0),
+      padding: const EdgeInsets.all(20),
       width: 400,
       height: 200,
       child: Column(
@@ -117,8 +115,7 @@ class AmexCard extends StatelessWidget {
 
 class PayCashCard extends StatelessWidget {
   const PayCashCard({
-    super.key,
-    required this.card,
+    required this.card, super.key,
   });
 
   final WalletCard card;
@@ -126,7 +123,7 @@ class PayCashCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(20.0),
+      padding: const EdgeInsets.all(20),
       width: 400,
       height: 200,
       child: Column(

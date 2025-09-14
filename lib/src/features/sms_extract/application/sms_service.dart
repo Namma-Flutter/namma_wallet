@@ -51,14 +51,14 @@ class SMSService {
 
   String createGooglePass(BusTicket busTicket) {
     // Generate pass
-    final String passId = const Uuid().v4();
-    final String passClass = 'tnstc';
-    final String issuerId = '3388000000022803339';
-    final String issuerEmail = 'warriorharish95668@gmail.com';
+    final passId = const Uuid().v4();
+    const passClass = 'tnstc';
+    const issuerId = '3388000000022803339';
+    const issuerEmail = 'warriorharish95668@gmail.com';
 
     // Ensure origin_name is set based on destination
-    String originName = (busTicket.serviceStartPlace ?? 'MNH').toAreaCode();
-    final String destinationName =
+    var originName = (busTicket.serviceStartPlace ?? 'MNH').toAreaCode();
+    final destinationName =
         (busTicket.serviceEndPlace ?? 'CHN').toAreaCode();
 
     // Check if destination is provided and origin is missing, then set originName to a default value
@@ -67,11 +67,11 @@ class SMSService {
     }
 
     // Variables for JSON fields
-    final String ticketNumber = busTicket.pnrNumber ?? '';
-    final String tripId = busTicket.tripCode ?? '';
-    final String journeyDate = busTicket.journeyDate?.toIso8601String() ?? '';
-    final String fareAmount = busTicket.totalFare?.toString() ?? '0.0';
-    final String serviceClass = busTicket.classOfService ?? '';
+    final ticketNumber = busTicket.pnrNumber ?? '';
+    final tripId = busTicket.tripCode ?? '';
+    final journeyDate = busTicket.journeyDate?.toIso8601String() ?? '';
+    final fareAmount = busTicket.totalFare?.toString() ?? '0.0';
+    final serviceClass = busTicket.classOfService ?? '';
 
     // Create JSON string with variables
     return '''
@@ -142,7 +142,7 @@ extension ShortFormExtension on String {
   /// "KUMBAKONAM" -> "KUM"
   String toAreaCode() {
     // Split the string into words
-    final List<String> words = split(RegExp(r'[\s\-\.]+'));
+    final words = split(RegExp(r'[\s\-\.]+'));
 
     // Handle special cases for specific names
     if (toUpperCase().contains('CHENNAI')) {
@@ -154,9 +154,9 @@ extension ShortFormExtension on String {
 
     // General rule: Return first three characters of the first word
     // and first three characters of the second word (if present)
-    final String firstPart =
+    final firstPart =
         words.isNotEmpty ? words.first.substring(0, 3).toUpperCase() : '';
-    final String secondPart =
+    final secondPart =
         words.length > 1 ? words[1].substring(0, 3).toUpperCase() : '';
 
     return [firstPart, secondPart].where((part) => part.isNotEmpty).join(' ');

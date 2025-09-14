@@ -1,7 +1,6 @@
 import 'dart:core';
 
 class BusTicket {
-
   BusTicket({
     this.corporation,
     this.pnrNumber,
@@ -53,34 +52,33 @@ class BusTicket {
 
   @override
   String toString() => 'BusTicket(\n'
-        'Corporation: $corporation,\n'
-        'PNR Number: $pnrNumber,\n'
-        'Journey Date: $journeyDate,\n'
-        'Route No: $routeNo,\n'
-        'Service Start Place: $serviceStartPlace,\n'
-        'Service End Place: $serviceEndPlace,\n'
-        'Service Start Time: $serviceStartTime,\n'
-        'Passenger Start Place: $passengerStartPlace,\n'
-        'Passenger End Place: $passengerEndPlace,\n'
-        'Passenger Pickup Point: $passengerPickupPoint,\n'
-        'Passenger Pickup Time: $passengerPickupTime,\n'
-        'Platform Number: $platformNumber,\n'
-        'Class of Service: $classOfService,\n'
-        'Trip Code: $tripCode,\n'
-        'OB Reference No: $obReferenceNumber,\n'
-        'Number of Seats: $numberOfSeats,\n'
-        'Bank Transaction No: $bankTransactionNumber,\n'
-        'Bus ID No: $busIdNumber,\n'
-        'Passenger Category: $passengerCategory,\n'
-        'Passenger Info: $passengerInfo,\n'
-        'ID Card Type: $idCardType,\n'
-        'ID Card Number: $idCardNumber,\n'
-        'Total Fare: $totalFare\n'
-        ')';
+      'Corporation: $corporation,\n'
+      'PNR Number: $pnrNumber,\n'
+      'Journey Date: $journeyDate,\n'
+      'Route No: $routeNo,\n'
+      'Service Start Place: $serviceStartPlace,\n'
+      'Service End Place: $serviceEndPlace,\n'
+      'Service Start Time: $serviceStartTime,\n'
+      'Passenger Start Place: $passengerStartPlace,\n'
+      'Passenger End Place: $passengerEndPlace,\n'
+      'Passenger Pickup Point: $passengerPickupPoint,\n'
+      'Passenger Pickup Time: $passengerPickupTime,\n'
+      'Platform Number: $platformNumber,\n'
+      'Class of Service: $classOfService,\n'
+      'Trip Code: $tripCode,\n'
+      'OB Reference No: $obReferenceNumber,\n'
+      'Number of Seats: $numberOfSeats,\n'
+      'Bank Transaction No: $bankTransactionNumber,\n'
+      'Bus ID No: $busIdNumber,\n'
+      'Passenger Category: $passengerCategory,\n'
+      'Passenger Info: $passengerInfo,\n'
+      'ID Card Type: $idCardType,\n'
+      'ID Card Number: $idCardNumber,\n'
+      'Total Fare: $totalFare\n'
+      ')';
 }
 
 class PassengerInfo {
-
   PassengerInfo({
     required this.name,
     required this.age,
@@ -96,12 +94,12 @@ class PassengerInfo {
 
   @override
   String toString() => 'PassengerInfo(\n'
-        'Name: $name,\n'
-        'Age: $age,\n'
-        'Type: $type,\n'
-        'Gender: $gender,\n'
-        'Seat Number: $seatNumber\n'
-        ')';
+      'Name: $name,\n'
+      'Age: $age,\n'
+      'Type: $type,\n'
+      'Gender: $gender,\n'
+      'Seat Number: $seatNumber\n'
+      ')';
 }
 
 BusTicket parseTicket(String text) {
@@ -135,7 +133,12 @@ BusTicket parseTicket(String text) {
     final hour = int.parse(timeParts[0]);
     final minute = int.parse(timeParts[1]);
     return DateTime(
-        year, month, day, hour, minute,); // Construct DateTime object
+      year,
+      month,
+      day,
+      hour,
+      minute,
+    ); // Construct DateTime object
   }
 
   int parseAge(String text) {
@@ -149,8 +152,9 @@ BusTicket parseTicket(String text) {
   final corporation = extractMatch(r'Corporation\s*:\s*(.*)', text);
   final pnrNumber = extractMatch(r'PNR Number\s*:\s*(\S+)', text);
   final journeyDate = parseDate(
-      extractMatch(r'Date of Journey\s*:\s*(\d{2}/\d{2}/\d{4})', text)
-          .replaceAll('/', '-'),);
+    extractMatch(r'Date of Journey\s*:\s*(\d{2}/\d{2}/\d{4})', text)
+        .replaceAll('/', '-'),
+  );
   final routeNo = extractMatch(r'Route No\s*:\s*(\S+)', text);
   final serviceStartPlace =
       extractMatch(r'Service Start Place\s*:\s*(.*)', text);
@@ -163,9 +167,12 @@ BusTicket parseTicket(String text) {
       extractMatch(r'Passenger End Place\s*:\s*(.*)', text);
   final passengerPickupPoint =
       extractMatch(r'Passenger Pickup Point\s*:\s*(.*)', text);
-  final passengerPickupTime = parseDateTime(extractMatch(
-          r'Passenger Pickup Time\s*:\s*(\d{2}/\d{2}/\d{4} \d{2}:\d{2})', text,)
-      .replaceAll('/', '-'),);
+  final passengerPickupTime = parseDateTime(
+    extractMatch(
+      r'Passenger Pickup Time\s*:\s*(\d{2}/\d{2}/\d{4} \d{2}:\d{2})',
+      text,
+    ).replaceAll('/', '-'),
+  );
   final platformNumber = extractMatch(r'Platform Number\s*:\s*(\S+)', text);
   final classOfService = extractMatch(r'Class of Service\s*:\s*(.*)', text);
   final tripCode = extractMatch(r'Trip Code\s*:\s*(\S+)', text);
@@ -179,10 +186,12 @@ BusTicket parseTicket(String text) {
   final passengerCategory =
       extractMatch(r'Passenger category\s*:\s*(.*)', text);
   final passengerName = extractMatch(
-      r'Name\s+Age\s+Adult/Child\s+Gender\s+Seat No\.\n(.*)\s+\d+', text,);
+    r'Name\s+Age\s+Adult/Child\s+Gender\s+Seat No\.\n(.*)\s+\d+',
+    text,
+  );
   final passengerAge = parseAge(text);
-  final passengerType = extractMatch(r'Adult|Child', text);
-  final passengerGender = extractMatch(r'(M|F)', text);
+  final passengerType = extractMatch('Adult|Child', text);
+  final passengerGender = extractMatch('(M|F)', text);
   final passengerSeatNumber = extractMatch(r'\d+[A-Z]+', text);
   final idCardType = extractMatch(r'ID Card Type\s*:\s*(.*)', text);
   final idCardNumber = extractMatch(r'ID Card Number\s*:\s*(.*)', text);
@@ -227,7 +236,7 @@ BusTicket parseTicket(String text) {
 // void main() {
 //   const ticketText = '''
 // E-Ticket/Reservation Voucher-H
- 
+
 // Corporation :
 // SETC
 // PNR Number :

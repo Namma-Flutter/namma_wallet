@@ -3,8 +3,7 @@ import 'package:namma_wallet/src/features/home/data/model/other_card_model.dart'
 
 class TicketCardWidget extends StatelessWidget {
   const TicketCardWidget({
-    super.key,
-    required this.card,
+    required this.card, super.key,
   });
 
   final OtherCard card;
