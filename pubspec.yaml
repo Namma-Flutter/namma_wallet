@@ -29,7 +29,7 @@ dependencies:
   syncfusion_flutter_pdf: ^31.1.19
   uuid: ^4.5.1
   flutter_gemma: ^0.10.5
-  
+
 
 dev_dependencies:
   build_runner: ^2.4.0

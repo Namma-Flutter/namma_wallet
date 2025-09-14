@@ -3,3 +3,4 @@
 *.g.dart linguist-generated=true
 *.gen.dart linguist-generated=true
 *.gr.dart linguist-generated=true
+*.mapper.dart linguist-generated=true
