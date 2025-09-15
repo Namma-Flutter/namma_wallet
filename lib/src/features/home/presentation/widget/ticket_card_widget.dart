@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:namma_wallet/src/features/home/data/model/other_card_model.dart';
+import 'package:namma_wallet/src/features/home/domain/other_card_model.dart';
 
 class TicketCardWidget extends StatelessWidget {
   const TicketCardWidget({
-    required this.card, super.key,
+    required this.card,
+    super.key,
   });
 
   final OtherCard card;

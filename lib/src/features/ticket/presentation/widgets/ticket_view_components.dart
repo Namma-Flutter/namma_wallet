@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 
-import 'package:namma_wallet/styles/styles.dart';
+import 'package:namma_wallet/src/core/styles/styles.dart';
 
 class TicketLabelValueWidget extends StatelessWidget {
   const TicketLabelValueWidget(
-      {required this.label, required this.value, super.key,
+      {required this.label,
+      required this.value,
+      super.key,
       this.alignment = CrossAxisAlignment.start});
 
   final String label;
@@ -25,7 +27,9 @@ class TicketLabelValueWidget extends StatelessWidget {
 
 class TicketRowWidget extends StatelessWidget {
   const TicketRowWidget(
-      {required this.title1, required this.title2, super.key,
+      {required this.title1,
+      required this.title2,
+      super.key,
       this.value1,
       this.value2});
 
@@ -58,7 +62,14 @@ class TicketRowWidget extends StatelessWidget {
 }
 
 class TicketFromToRowWidget extends StatelessWidget {
-  const TicketFromToRowWidget({super.key});
+  const TicketFromToRowWidget({
+    required this.fromLocation,
+    required this.toLocation,
+    super.key,
+  });
+
+  final String fromLocation;
+  final String toLocation;
 
   @override
   Widget build(BuildContext context) {
@@ -72,7 +83,7 @@ class TicketFromToRowWidget extends StatelessWidget {
             children: [
               Text('From', style: Paragraph02(color: Shades.s0).regular),
               Text(
-                '--',
+                fromLocation,
                 style: HeadingH6(color: Shades.s0).semiBold,
                 textAlign: TextAlign.start,
                 overflow: TextOverflow.clip,
@@ -86,7 +97,7 @@ class TicketFromToRowWidget extends StatelessWidget {
             children: [
               Text('To', style: Paragraph02(color: Shades.s0).regular),
               Text(
-                '--',
+                toLocation,
                 style: HeadingH6(color: Shades.s0).semiBold,
               ),
             ],

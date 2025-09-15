@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 class OtherCard {
-
   OtherCard({
     required this.icon,
     required this.title,

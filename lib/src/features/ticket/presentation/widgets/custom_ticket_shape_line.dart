@@ -1,7 +1,7 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
-import 'package:namma_wallet/styles/styles.dart';
+import 'package:namma_wallet/src/core/styles/styles.dart';
 
 class CustomTicketShapeLine extends CustomPainter {
   @override
@@ -62,7 +62,6 @@ class CustomTicketShapeLine extends CustomPainter {
 }
 
 class DashedLinePainter extends CustomPainter {
-
   DashedLinePainter({
     this.padding = 0.0,
     this.dashLength = 8.0,
