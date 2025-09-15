@@ -52,7 +52,8 @@ class _NammaWalletAppState extends State<NammaWalletApp> {
           body: <Widget>[
             const HomePage(),
             const CalendarPage(),
-            const ScannerView(),
+            const TicketScannerPage(),
+            // ScannerScreen(),
             const ProfilePage(),
           ][currentPageIndex],
         ),

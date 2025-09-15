@@ -14,7 +14,6 @@ environment:
 # versions available, run `flutter pub outdated`.
 dependencies:
   add_to_google_wallet: ^0.0.5
-  card_stack_widget: ^0.1.6
   cupertino_icons: ^1.0.8
   dart_mappable: ^4.6.0
   file_picker: ^10.3.3
@@ -29,7 +28,10 @@ dependencies:
   syncfusion_flutter_pdf: ^31.1.19
   uuid: ^4.5.1
   flutter_gemma: ^0.10.5
-
+  card_stack_widget: ^0.1.6
+  dotted_border: ^3.1.0
+  flutter_svg: ^2.2.1
+  ai_barcode_scanner: ^7.0.0
 
 dev_dependencies:
   build_runner: ^2.4.0
@@ -50,6 +52,7 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/data/
+    - assets/images/
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
   # An image asset can refer to one or more resolution-specific "variants", see
