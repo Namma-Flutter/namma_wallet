@@ -37,7 +37,6 @@ class ClipboardResult {
 }
 
 class ClipboardService {
-
   Future<ClipboardResult> readClipboard() async {
     try {
       // First check if clipboard has any content
@@ -66,9 +65,9 @@ class ClipboardService {
       return ClipboardResult.error(
         'No text content found in clipboard. Please copy plain text.',
       );
-
     } on PlatformException catch (e) {
-      if (e.code == 'clipboard_error' || (e.message?.contains('URI') ?? false)) {
+      if (e.code == 'clipboard_error' ||
+          (e.message?.contains('URI') ?? false)) {
         return ClipboardResult.error(
           'Unable to access clipboard content. Please copy plain text only.',
         );

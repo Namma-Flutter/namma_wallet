@@ -21,7 +21,6 @@ class TicketScannerPage extends StatelessWidget {
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
     const borderColor = Color.fromARGB(255, 231, 252, 85);
