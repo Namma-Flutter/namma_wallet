@@ -30,32 +30,14 @@ class _ProfilePageState extends State<ProfilePage> {
         body: const Center(
           child: Text('Profile page'),
         ),
-        floatingActionButton: Column(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            // Container(
-            //   width: 140,
-            //   child: FloatingActionButton.extended(
-            //     onPressed: () async {},
-            //     label: const Text('Pin Ticket'),
-            //     icon: Icon(Icons.push_pin),
-            //   ),
-            // ),
-            // SizedBox(height: 16),
-            SizedBox(
-              width: 140,
-              child: FloatingActionButton.extended(
-                onPressed: () async {
-                  await Navigator.of(context).push(
-                    MaterialPageRoute<void>(
-                        builder: (_) => const _DbViewerPage()),
-                  );
-                },
-                label: const Text('View DB'),
-                icon: const Icon(Icons.storage),
-              ),
-            ),
-          ],
+        floatingActionButton: FloatingActionButton.extended(
+          onPressed: () async {
+            await Navigator.of(context).push(
+              MaterialPageRoute<void>(builder: (_) => const _DbViewerPage()),
+            );
+          },
+          label: const Text('View DB'),
+          icon: const Icon(Icons.storage),
         ),
       );
 }
