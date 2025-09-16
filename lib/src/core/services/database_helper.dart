@@ -31,7 +31,6 @@ class DatabaseHelper {
       },
     );
   }
-  
 
   Future<void> _createSchema(Database db) async {
     // users table
@@ -91,7 +90,8 @@ CREATE TABLE tickets (
         'destination': 'Coimbatore',
         'seat_number': '12A',
         'coach_or_bus': 'Volvo AC',
-        'journey_date': DateTime.now().add(const Duration(days: 3)).toIso8601String(),
+        'journey_date':
+            DateTime.now().add(const Duration(days: 3)).toIso8601String(),
         'booking_date': DateTime.now().toIso8601String(),
         'amount': 599.00,
         'status': 'CONFIRMED',
@@ -106,8 +106,10 @@ CREATE TABLE tickets (
         'destination': 'Chennai',
         'seat_number': 'S2-34',
         'coach_or_bus': 'S2',
-        'journey_date': DateTime.now().add(const Duration(days: 10)).toIso8601String(),
-        'booking_date': DateTime.now().subtract(const Duration(days: 1)).toIso8601String(),
+        'journey_date':
+            DateTime.now().add(const Duration(days: 10)).toIso8601String(),
+        'booking_date':
+            DateTime.now().subtract(const Duration(days: 1)).toIso8601String(),
         'amount': 450.50,
         'status': 'CONFIRMED',
       },
@@ -122,7 +124,8 @@ CREATE TABLE tickets (
         'destination': 'Chennai Trade Centre',
         'seat_number': 'A-10',
         'coach_or_bus': 'Hall 1',
-        'journey_date': DateTime.now().add(const Duration(days: 20)).toIso8601String(),
+        'journey_date':
+            DateTime.now().add(const Duration(days: 20)).toIso8601String(),
         'booking_date': DateTime.now().toIso8601String(),
         'amount': 999.99,
         'status': 'PENDING',
@@ -155,5 +158,3 @@ ORDER BY t.ticket_id DESC
 ''');
   }
 }
-
-
