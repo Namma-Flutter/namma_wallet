@@ -3,9 +3,24 @@ import 'package:dotted_border/dotted_border.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:namma_wallet/src/features/clipboard/application/clipboard_service.dart';
 
 class TicketScannerPage extends StatelessWidget {
   const TicketScannerPage({super.key});
+
+  static Future<void> _handleClipboardRead(BuildContext context) async {
+    final clipboardService = ClipboardService();
+    final result = await clipboardService.readClipboard();
+
+    if (result.isSuccess && result.content != null) {
+      debugPrint('Clipboard content: ${result.content}');
+    }
+
+    if (context.mounted) {
+      clipboardService.showResultMessage(context, result);
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -108,6 +123,27 @@ class TicketScannerPage extends StatelessWidget {
                                 'Scan was better',
                                 style: TextStyle(
                                   color: Colors.black,
+                                  fontSize: 12,
+                                ),
+                              )),
+                        ),
+                        const SizedBox(height: 20),
+                        SizedBox(
+                          width: 141,
+                          height: 42,
+                          child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.orange,
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 12, vertical: 12),
+                                  shape: const StadiumBorder()),
+                              onPressed: () async {
+                                await _handleClipboardRead(context);
+                              },
+                              child: const Text(
+                                'Read Clipboard',
+                                style: TextStyle(
+                                  color: Colors.white,
                                   fontSize: 12,
                                 ),
                               )),
