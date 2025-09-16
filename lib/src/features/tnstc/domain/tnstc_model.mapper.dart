@@ -167,48 +167,6 @@ class TNSTCTicketModelMapper extends ClassMapperBase<TNSTCTicketModel> {
     _$boardingPoint,
     opt: true,
   );
-  static String _$displayPnr(TNSTCTicketModel v) => v.displayPnr;
-  static const Field<TNSTCTicketModel, String> _f$displayPnr = Field(
-    'displayPnr',
-    _$displayPnr,
-    mode: FieldMode.member,
-  );
-  static String _$displayFrom(TNSTCTicketModel v) => v.displayFrom;
-  static const Field<TNSTCTicketModel, String> _f$displayFrom = Field(
-    'displayFrom',
-    _$displayFrom,
-    mode: FieldMode.member,
-  );
-  static String _$displayTo(TNSTCTicketModel v) => v.displayTo;
-  static const Field<TNSTCTicketModel, String> _f$displayTo = Field(
-    'displayTo',
-    _$displayTo,
-    mode: FieldMode.member,
-  );
-  static String _$displayClass(TNSTCTicketModel v) => v.displayClass;
-  static const Field<TNSTCTicketModel, String> _f$displayClass = Field(
-    'displayClass',
-    _$displayClass,
-    mode: FieldMode.member,
-  );
-  static String _$displayFare(TNSTCTicketModel v) => v.displayFare;
-  static const Field<TNSTCTicketModel, String> _f$displayFare = Field(
-    'displayFare',
-    _$displayFare,
-    mode: FieldMode.member,
-  );
-  static String _$displayDate(TNSTCTicketModel v) => v.displayDate;
-  static const Field<TNSTCTicketModel, String> _f$displayDate = Field(
-    'displayDate',
-    _$displayDate,
-    mode: FieldMode.member,
-  );
-  static String _$seatNumbers(TNSTCTicketModel v) => v.seatNumbers;
-  static const Field<TNSTCTicketModel, String> _f$seatNumbers = Field(
-    'seatNumbers',
-    _$seatNumbers,
-    mode: FieldMode.member,
-  );
 
   @override
   final MappableFields<TNSTCTicketModel> fields = const {
@@ -236,13 +194,6 @@ class TNSTCTicketModelMapper extends ClassMapperBase<TNSTCTicketModel> {
     #idCardNumber: _f$idCardNumber,
     #totalFare: _f$totalFare,
     #boardingPoint: _f$boardingPoint,
-    #displayPnr: _f$displayPnr,
-    #displayFrom: _f$displayFrom,
-    #displayTo: _f$displayTo,
-    #displayClass: _f$displayClass,
-    #displayFare: _f$displayFare,
-    #displayDate: _f$displayDate,
-    #seatNumbers: _f$seatNumbers,
   };
 
   static TNSTCTicketModel _instantiate(DecodingData data) {
