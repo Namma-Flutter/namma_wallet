@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:namma_wallet/src/features/calendar/presentation/calendar_page.dart';
 import 'package:namma_wallet/src/features/home/presentation/home_page.dart';
 import 'package:namma_wallet/src/features/profile/presentation/profile_page.dart';
-
 import 'package:namma_wallet/src/features/scanner/presentation/scanner_view.dart';
 
 class NammaWalletApp extends StatefulWidget {
@@ -38,9 +37,9 @@ class _NammaWalletAppState extends State<NammaWalletApp> {
                 label: 'Calender',
               ),
               NavigationDestination(
-                selectedIcon: Icon(Icons.qr_code),
-                icon: Icon(Icons.qr_code_scanner_outlined),
-                label: 'Scanner',
+                selectedIcon: Icon(Icons.add_box),
+                icon: Icon(Icons.add_box_outlined),
+                label: 'Import',
               ),
               NavigationDestination(
                 selectedIcon: Icon(Icons.more),
