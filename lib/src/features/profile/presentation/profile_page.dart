@@ -1,8 +1,28 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:home_widget/home_widget.dart';
 import 'package:namma_wallet/src/core/services/database_helper.dart';
 
-class ProfilePage extends StatelessWidget {
+class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
+
+  @override
+  State<ProfilePage> createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends State<ProfilePage> {
+  String appGroupId = "group.homeScreenApp";
+  String iOSWidgetName = "TicketHomeWidget";
+  String androidWidgetName = "TicketHomeWidget";
+  String dataKey = "text_from_flutter_app";
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    HomeWidget.setAppGroupId(androidWidgetName);
+  }
 
   @override
   Widget build(BuildContext context) => Scaffold(
@@ -10,14 +30,32 @@ class ProfilePage extends StatelessWidget {
         body: const Center(
           child: Text('Profile page'),
         ),
-        floatingActionButton: FloatingActionButton.extended(
-          onPressed: () async {
-            await Navigator.of(context).push(
-              MaterialPageRoute<void>(builder: (_) => const _DbViewerPage()),
-            );
-          },
-          label: const Text('View DB'),
-          icon: const Icon(Icons.storage),
+        floatingActionButton: Column(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            Container(
+              width: 140,
+              child: FloatingActionButton.extended(
+                onPressed: () async {},
+                label: const Text('Pin Ticket'),
+                icon: Icon(Icons.push_pin),
+              ),
+            ),
+            SizedBox(height: 16),
+            SizedBox(
+              width: 140,
+              child: FloatingActionButton.extended(
+                onPressed: () async {
+                  await Navigator.of(context).push(
+                    MaterialPageRoute<void>(
+                        builder: (_) => const _DbViewerPage()),
+                  );
+                },
+                label: const Text('View DB'),
+                icon: const Icon(Icons.storage),
+              ),
+            ),
+          ],
         ),
       );
 }
@@ -131,6 +169,95 @@ class _TicketsList extends StatelessWidget {
         final String subtitle =
             '${t['source'] ?? t['event_name'] ?? ''} → ${t['destination'] ?? ''}';
         return ListTile(
+          onTap: () {
+            showDialog(
+                context: context,
+                builder: (context) {
+                  return Dialog(
+                    backgroundColor: Colors.white,
+                    child: Container(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Row(
+                              children: [
+                                Text(
+                                  'Ticket Details',
+                                  style: TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                Spacer(),
+                                IconButton(
+                                  icon: Icon(Icons.close),
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                ),
+                              ],
+                            ),
+                          ),
+                          ListTile(
+                            leading: Icon(Icons.confirmation_number),
+                            title: Text('Ticket ID'),
+                            subtitle: Text('${t['ticket_id']}'),
+                          ),
+                          ListTile(
+                            leading: Icon(Icons.person),
+                            title: Text('User'),
+                            subtitle: Text(
+                                '${t['user_full_name']} (${t['user_id']})'),
+                          ),
+                          ListTile(
+                            leading: Icon(Icons.event),
+                            title: Text('Event/Route'),
+                            subtitle: Text('$subtitle'),
+                          ),
+                          ListTile(
+                            leading: Icon(Icons.category),
+                            title: Text('Ticket Type'),
+                            subtitle: Text('${t['ticket_type']}'),
+                          ),
+                          ListTile(
+                            leading: Icon(Icons.account_balance_wallet),
+                            title: Text('Amount'),
+                            subtitle: Text('₹${t['amount']}'),
+                          ),
+                          ListTile(
+                            leading: Icon(Icons.date_range),
+                            title: Text('Date Purchased'),
+                            subtitle: Text('${t['date_purchased']}'),
+                          ),
+                          SizedBox(
+                            height: 16,
+                          ),
+                          ElevatedButton(
+                            onPressed: () async {
+                              String appGroupId = "group.homeScreenApp";
+                              String iOSWidgetName = "TicketHomeWidget";
+                              String androidWidgetName = "TicketHomeWidget";
+                              String dataKey = "text_from_flutter_app";
+                              await HomeWidget.saveWidgetData(
+                                  dataKey, jsonEncode(t));
+
+                              await HomeWidget.updateWidget(
+                                  androidName: androidWidgetName,
+                                  iOSName: iOSWidgetName);
+                              Navigator.of(context).pop();
+                            },
+                            child: Text('Pin to Home Screen'),
+                          ),
+                          SizedBox(
+                            height: 16,
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                });
+          },
           leading: const Icon(Icons.receipt_long),
           title: Text(title),
           subtitle: Text(subtitle),
