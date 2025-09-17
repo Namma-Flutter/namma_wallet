@@ -8,7 +8,7 @@
     [
       "@semantic-release/exec",
       {
-        "prepareCmd": "flutter build apk --release"
+        "prepareCmd": "flutter build apk --release && cp build/app/outputs/flutter-apk/app-release.apk build/app/outputs/flutter-apk/namma-wallet-${nextRelease.version}.apk"
       }
     ],
     [
