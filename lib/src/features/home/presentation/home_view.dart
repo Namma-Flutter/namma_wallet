@@ -13,6 +13,7 @@ import 'package:namma_wallet/src/features/home/presentation/widget/ticket_card_w
 import 'package:namma_wallet/src/features/home/presentation/widgets/header_widget.dart';
 import 'package:namma_wallet/src/features/home/presentation/widgets/trave_ticket_card_widget.dart';
 import 'package:namma_wallet/src/features/ticket/presentation/ticket_view.dart';
+import 'package:namma_wallet/src/features/common/generated/assets.gen.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -41,7 +42,7 @@ class _HomePageState extends State<HomePage> {
   Future<void> _loadTicketData() async {
     try {
       final response = await rootBundle
-          .loadString('assets/data/ticket_mocked_data.json');
+          .loadString(Assets.data.ticketMockedData);
       final data = await json.decode(response) as List<dynamic>;
       if (!mounted) return;
       setState(() {

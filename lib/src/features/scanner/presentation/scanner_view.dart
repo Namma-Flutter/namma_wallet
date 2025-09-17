@@ -4,6 +4,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:namma_wallet/src/features/clipboard/application/clipboard_service.dart';
+import 'package:namma_wallet/src/features/common/generated/assets.gen.dart';
 
 class TicketScannerPage extends StatelessWidget {
   const TicketScannerPage({super.key});
@@ -150,7 +151,7 @@ class TicketScannerPage extends StatelessWidget {
                       ],
                     ),
                   ),
-                  SvgPicture.asset('assets/images/bottom_curve.svg'),
+                  SvgPicture.asset(Assets.images.bottomCurve),
                 ],
               ),
             ),

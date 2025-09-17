@@ -25,11 +25,18 @@ class TagModelMapper extends ClassMapperBase<TagModel> {
   static const Field<TagModel, String> _f$icon = Field('icon', _$icon);
   static String? _$value(TagModel v) => v.value;
   static const Field<TagModel, String> _f$value = Field('value', _$value);
+  static IconData _$iconData(TagModel v) => v.iconData;
+  static const Field<TagModel, IconData> _f$iconData = Field(
+    'iconData',
+    _$iconData,
+    mode: FieldMode.member,
+  );
 
   @override
   final MappableFields<TagModel> fields = const {
     #icon: _f$icon,
     #value: _f$value,
+    #iconData: _f$iconData,
   };
 
   static TagModel _instantiate(DecodingData data) {
