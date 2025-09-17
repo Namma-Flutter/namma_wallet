@@ -1,0 +1,102 @@
+[
+  {
+    "ticket_id": "TICKET001",
+    "event_name": "Flutter Dev Conference",
+    "event_description": "A meetup for Flutter developers to share knowledge and experience.",
+    "venue": "Bangalore International Exhibition Centre",
+    "date_time": 1736425200000,
+    "organizer_name": "Tech Community India",
+    "status": "upcoming",
+    "more_info_url": "https://flutter.dev/events"
+  },
+  {
+    "ticket_id": "TICKET002",
+    "event_name": "AI & ML Summit",
+    "event_description": "Exploring artificial intelligence and machine learning trends.",
+    "venue": "Hyderabad Convention Center",
+    "date_time": 1737028800000,
+    "organizer_name": "AI India",
+    "status": "upcoming",
+    "more_info_url": "https://aiindia.com/summit"
+  },
+  {
+    "ticket_id": "TICKET003",
+    "event_name": "Cybersecurity Forum",
+    "event_description": "Panel discussions on cybersecurity and digital safety.",
+    "venue": "Delhi Expo Hall",
+    "date_time": 1737633600000,
+    "organizer_name": "SecureTech",
+    "status": "upcoming",
+    "more_info_url": "https://securetech.org/forum"
+  },
+  {
+    "ticket_id": "TICKET004",
+    "event_name": "Startup Pitch Night",
+    "event_description": "Entrepreneurs pitch their startups to investors.",
+    "venue": "Mumbai Startup Hub",
+    "date_time": 1738238400000,
+    "organizer_name": "Venture Capital India",
+    "status": "upcoming",
+    "more_info_url": "https://vcindia.com/pitch"
+  },
+  {
+    "ticket_id": "TICKET005",
+    "event_name": "Health & Wellness Expo",
+    "event_description": "Workshops and talks on physical and mental wellness.",
+    "venue": "Chennai Trade Center",
+    "date_time": 1738843200000,
+    "organizer_name": "Healthy Living Org",
+    "status": "upcoming",
+    "more_info_url": "https://healthyliving.org/expo"
+  },
+  {
+    "ticket_id": "TICKET006",
+    "event_name": "Blockchain Conference",
+    "event_description": "Latest trends in blockchain, crypto, and DeFi.",
+    "venue": "Goa Tech Park",
+    "date_time": 1739448000000,
+    "organizer_name": "CryptoChain India",
+    "status": "upcoming",
+    "more_info_url": "https://cryptochain.io/conference"
+  },
+  {
+    "ticket_id": "TICKET007",
+    "event_name": "Design Thinking Workshop",
+    "event_description": "Hands-on session for product design and UX.",
+    "venue": "Pune Innovation Center",
+    "date_time": 1740052800000,
+    "organizer_name": "Design Lab",
+    "status": "upcoming",
+    "more_info_url": "https://designlab.io/workshop"
+  },
+  {
+    "ticket_id": "TICKET008",
+    "event_name": "Music Festival 2025",
+    "event_description": "Live performances by international and local artists.",
+    "venue": "Jaipur Open Grounds",
+    "date_time": 1740657600000,
+    "organizer_name": "Live Nation India",
+    "status": "upcoming",
+    "more_info_url": "https://livenation.in/festival"
+  },
+  {
+    "ticket_id": "TICKET009",
+    "event_name": "Literature Fest",
+    "event_description": "Celebrating authors, poets, and storytellers.",
+    "venue": "Kolkata Literature House",
+    "date_time": 1741262400000,
+    "organizer_name": "Book Lovers Club",
+    "status": "upcoming",
+    "more_info_url": "https://litfest.org"
+  },
+  {
+    "ticket_id": "TICKET010",
+    "event_name": "Tech Career Fair",
+    "event_description": "Job fair for tech enthusiasts and professionals.",
+    "venue": "Ahmedabad Career Center",
+    "date_time": 1741867200000,
+    "organizer_name": "Tech Jobs India",
+    "status": "upcoming",
+    "more_info_url": "https://techjobs.in/fair"
+  }
+]

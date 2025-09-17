@@ -1,24 +1,37 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
-import 'package:namma_wallet/src/features/bottom_navigation/presentation/widgets/widgets.dart';
+import 'package:namma_wallet/src/core/routing/app_routes.dart';
+import 'package:namma_wallet/src/features/bottom_navigation/presentation/widgets/nav_bar.dart';
 
-class BottomNavigation extends StatefulWidget {
-  const BottomNavigation({required this.child, super.key});
+class NammaNavigationBar extends StatefulWidget {
+  const NammaNavigationBar({required this.child, super.key});
   final Widget child;
 
   @override
-  State<BottomNavigation> createState() => _BottomNavigationState();
+  State<NammaNavigationBar> createState() => _NammaNavigationBarState();
 }
 
-class _BottomNavigationState extends State<BottomNavigation> {
+class _NammaNavigationBarState extends State<NammaNavigationBar> {
   bool _revealBar = false;
 
   // Define your tabs here
-  final _items = const <NavItem>[
-    NavItem(icon: Icons.home, label: 'Home', route: '/'),
-    NavItem(icon: Icons.qr_code_scanner, label: 'Scanner', route: '/scanner'),
-    NavItem(icon: Icons.calendar_today, label: 'Calendar', route: '/calendar'),
+  final _items = <NavItem>[
+    NavItem(
+      icon: Icons.home,
+      label: 'Home',
+      route: AppRoute.home.path,
+    ),
+    NavItem(
+      icon: Icons.qr_code_scanner,
+      label: 'Scanner',
+      route: AppRoute.scanner.path,
+    ),
+    NavItem(
+      icon: Icons.calendar_today,
+      label: 'Calendar',
+      route: AppRoute.calendar.path,
+    ),
   ];
 
   @override

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:namma_wallet/src/features/bottom_navigation/presentation/go_router_navigation.dart';
+import 'package:namma_wallet/src/core/routing/app_router.dart';
 
 class NammaWalletApp extends StatefulWidget {
   const NammaWalletApp({super.key});

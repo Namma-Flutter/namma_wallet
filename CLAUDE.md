@@ -53,7 +53,6 @@ lib/
 ### Key Features
 - **Ticket Management**: Save and organize tickets from various sources (SMS, PDF, manual entry)
 - **PDF Processing**: Uses Syncfusion PDF library for ticket extraction
-- **Google Wallet Integration**: Export tickets using add_to_google_wallet package
 - **Multi-source Support**: TNSTC, SETC, buses, trains, general tickets
 
 ### Architecture Patterns
@@ -64,7 +63,6 @@ lib/
 ### Dependencies
 Key packages:
 - `syncfusion_flutter_pdf`: PDF processing
-- `add_to_google_wallet`: Wallet integration  
 - `file_picker`: File selection
 - `uuid`: Unique identifier generation
 
