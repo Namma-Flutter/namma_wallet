@@ -19,7 +19,10 @@
             "path": "build/app/outputs/flutter-apk/app-release.apk",
             "label": "Android APK"
           }
-        ]
+        ],
+        "successComment": false,
+        "failComment": false,
+        "releasedLabels": false
       }
     ]
   ]
