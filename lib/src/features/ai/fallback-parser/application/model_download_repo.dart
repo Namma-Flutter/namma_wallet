@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_gemma/flutter_gemma_interface.dart';
 import 'package:http/http.dart' as http;
+import 'package:namma_wallet/src/features/ai/fallback-parser/domain/constants.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -50,8 +51,6 @@ class ModelDownloadService {
       final filePath = await getFilePath();
       final file = File(filePath);
 
-      return file.existsSync();
-
       final headers = token.isNotEmpty
           ? {'Authorization': 'Bearer $token'}
           : <String, String>{};
@@ -83,7 +82,8 @@ class ModelDownloadService {
   }) async {
     try {
       final stream = FlutterGemmaPlugin.instance.modelManager
-          .downloadModelFromNetworkWithProgress(modelUrl, token: token);
+          .downloadModelFromNetworkWithProgress(modelUrl,
+              token: AIConstants.HUGGING_FACE_KEY);
 
       await for (final progress in stream) {
         onProgress(progress.toDouble());
