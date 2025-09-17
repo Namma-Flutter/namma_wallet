@@ -1,0 +1,21 @@
+
+[
+  {
+    "type": "PAY_CASH",
+    "name": "Pay Cash",
+    "brand": "BCA",
+    "color": "0xFF000000"
+  },
+  {
+    "type": "PASPOR_GOLD",
+    "name": "Paspor Gold",
+    "brand": "BCA",
+    "color": "0xFFD4AF37"
+  },
+  {
+    "type": "AMEX_PLATINUM",
+    "name": "AMEX Platinum",
+    "brand": "AMEX",
+    "color": "0xFFE0E0E0"
+  }
+]
