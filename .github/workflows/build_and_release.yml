@@ -1,0 +1,56 @@
+name: Release
+
+on:
+  workflow_dispatch:
+
+jobs:
+  release:
+    name: Release
+    permissions:
+      contents: write
+      id-token: write
+      attestations: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '11'
+
+      - name: Read Flutter version from .fvmrc
+        id: fvm
+        run: echo "flutter_version=$(grep -o '"flutter": "[^"]*"' .fvmrc | cut -d'"' -f4)" >> $GITHUB_OUTPUT
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: ${{ steps.fvm.outputs.flutter_version }}
+          cache: true
+
+      - name: Cache Gradle
+        uses: burrunan/gradle-cache-action@v3
+        with:
+          build-root-directory: ${{ github.workspace }}/android
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Generate code files
+        run: dart run build_runner build --delete-conflicting-outputs
+
+      - name: Semantic Release
+        uses: cycjimmy/semantic-release-action@v4
+        id: semantic
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: Attest
+        if: steps.semantic.outputs.new_release_published == 'true'
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: build/app/outputs/apk/release/namma-wallet-*.apk
