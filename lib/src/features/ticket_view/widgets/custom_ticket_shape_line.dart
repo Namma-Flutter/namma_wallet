@@ -54,6 +54,8 @@ class CustomTicketShapeLine extends CustomPainter {
     // Dashed (hyphen) center divider
     DashedLinePainter(
       padding: 40,
+
+      // color: Shades.s0,
       color: Colors.black38,
     ).paint(canvas, size);
   }

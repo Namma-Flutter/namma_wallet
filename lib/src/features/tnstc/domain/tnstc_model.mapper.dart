@@ -167,6 +167,48 @@ class TNSTCTicketModelMapper extends ClassMapperBase<TNSTCTicketModel> {
     _$boardingPoint,
     opt: true,
   );
+  static String _$displayPnr(TNSTCTicketModel v) => v.displayPnr;
+  static const Field<TNSTCTicketModel, String> _f$displayPnr = Field(
+    'displayPnr',
+    _$displayPnr,
+    mode: FieldMode.member,
+  );
+  static String _$displayFrom(TNSTCTicketModel v) => v.displayFrom;
+  static const Field<TNSTCTicketModel, String> _f$displayFrom = Field(
+    'displayFrom',
+    _$displayFrom,
+    mode: FieldMode.member,
+  );
+  static String _$displayTo(TNSTCTicketModel v) => v.displayTo;
+  static const Field<TNSTCTicketModel, String> _f$displayTo = Field(
+    'displayTo',
+    _$displayTo,
+    mode: FieldMode.member,
+  );
+  static String _$displayClass(TNSTCTicketModel v) => v.displayClass;
+  static const Field<TNSTCTicketModel, String> _f$displayClass = Field(
+    'displayClass',
+    _$displayClass,
+    mode: FieldMode.member,
+  );
+  static String _$displayFare(TNSTCTicketModel v) => v.displayFare;
+  static const Field<TNSTCTicketModel, String> _f$displayFare = Field(
+    'displayFare',
+    _$displayFare,
+    mode: FieldMode.member,
+  );
+  static String _$displayDate(TNSTCTicketModel v) => v.displayDate;
+  static const Field<TNSTCTicketModel, String> _f$displayDate = Field(
+    'displayDate',
+    _$displayDate,
+    mode: FieldMode.member,
+  );
+  static String _$seatNumbers(TNSTCTicketModel v) => v.seatNumbers;
+  static const Field<TNSTCTicketModel, String> _f$seatNumbers = Field(
+    'seatNumbers',
+    _$seatNumbers,
+    mode: FieldMode.member,
+  );
 
   @override
   final MappableFields<TNSTCTicketModel> fields = const {
@@ -194,6 +236,13 @@ class TNSTCTicketModelMapper extends ClassMapperBase<TNSTCTicketModel> {
     #idCardNumber: _f$idCardNumber,
     #totalFare: _f$totalFare,
     #boardingPoint: _f$boardingPoint,
+    #displayPnr: _f$displayPnr,
+    #displayFrom: _f$displayFrom,
+    #displayTo: _f$displayTo,
+    #displayClass: _f$displayClass,
+    #displayFare: _f$displayFare,
+    #displayDate: _f$displayDate,
+    #seatNumbers: _f$seatNumbers,
   };
 
   static TNSTCTicketModel _instantiate(DecodingData data) {
@@ -249,12 +298,12 @@ mixin TNSTCTicketModelMappable {
   }
 
   TNSTCTicketModelCopyWith<TNSTCTicketModel, TNSTCTicketModel, TNSTCTicketModel>
-      get copyWith =>
-          _TNSTCTicketModelCopyWithImpl<TNSTCTicketModel, TNSTCTicketModel>(
-            this as TNSTCTicketModel,
-            $identity,
-            $identity,
-          );
+  get copyWith =>
+      _TNSTCTicketModelCopyWithImpl<TNSTCTicketModel, TNSTCTicketModel>(
+        this as TNSTCTicketModel,
+        $identity,
+        $identity,
+      );
   @override
   String toString() {
     return TNSTCTicketModelMapper.ensureInitialized().stringifyValue(
@@ -281,14 +330,18 @@ mixin TNSTCTicketModelMappable {
 extension TNSTCTicketModelValueCopy<$R, $Out>
     on ObjectCopyWith<$R, TNSTCTicketModel, $Out> {
   TNSTCTicketModelCopyWith<$R, TNSTCTicketModel, $Out>
-      get $asTNSTCTicketModel => $base
-          .as((v, t, t2) => _TNSTCTicketModelCopyWithImpl<$R, $Out>(v, t, t2));
+  get $asTNSTCTicketModel =>
+      $base.as((v, t, t2) => _TNSTCTicketModelCopyWithImpl<$R, $Out>(v, t, t2));
 }
 
 abstract class TNSTCTicketModelCopyWith<$R, $In extends TNSTCTicketModel, $Out>
     implements ClassCopyWith<$R, $In, $Out> {
-  ListCopyWith<$R, PassengerInfo,
-      PassengerInfoCopyWith<$R, PassengerInfo, PassengerInfo>> get passengers;
+  ListCopyWith<
+    $R,
+    PassengerInfo,
+    PassengerInfoCopyWith<$R, PassengerInfo, PassengerInfo>
+  >
+  get passengers;
   $R call({
     String? corporation,
     String? pnrNumber,
@@ -329,13 +382,16 @@ class _TNSTCTicketModelCopyWithImpl<$R, $Out>
   late final ClassMapperBase<TNSTCTicketModel> $mapper =
       TNSTCTicketModelMapper.ensureInitialized();
   @override
-  ListCopyWith<$R, PassengerInfo,
-          PassengerInfoCopyWith<$R, PassengerInfo, PassengerInfo>>
-      get passengers => ListCopyWith(
-            $value.passengers,
-            (v, t) => v.copyWith.$chain(t),
-            (v) => call(passengers: v),
-          );
+  ListCopyWith<
+    $R,
+    PassengerInfo,
+    PassengerInfoCopyWith<$R, PassengerInfo, PassengerInfo>
+  >
+  get passengers => ListCopyWith(
+    $value.passengers,
+    (v, t) => v.copyWith.$chain(t),
+    (v) => call(passengers: v),
+  );
   @override
   $R call({
     Object? corporation = $none,
@@ -362,97 +418,94 @@ class _TNSTCTicketModelCopyWithImpl<$R, $Out>
     Object? idCardNumber = $none,
     Object? totalFare = $none,
     Object? boardingPoint = $none,
-  }) =>
-      $apply(
-        FieldCopyWithData({
-          if (corporation != $none) #corporation: corporation,
-          if (pnrNumber != $none) #pnrNumber: pnrNumber,
-          if (journeyDate != $none) #journeyDate: journeyDate,
-          if (routeNo != $none) #routeNo: routeNo,
-          if (serviceStartPlace != $none) #serviceStartPlace: serviceStartPlace,
-          if (serviceEndPlace != $none) #serviceEndPlace: serviceEndPlace,
-          if (serviceStartTime != $none) #serviceStartTime: serviceStartTime,
-          if (passengerStartPlace != $none)
-            #passengerStartPlace: passengerStartPlace,
-          if (passengerEndPlace != $none) #passengerEndPlace: passengerEndPlace,
-          if (passengerPickupPoint != $none)
-            #passengerPickupPoint: passengerPickupPoint,
-          if (passengerPickupTime != $none)
-            #passengerPickupTime: passengerPickupTime,
-          if (platformNumber != $none) #platformNumber: platformNumber,
-          if (classOfService != $none) #classOfService: classOfService,
-          if (tripCode != $none) #tripCode: tripCode,
-          if (obReferenceNumber != $none) #obReferenceNumber: obReferenceNumber,
-          if (numberOfSeats != $none) #numberOfSeats: numberOfSeats,
-          if (bankTransactionNumber != $none)
-            #bankTransactionNumber: bankTransactionNumber,
-          if (busIdNumber != $none) #busIdNumber: busIdNumber,
-          if (passengerCategory != $none) #passengerCategory: passengerCategory,
-          if (passengers != null) #passengers: passengers,
-          if (idCardType != $none) #idCardType: idCardType,
-          if (idCardNumber != $none) #idCardNumber: idCardNumber,
-          if (totalFare != $none) #totalFare: totalFare,
-          if (boardingPoint != $none) #boardingPoint: boardingPoint,
-        }),
-      );
+  }) => $apply(
+    FieldCopyWithData({
+      if (corporation != $none) #corporation: corporation,
+      if (pnrNumber != $none) #pnrNumber: pnrNumber,
+      if (journeyDate != $none) #journeyDate: journeyDate,
+      if (routeNo != $none) #routeNo: routeNo,
+      if (serviceStartPlace != $none) #serviceStartPlace: serviceStartPlace,
+      if (serviceEndPlace != $none) #serviceEndPlace: serviceEndPlace,
+      if (serviceStartTime != $none) #serviceStartTime: serviceStartTime,
+      if (passengerStartPlace != $none)
+        #passengerStartPlace: passengerStartPlace,
+      if (passengerEndPlace != $none) #passengerEndPlace: passengerEndPlace,
+      if (passengerPickupPoint != $none)
+        #passengerPickupPoint: passengerPickupPoint,
+      if (passengerPickupTime != $none)
+        #passengerPickupTime: passengerPickupTime,
+      if (platformNumber != $none) #platformNumber: platformNumber,
+      if (classOfService != $none) #classOfService: classOfService,
+      if (tripCode != $none) #tripCode: tripCode,
+      if (obReferenceNumber != $none) #obReferenceNumber: obReferenceNumber,
+      if (numberOfSeats != $none) #numberOfSeats: numberOfSeats,
+      if (bankTransactionNumber != $none)
+        #bankTransactionNumber: bankTransactionNumber,
+      if (busIdNumber != $none) #busIdNumber: busIdNumber,
+      if (passengerCategory != $none) #passengerCategory: passengerCategory,
+      if (passengers != null) #passengers: passengers,
+      if (idCardType != $none) #idCardType: idCardType,
+      if (idCardNumber != $none) #idCardNumber: idCardNumber,
+      if (totalFare != $none) #totalFare: totalFare,
+      if (boardingPoint != $none) #boardingPoint: boardingPoint,
+    }),
+  );
   @override
   TNSTCTicketModel $make(CopyWithData data) => TNSTCTicketModel(
-        corporation: data.get(#corporation, or: $value.corporation),
-        pnrNumber: data.get(#pnrNumber, or: $value.pnrNumber),
-        journeyDate: data.get(#journeyDate, or: $value.journeyDate),
-        routeNo: data.get(#routeNo, or: $value.routeNo),
-        serviceStartPlace: data.get(
-          #serviceStartPlace,
-          or: $value.serviceStartPlace,
-        ),
-        serviceEndPlace: data.get(#serviceEndPlace, or: $value.serviceEndPlace),
-        serviceStartTime:
-            data.get(#serviceStartTime, or: $value.serviceStartTime),
-        passengerStartPlace: data.get(
-          #passengerStartPlace,
-          or: $value.passengerStartPlace,
-        ),
-        passengerEndPlace: data.get(
-          #passengerEndPlace,
-          or: $value.passengerEndPlace,
-        ),
-        passengerPickupPoint: data.get(
-          #passengerPickupPoint,
-          or: $value.passengerPickupPoint,
-        ),
-        passengerPickupTime: data.get(
-          #passengerPickupTime,
-          or: $value.passengerPickupTime,
-        ),
-        platformNumber: data.get(#platformNumber, or: $value.platformNumber),
-        classOfService: data.get(#classOfService, or: $value.classOfService),
-        tripCode: data.get(#tripCode, or: $value.tripCode),
-        obReferenceNumber: data.get(
-          #obReferenceNumber,
-          or: $value.obReferenceNumber,
-        ),
-        numberOfSeats: data.get(#numberOfSeats, or: $value.numberOfSeats),
-        bankTransactionNumber: data.get(
-          #bankTransactionNumber,
-          or: $value.bankTransactionNumber,
-        ),
-        busIdNumber: data.get(#busIdNumber, or: $value.busIdNumber),
-        passengerCategory: data.get(
-          #passengerCategory,
-          or: $value.passengerCategory,
-        ),
-        passengers: data.get(#passengers, or: $value.passengers),
-        idCardType: data.get(#idCardType, or: $value.idCardType),
-        idCardNumber: data.get(#idCardNumber, or: $value.idCardNumber),
-        totalFare: data.get(#totalFare, or: $value.totalFare),
-        boardingPoint: data.get(#boardingPoint, or: $value.boardingPoint),
-      );
+    corporation: data.get(#corporation, or: $value.corporation),
+    pnrNumber: data.get(#pnrNumber, or: $value.pnrNumber),
+    journeyDate: data.get(#journeyDate, or: $value.journeyDate),
+    routeNo: data.get(#routeNo, or: $value.routeNo),
+    serviceStartPlace: data.get(
+      #serviceStartPlace,
+      or: $value.serviceStartPlace,
+    ),
+    serviceEndPlace: data.get(#serviceEndPlace, or: $value.serviceEndPlace),
+    serviceStartTime: data.get(#serviceStartTime, or: $value.serviceStartTime),
+    passengerStartPlace: data.get(
+      #passengerStartPlace,
+      or: $value.passengerStartPlace,
+    ),
+    passengerEndPlace: data.get(
+      #passengerEndPlace,
+      or: $value.passengerEndPlace,
+    ),
+    passengerPickupPoint: data.get(
+      #passengerPickupPoint,
+      or: $value.passengerPickupPoint,
+    ),
+    passengerPickupTime: data.get(
+      #passengerPickupTime,
+      or: $value.passengerPickupTime,
+    ),
+    platformNumber: data.get(#platformNumber, or: $value.platformNumber),
+    classOfService: data.get(#classOfService, or: $value.classOfService),
+    tripCode: data.get(#tripCode, or: $value.tripCode),
+    obReferenceNumber: data.get(
+      #obReferenceNumber,
+      or: $value.obReferenceNumber,
+    ),
+    numberOfSeats: data.get(#numberOfSeats, or: $value.numberOfSeats),
+    bankTransactionNumber: data.get(
+      #bankTransactionNumber,
+      or: $value.bankTransactionNumber,
+    ),
+    busIdNumber: data.get(#busIdNumber, or: $value.busIdNumber),
+    passengerCategory: data.get(
+      #passengerCategory,
+      or: $value.passengerCategory,
+    ),
+    passengers: data.get(#passengers, or: $value.passengers),
+    idCardType: data.get(#idCardType, or: $value.idCardType),
+    idCardNumber: data.get(#idCardNumber, or: $value.idCardNumber),
+    totalFare: data.get(#totalFare, or: $value.totalFare),
+    boardingPoint: data.get(#boardingPoint, or: $value.boardingPoint),
+  );
 
   @override
   TNSTCTicketModelCopyWith<$R2, TNSTCTicketModel, $Out2> $chain<$R2, $Out2>(
     Then<$Out2, $R2> t,
-  ) =>
-      _TNSTCTicketModelCopyWithImpl<$R2, $Out2>($value, $cast, t);
+  ) => _TNSTCTicketModelCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }
 
 class PassengerInfoMapper extends ClassMapperBase<PassengerInfo> {
@@ -531,11 +584,11 @@ mixin PassengerInfoMappable {
   }
 
   PassengerInfoCopyWith<PassengerInfo, PassengerInfo, PassengerInfo>
-      get copyWith => _PassengerInfoCopyWithImpl<PassengerInfo, PassengerInfo>(
-            this as PassengerInfo,
-            $identity,
-            $identity,
-          );
+  get copyWith => _PassengerInfoCopyWithImpl<PassengerInfo, PassengerInfo>(
+    this as PassengerInfo,
+    $identity,
+    $identity,
+  );
   @override
   String toString() {
     return PassengerInfoMapper.ensureInitialized().stringifyValue(
@@ -592,28 +645,27 @@ class _PassengerInfoCopyWithImpl<$R, $Out>
     String? type,
     String? gender,
     String? seatNumber,
-  }) =>
-      $apply(
-        FieldCopyWithData({
-          if (name != null) #name: name,
-          if (age != null) #age: age,
-          if (type != null) #type: type,
-          if (gender != null) #gender: gender,
-          if (seatNumber != null) #seatNumber: seatNumber,
-        }),
-      );
+  }) => $apply(
+    FieldCopyWithData({
+      if (name != null) #name: name,
+      if (age != null) #age: age,
+      if (type != null) #type: type,
+      if (gender != null) #gender: gender,
+      if (seatNumber != null) #seatNumber: seatNumber,
+    }),
+  );
   @override
   PassengerInfo $make(CopyWithData data) => PassengerInfo(
-        name: data.get(#name, or: $value.name),
-        age: data.get(#age, or: $value.age),
-        type: data.get(#type, or: $value.type),
-        gender: data.get(#gender, or: $value.gender),
-        seatNumber: data.get(#seatNumber, or: $value.seatNumber),
-      );
+    name: data.get(#name, or: $value.name),
+    age: data.get(#age, or: $value.age),
+    type: data.get(#type, or: $value.type),
+    gender: data.get(#gender, or: $value.gender),
+    seatNumber: data.get(#seatNumber, or: $value.seatNumber),
+  );
 
   @override
   PassengerInfoCopyWith<$R2, PassengerInfo, $Out2> $chain<$R2, $Out2>(
     Then<$Out2, $R2> t,
-  ) =>
-      _PassengerInfoCopyWithImpl<$R2, $Out2>($value, $cast, t);
+  ) => _PassengerInfoCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }
+

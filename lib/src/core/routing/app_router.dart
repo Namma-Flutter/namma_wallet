@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:namma_wallet/src/features/bottom_navigation/presentation/bottom_navigation.dart';
+import 'package:namma_wallet/src/core/routing/app_routes.dart';
+import 'package:namma_wallet/src/features/bottom_navigation/presentation/namma_navigation_bar.dart';
 import 'package:namma_wallet/src/features/calendar/presentation/calendar_page.dart';
-import 'package:namma_wallet/src/features/home/presentation/home_page.dart';
+import 'package:namma_wallet/src/features/home/presentation/home_view.dart';
 import 'package:namma_wallet/src/features/scanner/presentation/scanner_view.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey =
@@ -15,18 +16,21 @@ final router = GoRouter(
   routes: [
     ShellRoute(
       navigatorKey: _shellNavigatorKey,
-      builder: (context, state, child) => BottomNavigation(child: child),
+      builder: (context, state, child) => NammaNavigationBar(child: child),
       routes: [
         GoRoute(
-          path: '/',
+          path: AppRoute.home.path,
+          name: AppRoute.home.name,
           builder: (context, state) => const HomePage(),
         ),
         GoRoute(
-          path: '/scanner',
+          path: AppRoute.scanner.path,
+          name: AppRoute.scanner.name,
           builder: (context, state) => const TicketScannerPage(),
         ),
         GoRoute(
-          path: '/calendar',
+          path: AppRoute.calendar.path,
+          name: AppRoute.calendar.name,
           builder: (context, state) => const CalendarPage(),
         ),
       ],

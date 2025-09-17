@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import 'package:namma_wallet/src/core/styles/styles.dart';
 
 class TicketLabelValueWidget extends StatelessWidget {
@@ -18,8 +17,8 @@ class TicketLabelValueWidget extends StatelessWidget {
     return Column(
       crossAxisAlignment: alignment,
       children: [
-        Text(label, style: Paragraph02(color: Shades.s0).regular),
-        Text(value, style: HeadingH6(color: Shades.s0).semiBold),
+        Text(label, style: Paragraph02(color: Shades.s100).regular),
+        Text(value, style: HeadingH6(color: Shades.s100).semiBold),
       ],
     );
   }
@@ -63,13 +62,13 @@ class TicketRowWidget extends StatelessWidget {
 
 class TicketFromToRowWidget extends StatelessWidget {
   const TicketFromToRowWidget({
-    required this.fromLocation,
-    required this.toLocation,
+    required this.from,
+    required this.to,
     super.key,
   });
 
-  final String fromLocation;
-  final String toLocation;
+  final String from;
+  final String to;
 
   @override
   Widget build(BuildContext context) {
@@ -81,10 +80,10 @@ class TicketFromToRowWidget extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('From', style: Paragraph02(color: Shades.s0).regular),
+              Text('From', style: Paragraph02(color: Shades.s100).regular),
               Text(
-                fromLocation,
-                style: HeadingH6(color: Shades.s0).semiBold,
+                from.isNotEmpty ? from : '--',
+                style: HeadingH6(color: Shades.s100).semiBold,
                 textAlign: TextAlign.start,
                 overflow: TextOverflow.clip,
               ),
@@ -95,10 +94,10 @@ class TicketFromToRowWidget extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              Text('To', style: Paragraph02(color: Shades.s0).regular),
+              Text('To', style: Paragraph02(color: Shades.s100).regular),
               Text(
-                toLocation,
-                style: HeadingH6(color: Shades.s0).semiBold,
+                to.isNotEmpty ? to : '--',
+                style: HeadingH6(color: Shades.s100).semiBold,
               ),
             ],
           ),
