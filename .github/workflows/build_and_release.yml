@@ -21,6 +21,12 @@ jobs:
           distribution: 'temurin'
           java-version: '11'
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "lts/*"
+          cache: 'npm'
+
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
@@ -33,6 +39,9 @@ jobs:
         with:
           build-root-directory: ${{ github.workspace }}/android
 
+      - name: Install dependencies
+        run: npm i
+
       - name: Get dependencies
         run: flutter pub get
 
@@ -44,7 +53,7 @@ jobs:
         id: semantic
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          
+
       - name: Attest
         if: steps.semantic.outputs.new_release_published == 'true'
         uses: actions/attest-build-provenance@v2
