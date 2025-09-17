@@ -23,7 +23,7 @@ jobs:
 
       - name: Read Flutter version from .fvmrc
         id: fvm
-        run: echo "flutter_version=$(grep -o '"flutter": "[^"]*"' .fvmrc | cut -d'"' -f4)" >> $GITHUB_OUTPUT
+        run: echo "flutter_version=$(grep -o '\"flutter\": \"[^\"]*\"' .fvmrc | cut -d'\"' -f4)" >> $GITHUB_OUTPUT
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
