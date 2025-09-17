@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository. Read Serena's initial Instructions for more details.
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository. Never run the app. Tell the user to run it. You don't need to listen to logs. let the user do it. Use dart mcp as much as possible.
 
 ## Development Commands
 
@@ -72,3 +72,11 @@ Key packages:
 - Uses `flutter_lints` for linting rules
 - Standard Flutter/Dart conventions
 - Analysis options configured in `analysis_options.yaml`
+
+### Naming Conventions
+- **Views**: Use "view" suffix for main/page widgets (e.g., `HomeView`, `TicketListView`)
+  - File naming: `home_view.dart`, `ticket_list_view.dart`
+  - Class naming: `class HomeView extends StatefulWidget`
+- **Widgets**: Use "widget" suffix for smaller reusable components (e.g., `TicketCardWidget`, `ButtonWidget`)
+  - File naming: `ticket_card_widget.dart`, `button_widget.dart`
+  - Class naming: `class TicketCardWidget extends StatelessWidget`

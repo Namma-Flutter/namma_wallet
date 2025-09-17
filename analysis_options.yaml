@@ -8,3 +8,5 @@ analyzer:
     - "*/.gen.dart"
     - "*/.gr.dart"
     - "*/.config.dart"
+  errors:
+    public_member_api_docs: ignore
