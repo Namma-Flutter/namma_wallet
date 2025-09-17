@@ -76,10 +76,7 @@ class _BottomNavigationState extends State<BottomNavigation> {
             transitionBuilder: (child, animation) {
               return FadeTransition(opacity: animation, child: child);
             },
-            child: KeyedSubtree(
-              key: ValueKey(location),
-              child: widget.child,
-            ),
+            child: widget.child,
           ),
 
           // Floating nav bar
