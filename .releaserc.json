@@ -16,7 +16,7 @@
       {
         "assets": [
           {
-            "path": "build/app/outputs/flutter-apk/app-release.apk",
+            "path": "build/app/outputs/flutter-apk/namma-wallet-*.apk",
             "label": "Android APK"
           }
         ],
