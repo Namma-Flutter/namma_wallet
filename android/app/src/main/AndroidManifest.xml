@@ -23,7 +23,8 @@
     <application
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
-        android:label="Namma Wallet">
+        android:label="Namma Wallet"
+        android:enableOnBackInvokedCallback="true">
         <receiver
             android:name=".TicketHomeWidget"
             android:exported="false">

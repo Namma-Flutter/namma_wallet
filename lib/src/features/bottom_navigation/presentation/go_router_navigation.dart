@@ -5,9 +5,10 @@ import 'package:namma_wallet/src/features/calendar/presentation/calendar_page.da
 import 'package:namma_wallet/src/features/home/presentation/home_page.dart';
 import 'package:namma_wallet/src/features/scanner/presentation/scanner_view.dart';
 
-final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
+final GlobalKey<NavigatorState> _rootNavigatorKey =
+    GlobalKey<NavigatorState>(debugLabel: 'root');
 final GlobalKey<NavigatorState> _shellNavigatorKey =
-    GlobalKey<NavigatorState>();
+    GlobalKey<NavigatorState>(debugLabel: 'shell');
 
 final router = GoRouter(
   navigatorKey: _rootNavigatorKey,
@@ -18,17 +19,14 @@ final router = GoRouter(
       routes: [
         GoRoute(
           path: '/',
-          parentNavigatorKey: _shellNavigatorKey,
           builder: (context, state) => const HomePage(),
         ),
         GoRoute(
           path: '/scanner',
-          parentNavigatorKey: _shellNavigatorKey,
           builder: (context, state) => const TicketScannerPage(),
         ),
         GoRoute(
           path: '/calendar',
-          parentNavigatorKey: _shellNavigatorKey,
           builder: (context, state) => const CalendarPage(),
         ),
       ],
