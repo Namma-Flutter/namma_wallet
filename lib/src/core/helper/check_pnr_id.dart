@@ -1,4 +1,4 @@
-import 'package:namma_wallet/src/features/home/data/model/generic_details_model.dart';
+import 'package:namma_wallet/src/features/home/domain/generic_details_model.dart';
 
 bool hasPnrOrId(GenericDetailsModel ticket) {
   return ticket.extras?.any((extra) {

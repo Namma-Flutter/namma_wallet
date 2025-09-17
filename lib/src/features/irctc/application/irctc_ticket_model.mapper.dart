@@ -247,56 +247,54 @@ class _IRCTCTicketCopyWithImpl<$R, $Out>
     String? toStation,
     double? ticketFare,
     double? irctcFee,
-  }) =>
-      $apply(
-        FieldCopyWithData({
-          if (pnrNumber != null) #pnrNumber: pnrNumber,
-          if (transactionId != null) #transactionId: transactionId,
-          if (passengerName != null) #passengerName: passengerName,
-          if (gender != null) #gender: gender,
-          if (age != null) #age: age,
-          if (status != null) #status: status,
-          if (quota != null) #quota: quota,
-          if (trainNumber != null) #trainNumber: trainNumber,
-          if (trainName != null) #trainName: trainName,
-          if (scheduledDeparture != null)
-            #scheduledDeparture: scheduledDeparture,
-          if (dateOfJourney != null) #dateOfJourney: dateOfJourney,
-          if (boardingStation != null) #boardingStation: boardingStation,
-          if (travelClass != null) #travelClass: travelClass,
-          if (fromStation != null) #fromStation: fromStation,
-          if (toStation != null) #toStation: toStation,
-          if (ticketFare != null) #ticketFare: ticketFare,
-          if (irctcFee != null) #irctcFee: irctcFee,
-        }),
-      );
+  }) => $apply(
+    FieldCopyWithData({
+      if (pnrNumber != null) #pnrNumber: pnrNumber,
+      if (transactionId != null) #transactionId: transactionId,
+      if (passengerName != null) #passengerName: passengerName,
+      if (gender != null) #gender: gender,
+      if (age != null) #age: age,
+      if (status != null) #status: status,
+      if (quota != null) #quota: quota,
+      if (trainNumber != null) #trainNumber: trainNumber,
+      if (trainName != null) #trainName: trainName,
+      if (scheduledDeparture != null) #scheduledDeparture: scheduledDeparture,
+      if (dateOfJourney != null) #dateOfJourney: dateOfJourney,
+      if (boardingStation != null) #boardingStation: boardingStation,
+      if (travelClass != null) #travelClass: travelClass,
+      if (fromStation != null) #fromStation: fromStation,
+      if (toStation != null) #toStation: toStation,
+      if (ticketFare != null) #ticketFare: ticketFare,
+      if (irctcFee != null) #irctcFee: irctcFee,
+    }),
+  );
   @override
   IRCTCTicket $make(CopyWithData data) => IRCTCTicket(
-        pnrNumber: data.get(#pnrNumber, or: $value.pnrNumber),
-        transactionId: data.get(#transactionId, or: $value.transactionId),
-        passengerName: data.get(#passengerName, or: $value.passengerName),
-        gender: data.get(#gender, or: $value.gender),
-        age: data.get(#age, or: $value.age),
-        status: data.get(#status, or: $value.status),
-        quota: data.get(#quota, or: $value.quota),
-        trainNumber: data.get(#trainNumber, or: $value.trainNumber),
-        trainName: data.get(#trainName, or: $value.trainName),
-        scheduledDeparture: data.get(
-          #scheduledDeparture,
-          or: $value.scheduledDeparture,
-        ),
-        dateOfJourney: data.get(#dateOfJourney, or: $value.dateOfJourney),
-        boardingStation: data.get(#boardingStation, or: $value.boardingStation),
-        travelClass: data.get(#travelClass, or: $value.travelClass),
-        fromStation: data.get(#fromStation, or: $value.fromStation),
-        toStation: data.get(#toStation, or: $value.toStation),
-        ticketFare: data.get(#ticketFare, or: $value.ticketFare),
-        irctcFee: data.get(#irctcFee, or: $value.irctcFee),
-      );
+    pnrNumber: data.get(#pnrNumber, or: $value.pnrNumber),
+    transactionId: data.get(#transactionId, or: $value.transactionId),
+    passengerName: data.get(#passengerName, or: $value.passengerName),
+    gender: data.get(#gender, or: $value.gender),
+    age: data.get(#age, or: $value.age),
+    status: data.get(#status, or: $value.status),
+    quota: data.get(#quota, or: $value.quota),
+    trainNumber: data.get(#trainNumber, or: $value.trainNumber),
+    trainName: data.get(#trainName, or: $value.trainName),
+    scheduledDeparture: data.get(
+      #scheduledDeparture,
+      or: $value.scheduledDeparture,
+    ),
+    dateOfJourney: data.get(#dateOfJourney, or: $value.dateOfJourney),
+    boardingStation: data.get(#boardingStation, or: $value.boardingStation),
+    travelClass: data.get(#travelClass, or: $value.travelClass),
+    fromStation: data.get(#fromStation, or: $value.fromStation),
+    toStation: data.get(#toStation, or: $value.toStation),
+    ticketFare: data.get(#ticketFare, or: $value.ticketFare),
+    irctcFee: data.get(#irctcFee, or: $value.irctcFee),
+  );
 
   @override
   IRCTCTicketCopyWith<$R2, IRCTCTicket, $Out2> $chain<$R2, $Out2>(
     Then<$Out2, $R2> t,
-  ) =>
-      _IRCTCTicketCopyWithImpl<$R2, $Out2>($value, $cast, t);
+  ) => _IRCTCTicketCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }
+

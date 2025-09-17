@@ -1,10 +1,5 @@
 import 'package:flutter/material.dart';
-<<<<<<<< HEAD:lib/src/features/ticket_view/widgets/ticket_view_widget.dart
-import 'package:namma_wallet/styles/styles.dart';
-========
-
 import 'package:namma_wallet/src/core/styles/styles.dart';
->>>>>>>> main:lib/src/features/ticket/presentation/widgets/ticket_view_components.dart
 
 class TicketLabelValueWidget extends StatelessWidget {
   const TicketLabelValueWidget(
@@ -66,22 +61,12 @@ class TicketRowWidget extends StatelessWidget {
 }
 
 class TicketFromToRowWidget extends StatelessWidget {
-<<<<<<<< HEAD:lib/src/features/ticket_view/widgets/ticket_view_widget.dart
   const TicketFromToRowWidget(
       {required this.from, required this.to, super.key});
+
   final String from;
   final String to;
-========
-  const TicketFromToRowWidget({
-    required this.fromLocation,
-    required this.toLocation,
-    super.key,
-  });
-
-  final String fromLocation;
-  final String toLocation;
->>>>>>>> main:lib/src/features/ticket/presentation/widgets/ticket_view_components.dart
-
+  @override
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -94,13 +79,8 @@ class TicketFromToRowWidget extends StatelessWidget {
             children: [
               Text('From', style: Paragraph02(color: Shades.s100).regular),
               Text(
-<<<<<<<< HEAD:lib/src/features/ticket_view/widgets/ticket_view_widget.dart
                 from.isNotEmpty ? from : '--',
                 style: HeadingH6(color: Shades.s100).semiBold,
-========
-                fromLocation,
-                style: HeadingH6(color: Shades.s0).semiBold,
->>>>>>>> main:lib/src/features/ticket/presentation/widgets/ticket_view_components.dart
                 textAlign: TextAlign.start,
                 overflow: TextOverflow.clip,
               ),
@@ -113,13 +93,8 @@ class TicketFromToRowWidget extends StatelessWidget {
             children: [
               Text('To', style: Paragraph02(color: Shades.s100).regular),
               Text(
-<<<<<<<< HEAD:lib/src/features/ticket_view/widgets/ticket_view_widget.dart
                 to.isNotEmpty ? to : '--',
                 style: HeadingH6(color: Shades.s100).semiBold,
-========
-                toLocation,
-                style: HeadingH6(color: Shades.s0).semiBold,
->>>>>>>> main:lib/src/features/ticket/presentation/widgets/ticket_view_components.dart
               ),
             ],
           ),

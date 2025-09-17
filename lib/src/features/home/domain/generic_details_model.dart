@@ -1,7 +1,7 @@
 import 'package:dart_mappable/dart_mappable.dart';
-import 'package:namma_wallet/src/features/home/data/model/extras_model.dart';
-import 'package:namma_wallet/src/features/home/data/model/tag_model.dart';
-import 'package:namma_wallet/src/features/home/data/model/tnstc_model.dart';
+import 'package:namma_wallet/src/features/home/domain/extras_model.dart';
+import 'package:namma_wallet/src/features/home/domain/tag_model.dart';
+import 'package:namma_wallet/src/features/home/domain/tnstc_model.dart';
 
 part 'generic_details_model.mapper.dart';
 

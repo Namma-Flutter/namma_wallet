@@ -8,11 +8,11 @@ import 'package:card_stack_widget/widget/card_stack_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:namma_wallet/src/core/widgets/snackbar_widget.dart';
-import 'package:namma_wallet/src/features/home/data/model/generic_details_model.dart';
+import 'package:namma_wallet/src/features/home/domain/generic_details_model.dart';
 import 'package:namma_wallet/src/features/home/presentation/widget/ticket_card_widget.dart';
 import 'package:namma_wallet/src/features/home/presentation/widgets/header_widget.dart';
 import 'package:namma_wallet/src/features/home/presentation/widgets/trave_ticket_card_widget.dart';
-import 'package:namma_wallet/src/features/ticket_view/ticket_view.dart';
+import 'package:namma_wallet/src/features/ticket/presentation/ticket_view.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -41,7 +41,7 @@ class _HomePageState extends State<HomePage> {
   Future<void> _loadTicketData() async {
     try {
       final response = await rootBundle
-          .loadString('lib/src/features/home/domain/ticket_mocked_data.json');
+          .loadString('assets/data/ticket_mocked_data.json');
       final data = await json.decode(response) as List<dynamic>;
       if (!mounted) return;
       setState(() {

@@ -1,11 +1,11 @@
 // A dedicated, reusable widget for rendering the content of a wallet card.
 import 'package:flutter/material.dart';
 import 'package:namma_wallet/src/core/helper/date_time_converter.dart';
-import 'package:namma_wallet/src/features/home/data/model/generic_details_model.dart';
+import 'package:namma_wallet/src/core/styles/styles.dart';
+import 'package:namma_wallet/src/features/home/domain/generic_details_model.dart';
 import 'package:namma_wallet/src/features/home/presentation/widgets/hilight_widget.dart';
-import 'package:namma_wallet/src/features/ticket_view/ticket_view.dart';
+import 'package:namma_wallet/src/features/ticket/presentation/ticket_view.dart';
 import 'package:namma_wallet/src/features/ticket_view/widgets/ticket_view_widget.dart';
-import 'package:namma_wallet/styles/styles.dart';
 
 class TravelTicketCardWidget extends StatelessWidget {
   const TravelTicketCardWidget({required this.ticket, super.key});

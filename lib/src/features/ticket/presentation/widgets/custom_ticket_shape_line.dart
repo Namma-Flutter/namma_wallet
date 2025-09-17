@@ -1,10 +1,6 @@
 import 'dart:math' as math;
 
-<<<<<<<< HEAD:lib/src/features/ticket_view/widgets/custom_ticket_shape_line.dart
 import 'package:flutter/material.dart';
-========
-import 'package:namma_wallet/src/core/styles/styles.dart';
->>>>>>>> main:lib/src/features/ticket/presentation/widgets/custom_ticket_shape_line.dart
 
 class CustomTicketShapeLine extends CustomPainter {
   @override
@@ -49,20 +45,16 @@ class CustomTicketShapeLine extends CustomPainter {
       ..close();
 
     // Fill ticket
-    final paint0Fill = Paint()..style = PaintingStyle.fill;
-    // paint0Fill.color = AppColor.periwinkleBlue;
-    paint0Fill.color = const Color(0xffE7FC57);
+    final paint0Fill = Paint()
+      ..style = PaintingStyle.fill
+      // paint0Fill.color = AppColor.periwinkleBlue;
+      ..color = const Color(0xffE7FC57);
     canvas.drawPath(path_0, paint0Fill);
 
     // Dashed (hyphen) center divider
     DashedLinePainter(
       padding: 40,
-<<<<<<<< HEAD:lib/src/features/ticket_view/widgets/custom_ticket_shape_line.dart
-      // color: Shades.s0,
       color: Colors.black38,
-========
-      color: Shades.s0,
->>>>>>>> main:lib/src/features/ticket/presentation/widgets/custom_ticket_shape_line.dart
     ).paint(canvas, size);
   }
 
