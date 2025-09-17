@@ -8,12 +8,12 @@ import 'package:card_stack_widget/widget/card_stack_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:namma_wallet/src/core/widgets/snackbar_widget.dart';
+import 'package:namma_wallet/src/features/common/generated/assets.gen.dart';
 import 'package:namma_wallet/src/features/home/domain/generic_details_model.dart';
 import 'package:namma_wallet/src/features/home/presentation/widget/ticket_card_widget.dart';
 import 'package:namma_wallet/src/features/home/presentation/widgets/header_widget.dart';
 import 'package:namma_wallet/src/features/home/presentation/widgets/trave_ticket_card_widget.dart';
 import 'package:namma_wallet/src/features/ticket/presentation/ticket_view.dart';
-import 'package:namma_wallet/src/features/common/generated/assets.gen.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -41,8 +41,8 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> _loadTicketData() async {
     try {
-      final response = await rootBundle
-          .loadString(Assets.data.ticketMockedData);
+      final response =
+          await rootBundle.loadString(Assets.data.ticketMockedData);
       final data = await json.decode(response) as List<dynamic>;
       if (!mounted) return;
       setState(() {
@@ -318,6 +318,7 @@ class _HomePageState extends State<HomePage> {
                   ],
                 ),
               ),
+              const SizedBox(height: 100),
             ],
           ),
         ),
