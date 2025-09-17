@@ -62,20 +62,17 @@ android {
 
                 resValue("string", "app_name", "Namma Wallet")
             } else {
-                applicationIdSuffix = ".development"
                 resValue("string", "app_name", "Namma Wallet (Development)")
                 signingConfig = signingConfigs["debug"]
             }
         }
 
         debug {
-            applicationIdSuffix = ".debug"
             resValue("string", "app_name", "Namma Wallet (Debug)")
         }
 
         named("profile") {
             initWith(getByName("debug"))
-            applicationIdSuffix = ".profile"
             resValue("string", "app_name", "Namma Wallet (Profile)")
         }
     }
