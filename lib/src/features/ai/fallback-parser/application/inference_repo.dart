@@ -22,8 +22,7 @@ class GemmaInferenceService {
       preferredBackend: PreferredBackend.cpu,
       maxTokens: 1024,
       supportImage: model.supportImage,
-      maxNumImages:
-          model.maxNumImages,
+      maxNumImages: model.maxNumImages,
     );
 
     final chat = await inferenceModel.createChat(
@@ -33,8 +32,7 @@ class GemmaInferenceService {
       topP: model.topP,
       tokenBuffer: 256,
       supportImage: model.supportImage,
-      supportsFunctionCalls:
-          model.supportsFunctionCalls,
+      supportsFunctionCalls: model.supportsFunctionCalls,
       isThinking: model.isThinking,
       modelType: model.modelType,
     );
