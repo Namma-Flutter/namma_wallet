@@ -12,6 +12,9 @@
 class $AssetsDataGen {
   const $AssetsDataGen();
 
+  /// File path: assets/data/cards.json
+  String get cards => 'assets/data/cards.json';
+
   /// File path: assets/data/event_tickets_mocked_data.json
   String get eventTicketsMockedData =>
       'assets/data/event_tickets_mocked_data.json';
@@ -19,12 +22,20 @@ class $AssetsDataGen {
   /// File path: assets/data/mocked_tickets.json
   String get mockedTickets => 'assets/data/mocked_tickets.json';
 
+  /// File path: assets/data/other_cards.json
+  String get otherCards => 'assets/data/other_cards.json';
+
   /// File path: assets/data/ticket_mocked_data.json
   String get ticketMockedData => 'assets/data/ticket_mocked_data.json';
 
   /// List of all assets
-  List<String> get values =>
-      [eventTicketsMockedData, mockedTickets, ticketMockedData];
+  List<String> get values => [
+        cards,
+        eventTicketsMockedData,
+        mockedTickets,
+        otherCards,
+        ticketMockedData
+      ];
 }
 
 class $AssetsImagesGen {

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:namma_wallet/src/core/styles/styles.dart';
 
 class CustomBackButton extends StatelessWidget {
@@ -18,7 +19,7 @@ class CustomBackButton extends StatelessWidget {
           radius: 24,
           backgroundColor: AppColor.primaryColor,
           child: InkWell(
-            onTap: onPressed ?? () => Navigator.of(context).pop(),
+            onTap: onPressed ?? () => context.pop(),
             child: const Icon(Icons.chevron_left, size: 28),
           ),
         ),

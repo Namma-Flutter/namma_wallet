@@ -112,8 +112,12 @@ extension ExtrasModelValueCopy<$R, $Out>
 
 abstract class ExtrasModelCopyWith<$R, $In extends ExtrasModel, $Out>
     implements ClassCopyWith<$R, $In, $Out> {
-  ListCopyWith<$R, ExtrasModel,
-      ExtrasModelCopyWith<$R, ExtrasModel, ExtrasModel>>? get child;
+  ListCopyWith<
+    $R,
+    ExtrasModel,
+    ExtrasModelCopyWith<$R, ExtrasModel, ExtrasModel>
+  >?
+  get child;
   $R call({String? value, List<ExtrasModel>? child, String? title});
   ExtrasModelCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
@@ -127,15 +131,18 @@ class _ExtrasModelCopyWithImpl<$R, $Out>
   late final ClassMapperBase<ExtrasModel> $mapper =
       ExtrasModelMapper.ensureInitialized();
   @override
-  ListCopyWith<$R, ExtrasModel,
-          ExtrasModelCopyWith<$R, ExtrasModel, ExtrasModel>>?
-      get child => $value.child != null
-          ? ListCopyWith(
-              $value.child!,
-              (v, t) => v.copyWith.$chain(t),
-              (v) => call(child: v),
-            )
-          : null;
+  ListCopyWith<
+    $R,
+    ExtrasModel,
+    ExtrasModelCopyWith<$R, ExtrasModel, ExtrasModel>
+  >?
+  get child => $value.child != null
+      ? ListCopyWith(
+          $value.child!,
+          (v, t) => v.copyWith.$chain(t),
+          (v) => call(child: v),
+        )
+      : null;
   @override
   $R call({String? value, Object? child = $none, Object? title = $none}) =>
       $apply(
@@ -147,14 +154,14 @@ class _ExtrasModelCopyWithImpl<$R, $Out>
       );
   @override
   ExtrasModel $make(CopyWithData data) => ExtrasModel(
-        value: data.get(#value, or: $value.value),
-        child: data.get(#child, or: $value.child),
-        title: data.get(#title, or: $value.title),
-      );
+    value: data.get(#value, or: $value.value),
+    child: data.get(#child, or: $value.child),
+    title: data.get(#title, or: $value.title),
+  );
 
   @override
   ExtrasModelCopyWith<$R2, ExtrasModel, $Out2> $chain<$R2, $Out2>(
     Then<$Out2, $R2> t,
-  ) =>
-      _ExtrasModelCopyWithImpl<$R2, $Out2>($value, $cast, t);
+  ) => _ExtrasModelCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }
+

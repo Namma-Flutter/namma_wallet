@@ -3,22 +3,41 @@ import 'package:dotted_border/dotted_border.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:go_router/go_router.dart';
+import 'package:namma_wallet/src/core/routing/app_routes.dart';
 import 'package:namma_wallet/src/features/clipboard/application/clipboard_service.dart';
 import 'package:namma_wallet/src/features/common/generated/assets.gen.dart';
 
-class TicketScannerPage extends StatelessWidget {
+class TicketScannerPage extends StatefulWidget {
   const TicketScannerPage({super.key});
 
-  static Future<void> _handleClipboardRead(BuildContext context) async {
-    final clipboardService = ClipboardService();
-    final result = await clipboardService.readClipboard();
+  @override
+  State<TicketScannerPage> createState() => _TicketScannerPageState();
+}
 
-    if (result.isSuccess && result.content != null) {
-      debugPrint('Clipboard content: ${result.content}');
-    }
+class _TicketScannerPageState extends State<TicketScannerPage> {
+  bool _isPasting = false;
 
-    if (context.mounted) {
+  Future<void> _handleClipboardRead() async {
+    if (_isPasting) return;
+
+    setState(() {
+      _isPasting = true;
+    });
+
+    try {
+      final clipboardService = ClipboardService();
+      final result = await clipboardService.readClipboard();
+
+      if (!mounted) return;
+
       clipboardService.showResultMessage(context, result);
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isPasting = false;
+        });
+      }
     }
   }
 
@@ -99,24 +118,15 @@ class TicketScannerPage extends StatelessWidget {
                                   padding: const EdgeInsets.symmetric(
                                       horizontal: 12, vertical: 12),
                                   shape: const StadiumBorder()),
-                              onPressed: () async {
-                                await Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => AiBarcodeScanner(
-                                      overlayConfig: const ScannerOverlayConfig(
-                                          borderColor: borderColor,
-                                          animationColor: borderColor,
-                                          cornerRadius: 30,
-                                          lineThickness: 10),
-                                      onDetect: (BarcodeCapture capture) {
-                                        // Handle the scanned barcode
-                                        // debugPrint(
-                                        //     'Barcode detected: ${capture.barcodes.first.rawValue}');
-                                        Navigator.of(context).pop();
-                                      },
-                                    ),
-                                  ),
+                              onPressed: () {
+                                context.pushNamed(
+                                  AppRoute.barcodeScanner.name,
+                                  extra: (BarcodeCapture capture) {
+                                    // Handle the scanned barcode
+                                    // debugPrint(
+                                    //     'Barcode detected: ${capture.barcodes.first.rawValue}');
+                                    context.pop();
+                                  },
                                 );
                               },
                               child: const Text(
@@ -137,16 +147,23 @@ class TicketScannerPage extends StatelessWidget {
                                   padding: const EdgeInsets.symmetric(
                                       horizontal: 12, vertical: 12),
                                   shape: const StadiumBorder()),
-                              onPressed: () async {
-                                await _handleClipboardRead(context);
-                              },
-                              child: const Text(
-                                'Read Clipboard',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 12,
-                                ),
-                              )),
+                              onPressed: _isPasting ? null : _handleClipboardRead,
+                              child: _isPasting
+                                  ? const SizedBox(
+                                      width: 16,
+                                      height: 16,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        color: Colors.white,
+                                      ),
+                                    )
+                                  : const Text(
+                                      'Read Clipboard',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 12,
+                                      ),
+                                    )),
                         ),
                       ],
                     ),

@@ -1,21 +1,97 @@
+import 'dart:developer' as developer;
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:namma_wallet/src/core/helper/check_pnr_id.dart';
 import 'package:namma_wallet/src/core/helper/date_time_converter.dart';
+import 'package:namma_wallet/src/core/services/database_helper.dart';
 import 'package:namma_wallet/src/core/styles/styles.dart';
 import 'package:namma_wallet/src/core/widgets/custom_back_button.dart';
+import 'package:namma_wallet/src/core/widgets/snackbar_widget.dart';
 import 'package:namma_wallet/src/features/home/domain/generic_details_model.dart';
 import 'package:namma_wallet/src/features/home/presentation/widgets/hilight_widget.dart';
 import 'package:namma_wallet/src/features/travel/presentation/widgets/custom_ticket_shape_line.dart';
 import 'package:namma_wallet/src/features/travel/presentation/widgets/ticket_view_widget.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
-class TicketView extends StatelessWidget {
+class TicketView extends StatefulWidget {
   const TicketView({required this.ticket, super.key});
   final GenericDetailsModel ticket;
+
+  @override
+  State<TicketView> createState() => _TicketViewState();
+}
+
+class _TicketViewState extends State<TicketView> {
+  bool _isDeleting = false;
 
   // Helper method to handle empty values
   String getValueOrDefault(String? value) {
     return (value?.isEmpty ?? true) ? '--' : value!;
+  }
+
+  Future<void> _showDeleteConfirmation() async {
+    if (widget.ticket.ticketId == null) {
+      showSnackbar(context, 'Cannot delete this ticket', isError: true);
+      return;
+    }
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete Ticket'),
+        content: const Text('Are you sure you want to delete this ticket? This action cannot be undone.'),
+        actions: [
+          TextButton(
+            onPressed: () => context.pop(false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => context.pop(true),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true && mounted) {
+      await _deleteTicket();
+    }
+  }
+
+  Future<void> _deleteTicket() async {
+    if (widget.ticket.ticketId == null) return;
+
+    setState(() {
+      _isDeleting = true;
+    });
+
+    try {
+      await DatabaseHelper.instance.deleteTravelTicket(widget.ticket.ticketId!);
+
+      developer.log('Successfully deleted ticket with ID: ${widget.ticket.ticketId}',
+          name: 'TicketView');
+      print('✅ TICKET DELETE: Ticket deleted successfully');
+
+      if (mounted) {
+        showSnackbar(context, 'Ticket deleted successfully');
+        context.pop(true); // Return true to indicate ticket was deleted
+      }
+    } catch (e) {
+      developer.log('Failed to delete ticket',
+          name: 'TicketView', error: e);
+      print('🔴 TICKET DELETE ERROR: Failed to delete ticket: $e');
+
+      if (mounted) {
+        showSnackbar(context, 'Failed to delete ticket: $e', isError: true);
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isDeleting = false;
+        });
+      }
+    }
   }
 
   @override
@@ -28,15 +104,29 @@ class TicketView extends StatelessWidget {
         leading: const CustomBackButton(),
         title:
             Text('Ticket View', style: HeadingH6(color: Shades.s100).regular),
-        actions: const [
-          Center(
-            child: CircleAvatar(
-              radius: 24,
-              backgroundColor: AppColor.primaryColor,
-              child: Icon(Icons.more_horiz, size: 28),
+        actions: [
+          if (widget.ticket.ticketId != null)
+            Center(
+              child: CircleAvatar(
+                radius: 24,
+                backgroundColor: Colors.red.shade400,
+                child: _isDeleting
+                    ? const SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      )
+                    : IconButton(
+                        onPressed: _isDeleting ? null : _showDeleteConfirmation,
+                        icon: const Icon(Icons.delete, size: 20, color: Colors.white),
+                        tooltip: 'Delete ticket',
+                      ),
+              ),
             ),
-          ),
-          SizedBox(width: 16)
+          const SizedBox(width: 16)
         ],
       ),
       body: SingleChildScrollView(
@@ -61,21 +151,27 @@ class TicketView extends StatelessWidget {
                       CircleAvatar(
                           radius: 20,
                           backgroundColor: AppColor.whiteColor,
-                          child: Icon(ticket.type == EntryType.busTicket
+                          child: Icon(widget.ticket.type == EntryType.busTicket
                               ? Icons.airport_shuttle_outlined
                               : Icons.tram_outlined)),
                       const SizedBox(width: 16),
                       //* Description (Secondry text)
-                      Text(ticket.secondaryText,
-                          style: SubHeading(color: Shades.s100).regular),
+                      Expanded(
+                        child: Text(widget.ticket.secondaryText,
+                            style: SubHeading(color: Shades.s100).regular,
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 2),
+                      ),
                     ],
                   ),
 
                   const SizedBox(height: 16),
 
                   //* From to To (Primary text)
-                  Text(ticket.primaryText,
-                      style: HeadingH2Small(color: Shades.s100).bold),
+                  Text(widget.ticket.primaryText,
+                      style: HeadingH2Small(color: Shades.s100).bold,
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 3),
 
                   const SizedBox(height: 16),
 
@@ -83,17 +179,17 @@ class TicketView extends StatelessWidget {
                   TicketRowWidget(
                     title1: 'Journey Date',
                     title2: 'Time',
-                    value1: getValueOrDefault(getTime(ticket.startTime)),
-                    value2: getValueOrDefault(getDate(ticket.startTime)),
+                    value1: getValueOrDefault(getTime(widget.ticket.startTime)),
+                    value2: getValueOrDefault(getDate(widget.ticket.startTime)),
                   ),
 
-                  if (ticket.tags != null && ticket.tags!.isNotEmpty) ...[
+                  if (widget.ticket.tags != null && widget.ticket.tags!.isNotEmpty) ...[
                     const SizedBox(height: 16),
                     Wrap(
                       spacing: 10,
                       runSpacing: 10,
                       children: [
-                        ...ticket.tags!.map((tag) => const HighlightChipsWidget(
+                        ...widget.ticket.tags!.map((tag) => const HighlightChipsWidget(
                               bgColor: Color(0xffCADC56),
                               label: 'xxx',
                               icon: Icons.star_border_rounded,
@@ -102,30 +198,35 @@ class TicketView extends StatelessWidget {
                     ),
                   ],
 
-                  if (ticket.extras != null && ticket.extras!.isNotEmpty) ...[
+                  if (widget.ticket.extras != null && widget.ticket.extras!.isNotEmpty) ...[
                     const SizedBox(height: 16),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        for (var i = 0; i < ticket.extras!.length; i++) ...[
+                        for (var i = 0; i < widget.ticket.extras!.length; i++) ...[
                           Row(
                             children: [
-                              Text(
-                                '${ticket.extras![i].title ?? 'xxx'}: ',
-                                overflow: TextOverflow.ellipsis,
-                                maxLines: 1,
-                                style: Paragraph02(color: Shades.s100).regular,
+                              Flexible(
+                                flex: 2,
+                                child: Text(
+                                  '${widget.ticket.extras![i].title ?? 'xxx'}: ',
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 1,
+                                  style: Paragraph02(color: Shades.s100).regular,
+                                ),
                               ),
                               Expanded(
-                                  child: Text(
-                                ticket.extras![i].value,
-                                overflow: TextOverflow.ellipsis,
-                                maxLines: 1,
-                                style: Paragraph01(color: Shades.s100).regular,
-                              )),
+                                flex: 3,
+                                child: Text(
+                                  widget.ticket.extras![i].value,
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 1,
+                                  style: Paragraph01(color: Shades.s100).regular,
+                                ),
+                              ),
                             ],
                           ),
-                          if (i < ticket.extras!.length - 1)
+                          if (i < widget.ticket.extras!.length - 1)
                             const SizedBox(height: 5),
                         ]
                       ],
@@ -138,7 +239,7 @@ class TicketView extends StatelessWidget {
               size: Size(MediaQuery.of(context).size.width * 0.95, 40),
               painter: CustomTicketShapeLine(),
             ),
-            if (hasPnrOrId(ticket))
+            if (hasPnrOrId(widget.ticket))
               Container(
                 margin: const EdgeInsets.only(bottom: 16, left: 16, right: 16),
                 padding: const EdgeInsets.all(24),
@@ -151,7 +252,7 @@ class TicketView extends StatelessWidget {
                 ),
                 child: Center(
                   child: QrImageView(
-                    data: getPnrOrId(ticket) ?? 'xxx',
+                    data: getPnrOrId(widget.ticket) ?? 'xxx',
                     size: 200,
                   ),
                 ),
