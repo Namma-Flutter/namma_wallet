@@ -40,6 +40,8 @@ enum SourceType {
   clipboard,
   @MappableValue('QR')
   qr,
+  @MappableValue('SCANNER')
+  scanner,
 }
 
 @MappableClass()

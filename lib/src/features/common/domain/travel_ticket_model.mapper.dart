@@ -148,6 +148,8 @@ class SourceTypeMapper extends EnumMapper<SourceType> {
         return SourceType.clipboard;
       case 'QR':
         return SourceType.qr;
+      case 'SCANNER':
+        return SourceType.scanner;
       default:
         throw MapperException.unknownEnumValue(value);
     }
@@ -166,6 +168,8 @@ class SourceTypeMapper extends EnumMapper<SourceType> {
         return 'CLIPBOARD';
       case SourceType.qr:
         return 'QR';
+      case SourceType.scanner:
+        return 'SCANNER';
     }
   }
 }

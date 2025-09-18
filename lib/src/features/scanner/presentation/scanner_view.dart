@@ -7,6 +7,8 @@ import 'package:go_router/go_router.dart';
 import 'package:namma_wallet/src/core/routing/app_routes.dart';
 import 'package:namma_wallet/src/features/clipboard/application/clipboard_service.dart';
 import 'package:namma_wallet/src/features/common/generated/assets.gen.dart';
+import 'package:namma_wallet/src/features/irctc/application/irctc_qr_parser.dart';
+import 'package:namma_wallet/src/features/irctc/application/irctc_scanner_service.dart';
 
 class TicketScannerPage extends StatefulWidget {
   const TicketScannerPage({super.key});
@@ -17,6 +19,42 @@ class TicketScannerPage extends StatefulWidget {
 
 class _TicketScannerPageState extends State<TicketScannerPage> {
   bool _isPasting = false;
+  bool _isScanning = false;
+
+  Future<void> _handleQRCodeScan(String qrData) async {
+    if (_isScanning) return;
+
+    setState(() {
+      _isScanning = true;
+    });
+
+    try {
+      // Check if it's an IRCTC QR code
+      if (IRCTCQRParser.isIRCTCQRCode(qrData)) {
+        final irctcService = IRCTCScannerService();
+        final result = await irctcService.parseAndSaveIRCTCTicket(qrData);
+
+        if (!mounted) return;
+        irctcService.showResultMessage(context, result);
+      } else {
+        // Handle other QR code types here if needed
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('QR code format not supported'),
+            backgroundColor: Colors.orange,
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isScanning = false;
+        });
+      }
+    }
+  }
 
   Future<void> _handleClipboardRead() async {
     if (_isPasting) return;
@@ -121,11 +159,14 @@ class _TicketScannerPageState extends State<TicketScannerPage> {
                               onPressed: () {
                                 context.pushNamed(
                                   AppRoute.barcodeScanner.name,
-                                  extra: (BarcodeCapture capture) {
+                                  extra: (BarcodeCapture capture) async {
                                     // Handle the scanned barcode
-                                    // debugPrint(
-                                    //     'Barcode detected: ${capture.barcodes.first.rawValue}');
+                                    final qrData =
+                                        capture.barcodes.first.rawValue;
                                     context.pop();
+                                    if (qrData != null) {
+                                      await _handleQRCodeScan(qrData);
+                                    }
                                   },
                                 );
                               },
@@ -147,7 +188,8 @@ class _TicketScannerPageState extends State<TicketScannerPage> {
                                   padding: const EdgeInsets.symmetric(
                                       horizontal: 12, vertical: 12),
                                   shape: const StadiumBorder()),
-                              onPressed: _isPasting ? null : _handleClipboardRead,
+                              onPressed:
+                                  _isPasting ? null : _handleClipboardRead,
                               child: _isPasting
                                   ? const SizedBox(
                                       width: 16,
