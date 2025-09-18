@@ -114,20 +114,20 @@ class _TagModelCopyWithImpl<$R, $Out>
       TagModelMapper.ensureInitialized();
   @override
   $R call({Object? icon = $none, Object? value = $none}) => $apply(
-    FieldCopyWithData({
-      if (icon != $none) #icon: icon,
-      if (value != $none) #value: value,
-    }),
-  );
+        FieldCopyWithData({
+          if (icon != $none) #icon: icon,
+          if (value != $none) #value: value,
+        }),
+      );
   @override
   TagModel $make(CopyWithData data) => TagModel(
-    icon: data.get(#icon, or: $value.icon),
-    value: data.get(#value, or: $value.value),
-  );
+        icon: data.get(#icon, or: $value.icon),
+        value: data.get(#value, or: $value.value),
+      );
 
   @override
   TagModelCopyWith<$R2, TagModel, $Out2> $chain<$R2, $Out2>(
     Then<$Out2, $R2> t,
-  ) => _TagModelCopyWithImpl<$R2, $Out2>($value, $cast, t);
+  ) =>
+      _TagModelCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }
-

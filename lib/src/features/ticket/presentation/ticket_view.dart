@@ -128,7 +128,7 @@ class TicketView extends StatelessWidget {
                               ),
                               Expanded(
                                   child: Text(
-                                ticket.extras![i].value ?? 'xxx',
+                                ticket.extras![i].value,
                                 overflow: TextOverflow.ellipsis,
                                 maxLines: 1,
                                 style: Paragraph01(color: Shades.s100).regular,

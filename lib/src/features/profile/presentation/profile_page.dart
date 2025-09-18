@@ -12,10 +12,10 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  String appGroupId = "group.homeScreenApp";
-  String iOSWidgetName = "TicketHomeWidget";
-  String androidWidgetName = "TicketHomeWidget";
-  String dataKey = "text_from_flutter_app";
+  String appGroupId = 'group.homeScreenApp';
+  String iOSWidgetName = 'TicketHomeWidget';
+  String androidWidgetName = 'TicketHomeWidget';
+  String dataKey = 'text_from_flutter_app';
 
   @override
   void initState() {
@@ -63,9 +63,9 @@ class _DbViewerPageState extends State<_DbViewerPage>
   }
 
   Future<void> _load() async {
-    final DatabaseHelper db = DatabaseHelper.instance;
-    final List<Map<String, Object?>> u = await db.fetchAllUsers();
-    final List<Map<String, Object?>> t = await db.fetchTicketsWithUser();
+    final db = DatabaseHelper.instance;
+    final u = await db.fetchAllUsers();
+    final t = await db.fetchTicketsWithUser();
     if (!mounted) return;
     setState(() {
       users = u;
@@ -121,11 +121,11 @@ class _UsersList extends StatelessWidget {
       itemCount: users.length,
       separatorBuilder: (_, __) => const Divider(height: 1),
       itemBuilder: (BuildContext context, int index) {
-        final Map<String, Object?> user = users[index];
+        final user = users[index];
         return ListTile(
           leading: const Icon(Icons.person),
           title: Text((user['full_name'] ?? '') as String),
-          subtitle: Text(((user['email'] ?? '') as String).toString()),
+          subtitle: Text((user['email'] ?? '') as String),
           trailing: Text('#${user['user_id']}'),
         );
       },
@@ -146,9 +146,9 @@ class _TicketsList extends StatelessWidget {
       itemCount: tickets.length,
       separatorBuilder: (_, __) => const Divider(height: 1),
       itemBuilder: (BuildContext context, int index) {
-        final Map<String, Object?> t = tickets[index];
-        final String title = '${t['ticket_type']} • ${t['provider']}';
-        final String subtitle =
+        final t = tickets[index];
+        final title = '${t['ticket_type']} • ${t['provider']}';
+        final subtitle =
             '${t['source'] ?? t['event_name'] ?? ''} → ${t['destination'] ?? ''}';
         return ListTile(
           onTap: () {
@@ -162,7 +162,7 @@ class _TicketsList extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: <Widget>[
               Text((t['user_full_name'] ?? '') as String),
-              Text('₹${(t['amount'] ?? 0).toString()}'),
+              Text('₹${t['amount'] ?? 0}'),
             ],
           ),
         );
@@ -182,17 +182,17 @@ class _TicketsList extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Padding(
-                    padding: const EdgeInsets.all(16.0),
+                    padding: const EdgeInsets.all(16),
                     child: Row(
                       children: [
-                        Text(
+                        const Text(
                           'Ticket Details',
                           style: TextStyle(
                               fontSize: 20, fontWeight: FontWeight.bold),
                         ),
-                        Spacer(),
+                        const Spacer(),
                         IconButton(
-                          icon: Icon(Icons.close),
+                          icon: const Icon(Icons.close),
                           onPressed: () {
                             Navigator.of(context).pop();
                           },
@@ -201,44 +201,44 @@ class _TicketsList extends StatelessWidget {
                     ),
                   ),
                   ListTile(
-                    leading: Icon(Icons.confirmation_number),
-                    title: Text('Ticket ID'),
+                    leading: const Icon(Icons.confirmation_number),
+                    title: const Text('Ticket ID'),
                     subtitle: Text('${t['ticket_id']}'),
                   ),
                   ListTile(
-                    leading: Icon(Icons.person),
-                    title: Text('User'),
+                    leading: const Icon(Icons.person),
+                    title: const Text('User'),
                     subtitle: Text('${t['user_full_name']} (${t['user_id']})'),
                   ),
                   ListTile(
-                    leading: Icon(Icons.event),
-                    title: Text('Event/Route'),
-                    subtitle: Text('$subtitle'),
+                    leading: const Icon(Icons.event),
+                    title: const Text('Event/Route'),
+                    subtitle: Text(subtitle),
                   ),
                   ListTile(
-                    leading: Icon(Icons.category),
-                    title: Text('Ticket Type'),
+                    leading: const Icon(Icons.category),
+                    title: const Text('Ticket Type'),
                     subtitle: Text('${t['ticket_type']}'),
                   ),
                   ListTile(
-                    leading: Icon(Icons.account_balance_wallet),
-                    title: Text('Amount'),
+                    leading: const Icon(Icons.account_balance_wallet),
+                    title: const Text('Amount'),
                     subtitle: Text('₹${t['amount']}'),
                   ),
                   ListTile(
-                    leading: Icon(Icons.date_range),
-                    title: Text('Date Purchased'),
+                    leading: const Icon(Icons.date_range),
+                    title: const Text('Date Purchased'),
                     subtitle: Text('${t['date_purchased']}'),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 16,
                   ),
                   ElevatedButton(
                     onPressed: () async {
-                      String appGroupId = "group.homeScreenApp";
-                      String iOSWidgetName = "TicketHomeWidget";
-                      String androidWidgetName = "TicketHomeWidget";
-                      String dataKey = "text_from_flutter_app";
+                      const appGroupId = 'group.homeScreenApp';
+                      const iOSWidgetName = 'TicketHomeWidget';
+                      const androidWidgetName = 'TicketHomeWidget';
+                      const dataKey = 'text_from_flutter_app';
                       await HomeWidget.saveWidgetData(dataKey, jsonEncode(t));
 
                       await HomeWidget.updateWidget(
@@ -246,9 +246,9 @@ class _TicketsList extends StatelessWidget {
                           iOSName: iOSWidgetName);
                       Navigator.of(context).pop();
                     },
-                    child: Text('Pin to Home Screen'),
+                    child: const Text('Pin to Home Screen'),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 16,
                   ),
                 ],

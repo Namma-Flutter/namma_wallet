@@ -13,15 +13,15 @@ class DatabaseHelper {
   Database? _database;
 
   Future<Database> get database async {
-    final Database? existing = _database;
+    final existing = _database;
     if (existing != null) return existing;
     _database = await _initDatabase();
     return _database!;
   }
 
   Future<Database> _initDatabase() async {
-    final String dbPath = await getDatabasesPath();
-    final String path = p.join(dbPath, _dbName);
+    final dbPath = await getDatabasesPath();
+    final path = p.join(dbPath, _dbName);
     return openDatabase(
       path,
       version: _dbVersion,
@@ -71,7 +71,7 @@ CREATE TABLE tickets (
 
   Future<void> _seedDummyData(Database db) async {
     // Insert a demo user
-    final int userId = await db.insert('users', <String, Object?>{
+    final userId = await db.insert('users', <String, Object?>{
       'full_name': 'Test User',
       'email': 'test@example.com',
       'phone': '+911234567890',
@@ -79,7 +79,7 @@ CREATE TABLE tickets (
     });
 
     // Insert some demo tickets (BUS, TRAIN, EVENT)
-    final List<Map<String, Object?>> tickets = <Map<String, Object?>>[
+    final tickets = <Map<String, Object?>>[
       {
         'user_id': userId,
         'ticket_type': 'BUS',
@@ -132,24 +132,24 @@ CREATE TABLE tickets (
       },
     ];
 
-    for (final Map<String, Object?> ticket in tickets) {
+    for (final ticket in tickets) {
       await db.insert('tickets', ticket);
     }
   }
 
   // Queries
   Future<List<Map<String, Object?>>> fetchAllUsers() async {
-    final Database db = await database;
+    final db = await database;
     return db.query('users', orderBy: 'user_id DESC');
   }
 
   Future<List<Map<String, Object?>>> fetchAllTickets() async {
-    final Database db = await database;
+    final db = await database;
     return db.query('tickets', orderBy: 'ticket_id DESC');
   }
 
   Future<List<Map<String, Object?>>> fetchTicketsWithUser() async {
-    final Database db = await database;
+    final db = await database;
     return db.rawQuery('''
 SELECT t.*, u.full_name AS user_full_name, u.email AS user_email
 FROM tickets t
