@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:ai_barcode_scanner/ai_barcode_scanner.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:file_picker/file_picker.dart';
@@ -9,6 +11,7 @@ import 'package:namma_wallet/src/features/clipboard/application/clipboard_servic
 import 'package:namma_wallet/src/features/common/generated/assets.gen.dart';
 import 'package:namma_wallet/src/features/irctc/application/irctc_qr_parser.dart';
 import 'package:namma_wallet/src/features/irctc/application/irctc_scanner_service.dart';
+import 'package:namma_wallet/src/features/pdf_extract/application/pdf_parser_service.dart';
 
 class TicketScannerPage extends StatefulWidget {
   const TicketScannerPage({super.key});
@@ -20,6 +23,7 @@ class TicketScannerPage extends StatefulWidget {
 class _TicketScannerPageState extends State<TicketScannerPage> {
   bool _isPasting = false;
   bool _isScanning = false;
+  bool _isProcessingPDF = false;
 
   Future<void> _handleQRCodeScan(String qrData) async {
     if (_isScanning) return;
@@ -51,6 +55,36 @@ class _TicketScannerPageState extends State<TicketScannerPage> {
       if (mounted) {
         setState(() {
           _isScanning = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _handlePDFPick() async {
+    if (_isProcessingPDF) return;
+
+    setState(() {
+      _isProcessingPDF = true;
+    });
+
+    try {
+      final result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['pdf'],
+      );
+
+      if (result != null && result.files.single.path != null) {
+        final file = File(result.files.single.path!);
+        final pdfParserService = PDFParserService();
+        final parseResult = await pdfParserService.parseAndSavePDFTicket(file);
+
+        if (!mounted) return;
+        pdfParserService.showResultMessage(context, parseResult);
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isProcessingPDF = false;
         });
       }
     }
@@ -106,9 +140,7 @@ class _TicketScannerPageState extends State<TicketScannerPage> {
                               : 40,
                         ),
                         GestureDetector(
-                          onTap: () async {
-                            await FilePicker.platform.pickFiles();
-                          },
+                          onTap: _isProcessingPDF ? null : _handlePDFPick,
                           child: SizedBox(
                               height: pickFileContainerWidth,
                               width: pickFileContainerWidth,
@@ -121,26 +153,50 @@ class _TicketScannerPageState extends State<TicketScannerPage> {
                                   color: borderColor,
                                 ),
                                 child: Center(
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Icon(
-                                        Icons.upload_file,
-                                        size: 90,
-                                        color: Colors.white.withAlpha(145),
-                                      ),
-                                      const SizedBox(
-                                        height: 5,
-                                      ),
-                                      Text(
-                                        'Upload Here',
-                                        style: TextStyle(
-                                            color: Colors.white.withAlpha(145),
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.w500),
-                                      )
-                                    ],
-                                  ),
+                                  child: _isProcessingPDF
+                                      ? Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            const CircularProgressIndicator(
+                                              color: borderColor,
+                                              strokeWidth: 3,
+                                            ),
+                                            const SizedBox(height: 10),
+                                            Text(
+                                              'Processing PDF...',
+                                              style: TextStyle(
+                                                color:
+                                                    Colors.white.withAlpha(145),
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            ),
+                                          ],
+                                        )
+                                      : Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Icon(
+                                              Icons.upload_file,
+                                              size: 90,
+                                              color:
+                                                  Colors.white.withAlpha(145),
+                                            ),
+                                            const SizedBox(
+                                              height: 5,
+                                            ),
+                                            Text(
+                                              'Upload PDF Here',
+                                              style: TextStyle(
+                                                  color: Colors.white
+                                                      .withAlpha(145),
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.w500),
+                                            )
+                                          ],
+                                        ),
                                 ),
                               )),
                         ),

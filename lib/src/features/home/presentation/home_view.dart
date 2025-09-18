@@ -1,5 +1,7 @@
 // Home page shows the tickets saved
 // Top left has profile
+import 'dart:developer' as developer;
+
 import 'package:card_stack_widget/model/card_model.dart';
 import 'package:card_stack_widget/model/card_orientation.dart';
 import 'package:card_stack_widget/widget/card_stack_widget.dart';
@@ -79,12 +81,54 @@ class _HomePageState extends State<HomePage> {
 
 
   GenericDetailsModel _convertToGenericDetails(TravelTicketModel ticket) {
-    // Parse journey date or use current time
+    // Parse journey date and combine with departure time
     DateTime startTime;
     try {
-      startTime = ticket.journeyDate != null
-          ? DateTime.parse(ticket.journeyDate!)
-          : DateTime.now();
+      DateTime baseDate;
+      if (ticket.journeyDate != null) {
+        // Handle both ISO format (2025-01-15) and display format (15/01/2025)
+        final dateStr = ticket.journeyDate!;
+        if (dateStr.contains('/')) {
+          // Convert dd/mm/yyyy to yyyy-mm-dd for parsing
+          final parts = dateStr.split('/');
+          if (parts.length == 3) {
+            final day = parts[0].padLeft(2, '0');
+            final month = parts[1].padLeft(2, '0');
+            final year = parts[2];
+            baseDate = DateTime.parse('$year-$month-$day');
+          } else {
+            baseDate = DateTime.now();
+          }
+        } else {
+          baseDate = DateTime.parse(dateStr);
+        }
+      } else {
+        baseDate = DateTime.now();
+      }
+
+      // Add departure time if available
+      if (ticket.departureTime?.isNotEmpty == true) {
+        try {
+          final timeParts = ticket.departureTime!.split(':');
+          if (timeParts.length >= 2) {
+            final hour = int.parse(timeParts[0]);
+            final minute = int.parse(timeParts[1]);
+            startTime = DateTime(
+              baseDate.year,
+              baseDate.month,
+              baseDate.day,
+              hour,
+              minute,
+            );
+          } else {
+            startTime = baseDate;
+          }
+        } catch (e) {
+          startTime = baseDate;
+        }
+      } else {
+        startTime = baseDate;
+      }
     } catch (e) {
       startTime = DateTime.now();
     }
@@ -92,8 +136,16 @@ class _HomePageState extends State<HomePage> {
     // Build extras list with ticket details
     final extras = <ExtrasModel>[];
 
+    // Add departure time if available
+    if (ticket.departureTime?.isNotEmpty ?? false) {
+      extras.add(ExtrasModel(
+        title: 'Departure Time',
+        value: ticket.departureTime!,
+      ));
+    }
+
     // Add seat numbers if available
-    if (ticket.seatNumbers?.isNotEmpty == true) {
+    if (ticket.seatNumbers?.isNotEmpty ?? false) {
       extras.add(ExtrasModel(
         title: 'Seat Numbers',
         value: ticket.seatNumbers!,
@@ -101,7 +153,7 @@ class _HomePageState extends State<HomePage> {
     }
 
     // Add class of service if available
-    if (ticket.classOfService?.isNotEmpty == true) {
+    if (ticket.classOfService?.isNotEmpty ?? false) {
       extras.add(ExtrasModel(
         title: 'Class',
         value: ticket.classOfService!,
@@ -110,7 +162,7 @@ class _HomePageState extends State<HomePage> {
 
     // Add PNR/booking reference if different from primary text
     final pnrOrBooking = ticket.pnrNumber ?? ticket.bookingReference;
-    if (pnrOrBooking?.isNotEmpty == true) {
+    if (pnrOrBooking?.isNotEmpty ?? false) {
       extras.add(ExtrasModel(
         title: ticket.pnrNumber != null ? 'PNR Number' : 'Booking Reference',
         value: pnrOrBooking!,
@@ -118,7 +170,7 @@ class _HomePageState extends State<HomePage> {
     }
 
     // Add trip code if available
-    if (ticket.tripCode?.isNotEmpty == true) {
+    if (ticket.tripCode?.isNotEmpty ?? false) {
       extras.add(ExtrasModel(
         title: 'Trip Code',
         value: ticket.tripCode!,
@@ -126,7 +178,7 @@ class _HomePageState extends State<HomePage> {
     }
 
     // Add coach number if available (for trains)
-    if (ticket.coachNumber?.isNotEmpty == true) {
+    if (ticket.coachNumber?.isNotEmpty ?? false) {
       extras.add(ExtrasModel(
         title: 'Coach',
         value: ticket.coachNumber!,
@@ -134,7 +186,7 @@ class _HomePageState extends State<HomePage> {
     }
 
     // Add boarding point if available
-    if (ticket.boardingPoint?.isNotEmpty == true) {
+    if (ticket.boardingPoint?.isNotEmpty ?? false) {
       extras.add(ExtrasModel(
         title: 'Boarding Point',
         value: ticket.boardingPoint!,
@@ -149,15 +201,54 @@ class _HomePageState extends State<HomePage> {
       ));
     }
 
+    // Create meaningful primary text with debug logging
+    String primaryText;
+
+    // Debug logging
+    developer.log('Ticket fields for UI mapping:', name: 'UI_MAPPING');
+    developer.log('sourceLocation: "${ticket.sourceLocation}"', name: 'UI_MAPPING');
+    developer.log('destinationLocation: "${ticket.destinationLocation}"', name: 'UI_MAPPING');
+    developer.log('pnrNumber: "${ticket.pnrNumber}"', name: 'UI_MAPPING');
+    developer.log('providerName: "${ticket.providerName}"', name: 'UI_MAPPING');
+    developer.log('displayName: "${ticket.displayName}"', name: 'UI_MAPPING');
+
+    if ((ticket.sourceLocation?.isNotEmpty ?? false) &&
+        (ticket.destinationLocation?.isNotEmpty ?? false)) {
+      primaryText = '${ticket.sourceLocation!} → '
+          '${ticket.destinationLocation!}';
+      developer.log('Using route as primary text: "$primaryText"', name: 'UI_MAPPING');
+    } else if (ticket.pnrNumber?.isNotEmpty ?? false) {
+      primaryText = ticket.pnrNumber!;
+      developer.log('Using PNR as primary text: "$primaryText"', name: 'UI_MAPPING');
+    } else if (ticket.bookingReference?.isNotEmpty ?? false) {
+      primaryText = ticket.bookingReference!;
+      developer.log('Using booking ref as primary text: "$primaryText"', name: 'UI_MAPPING');
+    } else {
+      primaryText = ticket.displayName;
+      developer.log('Using display name as primary text: "$primaryText"', name: 'UI_MAPPING');
+    }
+
+    // Create meaningful secondary text (provider name)
+    String secondaryText;
+    if (ticket.ticketType == TicketType.event) {
+      secondaryText = ticket.eventName ?? 'Event Ticket';
+    } else {
+      secondaryText = '${ticket.providerName} - ${ticket.tripCode ?? 'Travel'}';
+    }
+
+    // Determine location for display
+    String displayLocation;
+    if (ticket.ticketType == TicketType.event) {
+      displayLocation = ticket.venueName ?? ticket.sourceLocation ?? '';
+    } else {
+      displayLocation = ticket.boardingPoint ?? ticket.sourceLocation ?? '';
+    }
+
     return GenericDetailsModel(
-      primaryText: ticket.pnrNumber ?? ticket.bookingReference ?? ticket.displayName,
-      secondaryText: ticket.ticketType == TicketType.event
-          ? ticket.eventName ?? 'Event Ticket'
-          : '${ticket.sourceLocation ?? ''} → ${ticket.destinationLocation ?? ''}',
+      primaryText: primaryText,
+      secondaryText: secondaryText,
       startTime: startTime,
-      location: ticket.ticketType == TicketType.event
-          ? ticket.venueName ?? ticket.sourceLocation ?? ''
-          : ticket.boardingPoint ?? ticket.sourceLocation ?? '',
+      location: displayLocation,
       type: ticket.ticketType == TicketType.event ? EntryType.event
           : ticket.ticketType == TicketType.bus ? EntryType.busTicket
           : EntryType.trainTicket,
