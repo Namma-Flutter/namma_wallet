@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:namma_wallet/src/core/routing/app_routes.dart';
 import 'package:namma_wallet/src/core/styles/styles.dart';
 
 class UserProfileWidget extends StatelessWidget {
@@ -28,11 +30,16 @@ class UserProfileWidget extends StatelessWidget {
           ),
 
           //* Profile
-          CircleAvatar(
-            radius: 28,
-            backgroundImage: const NetworkImage(
-                'https://avatars.githubusercontent.com/u/583231?v=4'),
-            backgroundColor: Colors.grey[200],
+          InkWell(
+            onTap: () {
+              context.pushNamed(AppRoute.profile.name);
+            },
+            child: CircleAvatar(
+              radius: 28,
+              backgroundImage: const NetworkImage(
+                  'https://avatars.githubusercontent.com/u/583231?v=4'),
+              backgroundColor: Colors.grey[200],
+            ),
           ),
         ],
       ),

@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:namma_wallet/src/core/services/database_helper.dart';
+import 'package:namma_wallet/src/core/widgets/custom_back_button.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -26,7 +27,10 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(title: const Text('Profile')),
+        appBar: AppBar(
+          title: const Text('Profile'),
+          leading: const CustomBackButton(),
+        ),
         body: const Center(
           child: Text('Profile page'),
         ),
@@ -83,6 +87,7 @@ class _DbViewerPageState extends State<_DbViewerPage>
   Widget build(BuildContext context) => Scaffold(
         appBar: AppBar(
           title: const Text('Database Viewer'),
+          leading: const CustomBackButton(),
           bottom: TabBar(
             controller: _tabController,
             tabs: const <Widget>[

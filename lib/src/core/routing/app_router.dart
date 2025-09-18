@@ -3,8 +3,11 @@ import 'package:go_router/go_router.dart';
 import 'package:namma_wallet/src/core/routing/app_routes.dart';
 import 'package:namma_wallet/src/features/bottom_navigation/presentation/namma_navigation_bar.dart';
 import 'package:namma_wallet/src/features/calendar/presentation/calendar_page.dart';
+import 'package:namma_wallet/src/features/home/domain/generic_details_model.dart';
 import 'package:namma_wallet/src/features/home/presentation/home_view.dart';
+import 'package:namma_wallet/src/features/profile/presentation/profile_page.dart';
 import 'package:namma_wallet/src/features/scanner/presentation/scanner_view.dart';
+import 'package:namma_wallet/src/features/travel/presentation/ticket_view.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey =
     GlobalKey<NavigatorState>(debugLabel: 'root');
@@ -34,6 +37,24 @@ final router = GoRouter(
           builder: (context, state) => const CalendarPage(),
         ),
       ],
-    )
+    ),
+    GoRoute(
+      path: AppRoute.ticketView.path,
+      name: AppRoute.ticketView.name,
+      builder: (context, state) {
+        final ticket = state.extra as GenericDetailsModel?;
+        if (ticket == null) {
+          return const Scaffold(
+            body: Center(child: Text('Ticket not found')),
+          );
+        }
+        return TicketView(ticket: ticket);
+      },
+    ),
+    GoRoute(
+      path: AppRoute.profile.path,
+      name: AppRoute.profile.name,
+      builder: (context, state) => const ProfilePage(),
+    ),
   ],
 );

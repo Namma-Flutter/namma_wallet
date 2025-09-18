@@ -7,13 +7,14 @@ import 'package:card_stack_widget/model/card_orientation.dart';
 import 'package:card_stack_widget/widget/card_stack_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
+import 'package:namma_wallet/src/core/routing/app_routes.dart';
 import 'package:namma_wallet/src/core/widgets/snackbar_widget.dart';
 import 'package:namma_wallet/src/features/common/generated/assets.gen.dart';
 import 'package:namma_wallet/src/features/home/domain/generic_details_model.dart';
 import 'package:namma_wallet/src/features/home/presentation/widgets/header_widget.dart';
 import 'package:namma_wallet/src/features/home/presentation/widgets/ticket_card_widget.dart';
 import 'package:namma_wallet/src/features/home/presentation/widgets/trave_ticket_card_widget.dart';
-import 'package:namma_wallet/src/features/ticket/presentation/ticket_view.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -77,16 +78,13 @@ class _HomePageState extends State<HomePage> {
         shadowColor: Colors.transparent,
         child: InkWell(
             onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => TicketView(ticket: card),
-                ),
+              context.pushNamed(
+                AppRoute.ticketView.name,
+                extra: card,
               );
             },
             child: TravelTicketCardWidget(ticket: card)),
       );
-      // return const SizedBox.shrink();
     }).toList();
 
     return Scaffold(
@@ -158,12 +156,9 @@ class _HomePageState extends State<HomePage> {
                         final event = _eventTickets[index];
                         return InkWell(
                           onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    TicketView(ticket: _eventTickets[index]),
-                              ),
+                            context.pushNamed(
+                              AppRoute.ticketView.name,
+                              extra: event,
                             );
                           },
                           child: EventTicketCardWidget(

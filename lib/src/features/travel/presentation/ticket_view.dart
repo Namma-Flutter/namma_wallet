@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:namma_wallet/src/core/helper/check_pnr_id.dart';
 import 'package:namma_wallet/src/core/helper/date_time_converter.dart';
 import 'package:namma_wallet/src/core/styles/styles.dart';
+import 'package:namma_wallet/src/core/widgets/custom_back_button.dart';
 import 'package:namma_wallet/src/features/home/domain/generic_details_model.dart';
 import 'package:namma_wallet/src/features/home/presentation/widgets/hilight_widget.dart';
-import 'package:namma_wallet/src/features/ticket_view/widgets/widget.dart';
+import 'package:namma_wallet/src/features/travel/presentation/widgets/custom_ticket_shape_line.dart';
+import 'package:namma_wallet/src/features/travel/presentation/widgets/ticket_view_widget.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
 class TicketView extends StatelessWidget {
@@ -23,19 +25,7 @@ class TicketView extends StatelessWidget {
       appBar: AppBar(
         centerTitle: true,
         backgroundColor: AppColor.quaternaryColor,
-        leading: Center(
-          child: Padding(
-            padding: const EdgeInsets.only(left: 16),
-            child: CircleAvatar(
-              radius: 24,
-              backgroundColor: AppColor.primaryColor,
-              child: InkWell(
-                onTap: () => Navigator.of(context).pop(),
-                child: const Icon(Icons.chevron_left, size: 28),
-              ),
-            ),
-          ),
-        ),
+        leading: const CustomBackButton(),
         title:
             Text('Ticket View', style: HeadingH6(color: Shades.s100).regular),
         actions: const [
