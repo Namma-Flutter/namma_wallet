@@ -12,7 +12,7 @@ import 'package:namma_wallet/src/features/common/domain/travel_ticket_model.dart
 import 'package:namma_wallet/src/features/home/domain/generic_details_model.dart';
 import 'package:namma_wallet/src/features/home/presentation/widgets/header_widget.dart';
 import 'package:namma_wallet/src/features/home/presentation/widgets/ticket_card_widget.dart';
-import 'package:namma_wallet/src/features/home/presentation/widgets/trave_ticket_card_widget.dart';
+import 'package:namma_wallet/src/features/home/presentation/widgets/travel_ticket_card_widget.dart';
 import 'package:namma_wallet/src/features/home/domain/extras_model.dart';
 
 class HomePage extends StatefulWidget {
