@@ -1,19 +1,21 @@
 // Home page shows the tickets saved
 // Top left has profile
-import 'dart:convert';
+import 'dart:developer' as developer;
 
 import 'package:card_stack_widget/model/card_model.dart';
 import 'package:card_stack_widget/model/card_orientation.dart';
 import 'package:card_stack_widget/widget/card_stack_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
+import 'package:namma_wallet/src/core/routing/app_routes.dart';
+import 'package:namma_wallet/src/core/services/database_helper.dart';
 import 'package:namma_wallet/src/core/widgets/snackbar_widget.dart';
-import 'package:namma_wallet/src/features/common/generated/assets.gen.dart';
+import 'package:namma_wallet/src/features/common/domain/travel_ticket_model.dart';
 import 'package:namma_wallet/src/features/home/domain/generic_details_model.dart';
-import 'package:namma_wallet/src/features/home/presentation/widget/ticket_card_widget.dart';
 import 'package:namma_wallet/src/features/home/presentation/widgets/header_widget.dart';
-import 'package:namma_wallet/src/features/home/presentation/widgets/trave_ticket_card_widget.dart';
-import 'package:namma_wallet/src/features/ticket/presentation/ticket_view.dart';
+import 'package:namma_wallet/src/features/home/presentation/widgets/ticket_card_widget.dart';
+import 'package:namma_wallet/src/features/home/presentation/widgets/travel_ticket_card_widget.dart';
+import 'package:namma_wallet/src/features/home/domain/extras_model.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -24,14 +26,8 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   bool _isLoading = true;
-  String extractedText = 'None';
-  String? busTicket;
-  List<GenericDetailsModel> _allTickets = [];
-  final List<GenericDetailsModel> _busTickets = [];
-  final List<GenericDetailsModel> _trainTickets = [];
-  final List<GenericDetailsModel> _travelTickets = [];
-  final List<GenericDetailsModel> _eventTickets = [];
-  final List<GenericDetailsModel> _otherTickets = [];
+  List<TravelTicketModel> _travelTickets = [];
+  List<TravelTicketModel> _eventTickets = [];
 
   @override
   void initState() {
@@ -41,285 +37,405 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> _loadTicketData() async {
     try {
-      final response =
-          await rootBundle.loadString(Assets.data.ticketMockedData);
-      final data = await json.decode(response) as List<dynamic>;
-      if (!mounted) return;
       setState(() {
-        _allTickets = data
-            .map((ticket) => GenericDetailsModelMapper.fromMap(
-                ticket as Map<String, dynamic>))
-            .toList();
-        _isLoading = false;
+        _isLoading = true;
       });
-      for (final ticket in _allTickets) {
-        // ticket.type.name == EntryType.busTicket.name
-        //     ? _busTickets.add(ticket)
-        //     : _trainTickets.add(ticket);
-        switch (ticket.type) {
-          // case EntryType.busTicket:
-          //   _busTickets.add(ticket);
-          //   // ignore: unnecessary_breaks
-          //   break;
-          // case EntryType.trainTicket:
-          //   _trainTickets.add(ticket);
-          //   // ignore: unnecessary_breaks
-          //   break;
-          case EntryType.busTicket || EntryType.trainTicket:
-            _travelTickets.add(ticket);
-            // ignore: unnecessary_breaks
-            break;
-          case EntryType.event:
-            _eventTickets.add(ticket);
-            // ignore: unnecessary_breaks
-            break;
-          default:
-            _otherTickets.add(ticket);
-            // ignore: unnecessary_breaks
-            break;
+
+      final ticketMaps = await DatabaseHelper.instance.fetchAllTravelTickets();
+
+      if (!mounted) return;
+
+      final tickets = ticketMaps
+          .map((map) => TravelTicketModelMapper.fromMap(map))
+          .toList();
+
+      final travelTickets = <TravelTicketModel>[];
+      final eventTickets = <TravelTicketModel>[];
+
+      for (final ticket in tickets) {
+        switch (ticket.ticketType) {
+          case TicketType.bus:
+          case TicketType.train:
+          case TicketType.flight:
+          case TicketType.metro:
+            travelTickets.add(ticket);
+          case TicketType.event:
+            eventTickets.add(ticket);
         }
       }
-    } catch (e) {
+
       if (!mounted) return;
-      showSnackbar(context, 'Error loading card data: $e');
+      setState(() {
+        _travelTickets = travelTickets;
+        _eventTickets = eventTickets;
+        _isLoading = false;
+      });
+    } on Object catch (e) {
+      if (!mounted) return;
+      showSnackbar(context, 'Error loading ticket data: $e', isError: true);
       setState(() {
         _isLoading = false;
       });
     }
   }
 
-  // Map<String, dynamic> staticTnstcJson = {
-  //   'corporation': 'TNSTC',
-  //   'service': 'SETC',
-  //   'pnr_no': 'T63736642',
-  //   'from': 'CHENNAI-PT DR. M.G.R. BS',
-  //   'to': 'KUMBAKONAM',
-  //   'trip_code': '2145CHEKUMAB',
-  //   'journey_date': '11/02/2025',
-  //   'time': '22:35',
-  //   'seat_numbers': ['20', '21'],
-  //   'class': 'AC SLEEPER SEATER',
-  //   'boarding_at': 'KOTTIVAKKAM(RTO OFFICE)',
-  // };
+  GenericDetailsModel _convertToGenericDetails(TravelTicketModel ticket) {
+    // Parse journey date and combine with departure time
+    DateTime startTime;
+    try {
+      DateTime baseDate;
+      if (ticket.journeyDate != null) {
+        // Handle both ISO format (2025-01-15) and display format (15/01/2025)
+        final dateStr = ticket.journeyDate!;
+        if (dateStr.contains('/')) {
+          // Convert dd/mm/yyyy to yyyy-mm-dd for parsing
+          final parts = dateStr.split('/');
+          if (parts.length == 3) {
+            final day = parts[0].padLeft(2, '0');
+            final month = parts[1].padLeft(2, '0');
+            final year = parts[2];
+            baseDate = DateTime.parse('$year-$month-$day');
+          } else {
+            baseDate = DateTime.now();
+          }
+        } else {
+          baseDate = DateTime.parse(dateStr);
+        }
+      } else {
+        baseDate = DateTime.now();
+      }
 
-  // Future<void> onPDFExtractPressed() async {
-  //   final pdf = await FilePickerService().pickFile();
-  //   if (pdf == null) {
-  //     debugPrint('File not picked');
-  //     return;
-  //   }
-  //   final text = PDFService().extractTextFrom(pdf);
-  //   // extractedText = text;
-  //   setState(() {});
-  //   debugPrint(text);
-  //   final ticket = parseTicket(text);
-  //   debugPrint(ticket.toString());
-  // }
+      // Add departure time if available
+      if (ticket.departureTime?.isNotEmpty == true) {
+        try {
+          final timeParts = ticket.departureTime!.split(':');
+          if (timeParts.length >= 2) {
+            final hour = int.parse(timeParts[0]);
+            final minute = int.parse(timeParts[1]);
+            startTime = DateTime(
+              baseDate.year,
+              baseDate.month,
+              baseDate.day,
+              hour,
+              minute,
+            );
+          } else {
+            startTime = baseDate;
+          }
+        } catch (e) {
+          startTime = baseDate;
+        }
+      } else {
+        startTime = baseDate;
+      }
+    } catch (e) {
+      startTime = DateTime.now();
+    }
 
-  // Future<void> onSMSExtractPressed() async {
-  //   final data = await Clipboard.getData('text/plain');
-  //   final ticket = data?.text ??
-  //       'TNSTC Corporation:SETC , PNR NO.:T60856763 , From:CHENNAI-PT DR. M.G.R. BS To KUMBAKONAM , Trip Code:2300CHEKUMLB , Journey Date:10/01/2025 , Time:23:55 , Seat No.:4 UB, .Class:NON AC LOWER BIRTH SEATER , Boarding at:KOTTIVAKKAM(RTO OFFICE) . For e-Ticket: Download from View Ticket. Please carry your photo ID during journey. T&C apply. https://www.radiantinfo.com';
+    // Build extras list with ticket details
+    final extras = <ExtrasModel>[];
 
-  //   busTicket = SMSService().parseTicket(ticket);
-  //   debugPrint(busTicket);
-  //   // extractedText = busTicket.toString();
-  //   setState(() {});
-  // }
+    // Add departure time if available
+    if (ticket.departureTime?.isNotEmpty ?? false) {
+      extras.add(ExtrasModel(
+        title: 'Departure Time',
+        value: ticket.departureTime!,
+      ));
+    }
 
-  // String getFormattedDate() {
-  //   final now = DateTime.now();
-  //   final formatter = DateFormat('EEEE, MMM, dd');
-  //   return formatter.format(now);
-  // }
+    // Add seat numbers if available
+    if (ticket.seatNumbers?.isNotEmpty ?? false) {
+      extras.add(ExtrasModel(
+        title: 'Seat Numbers',
+        value: ticket.seatNumbers!,
+      ));
+    }
 
-  // void _onError(BuildContext context, Object error) {
-  //   debugPrint(error.toString());
-  //   ScaffoldMessenger.of(context).showSnackBar(
-  //     SnackBar(
-  //       backgroundColor: Colors.red,
-  //       content: Text(error.toString()),
-  //     ),
-  //   );
-  // }
+    // Add class of service if available
+    if (ticket.classOfService?.isNotEmpty ?? false) {
+      extras.add(ExtrasModel(
+        title: 'Class',
+        value: ticket.classOfService!,
+      ));
+    }
 
-  // void _onSuccess(BuildContext context) =>
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       const SnackBar(
-  //         backgroundColor: Colors.green,
-  //         content:
-  //             Text('Pass has been successfully added to the Google Wallet.'),
-  //       ),
-  //     );
+    // Add PNR/booking reference if different from primary text
+    final pnrOrBooking = ticket.pnrNumber ?? ticket.bookingReference;
+    if (pnrOrBooking?.isNotEmpty ?? false) {
+      extras.add(ExtrasModel(
+        title: ticket.pnrNumber != null ? 'PNR Number' : 'Booking Reference',
+        value: pnrOrBooking!,
+      ));
+    }
 
-  // void _onCanceled(BuildContext context) =>
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       const SnackBar(
-  //         backgroundColor: Colors.yellow,
-  //         content: Text('Adding a pass has been canceled.'),
-  //       ),
-  //     );
+    // Add trip code if available
+    if (ticket.tripCode?.isNotEmpty ?? false) {
+      extras.add(ExtrasModel(
+        title: 'Trip Code',
+        value: ticket.tripCode!,
+      ));
+    }
+
+    // Add coach number if available (for trains)
+    if (ticket.coachNumber?.isNotEmpty ?? false) {
+      extras.add(ExtrasModel(
+        title: 'Coach',
+        value: ticket.coachNumber!,
+      ));
+    }
+
+    // Add boarding point if available
+    if (ticket.boardingPoint?.isNotEmpty ?? false) {
+      extras.add(ExtrasModel(
+        title: 'Boarding Point',
+        value: ticket.boardingPoint!,
+      ));
+    }
+
+    // Add amount if available
+    if (ticket.amount != null) {
+      extras.add(ExtrasModel(
+        title: 'Amount',
+        value: '${ticket.currency} ${ticket.amount}',
+      ));
+    }
+
+    // Create meaningful primary text with debug logging
+    String primaryText;
+
+    // Debug logging
+    developer.log('Ticket fields for UI mapping:', name: 'UI_MAPPING');
+    developer.log('sourceLocation: "${ticket.sourceLocation}"',
+        name: 'UI_MAPPING');
+    developer.log('destinationLocation: "${ticket.destinationLocation}"',
+        name: 'UI_MAPPING');
+    developer.log('pnrNumber: "${ticket.pnrNumber}"', name: 'UI_MAPPING');
+    developer.log('providerName: "${ticket.providerName}"', name: 'UI_MAPPING');
+    developer.log('displayName: "${ticket.displayName}"', name: 'UI_MAPPING');
+
+    if ((ticket.sourceLocation?.isNotEmpty ?? false) &&
+        (ticket.destinationLocation?.isNotEmpty ?? false)) {
+      primaryText = '${ticket.sourceLocation!} → '
+          '${ticket.destinationLocation!}';
+      developer.log('Using route as primary text: "$primaryText"',
+          name: 'UI_MAPPING');
+    } else if (ticket.pnrNumber?.isNotEmpty ?? false) {
+      primaryText = ticket.pnrNumber!;
+      developer.log('Using PNR as primary text: "$primaryText"',
+          name: 'UI_MAPPING');
+    } else if (ticket.bookingReference?.isNotEmpty ?? false) {
+      primaryText = ticket.bookingReference!;
+      developer.log('Using booking ref as primary text: "$primaryText"',
+          name: 'UI_MAPPING');
+    } else {
+      primaryText = ticket.displayName;
+      developer.log('Using display name as primary text: "$primaryText"',
+          name: 'UI_MAPPING');
+    }
+
+    // Create meaningful secondary text (provider name)
+    String secondaryText;
+    if (ticket.ticketType == TicketType.event) {
+      secondaryText = ticket.eventName ?? 'Event Ticket';
+    } else {
+      secondaryText = '${ticket.providerName} - ${ticket.tripCode ?? 'Travel'}';
+    }
+
+    // Determine location for display
+    String displayLocation;
+    if (ticket.ticketType == TicketType.event) {
+      displayLocation = ticket.venueName ?? ticket.sourceLocation ?? '';
+    } else {
+      displayLocation = ticket.boardingPoint ?? ticket.sourceLocation ?? '';
+    }
+
+    return GenericDetailsModel(
+      primaryText: primaryText,
+      secondaryText: secondaryText,
+      startTime: startTime,
+      location: displayLocation,
+      type: ticket.ticketType == TicketType.event
+          ? EntryType.event
+          : ticket.ticketType == TicketType.bus
+              ? EntryType.busTicket
+              : EntryType.trainTicket,
+      endTime: startTime, // For simplicity, same as start time
+      extras: extras.isNotEmpty ? extras : null,
+      ticketId: ticket.id,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    final cardStackList = _travelTickets.map((card) {
+    final cardStackList = _travelTickets.map((ticket) {
+      final genericTicket = _convertToGenericDetails(ticket);
       return CardModel(
         radius: const Radius.circular(30),
         shadowColor: Colors.transparent,
         child: InkWell(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => TicketView(ticket: card),
-                ),
+            onTap: () async {
+              final wasDeleted = await context.pushNamed<bool>(
+                AppRoute.ticketView.name,
+                extra: genericTicket,
               );
+
+              if (wasDeleted == true && mounted) {
+                await _loadTicketData();
+              }
             },
-            child: TravelTicketCardWidget(ticket: card)),
+            child: TravelTicketCardWidget(
+              ticket: genericTicket,
+              onTicketDeleted: _loadTicketData,
+            )),
       );
-      // return const SizedBox.shrink();
     }).toList();
 
     return Scaffold(
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const UserProfileWidget(),
-              const Padding(
-                padding: EdgeInsets.all(16),
-                child: Text(
-                  'Tickets',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                  ),
-                ),
-              ),
-
-              //* Top 3 card list
-              if (_isLoading)
-                const Center(child: CircularProgressIndicator())
-              else
-                _travelTickets.isEmpty
-                    ? const Center(child: Text('No cards found.'))
-                    : Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: SizedBox(
-                          height: 500,
-                          child: CardStackWidget(
-                            cardList: cardStackList.take(3).toList(),
-                            opacityChangeOnDrag: true,
-                            swipeOrientation: CardOrientation.both,
-                            cardDismissOrientation: CardOrientation.both,
-                            positionFactor: 3,
-                            scaleFactor: 1.5,
-                            alignment: Alignment.center,
-                            animateCardScale: true,
-                            dismissedCardDuration:
-                                const Duration(milliseconds: 150),
-                          ),
+        child: RefreshIndicator(
+          onRefresh: _loadTicketData,
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const UserProfileWidget(),
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Tickets',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
                         ),
                       ),
+                      const SizedBox.shrink(),
+                    ],
+                  ),
+                ),
 
-              //* Other Cards Section
-              Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    //* Event heading
-                    const Text(
-                      'Events',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    //* More cards list view
-                    ListView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: _eventTickets.length,
-                      itemBuilder: (context, index) {
-                        final event = _eventTickets[index];
-                        return InkWell(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    TicketView(ticket: _eventTickets[index]),
-                              ),
-                            );
-                          },
-                          child: EventTicketCardWidget(
-                            ticket: event,
+                //* Top 3 card list
+                if (_isLoading)
+                  const Center(child: CircularProgressIndicator())
+                else
+                  _travelTickets.isEmpty
+                      ? const Padding(
+                          padding: EdgeInsets.all(32),
+                          child: Center(
+                            child: Column(
+                              children: [
+                                Icon(
+                                  Icons.airplane_ticket_outlined,
+                                  size: 64,
+                                  color: Colors.grey,
+                                ),
+                                SizedBox(height: 16),
+                                Text(
+                                  'No travel tickets found',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w500,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                                SizedBox(height: 8),
+                                Text(
+                                  'Paste travel SMS or add tickets manually',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.grey,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ],
+                            ),
                           ),
-                        );
-                      },
-                    ),
-                  ],
+                        )
+                      : Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: SizedBox(
+                            height: 500,
+                            child: CardStackWidget(
+                              cardList: cardStackList.take(3).toList(),
+                              opacityChangeOnDrag: true,
+                              swipeOrientation: CardOrientation.both,
+                              cardDismissOrientation: CardOrientation.both,
+                              positionFactor: 3,
+                              scaleFactor: 2,
+                              alignment: Alignment.center,
+                              animateCardScale: true,
+                              dismissedCardDuration:
+                                  const Duration(milliseconds: 150),
+                            ),
+                          ),
+                        ),
+
+                //* Other Cards Section
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      //* Event heading
+                      const Text(
+                        'Events',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      //* More cards list view
+                      _eventTickets.isEmpty
+                          ? const Padding(
+                              padding: EdgeInsets.all(16),
+                              child: Center(
+                                child: Text(
+                                  'No event tickets found',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                              ),
+                            )
+                          : ListView.builder(
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              itemCount: _eventTickets.length,
+                              itemBuilder: (context, index) {
+                                final eventTicket = _eventTickets[index];
+                                final genericEvent =
+                                    _convertToGenericDetails(eventTicket);
+                                return InkWell(
+                                  onTap: () async {
+                                    final wasDeleted =
+                                        await context.pushNamed<bool>(
+                                      AppRoute.ticketView.name,
+                                      extra: genericEvent,
+                                    );
+
+                                    if (wasDeleted == true && mounted) {
+                                      await _loadTicketData();
+                                    }
+                                  },
+                                  child: EventTicketCardWidget(
+                                    ticket: genericEvent,
+                                  ),
+                                );
+                              },
+                            ),
+                    ],
+                  ),
                 ),
-              ),
-              //* Action buttons section
-              Padding(
-                padding: const EdgeInsets.all(16),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(extractedText),
-                    const FloatingActionButton.extended(
-                      // onPressed: onSMSExtractPressed,
-                      onPressed: null,
-                      label: Text('SMS'),
-                    ),
-                    // FloatingActionButton.extended(
-                    //   onPressed: onPDFExtractPressed,
-                    //   label: const Text('PDF'),
-                    // ),
-                    // if (busTicket != null)
-                    //   AddToGoogleWalletButton(
-                    //     pass: busTicket!,
-                    //     onError: (Object error) => _onError(context, error),
-                    //     onSuccess: () => _onSuccess(context),
-                    //     onCanceled: () => _onCanceled(context),
-                    //   ),
-                    // ElevatedButton(
-                    //     onPressed: () {
-                    //       Navigator.push(
-                    //         context,
-                    //         MaterialPageRoute(
-                    //           builder: (context) => TicketView(
-                    //               ticket: TNSTCModel(
-                    //                   corporation:
-                    //                       staticTnstcJson['corporation']!,
-                    //                   service: staticTnstcJson['service']!,
-                    //                   pnrNo: staticTnstcJson['pnr_no']!,
-                    //                   from: staticTnstcJson['from']!,
-                    //                   to: staticTnstcJson['to']!,
-                    //                   tripCode: staticTnstcJson['trip_code']!,
-                    //                   journeyDate:
-                    //                       staticTnstcJson['journey_date']!,
-                    //                   time: staticTnstcJson['time']!,
-                    //                   seatNumbers: List<String>.from(
-                    //                       staticTnstcJson['seat_numbers']!),
-                    //                   ticketClass: staticTnstcJson['class']!,
-                    //                   boardingAt:
-                    //                       staticTnstcJson['boarding_at']!)),
-                    //         ),
-                    //       );
-                    //     },
-                    //     child: const Text('TicketView'))
-                  ],
-                ),
-              ),
-              const SizedBox(height: 100),
-            ],
+                const SizedBox(height: 100),
+              ],
+            ),
           ),
         ),
       ),

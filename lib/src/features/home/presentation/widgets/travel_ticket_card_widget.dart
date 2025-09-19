@@ -1,15 +1,21 @@
 // A dedicated, reusable widget for rendering the content of a wallet card.
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:namma_wallet/src/core/helper/date_time_converter.dart';
+import 'package:namma_wallet/src/core/routing/app_routes.dart';
 import 'package:namma_wallet/src/core/styles/styles.dart';
 import 'package:namma_wallet/src/features/home/domain/generic_details_model.dart';
 import 'package:namma_wallet/src/features/home/presentation/widgets/hilight_widget.dart';
-import 'package:namma_wallet/src/features/ticket/presentation/ticket_view.dart';
-import 'package:namma_wallet/src/features/ticket_view/widgets/ticket_view_widget.dart';
+import 'package:namma_wallet/src/features/travel/presentation/widgets/ticket_view_widget.dart';
 
 class TravelTicketCardWidget extends StatelessWidget {
-  const TravelTicketCardWidget({required this.ticket, super.key});
+  const TravelTicketCardWidget({
+    required this.ticket,
+    this.onTicketDeleted,
+    super.key,
+  });
   final GenericDetailsModel ticket;
+  final VoidCallback? onTicketDeleted;
 
   @override
   Widget build(BuildContext context) {
@@ -127,24 +133,18 @@ class TravelTicketCardWidget extends StatelessWidget {
               ),
 
               //* See more button
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => TicketView(ticket: ticket),
-                    ),
+              IconButton(
+                onPressed: () async {
+                  final wasDeleted = await context.pushNamed<bool>(
+                    AppRoute.ticketView.name,
+                    extra: ticket,
                   );
+
+                  if (wasDeleted == true && onTicketDeleted != null) {
+                    onTicketDeleted!();
+                  }
                 },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.black87,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                ),
-                child: const Text(
-                  'See Details',
-                  style: TextStyle(color: Colors.white),
-                ),
+                icon: const Icon(Icons.info),
               )
             ],
           )

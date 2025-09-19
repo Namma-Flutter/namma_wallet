@@ -4,6 +4,19 @@ part 'tnstc_model.mapper.dart';
 
 @MappableClass()
 class TNSTCModel with TNSTCModelMappable {
+  const TNSTCModel({
+    required this.corporation,
+    required this.service,
+    required this.pnrNo,
+    required this.from,
+    required this.to,
+    required this.tripCode,
+    required this.journeyDate,
+    required this.time,
+    required this.seatNumbers,
+    required this.ticketClass,
+    required this.boardingAt,
+  });
   @MappableField(key: 'corporation')
   final String corporation;
 
@@ -36,19 +49,4 @@ class TNSTCModel with TNSTCModelMappable {
 
   @MappableField(key: 'boarding_at')
   final String boardingAt;
-
-  const TNSTCModel({
-    required this.corporation,
-    required this.service,
-    required this.pnrNo,
-    required this.from,
-    required this.to,
-    required this.tripCode,
-    required this.journeyDate,
-    required this.time,
-    required this.seatNumbers,
-    required this.ticketClass,
-    required this.boardingAt,
-  });
-  
 }

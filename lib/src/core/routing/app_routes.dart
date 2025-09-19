@@ -7,16 +7,18 @@ enum AppRoute {
 
   // Ticket related routes
   ticketView(path: '/ticket', name: 'ticketView'),
-  ticketDetails(path: '/ticket/:id', name: 'ticketDetails'),
+
+  // Scanner related routes
+  barcodeScanner(path: '/barcode-scanner', name: 'barcodeScanner'),
 
   // Export functionality
   export(path: '/export', name: 'export'),
 
-  // TNSTC specific
-  tnstcTicket(path: '/tnstc-ticket', name: 'tnstcTicket'),
-
   // Settings and configuration
-  settings(path: '/settings', name: 'settings');
+  settings(path: '/settings', name: 'settings'),
+
+  // Debug routes
+  dbViewer(path: '/db-viewer', name: 'dbViewer');
 
   const AppRoute({required this.path, required this.name});
 

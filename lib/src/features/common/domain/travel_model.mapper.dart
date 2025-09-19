@@ -192,11 +192,11 @@ class _TravelModelCopyWithImpl<$R, $Out>
       TravelModelMapper.ensureInitialized();
   @override
   ListCopyWith<$R, String, ObjectCopyWith<$R, String, String>>
-  get seatNumbers => ListCopyWith(
-    $value.seatNumbers,
-    (v, t) => ObjectCopyWith(v, $identity, t),
-    (v) => call(seatNumbers: v),
-  );
+      get seatNumbers => ListCopyWith(
+            $value.seatNumbers,
+            (v, t) => ObjectCopyWith(v, $identity, t),
+            (v) => call(seatNumbers: v),
+          );
   @override
   $R call({
     String? corporation,
@@ -210,39 +210,40 @@ class _TravelModelCopyWithImpl<$R, $Out>
     List<String>? seatNumbers,
     String? ticketClass,
     String? boardingAt,
-  }) => $apply(
-    FieldCopyWithData({
-      if (corporation != null) #corporation: corporation,
-      if (service != null) #service: service,
-      if (pnrNo != null) #pnrNo: pnrNo,
-      if (from != null) #from: from,
-      if (to != null) #to: to,
-      if (tripCode != null) #tripCode: tripCode,
-      if (journeyDate != null) #journeyDate: journeyDate,
-      if (time != null) #time: time,
-      if (seatNumbers != null) #seatNumbers: seatNumbers,
-      if (ticketClass != null) #ticketClass: ticketClass,
-      if (boardingAt != null) #boardingAt: boardingAt,
-    }),
-  );
+  }) =>
+      $apply(
+        FieldCopyWithData({
+          if (corporation != null) #corporation: corporation,
+          if (service != null) #service: service,
+          if (pnrNo != null) #pnrNo: pnrNo,
+          if (from != null) #from: from,
+          if (to != null) #to: to,
+          if (tripCode != null) #tripCode: tripCode,
+          if (journeyDate != null) #journeyDate: journeyDate,
+          if (time != null) #time: time,
+          if (seatNumbers != null) #seatNumbers: seatNumbers,
+          if (ticketClass != null) #ticketClass: ticketClass,
+          if (boardingAt != null) #boardingAt: boardingAt,
+        }),
+      );
   @override
   TravelModel $make(CopyWithData data) => TravelModel(
-    corporation: data.get(#corporation, or: $value.corporation),
-    service: data.get(#service, or: $value.service),
-    pnrNo: data.get(#pnrNo, or: $value.pnrNo),
-    from: data.get(#from, or: $value.from),
-    to: data.get(#to, or: $value.to),
-    tripCode: data.get(#tripCode, or: $value.tripCode),
-    journeyDate: data.get(#journeyDate, or: $value.journeyDate),
-    time: data.get(#time, or: $value.time),
-    seatNumbers: data.get(#seatNumbers, or: $value.seatNumbers),
-    ticketClass: data.get(#ticketClass, or: $value.ticketClass),
-    boardingAt: data.get(#boardingAt, or: $value.boardingAt),
-  );
+        corporation: data.get(#corporation, or: $value.corporation),
+        service: data.get(#service, or: $value.service),
+        pnrNo: data.get(#pnrNo, or: $value.pnrNo),
+        from: data.get(#from, or: $value.from),
+        to: data.get(#to, or: $value.to),
+        tripCode: data.get(#tripCode, or: $value.tripCode),
+        journeyDate: data.get(#journeyDate, or: $value.journeyDate),
+        time: data.get(#time, or: $value.time),
+        seatNumbers: data.get(#seatNumbers, or: $value.seatNumbers),
+        ticketClass: data.get(#ticketClass, or: $value.ticketClass),
+        boardingAt: data.get(#boardingAt, or: $value.boardingAt),
+      );
 
   @override
   TravelModelCopyWith<$R2, TravelModel, $Out2> $chain<$R2, $Out2>(
     Then<$Out2, $R2> t,
-  ) => _TravelModelCopyWithImpl<$R2, $Out2>($value, $cast, t);
+  ) =>
+      _TravelModelCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }
-
