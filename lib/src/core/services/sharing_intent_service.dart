@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:receive_sharing_intent/receive_sharing_intent.dart';
+import 'package:listen_sharing_intent/listen_sharing_intent.dart';
+
 
 /// Service to handle sharing intents from other apps
 class SharingIntentService {
