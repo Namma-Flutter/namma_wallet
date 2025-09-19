@@ -2,10 +2,9 @@ import 'dart:async';
 import 'dart:io';
 import 'package:listen_sharing_intent/listen_sharing_intent.dart';
 
-
 /// Service to handle sharing intents from other apps
 class SharingIntentService {
-  static final SharingIntentService _instance = 
+  static final SharingIntentService _instance =
       SharingIntentService._internal();
   factory SharingIntentService() => _instance;
   SharingIntentService._internal();
