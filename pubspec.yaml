@@ -35,6 +35,9 @@ dependencies:
   syncfusion_flutter_pdf: ^31.1.19
   table_calendar: ^3.1.2
   uuid: ^4.5.1
+  listen_sharing_intent:
+    git:
+      url: https://github.com/Zverik/receive_sharing_intent
 
 dev_dependencies:
   build_runner: ^2.4.0
