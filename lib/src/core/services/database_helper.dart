@@ -152,7 +152,8 @@ CREATE INDEX idx_travel_tickets_ticket_type ON travel_tickets(ticket_type);
         'trip_code': 'CHN-CBE-001',
         'source_location': 'Chennai',
         'destination_location': 'Coimbatore',
-        'journey_date': DateTime.now().add(const Duration(days: 3)).toIso8601String(),
+        'journey_date':
+            DateTime.now().add(const Duration(days: 3)).toIso8601String(),
         'departure_time': '08:30',
         'passenger_name': 'Test User',
         'seat_numbers': '12A,12B',
@@ -171,14 +172,16 @@ CREATE INDEX idx_travel_tickets_ticket_type ON travel_tickets(ticket_type);
         'pnr_number': '9876543210',
         'source_location': 'Bangalore',
         'destination_location': 'Chennai',
-        'journey_date': DateTime.now().add(const Duration(days: 10)).toIso8601String(),
+        'journey_date':
+            DateTime.now().add(const Duration(days: 10)).toIso8601String(),
         'departure_time': '06:00',
         'arrival_time': '11:30',
         'passenger_name': 'Test User',
         'seat_numbers': 'S2-34',
         'coach_number': 'S2',
         'class_of_service': 'Sleeper',
-        'booking_date': DateTime.now().subtract(const Duration(days: 1)).toIso8601String(),
+        'booking_date':
+            DateTime.now().subtract(const Duration(days: 1)).toIso8601String(),
         'amount': 450.50,
         'status': 'CONFIRMED',
         'source_type': 'PDF',
@@ -193,7 +196,8 @@ CREATE INDEX idx_travel_tickets_ticket_type ON travel_tickets(ticket_type);
         'venue_name': 'Chennai Trade Centre',
         'source_location': 'Chennai Trade Centre',
         'destination_location': 'Chennai Trade Centre',
-        'journey_date': DateTime.now().add(const Duration(days: 20)).toIso8601String(),
+        'journey_date':
+            DateTime.now().add(const Duration(days: 20)).toIso8601String(),
         'journey_time': '19:00',
         'seat_numbers': 'A-10',
         'booking_date': DateTime.now().toIso8601String(),
@@ -217,7 +221,8 @@ CREATE INDEX idx_travel_tickets_ticket_type ON travel_tickets(ticket_type);
   Future<List<Map<String, Object?>>> fetchAllTravelTickets() async {
     try {
       final db = await database;
-      final tickets = await db.query('travel_tickets', orderBy: 'created_at DESC');
+      final tickets =
+          await db.query('travel_tickets', orderBy: 'created_at DESC');
       developer.log('Successfully fetched ${tickets.length} travel tickets',
           name: 'DatabaseHelper');
       print('✅ DB FETCH: Retrieved ${tickets.length} travel tickets');
@@ -240,7 +245,8 @@ ORDER BY t.created_at DESC
 ''');
   }
 
-  Future<List<Map<String, Object?>>> fetchTravelTicketsByType(String ticketType) async {
+  Future<List<Map<String, Object?>>> fetchTravelTicketsByType(
+      String ticketType) async {
     final db = await database;
     return db.query(
       'travel_tickets',
@@ -274,7 +280,8 @@ ORDER BY t.created_at DESC
           developer.log('Duplicate ticket found with PNR: $pnrNumber',
               name: 'DatabaseHelper');
           print('⚠️ DB DUPLICATE: Ticket with PNR $pnrNumber already exists');
-          throw DuplicateTicketException('Ticket with PNR $pnrNumber already exists');
+          throw DuplicateTicketException(
+              'Ticket with PNR $pnrNumber already exists');
         }
       } else if (bookingRef != null && bookingRef.isNotEmpty) {
         final existing = await db.query(
@@ -284,10 +291,13 @@ ORDER BY t.created_at DESC
           limit: 1,
         );
         if (existing.isNotEmpty) {
-          developer.log('Duplicate ticket found with booking reference: $bookingRef',
+          developer.log(
+              'Duplicate ticket found with booking reference: $bookingRef',
               name: 'DatabaseHelper');
-          print('⚠️ DB DUPLICATE: Ticket with booking reference $bookingRef already exists');
-          throw DuplicateTicketException('Ticket with booking reference $bookingRef already exists');
+          print(
+              '⚠️ DB DUPLICATE: Ticket with booking reference $bookingRef already exists');
+          throw DuplicateTicketException(
+              'Ticket with booking reference $bookingRef already exists');
         }
       }
 

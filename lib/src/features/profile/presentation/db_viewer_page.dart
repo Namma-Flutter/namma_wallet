@@ -84,11 +84,13 @@ class _DbViewerPageState extends State<DbViewerPage>
               itemCount: tickets.length,
               itemBuilder: (context, index) {
                 final t = tickets[index];
-                final subtitle = '${t['provider_name']} - ${t['source_location']} → ${t['destination_location']}';
+                final subtitle =
+                    '${t['provider_name']} - ${t['source_location']} → ${t['destination_location']}';
                 return Card(
                   margin: const EdgeInsets.all(8),
                   child: ListTile(
-                    title: Text('${t['pnr_number'] ?? t['booking_reference'] ?? 'N/A'}'),
+                    title: Text(
+                        '${t['pnr_number'] ?? t['booking_reference'] ?? 'N/A'}'),
                     subtitle: Text(subtitle),
                     trailing: Text('${t['amount'] ?? 'N/A'}'),
                     onTap: () => showTicketDetails(context, t, subtitle),
@@ -108,69 +110,68 @@ class _DbViewerPageState extends State<DbViewerPage>
           return Dialog(
             backgroundColor: Colors.white,
             child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Padding(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Text(
+                    subtitle,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: SingleChildScrollView(
                     padding: const EdgeInsets.all(16),
-                    child: Text(
-                      subtitle,
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    child: SingleChildScrollView(
-                      padding: const EdgeInsets.all(16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: t.entries
-                            .map((entry) => Padding(
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 4),
-                                  child: RichText(
-                                    text: TextSpan(
-                                      style: DefaultTextStyle.of(context).style,
-                                      children: [
-                                        TextSpan(
-                                          text: '${entry.key}: ',
-                                          style: const TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                          ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: t.entries
+                          .map((entry) => Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 4),
+                                child: RichText(
+                                  text: TextSpan(
+                                    style: DefaultTextStyle.of(context).style,
+                                    children: [
+                                      TextSpan(
+                                        text: '${entry.key}: ',
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
                                         ),
-                                        TextSpan(
-                                          text: '${entry.value}',
-                                        ),
-                                      ],
-                                    ),
+                                      ),
+                                      TextSpan(
+                                        text: '${entry.value}',
+                                      ),
+                                    ],
                                   ),
-                                ))
-                            .toList(),
-                      ),
+                                ),
+                              ))
+                          .toList(),
                     ),
                   ),
-                  ElevatedButton(
-                    onPressed: () async {
-                      const iOSWidgetName = 'TicketHomeWidget';
-                      const androidWidgetName = 'TicketHomeWidget';
-                      const dataKey = 'text_from_flutter_app';
-                      await HomeWidget.saveWidgetData(dataKey, jsonEncode(t));
+                ),
+                ElevatedButton(
+                  onPressed: () async {
+                    const iOSWidgetName = 'TicketHomeWidget';
+                    const androidWidgetName = 'TicketHomeWidget';
+                    const dataKey = 'text_from_flutter_app';
+                    await HomeWidget.saveWidgetData(dataKey, jsonEncode(t));
 
-                      await HomeWidget.updateWidget(
-                          androidName: androidWidgetName,
-                          iOSName: iOSWidgetName);
-                      if (context.mounted) {
-                        context.pop();
-                      }
-                    },
-                    child: const Text('Pin to Home Screen'),
-                  ),
-                  const SizedBox(
-                    height: 16,
-                  ),
-                ],
-              ),
+                    await HomeWidget.updateWidget(
+                        androidName: androidWidgetName, iOSName: iOSWidgetName);
+                    if (context.mounted) {
+                      context.pop();
+                    }
+                  },
+                  child: const Text('Pin to Home Screen'),
+                ),
+                const SizedBox(
+                  height: 16,
+                ),
+              ],
+            ),
           );
         });
   }

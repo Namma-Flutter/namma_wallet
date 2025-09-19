@@ -20,7 +20,8 @@ class ClipboardResult {
     this.errorMessage,
   });
 
-  factory ClipboardResult.success(ClipboardContentType type, String content, {TravelTicketModel? ticket}) {
+  factory ClipboardResult.success(ClipboardContentType type, String content,
+      {TravelTicketModel? ticket}) {
     return ClipboardResult(
       type: type,
       content: content,
@@ -147,7 +148,8 @@ class ClipboardService {
     if (result.isSuccess) {
       message = switch (result.type) {
         ClipboardContentType.text => 'Text content read successfully',
-        ClipboardContentType.travelTicket => 'Travel ticket saved successfully!',
+        ClipboardContentType.travelTicket =>
+          'Travel ticket saved successfully!',
         ClipboardContentType.invalid => 'Invalid content',
       };
       backgroundColor = Colors.green;

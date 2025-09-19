@@ -70,9 +70,10 @@ final router = GoRouter(
             cornerRadius: 30,
             lineThickness: 10,
           ),
-          onDetect: onDetect ?? (BarcodeCapture capture) {
-            // Default handler if none provided
-          },
+          onDetect: onDetect ??
+              (BarcodeCapture capture) {
+                // Default handler if none provided
+              },
         );
       },
     ),

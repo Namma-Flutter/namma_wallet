@@ -15,6 +15,11 @@ class PDFService {
       // Dispose the document.
       document.dispose();
 
+      // Log raw text before cleaning
+      developer.log('=== RAW PDF TEXT ===', name: 'PDFService');
+      developer.log(rawText, name: 'PDFService');
+      developer.log('=== END RAW PDF TEXT ===', name: 'PDFService');
+
       // Clean and normalize the extracted text
       final cleanedText = _cleanExtractedText(rawText);
 
@@ -48,13 +53,12 @@ class PDFService {
     cleanedText = cleanedText.replaceAll(RegExp(r'\n{3,}'), '\n\n');
 
     // Fix common PDF extraction issues
-    // Sometimes colons get separated from labels
+    // Sometimes colons get separated from labels - fix spacing but keep original text
     cleanedText = cleanedText.replaceAll(RegExp(r'(\w+)\s+:\s*'), r'$1: ');
 
     // Sometimes values get split across lines - try to rejoin obvious cases
     cleanedText = cleanedText.replaceAll(
-        RegExp(r'Corporation\s*:\s*\n([A-Z\s]+)\n'),
-        r'Corporation: $1\n');
+        RegExp(r'Corporation\s*:\s*\n([A-Z\s]+)\n'), r'Corporation: $1\n');
     cleanedText = cleanedText.replaceAll(
         RegExp(r'Service Start Place\s*:\s*\n([A-Z\s.-]+)\n'),
         r'Service Start Place: $1\n');
@@ -78,8 +82,7 @@ class PDFService {
     final preview = cleanedText.length > 500
         ? '${cleanedText.substring(0, 500)}...'
         : cleanedText;
-    developer.log('Cleaned PDF text preview: $preview',
-        name: 'PDFService');
+    developer.log('Cleaned PDF text preview: $preview', name: 'PDFService');
 
     return cleanedText;
   }

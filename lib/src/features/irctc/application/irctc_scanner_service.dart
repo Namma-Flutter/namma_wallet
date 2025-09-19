@@ -147,7 +147,8 @@ class IRCTCScannerService {
 
     if (result.isSuccess) {
       message = switch (result.type) {
-        IRCTCScannerContentType.irctcTicket => 'IRCTC ticket saved successfully!',
+        IRCTCScannerContentType.irctcTicket =>
+          'IRCTC ticket saved successfully!',
         IRCTCScannerContentType.invalid => 'Invalid content',
       };
       backgroundColor = Colors.green;

@@ -27,7 +27,8 @@ class TNSTCBusParser implements TravelTicketParser {
       'Service Start Place',
       'Date of Journey',
     ];
-    return patterns.any((pattern) => text.toLowerCase().contains(pattern.toLowerCase()));
+    return patterns
+        .any((pattern) => text.toLowerCase().contains(pattern.toLowerCase()));
   }
 
   @override
@@ -71,33 +72,40 @@ class TNSTCBusParser implements TravelTicketParser {
     );
     var departureTime = extractMatch(
         r'Time\s*:\s*(?:\d{2}/\d{2}/\d{4},)?\s*,?\s*(\d{2}:\d{2})', text);
-    var seatNumbers =
-        extractMatch(r'Seat No\.\s*:\s*([0-9A-Z,\s\-#]+)', text)
-            .replaceAll(RegExp(r'[,\s]+$'), '');
+    var seatNumbers = extractMatch(r'Seat No\.\s*:\s*([0-9A-Z,\s\-#]+)', text)
+        .replaceAll(RegExp(r'[,\s]+$'), '');
     var classOfService = extractMatch(
-        r'Class\s*:\s*(.*?)(?=\s*[,\.]|\s*Boarding|\s*For\s+e-Ticket|$)',
-        text);
+        r'Class\s*:\s*(.*?)(?=\s*[,\.]|\s*Boarding|\s*For\s+e-Ticket|$)', text);
     var boardingPoint =
         extractMatch(r'Boarding at\s*:\s*(.*?)(?=\s*\.|$)', text);
 
     // If SMS patterns failed, try PDF patterns
     if (corporation.isEmpty || pnrNumber.isEmpty) {
-      corporation = corporation.isNotEmpty ? corporation
+      corporation = corporation.isNotEmpty
+          ? corporation
           : extractMatch(r'Corporation\s*:\s*(.*)', text);
-      pnrNumber = pnrNumber.isNotEmpty ? pnrNumber
+      pnrNumber = pnrNumber.isNotEmpty
+          ? pnrNumber
           : extractMatch(r'PNR Number\s*:\s*(\S+)', text);
-      from = from.isNotEmpty ? from
+      from = from.isNotEmpty
+          ? from
           : extractMatch(r'Service Start Place\s*:\s*(.*)', text);
-      to = to.isNotEmpty ? to
+      to = to.isNotEmpty
+          ? to
           : extractMatch(r'Service End Place\s*:\s*(.*)', text);
-      journeyDate = journeyDate ?? parseDate(
-        extractMatch(r'Date of Journey\s*:\s*(\d{2}[/-]\d{2}[/-]\d{4})', text),
-      );
-      departureTime = departureTime.isNotEmpty ? departureTime
+      journeyDate = journeyDate ??
+          parseDate(
+            extractMatch(
+                r'Date of Journey\s*:\s*(\d{2}[/-]\d{2}[/-]\d{4})', text),
+          );
+      departureTime = departureTime.isNotEmpty
+          ? departureTime
           : extractMatch(r'Service Start Time\s*:\s*(\d{2}:\d{2})', text);
-      classOfService = classOfService.isNotEmpty ? classOfService
+      classOfService = classOfService.isNotEmpty
+          ? classOfService
           : extractMatch(r'Class of Service\s*:\s*(.*)', text);
-      boardingPoint = boardingPoint.isNotEmpty ? boardingPoint
+      boardingPoint = boardingPoint.isNotEmpty
+          ? boardingPoint
           : extractMatch(r'Passenger Pickup Point\s*:\s*(.*)', text);
 
       // For PDF, try to extract seat number differently
@@ -140,7 +148,8 @@ class IRCTCTrainParser implements TravelTicketParser {
       r'Train\s*No',
       r'E-TICKET',
     ];
-    return patterns.any((pattern) => RegExp(pattern, caseSensitive: false).hasMatch(text));
+    return patterns
+        .any((pattern) => RegExp(pattern, caseSensitive: false).hasMatch(text));
   }
 
   @override
@@ -197,7 +206,8 @@ class SETCBusParser implements TravelTicketParser {
       r'Booking ID',
       r'Bus No',
     ];
-    return patterns.any((pattern) => RegExp(pattern, caseSensitive: false).hasMatch(text));
+    return patterns
+        .any((pattern) => RegExp(pattern, caseSensitive: false).hasMatch(text));
   }
 
   @override
@@ -242,19 +252,23 @@ class TravelParserService {
     SETCBusParser(),
   ];
 
-  static TravelTicketModel? parseTicketFromText(String text, {SourceType? sourceType}) {
+  static TravelTicketModel? parseTicketFromText(String text,
+      {SourceType? sourceType}) {
     try {
       for (final parser in _parsers) {
         if (parser.canParse(text)) {
-          developer.log('Attempting to parse with ${parser.providerName} parser',
+          developer.log(
+              'Attempting to parse with ${parser.providerName} parser',
               name: 'TravelParserService');
           print('🔍 PARSING: Trying ${parser.providerName} parser');
 
           final ticket = parser.parseTicket(text);
           if (ticket != null) {
-            developer.log('Successfully parsed ticket with ${parser.providerName}',
+            developer.log(
+                'Successfully parsed ticket with ${parser.providerName}',
                 name: 'TravelParserService');
-            print('✅ PARSED: Successfully parsed ${parser.providerName} ticket');
+            print(
+                '✅ PARSED: Successfully parsed ${parser.providerName} ticket');
 
             if (sourceType != null) {
               return ticket.copyWith(sourceType: sourceType);
