@@ -1,4 +1,4 @@
-package com.example.namma_wallet
+package com.nammaflutter.nammawallet
 
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
