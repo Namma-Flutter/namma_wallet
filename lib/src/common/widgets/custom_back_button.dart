@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:namma_wallet/src/core/styles/styles.dart';
+import 'package:namma_wallet/src/common/theme/styles.dart';
 
 class CustomBackButton extends StatelessWidget {
   const CustomBackButton({

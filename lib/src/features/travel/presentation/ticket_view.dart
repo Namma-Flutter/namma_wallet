@@ -1,12 +1,14 @@
+import 'dart:convert';
 import 'dart:developer' as developer;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:namma_wallet/src/core/helper/check_pnr_id.dart';
-import 'package:namma_wallet/src/core/helper/date_time_converter.dart';
-import 'package:namma_wallet/src/core/services/database_helper.dart';
-import 'package:namma_wallet/src/core/styles/styles.dart';
-import 'package:namma_wallet/src/core/widgets/custom_back_button.dart';
-import 'package:namma_wallet/src/core/widgets/snackbar_widget.dart';
+import 'package:home_widget/home_widget.dart';
+import 'package:namma_wallet/src/common/helper/check_pnr_id.dart';
+import 'package:namma_wallet/src/common/helper/date_time_converter.dart';
+import 'package:namma_wallet/src/common/services/database_helper.dart';
+import 'package:namma_wallet/src/common/theme/styles.dart';
+import 'package:namma_wallet/src/common/widgets/custom_back_button.dart';
+import 'package:namma_wallet/src/common/widgets/snackbar_widget.dart';
 import 'package:namma_wallet/src/features/home/domain/generic_details_model.dart';
 import 'package:namma_wallet/src/features/home/presentation/widgets/hilight_widget.dart';
 import 'package:namma_wallet/src/features/travel/presentation/widgets/custom_ticket_shape_line.dart';
@@ -23,10 +25,45 @@ class TicketView extends StatefulWidget {
 
 class _TicketViewState extends State<TicketView> {
   bool _isDeleting = false;
+  bool _isPinning = false;
 
   // Helper method to handle empty values
   String getValueOrDefault(String? value) {
     return (value?.isEmpty ?? true) ? '--' : value!;
+  }
+
+  Future<void> _pinToHomeScreen() async {
+    setState(() {
+      _isPinning = true;
+    });
+
+    try {
+      const iOSWidgetName = 'TicketHomeWidget';
+      const androidWidgetName = 'TicketHomeWidget';
+      const dataKey = 'ticket_data';
+
+      // Convert ticket to JSON format for the widget
+      final ticketData = widget.ticket.toJson();
+      await HomeWidget.saveWidgetData(dataKey, jsonEncode(ticketData));
+
+      await HomeWidget.updateWidget(
+          androidName: androidWidgetName, iOSName: iOSWidgetName);
+
+      if (mounted) {
+        showSnackbar(context, '📌 Ticket pinned to home screen successfully!');
+      }
+    } catch (e) {
+      developer.log('Failed to pin ticket to home screen', name: 'TicketView', error: e);
+      if (mounted) {
+        showSnackbar(context, 'Failed to pin ticket: $e', isError: true);
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isPinning = false;
+        });
+      }
+    }
   }
 
   Future<void> _showDeleteConfirmation() async {
@@ -131,19 +168,22 @@ class _TicketViewState extends State<TicketView> {
           const SizedBox(width: 16)
         ],
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Container(
-              margin: const EdgeInsets.only(top: 16, left: 16, right: 16),
-              padding: const EdgeInsets.all(24),
-              decoration: const BoxDecoration(
-                color: AppColor.limeYellowColor,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(16),
-                  topRight: Radius.circular(16),
-                ),
-              ),
+      body: Column(
+        children: [
+          Expanded(
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  Container(
+                    margin: const EdgeInsets.only(top: 16, left: 16, right: 16),
+                    padding: const EdgeInsets.all(24),
+                    decoration: const BoxDecoration(
+                      color: AppColor.limeYellowColor,
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(16),
+                        topRight: Radius.circular(16),
+                      ),
+                    ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -248,26 +288,77 @@ class _TicketViewState extends State<TicketView> {
               size: Size(MediaQuery.of(context).size.width * 0.95, 40),
               painter: CustomTicketShapeLine(),
             ),
-            if (hasPnrOrId(widget.ticket))
-              Container(
-                margin: const EdgeInsets.only(bottom: 16, left: 16, right: 16),
-                padding: const EdgeInsets.all(24),
-                decoration: const BoxDecoration(
-                  color: AppColor.limeYellowColor,
-                  borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(16),
-                    bottomRight: Radius.circular(16),
+                  if (hasPnrOrId(widget.ticket))
+                    Container(
+                      margin: const EdgeInsets.only(bottom: 16, left: 16, right: 16),
+                      padding: const EdgeInsets.all(24),
+                      decoration: const BoxDecoration(
+                        color: AppColor.limeYellowColor,
+                        borderRadius: BorderRadius.only(
+                          bottomLeft: Radius.circular(16),
+                          bottomRight: Radius.circular(16),
+                        ),
+                      ),
+                      child: Center(
+                        child: QrImageView(
+                          data: getPnrOrId(widget.ticket) ?? 'xxx',
+                          size: 200,
+                        ),
+                      ),
+                    )
+                ],
+              ),
+            ),
+          ),
+          // Bottom section with Pin to Home Screen button
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: AppColor.whiteColor,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.1),
+                  blurRadius: 8,
+                  offset: const Offset(0, -2),
+                ),
+              ],
+            ),
+            child: SafeArea(
+              child: SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: ElevatedButton.icon(
+                  onPressed: _isPinning ? null : _pinToHomeScreen,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColor.limeYellowColor,
+                    foregroundColor: Colors.black87,
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  icon: _isPinning
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.black54,
+                          ),
+                        )
+                      : const Icon(Icons.push_pin, size: 20),
+                  label: Text(
+                    _isPinning ? 'Pinning...' : 'Pin to Home Screen',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
                   ),
                 ),
-                child: Center(
-                  child: QrImageView(
-                    data: getPnrOrId(widget.ticket) ?? 'xxx',
-                    size: 200,
-                  ),
-                ),
-              )
-          ],
-        ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

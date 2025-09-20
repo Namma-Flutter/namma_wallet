@@ -1,9 +1,9 @@
 // A dedicated, reusable widget for rendering the content of a wallet card.
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:namma_wallet/src/core/helper/date_time_converter.dart';
-import 'package:namma_wallet/src/core/routing/app_routes.dart';
-import 'package:namma_wallet/src/core/styles/styles.dart';
+import 'package:namma_wallet/src/common/helper/date_time_converter.dart';
+import 'package:namma_wallet/src/common/routing/app_routes.dart';
+import 'package:namma_wallet/src/common/theme/styles.dart';
 import 'package:namma_wallet/src/features/home/domain/generic_details_model.dart';
 import 'package:namma_wallet/src/features/home/presentation/widgets/hilight_widget.dart';
 import 'package:namma_wallet/src/features/travel/presentation/widgets/ticket_view_widget.dart';

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:namma_wallet/src/core/styles/styles.dart';
+import 'package:namma_wallet/src/common/theme/styles.dart';
 
 class TicketLabelValueWidget extends StatelessWidget {
   const TicketLabelValueWidget(
