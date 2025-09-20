@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:namma_wallet/src/common/routing/app_routes.dart';
-import 'package:namma_wallet/src/common/styles/styles.dart';
+import 'package:namma_wallet/src/common/theme/styles.dart';
 
 class UserProfileWidget extends StatelessWidget {
   const UserProfileWidget({
