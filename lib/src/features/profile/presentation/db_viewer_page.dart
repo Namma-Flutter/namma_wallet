@@ -156,7 +156,7 @@ class _DbViewerPageState extends State<DbViewerPage>
                   onPressed: () async {
                     const iOSWidgetName = 'TicketHomeWidget';
                     const androidWidgetName = 'TicketHomeWidget';
-                    const dataKey = 'text_from_flutter_app';
+                    const dataKey = 'ticket_data';
                     await HomeWidget.saveWidgetData(dataKey, jsonEncode(t));
 
                     await HomeWidget.updateWidget(
