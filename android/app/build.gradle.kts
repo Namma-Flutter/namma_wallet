@@ -8,7 +8,7 @@ plugins {
 android {
     namespace = "com.nammaflutter.nammawallet"
     compileSdk = 36
-    ndkVersion = "28.2.13676358"
+    // ndkVersion = "28.2.13676358"
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
