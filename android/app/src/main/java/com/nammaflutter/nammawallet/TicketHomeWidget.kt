@@ -67,22 +67,25 @@ internal fun updateAppWidget(
                 // First attempt: direct parsing
                 JSONObject(jsonString)
             } catch (e1: Exception) {
-                android.util.Log.w("TicketHomeWidget", "Direct JSON parsing failed, trying cleanup", e1)
+                android.util.Log.w("TicketHomeWidget", "Direct JSON parsing failed, trying cleanup")
                 try {
-                    // Second attempt: clean up the string and try again
-                    val cleanedString = jsonString.trim().replace("\\\"", "\"")
-                    JSONObject(cleanedString)
-                } catch (e2: Exception) {
-                    android.util.Log.w("TicketHomeWidget", "Cleaned JSON parsing failed, trying raw approach", e2)
-                    try {
-                        // Third attempt: treat as escaped JSON string
-                        val unescapedString = jsonString.replace("\\", "")
-                        JSONObject(unescapedString)
-                    } catch (e3: Exception) {
-                        android.util.Log.e("TicketHomeWidget", "All JSON parsing attempts failed, trying manual parsing", e3)
-                        // Final fallback: manually extract values using regex
-                        return parseTicketDataManually(jsonString, views, appWidgetManager, appWidgetId)
+                    // Second attempt: check if the string is double-encoded
+                    val trimmedString = jsonString.trim()
+                    if (trimmedString.startsWith("\"") && trimmedString.endsWith("\"")) {
+                        // Remove outer quotes and unescape
+                        val unquotedString = trimmedString.substring(1, trimmedString.length - 1)
+                            .replace("\\\"", "\"")
+                            .replace("\\\\", "\\")
+                        JSONObject(unquotedString)
+                    } else {
+                        // Try cleaning up escaped quotes
+                        val cleanedString = trimmedString.replace("\\\"", "\"")
+                        JSONObject(cleanedString)
                     }
+                } catch (e2: Exception) {
+                    android.util.Log.w("TicketHomeWidget", "Cleaned JSON parsing failed, trying regex extraction")
+                    // Use regex parsing as it's working in the manual parsing method
+                    parseTicketDataWithRegex(jsonString)
                 }
             }
 
@@ -104,7 +107,7 @@ internal fun updateAppWidget(
                 "busticket", "bus" -> R.drawable.ic_bus
                 "trainticket", "train" -> R.drawable.ic_train
                 "event" -> R.drawable.ic_event
-                else -> R.drawable.ic_event
+                else -> R.drawable.ic_bus // Default to bus for unknown types
             }
 
             // Update views with ticket data
@@ -298,7 +301,7 @@ private fun parseTicketDataManually(
             "busticket", "bus" -> R.drawable.ic_bus
             "trainticket", "train" -> R.drawable.ic_train
             "event" -> R.drawable.ic_event
-            else -> R.drawable.ic_event
+            else -> R.drawable.ic_bus // Default to bus for unknown types
         }
 
         // Update views with ticket data
@@ -320,6 +323,46 @@ private fun parseTicketDataManually(
 
     // Update the widget
     appWidgetManager.updateAppWidget(appWidgetId, views)
+}
+
+private fun parseTicketDataWithRegex(jsonString: String): JSONObject {
+    try {
+        val json = JSONObject()
+
+        // Extract basic string values
+        json.put("primaryText", extractValue(jsonString, "primaryText") ?: "No Route Info")
+        json.put("secondaryText", extractValue(jsonString, "secondaryText") ?: "Service")
+        json.put("type", extractValue(jsonString, "type") ?: "event")
+        json.put("location", extractValue(jsonString, "location") ?: "Unknown")
+        json.put("startTime", extractValue(jsonString, "startTime") ?: "")
+        json.put("endTime", extractValue(jsonString, "endTime") ?: "")
+
+        // Extract ticketId as number
+        val ticketIdPattern = "\"ticketId\"\\s*:\\s*(\\d+)"
+        val ticketIdRegex = Regex(ticketIdPattern)
+        val ticketIdMatch = ticketIdRegex.find(jsonString)
+        json.put("ticketId", ticketIdMatch?.groupValues?.get(1)?.toIntOrNull() ?: 0)
+
+        // Check if tags is null
+        val tagsNullPattern = "\"tags\"\\s*:\\s*null"
+        val tagsIsNull = Regex(tagsNullPattern).find(jsonString) != null
+        if (tagsIsNull) {
+            json.put("tags", JSONObject.NULL)
+        }
+
+        android.util.Log.d("TicketHomeWidget", "Successfully created JSON object with regex parsing")
+        return json
+    } catch (e: Exception) {
+        android.util.Log.e("TicketHomeWidget", "Failed to create JSON object with regex", e)
+        // Return a basic JSON object with default values
+        val fallbackJson = JSONObject()
+        fallbackJson.put("primaryText", "No Route Info")
+        fallbackJson.put("secondaryText", "Service")
+        fallbackJson.put("type", "event")
+        fallbackJson.put("location", "Unknown")
+        fallbackJson.put("startTime", "")
+        return fallbackJson
+    }
 }
 
 private fun extractValue(jsonString: String, key: String): String? {
