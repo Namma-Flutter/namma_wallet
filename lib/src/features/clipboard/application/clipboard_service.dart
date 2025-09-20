@@ -1,7 +1,7 @@
 import 'dart:developer' as developer;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:namma_wallet/src/core/services/database_helper.dart';
+import 'package:namma_wallet/src/common/services/database_helper.dart';
 import 'package:namma_wallet/src/features/common/application/travel_parser_service.dart';
 import 'package:namma_wallet/src/features/common/domain/travel_ticket_model.dart';
 

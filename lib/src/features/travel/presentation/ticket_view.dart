@@ -1,12 +1,12 @@
 import 'dart:developer' as developer;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:namma_wallet/src/core/helper/check_pnr_id.dart';
-import 'package:namma_wallet/src/core/helper/date_time_converter.dart';
-import 'package:namma_wallet/src/core/services/database_helper.dart';
-import 'package:namma_wallet/src/core/styles/styles.dart';
-import 'package:namma_wallet/src/core/widgets/custom_back_button.dart';
-import 'package:namma_wallet/src/core/widgets/snackbar_widget.dart';
+import 'package:namma_wallet/src/common/helper/check_pnr_id.dart';
+import 'package:namma_wallet/src/common/helper/date_time_converter.dart';
+import 'package:namma_wallet/src/common/services/database_helper.dart';
+import 'package:namma_wallet/src/common/styles/styles.dart';
+import 'package:namma_wallet/src/common/widgets/custom_back_button.dart';
+import 'package:namma_wallet/src/common/widgets/snackbar_widget.dart';
 import 'package:namma_wallet/src/features/home/domain/generic_details_model.dart';
 import 'package:namma_wallet/src/features/home/presentation/widgets/hilight_widget.dart';
 import 'package:namma_wallet/src/features/travel/presentation/widgets/custom_ticket_shape_line.dart';

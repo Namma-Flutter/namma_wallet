@@ -3,8 +3,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:home_widget/home_widget.dart';
-import 'package:namma_wallet/src/core/services/database_helper.dart';
-import 'package:namma_wallet/src/core/widgets/custom_back_button.dart';
+import 'package:namma_wallet/src/common/services/database_helper.dart';
+import 'package:namma_wallet/src/common/widgets/custom_back_button.dart';
 
 class DbViewerPage extends StatefulWidget {
   const DbViewerPage({super.key});

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:namma_wallet/src/core/routing/app_router.dart';
-import 'package:namma_wallet/src/core/services/sharing_intent_service.dart';
+import 'package:namma_wallet/src/common/routing/app_router.dart';
+import 'package:namma_wallet/src/common/services/sharing_intent_service.dart';
 
 class NammaWalletApp extends StatefulWidget {
   const NammaWalletApp({super.key});
