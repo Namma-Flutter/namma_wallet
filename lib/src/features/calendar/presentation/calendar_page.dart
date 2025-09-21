@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:namma_wallet/src/features/calendar/data/event_model.dart';
 import 'package:namma_wallet/src/features/home/domain/generic_details_model.dart';
+import 'package:namma_wallet/src/features/home/presentation/widgets/header_widget.dart';
 import 'package:namma_wallet/src/features/ticket/presentation/ticket_view.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -63,12 +64,8 @@ class CalendarPage extends StatelessWidget {
               height: MediaQuery.of(context).padding.top,
               color: Colors.grey[50],
             ),
-            // Header with title and profile
-            Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-              child: _buildHeader(),
-            ),
+            // Header with consistent design
+            const UserProfileWidget(),
             // Calendar widget - full screen
             Expanded(
               child: Padding(
@@ -79,74 +76,6 @@ class CalendarPage extends StatelessWidget {
           ],
         ),
       ),
-    );
-  }
-
-  Widget _buildHeader() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Row(
-          children: [
-            const Text(
-              'Namma',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
-              ),
-            ),
-            const SizedBox(width: 4),
-            const Text(
-              'Wallet',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.normal,
-                color: Colors.black,
-              ),
-            ),
-            const SizedBox(width: 8),
-            Container(
-              padding: const EdgeInsets.all(2),
-              decoration: BoxDecoration(
-                color: Colors.orange[100],
-                borderRadius: BorderRadius.circular(4),
-              ),
-              child: const Text(
-                '🎪',
-                style: TextStyle(fontSize: 16),
-              ),
-            ),
-          ],
-        ),
-        Container(
-          width: 40,
-          height: 40,
-          decoration: BoxDecoration(
-            color: Colors.green[200],
-            shape: BoxShape.circle,
-          ),
-          child: ClipOval(
-            child: Image.asset(
-              'assets/images/profile.png', // You may need to add this asset
-              fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) {
-                return Container(
-                  decoration: BoxDecoration(
-                    color: Colors.green[200],
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.person,
-                    color: Colors.white,
-                    size: 24,
-                  ),
-                );
-              },
-            ),
-          ),
-        ),
-      ],
     );
   }
 
@@ -226,9 +155,9 @@ class _CalendarViewState extends State<CalendarView> {
 
     return Column(
       children: [
-        // Calendar with gradient background - larger size
+        // Calendar with gradient background - half page
         Expanded(
-          flex: 3,
+          flex: 1, // Exactly half the page
           child: Container(
             decoration: BoxDecoration(
               gradient: const LinearGradient(
@@ -241,96 +170,105 @@ class _CalendarViewState extends State<CalendarView> {
               ),
               borderRadius: BorderRadius.circular(20),
             ),
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              children: [
-                TableCalendar<Event>(
-                  firstDay: DateTime.utc(2020),
-                  lastDay: DateTime.utc(2030, 12, 31),
-                  focusedDay: selectedDay,
-                  calendarFormat: _calendarFormat,
-                  selectedDayPredicate: (day) => isSameDay(selectedDay, day),
-                  onDaySelected: (day, focusedDay) {
-                    provider.setSelectedDay(day);
-                  },
-                  calendarStyle: CalendarStyle(
-                    // Remove default decorations
-                    defaultDecoration: const BoxDecoration(),
-                    weekendDecoration: const BoxDecoration(),
-                    outsideDaysVisible: false,
+            padding: const EdgeInsets.all(18), // Slightly increased padding
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                return SingleChildScrollView(
+                  child: SizedBox(
+                    height: constraints.maxHeight,
+                    child: TableCalendar<Event>(
+                      firstDay: DateTime.utc(2020),
+                      lastDay: DateTime.utc(2030, 12, 31),
+                      focusedDay: selectedDay,
+                      calendarFormat: _calendarFormat,
+                      selectedDayPredicate: (day) =>
+                          isSameDay(selectedDay, day),
+                      onDaySelected: (day, focusedDay) {
+                        provider.setSelectedDay(day);
+                      },
+                      // Optimized row height for half-page design
+                      rowHeight: (constraints.maxHeight - 70) /
+                          7, // Adjusted for half-page layout
+                      calendarStyle: CalendarStyle(
+                        // Remove default decorations
+                        defaultDecoration: const BoxDecoration(),
+                        weekendDecoration: const BoxDecoration(),
+                        outsideDaysVisible: false,
 
-                    // Selected day styling
-                    selectedDecoration: BoxDecoration(
-                      color: Colors.white,
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
-                          blurRadius: 4,
-                          offset: const Offset(0, 2),
+                        // Selected day styling
+                        selectedDecoration: BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.1),
+                              blurRadius: 4,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                    selectedTextStyle: const TextStyle(
-                      color: Colors.black,
-                      fontWeight: FontWeight.bold,
-                    ),
+                        selectedTextStyle: const TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                        ),
 
-                    // Today styling
-                    todayDecoration: const BoxDecoration(
-                      color: Colors.transparent,
-                      shape: BoxShape.circle,
-                    ),
-                    todayTextStyle: const TextStyle(
-                      color: Colors.black,
-                      fontWeight: FontWeight.w500,
-                    ),
+                        // Today styling
+                        todayDecoration: const BoxDecoration(
+                          color: Colors.transparent,
+                          shape: BoxShape.circle,
+                        ),
+                        todayTextStyle: const TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.w500,
+                        ),
 
-                    // Default text styling
-                    defaultTextStyle: const TextStyle(
-                      color: Colors.black,
-                      fontWeight: FontWeight.w500,
-                      fontSize: 16,
-                    ),
-                    weekendTextStyle: const TextStyle(
-                      color: Colors.black,
-                      fontWeight: FontWeight.w500,
-                      fontSize: 16,
+                        // Default text styling
+                        defaultTextStyle: const TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.w500,
+                          fontSize: 14,
+                        ),
+                        weekendTextStyle: const TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.w500,
+                          fontSize: 14,
+                        ),
+                      ),
+                      headerStyle: const HeaderStyle(
+                        titleCentered: true,
+                        formatButtonVisible: false,
+                        leftChevronIcon: Icon(
+                          Icons.chevron_left,
+                          color: Colors.black,
+                          size: 24,
+                        ),
+                        rightChevronIcon: Icon(
+                          Icons.chevron_right,
+                          color: Colors.black,
+                          size: 24,
+                        ),
+                        titleTextStyle: TextStyle(
+                          color: Colors.black,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      daysOfWeekStyle: const DaysOfWeekStyle(
+                        weekdayStyle: TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 12,
+                        ),
+                        weekendStyle: TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 12,
+                        ),
+                      ),
                     ),
                   ),
-                  headerStyle: const HeaderStyle(
-                    titleCentered: true,
-                    formatButtonVisible: false,
-                    leftChevronIcon: Icon(
-                      Icons.chevron_left,
-                      color: Colors.black,
-                      size: 28,
-                    ),
-                    rightChevronIcon: Icon(
-                      Icons.chevron_right,
-                      color: Colors.black,
-                      size: 28,
-                    ),
-                    titleTextStyle: TextStyle(
-                      color: Colors.black,
-                      fontSize: 20,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  daysOfWeekStyle: const DaysOfWeekStyle(
-                    weekdayStyle: TextStyle(
-                      color: Colors.black,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 14,
-                    ),
-                    weekendStyle: TextStyle(
-                      color: Colors.black,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 14,
-                    ),
-                  ),
-                ),
-              ],
+                );
+              },
             ),
           ),
         ),
@@ -348,9 +286,9 @@ class _CalendarViewState extends State<CalendarView> {
 
         const SizedBox(height: 20),
 
-        // Upcoming section
+        // Upcoming section - other half of the page
         Expanded(
-          flex: 2,
+          flex: 1, // Exactly half the page to match calendar
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -368,6 +306,10 @@ class _CalendarViewState extends State<CalendarView> {
                     ? _buildNoEventsMessage()
                     : ListView.builder(
                         itemCount: events.length,
+                        padding: EdgeInsets.only(
+                          bottom: MediaQuery.of(context).padding.bottom +
+                              80, // Account for nav bar
+                        ),
                         itemBuilder: (context, index) {
                           final event = events[index];
                           return _buildEventCard(event);
