@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:namma_wallet/src/core/styles/styles.dart';
 import 'package:namma_wallet/src/features/bottom_navigation/presentation/widgets/nav_button.dart';
 
 class NavBar extends StatelessWidget {
@@ -30,28 +31,28 @@ class NavBar extends StatelessWidget {
           decoration: BoxDecoration(
             // Transparent glassy background
             color: isDark
-                ? Colors.white.withOpacity(0.1)
-                : Colors.white.withOpacity(0.15),
+                ? AppColor.whiteColor.withOpacity(0.1)
+                : AppColor.whiteColor.withOpacity(0.15),
             borderRadius: BorderRadius.circular(25),
             border: Border.all(
               color: isDark
-                  ? Colors.white.withOpacity(0.2)
-                  : Colors.white.withOpacity(0.3),
+                  ? AppColor.whiteColor.withOpacity(0.2)
+                  : AppColor.whiteColor.withOpacity(0.3),
               width: 0.8,
             ),
             boxShadow: [
               // Soft glowing shadow for glass effect
               BoxShadow(
                 color: isDark
-                    ? Colors.white.withOpacity(0.1)
-                    : Colors.black.withOpacity(0.08),
+                    ? AppColor.whiteColor.withOpacity(0.1)
+                    : AppColor.blackColor.withOpacity(0.08),
                 blurRadius: 25,
                 offset: const Offset(0, 8),
                 spreadRadius: 0,
               ),
               // Inner highlight for glass effect
               BoxShadow(
-                color: Colors.white.withOpacity(0.2),
+                color: AppColor.whiteColor.withOpacity(0.2),
                 blurRadius: 2,
                 offset: const Offset(0, 1),
                 spreadRadius: 0,

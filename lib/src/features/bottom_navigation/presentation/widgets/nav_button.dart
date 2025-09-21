@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:namma_wallet/src/core/styles/styles.dart';
 
 class NavButton extends StatefulWidget {
   const NavButton({
@@ -84,14 +85,16 @@ class _NavButtonState extends State<NavButton>
               decoration: BoxDecoration(
                 color: widget.selected
                     ? (isDark
-                        ? Colors.white.withOpacity(0.15)
-                        : Colors.black.withOpacity(0.25))
+                        ? AppColor.whiteColor.withOpacity(0.15)
+                        : AppColor.blackColor.withOpacity(0.25))
                     : Colors.transparent,
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: widget.selected
                     ? [
                         BoxShadow(
-                          color: (isDark ? Colors.white : Colors.black)
+                          color: (isDark
+                                  ? AppColor.whiteColor
+                                  : AppColor.blackColor)
                               .withOpacity(0.1),
                           blurRadius: 4,
                           offset: const Offset(0, 1),
@@ -112,10 +115,10 @@ class _NavButtonState extends State<NavButton>
                       widget.icon,
                       size: 22,
                       color: widget.selected
-                          ? (isDark ? Colors.white : Colors.white)
+                          ? (isDark ? AppColor.whiteColor : AppColor.whiteColor)
                           : (isDark
-                              ? Colors.white.withOpacity(0.7)
-                              : Colors.black.withOpacity(0.6)),
+                              ? AppColor.whiteColor.withOpacity(0.7)
+                              : AppColor.blackColor.withOpacity(0.6)),
                     ),
                   ),
 
@@ -133,7 +136,9 @@ class _NavButtonState extends State<NavButton>
                               child: Text(
                                 widget.label,
                                 style: TextStyle(
-                                  color: isDark ? Colors.white : Colors.white,
+                                  color: isDark
+                                      ? AppColor.whiteColor
+                                      : AppColor.whiteColor,
                                   fontWeight: FontWeight.w600,
                                   fontSize: 12,
                                 ),

@@ -7,6 +7,7 @@ import 'package:namma_wallet/src/features/calendar/data/event_model.dart';
 import 'package:namma_wallet/src/features/home/domain/generic_details_model.dart';
 import 'package:namma_wallet/src/features/home/presentation/widgets/header_widget.dart';
 import 'package:namma_wallet/src/features/ticket/presentation/ticket_view.dart';
+import 'package:namma_wallet/src/core/styles/styles.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 
@@ -56,13 +57,13 @@ class CalendarPage extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (_) => CalendarProvider()..loadEvents(),
       child: Scaffold(
-        backgroundColor: Colors.grey[50],
+        backgroundColor: AppColor.quaternaryColor,
         body: Column(
           children: [
             // Status bar area
             Container(
               height: MediaQuery.of(context).padding.top,
-              color: Colors.grey[50],
+              color: AppColor.quaternaryColor,
             ),
             // Header with consistent design
             const UserProfileWidget(),
@@ -164,8 +165,8 @@ class _CalendarViewState extends State<CalendarView> {
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [
-                  Color(0xffE7FC57), // Lime yellow color from existing theme
-                  Color(0xffD4E157), // Slightly darker green-yellow
+                  AppColor.limeYellowColor,
+                  AppColor.limeYellowThikColor,
                 ],
               ),
               borderRadius: BorderRadius.circular(20),
@@ -197,18 +198,18 @@ class _CalendarViewState extends State<CalendarView> {
 
                         // Selected day styling
                         selectedDecoration: BoxDecoration(
-                          color: Colors.white,
+                          color: AppColor.whiteColor,
                           shape: BoxShape.circle,
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.1),
+                              color: AppColor.blackColor.withOpacity(0.1),
                               blurRadius: 4,
                               offset: const Offset(0, 2),
                             ),
                           ],
                         ),
                         selectedTextStyle: const TextStyle(
-                          color: Colors.black,
+                          color: AppColor.blackColor,
                           fontWeight: FontWeight.bold,
                         ),
 
@@ -218,18 +219,18 @@ class _CalendarViewState extends State<CalendarView> {
                           shape: BoxShape.circle,
                         ),
                         todayTextStyle: const TextStyle(
-                          color: Colors.black,
+                          color: AppColor.blackColor,
                           fontWeight: FontWeight.w500,
                         ),
 
                         // Default text styling
                         defaultTextStyle: const TextStyle(
-                          color: Colors.black,
+                          color: AppColor.blackColor,
                           fontWeight: FontWeight.w500,
                           fontSize: 14,
                         ),
                         weekendTextStyle: const TextStyle(
-                          color: Colors.black,
+                          color: AppColor.blackColor,
                           fontWeight: FontWeight.w500,
                           fontSize: 14,
                         ),
@@ -239,28 +240,28 @@ class _CalendarViewState extends State<CalendarView> {
                         formatButtonVisible: false,
                         leftChevronIcon: Icon(
                           Icons.chevron_left,
-                          color: Colors.black,
+                          color: AppColor.blackColor,
                           size: 24,
                         ),
                         rightChevronIcon: Icon(
                           Icons.chevron_right,
-                          color: Colors.black,
+                          color: AppColor.blackColor,
                           size: 24,
                         ),
                         titleTextStyle: TextStyle(
-                          color: Colors.black,
+                          color: AppColor.blackColor,
                           fontSize: 18,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
                       daysOfWeekStyle: const DaysOfWeekStyle(
                         weekdayStyle: TextStyle(
-                          color: Colors.black,
+                          color: AppColor.blackColor,
                           fontWeight: FontWeight.w600,
                           fontSize: 12,
                         ),
                         weekendStyle: TextStyle(
-                          color: Colors.black,
+                          color: AppColor.blackColor,
                           fontWeight: FontWeight.w600,
                           fontSize: 12,
                         ),
@@ -297,7 +298,7 @@ class _CalendarViewState extends State<CalendarView> {
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
-                  color: Colors.black,
+                  color: AppColor.blackColor,
                 ),
               ),
               const SizedBox(height: 12),
@@ -331,14 +332,14 @@ class _CalendarViewState extends State<CalendarView> {
           Icon(
             Icons.event_busy,
             size: 48,
-            color: Colors.grey[400],
+            color: AppColor.blackColor.withOpacity(0.4),
           ),
           const SizedBox(height: 16),
           Text(
             'No event for today',
             style: TextStyle(
               fontSize: 16,
-              color: Colors.grey[600],
+              color: AppColor.blackColor.withOpacity(0.6),
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -370,7 +371,7 @@ class _CalendarViewState extends State<CalendarView> {
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colors.grey[800],
+          color: AppColor.secondaryColor,
           borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
@@ -382,7 +383,7 @@ class _CalendarViewState extends State<CalendarView> {
                   Text(
                     event.title,
                     style: const TextStyle(
-                      color: Colors.white,
+                      color: AppColor.whiteColor,
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
                     ),
@@ -390,16 +391,16 @@ class _CalendarViewState extends State<CalendarView> {
                   const SizedBox(height: 4),
                   Text(
                     DateFormat('d MMM yy').format(event.date),
-                    style: const TextStyle(
-                      color: Colors.white70,
+                    style: TextStyle(
+                      color: AppColor.whiteColor.withOpacity(0.7),
                       fontSize: 14,
                     ),
                   ),
                   const SizedBox(height: 8),
                   Text(
                     event.subtitle,
-                    style: const TextStyle(
-                      color: Colors.white70,
+                    style: TextStyle(
+                      color: AppColor.whiteColor.withOpacity(0.7),
                       fontSize: 12,
                     ),
                   ),
@@ -408,7 +409,7 @@ class _CalendarViewState extends State<CalendarView> {
             ),
             Icon(
               event.icon,
-              color: Colors.white,
+              color: AppColor.whiteColor,
               size: 24,
             ),
           ],
@@ -423,7 +424,7 @@ class DottedLinePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.grey[400]!
+      ..color = AppColor.blackColor.withOpacity(0.4)
       ..strokeWidth = 1;
 
     const dashWidth = 5.0;
