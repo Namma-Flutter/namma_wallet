@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
-import 'package:namma_wallet/src/core/routing/app_routes.dart';
+import 'package:namma_wallet/src/common/routing/app_routes.dart';
 import 'package:namma_wallet/src/features/bottom_navigation/presentation/widgets/nav_bar.dart';
 
 class NammaNavigationBar extends StatefulWidget {

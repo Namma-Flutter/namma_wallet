@@ -19,6 +19,7 @@ class GenericDetailsModel with GenericDetailsModelMappable {
     this.endTime,
     this.tags,
     this.extras,
+    this.ticketId,
   });
 
   GenericDetailsModel.fromTrainTicket(TNSTCModel ticket)
@@ -28,6 +29,7 @@ class GenericDetailsModel with GenericDetailsModelMappable {
         endTime = DateTime.parse(ticket.journeyDate),
         location = ticket.boardingAt,
         type = EntryType.trainTicket,
+        ticketId = null,
         tags = [
           TagModel(value: ticket.tripCode, icon: 'confirmation_number'),
           TagModel(value: ticket.pnrNo, icon: 'train'),
@@ -43,4 +45,5 @@ class GenericDetailsModel with GenericDetailsModelMappable {
   final String location;
   final List<ExtrasModel>? extras;
   final List<TagModel>? tags;
+  final int? ticketId;
 }

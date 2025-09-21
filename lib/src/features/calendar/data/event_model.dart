@@ -1,13 +1,6 @@
-
 import 'package:flutter/material.dart';
 
 class Event {
-  final IconData icon;
-  final String title;
-  final String subtitle;
-  final DateTime date;
-  final String price;
-
   Event({
     required this.icon,
     required this.title,
@@ -15,6 +8,11 @@ class Event {
     required this.date,
     required this.price,
   });
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final DateTime date;
+  final String price;
 
   static IconData getIconData(String iconName) {
     switch (iconName) {

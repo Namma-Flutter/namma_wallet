@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:namma_wallet/src/app.dart';
-import 'package:namma_wallet/src/core/services/database_helper.dart';
+import 'package:namma_wallet/src/common/services/database_helper.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();

@@ -6,23 +6,23 @@ plugins {
 }
 
 android {
-    namespace = "com.example.namma_wallet"
+    namespace = "com.nammaflutter.nammawallet"
     compileSdk = 36
     ndkVersion = "28.2.13676358"
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_21
-        targetCompatibility = JavaVersion.VERSION_21
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     kotlin {
         compilerOptions {
-            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21)
+            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
         }
     }
 
     defaultConfig {
-        applicationId = "com.example.namma_wallet"
+        applicationId = "com.nammaflutter.nammawallet"
         minSdk = 26
         targetSdk = 36
         versionCode = flutter.versionCode
