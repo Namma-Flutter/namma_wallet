@@ -304,7 +304,7 @@ class _CalendarViewState extends State<CalendarView> {
               const SizedBox(height: 12),
               Expanded(
                 child: events.isEmpty
-                    ? _buildNoEventsMessage()
+                    ? const NoEventsMessageWidget()
                     : ListView.builder(
                         itemCount: events.length,
                         padding: EdgeInsets.only(
@@ -313,7 +313,7 @@ class _CalendarViewState extends State<CalendarView> {
                         ),
                         itemBuilder: (context, index) {
                           final event = events[index];
-                          return _buildEventCard(event);
+                          return EventCardWidget(event: event);
                         },
                       ),
               ),
@@ -323,8 +323,13 @@ class _CalendarViewState extends State<CalendarView> {
       ],
     );
   }
+}
 
-  Widget _buildNoEventsMessage() {
+class NoEventsMessageWidget extends StatelessWidget {
+  const NoEventsMessageWidget({super.key});
+
+  @override
+  Widget build(BuildContext context) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -347,8 +352,18 @@ class _CalendarViewState extends State<CalendarView> {
       ),
     );
   }
+}
 
-  Widget _buildEventCard(Event event) {
+class EventCardWidget extends StatelessWidget {
+  const EventCardWidget({
+    required this.event,
+    super.key,
+  });
+
+  final Event event;
+
+  @override
+  Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
         // Convert Event to GenericDetailsModel
