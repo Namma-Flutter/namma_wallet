@@ -1,7 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:namma_wallet/src/core/styles/styles.dart';
+import 'package:namma_wallet/src/common/theme/styles.dart';
 import 'package:namma_wallet/src/features/bottom_navigation/presentation/widgets/nav_button.dart';
 
 class NavBar extends StatelessWidget {

@@ -3,11 +3,11 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:namma_wallet/src/common/theme/styles.dart';
 import 'package:namma_wallet/src/features/calendar/data/event_model.dart';
 import 'package:namma_wallet/src/features/home/domain/generic_details_model.dart';
 import 'package:namma_wallet/src/features/home/presentation/widgets/header_widget.dart';
-import 'package:namma_wallet/src/features/ticket/presentation/ticket_view.dart';
-import 'package:namma_wallet/src/core/styles/styles.dart';
+import 'package:namma_wallet/src/features/travel/presentation/ticket_view.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 

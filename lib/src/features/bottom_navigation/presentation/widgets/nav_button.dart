@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:namma_wallet/src/core/styles/styles.dart';
-
+import 'package:namma_wallet/src/common/theme/styles.dart';
 class NavButton extends StatefulWidget {
   const NavButton({
     required this.icon,
