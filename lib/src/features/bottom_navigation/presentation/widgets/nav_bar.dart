@@ -22,18 +22,18 @@ class NavBar extends StatelessWidget {
     final isDark = theme.brightness == Brightness.dark;
 
     return ClipRRect(
-      borderRadius: BorderRadius.circular(25),
+      borderRadius: BorderRadius.circular(35),
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
         child: Container(
-          height: 50,
-          padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 4),
+          height: 70,
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
           decoration: BoxDecoration(
             // Transparent glassy background
             color: isDark
                 ? AppColor.whiteColor.withOpacity(0.1)
                 : AppColor.whiteColor.withOpacity(0.15),
-            borderRadius: BorderRadius.circular(25),
+            borderRadius: BorderRadius.circular(35),
             border: Border.all(
               color: isDark
                   ? AppColor.whiteColor.withOpacity(0.2)
@@ -52,7 +52,7 @@ class NavBar extends StatelessWidget {
               ),
               // Inner highlight for glass effect
               BoxShadow(
-                color: AppColor.blackColor,
+                color: AppColor.whiteColor.withOpacity(0.2),
                 blurRadius: 2,
                 offset: const Offset(0, 1),
                 spreadRadius: 0,

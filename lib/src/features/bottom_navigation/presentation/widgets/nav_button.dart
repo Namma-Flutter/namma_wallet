@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:namma_wallet/src/common/theme/styles.dart';
+
 class NavButton extends StatefulWidget {
   const NavButton({
     required this.icon,
@@ -76,18 +77,16 @@ class _NavButtonState extends State<NavButton>
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 250),
               curve: Curves.easeInOutCubicEmphasized,
-              margin: const EdgeInsets.symmetric(horizontal: 2),
+              margin: const EdgeInsets.symmetric(horizontal: 4),
               padding: EdgeInsets.symmetric(
-                horizontal: widget.selected ? 14 : 10,
-                vertical: 8,
+                horizontal: widget.selected ? 18 : 14,
+                vertical: 12,
               ),
               decoration: BoxDecoration(
                 color: widget.selected
-                    ? (isDark
-                        ? AppColor.whiteColor.withOpacity(0.15)
-                        : AppColor.blackColor.withOpacity(0.25))
+                    ? AppColor.blackColor.withOpacity(0.8)
                     : Colors.transparent,
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(25),
                 boxShadow: widget.selected
                     ? [
                         BoxShadow(
@@ -112,7 +111,7 @@ class _NavButtonState extends State<NavButton>
                     scale: widget.selected ? 1.1 : 1.0,
                     child: Icon(
                       widget.icon,
-                      size: 22,
+                      size: 26,
                       color: widget.selected
                           ? (isDark ? AppColor.whiteColor : AppColor.whiteColor)
                           : (isDark
@@ -127,7 +126,7 @@ class _NavButtonState extends State<NavButton>
                     curve: Curves.easeInOutCubicEmphasized,
                     child: widget.selected
                         ? Padding(
-                            padding: const EdgeInsets.only(left: 8),
+                            padding: const EdgeInsets.only(left: 10),
                             child: AnimatedOpacity(
                               duration: const Duration(milliseconds: 200),
                               curve: Curves.easeInOutCubicEmphasized,
@@ -139,7 +138,7 @@ class _NavButtonState extends State<NavButton>
                                       ? AppColor.whiteColor
                                       : AppColor.whiteColor,
                                   fontWeight: FontWeight.w600,
-                                  fontSize: 12,
+                                  fontSize: 14,
                                 ),
                               ),
                             ),
