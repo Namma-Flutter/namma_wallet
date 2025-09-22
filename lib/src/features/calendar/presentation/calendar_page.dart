@@ -79,63 +79,6 @@ class CalendarPage extends StatelessWidget {
       ),
     );
   }
-
-  // Widget _buildBottomNavigation() {
-  //   return Container(
-  //     padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-  //     decoration: BoxDecoration(
-  //       color: Colors.white,
-  //       boxShadow: [
-  //         BoxShadow(
-  //           color: Colors.grey.withOpacity(0.1),
-  //           spreadRadius: 1,
-  //           blurRadius: 10,
-  //           offset: const Offset(0, -2),
-  //         ),
-  //       ],
-  //     ),
-  //     child: Row(
-  //       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-  //       children: [
-  //         IconButton(
-  //           onPressed: () {},
-  //           icon: const Icon(Icons.home_outlined),
-  //           color: Colors.grey[600],
-  //         ),
-  //         IconButton(
-  //           onPressed: () {},
-  //           icon: const Icon(Icons.star_outline),
-  //           color: Colors.grey[600],
-  //         ),
-  //         Container(
-  //           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-  //           decoration: BoxDecoration(
-  //             color: Colors.grey[800],
-  //             borderRadius: BorderRadius.circular(20),
-  //           ),
-  //           child: const Row(
-  //             mainAxisSize: MainAxisSize.min,
-  //             children: [
-  //               Icon(
-  //                 Icons.calendar_month,
-  //                 color: Colors.white,
-  //                 size: 20,
-  //               ),
-  //               SizedBox(width: 4),
-  //               Text(
-  //                 'Nov',
-  //                 style: TextStyle(
-  //                   color: Colors.white,
-  //                   fontWeight: FontWeight.w500,
-  //                 ),
-  //               ),
-  //             ],
-  //           ),
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
 }
 
 class CalendarView extends StatefulWidget {
