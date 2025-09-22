@@ -52,7 +52,7 @@ class NavBar extends StatelessWidget {
               ),
               // Inner highlight for glass effect
               BoxShadow(
-                color: AppColor.whiteColor.withOpacity(0.2),
+                color: AppColor.blackColor,
                 blurRadius: 2,
                 offset: const Offset(0, 1),
                 spreadRadius: 0,
