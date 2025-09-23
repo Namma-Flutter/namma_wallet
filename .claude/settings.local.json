@@ -28,7 +28,8 @@
       "WebFetch(domain:github.com)",
       "Bash(java:*)",
       "Bash(./gradlew:*)",
-      "Bash(tree:*)"
+      "Bash(tree:*)",
+      "Bash(dart analyze:*)"
     ],
     "deny": []
   },
