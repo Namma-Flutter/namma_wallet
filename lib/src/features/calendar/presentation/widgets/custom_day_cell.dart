@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:namma_wallet/src/common/theme/styles.dart';
-import 'package:namma_wallet/src/features/calendar/components/calendar_utils.dart';
+import 'package:namma_wallet/src/features/calendar/presentation/widgets/calendar_utils.dart';
 import 'package:namma_wallet/src/features/calendar/presentation/calendar_page.dart';
 
 class CustomDayCell extends StatelessWidget {

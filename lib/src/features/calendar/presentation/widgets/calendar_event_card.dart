@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:namma_wallet/src/common/theme/styles.dart';
-import 'package:namma_wallet/src/features/calendar/data/event_model.dart';
+import 'package:namma_wallet/src/features/calendar/domain/event_model.dart';
 
 class CalendarEventCard extends StatelessWidget {
   const CalendarEventCard({

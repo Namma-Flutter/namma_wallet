@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:namma_wallet/src/features/calendar/presentation/calendar_page.dart';
-import 'package:namma_wallet/src/features/calendar/components/calendar_ticket_card.dart';
-import 'package:namma_wallet/src/features/calendar/components/calendar_event_card.dart';
+import 'package:namma_wallet/src/features/calendar/presentation/widgets/calendar_ticket_card.dart';
+import 'package:namma_wallet/src/features/calendar/presentation/widgets/calendar_event_card.dart';
 
 class TicketsList extends StatelessWidget {
   const TicketsList({
