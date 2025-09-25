@@ -29,7 +29,8 @@
       "Bash(java:*)",
       "Bash(./gradlew:*)",
       "Bash(tree:*)",
-      "Bash(dart analyze:*)"
+      "Bash(dart analyze:*)",
+      "Bash(flutter analyze:*)"
     ],
     "deny": []
   },

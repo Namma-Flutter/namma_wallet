@@ -105,8 +105,8 @@ class CalendarProvider extends ChangeNotifier {
   }
 }
 
-class CalendarPage extends StatelessWidget {
-  const CalendarPage({super.key});
+class CalendarView extends StatelessWidget {
+  const CalendarView({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -127,20 +127,20 @@ class CalendarPage extends StatelessWidget {
           ),
           centerTitle: false,
         ),
-        body: const CalendarView(),
+        body: const CalendarContent(),
       ),
     );
   }
 }
 
-class CalendarView extends StatefulWidget {
-  const CalendarView({super.key});
+class CalendarContent extends StatefulWidget {
+  const CalendarContent({super.key});
 
   @override
-  State<CalendarView> createState() => _CalendarViewState();
+  State<CalendarContent> createState() => _CalendarContentState();
 }
 
-class _CalendarViewState extends State<CalendarView> {
+class _CalendarContentState extends State<CalendarContent> {
   CalendarFormat _calendarFormat = CalendarFormat.month;
   int _selectedFilter = 1;
 

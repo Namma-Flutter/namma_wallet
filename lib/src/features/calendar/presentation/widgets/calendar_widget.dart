@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:namma_wallet/src/features/calendar/domain/event_model.dart';
-import 'package:namma_wallet/src/features/calendar/presentation/calendar_page.dart';
+import 'package:namma_wallet/src/features/calendar/presentation/calendar_view.dart';
 import 'package:namma_wallet/src/features/calendar/presentation/widgets/custom_day_cell.dart';
 
 class CalendarWidget extends StatelessWidget {
