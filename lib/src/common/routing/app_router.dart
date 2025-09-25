@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:namma_wallet/src/common/routing/app_routes.dart';
 import 'package:namma_wallet/src/features/bottom_navigation/presentation/namma_navigation_bar.dart';
-import 'package:namma_wallet/src/features/calendar/presentation/calendar_page.dart';
+import 'package:namma_wallet/src/features/calendar/presentation/calendar_view.dart';
 import 'package:namma_wallet/src/features/home/domain/generic_details_model.dart';
 import 'package:namma_wallet/src/features/home/presentation/home_view.dart';
 import 'package:namma_wallet/src/features/profile/presentation/db_viewer_page.dart';
@@ -36,7 +36,7 @@ final router = GoRouter(
         GoRoute(
           path: AppRoute.calendar.path,
           name: AppRoute.calendar.name,
-          builder: (context, state) => const CalendarPage(),
+          builder: (context, state) => const CalendarView(),
         ),
       ],
     ),
