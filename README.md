@@ -244,6 +244,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <tr>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/jolan94"><img src="https://avatars.githubusercontent.com/u/61643920?v=4?s=100" width="100px;" alt="Joe Jeyaseelan"/><br /><sub><b>Joe Jeyaseelan</b></sub></a><br /><a href="https://github.com/Namma-Flutter/namma_wallet/commits?author=jolan94" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/Harishwarrior"><img src="https://avatars.githubusercontent.com/u/38380040?v=4?s=100" width="100px;" alt="Harish Anbalagan"/><br /><sub><b>Harish Anbalagan</b></sub></a><br /><a href="https://github.com/Namma-Flutter/namma_wallet/commits?author=Harishwarrior" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://mageshportfolio.netlify.app/"><img src="https://avatars.githubusercontent.com/u/127011222?v=4?s=100" width="100px;" alt="Magesh K"/><br /><sub><b>Magesh K</b></sub></a><br /><a href="https://github.com/Namma-Flutter/namma_wallet/commits?author=Magesh-kanna" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/kumaran-flutter"><img src="https://avatars.githubusercontent.com/u/117720053?v=4?s=100" width="100px;" alt="Kumaran"/><br /><sub><b>Kumaran</b></sub></a><br /><a href="https://github.com/Namma-Flutter/namma_wallet/commits?author=kumaran-flutter" title="Code">💻</a></td>
     </tr>
   </tbody>
