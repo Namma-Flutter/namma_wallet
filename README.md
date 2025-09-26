@@ -1,6 +1,6 @@
 # 👜 Namma Wallet
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-1-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-2-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 **Namma Wallet** is an open-source Flutter mobile application for managing digital travel tickets and passes. The app provides a unified interface to save, organize, and view tickets from multiple sources including SMS, PDFs, QR codes, and clipboard text. It features intelligent parsing for Indian transport providers and generates beautiful digital ticket designs.
@@ -243,6 +243,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
   <tbody>
     <tr>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/jolan94"><img src="https://avatars.githubusercontent.com/u/61643920?v=4?s=100" width="100px;" alt="Joe Jeyaseelan"/><br /><sub><b>Joe Jeyaseelan</b></sub></a><br /><a href="https://github.com/Namma-Flutter/namma_wallet/commits?author=jolan94" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/Harishwarrior"><img src="https://avatars.githubusercontent.com/u/38380040?v=4?s=100" width="100px;" alt="Harish Anbalagan"/><br /><sub><b>Harish Anbalagan</b></sub></a><br /><a href="https://github.com/Namma-Flutter/namma_wallet/commits?author=Harishwarrior" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>
