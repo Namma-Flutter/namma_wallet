@@ -249,6 +249,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center" valign="top" width="14.28%"><a href="http://srinivasanr.me"><img src="https://avatars.githubusercontent.com/u/92676627?v=4?s=100" width="100px;" alt="Srinivasan R"/><br /><sub><b>Srinivasan R</b></sub></a><br /><a href="https://github.com/Namma-Flutter/namma_wallet/commits?author=Srinivasan8888" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/imsarkie"><img src="https://avatars.githubusercontent.com/u/119160091?v=4?s=100" width="100px;" alt="Saravana"/><br /><sub><b>Saravana</b></sub></a><br /><a href="https://github.com/Namma-Flutter/namma_wallet/commits?author=imsarkie" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/AkashProfessionalCoder"><img src="https://avatars.githubusercontent.com/u/115221061?v=4?s=100" width="100px;" alt="Akash Senthil"/><br /><sub><b>Akash Senthil</b></sub></a><br /><a href="https://github.com/Namma-Flutter/namma_wallet/commits?author=AkashProfessionalCoder" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/rengapraveenx"><img src="https://avatars.githubusercontent.com/u/70749271?v=4?s=100" width="100px;" alt="Renga Praveen Kumar"/><br /><sub><b>Renga Praveen Kumar</b></sub></a><br /><a href="https://github.com/Namma-Flutter/namma_wallet/commits?author=rengapraveenx" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>
