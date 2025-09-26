@@ -33,6 +33,15 @@
       "contributions": [
         "code"
       ]
+     },
+     {
+      "login": "kumaran-flutter",
+      "name": "Kumaran",
+      "avatar_url": "https://avatars.githubusercontent.com/u/117720053?v=4",
+      "profile": "https://github.com/kumaran-flutter",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
