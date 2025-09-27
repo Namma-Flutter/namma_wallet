@@ -1,7 +1,31 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:http/http.dart' as http;
 import 'package:namma_wallet/src/common/routing/app_routes.dart';
+import 'package:namma_wallet/src/features/profile/presentation/sample_contributors_data.dart';
 
+// ----------------- Model -----------------
+class Contributor {
+  Contributor({
+    required this.name,
+    required this.avatarUrl,
+    required this.profileUrl,
+  });
+
+  factory Contributor.fromJson(Map<String, dynamic> json) {
+    return Contributor(
+      name: json['login'] as String,
+      avatarUrl: json['avatar_url'] as String,
+      profileUrl: json['html_url'] as String,
+    );
+  }
+  final String name;
+  final String avatarUrl;
+  final String profileUrl;
+}
+
+// ----------------- Profile Page -----------------
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
 
@@ -10,14 +34,79 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
+  late Future<List<Contributor>> _contributorsFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _contributorsFuture = _fetchContributors();
+  }
+
+  Future<List<Contributor>> _fetchContributors() async {
+    await Future.delayed(const Duration(seconds: 2));
+
+    return sample_contributors_data.map(Contributor.fromJson).toList();
+    // final response = await http.get(
+    //   Uri.parse(
+    //       'https://api.github.com/repos/Namma-Flutter/namma_wallet/contributors'),
+    // );
+    //
+    // if (response.statusCode == 200) {
+    //   final body = response.body as List<Map<String, dynamic>>;
+    //   return body.map((json) => Contributor.fromJson(json)).toList();
+    // } else {
+    //   throw Exception('Failed to load contributors');
+    // }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Profile'),
       ),
-      body: const Center(
-        child: Text('Profile page'),
+      body: FutureBuilder<List<Contributor>>(
+        future: _contributorsFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return const Center(child: Text('No contributors found.'));
+          }
+
+          final contributors = snapshot.data!;
+          print('contributors : $contributors');
+          return ListView.builder(
+            padding: const EdgeInsets.all(12),
+            itemCount: contributors.length,
+            itemBuilder: (context, index) {
+              final contributor = contributors[index];
+              return Card(
+                margin: const EdgeInsets.symmetric(vertical: 8),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: ListTile(
+                  leading: CircleAvatar(
+                    backgroundImage: NetworkImage(contributor.avatarUrl),
+                    radius: 24,
+                  ),
+                  title: Text(contributor.name),
+                  subtitle: Text(contributor.profileUrl),
+                  onTap: () {
+                    // You can integrate url_launcher here
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                          content: Text('Open: ${contributor.profileUrl}')),
+                    );
+                  },
+                ),
+              );
+            },
+          );
+        },
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
