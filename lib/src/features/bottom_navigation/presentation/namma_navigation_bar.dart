@@ -14,6 +14,7 @@ class NammaNavigationBar extends StatefulWidget {
 
 class _NammaNavigationBarState extends State<NammaNavigationBar> {
   bool _revealBar = false;
+  int? _pendingIndex; // Track pending navigation for immediate UI feedback
 
   // Define your tabs here
   final _items = <NavItem>[
@@ -58,26 +59,42 @@ class _NammaNavigationBarState extends State<NammaNavigationBar> {
     final target = _items[index].route;
     final current = GoRouterState.of(context).uri.toString();
     if (current != target) {
+      // Update UI immediately for smooth highlight transition
+      setState(() {
+        _pendingIndex = index;
+      });
+
       HapticFeedback.selectionClick();
-      context.go(target);
+
+      // Reduced delay for snappier navigation while maintaining smoothness
+      Future.delayed(const Duration(milliseconds: 50), () {
+        if (mounted) {
+          context.go(target);
+          // Clear pending state after navigation
+          setState(() {
+            _pendingIndex = null;
+          });
+        }
+      });
     }
-    // No setState needed; selection derives from location
   }
 
   @override
   Widget build(BuildContext context) {
     final location = GoRouterState.of(context).uri.toString();
-    final currentIndex = _indexFromLocation(location);
+    final locationIndex = _indexFromLocation(location);
+    // Use pending index for immediate UI feedback, fallback to location-based index
+    final currentIndex = _pendingIndex ?? locationIndex;
 
     return Scaffold(
       // Smooth page transitions between shell children
       body: Stack(
         children: [
-          // The page content, with a fade transition keyed by location
+          // The page content, with ultra-smooth fade transition
           AnimatedSwitcher(
-            duration: const Duration(milliseconds: 280),
-            switchInCurve: Curves.easeOut,
-            switchOutCurve: Curves.easeIn,
+            duration: const Duration(milliseconds: 200),
+            switchInCurve: Curves.easeInOutCubicEmphasized,
+            switchOutCurve: Curves.easeInOutCubicEmphasized,
             layoutBuilder: (currentChild, previousChildren) {
               return Stack(
                 children: <Widget>[
@@ -92,25 +109,27 @@ class _NammaNavigationBarState extends State<NammaNavigationBar> {
             child: widget.child,
           ),
 
-          // Floating nav bar
+          // Floating nav bar with ultra-smooth animations
           Positioned(
-            left: 20,
-            right: 20,
+            left: 0,
+            right: 0,
             bottom: 20,
             child: SafeArea(
               top: false,
               child: AnimatedSlide(
-                duration: const Duration(milliseconds: 400),
-                curve: Curves.easeOutCubic,
-                offset: _revealBar ? Offset.zero : const Offset(0, 0.15),
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeInOutCubicEmphasized,
+                offset: _revealBar ? Offset.zero : const Offset(0, 0.08),
                 child: AnimatedOpacity(
-                  duration: const Duration(milliseconds: 350),
-                  curve: Curves.easeOut,
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.easeInOutCubicEmphasized,
                   opacity: _revealBar ? 1 : 0,
-                  child: NavBar(
-                    items: _items,
-                    currentIndex: currentIndex,
-                    onTap: (i) => _changeTab(context, i),
+                  child: Center(
+                    child: NavBar(
+                      items: _items,
+                      currentIndex: currentIndex,
+                      onTap: (i) => _changeTab(context, i),
+                    ),
                   ),
                 ),
               ),
