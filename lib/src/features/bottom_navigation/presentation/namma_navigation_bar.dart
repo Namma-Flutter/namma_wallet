@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
@@ -15,6 +17,7 @@ class NammaNavigationBar extends StatefulWidget {
 class _NammaNavigationBarState extends State<NammaNavigationBar> {
   bool _revealBar = false;
   int? _pendingIndex; // Track pending navigation for immediate UI feedback
+  Timer? _navigationTimer; // Track cancellable navigation timer
 
   // Define your tabs here
   final _items = <NavItem>[
@@ -59,6 +62,9 @@ class _NammaNavigationBarState extends State<NammaNavigationBar> {
     final target = _items[index].route;
     final current = GoRouterState.of(context).uri.toString();
     if (current != target) {
+      // Cancel any existing navigation timer to prevent stale navigations
+      _navigationTimer?.cancel();
+
       // Update UI immediately for smooth highlight transition
       setState(() {
         _pendingIndex = index;
@@ -66,8 +72,8 @@ class _NammaNavigationBarState extends State<NammaNavigationBar> {
 
       HapticFeedback.selectionClick();
 
-      // Reduced delay for snappier navigation while maintaining smoothness
-      Future.delayed(const Duration(milliseconds: 50), () {
+      // Use cancellable Timer for navigation delay
+      _navigationTimer = Timer(const Duration(milliseconds: 100), () {
         if (mounted) {
           context.go(target);
           // Clear pending state after navigation
@@ -75,6 +81,7 @@ class _NammaNavigationBarState extends State<NammaNavigationBar> {
             _pendingIndex = null;
           });
         }
+        _navigationTimer = null;
       });
     }
   }
@@ -138,5 +145,11 @@ class _NammaNavigationBarState extends State<NammaNavigationBar> {
         ],
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _navigationTimer?.cancel();
+    super.dispose();
   }
 }
