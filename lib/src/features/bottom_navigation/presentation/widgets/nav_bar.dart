@@ -1,4 +1,7 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
+import 'package:namma_wallet/src/common/theme/styles.dart';
 import 'package:namma_wallet/src/features/bottom_navigation/presentation/widgets/nav_button.dart';
 
 class NavBar extends StatelessWidget {
@@ -18,32 +21,60 @@ class NavBar extends StatelessWidget {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-      decoration: BoxDecoration(
-        color: isDark ? Colors.black : Colors.black,
-        borderRadius: BorderRadius.circular(32),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.18),
-            blurRadius: 16,
-            offset: const Offset(0, 6),
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(35),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+        child: Container(
+          height: 70,
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+          decoration: BoxDecoration(
+            // Transparent glassy background
+            color: isDark
+                ? AppColor.whiteColor.withOpacity(0.1)
+                : AppColor.whiteColor.withOpacity(0.15),
+            borderRadius: BorderRadius.circular(35),
+            border: Border.all(
+              color: isDark
+                  ? AppColor.whiteColor.withOpacity(0.2)
+                  : AppColor.whiteColor.withOpacity(0.3),
+              width: 0.8,
+            ),
+            boxShadow: [
+              // Soft glowing shadow for glass effect
+              BoxShadow(
+                color: isDark
+                    ? AppColor.whiteColor.withOpacity(0.1)
+                    : AppColor.blackColor.withOpacity(0.08),
+                blurRadius: 25,
+                offset: const Offset(0, 8),
+                spreadRadius: 0,
+              ),
+              // Inner highlight for glass effect
+              BoxShadow(
+                color: AppColor.whiteColor.withOpacity(0.2),
+                blurRadius: 2,
+                offset: const Offset(0, 1),
+                spreadRadius: 0,
+              ),
+            ],
           ),
-        ],
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: List.generate(items.length, (index) {
-          final item = items[index];
-          final selected = currentIndex == index;
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: List.generate(items.length, (index) {
+              final item = items[index];
+              final selected = currentIndex == index;
 
-          return NavButton(
-            icon: item.icon,
-            label: item.label,
-            selected: selected,
-            onTap: () => onTap(index),
-          );
-        }),
+              return NavButton(
+                icon: item.icon,
+                label: item.label,
+                selected: selected,
+                onTap: () => onTap(index),
+              );
+            }),
+          ),
+        ),
       ),
     );
   }
