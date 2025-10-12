@@ -38,6 +38,8 @@ dependencies:
   listen_sharing_intent:
     git:
       url: https://github.com/Zverik/receive_sharing_intent
+  url_launcher: ^6.3.2
+  package_info_plus: ^9.0.0
 
 dev_dependencies:
   build_runner: ^2.4.0

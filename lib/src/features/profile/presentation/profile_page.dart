@@ -2,8 +2,10 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
+import 'package:namma_wallet/src/common/helper/app_info.dart';
+import 'package:namma_wallet/src/common/helper/send_email.dart';
 import 'package:namma_wallet/src/common/routing/app_routes.dart';
-import 'package:namma_wallet/src/features/profile/presentation/sample_contributors_data.dart';
+import 'package:namma_wallet/src/features/profile/presentation/widgets/profile_page_card_widget.dart';
 
 // ----------------- Model -----------------
 class Contributor {
@@ -35,28 +37,26 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   late Future<List<Contributor>> _contributorsFuture;
+  String _version = '';
+
+  void _launchEmail() {
+    EmailHelper.sendEmail(
+      subject: 'App Support',
+      body: 'Hi, I need help regarding ...',
+    );
+  }
+
+  Future<void> _loadVersion() async {
+    final version = await getAppVersion();
+    setState(() {
+      _version = version;
+    });
+  }
 
   @override
   void initState() {
     super.initState();
-    _contributorsFuture = _fetchContributors();
-  }
-
-  Future<List<Contributor>> _fetchContributors() async {
-    await Future.delayed(const Duration(seconds: 2));
-
-    return sample_contributors_data.map(Contributor.fromJson).toList();
-    // final response = await http.get(
-    //   Uri.parse(
-    //       'https://api.github.com/repos/Namma-Flutter/namma_wallet/contributors'),
-    // );
-    //
-    // if (response.statusCode == 200) {
-    //   final body = response.body as List<Map<String, dynamic>>;
-    //   return body.map((json) => Contributor.fromJson(json)).toList();
-    // } else {
-    //   throw Exception('Failed to load contributors');
-    // }
+    _loadVersion();
   }
 
   @override
@@ -65,48 +65,63 @@ class _ProfilePageState extends State<ProfilePage> {
       appBar: AppBar(
         title: const Text('Profile'),
       ),
-      body: FutureBuilder<List<Contributor>>(
-        future: _contributorsFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(child: Text('No contributors found.'));
-          }
-
-          final contributors = snapshot.data!;
-          print('contributors : $contributors');
-          return ListView.builder(
-            padding: const EdgeInsets.all(12),
-            itemCount: contributors.length,
-            itemBuilder: (context, index) {
-              final contributor = contributors[index];
-              return Card(
-                margin: const EdgeInsets.symmetric(vertical: 8),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: ListTile(
-                  leading: CircleAvatar(
-                    backgroundImage: NetworkImage(contributor.avatarUrl),
-                    radius: 24,
+      body: Column(
+        children: [
+          Card(
+            elevation: 4,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: ListTile(
+                leading: CircleAvatar(
+                  radius: 28,
+                  backgroundImage: const NetworkImage(
+                    'https://avatars.githubusercontent.com/u/583231?v=4',
                   ),
-                  title: Text(contributor.name),
-                  subtitle: Text(contributor.profileUrl),
-                  onTap: () {
-                    // You can integrate url_launcher here
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                          content: Text('Open: ${contributor.profileUrl}')),
-                    );
-                  },
+                  backgroundColor: Colors.grey[200],
                 ),
-              );
+                title: const Text(
+                  'Hii User 🖐',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                ),
+                subtitle: const Text(
+                  'Namma Wallet',
+                  style: TextStyle(color: Colors.black54),
+                ),
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 20),
+
+          ProfilePageCard(
+            icon: Icons.group,
+            title: 'Contributors',
+            onTap: () {
+              context.pushNamed(AppRoute.contributors.name);
             },
-          );
-        },
+          ),
+
+          ProfilePageCard(
+            icon: Icons.mail_outline,
+            iconColor: Colors.green,
+            title: 'Contact Us',
+            onTap: _launchEmail,
+          ),
+
+          const Spacer(),
+
+          Padding(
+            padding: const EdgeInsets.only(bottom: 16),
+            child: Text(
+              "Version: $_version",
+              style: TextStyle(color: Colors.grey[600]),
+            ),
+          ),
+        ],
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
