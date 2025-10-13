@@ -20,7 +20,7 @@ dependencies:
   file_picker: ^10.3.3
   flutter:
     sdk: flutter
-  flutter_gemma: ^0.10.5
+  flutter_gemma: ^0.10.6
   google_fonts: ^6.3.1
   intl: ^0.20.2
   mobile_scanner: ^7.0.1
@@ -30,6 +30,7 @@ dependencies:
   syncfusion_flutter_pdf: ^31.1.19
   shared_preferences: ^2.5.3
   uuid: ^4.5.1
+  path_provider: ^2.1.5
 
 dev_dependencies:
   build_runner: ^2.4.0

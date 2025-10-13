@@ -4,7 +4,7 @@ import 'package:namma_wallet/src/features/ai/fallback-parser/application/model_d
 import 'package:namma_wallet/src/features/ai/fallback-parser/domain/constants.dart';
 import 'package:namma_wallet/src/features/ai/fallback-parser/domain/enums/model_configs.dart';
 
-/// Class [ModelDownloadTile] is a Widget for downlooading the model
+/// Class [ModelDownloadTile] is a Widget for downloading the model
 /// from the
 class ModelDownloadTile extends StatefulWidget {
   ///
