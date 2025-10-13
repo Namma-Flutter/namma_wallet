@@ -95,11 +95,11 @@ class _AIParserTestScreenState extends State<AIParserTestScreen> {
 
 /// Testing
 /// Entry point of the Flutter application
-void main() {
-  WidgetsFlutterBinding.ensureInitialized();
-
-  /// Ensures that widget binding is initialized before running the app
-  runApp(const AIParserTestScreen());
-
-  /// Launches the AIParserTestScreen widget as the root of the app
-}
+// void main() {
+//   WidgetsFlutterBinding.ensureInitialized();
+//
+//   /// Ensures that widget binding is initialized before running the app
+//   runApp(const AIParserTestScreen());
+//
+//   /// Launches the AIParserTestScreen widget as the root of the app
+// }
