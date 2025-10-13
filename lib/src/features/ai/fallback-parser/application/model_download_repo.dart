@@ -82,9 +82,8 @@ class ModelDownloadService {
   }) async {
     try {
       final stream = FlutterGemmaPlugin.instance.modelManager
-          .downloadModelFromNetworkWithProgress(
-        modelUrl,token: AIConstants.HUGGING_FACE_KEY
-      );
+          .downloadModelFromNetworkWithProgress(modelUrl,
+              token: AIConstants.HUGGING_FACE_KEY);
 
       await for (final progress in stream) {
         onProgress(progress.toDouble());

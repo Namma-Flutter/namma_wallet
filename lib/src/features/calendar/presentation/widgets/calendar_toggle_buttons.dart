@@ -36,18 +36,18 @@ class CalendarToggleButtons extends StatelessWidget {
           children: const [
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              child: Text('Week',
-                  style: TextStyle(fontWeight: FontWeight.w500)),
+              child:
+                  Text('Week', style: TextStyle(fontWeight: FontWeight.w500)),
             ),
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              child: Text('Month',
-                  style: TextStyle(fontWeight: FontWeight.w500)),
+              child:
+                  Text('Month', style: TextStyle(fontWeight: FontWeight.w500)),
             ),
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              child: Text('Range',
-                  style: TextStyle(fontWeight: FontWeight.w500)),
+              child:
+                  Text('Range', style: TextStyle(fontWeight: FontWeight.w500)),
             ),
           ],
         ),

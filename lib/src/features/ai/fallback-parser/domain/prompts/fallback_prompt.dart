@@ -63,5 +63,4 @@ Text: "$message"
 JSON:
     ''';
   }
-
 }
