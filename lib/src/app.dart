@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:namma_wallet/src/features/calendar/presentation/calendar_page.dart';
-import 'package:namma_wallet/src/features/home/presentation/home_page.dart';
-import 'package:namma_wallet/src/features/profile/presentation/profile_page.dart';
-
-import 'package:namma_wallet/src/features/scanner/presentation/scanner_view.dart';
+import 'package:namma_wallet/src/common/routing/app_router.dart';
+import 'package:namma_wallet/src/common/services/sharing_intent_service.dart';
 
 class NammaWalletApp extends StatefulWidget {
   const NammaWalletApp({super.key});
@@ -14,47 +11,49 @@ class NammaWalletApp extends StatefulWidget {
 
 class _NammaWalletAppState extends State<NammaWalletApp> {
   int currentPageIndex = 0;
+  final SharingIntentService _sharingService = SharingIntentService();
+  final GlobalKey<ScaffoldMessengerState> _scaffoldMessengerKey =
+      GlobalKey<ScaffoldMessengerState>();
+
   @override
-  Widget build(BuildContext context) => MaterialApp(
-        title: 'NammaWallet',
-        home: Scaffold(
-          bottomNavigationBar: NavigationBar(
-            onDestinationSelected: (int index) {
-              setState(() {
-                currentPageIndex = index;
-              });
-            },
-            indicatorColor: Colors.amber,
-            selectedIndex: currentPageIndex,
-            destinations: const <Widget>[
-              NavigationDestination(
-                selectedIcon: Icon(Icons.home),
-                icon: Icon(Icons.home_outlined),
-                label: 'Home',
-              ),
-              NavigationDestination(
-                selectedIcon: Icon(Icons.calendar_month),
-                icon: Icon(Icons.calendar_month_outlined),
-                label: 'Calender',
-              ),
-              NavigationDestination(
-                selectedIcon: Icon(Icons.qr_code),
-                icon: Icon(Icons.qr_code_scanner_outlined),
-                label: 'Scanner',
-              ),
-              NavigationDestination(
-                selectedIcon: Icon(Icons.more),
-                icon: Icon(Icons.more_outlined),
-                label: 'More',
-              ),
-            ],
+  void initState() {
+    super.initState();
+
+    // Initialize sharing intent service for file logging
+    _sharingService.initialize(
+      onFileReceived: (fileName) {
+        // Show user that file was received
+        _scaffoldMessengerKey.currentState?.showSnackBar(
+          SnackBar(
+            content: Text('📄 Shared file received: $fileName'),
+            backgroundColor: Colors.blue,
+            duration: const Duration(seconds: 3),
           ),
-          body: <Widget>[
-            const HomePage(),
-            const CalendarPage(),
-            const ScannerView(),
-            const ProfilePage(),
-          ][currentPageIndex],
-        ),
+        );
+      },
+      onError: (error) {
+        //error message
+        _scaffoldMessengerKey.currentState?.showSnackBar(
+          SnackBar(
+            content: Text('❌ Sharing error: $error'),
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 5),
+          ),
+        );
+      },
+    );
+  }
+
+  @override
+  void dispose() {
+    _sharingService.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => MaterialApp.router(
+        title: 'NammaWallet',
+        routerConfig: router,
+        scaffoldMessengerKey: _scaffoldMessengerKey,
       );
 }

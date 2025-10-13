@@ -1,38 +1,37 @@
-
 [
-  {
-    "icon": "local_activity",
-    "title": "NammaFlutter | Indie...",
-    "subtitle": "Luma",
-    "date": "Saturday Sept 20",
-    "price": "Free"
-  },
-  {
-    "icon": "code",
-    "title": "FOSSUnited Chennai",
-    "subtitle": "fossunited.org",
-    "date": "Saturday Sept 27",
-    "price": "Free"
-  },
-  {
-    "icon": "code",
-    "title": "Chennai React",
-    "subtitle": "chennaireact.org",
-    "date": "Saturday Oct 04",
-    "price": "Free"
-  },
-  {
-    "icon": "code",
-    "title": "Chennai React",
-    "subtitle": "chennaireact.org",
-    "date": "Saturday Oct 04",
-    "price": "Free"
-  },
-  {
-    "icon": "local_activity",
-    "title": "Renga",
-    "subtitle": "renga.org",
-    "date": "Saturday Oct 07",
-    "price": "Free"
-  }
+    {
+        "icon": "local_activity",
+        "title": "NammaFlutter | Indie...",
+        "subtitle": "Luma",
+        "date": "Saturday Sept 20",
+        "price": "Free"
+    },
+    {
+        "icon": "code",
+        "title": "FOSSUnited Chennai",
+        "subtitle": "fossunited.org",
+        "date": "Saturday Sept 27",
+        "price": "Free"
+    },
+    {
+        "icon": "code",
+        "title": "Chennai React",
+        "subtitle": "chennaireact.org",
+        "date": "Saturday Oct 04",
+        "price": "Free"
+    },
+    {
+        "icon": "code",
+        "title": "Chennai React",
+        "subtitle": "chennaireact.org",
+        "date": "Saturday Oct 04",
+        "price": "Free"
+    },
+    {
+        "icon": "local_activity",
+        "title": "Renga",
+        "subtitle": "renga.org",
+        "date": "Saturday Oct 07",
+        "price": "Free"
+    }
 ]

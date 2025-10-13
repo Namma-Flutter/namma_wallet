@@ -1,0 +1,29 @@
+{
+  "branches": [
+    "main"
+  ],
+  "plugins": [
+    "@semantic-release/commit-analyzer",
+    "@semantic-release/release-notes-generator",
+    [
+      "@semantic-release/exec",
+      {
+        "prepareCmd": "flutter build apk --release && cp build/app/outputs/flutter-apk/app-release.apk build/app/outputs/flutter-apk/namma-wallet-${nextRelease.version}.apk"
+      }
+    ],
+    [
+      "@semantic-release/github",
+      {
+        "assets": [
+          {
+            "path": "build/app/outputs/flutter-apk/namma-wallet-*.apk",
+            "label": "Android APK"
+          }
+        ],
+        "successComment": false,
+        "failComment": false,
+        "releasedLabels": false
+      }
+    ]
+  ]
+}

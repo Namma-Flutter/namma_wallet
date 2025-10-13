@@ -1,0 +1,89 @@
+{
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": false,
+  "commitType": "docs",
+  "commitConvention": "angular",
+  "contributors": [
+    {
+      "login": "jolan94",
+      "name": "Joe Jeyaseelan",
+      "avatar_url": "https://avatars.githubusercontent.com/u/61643920?v=4",
+      "profile": "https://github.com/jolan94",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "Harishwarrior",
+      "name": "Harish Anbalagan",
+      "avatar_url": "https://avatars.githubusercontent.com/u/38380040?v=4",
+      "profile": "https://github.com/Harishwarrior",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "Magesh-kanna",
+      "name": "Magesh K",
+      "avatar_url": "https://avatars.githubusercontent.com/u/127011222?v=4",
+      "profile": "https://mageshportfolio.netlify.app/",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "kumaran-flutter",
+      "name": "Kumaran",
+      "avatar_url": "https://avatars.githubusercontent.com/u/117720053?v=4",
+      "profile": "https://github.com/kumaran-flutter",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "Srinivasan8888",
+      "name": "Srinivasan R",
+      "avatar_url": "https://avatars.githubusercontent.com/u/92676627?v=4",
+      "profile": "http://srinivasanr.me",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "imsarkie",
+      "name": "Saravana",
+      "avatar_url": "https://avatars.githubusercontent.com/u/119160091?v=4",
+      "profile": "https://github.com/imsarkie",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "AkashProfessionalCoder",
+      "name": "Akash Senthil",
+      "avatar_url": "https://avatars.githubusercontent.com/u/115221061?v=4",
+      "profile": "https://github.com/AkashProfessionalCoder",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "rengapraveenx",
+      "name": "Renga Praveen Kumar",
+      "avatar_url": "https://avatars.githubusercontent.com/u/70749271?v=4",
+      "profile": "https://github.com/rengapraveenx",
+      "contributions": [
+        "code"
+      ]
+    }
+  ],
+  "contributorsPerLine": 7,
+  "skipCi": true,
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "projectName": "namma_wallet",
+  "projectOwner": "Namma-Flutter"
+}

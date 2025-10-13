@@ -1,149 +1,120 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:namma_wallet/src/core/services/database_helper.dart';
+import 'package:go_router/go_router.dart';
+import 'package:http/http.dart' as http;
+import 'package:namma_wallet/src/common/routing/app_routes.dart';
+import 'package:namma_wallet/src/features/profile/presentation/sample_contributors_data.dart';
 
-class ProfilePage extends StatelessWidget {
+// ----------------- Model -----------------
+class Contributor {
+  Contributor({
+    required this.name,
+    required this.avatarUrl,
+    required this.profileUrl,
+  });
+
+  factory Contributor.fromJson(Map<String, dynamic> json) {
+    return Contributor(
+      name: json['login'] as String,
+      avatarUrl: json['avatar_url'] as String,
+      profileUrl: json['html_url'] as String,
+    );
+  }
+  final String name;
+  final String avatarUrl;
+  final String profileUrl;
+}
+
+// ----------------- Profile Page -----------------
+class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(title: const Text('Profile')),
-        body: const Center(
-          child: Text('Profile page'),
-        ),
-        floatingActionButton: FloatingActionButton.extended(
-          onPressed: () async {
-            await Navigator.of(context).push(
-              MaterialPageRoute<void>(builder: (_) => const _DbViewerPage()),
-            );
-          },
-          label: const Text('View DB'),
-          icon: const Icon(Icons.storage),
-        ),
-      );
+  State<ProfilePage> createState() => _ProfilePageState();
 }
 
-class _DbViewerPage extends StatefulWidget {
-  const _DbViewerPage();
-
-  @override
-  State<_DbViewerPage> createState() => _DbViewerPageState();
-}
-
-class _DbViewerPageState extends State<_DbViewerPage>
-    with SingleTickerProviderStateMixin {
-  late final TabController _tabController;
-  List<Map<String, Object?>> users = <Map<String, Object?>>[];
-  List<Map<String, Object?>> tickets = <Map<String, Object?>>[];
+class _ProfilePageState extends State<ProfilePage> {
+  late Future<List<Contributor>> _contributorsFuture;
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
-    _load();
+    _contributorsFuture = _fetchContributors();
   }
 
-  Future<void> _load() async {
-    final DatabaseHelper db = DatabaseHelper.instance;
-    final List<Map<String, Object?>> u = await db.fetchAllUsers();
-    final List<Map<String, Object?>> t = await db.fetchTicketsWithUser();
-    if (!mounted) return;
-    setState(() {
-      users = u;
-      tickets = t;
-    });
+  Future<List<Contributor>> _fetchContributors() async {
+    await Future.delayed(const Duration(seconds: 2));
+
+    return sample_contributors_data.map(Contributor.fromJson).toList();
+    // final response = await http.get(
+    //   Uri.parse(
+    //       'https://api.github.com/repos/Namma-Flutter/namma_wallet/contributors'),
+    // );
+    //
+    // if (response.statusCode == 200) {
+    //   final body = response.body as List<Map<String, dynamic>>;
+    //   return body.map((json) => Contributor.fromJson(json)).toList();
+    // } else {
+    //   throw Exception('Failed to load contributors');
+    // }
   }
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(
-          title: const Text('Database Viewer'),
-          bottom: TabBar(
-            controller: _tabController,
-            tabs: const <Widget>[
-              Tab(text: 'Users'),
-              Tab(text: 'Tickets'),
-            ],
-          ),
-          actions: <Widget>[
-            IconButton(
-              onPressed: _load,
-              icon: const Icon(Icons.refresh),
-              tooltip: 'Refresh',
-            ),
-          ],
-        ),
-        body: TabBarView(
-          controller: _tabController,
-          children: <Widget>[
-            _UsersList(users: users),
-            _TicketsList(tickets: tickets),
-          ],
-        ),
-      );
-}
-
-class _UsersList extends StatelessWidget {
-  const _UsersList({required this.users});
-  final List<Map<String, Object?>> users;
 
   @override
   Widget build(BuildContext context) {
-    if (users.isEmpty) {
-      return const Center(child: Text('No users'));
-    }
-    return ListView.separated(
-      itemCount: users.length,
-      separatorBuilder: (_, __) => const Divider(height: 1),
-      itemBuilder: (BuildContext context, int index) {
-        final Map<String, Object?> user = users[index];
-        return ListTile(
-          leading: const Icon(Icons.person),
-          title: Text((user['full_name'] ?? '') as String),
-          subtitle: Text(((user['email'] ?? '') as String).toString()),
-          trailing: Text('#${user['user_id']}'),
-        );
-      },
-    );
-  }
-}
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Profile'),
+      ),
+      body: FutureBuilder<List<Contributor>>(
+        future: _contributorsFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return const Center(child: Text('No contributors found.'));
+          }
 
-class _TicketsList extends StatelessWidget {
-  const _TicketsList({required this.tickets});
-  final List<Map<String, Object?>> tickets;
-
-  @override
-  Widget build(BuildContext context) {
-    if (tickets.isEmpty) {
-      return const Center(child: Text('No tickets'));
-    }
-    return ListView.separated(
-      itemCount: tickets.length,
-      separatorBuilder: (_, __) => const Divider(height: 1),
-      itemBuilder: (BuildContext context, int index) {
-        final Map<String, Object?> t = tickets[index];
-        final String title = '${t['ticket_type']} • ${t['provider']}';
-        final String subtitle =
-            '${t['source'] ?? t['event_name'] ?? ''} → ${t['destination'] ?? ''}';
-        return ListTile(
-          leading: const Icon(Icons.receipt_long),
-          title: Text(title),
-          subtitle: Text(subtitle),
-          trailing: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: <Widget>[
-              Text((t['user_full_name'] ?? '') as String),
-              Text('₹${(t['amount'] ?? 0).toString()}'),
-            ],
-          ),
-        );
-      },
+          final contributors = snapshot.data!;
+          print('contributors : $contributors');
+          return ListView.builder(
+            padding: const EdgeInsets.all(12),
+            itemCount: contributors.length,
+            itemBuilder: (context, index) {
+              final contributor = contributors[index];
+              return Card(
+                margin: const EdgeInsets.symmetric(vertical: 8),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: ListTile(
+                  leading: CircleAvatar(
+                    backgroundImage: NetworkImage(contributor.avatarUrl),
+                    radius: 24,
+                  ),
+                  title: Text(contributor.name),
+                  subtitle: Text(contributor.profileUrl),
+                  onTap: () {
+                    // You can integrate url_launcher here
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                          content: Text('Open: ${contributor.profileUrl}')),
+                    );
+                  },
+                ),
+              );
+            },
+          );
+        },
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+          context.pushNamed(AppRoute.dbViewer.name);
+        },
+        label: const Text('View DB'),
+        icon: const Icon(Icons.storage),
+      ),
     );
   }
 }

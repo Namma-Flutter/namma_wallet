@@ -3,8 +3,7 @@
   {
     "type": "PAY_CASH",
     "name": "Pay Cash",
-    "balance": "$226.78",
-    "number": ".... .... .... 0000",
+    "brand": "BCA",
     "color": "0xFF000000"
   },
   {
