@@ -154,9 +154,76 @@ We welcome contributions from the community! 🚀
 * Use conventional commit messages
 * Ensure all CI checks pass before submitting PR
 
-Please check our [CONTRIBUTING.md](CONTRIBUTING.md) (coming soon) for detailed guidelines.
+### 🧩 Commit & Branch Naming Guidelines
+
+To maintain a clean and consistent Git history, **Namma Wallet** follows the [**Conventional Commits**](https://www.conventionalcommits.org/en/v1.0.0/) specification and a structured **branch naming convention**.
+
+#### ✅ **Commit Message Format**
+
+Each commit message should follow this pattern:
+
+```
+<type>(<scope>): <short summary>
+```
+
+**Examples:**
+
+```
+feat(sms_extract): add TNSTC SMS parsing support
+fix(irctc): resolve PNR extraction issue in QR scan
+chore(deps): update flutter_lints version
+docs(readme): add installation guide
+```
+
+**Common Commit Types:**
+
+| Type       | Description                                       |
+| ---------- | ------------------------------------------------- |
+| `feat`     | Introduces a new feature                          |
+| `fix`      | Fixes a bug                                       |
+| `docs`     | Documentation-only changes                        |
+| `style`    | Formatting changes (no logic change)              |
+| `refactor` | Code restructuring without changing functionality |
+| `perf`     | Performance improvement                           |
+| `test`     | Adding or updating tests                          |
+| `build`    | Changes to build tools or dependencies            |
+| `chore`    | Routine tasks or maintenance work                 |
+
+> 🔹 Keep commit summaries under **72 characters** and start with a **lowercase** verb.
+> 🔹 Use the **imperative mood** — e.g., “add” instead of “added” or “adds”.
 
 ---
+
+#### 🌿 **Branch Naming Convention**
+
+Branch names should follow this format:
+
+```
+<type>/<short-description>
+```
+
+**Examples:**
+
+```
+feature/pdf-parsing
+fix/calendar-event-display
+docs/update-readme
+refactor/database-schema
+```
+
+**Allowed Branch Prefixes:**
+
+| Prefix      | Purpose                      |
+| ----------- | ---------------------------- |
+| `feature/`     | For new features             |
+| `fix/`      | For bug fixes                |
+| `hotfix/`   | For urgent production fixes  |
+| `refactor/` | For code restructuring       |
+| `docs/`     | For documentation updates    |
+| `chore/`    | For non-functional tasks     |
+| `test/`     | For testing-related branches |
+
+> 💡 Keep branch names **short**, use **kebab-case**, and avoid personal prefixes like `harish-` unless collaborating on shared experimental branches.
 
 ## 🏗 Technical Implementation
 
