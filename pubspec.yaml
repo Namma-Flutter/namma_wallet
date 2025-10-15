@@ -93,14 +93,10 @@ flutter_gen:
 # Splash screen configuration
 flutter_native_splash:
   color: "#FFFFFF"
-  image: android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
-  color_dark: "#000000"
-  image_dark: android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
+  image: assets/images/splash-icon.png
   android_12:
     color: "#FFFFFF"
-    image: android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
-    color_dark: "#000000"
-    image_dark: android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
+    image: assets/images/splash-icon.png
   ios: true
   android: true
   web: false
