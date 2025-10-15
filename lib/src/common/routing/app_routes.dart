@@ -4,6 +4,7 @@ enum AppRoute {
   scanner(path: '/scanner', name: 'scanner'),
   calendar(path: '/calendar', name: 'calendar'),
   profile(path: '/profile', name: 'profile'),
+  contributors(path: '/contributors', name: 'contributors'),
 
   // Ticket related routes
   ticketView(path: '/ticket', name: 'ticketView'),
