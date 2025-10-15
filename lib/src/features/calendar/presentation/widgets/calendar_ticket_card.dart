@@ -67,7 +67,8 @@ class CalendarTicketCard extends StatelessWidget {
     );
   }
 
-  Widget _buildCalendarTicketCard(BuildContext context, GenericDetailsModel ticket) {
+  Widget _buildCalendarTicketCard(
+      BuildContext context, GenericDetailsModel ticket) {
     return Container(
       height: 350,
       width: double.infinity,
