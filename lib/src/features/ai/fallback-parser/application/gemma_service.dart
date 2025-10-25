@@ -2,9 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_gemma/core/message.dart';
-import 'package:flutter_gemma/core/model.dart';
 import 'package:flutter_gemma/flutter_gemma_interface.dart';
-import 'package:flutter_gemma/pigeon.g.dart';
 import 'package:namma_wallet/src/features/ai/fallback-parser/domain/enums/model_configs.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -15,6 +13,15 @@ class GemmaChatService {
 
   /// Private named constructor
   GemmaChatService._internal();
+
+  /// Current model to use
+  Model _currentModel = Model.gemma3_1B;
+
+  /// Set the active model
+  void setModel(Model model) {
+    _currentModel = model;
+    _isInitialized = false;
+  }
 
   /// Singleton Instance
   static final GemmaChatService _instance = GemmaChatService._internal();
@@ -37,22 +44,22 @@ class GemmaChatService {
     if (!await gemma.modelManager.isModelInstalled) {
       /// If not installed, set model path
       final path =
-          '${(await getApplicationDocumentsDirectory()).path}/${Model.gemma3_1B.filename}';
+          '${(await getApplicationDocumentsDirectory()).path}/${_currentModel.filename}';
       await gemma.modelManager.setModelPath(path);
     }
 
     /// Create the inference model with specified configuration
     _model = await gemma.createModel(
-      modelType: ModelType.gemmaIt,
+      modelType: _currentModel.modelType,
 
       /// Type of model to use
-      preferredBackend: PreferredBackend.cpu,
+      preferredBackend: _currentModel.preferredBackend,
 
       /// Backend preference
-      maxTokens: 1024,
+      maxTokens: _currentModel.maxTokens,
 
       /// Maximum tokens per response
-      loraRanks: [4, 8],
+      loraRanks: [4, 8], // TODO(Keerthi): Make configurable in Model enum
 
       /// Lora fine-tuning ranks
     );
@@ -70,17 +77,18 @@ class GemmaChatService {
 
     try {
       /// Create a new session with custom settings
-      final session = await _model!.createSession(
-        temperature: 1.0,
+      final session = await _model!
+          .createSession(
+            temperature: _currentModel.temperature,
 
-        /// Controls randomness of AI responses
-        randomSeed: 1,
+            /// Controls randomness of AI responses
+            randomSeed: 1,
 
-        /// Fixed seed for reproducibility
-        topK: 1,
-
-        /// Top-K sampling parameter
-      );
+            /// Top-K and Top-P sampling parameter
+            topK: _currentModel.topK,
+            topP: _currentModel.topP,
+          )
+          .timeout(const Duration(seconds: 120));
 
       /// Add the user message to the session
       await session.addQueryChunk(
@@ -93,9 +101,18 @@ class GemmaChatService {
       /// Close the session to free resources
       await session.close();
 
+      /// Validate and clean the response
+      if (response.trim().isEmpty) {
+        throw const FormatException('Empty response from AI');
+      }
+
       /// Parse JSON response string into a Map
       final dataJson = jsonDecode(response);
-      return dataJson as Map<String, dynamic>;
+
+      if (dataJson is! Map<String, dynamic>) {
+        throw FormatException('Response is not a JSON object: $response');
+      }
+      return dataJson;
     } on Exception catch (e) {
       /// Catch errors and return a fallback error map
       if (kDebugMode) {

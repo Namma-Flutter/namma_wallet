@@ -55,8 +55,9 @@ class ModelDownloadService {
           ? {'Authorization': 'Bearer $token'}
           : <String, String>{};
 
-      final headResponse =
-          await http.head(Uri.parse(modelUrl), headers: headers);
+      final headResponse = await http
+          .head(Uri.parse(modelUrl), headers: headers)
+          .timeout(const Duration(seconds: 10));
 
       if (headResponse.statusCode == 200) {
         final contentLengthHeader = headResponse.headers['content-length'];
@@ -65,6 +66,15 @@ class ModelDownloadService {
           if (file.existsSync() && await file.length() == remoteFileSize) {
             return true;
           }
+        }
+      } else {
+        // If content-length is not available, fall back to checking local file existence
+        if (file.existsSync()) {
+          if (kDebugMode) {
+            print(
+                'Remote content-length unavailable, assuming local file is valid');
+          }
+          return true;
         }
       }
     } on Exception catch (e) {
@@ -83,7 +93,7 @@ class ModelDownloadService {
     try {
       final stream = FlutterGemmaPlugin.instance.modelManager
           .downloadModelFromNetworkWithProgress(modelUrl,
-              token: AIConstants.HUGGING_FACE_KEY);
+              token: token.isNotEmpty ? token : AIConstants.huggingFaceKey);
 
       await for (final progress in stream) {
         onProgress(progress.toDouble());
@@ -109,6 +119,7 @@ class ModelDownloadService {
       if (kDebugMode) {
         print('Error deleting model: $e');
       }
+      rethrow;
     }
   }
 }

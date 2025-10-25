@@ -37,11 +37,16 @@ class _AIParserTestScreenState extends State<AIParserTestScreen> {
       _response = 'Thinking...';
     });
 
-    /// Send message to Gemma AI service and wait for the reply
-    final reply = await _gemmaService.sendMessage(userText);
+    try {
+      /// Send message to Gemma AI service and wait for the reply
+      final reply = await _gemmaService.sendMessage(userText);
 
-    /// Update UI with AI's reply
-    setState(() => _response = reply.toString());
+      /// Update UI with AI's reply
+      setState(() => _response = reply.toString());
+    } on Exception catch (e) {
+      /// Update UI with Error if failed
+      setState(() => _response = 'Error: $e');
+    }
   }
 
   @override
@@ -53,40 +58,38 @@ class _AIParserTestScreenState extends State<AIParserTestScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(title: const Text('Gemma AI Chat')),
-        body: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            children: [
-              /// Expanded widget to show AI responses in a scrollable view
-              Expanded(
-                child: SingleChildScrollView(
-                  child: Text(
-                    _response,
-                    style: const TextStyle(fontSize: 18),
-                  ),
+    return Scaffold(
+      appBar: AppBar(title: const Text('Gemma AI Chat')),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            /// Expanded widget to show AI responses in a scrollable view
+            Expanded(
+              child: SingleChildScrollView(
+                child: Text(
+                  _response,
+                  style: const TextStyle(fontSize: 18),
                 ),
               ),
+            ),
 
-              /// Input TextField for user messages
-              TextField(
-                controller: _controller,
-                decoration: const InputDecoration(
-                  labelText: 'Enter your message',
-                  border: OutlineInputBorder(),
-                ),
+            /// Input TextField for user messages
+            TextField(
+              controller: _controller,
+              decoration: const InputDecoration(
+                labelText: 'Enter your message',
+                border: OutlineInputBorder(),
               ),
-              const SizedBox(height: 10),
+            ),
+            const SizedBox(height: 10),
 
-              /// Button to send message to AI
-              ElevatedButton(
-                onPressed: _sendMessage,
-                child: const Text('Send'),
-              ),
-            ],
-          ),
+            /// Button to send message to AI
+            ElevatedButton(
+              onPressed: _sendMessage,
+              child: const Text('Send'),
+            ),
+          ],
         ),
       ),
     );

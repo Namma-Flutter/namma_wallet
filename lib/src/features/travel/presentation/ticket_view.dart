@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:developer' as developer;
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:home_widget/home_widget.dart';
@@ -17,6 +18,7 @@ import 'package:qr_flutter/qr_flutter.dart';
 
 class TicketView extends StatefulWidget {
   const TicketView({required this.ticket, super.key});
+
   final GenericDetailsModel ticket;
 
   @override
@@ -237,9 +239,9 @@ class _TicketViewState extends State<TicketView> {
                             runSpacing: 10,
                             children: [
                               ...widget.ticket.tags!
-                                  .map((tag) => const HighlightChipsWidget(
-                                        bgColor: Color(0xffCADC56),
-                                        label: 'xxx',
+                                  .map((tag) => HighlightChipsWidget(
+                                        bgColor: const Color(0xffCADC56),
+                                        label: tag.icon ?? '',
                                         icon: Icons.star_border_rounded,
                                       ))
                             ],

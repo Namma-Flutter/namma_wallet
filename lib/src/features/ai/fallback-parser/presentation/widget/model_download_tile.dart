@@ -38,7 +38,7 @@ class _ModelDownloadTileState extends State<ModelDownloadTile> {
   }
 
   Future<void> _initialize() async {
-    _token = await _downloadService.loadToken() ?? AIConstants.HUGGING_FACE_KEY;
+    _token = AIConstants.huggingFaceKey;
     _needToDownload = !(await _downloadService.checkModelExistence(_token));
     setState(() {});
   }
@@ -62,7 +62,7 @@ class _ModelDownloadTileState extends State<ModelDownloadTile> {
       }
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Failed to download model.')),
+          SnackBar(content: Text('Failed to download model: $e')),
         );
       }
     } finally {
@@ -99,11 +99,9 @@ class _ModelDownloadTileState extends State<ModelDownloadTile> {
           ? const SizedBox(
               width: 24, height: 24, child: CircularProgressIndicator())
           : (_needToDownload
-              ? Switch(
-                  value: !_needToDownload,
-                  onChanged: (val) {
-                    if (val) _downloadModel();
-                  },
+              ? IconButton(
+                  icon: const Icon(Icons.download),
+                  onPressed: _downloadModel,
                 )
               : const Icon(Icons.check_circle, color: Colors.green, size: 28)),
       onTap: () {

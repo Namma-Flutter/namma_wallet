@@ -47,8 +47,8 @@ JSON SCHEMA:
 }
 
 EXAMPLE:
-Text: "Your request to participate in the Namma Flutter Event on 20th September 2025 was accepted and the timing will be 9:00 AM to 1:00 AM which is happening at Some Company Pvt Ltd. Please bring your ticket while arriving to the event."
-JSON: { "name": "Namma Flutter Event", "location": "Some Company Pvt Ltd", "from_place": "N/A", "to_place": "N/A", "date": "20th September 2025", "timing": "9:00 AM to 1:00 AM", "status": "accepted", "ticket_no": "N/A" }
+Text: "Your request to participate in the Namma Flutter Event on 20th September 2025 was accepted and the timing will be 9:00 AM to 1:00 PM which is happening at Some Company Pvt Ltd. Please bring your ticket while arriving to the event."
+JSON: { "name": "Namma Flutter Event", "location": "Some Company Pvt Ltd", "from_place": "N/A", "to_place": "N/A", "date": "20th September 2025", "timing": "9:00 AM to 1:00 PM", "status": "accepted", "ticket_no": "N/A" }
 
 Text: "Your flight from New York to London has been confirmed. The flight number is BA249, departing on 10th October 2025 at 3:00 PM. Your ticket number is TKT12345."
 JSON: { "name": "flight", "location": "N/A", "from_place": "New York", "to_place": "London", "date": "10th October 2025", "timing": "3:00 PM", "status": "confirmed", "ticket_no": "TKT12345" }
