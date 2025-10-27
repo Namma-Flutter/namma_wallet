@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:developer' as developer;
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:home_widget/home_widget.dart';
@@ -17,6 +18,7 @@ import 'package:qr_flutter/qr_flutter.dart';
 
 class TicketView extends StatefulWidget {
   const TicketView({required this.ticket, super.key});
+
   final GenericDetailsModel ticket;
 
   @override
@@ -53,7 +55,8 @@ class _TicketViewState extends State<TicketView> {
         showSnackbar(context, '📌 Ticket pinned to home screen successfully!');
       }
     } catch (e) {
-      developer.log('Failed to pin ticket to home screen', name: 'TicketView', error: e);
+      developer.log('Failed to pin ticket to home screen',
+          name: 'TicketView', error: e);
       if (mounted) {
         showSnackbar(context, 'Failed to pin ticket: $e', isError: true);
       }
@@ -184,113 +187,117 @@ class _TicketViewState extends State<TicketView> {
                         topRight: Radius.circular(16),
                       ),
                     ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  //* Icon & Service
-                  Row(
-                    children: [
-                      CircleAvatar(
-                          radius: 20,
-                          backgroundColor: AppColor.whiteColor,
-                          child: Icon(widget.ticket.type == EntryType.busTicket
-                              ? Icons.airport_shuttle_outlined
-                              : Icons.tram_outlined)),
-                      const SizedBox(width: 16),
-                      //* Description (Secondry text)
-                      Expanded(
-                        child: Text(widget.ticket.secondaryText,
-                            style: SubHeading(color: Shades.s100).regular,
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 2),
-                      ),
-                    ],
-                  ),
-
-                  const SizedBox(height: 16),
-
-                  //* From to To (Primary text)
-                  Text(widget.ticket.primaryText,
-                      style: HeadingH2Small(color: Shades.s100).bold,
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 3),
-
-                  const SizedBox(height: 16),
-
-                  //* Date - Time
-                  TicketRowWidget(
-                    title1: 'Journey Date',
-                    title2: 'Time',
-                    value1: getValueOrDefault(getTime(widget.ticket.startTime)),
-                    value2: getValueOrDefault(getDate(widget.ticket.startTime)),
-                  ),
-
-                  if (widget.ticket.tags != null &&
-                      widget.ticket.tags!.isNotEmpty) ...[
-                    const SizedBox(height: 16),
-                    Wrap(
-                      spacing: 10,
-                      runSpacing: 10,
-                      children: [
-                        ...widget.ticket.tags!
-                            .map((tag) => const HighlightChipsWidget(
-                                  bgColor: Color(0xffCADC56),
-                                  label: 'xxx',
-                                  icon: Icons.star_border_rounded,
-                                ))
-                      ],
-                    ),
-                  ],
-
-                  if (widget.ticket.extras != null &&
-                      widget.ticket.extras!.isNotEmpty) ...[
-                    const SizedBox(height: 16),
-                    Column(
+                    child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        for (var i = 0;
-                            i < widget.ticket.extras!.length;
-                            i++) ...[
-                          Row(
+                        //* Icon & Service
+                        Row(
+                          children: [
+                            CircleAvatar(
+                                radius: 20,
+                                backgroundColor: AppColor.whiteColor,
+                                child: Icon(
+                                    widget.ticket.type == EntryType.busTicket
+                                        ? Icons.airport_shuttle_outlined
+                                        : Icons.tram_outlined)),
+                            const SizedBox(width: 16),
+                            //* Description (Secondry text)
+                            Expanded(
+                              child: Text(widget.ticket.secondaryText,
+                                  style: SubHeading(color: Shades.s100).regular,
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 2),
+                            ),
+                          ],
+                        ),
+
+                        const SizedBox(height: 16),
+
+                        //* From to To (Primary text)
+                        Text(widget.ticket.primaryText,
+                            style: HeadingH2Small(color: Shades.s100).bold,
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 3),
+
+                        const SizedBox(height: 16),
+
+                        //* Date - Time
+                        TicketRowWidget(
+                          title1: 'Journey Date',
+                          title2: 'Time',
+                          value1: getValueOrDefault(
+                              getTime(widget.ticket.startTime)),
+                          value2: getValueOrDefault(
+                              getDate(widget.ticket.startTime)),
+                        ),
+
+                        if (widget.ticket.tags != null &&
+                            widget.ticket.tags!.isNotEmpty) ...[
+                          const SizedBox(height: 16),
+                          Wrap(
+                            spacing: 10,
+                            runSpacing: 10,
                             children: [
-                              Flexible(
-                                flex: 2,
-                                child: Text(
-                                  '${widget.ticket.extras![i].title ?? 'xxx'}: ',
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 1,
-                                  style:
-                                      Paragraph02(color: Shades.s100).regular,
-                                ),
-                              ),
-                              Expanded(
-                                flex: 3,
-                                child: Text(
-                                  widget.ticket.extras![i].value,
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 1,
-                                  style:
-                                      Paragraph01(color: Shades.s100).regular,
-                                ),
-                              ),
+                              ...widget.ticket.tags!
+                                  .map((tag) => HighlightChipsWidget(
+                                        bgColor: const Color(0xffCADC56),
+                                        label: tag.icon ?? '',
+                                        icon: Icons.star_border_rounded,
+                                      ))
                             ],
                           ),
-                          if (i < widget.ticket.extras!.length - 1)
-                            const SizedBox(height: 5),
-                        ]
+                        ],
+
+                        if (widget.ticket.extras != null &&
+                            widget.ticket.extras!.isNotEmpty) ...[
+                          const SizedBox(height: 16),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              for (var i = 0;
+                                  i < widget.ticket.extras!.length;
+                                  i++) ...[
+                                Row(
+                                  children: [
+                                    Flexible(
+                                      flex: 2,
+                                      child: Text(
+                                        '${widget.ticket.extras![i].title ?? 'xxx'}: ',
+                                        overflow: TextOverflow.ellipsis,
+                                        maxLines: 1,
+                                        style: Paragraph02(color: Shades.s100)
+                                            .regular,
+                                      ),
+                                    ),
+                                    Expanded(
+                                      flex: 3,
+                                      child: Text(
+                                        widget.ticket.extras![i].value,
+                                        overflow: TextOverflow.ellipsis,
+                                        maxLines: 1,
+                                        style: Paragraph01(color: Shades.s100)
+                                            .regular,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                if (i < widget.ticket.extras!.length - 1)
+                                  const SizedBox(height: 5),
+                              ]
+                            ],
+                          ),
+                        ],
                       ],
                     ),
-                  ],
-                ],
-              ),
-            ),
-            CustomPaint(
-              size: Size(MediaQuery.of(context).size.width * 0.95, 40),
-              painter: CustomTicketShapeLine(),
-            ),
+                  ),
+                  CustomPaint(
+                    size: Size(MediaQuery.of(context).size.width * 0.95, 40),
+                    painter: CustomTicketShapeLine(),
+                  ),
                   if (hasPnrOrId(widget.ticket))
                     Container(
-                      margin: const EdgeInsets.only(bottom: 16, left: 16, right: 16),
+                      margin: const EdgeInsets.only(
+                          bottom: 16, left: 16, right: 16),
                       padding: const EdgeInsets.all(24),
                       decoration: const BoxDecoration(
                         color: AppColor.limeYellowColor,
