@@ -109,38 +109,40 @@ class EventTicketCardWidget extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    //* ticket title
-                    Text(
-                      ticket.primaryText ?? 'xxx xxx',
-                      style: const TextStyle(color: AppColor.whiteColor),
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 1,
-                    ),
+                Flexible(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      //* ticket title
+                      Text(
+                        ticket.primaryText,
+                        style: const TextStyle(color: AppColor.whiteColor),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 2,
+                      ),
 
-                    //* Date & Time
-                    Row(
-                      children: [
-                        Text(
-                          // ticket.dateTime?.toString() ?? 'xxx xxx',
-                          getTime(ticket.startTime),
-                          style: const TextStyle(color: AppColor.whiteColor),
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 1,
-                        ),
-                        const Text(' - '),
-                        Text(
-                          // ticket.dateTime?.toString() ?? 'xxx xxx',
-                          getDate(ticket.startTime),
-                          style: const TextStyle(color: AppColor.whiteColor),
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 1,
-                        ),
-                      ],
-                    ),
-                  ],
+                      //* Date & Time
+                      Row(
+                        children: [
+                          Text(
+                            // ticket.dateTime?.toString() ?? 'xxx xxx',
+                            getTime(ticket.startTime),
+                            style: const TextStyle(color: AppColor.whiteColor),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                          ),
+                          const Text(' - '),
+                          Text(
+                            // ticket.dateTime?.toString() ?? 'xxx xxx',
+                            getDate(ticket.startTime),
+                            style: const TextStyle(color: AppColor.whiteColor),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
                 //* ticket icon
                 const Icon(
