@@ -318,10 +318,12 @@ class _TicketViewState extends State<TicketView> {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: AppColor.whiteColor,
+              color: Theme.of(context).scaffoldBackgroundColor,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.1),
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.black.withValues(alpha: 0.3)
+                      : Colors.black.withValues(alpha: 0.1),
                   blurRadius: 8,
                   offset: const Offset(0, -2),
                 ),
@@ -334,7 +336,7 @@ class _TicketViewState extends State<TicketView> {
                 child: ElevatedButton.icon(
                   onPressed: _isPinning ? null : _pinToHomeScreen,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColor.limeYellowColor,
+                    backgroundColor: Theme.of(context).colorScheme.primary,
                     foregroundColor: Colors.black87,
                     elevation: 0,
                     shape: RoundedRectangleBorder(

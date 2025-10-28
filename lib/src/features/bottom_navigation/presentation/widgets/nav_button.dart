@@ -79,8 +79,8 @@ class _NavButtonState extends State<NavButton>
               curve: Curves.easeInOutCubicEmphasized,
               margin: const EdgeInsets.symmetric(horizontal: 4),
               padding: EdgeInsets.symmetric(
-                horizontal: widget.selected ? 18 : 14,
-                vertical: 12,
+                horizontal: widget.selected ? 16 : 12,
+                vertical: 10,
               ),
               decoration: BoxDecoration(
                 color: widget.selected
@@ -108,10 +108,10 @@ class _NavButtonState extends State<NavButton>
                   AnimatedScale(
                     duration: const Duration(milliseconds: 250),
                     curve: Curves.easeInOutCubicEmphasized,
-                    scale: widget.selected ? 1.1 : 1.0,
+                    scale: widget.selected ? 1.05 : 1.0,
                     child: Icon(
                       widget.icon,
-                      size: 26,
+                      size: 20,
                       color: widget.selected
                           ? (isDark ? AppColor.whiteColor : AppColor.whiteColor)
                           : (isDark
@@ -126,7 +126,7 @@ class _NavButtonState extends State<NavButton>
                     curve: Curves.easeInOutCubicEmphasized,
                     child: widget.selected
                         ? Padding(
-                            padding: const EdgeInsets.only(left: 10),
+                            padding: const EdgeInsets.only(left: 8),
                             child: AnimatedOpacity(
                               duration: const Duration(milliseconds: 200),
                               curve: Curves.easeInOutCubicEmphasized,
@@ -138,7 +138,8 @@ class _NavButtonState extends State<NavButton>
                                       ? AppColor.whiteColor
                                       : AppColor.whiteColor,
                                   fontWeight: FontWeight.w600,
-                                  fontSize: 14,
+                                  fontSize: 13,
+                                  height: 1,
                                 ),
                               ),
                             ),
