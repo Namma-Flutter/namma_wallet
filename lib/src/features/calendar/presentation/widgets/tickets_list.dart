@@ -5,7 +5,8 @@ import 'package:namma_wallet/src/features/calendar/presentation/widgets/calendar
 
 class TicketsList extends StatelessWidget {
   const TicketsList({
-    required this.provider, super.key,
+    required this.provider,
+    super.key,
   });
 
   final CalendarProvider provider;

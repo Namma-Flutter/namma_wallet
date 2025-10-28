@@ -6,7 +6,10 @@ import 'package:table_calendar/table_calendar.dart';
 
 class CalendarWidget extends StatelessWidget {
   const CalendarWidget({
-    required this.provider, required this.calendarFormat, required this.onDaySelected, super.key,
+    required this.provider,
+    required this.calendarFormat,
+    required this.onDaySelected,
+    super.key,
   });
 
   final CalendarProvider provider;

@@ -57,9 +57,7 @@ class CalendarProvider extends ChangeNotifier {
       final dbHelper = DatabaseHelper.instance;
       final ticketMaps = await dbHelper.fetchAllTravelTickets();
 
-      _tickets = ticketMaps
-          .map(TravelTicketModelMapper.fromMap)
-          .toList();
+      _tickets = ticketMaps.map(TravelTicketModelMapper.fromMap).toList();
 
       notifyListeners();
     } catch (e) {

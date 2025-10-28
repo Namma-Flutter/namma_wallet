@@ -5,7 +5,9 @@ import 'package:namma_wallet/src/features/calendar/presentation/widgets/calendar
 
 class CustomDayCell extends StatelessWidget {
   const CustomDayCell({
-    required this.day, required this.provider, super.key,
+    required this.day,
+    required this.provider,
+    super.key,
     this.isSelected = false,
     this.isToday = false,
   });
