@@ -1,7 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:http/http.dart' as http;
 import 'package:namma_wallet/src/common/routing/app_routes.dart';
-import 'package:namma_wallet/src/features/profile/presentation/sample_contributors_data.dart';
 
 // ----------------- Model -----------------
 class Contributor {
@@ -41,18 +43,19 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Future<List<Contributor>> _fetchContributors() async {
-    return sampleContributorData.map(Contributor.fromJson).toList();
-    // final response = await http.get(
-    //   Uri.parse(
-    //       'https://api.github.com/repos/Namma-Flutter/namma_wallet/contributors'),
-    // );
-    //
-    // if (response.statusCode == 200) {
-    //   final body = response.body as List<Map<String, dynamic>>;
-    //   return body.map((json) => Contributor.fromJson(json)).toList();
-    // } else {
-    //   throw Exception('Failed to load contributors');
-    // }
+    final response = await http.get(
+      Uri.parse(
+          'https://api.github.com/repos/Namma-Flutter/namma_wallet/contributors'),
+    );
+
+    if (response.statusCode == 200) {
+      final body = json.decode(response.body) as List<dynamic>;
+      return body
+          .map((json) => Contributor.fromJson(json as Map<String, dynamic>))
+          .toList();
+    } else {
+      throw Exception('Failed to load contributors');
+    }
   }
 
   @override
@@ -73,7 +76,6 @@ class _ProfilePageState extends State<ProfilePage> {
           }
 
           final contributors = snapshot.data!;
-          print('contributors : $contributors');
           return ListView.builder(
             padding: const EdgeInsets.all(12),
             itemCount: contributors.length,
