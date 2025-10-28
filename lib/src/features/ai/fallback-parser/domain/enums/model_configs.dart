@@ -33,6 +33,7 @@ enum Model {
     temperature: 1,
     topK: 64,
     topP: 0.95,
+    localModel: true,
   );
 
   /// Constructor

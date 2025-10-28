@@ -11,7 +11,7 @@ import 'package:namma_wallet/src/common/theme/styles.dart';
 import 'package:namma_wallet/src/common/widgets/custom_back_button.dart';
 import 'package:namma_wallet/src/common/widgets/snackbar_widget.dart';
 import 'package:namma_wallet/src/features/home/domain/generic_details_model.dart';
-import 'package:namma_wallet/src/features/home/presentation/widgets/hilight_widget.dart';
+import 'package:namma_wallet/src/features/home/presentation/widgets/highlight_widget.dart';
 import 'package:namma_wallet/src/features/travel/presentation/widgets/custom_ticket_shape_line.dart';
 import 'package:namma_wallet/src/features/travel/presentation/widgets/ticket_view_widget.dart';
 import 'package:qr_flutter/qr_flutter.dart';
@@ -95,7 +95,7 @@ class _TicketViewState extends State<TicketView> {
       ),
     );
 
-    if (confirmed == true && mounted) {
+    if (confirmed ?? false && mounted) {
       await _deleteTicket();
     }
   }

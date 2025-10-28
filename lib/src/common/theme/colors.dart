@@ -8,7 +8,7 @@ class AppColor {
   static const Color specialColor = Color.fromARGB(255, 236, 241, 248);
   static const Color periwinkleBlue = Color.fromRGBO(112, 135, 248, 1);
   static const Color limeYellowColor = Color(0xffE7FC57);
-  static const Color limeYellowThikColor = Color(0xffE0FB25);
+  static const Color limeYellowThinkColor = Color(0xffE0FB25);
   static const Color whiteColor = Colors.white;
   static const Color blackColor = Colors.black;
 }

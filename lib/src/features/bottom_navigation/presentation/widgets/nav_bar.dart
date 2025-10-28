@@ -31,31 +31,29 @@ class NavBar extends StatelessWidget {
           decoration: BoxDecoration(
             // Transparent glassy background
             color: isDark
-                ? AppColor.whiteColor.withOpacity(0.1)
-                : AppColor.whiteColor.withOpacity(0.15),
+                ? AppColor.whiteColor.withValues(alpha: 0.1)
+                : AppColor.whiteColor.withValues(alpha: 0.15),
             borderRadius: BorderRadius.circular(35),
             border: Border.all(
               color: isDark
-                  ? AppColor.whiteColor.withOpacity(0.2)
-                  : AppColor.whiteColor.withOpacity(0.3),
+                  ? AppColor.whiteColor.withValues(alpha: 0.2)
+                  : AppColor.whiteColor.withValues(alpha: 0.3),
               width: 0.8,
             ),
             boxShadow: [
               // Soft glowing shadow for glass effect
               BoxShadow(
                 color: isDark
-                    ? AppColor.whiteColor.withOpacity(0.1)
-                    : AppColor.blackColor.withOpacity(0.08),
+                    ? AppColor.whiteColor.withValues(alpha: 0.1)
+                    : AppColor.blackColor.withValues(alpha: 0.08),
                 blurRadius: 25,
                 offset: const Offset(0, 8),
-                spreadRadius: 0,
               ),
               // Inner highlight for glass effect
               BoxShadow(
-                color: AppColor.whiteColor.withOpacity(0.2),
+                color: AppColor.whiteColor.withValues(alpha: 0.2),
                 blurRadius: 2,
                 offset: const Offset(0, 1),
-                spreadRadius: 0,
               ),
             ],
           ),

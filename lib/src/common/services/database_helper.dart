@@ -267,7 +267,7 @@ ORDER BY t.created_at DESC
       // Check for duplicates based on PNR number or booking reference
       final pnrNumber = ticket['pnr_number'] as String?;
       final bookingRef = ticket['booking_reference'] as String?;
-      final providerName = ticket['provider_name'] as String;
+      final providerName = ticket['provider_name']! as String;
 
       if (pnrNumber != null && pnrNumber.isNotEmpty) {
         final existing = await db.query(

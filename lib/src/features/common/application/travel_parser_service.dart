@@ -48,7 +48,7 @@ class TNSTCBusParser implements TravelTicketParser {
       if (date.isEmpty) return null;
 
       // Handle both '/' and '-' separators
-      var parts = date.contains('/') ? date.split('/') : date.split('-');
+      final parts = date.contains('/') ? date.split('/') : date.split('-');
       if (parts.length != 3) return null;
 
       try {
@@ -66,7 +66,7 @@ class TNSTCBusParser implements TravelTicketParser {
     var pnrNumber = extractMatch(r'PNR NO\.\s*:\s*([^,\s]+)', text);
     var from = extractMatch(r'From\s*:\s*(.*?)(?=\s+To)', text);
     var to = extractMatch(r'To\s+([^,]+)', text);
-    var tripCode = extractMatch(r'Trip Code\s*:\s*(\S+)', text);
+    final tripCode = extractMatch(r'Trip Code\s*:\s*(\S+)', text);
     var journeyDate = parseDate(
       extractMatch(r'Journey Date\s*:\s*(\d{2}[/-]\d{2}[/-]\d{4})', text),
     );
@@ -142,11 +142,11 @@ class IRCTCTrainParser implements TravelTicketParser {
   @override
   bool canParse(String text) {
     final patterns = [
-      r'IRCTC',
-      r'Indian Railway',
+      'IRCTC',
+      'Indian Railway',
       r'PNR\s*:',
       r'Train\s*No',
-      r'E-TICKET',
+      'E-TICKET',
     ];
     return patterns
         .any((pattern) => RegExp(pattern, caseSensitive: false).hasMatch(text));
@@ -201,10 +201,10 @@ class SETCBusParser implements TravelTicketParser {
   @override
   bool canParse(String text) {
     final patterns = [
-      r'SETC',
-      r'State Express',
-      r'Booking ID',
-      r'Bus No',
+      'SETC',
+      'State Express',
+      'Booking ID',
+      'Bus No',
     ];
     return patterns
         .any((pattern) => RegExp(pattern, caseSensitive: false).hasMatch(text));

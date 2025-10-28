@@ -32,7 +32,7 @@ class _NavButtonState extends State<NavButton>
       vsync: this,
     );
     _pressAnimation = Tween<double>(
-      begin: 1.0,
+      begin: 1,
       end: 0.95,
     ).animate(CurvedAnimation(
       parent: _pressController,
@@ -84,7 +84,7 @@ class _NavButtonState extends State<NavButton>
               ),
               decoration: BoxDecoration(
                 color: widget.selected
-                    ? AppColor.blackColor.withOpacity(0.8)
+                    ? AppColor.blackColor.withValues(alpha: 0.8)
                     : Colors.transparent,
                 borderRadius: BorderRadius.circular(25),
                 boxShadow: widget.selected
@@ -93,7 +93,7 @@ class _NavButtonState extends State<NavButton>
                           color: (isDark
                                   ? AppColor.whiteColor
                                   : AppColor.blackColor)
-                              .withOpacity(0.1),
+                              .withValues(alpha: 0.1),
                           blurRadius: 4,
                           offset: const Offset(0, 1),
                         ),
@@ -115,8 +115,8 @@ class _NavButtonState extends State<NavButton>
                       color: widget.selected
                           ? (isDark ? AppColor.whiteColor : AppColor.whiteColor)
                           : (isDark
-                              ? AppColor.whiteColor.withOpacity(0.7)
-                              : AppColor.blackColor.withOpacity(0.6)),
+                              ? AppColor.whiteColor.withValues(alpha: 0.7)
+                              : AppColor.blackColor.withValues(alpha: 0.6)),
                     ),
                   ),
 

@@ -61,7 +61,7 @@ class _AIParserTestScreenState extends State<AIParserTestScreen> {
     return Scaffold(
       appBar: AppBar(title: const Text('Gemma AI Chat')),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16),
         child: Column(
           children: [
             /// Expanded widget to show AI responses in a scrollable view

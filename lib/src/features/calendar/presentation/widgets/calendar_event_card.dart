@@ -5,8 +5,7 @@ import 'package:namma_wallet/src/features/calendar/domain/event_model.dart';
 
 class CalendarEventCard extends StatelessWidget {
   const CalendarEventCard({
-    super.key,
-    required this.event,
+    required this.event, super.key,
   });
 
   final Event event;

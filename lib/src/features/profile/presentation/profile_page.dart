@@ -1,7 +1,5 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:http/http.dart' as http;
 import 'package:namma_wallet/src/common/routing/app_routes.dart';
 import 'package:namma_wallet/src/features/profile/presentation/sample_contributors_data.dart';
 
@@ -43,9 +41,7 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Future<List<Contributor>> _fetchContributors() async {
-    await Future.delayed(const Duration(seconds: 2));
-
-    return sample_contributors_data.map(Contributor.fromJson).toList();
+    return sampleContributorData.map(Contributor.fromJson).toList();
     // final response = await http.get(
     //   Uri.parse(
     //       'https://api.github.com/repos/Namma-Flutter/namma_wallet/contributors'),

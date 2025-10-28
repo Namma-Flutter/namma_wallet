@@ -23,7 +23,7 @@ class ModelDownloadTile extends StatefulWidget {
 class _ModelDownloadTileState extends State<ModelDownloadTile> {
   late ModelDownloadService _downloadService;
   bool _needToDownload = true;
-  double _progress = 0.0;
+  double _progress = 0;
   String _token = '';
 
   @override
