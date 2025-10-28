@@ -38,7 +38,7 @@ This is a Flutter mobile application for managing digital tickets and passes. Th
 
 ### Project Structure
 
-```
+```text
 lib/
 ├── main.dart                    # App entry point
 ├── src/
