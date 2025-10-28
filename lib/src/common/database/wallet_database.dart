@@ -12,9 +12,9 @@ class DuplicateTicketException implements Exception {
   String toString() => 'DuplicateTicketException: $message';
 }
 
-class DatabaseHelper {
-  DatabaseHelper._internal();
-  static final DatabaseHelper instance = DatabaseHelper._internal();
+class WalletDatabase {
+  WalletDatabase._internal();
+  static final WalletDatabase instance = WalletDatabase._internal();
 
   static const String _dbName = 'namma_wallet.db';
   static const int _dbVersion = 2;

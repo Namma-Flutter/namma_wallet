@@ -3,8 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
-import 'package:namma_wallet/src/common/services/database_helper.dart';
-import 'package:namma_wallet/src/common/theme/styles.dart';
+import 'package:namma_wallet/src/common/database/wallet_database.dart';
 import 'package:namma_wallet/src/features/calendar/domain/event_model.dart';
 import 'package:namma_wallet/src/features/calendar/presentation/widgets/calendar_toggle_buttons.dart';
 import 'package:namma_wallet/src/features/calendar/presentation/widgets/calendar_widget.dart';
@@ -54,7 +53,7 @@ class CalendarProvider extends ChangeNotifier {
 
   Future<void> loadTickets() async {
     try {
-      final dbHelper = DatabaseHelper.instance;
+      final dbHelper = WalletDatabase.instance;
       final ticketMaps = await dbHelper.fetchAllTravelTickets();
 
       _tickets = ticketMaps.map(TravelTicketModelMapper.fromMap).toList();
@@ -114,14 +113,7 @@ class CalendarView extends StatelessWidget {
         appBar: AppBar(
           title: const Padding(
             padding: EdgeInsets.only(left: 8),
-            child: Text(
-              'Calendar',
-              style: TextStyle(
-                color: AppColor.blackColor,
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+            child: Text('Calendar'),
           ),
           centerTitle: false,
         ),

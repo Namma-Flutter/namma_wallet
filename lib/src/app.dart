@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:namma_wallet/src/common/routing/app_router.dart';
 import 'package:namma_wallet/src/common/services/sharing_intent_service.dart';
+import 'package:namma_wallet/src/common/theme/app_theme.dart';
+import 'package:namma_wallet/src/common/theme/theme_provider.dart';
+import 'package:provider/provider.dart';
 
 class NammaWalletApp extends StatefulWidget {
   const NammaWalletApp({super.key});
@@ -51,9 +54,17 @@ class _NammaWalletAppState extends State<NammaWalletApp> {
   }
 
   @override
-  Widget build(BuildContext context) => MaterialApp.router(
-        title: 'NammaWallet',
-        routerConfig: router,
-        scaffoldMessengerKey: _scaffoldMessengerKey,
-      );
+  Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
+    return MaterialApp.router(
+      title: 'NammaWallet',
+      theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
+      themeMode: themeProvider.themeMode,
+      debugShowCheckedModeBanner: false,
+      routerConfig: router,
+      scaffoldMessengerKey: _scaffoldMessengerKey,
+    );
+  }
 }

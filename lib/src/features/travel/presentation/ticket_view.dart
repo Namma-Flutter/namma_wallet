@@ -4,9 +4,9 @@ import 'dart:developer' as developer;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:home_widget/home_widget.dart';
+import 'package:namma_wallet/src/common/database/wallet_database.dart';
 import 'package:namma_wallet/src/common/helper/check_pnr_id.dart';
 import 'package:namma_wallet/src/common/helper/date_time_converter.dart';
-import 'package:namma_wallet/src/common/services/database_helper.dart';
 import 'package:namma_wallet/src/common/theme/styles.dart';
 import 'package:namma_wallet/src/common/widgets/custom_back_button.dart';
 import 'package:namma_wallet/src/common/widgets/snackbar_widget.dart';
@@ -108,7 +108,7 @@ class _TicketViewState extends State<TicketView> {
     });
 
     try {
-      await DatabaseHelper.instance.deleteTravelTicket(widget.ticket.ticketId!);
+      await WalletDatabase.instance.deleteTravelTicket(widget.ticket.ticketId!);
 
       developer.log(
           'Successfully deleted ticket with ID: ${widget.ticket.ticketId}',
@@ -138,13 +138,10 @@ class _TicketViewState extends State<TicketView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColor.quaternaryColor,
       appBar: AppBar(
         centerTitle: true,
-        backgroundColor: AppColor.quaternaryColor,
         leading: const CustomBackButton(),
-        title:
-            Text('Ticket View', style: HeadingH6(color: Shades.s100).regular),
+        title: const Text('Ticket View'),
         actions: [
           if (widget.ticket.ticketId != null)
             Center(

@@ -7,8 +7,8 @@ import 'package:card_stack_widget/model/card_orientation.dart';
 import 'package:card_stack_widget/widget/card_stack_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:namma_wallet/src/common/database/wallet_database.dart';
 import 'package:namma_wallet/src/common/routing/app_routes.dart';
-import 'package:namma_wallet/src/common/services/database_helper.dart';
 import 'package:namma_wallet/src/common/widgets/snackbar_widget.dart';
 import 'package:namma_wallet/src/features/common/domain/travel_ticket_model.dart';
 import 'package:namma_wallet/src/features/home/domain/extras_model.dart';
@@ -41,7 +41,7 @@ class _HomePageState extends State<HomePage> {
         _isLoading = true;
       });
 
-      final ticketMaps = await DatabaseHelper.instance.fetchAllTravelTickets();
+      final ticketMaps = await WalletDatabase.instance.fetchAllTravelTickets();
 
       if (!mounted) return;
 
@@ -308,7 +308,6 @@ class _HomePageState extends State<HomePage> {
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: Colors.black,
                         ),
                       ),
                       SizedBox.shrink(),
@@ -384,7 +383,6 @@ class _HomePageState extends State<HomePage> {
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: Colors.black,
                         ),
                       ),
                       const SizedBox(height: 16),
