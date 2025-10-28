@@ -19,7 +19,7 @@ class CalendarTicketCard extends StatelessWidget {
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: _buildCalendarTicketCard(context, genericTicket),
+      child: CalendarTicketCardContent(ticket: genericTicket),
     );
   }
 
@@ -67,8 +67,18 @@ class CalendarTicketCard extends StatelessWidget {
     );
   }
 
-  Widget _buildCalendarTicketCard(
-      BuildContext context, GenericDetailsModel ticket) {
+}
+
+class CalendarTicketCardContent extends StatelessWidget {
+  const CalendarTicketCardContent({
+    required this.ticket,
+    super.key,
+  });
+
+  final GenericDetailsModel ticket;
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       height: 350,
       width: double.infinity,

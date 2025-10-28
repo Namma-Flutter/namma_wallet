@@ -75,12 +75,12 @@ class _ProfilePageState extends State<ProfilePage> {
         padding: const EdgeInsets.all(16),
         children: [
           // Theme Settings Section
-          _buildThemeSection(context, themeProvider),
+          ThemeSectionWidget(themeProvider: themeProvider),
 
           const SizedBox(height: 24),
 
           // Contributors Section
-          _buildContributorsSection(context),
+          ContributorsSectionWidget(contributorsFuture: _contributorsFuture),
 
           const SizedBox(height: 100), // Space for FAB
         ],
@@ -95,7 +95,19 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget _buildThemeSection(BuildContext context, ThemeProvider themeProvider) {
+}
+
+// ----------------- Theme Section Widget -----------------
+class ThemeSectionWidget extends StatelessWidget {
+  const ThemeSectionWidget({
+    required this.themeProvider,
+    super.key,
+  });
+
+  final ThemeProvider themeProvider;
+
+  @override
+  Widget build(BuildContext context) {
     return Card(
       elevation: 2,
       shape: RoundedRectangleBorder(
@@ -160,8 +172,19 @@ class _ProfilePageState extends State<ProfilePage> {
       ),
     );
   }
+}
 
-  Widget _buildContributorsSection(BuildContext context) {
+// ----------------- Contributors Section Widget -----------------
+class ContributorsSectionWidget extends StatelessWidget {
+  const ContributorsSectionWidget({
+    required this.contributorsFuture,
+    super.key,
+  });
+
+  final Future<List<Contributor>> contributorsFuture;
+
+  @override
+  Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -183,7 +206,7 @@ class _ProfilePageState extends State<ProfilePage> {
         ),
         const SizedBox(height: 12),
         FutureBuilder<List<Contributor>>(
-          future: _contributorsFuture,
+          future: contributorsFuture,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Card(
