@@ -210,13 +210,23 @@ class _TicketScannerPageState extends State<TicketScannerPage> {
                               context.pushNamed(
                                 AppRoute.barcodeScanner.name,
                                 extra: (BarcodeCapture capture) async {
-                                  // Handle the scanned barcode
-                                  final qrData =
-                                      capture.barcodes.first.rawValue;
-                                  context.pop();
-                                  if (qrData != null) {
-                                    await _handleQRCodeScan(qrData);
+                                  // Check if barcodes list is not empty
+                                  if (capture.barcodes.isEmpty) {
+                                    context.pop();
+                                    return;
                                   }
+
+                                  // Handle the scanned barcode
+                                  final qrData = capture.barcodes.first.rawValue;
+
+                                  // Check if rawValue is non-null
+                                  if (qrData == null) {
+                                    context.pop();
+                                    return;
+                                  }
+
+                                  context.pop();
+                                  await _handleQRCodeScan(qrData);
                                 },
                               );
                             },
