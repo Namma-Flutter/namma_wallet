@@ -1,3 +1,4 @@
+import 'package:ai_barcode_scanner/ai_barcode_scanner.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:namma_wallet/src/common/routing/app_routes.dart';
@@ -7,7 +8,6 @@ import 'package:namma_wallet/src/features/home/domain/generic_details_model.dart
 import 'package:namma_wallet/src/features/home/presentation/home_view.dart';
 import 'package:namma_wallet/src/features/profile/presentation/db_viewer_page.dart';
 import 'package:namma_wallet/src/features/profile/presentation/profile_page.dart';
-import 'package:ai_barcode_scanner/ai_barcode_scanner.dart';
 import 'package:namma_wallet/src/features/scanner/presentation/scanner_view.dart';
 import 'package:namma_wallet/src/features/travel/presentation/ticket_view.dart';
 

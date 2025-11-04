@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:namma_wallet/src/common/theme/styles.dart';
-import 'package:namma_wallet/src/features/calendar/presentation/widgets/calendar_utils.dart';
 import 'package:namma_wallet/src/features/calendar/presentation/calendar_view.dart';
+import 'package:namma_wallet/src/features/calendar/presentation/widgets/calendar_utils.dart';
 
 class CustomDayCell extends StatelessWidget {
   const CustomDayCell({
-    super.key,
     required this.day,
     required this.provider,
+    super.key,
     this.isSelected = false,
     this.isToday = false,
   });

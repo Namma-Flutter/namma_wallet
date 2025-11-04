@@ -27,7 +27,7 @@ class GemmaChatService {
   static final GemmaChatService _instance = GemmaChatService._internal();
 
   /// The Gemma AI inference model instance
-  InferenceModel? _model;
+  late InferenceModel _model;
 
   /// Flag to indicate if Gemma has been initialized
   bool _isInitialized = false;
@@ -77,12 +77,9 @@ class GemmaChatService {
 
     try {
       /// Create a new session with custom settings
-      final session = await _model!
+      final session = await _model
           .createSession(
             temperature: _currentModel.temperature,
-
-            /// Controls randomness of AI responses
-            randomSeed: 1,
 
             /// Top-K and Top-P sampling parameter
             topK: _currentModel.topK,

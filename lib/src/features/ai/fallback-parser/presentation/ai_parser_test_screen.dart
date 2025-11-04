@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:namma_wallet/src/common/widgets/custom_back_button.dart';
 import 'package:namma_wallet/src/features/ai/fallback-parser/application/gemma_service.dart';
 import 'package:namma_wallet/src/features/ai/fallback-parser/domain/prompts/fallback_prompt.dart';
 
@@ -59,9 +60,12 @@ class _AIParserTestScreenState extends State<AIParserTestScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Gemma AI Chat')),
+      appBar: AppBar(
+        leading: const CustomBackButton(),
+        title: const Text('Gemma AI Chat'),
+      ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16),
         child: Column(
           children: [
             /// Expanded widget to show AI responses in a scrollable view

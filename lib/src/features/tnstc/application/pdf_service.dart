@@ -53,7 +53,8 @@ class PDFService {
     cleanedText = cleanedText.replaceAll(RegExp(r'\n{3,}'), '\n\n');
 
     // Fix common PDF extraction issues
-    // Sometimes colons get separated from labels - fix spacing but keep original text
+    // Sometimes colons get separated from labels -
+    // fix spacing but keep original text
     cleanedText = cleanedText.replaceAll(RegExp(r'(\w+)\s+:\s*'), r'$1: ');
 
     // Sometimes values get split across lines - try to rejoin obvious cases

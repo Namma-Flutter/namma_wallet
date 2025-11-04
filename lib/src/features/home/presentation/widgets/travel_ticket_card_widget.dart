@@ -5,7 +5,7 @@ import 'package:namma_wallet/src/common/helper/date_time_converter.dart';
 import 'package:namma_wallet/src/common/routing/app_routes.dart';
 import 'package:namma_wallet/src/common/theme/styles.dart';
 import 'package:namma_wallet/src/features/home/domain/generic_details_model.dart';
-import 'package:namma_wallet/src/features/home/presentation/widgets/hilight_widget.dart';
+import 'package:namma_wallet/src/features/home/presentation/widgets/highlight_widget.dart';
 import 'package:namma_wallet/src/features/travel/presentation/widgets/ticket_view_widget.dart';
 
 class TravelTicketCardWidget extends StatelessWidget {
@@ -34,7 +34,7 @@ class TravelTicketCardWidget extends StatelessWidget {
             ),
           ],
           color: ticket.type == EntryType.busTicket
-              ? AppColor.limeYellowThikColor
+              ? AppColor.limeYellowThinkColor
               : AppColor.limeYellowColor),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -100,7 +100,7 @@ class TravelTicketCardWidget extends StatelessWidget {
                     ...ticket.tags!.take(2).map((tag) => HighlightChipsWidget(
                           bgColor: const Color(0xffCADC56),
                           label: tag.value ?? 'xxx',
-                          icon: tag.iconData ?? Icons.star_border_rounded,
+                          icon: tag.iconData,
                         ))
                   ],
                 ),
@@ -140,7 +140,7 @@ class TravelTicketCardWidget extends StatelessWidget {
                     extra: ticket,
                   );
 
-                  if (wasDeleted == true && onTicketDeleted != null) {
+                  if (onTicketDeleted != null && (wasDeleted ?? false)) {
                     onTicketDeleted!();
                   }
                 },

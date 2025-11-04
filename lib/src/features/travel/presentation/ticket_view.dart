@@ -4,14 +4,14 @@ import 'dart:developer' as developer;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:home_widget/home_widget.dart';
+import 'package:namma_wallet/src/common/database/wallet_database.dart';
 import 'package:namma_wallet/src/common/helper/check_pnr_id.dart';
 import 'package:namma_wallet/src/common/helper/date_time_converter.dart';
-import 'package:namma_wallet/src/common/services/database_helper.dart';
 import 'package:namma_wallet/src/common/theme/styles.dart';
 import 'package:namma_wallet/src/common/widgets/custom_back_button.dart';
 import 'package:namma_wallet/src/common/widgets/snackbar_widget.dart';
 import 'package:namma_wallet/src/features/home/domain/generic_details_model.dart';
-import 'package:namma_wallet/src/features/home/presentation/widgets/hilight_widget.dart';
+import 'package:namma_wallet/src/features/home/presentation/widgets/highlight_widget.dart';
 import 'package:namma_wallet/src/features/travel/presentation/widgets/custom_ticket_shape_line.dart';
 import 'package:namma_wallet/src/features/travel/presentation/widgets/ticket_view_widget.dart';
 import 'package:qr_flutter/qr_flutter.dart';
@@ -95,7 +95,7 @@ class _TicketViewState extends State<TicketView> {
       ),
     );
 
-    if (confirmed == true && mounted) {
+    if (confirmed ?? false && mounted) {
       await _deleteTicket();
     }
   }
@@ -108,7 +108,7 @@ class _TicketViewState extends State<TicketView> {
     });
 
     try {
-      await DatabaseHelper.instance.deleteTravelTicket(widget.ticket.ticketId!);
+      await WalletDatabase.instance.deleteTravelTicket(widget.ticket.ticketId!);
 
       developer.log(
           'Successfully deleted ticket with ID: ${widget.ticket.ticketId}',
@@ -138,13 +138,10 @@ class _TicketViewState extends State<TicketView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColor.quaternaryColor,
       appBar: AppBar(
         centerTitle: true,
-        backgroundColor: AppColor.quaternaryColor,
         leading: const CustomBackButton(),
-        title:
-            Text('Ticket View', style: HeadingH6(color: Shades.s100).regular),
+        title: const Text('Ticket View'),
         actions: [
           if (widget.ticket.ticketId != null)
             Center(
@@ -321,10 +318,12 @@ class _TicketViewState extends State<TicketView> {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: AppColor.whiteColor,
+              color: Theme.of(context).scaffoldBackgroundColor,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.1),
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.black.withValues(alpha: 0.3)
+                      : Colors.black.withValues(alpha: 0.1),
                   blurRadius: 8,
                   offset: const Offset(0, -2),
                 ),
@@ -337,7 +336,7 @@ class _TicketViewState extends State<TicketView> {
                 child: ElevatedButton.icon(
                   onPressed: _isPinning ? null : _pinToHomeScreen,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColor.limeYellowColor,
+                    backgroundColor: Theme.of(context).colorScheme.primary,
                     foregroundColor: Colors.black87,
                     elevation: 0,
                     shape: RoundedRectangleBorder(

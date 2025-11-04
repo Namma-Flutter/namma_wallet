@@ -32,7 +32,7 @@ class _NavButtonState extends State<NavButton>
       vsync: this,
     );
     _pressAnimation = Tween<double>(
-      begin: 1.0,
+      begin: 1,
       end: 0.95,
     ).animate(CurvedAnimation(
       parent: _pressController,
@@ -79,12 +79,12 @@ class _NavButtonState extends State<NavButton>
               curve: Curves.easeInOutCubicEmphasized,
               margin: const EdgeInsets.symmetric(horizontal: 4),
               padding: EdgeInsets.symmetric(
-                horizontal: widget.selected ? 18 : 14,
-                vertical: 12,
+                horizontal: widget.selected ? 16 : 12,
+                vertical: 10,
               ),
               decoration: BoxDecoration(
                 color: widget.selected
-                    ? AppColor.blackColor.withOpacity(0.8)
+                    ? AppColor.blackColor.withValues(alpha: 0.8)
                     : Colors.transparent,
                 borderRadius: BorderRadius.circular(25),
                 boxShadow: widget.selected
@@ -93,7 +93,7 @@ class _NavButtonState extends State<NavButton>
                           color: (isDark
                                   ? AppColor.whiteColor
                                   : AppColor.blackColor)
-                              .withOpacity(0.1),
+                              .withValues(alpha: 0.1),
                           blurRadius: 4,
                           offset: const Offset(0, 1),
                         ),
@@ -108,15 +108,15 @@ class _NavButtonState extends State<NavButton>
                   AnimatedScale(
                     duration: const Duration(milliseconds: 250),
                     curve: Curves.easeInOutCubicEmphasized,
-                    scale: widget.selected ? 1.1 : 1.0,
+                    scale: widget.selected ? 1.05 : 1.0,
                     child: Icon(
                       widget.icon,
-                      size: 26,
+                      size: 20,
                       color: widget.selected
                           ? (isDark ? AppColor.whiteColor : AppColor.whiteColor)
                           : (isDark
-                              ? AppColor.whiteColor.withOpacity(0.7)
-                              : AppColor.blackColor.withOpacity(0.6)),
+                              ? AppColor.whiteColor.withValues(alpha: 0.7)
+                              : AppColor.blackColor.withValues(alpha: 0.6)),
                     ),
                   ),
 
@@ -126,7 +126,7 @@ class _NavButtonState extends State<NavButton>
                     curve: Curves.easeInOutCubicEmphasized,
                     child: widget.selected
                         ? Padding(
-                            padding: const EdgeInsets.only(left: 10),
+                            padding: const EdgeInsets.only(left: 8),
                             child: AnimatedOpacity(
                               duration: const Duration(milliseconds: 200),
                               curve: Curves.easeInOutCubicEmphasized,
@@ -138,7 +138,8 @@ class _NavButtonState extends State<NavButton>
                                       ? AppColor.whiteColor
                                       : AppColor.whiteColor,
                                   fontWeight: FontWeight.w600,
-                                  fontSize: 14,
+                                  fontSize: 13,
+                                  height: 1,
                                 ),
                               ),
                             ),

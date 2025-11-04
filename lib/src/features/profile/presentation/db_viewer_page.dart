@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:home_widget/home_widget.dart';
-import 'package:namma_wallet/src/common/services/database_helper.dart';
+import 'package:namma_wallet/src/common/database/wallet_database.dart';
 import 'package:namma_wallet/src/common/widgets/custom_back_button.dart';
 
 class DbViewerPage extends StatefulWidget {
@@ -27,7 +27,7 @@ class _DbViewerPageState extends State<DbViewerPage>
   }
 
   Future<void> _load() async {
-    final db = DatabaseHelper.instance;
+    final db = WalletDatabase.instance;
     final u = await db.fetchAllUsers();
     final t = await db.fetchTravelTicketsWithUser();
     if (!mounted) return;

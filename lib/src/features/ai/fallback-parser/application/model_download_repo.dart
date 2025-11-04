@@ -88,7 +88,7 @@ class ModelDownloadService {
   /// Downloads the model file and tracks progress.
   Future<void> downloadModel({
     required String token,
-    required Function(double) onProgress,
+    required void Function(double) onProgress,
   }) async {
     try {
       final stream = FlutterGemmaPlugin.instance.modelManager

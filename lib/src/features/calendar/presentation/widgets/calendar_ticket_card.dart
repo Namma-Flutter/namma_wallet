@@ -7,8 +7,8 @@ import 'package:namma_wallet/src/features/home/domain/tag_model.dart';
 
 class CalendarTicketCard extends StatelessWidget {
   const CalendarTicketCard({
-    super.key,
     required this.ticket,
+    super.key,
   });
 
   final TravelTicketModel ticket;
@@ -19,7 +19,7 @@ class CalendarTicketCard extends StatelessWidget {
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: _buildCalendarTicketCard(context, genericTicket),
+      child: CalendarTicketCardContent(ticket: genericTicket),
     );
   }
 
@@ -34,7 +34,7 @@ class CalendarTicketCard extends StatelessWidget {
 
     final tags = <TagModel>[];
     if (ticket.seatNumbers != null && ticket.seatNumbers!.isNotEmpty) {
-      tags.add(TagModel(value: ticket.seatNumbers!, icon: 'event_seat'));
+      tags.add(TagModel(value: ticket.seatNumbers, icon: 'event_seat'));
     }
     if (ticket.displayTime.isNotEmpty) {
       tags.add(TagModel(value: ticket.displayTime, icon: 'access_time'));
@@ -67,8 +67,18 @@ class CalendarTicketCard extends StatelessWidget {
     );
   }
 
-  Widget _buildCalendarTicketCard(
-      BuildContext context, GenericDetailsModel ticket) {
+}
+
+class CalendarTicketCardContent extends StatelessWidget {
+  const CalendarTicketCardContent({
+    required this.ticket,
+    super.key,
+  });
+
+  final GenericDetailsModel ticket;
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       height: 350,
       width: double.infinity,
@@ -199,7 +209,7 @@ class CalendarTicketCard extends StatelessWidget {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Icon(
-                                tag.iconData ?? Icons.star_border_rounded,
+                                tag.iconData,
                                 size: 16,
                                 color: Colors.white,
                               ),

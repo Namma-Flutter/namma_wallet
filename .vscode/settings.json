@@ -2,8 +2,24 @@
   "dart.flutterSdkPath": ".fvm/versions/3.35.2",
   "dart.mcpServer": true,
   "cSpell.words": [
+    "AKASH",
+    "CHEKUMAB",
+    "kanna",
+    "Keerthi",
+    "KOTTIVAKKAM",
+    "KUMBAKONAM",
+    "Magesh",
+    "Maragatham",
+    "namma",
     "nammaflutter",
-    "nammawallet"
+    "nammawallet",
+    "prefs",
+    "SAMAARO",
+    "SETC",
+    "syncfusion",
+    "TNSTC",
+    "TNSTCPDF",
+    "TNSTCSMS"
   ],
   "java.configuration.updateBuildConfiguration": "interactive"
 }

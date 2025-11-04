@@ -3,9 +3,9 @@ import 'package:namma_wallet/src/common/theme/styles.dart';
 
 class CalendarToggleButtons extends StatelessWidget {
   const CalendarToggleButtons({
-    super.key,
     required this.selectedFilter,
     required this.onFilterChanged,
+    super.key,
   });
 
   final int selectedFilter;

@@ -12,9 +12,9 @@ class DuplicateTicketException implements Exception {
   String toString() => 'DuplicateTicketException: $message';
 }
 
-class DatabaseHelper {
-  DatabaseHelper._internal();
-  static final DatabaseHelper instance = DatabaseHelper._internal();
+class WalletDatabase {
+  WalletDatabase._internal();
+  static final WalletDatabase instance = WalletDatabase._internal();
 
   static const String _dbName = 'namma_wallet.db';
   static const int _dbVersion = 2;
@@ -267,7 +267,7 @@ ORDER BY t.created_at DESC
       // Check for duplicates based on PNR number or booking reference
       final pnrNumber = ticket['pnr_number'] as String?;
       final bookingRef = ticket['booking_reference'] as String?;
-      final providerName = ticket['provider_name'] as String;
+      final providerName = ticket['provider_name']! as String;
 
       if (pnrNumber != null && pnrNumber.isNotEmpty) {
         final existing = await db.query(

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:namma_wallet/src/common/theme/styles.dart';
 
 class CustomBackButton extends StatelessWidget {
   const CustomBackButton({
@@ -12,15 +11,21 @@ class CustomBackButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Center(
       child: Padding(
         padding: const EdgeInsets.only(left: 16),
         child: CircleAvatar(
           radius: 24,
-          backgroundColor: AppColor.primaryColor,
+          backgroundColor: Theme.of(context).colorScheme.primary,
           child: InkWell(
             onTap: onPressed ?? () => context.pop(),
-            child: const Icon(Icons.chevron_left, size: 28),
+            child: Icon(
+              Icons.chevron_left,
+              size: 28,
+              color: isDark ? Colors.black : Colors.black87,
+            ),
           ),
         ),
       ),

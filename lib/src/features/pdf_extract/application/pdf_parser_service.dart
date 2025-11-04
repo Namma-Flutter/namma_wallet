@@ -1,7 +1,8 @@
 import 'dart:developer' as developer;
 import 'dart:io';
+
 import 'package:flutter/material.dart';
-import 'package:namma_wallet/src/common/services/database_helper.dart';
+import 'package:namma_wallet/src/common/database/wallet_database.dart';
 import 'package:namma_wallet/src/features/common/domain/travel_ticket_model.dart';
 import 'package:namma_wallet/src/features/tnstc/application/pdf_service.dart';
 import 'package:namma_wallet/src/features/tnstc/application/tnstc_pdf_parser.dart';
@@ -191,7 +192,7 @@ class PDFParserService {
 
       // Save to database
       try {
-        final ticketId = await DatabaseHelper.instance.insertTravelTicket(
+        final ticketId = await WalletDatabase.instance.insertTravelTicket(
           parsedTicket.toDatabase(),
         );
         final updatedTicket = parsedTicket.copyWith(id: ticketId);

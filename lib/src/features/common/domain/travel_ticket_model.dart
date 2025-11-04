@@ -47,10 +47,10 @@ enum SourceType {
 @MappableClass()
 class TravelTicketModel with TravelTicketModelMappable {
   const TravelTicketModel({
-    this.id,
-    this.userId = 1,
     required this.ticketType,
     required this.providerName,
+    this.id,
+    this.userId = 1,
     this.bookingReference,
     this.pnrNumber,
     this.tripCode,

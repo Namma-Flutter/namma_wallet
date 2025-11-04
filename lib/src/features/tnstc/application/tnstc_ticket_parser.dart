@@ -102,8 +102,6 @@ class PassengerInfo {
       ')';
 }
 
-@Deprecated(
-    'Use TNSTCPDFParser.parseTicket() for PDF parsing or TNSTCSMSParser.parseTicket() for SMS parsing')
 TNSTCTicket parseTicket(String text) {
   String extractMatch(String pattern, String input, {int groupIndex = 1}) {
     final regex = RegExp(pattern, multiLine: true);

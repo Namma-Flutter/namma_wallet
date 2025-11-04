@@ -1,9 +1,13 @@
 import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
 import 'package:namma_wallet/src/common/routing/app_routes.dart';
-import 'package:namma_wallet/src/features/profile/presentation/sample_contributors_data.dart';
+import 'package:namma_wallet/src/common/theme/theme_provider.dart';
+import 'package:namma_wallet/src/common/widgets/custom_back_button.dart';
+import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 // ----------------- Model -----------------
 class Contributor {
@@ -43,70 +47,71 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Future<List<Contributor>> _fetchContributors() async {
-    await Future.delayed(const Duration(seconds: 2));
+    final contributors = <Contributor>[];
+    var page = 1;
+    const perPage = 100;
+    const timeout = Duration(seconds: 10);
 
-    return sample_contributors_data.map(Contributor.fromJson).toList();
-    // final response = await http.get(
-    //   Uri.parse(
-    //       'https://api.github.com/repos/Namma-Flutter/namma_wallet/contributors'),
-    // );
-    //
-    // if (response.statusCode == 200) {
-    //   final body = response.body as List<Map<String, dynamic>>;
-    //   return body.map((json) => Contributor.fromJson(json)).toList();
-    // } else {
-    //   throw Exception('Failed to load contributors');
-    // }
+    while (true) {
+      final uri = Uri.parse(
+        'https://api.github.com/repos/Namma-Flutter/namma_wallet/contributors',
+      ).replace(queryParameters: {
+        'per_page': perPage.toString(),
+        'page': page.toString(),
+      });
+
+      final response = await http.get(
+        uri,
+        headers: {
+          'User-Agent': 'namma_wallet',
+          'Accept': 'application/vnd.github.v3+json',
+        },
+      ).timeout(timeout);
+
+      if (response.statusCode == 200) {
+        final body = json.decode(response.body) as List<dynamic>;
+        if (body.isEmpty) {
+          break; // No more contributors
+        }
+        contributors.addAll(
+          body.map(
+            (json) => Contributor.fromJson(json as Map<String, dynamic>),
+          ),
+        );
+        page++;
+      } else {
+        throw Exception(
+          'Failed to load contributors: HTTP ${response.statusCode}\n'
+          'Response body: ${response.body}',
+        );
+      }
+    }
+
+    return contributors;
   }
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
     return Scaffold(
       appBar: AppBar(
+        leading: const CustomBackButton(),
         title: const Text('Profile'),
       ),
-      body: FutureBuilder<List<Contributor>>(
-        future: _contributorsFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(child: Text('No contributors found.'));
-          }
+      body: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          // Theme Settings Section
+          ThemeSectionWidget(themeProvider: themeProvider),
 
-          final contributors = snapshot.data!;
-          print('contributors : $contributors');
-          return ListView.builder(
-            padding: const EdgeInsets.all(12),
-            itemCount: contributors.length,
-            itemBuilder: (context, index) {
-              final contributor = contributors[index];
-              return Card(
-                margin: const EdgeInsets.symmetric(vertical: 8),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: ListTile(
-                  leading: CircleAvatar(
-                    backgroundImage: NetworkImage(contributor.avatarUrl),
-                    radius: 24,
-                  ),
-                  title: Text(contributor.name),
-                  subtitle: Text(contributor.profileUrl),
-                  onTap: () {
-                    // You can integrate url_launcher here
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                          content: Text('Open: ${contributor.profileUrl}')),
-                    );
-                  },
-                ),
-              );
-            },
-          );
-        },
+          const SizedBox(height: 24),
+
+          // Contributors Section
+          ContributorsSectionWidget(contributorsFuture: _contributorsFuture),
+
+          const SizedBox(height: 100), // Space for FAB
+        ],
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
@@ -115,6 +120,201 @@ class _ProfilePageState extends State<ProfilePage> {
         label: const Text('View DB'),
         icon: const Icon(Icons.storage),
       ),
+    );
+  }
+
+}
+
+// ----------------- Theme Section Widget -----------------
+class ThemeSectionWidget extends StatelessWidget {
+  const ThemeSectionWidget({
+    required this.themeProvider,
+    super.key,
+  });
+
+  final ThemeProvider themeProvider;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Row(
+              children: [
+                Icon(Icons.palette_outlined, size: 24),
+                SizedBox(width: 12),
+                Text(
+                  'Appearance',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            SwitchListTile(
+              title: const Text('Dark Mode'),
+              subtitle: Text(
+                themeProvider.isSystemMode
+                    ? 'Following system settings'
+                    : themeProvider.isDarkMode
+                        ? 'Dark theme enabled'
+                        : 'Light theme enabled',
+              ),
+              value: themeProvider.isDarkMode,
+              onChanged: (value) {
+                if (value) {
+                  themeProvider.setDarkMode();
+                } else {
+                  themeProvider.setLightMode();
+                }
+              },
+              secondary: Icon(
+                themeProvider.isDarkMode ? Icons.dark_mode : Icons.light_mode,
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.brightness_auto),
+              title: const Text('Use System Theme'),
+              trailing: Switch(
+                value: themeProvider.isSystemMode,
+                onChanged: (value) {
+                  if (value) {
+                    themeProvider.setSystemMode();
+                  } else {
+                    themeProvider.setLightMode();
+                  }
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ----------------- Contributors Section Widget -----------------
+class ContributorsSectionWidget extends StatelessWidget {
+  const ContributorsSectionWidget({
+    required this.contributorsFuture,
+    super.key,
+  });
+
+  final Future<List<Contributor>> contributorsFuture;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Padding(
+          padding: EdgeInsets.symmetric(horizontal: 4),
+          child: Row(
+            children: [
+              Icon(Icons.people_outline, size: 24),
+              SizedBox(width: 12),
+              Text(
+                'Contributors',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 12),
+        FutureBuilder<List<Contributor>>(
+          future: contributorsFuture,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Card(
+                child: Padding(
+                  padding: EdgeInsets.all(32),
+                  child: Center(child: CircularProgressIndicator()),
+                ),
+              );
+            } else if (snapshot.hasError) {
+              return Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    children: [
+                      const Icon(Icons.error_outline,
+                          size: 48, color: Colors.red),
+                      const SizedBox(height: 8),
+                      Text('Error: ${snapshot.error}'),
+                    ],
+                  ),
+                ),
+              );
+            } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+              return const Card(
+                child: Padding(
+                  padding: EdgeInsets.all(16),
+                  child: Center(child: Text('No contributors found.')),
+                ),
+              );
+            }
+
+            final contributors = snapshot.data!;
+            return Column(
+              children: contributors
+                  .map((contributor) => Card(
+                        margin: const EdgeInsets.only(bottom: 8),
+                        elevation: 1,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: ListTile(
+                          leading: CircleAvatar(
+                            backgroundImage:
+                                NetworkImage(contributor.avatarUrl),
+                            radius: 24,
+                          ),
+                          title: Text(
+                            contributor.name,
+                            style: const TextStyle(fontWeight: FontWeight.w600),
+                          ),
+                          subtitle: Text(
+                            contributor.profileUrl,
+                            style: const TextStyle(fontSize: 12),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          trailing: const Icon(Icons.open_in_new, size: 20),
+                          onTap: () async {
+                            final url = Uri.parse(contributor.profileUrl);
+                            try {
+                              await launchUrl(url);
+                            } on Exception catch (_) {
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      'Could not open '
+                                      '${contributor.profileUrl}',
+                                    ),
+                                  ),
+                                );
+                              }
+                            }
+                          },
+                        ),
+                      ))
+                  .toList(),
+            );
+          },
+        ),
+      ],
     );
   }
 }

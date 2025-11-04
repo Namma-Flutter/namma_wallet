@@ -4,10 +4,10 @@ import 'package:listen_sharing_intent/listen_sharing_intent.dart';
 
 /// Service to handle sharing intents from other apps
 class SharingIntentService {
-  static final SharingIntentService _instance =
-      SharingIntentService._internal();
   factory SharingIntentService() => _instance;
   SharingIntentService._internal();
+  static final SharingIntentService _instance =
+      SharingIntentService._internal();
 
   StreamSubscription<List<SharedMediaFile>>? _intentDataStreamSubscription;
 
@@ -46,7 +46,7 @@ class SharingIntentService {
   ) {
     print('\n === SHARING INTENT TRIGGERED ===');
 
-    for (int i = 0; i < files.length; i++) {
+    for (var i = 0; i < files.length; i++) {
       final file = files[i];
       try {
         print('\n=== SHARED FILE ${i + 1}/${files.length} DETAILS ===');

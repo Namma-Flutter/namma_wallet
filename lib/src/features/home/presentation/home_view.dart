@@ -7,15 +7,15 @@ import 'package:card_stack_widget/model/card_orientation.dart';
 import 'package:card_stack_widget/widget/card_stack_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:namma_wallet/src/common/database/wallet_database.dart';
 import 'package:namma_wallet/src/common/routing/app_routes.dart';
-import 'package:namma_wallet/src/common/services/database_helper.dart';
 import 'package:namma_wallet/src/common/widgets/snackbar_widget.dart';
 import 'package:namma_wallet/src/features/common/domain/travel_ticket_model.dart';
+import 'package:namma_wallet/src/features/home/domain/extras_model.dart';
 import 'package:namma_wallet/src/features/home/domain/generic_details_model.dart';
 import 'package:namma_wallet/src/features/home/presentation/widgets/header_widget.dart';
 import 'package:namma_wallet/src/features/home/presentation/widgets/ticket_card_widget.dart';
 import 'package:namma_wallet/src/features/home/presentation/widgets/travel_ticket_card_widget.dart';
-import 'package:namma_wallet/src/features/home/domain/extras_model.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -41,13 +41,11 @@ class _HomePageState extends State<HomePage> {
         _isLoading = true;
       });
 
-      final ticketMaps = await DatabaseHelper.instance.fetchAllTravelTickets();
+      final ticketMaps = await WalletDatabase.instance.fetchAllTravelTickets();
 
       if (!mounted) return;
 
-      final tickets = ticketMaps
-          .map((map) => TravelTicketModelMapper.fromMap(map))
-          .toList();
+      final tickets = ticketMaps.map(TravelTicketModelMapper.fromMap).toList();
 
       final travelTickets = <TravelTicketModel>[];
       final eventTickets = <TravelTicketModel>[];
@@ -106,7 +104,7 @@ class _HomePageState extends State<HomePage> {
       }
 
       // Add departure time if available
-      if (ticket.departureTime?.isNotEmpty == true) {
+      if (ticket.departureTime?.isNotEmpty ?? false) {
         try {
           final timeParts = ticket.departureTime!.split(':');
           if (timeParts.length >= 2) {
@@ -122,7 +120,7 @@ class _HomePageState extends State<HomePage> {
           } else {
             startTime = baseDate;
           }
-        } catch (e) {
+        } on Object catch (_) {
           startTime = baseDate;
         }
       } else {
@@ -279,7 +277,7 @@ class _HomePageState extends State<HomePage> {
                 extra: genericTicket,
               );
 
-              if (wasDeleted == true && mounted) {
+              if (mounted && (wasDeleted ?? false)) {
                 await _loadTicketData();
               }
             },
@@ -300,20 +298,19 @@ class _HomePageState extends State<HomePage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const UserProfileWidget(),
-                Padding(
-                  padding: const EdgeInsets.all(16),
+                const Padding(
+                  padding: EdgeInsets.all(16),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
+                      Text(
                         'Tickets',
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: Colors.black,
                         ),
                       ),
-                      const SizedBox.shrink(),
+                      SizedBox.shrink(),
                     ],
                   ),
                 ),
@@ -386,50 +383,50 @@ class _HomePageState extends State<HomePage> {
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: Colors.black,
                         ),
                       ),
                       const SizedBox(height: 16),
                       //* More cards list view
-                      _eventTickets.isEmpty
-                          ? const Padding(
-                              padding: EdgeInsets.all(16),
-                              child: Center(
-                                child: Text(
-                                  'No event tickets found',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.grey,
-                                  ),
-                                ),
+                      if (_eventTickets.isEmpty)
+                        const Padding(
+                          padding: EdgeInsets.all(16),
+                          child: Center(
+                            child: Text(
+                              'No event tickets found',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey,
                               ),
-                            )
-                          : ListView.builder(
-                              shrinkWrap: true,
-                              physics: const NeverScrollableScrollPhysics(),
-                              itemCount: _eventTickets.length,
-                              itemBuilder: (context, index) {
-                                final eventTicket = _eventTickets[index];
-                                final genericEvent =
-                                    _convertToGenericDetails(eventTicket);
-                                return InkWell(
-                                  onTap: () async {
-                                    final wasDeleted =
-                                        await context.pushNamed<bool>(
-                                      AppRoute.ticketView.name,
-                                      extra: genericEvent,
-                                    );
-
-                                    if (wasDeleted == true && mounted) {
-                                      await _loadTicketData();
-                                    }
-                                  },
-                                  child: EventTicketCardWidget(
-                                    ticket: genericEvent,
-                                  ),
-                                );
-                              },
                             ),
+                          ),
+                        )
+                      else
+                        ListView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: _eventTickets.length,
+                          itemBuilder: (context, index) {
+                            final eventTicket = _eventTickets[index];
+                            final genericEvent =
+                                _convertToGenericDetails(eventTicket);
+                            return InkWell(
+                              onTap: () async {
+                                final wasDeleted =
+                                    await context.pushNamed<bool>(
+                                  AppRoute.ticketView.name,
+                                  extra: genericEvent,
+                                );
+
+                                if (mounted && (wasDeleted ?? false)) {
+                                  await _loadTicketData();
+                                }
+                              },
+                              child: EventTicketCardWidget(
+                                ticket: genericEvent,
+                              ),
+                            );
+                          },
+                        ),
                     ],
                   ),
                 ),

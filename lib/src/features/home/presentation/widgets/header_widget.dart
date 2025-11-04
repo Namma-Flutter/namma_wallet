@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:namma_wallet/src/common/routing/app_routes.dart';
-import 'package:namma_wallet/src/common/theme/styles.dart';
 
 class UserProfileWidget extends StatelessWidget {
   const UserProfileWidget({
@@ -20,10 +19,7 @@ class UserProfileWidget extends StatelessWidget {
           const Expanded(
             child: Text(
               'Namma Wallet',
-              style: TextStyle(
-                  color: AppColor.blackColor,
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
               overflow: TextOverflow.ellipsis,
               maxLines: 1,
             ),
