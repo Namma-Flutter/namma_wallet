@@ -28,9 +28,13 @@ class ThemeProvider extends ChangeNotifier {
   /// Load saved theme preference from shared preferences
   Future<void> _loadThemePreference() async {
     final prefs = await SharedPreferences.getInstance();
-    final themeIndex = prefs.getInt(_themePreferenceKey) ?? 0;
-
-    _themeMode = ThemeMode.values[themeIndex];
+    final stored = prefs.getInt(_themePreferenceKey);
+    final idx = (stored != null &&
+            stored >= 0 &&
+            stored < ThemeMode.values.length)
+        ? stored
+        : 0;
+    _themeMode = ThemeMode.values[idx];
     notifyListeners();
   }
 

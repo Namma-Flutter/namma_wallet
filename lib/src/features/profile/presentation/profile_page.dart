@@ -47,19 +47,47 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Future<List<Contributor>> _fetchContributors() async {
-    final response = await http.get(
-      Uri.parse(
-          'https://api.github.com/repos/Namma-Flutter/namma_wallet/contributors'),
-    );
+    final contributors = <Contributor>[];
+    var page = 1;
+    const perPage = 100;
+    const timeout = Duration(seconds: 10);
 
-    if (response.statusCode == 200) {
-      final body = json.decode(response.body) as List<dynamic>;
-      return body
-          .map((json) => Contributor.fromJson(json as Map<String, dynamic>))
-          .toList();
-    } else {
-      throw Exception('Failed to load contributors');
+    while (true) {
+      final uri = Uri.parse(
+        'https://api.github.com/repos/Namma-Flutter/namma_wallet/contributors',
+      ).replace(queryParameters: {
+        'per_page': perPage.toString(),
+        'page': page.toString(),
+      });
+
+      final response = await http.get(
+        uri,
+        headers: {
+          'User-Agent': 'namma_wallet',
+          'Accept': 'application/vnd.github.v3+json',
+        },
+      ).timeout(timeout);
+
+      if (response.statusCode == 200) {
+        final body = json.decode(response.body) as List<dynamic>;
+        if (body.isEmpty) {
+          break; // No more contributors
+        }
+        contributors.addAll(
+          body.map(
+            (json) => Contributor.fromJson(json as Map<String, dynamic>),
+          ),
+        );
+        page++;
+      } else {
+        throw Exception(
+          'Failed to load contributors: HTTP ${response.statusCode}\n'
+          'Response body: ${response.body}',
+        );
+      }
     }
+
+    return contributors;
   }
 
   @override
