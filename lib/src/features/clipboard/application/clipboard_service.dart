@@ -68,6 +68,16 @@ class ClipboardService {
           );
         }
 
+        // First, check if this is an update SMS (e.g., conductor details)
+        final isUpdateHandled =
+            await TravelParserService.handleUpdateSMS(content);
+        if (isUpdateHandled) {
+          return ClipboardResult.success(
+            ClipboardContentType.travelTicket,
+            content,
+          );
+        }
+
         // Try to parse as travel ticket
         final parsedTicket = TravelParserService.parseTicketFromText(
           content,
@@ -149,8 +159,9 @@ class ClipboardService {
     if (result.isSuccess) {
       message = switch (result.type) {
         ClipboardContentType.text => 'Text content read successfully',
-        ClipboardContentType.travelTicket =>
-          'Travel ticket saved successfully!',
+        ClipboardContentType.travelTicket => result.ticket != null
+            ? 'Travel ticket saved successfully!'
+            : 'Ticket updated with conductor details!',
         ClipboardContentType.invalid => 'Invalid content',
       };
       backgroundColor = Colors.green;

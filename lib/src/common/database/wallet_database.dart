@@ -17,7 +17,7 @@ class WalletDatabase {
   static final WalletDatabase instance = WalletDatabase._internal();
 
   static const String _dbName = 'namma_wallet.db';
-  static const int _dbVersion = 2;
+  static const int _dbVersion = 3;
 
   Database? _database;
 
@@ -43,6 +43,11 @@ class WalletDatabase {
           // Drop old tickets table and recreate with new schema
           await db.execute('DROP TABLE IF EXISTS tickets');
           await _createTravelTicketsTable(db);
+        }
+        if (oldVersion < 3) {
+          // Add contact_mobile column for version 3
+          await db.execute(
+              'ALTER TABLE travel_tickets ADD COLUMN contact_mobile TEXT');
         }
       },
     );
@@ -107,6 +112,7 @@ CREATE TABLE travel_tickets (
   pickup_location TEXT,
   event_name TEXT, -- For event tickets
   venue_name TEXT, -- For event tickets
+  contact_mobile TEXT, -- Contact number for conductor/operator
 
   -- Source tracking
   source_type TEXT CHECK(source_type IN ('SMS','PDF','MANUAL','CLIPBOARD','QR')),
@@ -347,5 +353,54 @@ ORDER BY t.created_at DESC
       limit: 1,
     );
     return results.isNotEmpty ? results.first : null;
+  }
+
+  Future<Map<String, Object?>?> getTravelTicketByPNR(
+      String pnrNumber, String providerName) async {
+    final db = await database;
+    final results = await db.query(
+      'travel_tickets',
+      where: 'pnr_number = ? AND provider_name = ?',
+      whereArgs: [pnrNumber, providerName],
+      limit: 1,
+    );
+    return results.isNotEmpty ? results.first : null;
+  }
+
+  Future<int> updateTravelTicketByPNR(
+    String pnrNumber,
+    String providerName,
+    Map<String, Object?> updates,
+  ) async {
+    try {
+      final db = await database;
+      updates['updated_at'] = DateTime.now().toIso8601String();
+
+      final count = await db.update(
+        'travel_tickets',
+        updates,
+        where: 'pnr_number = ? AND provider_name = ?',
+        whereArgs: [pnrNumber, providerName],
+      );
+
+      if (count > 0) {
+        developer.log(
+            'Successfully updated ticket with PNR: $pnrNumber',
+            name: 'DatabaseHelper');
+        print(
+            '✅ DB UPDATE: Updated ticket with PNR $pnrNumber');
+      } else {
+        developer.log('No ticket found with PNR: $pnrNumber',
+            name: 'DatabaseHelper');
+        print('⚠️ DB UPDATE: No ticket found with PNR $pnrNumber');
+      }
+
+      return count;
+    } catch (e) {
+      developer.log('Failed to update ticket by PNR',
+          name: 'DatabaseHelper', error: e);
+      print('🔴 DB UPDATE ERROR: Failed to update ticket: $e');
+      rethrow;
+    }
   }
 }

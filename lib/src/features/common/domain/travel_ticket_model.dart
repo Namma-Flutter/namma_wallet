@@ -74,6 +74,7 @@ class TravelTicketModel with TravelTicketModelMappable {
     this.pickupLocation,
     this.eventName,
     this.venueName,
+    this.contactMobile,
     this.sourceType = SourceType.manual,
     this.rawData,
     this.createdAt,
@@ -160,6 +161,9 @@ class TravelTicketModel with TravelTicketModelMappable {
 
   @MappableField(key: 'venue_name')
   final String? venueName;
+
+  @MappableField(key: 'contact_mobile')
+  final String? contactMobile;
 
   @MappableField(key: 'source_type')
   final SourceType sourceType;

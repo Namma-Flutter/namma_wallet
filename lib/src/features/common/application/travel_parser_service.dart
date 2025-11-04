@@ -1,4 +1,6 @@
 import 'dart:developer' as developer;
+
+import 'package:namma_wallet/src/common/database/wallet_database.dart';
 import 'package:namma_wallet/src/features/common/domain/travel_ticket_model.dart';
 
 abstract class TravelTicketParser {
@@ -61,15 +63,25 @@ class TNSTCBusParser implements TravelTicketParser {
       }
     }
 
-    // Try SMS patterns first
+    // Try multiple PNR patterns (handles "PNR:", "PNR NO.", "PNR Number")
+    var pnrNumber = extractMatch(r'PNR\s*(?:NO\.?|Number)?\s*:\s*([^,\s]+)', text);
+
+    // Try multiple date patterns (DOJ, Journey Date, Date of Journey)
+    final journeyDateStr = extractMatch(
+      r'(?:DOJ|Journey Date|Date of Journey)\s*:\s*(\d{2}[/-]\d{2}[/-]\d{4})',
+      text
+    );
+    var journeyDate = parseDate(journeyDateStr);
+
+    // Try multiple patterns for route/vehicle information
+    final vehicleNo = extractMatch(r'Vehicle No\s*:\s*([^,\s]+)', text);
+    final routeNo = extractMatch(r'Route No\s*:\s*([^,.\s]+)', text);
+
+    // Try SMS patterns with various formats
     var corporation = extractMatch(r'Corporation\s*:\s*(.*?)(?=\s*,)', text);
-    var pnrNumber = extractMatch(r'PNR NO\.\s*:\s*([^,\s]+)', text);
     var from = extractMatch(r'From\s*:\s*(.*?)(?=\s+To)', text);
     var to = extractMatch(r'To\s+([^,]+)', text);
     final tripCode = extractMatch(r'Trip Code\s*:\s*(\S+)', text);
-    var journeyDate = parseDate(
-      extractMatch(r'Journey Date\s*:\s*(\d{2}[/-]\d{2}[/-]\d{4})', text),
-    );
     var departureTime = extractMatch(
         r'Time\s*:\s*(?:\d{2}/\d{2}/\d{4},)?\s*,?\s*(\d{2}:\d{2})', text);
     var seatNumbers = extractMatch(r'Seat No\.\s*:\s*([0-9A-Z,\s\-#]+)', text)
@@ -80,45 +92,52 @@ class TNSTCBusParser implements TravelTicketParser {
         extractMatch(r'Boarding at\s*:\s*(.*?)(?=\s*\.|$)', text);
 
     // If SMS patterns failed, try PDF patterns
-    if (corporation.isEmpty || pnrNumber.isEmpty) {
-      corporation = corporation.isNotEmpty
-          ? corporation
-          : extractMatch(r'Corporation\s*:\s*(.*)', text);
-      pnrNumber = pnrNumber.isNotEmpty
-          ? pnrNumber
-          : extractMatch(r'PNR Number\s*:\s*(\S+)', text);
+    if (corporation.isEmpty && pnrNumber.isEmpty) {
+      corporation = extractMatch(r'Corporation\s*:\s*(.*)', text);
+      pnrNumber = extractMatch(r'PNR Number\s*:\s*(\S+)', text);
+    }
+
+    if (from.isEmpty || to.isEmpty) {
       from = from.isNotEmpty
           ? from
           : extractMatch(r'Service Start Place\s*:\s*(.*)', text);
       to = to.isNotEmpty
           ? to
           : extractMatch(r'Service End Place\s*:\s*(.*)', text);
-      journeyDate = journeyDate ??
-          parseDate(
-            extractMatch(
-                r'Date of Journey\s*:\s*(\d{2}[/-]\d{2}[/-]\d{4})', text),
-          );
-      departureTime = departureTime.isNotEmpty
-          ? departureTime
-          : extractMatch(r'Service Start Time\s*:\s*(\d{2}:\d{2})', text);
-      classOfService = classOfService.isNotEmpty
-          ? classOfService
-          : extractMatch(r'Class of Service\s*:\s*(.*)', text);
-      boardingPoint = boardingPoint.isNotEmpty
-          ? boardingPoint
-          : extractMatch(r'Passenger Pickup Point\s*:\s*(.*)', text);
-
-      // For PDF, try to extract seat number differently
-      if (seatNumbers.isEmpty) {
-        seatNumbers = extractMatch(r'\d+[A-Z]+', text);
-      }
     }
+
+    journeyDate ??= parseDate(
+      extractMatch(
+          r'Date of Journey\s*:\s*(\d{2}[/-]\d{2}[/-]\d{4})', text),
+    );
+
+    if (departureTime.isEmpty) {
+      departureTime = extractMatch(r'Service Start Time\s*:\s*(\d{2}:\d{2})', text);
+    }
+
+    if (classOfService.isEmpty) {
+      classOfService = extractMatch(r'Class of Service\s*:\s*(.*)', text);
+    }
+
+    if (boardingPoint.isEmpty) {
+      boardingPoint = extractMatch(r'Passenger Pickup Point\s*:\s*(.*)', text);
+    }
+
+    // For PDF, try to extract seat number differently
+    if (seatNumbers.isEmpty) {
+      seatNumbers = extractMatch(r'\d+[A-Z]+', text);
+    }
+
+    // Use vehicle/route number as trip code if tripCode is empty
+    final finalTripCode = tripCode.isNotEmpty
+        ? tripCode
+        : (vehicleNo.isNotEmpty ? vehicleNo : routeNo);
 
     return TravelTicketModel(
       ticketType: TicketType.bus,
       providerName: corporation.isNotEmpty ? corporation : 'TNSTC',
       pnrNumber: pnrNumber.isNotEmpty ? pnrNumber : null,
-      tripCode: tripCode.isNotEmpty ? tripCode : null,
+      tripCode: finalTripCode.isNotEmpty ? finalTripCode : null,
       sourceLocation: from.isNotEmpty ? from : null,
       destinationLocation: to.isNotEmpty ? to : null,
       journeyDate: journeyDate?.toIso8601String(),
@@ -245,6 +264,18 @@ class SETCBusParser implements TravelTicketParser {
   }
 }
 
+class TicketUpdateInfo {
+  TicketUpdateInfo({
+    required this.pnrNumber,
+    required this.providerName,
+    required this.updates,
+  });
+
+  final String pnrNumber;
+  final String providerName;
+  final Map<String, Object?> updates;
+}
+
 class TravelParserService {
   static final List<TravelTicketParser> _parsers = [
     TNSTCBusParser(),
@@ -252,11 +283,81 @@ class TravelParserService {
     SETCBusParser(),
   ];
 
+  /// Detects if this is an update SMS (e.g., conductor details for TNSTC)
+  static TicketUpdateInfo? parseUpdateSMS(String text) {
+    // Check for TNSTC update SMS pattern
+    if (text.toUpperCase().contains('TNSTC') &&
+        text.toLowerCase().contains('conductor mobile no')) {
+      final pnrMatch = RegExp(r'PNR\s*:\s*([^,\s]+)', caseSensitive: false)
+          .firstMatch(text);
+      final mobileMatch = RegExp(
+        r'Conductor Mobile No\s*:\s*(\d+)',
+        caseSensitive: false,
+      ).firstMatch(text);
+
+      if (pnrMatch != null && mobileMatch != null) {
+        final pnr = pnrMatch.group(1)!.trim();
+        final mobile = mobileMatch.group(1)!.trim();
+
+        developer.log(
+          'Detected TNSTC update SMS for PNR: $pnr with mobile: $mobile',
+          name: 'TravelParserService',
+        );
+        print('🔄 UPDATE SMS: Found conductor details for PNR $pnr');
+
+        return TicketUpdateInfo(
+          pnrNumber: pnr,
+          providerName: 'TNSTC',
+          updates: {'contact_mobile': mobile},
+        );
+      }
+    }
+
+    return null;
+  }
+
+  /// Handles update SMS by updating existing ticket in database
+  static Future<bool> handleUpdateSMS(String text) async {
+    final updateInfo = parseUpdateSMS(text);
+    if (updateInfo == null) return false;
+
+    try {
+      final db = WalletDatabase.instance;
+      final count = await db.updateTravelTicketByPNR(
+        updateInfo.pnrNumber,
+        updateInfo.providerName,
+        updateInfo.updates,
+      );
+
+      if (count > 0) {
+        developer.log(
+          'Successfully updated ticket ${updateInfo.pnrNumber}',
+          name: 'TravelParserService',
+        );
+        print('✅ UPDATE: Ticket updated with conductor mobile');
+        return true;
+      } else {
+        developer.log(
+          'No ticket found to update for PNR: ${updateInfo.pnrNumber}',
+          name: 'TravelParserService',
+        );
+        print('⚠️ UPDATE: No matching ticket found for PNR');
+        return false;
+      }
+    } catch (e) {
+      developer.log('Error updating ticket',
+          name: 'TravelParserService', error: e);
+      print('🔴 UPDATE ERROR: $e');
+      return false;
+    }
+  }
+
   static TravelTicketModel? parseTicketFromText(String text,
       {SourceType? sourceType}) {
     try {
       for (final parser in _parsers) {
         if (parser.canParse(text)) {
+          developer.log('ticket text : $text', name: 'TravelParserService');
           developer.log(
               'Attempting to parse with ${parser.providerName} parser',
               name: 'TravelParserService');
@@ -264,6 +365,8 @@ class TravelParserService {
 
           final ticket = parser.parseTicket(text);
           if (ticket != null) {
+            developer.log('Parsed ticket: $ticket',
+                name: 'TravelParserService');
             developer.log(
                 'Successfully parsed ticket with ${parser.providerName}',
                 name: 'TravelParserService');

@@ -260,6 +260,7 @@ class _HomePageState extends State<HomePage> {
       endTime: startTime, // For simplicity, same as start time
       extras: extras.isNotEmpty ? extras : null,
       ticketId: ticket.id,
+      contactMobile: ticket.contactMobile,
     );
   }
 
