@@ -287,69 +287,48 @@ class TravelParserService {
   static TicketUpdateInfo? parseUpdateSMS(String text) {
     // Check for TNSTC update SMS pattern
     if (text.toUpperCase().contains('TNSTC') &&
-        text.toLowerCase().contains('conductor mobile no')) {
+        (text.toLowerCase().contains('conductor mobile no') ||
+            text.toLowerCase().contains('vehicle no'))) {
       final pnrMatch = RegExp(r'PNR\s*:\s*([^,\s]+)', caseSensitive: false)
           .firstMatch(text);
+
+      if (pnrMatch == null) return null;
+
+      final pnr = pnrMatch.group(1)!.trim();
+      final updates = <String, Object?>{};
+
+      // Extract conductor mobile number
       final mobileMatch = RegExp(
         r'Conductor Mobile No\s*:\s*(\d+)',
         caseSensitive: false,
       ).firstMatch(text);
+      if (mobileMatch != null) {
+        updates['contact_mobile'] = mobileMatch.group(1)!.trim();
+      }
 
-      if (pnrMatch != null && mobileMatch != null) {
-        final pnr = pnrMatch.group(1)!.trim();
-        final mobile = mobileMatch.group(1)!.trim();
+      // Extract vehicle number
+      final vehicleMatch = RegExp(r'Vehicle No\s*:\s*([^,\s]+)', caseSensitive: false)
+          .firstMatch(text);
+      if (vehicleMatch != null) {
+        updates['trip_code'] = vehicleMatch.group(1)!.trim();
+      }
 
+      if (updates.isNotEmpty) {
         developer.log(
-          'Detected TNSTC update SMS for PNR: $pnr with mobile: $mobile',
+          'Detected TNSTC update SMS for PNR: $pnr with updates: $updates',
           name: 'TravelParserService',
         );
-        print('🔄 UPDATE SMS: Found conductor details for PNR $pnr');
+        print('🔄 UPDATE SMS: Found details for PNR $pnr');
 
         return TicketUpdateInfo(
           pnrNumber: pnr,
-          providerName: 'TNSTC',
-          updates: {'contact_mobile': mobile},
+          providerName: 'TNSTC', // Default provider for these updates
+          updates: updates,
         );
       }
     }
 
     return null;
-  }
-
-  /// Handles update SMS by updating existing ticket in database
-  static Future<bool> handleUpdateSMS(String text) async {
-    final updateInfo = parseUpdateSMS(text);
-    if (updateInfo == null) return false;
-
-    try {
-      final db = WalletDatabase.instance;
-      final count = await db.updateTravelTicketByPNR(
-        updateInfo.pnrNumber,
-        updateInfo.providerName,
-        updateInfo.updates,
-      );
-
-      if (count > 0) {
-        developer.log(
-          'Successfully updated ticket ${updateInfo.pnrNumber}',
-          name: 'TravelParserService',
-        );
-        print('✅ UPDATE: Ticket updated with conductor mobile');
-        return true;
-      } else {
-        developer.log(
-          'No ticket found to update for PNR: ${updateInfo.pnrNumber}',
-          name: 'TravelParserService',
-        );
-        print('⚠️ UPDATE: No matching ticket found for PNR');
-        return false;
-      }
-    } catch (e) {
-      developer.log('Error updating ticket',
-          name: 'TravelParserService', error: e);
-      print('🔴 UPDATE ERROR: $e');
-      return false;
-    }
   }
 
   static TravelTicketModel? parseTicketFromText(String text,

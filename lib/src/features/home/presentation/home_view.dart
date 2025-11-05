@@ -24,7 +24,7 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   bool _isLoading = true;
   List<TravelTicketModel> _travelTickets = [];
   List<TravelTicketModel> _eventTickets = [];
@@ -32,7 +32,21 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _loadTicketData();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _loadTicketData();
+    }
   }
 
   Future<void> _loadTicketData() async {
@@ -167,11 +181,13 @@ class _HomePageState extends State<HomePage> {
     }
 
     // Add trip code if available
+    developer.log('Checking for trip code: ${ticket.tripCode}', name: 'UI_MAPPING');
     if (ticket.tripCode?.isNotEmpty ?? false) {
       extras.add(ExtrasModel(
-        title: 'Trip Code',
+        title: ticket.ticketType == TicketType.bus ? 'Bus Number' : 'Trip Code',
         value: ticket.tripCode!,
       ));
+      developer.log('Added trip code to extras: ${ticket.tripCode}', name: 'UI_MAPPING');
     }
 
     // Add coach number if available (for trains)
@@ -187,6 +203,14 @@ class _HomePageState extends State<HomePage> {
       extras.add(ExtrasModel(
         title: 'Boarding Point',
         value: ticket.boardingPoint!,
+      ));
+    }
+
+    // Add contact mobile if available
+    if (ticket.contactMobile?.isNotEmpty ?? false) {
+      extras.add(ExtrasModel(
+        title: 'Conductor Mobile',
+        value: ticket.contactMobile!,
       ));
     }
 

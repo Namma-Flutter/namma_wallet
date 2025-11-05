@@ -36,7 +36,7 @@ class WalletDatabase {
       version: _dbVersion,
       onCreate: (Database db, int version) async {
         await _createSchema(db);
-        await _seedDummyData(db);
+        // await _seedDummyData(db);
       },
       onUpgrade: (Database db, int oldVersion, int newVersion) async {
         if (oldVersion < 2) {
@@ -273,13 +273,12 @@ ORDER BY t.created_at DESC
       // Check for duplicates based on PNR number or booking reference
       final pnrNumber = ticket['pnr_number'] as String?;
       final bookingRef = ticket['booking_reference'] as String?;
-      final providerName = ticket['provider_name']! as String;
 
       if (pnrNumber != null && pnrNumber.isNotEmpty) {
         final existing = await db.query(
           'travel_tickets',
-          where: 'pnr_number = ? AND provider_name = ?',
-          whereArgs: [pnrNumber, providerName],
+          where: 'pnr_number = ?',
+          whereArgs: [pnrNumber],
           limit: 1,
         );
         if (existing.isNotEmpty) {
@@ -292,8 +291,8 @@ ORDER BY t.created_at DESC
       } else if (bookingRef != null && bookingRef.isNotEmpty) {
         final existing = await db.query(
           'travel_tickets',
-          where: 'booking_reference = ? AND provider_name = ?',
-          whereArgs: [bookingRef, providerName],
+          where: 'booking_reference = ?',
+          whereArgs: [bookingRef],
           limit: 1,
         );
         if (existing.isNotEmpty) {
@@ -355,13 +354,12 @@ ORDER BY t.created_at DESC
     return results.isNotEmpty ? results.first : null;
   }
 
-  Future<Map<String, Object?>?> getTravelTicketByPNR(
-      String pnrNumber, String providerName) async {
+  Future<Map<String, Object?>?> getTravelTicketByPNR(String pnrNumber) async {
     final db = await database;
     final results = await db.query(
       'travel_tickets',
-      where: 'pnr_number = ? AND provider_name = ?',
-      whereArgs: [pnrNumber, providerName],
+      where: 'pnr_number = ?',
+      whereArgs: [pnrNumber],
       limit: 1,
     );
     return results.isNotEmpty ? results.first : null;
@@ -369,7 +367,6 @@ ORDER BY t.created_at DESC
 
   Future<int> updateTravelTicketByPNR(
     String pnrNumber,
-    String providerName,
     Map<String, Object?> updates,
   ) async {
     try {
@@ -379,8 +376,8 @@ ORDER BY t.created_at DESC
       final count = await db.update(
         'travel_tickets',
         updates,
-        where: 'pnr_number = ? AND provider_name = ?',
-        whereArgs: [pnrNumber, providerName],
+        where: 'pnr_number = ?',
+        whereArgs: [pnrNumber],
       );
 
       if (count > 0) {

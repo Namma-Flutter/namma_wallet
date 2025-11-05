@@ -167,6 +167,18 @@ class TNSTCTicketModelMapper extends ClassMapperBase<TNSTCTicketModel> {
     _$boardingPoint,
     opt: true,
   );
+  static String? _$conductorMobileNo(TNSTCTicketModel v) => v.conductorMobileNo;
+  static const Field<TNSTCTicketModel, String> _f$conductorMobileNo = Field(
+    'conductorMobileNo',
+    _$conductorMobileNo,
+    opt: true,
+  );
+  static String? _$vehicleNumber(TNSTCTicketModel v) => v.vehicleNumber;
+  static const Field<TNSTCTicketModel, String> _f$vehicleNumber = Field(
+    'vehicleNumber',
+    _$vehicleNumber,
+    opt: true,
+  );
   static String _$displayPnr(TNSTCTicketModel v) => v.displayPnr;
   static const Field<TNSTCTicketModel, String> _f$displayPnr = Field(
     'displayPnr',
@@ -236,6 +248,8 @@ class TNSTCTicketModelMapper extends ClassMapperBase<TNSTCTicketModel> {
     #idCardNumber: _f$idCardNumber,
     #totalFare: _f$totalFare,
     #boardingPoint: _f$boardingPoint,
+    #conductorMobileNo: _f$conductorMobileNo,
+    #vehicleNumber: _f$vehicleNumber,
     #displayPnr: _f$displayPnr,
     #displayFrom: _f$displayFrom,
     #displayTo: _f$displayTo,
@@ -271,6 +285,8 @@ class TNSTCTicketModelMapper extends ClassMapperBase<TNSTCTicketModel> {
       idCardNumber: data.dec(_f$idCardNumber),
       totalFare: data.dec(_f$totalFare),
       boardingPoint: data.dec(_f$boardingPoint),
+      conductorMobileNo: data.dec(_f$conductorMobileNo),
+      vehicleNumber: data.dec(_f$vehicleNumber),
     );
   }
 
@@ -367,6 +383,8 @@ abstract class TNSTCTicketModelCopyWith<$R, $In extends TNSTCTicketModel, $Out>
     String? idCardNumber,
     double? totalFare,
     String? boardingPoint,
+    String? conductorMobileNo,
+    String? vehicleNumber,
   });
   TNSTCTicketModelCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
     Then<$Out2, $R2> t,
@@ -418,6 +436,8 @@ class _TNSTCTicketModelCopyWithImpl<$R, $Out>
     Object? idCardNumber = $none,
     Object? totalFare = $none,
     Object? boardingPoint = $none,
+    Object? conductorMobileNo = $none,
+    Object? vehicleNumber = $none,
   }) => $apply(
     FieldCopyWithData({
       if (corporation != $none) #corporation: corporation,
@@ -448,6 +468,8 @@ class _TNSTCTicketModelCopyWithImpl<$R, $Out>
       if (idCardNumber != $none) #idCardNumber: idCardNumber,
       if (totalFare != $none) #totalFare: totalFare,
       if (boardingPoint != $none) #boardingPoint: boardingPoint,
+      if (conductorMobileNo != $none) #conductorMobileNo: conductorMobileNo,
+      if (vehicleNumber != $none) #vehicleNumber: vehicleNumber,
     }),
   );
   @override
@@ -500,6 +522,11 @@ class _TNSTCTicketModelCopyWithImpl<$R, $Out>
     idCardNumber: data.get(#idCardNumber, or: $value.idCardNumber),
     totalFare: data.get(#totalFare, or: $value.totalFare),
     boardingPoint: data.get(#boardingPoint, or: $value.boardingPoint),
+    conductorMobileNo: data.get(
+      #conductorMobileNo,
+      or: $value.conductorMobileNo,
+    ),
+    vehicleNumber: data.get(#vehicleNumber, or: $value.vehicleNumber),
   );
 
   @override

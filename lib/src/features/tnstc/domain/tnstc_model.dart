@@ -29,6 +29,8 @@ class TNSTCTicketModel with TNSTCTicketModelMappable {
     this.idCardNumber,
     this.totalFare,
     this.boardingPoint,
+    this.conductorMobileNo,
+    this.vehicleNumber,
   });
   final String? corporation;
   final String? pnrNumber;
@@ -54,6 +56,8 @@ class TNSTCTicketModel with TNSTCTicketModelMappable {
   final String? idCardNumber;
   final double? totalFare;
   final String? boardingPoint;
+  final String? conductorMobileNo;
+  final String? vehicleNumber;
 
   @override
   String toString() {

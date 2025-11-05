@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:namma_wallet/src/common/database/wallet_database.dart';
-import 'package:namma_wallet/src/common/helper/check_pnr_id.dart';
 import 'package:namma_wallet/src/common/helper/date_time_converter.dart';
 import 'package:namma_wallet/src/common/theme/styles.dart';
 import 'package:namma_wallet/src/common/widgets/custom_back_button.dart';
@@ -33,6 +32,25 @@ class _TicketViewState extends State<TicketView> {
   // Helper method to handle empty values
   String getValueOrDefault(String? value) {
     return (value?.isEmpty ?? true) ? '--' : value!;
+  }
+
+  bool hasPnrOrId(GenericDetailsModel ticket) {
+    return getPnrOrId(ticket) != null;
+  }
+
+  String? getPnrOrId(GenericDetailsModel ticket) {
+    for (final extra in ticket.extras ?? []) {
+      if (extra.title?.toLowerCase() == 'pnr number') {
+        return extra.value as String;
+      }
+    }
+
+    for (final extra in ticket.extras ?? []) {
+      if (extra.title?.toLowerCase() == 'booking id') {
+        return extra.value as String;
+      }
+    }
+    return null;
   }
 
   Future<void> _pinToHomeScreen() async {
@@ -152,7 +170,8 @@ class _TicketViewState extends State<TicketView> {
         }
       }
     } catch (e) {
-      developer.log('Failed to launch phone call', name: 'TicketView', error: e);
+      developer.log('Failed to launch phone call',
+          name: 'TicketView', error: e);
       if (mounted) {
         showSnackbar(context, 'Failed to make call: $e', isError: true);
       }
@@ -427,7 +446,8 @@ class _TicketViewState extends State<TicketView> {
                       child: ElevatedButton.icon(
                         onPressed: _isPinning ? null : _pinToHomeScreen,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Theme.of(context).colorScheme.primary,
+                          backgroundColor:
+                              Theme.of(context).colorScheme.primary,
                           foregroundColor: Colors.black87,
                           elevation: 0,
                           shape: RoundedRectangleBorder(

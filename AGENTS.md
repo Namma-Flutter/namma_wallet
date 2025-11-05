@@ -26,6 +26,10 @@ fvm flutter analyze
 fvm flutter test
 ```
 
+### Analyzer
+
+Always use dart mcp server to analyze code.
+
 ### Development Setup
 
 - Flutter SDK: 3.35.2 (managed via FVM)
