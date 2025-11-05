@@ -16,6 +16,7 @@ enum AppRoute {
 
   // Settings and configuration
   settings(path: '/settings', name: 'settings'),
+  license(path: '/license', name: 'license'),
 
   // Debug routes
   dbViewer(path: '/db-viewer', name: 'dbViewer');

@@ -66,7 +66,6 @@ class CalendarTicketCard extends StatelessWidget {
       ticketId: ticket.id,
     );
   }
-
 }
 
 class CalendarTicketCardContent extends StatelessWidget {

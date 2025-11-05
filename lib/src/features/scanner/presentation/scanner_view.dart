@@ -217,7 +217,8 @@ class _TicketScannerPageState extends State<TicketScannerPage> {
                                   }
 
                                   // Handle the scanned barcode
-                                  final qrData = capture.barcodes.first.rawValue;
+                                  final qrData =
+                                      capture.barcodes.first.rawValue;
 
                                   // Check if rawValue is non-null
                                   if (qrData == null) {
