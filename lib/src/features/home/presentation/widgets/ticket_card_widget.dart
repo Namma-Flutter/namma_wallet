@@ -66,7 +66,7 @@ class TicketCardWidget extends StatelessWidget {
                   // ticket.eventIcon,
                   Icons.star,
                   color: AppColor.whiteColor,
-                )
+                ),
               ],
             ),
             //* Address
@@ -149,7 +149,7 @@ class EventTicketCardWidget extends StatelessWidget {
                   // ticket.eventIcon,
                   Icons.star,
                   color: AppColor.whiteColor,
-                )
+                ),
               ],
             ),
             //* Address

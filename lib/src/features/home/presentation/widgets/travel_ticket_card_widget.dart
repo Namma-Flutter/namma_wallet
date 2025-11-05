@@ -25,18 +25,19 @@ class TravelTicketCardWidget extends StatelessWidget {
       width: 350,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(30),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withAlpha(25),
-              blurRadius: 8,
-              spreadRadius: 1,
-              offset: const Offset(0, 6),
-            ),
-          ],
-          color: ticket.type == TicketType.bus
-              ? AppColor.limeYellowThinkColor
-              : AppColor.limeYellowColor),
+        borderRadius: BorderRadius.circular(30),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withAlpha(25),
+            blurRadius: 8,
+            spreadRadius: 1,
+            offset: const Offset(0, 6),
+          ),
+        ],
+        color: ticket.type == TicketType.bus
+            ? AppColor.limeYellowThinkColor
+            : AppColor.limeYellowColor,
+      ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -50,13 +51,16 @@ class TravelTicketCardWidget extends StatelessWidget {
                 children: [
                   //* Service icon
                   CircleAvatar(
-                      radius: 20,
-                      backgroundColor: AppColor.whiteColor,
-                      child: Icon(ticket.type == TicketType.bus
+                    radius: 20,
+                    backgroundColor: AppColor.whiteColor,
+                    child: Icon(
+                      ticket.type == TicketType.bus
                           ? ticket.type == TicketType.bus
-                              ? Icons.airport_shuttle_outlined
-                              : Icons.badge_outlined
-                          : Icons.tram_outlined)),
+                                ? Icons.airport_shuttle_outlined
+                                : Icons.badge_outlined
+                          : Icons.tram_outlined,
+                    ),
+                  ),
 
                   //* Secondary text
                   Flexible(
@@ -77,9 +81,10 @@ class TravelTicketCardWidget extends StatelessWidget {
                 Text(
                   ticket.primaryText,
                   style: const TextStyle(
-                      fontSize: 25,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black54),
+                    fontSize: 25,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black54,
+                  ),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -98,11 +103,15 @@ class TravelTicketCardWidget extends StatelessWidget {
                   spacing: 10,
                   runSpacing: 8,
                   children: [
-                    ...ticket.tags!.take(2).map((tag) => HighlightChipsWidget(
-                          bgColor: const Color(0xffCADC56),
-                          label: tag.value ?? 'xxx',
-                          icon: tag.iconData,
-                        ))
+                    ...ticket.tags!
+                        .take(2)
+                        .map(
+                          (tag) => HighlightChipsWidget(
+                            bgColor: const Color(0xffCADC56),
+                            label: tag.value ?? 'xxx',
+                            icon: tag.iconData,
+                          ),
+                        ),
                   ],
                 ),
             ],
@@ -122,9 +131,10 @@ class TravelTicketCardWidget extends StatelessWidget {
                       child: Text(
                         ticket.location,
                         style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                            color: Colors.black87),
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                          color: Colors.black87,
+                        ),
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
                       ),
@@ -146,9 +156,9 @@ class TravelTicketCardWidget extends StatelessWidget {
                   }
                 },
                 icon: const Icon(Icons.info),
-              )
+              ),
             ],
-          )
+          ),
         ],
       ),
     );

@@ -1,8 +1,11 @@
 import 'dart:developer' as developer;
 import 'package:flutter/material.dart';
 
-void showSnackbar(BuildContext context, String message,
-    {bool isError = false}) {
+void showSnackbar(
+  BuildContext context,
+  String message, {
+  bool isError = false,
+}) {
   // Print to console for debugging
   if (isError) {
     developer.log('ERROR: $message', name: 'SnackbarError');

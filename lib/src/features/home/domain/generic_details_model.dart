@@ -22,21 +22,21 @@ class GenericDetailsModel with GenericDetailsModelMappable {
   });
 
   GenericDetailsModel.fromTrainTicket(TNSTCModel ticket)
-      : primaryText = ticket.pnrNo,
-        secondaryText = '${ticket.from} → ${ticket.to}',
-        startTime = DateTime.parse(ticket.journeyDate),
-        endTime = DateTime.parse(ticket.journeyDate),
-        location = ticket.boardingAt,
-        type = TicketType.train,
-        ticketId = null,
-        contactMobile = null,
-        tags = [
-          TagModel(value: ticket.tripCode, icon: 'confirmation_number'),
-          TagModel(value: ticket.pnrNo, icon: 'train'),
-          TagModel(value: ticket.time, icon: 'access_time'),
-          TagModel(value: ticket.seatNumbers.join(', '), icon: 'event_seat'),
-        ],
-        extras = null;
+    : primaryText = ticket.pnrNo,
+      secondaryText = '${ticket.from} → ${ticket.to}',
+      startTime = DateTime.parse(ticket.journeyDate),
+      endTime = DateTime.parse(ticket.journeyDate),
+      location = ticket.boardingAt,
+      type = TicketType.train,
+      ticketId = null,
+      contactMobile = null,
+      tags = [
+        TagModel(value: ticket.tripCode, icon: 'confirmation_number'),
+        TagModel(value: ticket.pnrNo, icon: 'train'),
+        TagModel(value: ticket.time, icon: 'access_time'),
+        TagModel(value: ticket.seatNumbers.join(', '), icon: 'event_seat'),
+      ],
+      extras = null;
   @MappableField(key: 'primary_text')
   final String primaryText;
   @MappableField(key: 'secondary_text')

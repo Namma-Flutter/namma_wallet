@@ -135,14 +135,21 @@ CREATE INDEX idx_travel_tickets_ticket_type ON travel_tickets(ticket_type);
   Future<List<Map<String, Object?>>> fetchAllTravelTickets() async {
     try {
       final db = await database;
-      final tickets =
-          await db.query('travel_tickets', orderBy: 'created_at DESC');
-      developer.log('Successfully fetched ${tickets.length} travel tickets',
-          name: 'DatabaseHelper');
+      final tickets = await db.query(
+        'travel_tickets',
+        orderBy: 'created_at DESC',
+      );
+      developer.log(
+        'Successfully fetched ${tickets.length} travel tickets',
+        name: 'DatabaseHelper',
+      );
       return tickets;
     } catch (e) {
-      developer.log('Failed to fetch travel tickets',
-          name: 'DatabaseHelper', error: e);
+      developer.log(
+        'Failed to fetch travel tickets',
+        name: 'DatabaseHelper',
+        error: e,
+      );
       rethrow;
     }
   }
@@ -158,7 +165,8 @@ ORDER BY t.created_at DESC
   }
 
   Future<List<Map<String, Object?>>> fetchTravelTicketsByType(
-      String ticketType) async {
+    String ticketType,
+  ) async {
     final db = await database;
     return db.query(
       'travel_tickets',
@@ -188,10 +196,13 @@ ORDER BY t.created_at DESC
           limit: 1,
         );
         if (existing.isNotEmpty) {
-          developer.log('Duplicate ticket found with PNR: $pnrNumber',
-              name: 'DatabaseHelper');
+          developer.log(
+            'Duplicate ticket found with PNR: $pnrNumber',
+            name: 'DatabaseHelper',
+          );
           throw DuplicateTicketException(
-              'Ticket with PNR $pnrNumber already exists');
+            'Ticket with PNR $pnrNumber already exists',
+          );
         }
       } else if (bookingRef != null && bookingRef.isNotEmpty) {
         final existing = await db.query(
@@ -202,23 +213,30 @@ ORDER BY t.created_at DESC
         );
         if (existing.isNotEmpty) {
           developer.log(
-              'Duplicate ticket found with booking reference: $bookingRef',
-              name: 'DatabaseHelper');
+            'Duplicate ticket found with booking reference: $bookingRef',
+            name: 'DatabaseHelper',
+          );
           throw DuplicateTicketException(
-              'Ticket with booking reference $bookingRef already exists');
+            'Ticket with booking reference $bookingRef already exists',
+          );
         }
       }
 
       final id = await db.insert('travel_tickets', ticket);
-      developer.log('Successfully inserted travel ticket with ID: $id',
-          name: 'DatabaseHelper');
+      developer.log(
+        'Successfully inserted travel ticket with ID: $id',
+        name: 'DatabaseHelper',
+      );
       return id;
     } catch (e) {
       if (e is DuplicateTicketException) {
         rethrow;
       }
-      developer.log('Failed to insert travel ticket',
-          name: 'DatabaseHelper', error: e);
+      developer.log(
+        'Failed to insert travel ticket',
+        name: 'DatabaseHelper',
+        error: e,
+      );
       rethrow;
     }
   }
@@ -282,17 +300,24 @@ ORDER BY t.created_at DESC
       );
 
       if (count > 0) {
-        developer.log('Successfully updated ticket with PNR: $pnrNumber',
-            name: 'DatabaseHelper');
+        developer.log(
+          'Successfully updated ticket with PNR: $pnrNumber',
+          name: 'DatabaseHelper',
+        );
       } else {
-        developer.log('No ticket found with PNR: $pnrNumber',
-            name: 'DatabaseHelper');
+        developer.log(
+          'No ticket found with PNR: $pnrNumber',
+          name: 'DatabaseHelper',
+        );
       }
 
       return count;
     } catch (e) {
-      developer.log('Failed to update ticket by PNR',
-          name: 'DatabaseHelper', error: e);
+      developer.log(
+        'Failed to update ticket by PNR',
+        name: 'DatabaseHelper',
+        error: e,
+      );
       rethrow;
     }
   }

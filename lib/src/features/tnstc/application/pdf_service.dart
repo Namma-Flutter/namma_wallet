@@ -24,15 +24,22 @@ class PDFService {
       final cleanedText = _cleanExtractedText(rawText);
 
       // Log for debugging
-      developer.log('Raw PDF text length: ${rawText.length}',
-          name: 'PDFService');
-      developer.log('Cleaned PDF text length: ${cleanedText.length}',
-          name: 'PDFService');
+      developer.log(
+        'Raw PDF text length: ${rawText.length}',
+        name: 'PDFService',
+      );
+      developer.log(
+        'Cleaned PDF text length: ${cleanedText.length}',
+        name: 'PDFService',
+      );
 
       return cleanedText;
     } catch (e) {
-      developer.log('Error extracting text from PDF',
-          name: 'PDFService', error: e);
+      developer.log(
+        'Error extracting text from PDF',
+        name: 'PDFService',
+        error: e,
+      );
       rethrow;
     }
   }
@@ -59,22 +66,29 @@ class PDFService {
 
     // Sometimes values get split across lines - try to rejoin obvious cases
     cleanedText = cleanedText.replaceAll(
-        RegExp(r'Corporation\s*:\s*\n([A-Z\s]+)\n'), r'Corporation: $1\n');
+      RegExp(r'Corporation\s*:\s*\n([A-Z\s]+)\n'),
+      r'Corporation: $1\n',
+    );
     cleanedText = cleanedText.replaceAll(
-        RegExp(r'Service Start Place\s*:\s*\n([A-Z\s.-]+)\n'),
-        r'Service Start Place: $1\n');
+      RegExp(r'Service Start Place\s*:\s*\n([A-Z\s.-]+)\n'),
+      r'Service Start Place: $1\n',
+    );
     cleanedText = cleanedText.replaceAll(
-        RegExp(r'Service End Place\s*:\s*\n([A-Z\s.-]+)\n'),
-        r'Service End Place: $1\n');
+      RegExp(r'Service End Place\s*:\s*\n([A-Z\s.-]+)\n'),
+      r'Service End Place: $1\n',
+    );
     cleanedText = cleanedText.replaceAll(
-        RegExp(r'Passenger Start Place\s*:\s*\n([A-Z\s.-]+)\n'),
-        r'Passenger Start Place: $1\n');
+      RegExp(r'Passenger Start Place\s*:\s*\n([A-Z\s.-]+)\n'),
+      r'Passenger Start Place: $1\n',
+    );
     cleanedText = cleanedText.replaceAll(
-        RegExp(r'Passenger End Place\s*:\s*\n([A-Z\s.-]+)\n'),
-        r'Passenger End Place: $1\n');
+      RegExp(r'Passenger End Place\s*:\s*\n([A-Z\s.-]+)\n'),
+      r'Passenger End Place: $1\n',
+    );
     cleanedText = cleanedText.replaceAll(
-        RegExp(r'Passenger Pickup Point\s*:\s*\n([A-Z\s.\-()]+)\n'),
-        r'Passenger Pickup Point: $1\n');
+      RegExp(r'Passenger Pickup Point\s*:\s*\n([A-Z\s.\-()]+)\n'),
+      r'Passenger Pickup Point: $1\n',
+    );
 
     // Clean up any remaining extra whitespace
     cleanedText = cleanedText.trim();

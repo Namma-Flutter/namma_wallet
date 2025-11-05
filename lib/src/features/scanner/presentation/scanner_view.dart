@@ -132,7 +132,8 @@ class _TicketScannerPageState extends State<TicketScannerPage> {
                   child: Column(
                     children: [
                       SizedBox(
-                        height: MediaQuery.of(context).orientation ==
+                        height:
+                            MediaQuery.of(context).orientation ==
                                 Orientation.portrait
                             ? 120
                             : 40,
@@ -140,60 +141,62 @@ class _TicketScannerPageState extends State<TicketScannerPage> {
                       GestureDetector(
                         onTap: _isProcessingPDF ? null : _handlePDFPick,
                         child: SizedBox(
-                            height: pickFileContainerWidth,
-                            width: pickFileContainerWidth,
-                            child: DottedBorder(
-                              options: RoundedRectDottedBorderOptions(
-                                dashPattern: const [5, 12],
-                                strokeWidth: 8,
-                                padding: const EdgeInsets.all(16),
-                                radius: const Radius.circular(24),
-                                color: borderColor,
-                              ),
-                              child: Center(
-                                child: _isProcessingPDF
-                                    ? Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          CircularProgressIndicator(
-                                            color: borderColor,
-                                            strokeWidth: 3,
-                                          ),
-                                          const SizedBox(height: 10),
-                                          Text(
-                                            'Processing PDF...',
-                                            style: TextStyle(
-                                              color: textColor.withAlpha(180),
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.w500,
-                                            ),
-                                          ),
-                                        ],
-                                      )
-                                    : Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Icon(
-                                            Icons.upload_file,
-                                            size: 90,
+                          height: pickFileContainerWidth,
+                          width: pickFileContainerWidth,
+                          child: DottedBorder(
+                            options: RoundedRectDottedBorderOptions(
+                              dashPattern: const [5, 12],
+                              strokeWidth: 8,
+                              padding: const EdgeInsets.all(16),
+                              radius: const Radius.circular(24),
+                              color: borderColor,
+                            ),
+                            child: Center(
+                              child: _isProcessingPDF
+                                  ? Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        CircularProgressIndicator(
+                                          color: borderColor,
+                                          strokeWidth: 3,
+                                        ),
+                                        const SizedBox(height: 10),
+                                        Text(
+                                          'Processing PDF...',
+                                          style: TextStyle(
                                             color: textColor.withAlpha(180),
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w500,
                                           ),
-                                          const SizedBox(
-                                            height: 5,
+                                        ),
+                                      ],
+                                    )
+                                  : Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Icon(
+                                          Icons.upload_file,
+                                          size: 90,
+                                          color: textColor.withAlpha(180),
+                                        ),
+                                        const SizedBox(
+                                          height: 5,
+                                        ),
+                                        Text(
+                                          'Upload PDF Here',
+                                          style: TextStyle(
+                                            color: textColor.withAlpha(180),
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.w500,
                                           ),
-                                          Text(
-                                            'Upload PDF Here',
-                                            style: TextStyle(
-                                                color: textColor.withAlpha(180),
-                                                fontSize: 18,
-                                                fontWeight: FontWeight.w500),
-                                          )
-                                        ],
-                                      ),
-                              ),
-                            )),
+                                        ),
+                                      ],
+                                    ),
+                            ),
+                          ),
+                        ),
                       ),
                       const SizedBox(
                         height: 42,
@@ -202,72 +205,80 @@ class _TicketScannerPageState extends State<TicketScannerPage> {
                         width: 141,
                         height: 42,
                         child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 12, vertical: 12),
-                                shape: const StadiumBorder()),
-                            onPressed: () {
-                              context.pushNamed(
-                                AppRoute.barcodeScanner.name,
-                                extra: (BarcodeCapture capture) async {
-                                  // Check if barcodes list is not empty
-                                  if (capture.barcodes.isEmpty) {
-                                    context.pop();
-                                    return;
-                                  }
-
-                                  // Handle the scanned barcode
-                                  final qrData =
-                                      capture.barcodes.first.rawValue;
-
-                                  // Check if rawValue is non-null
-                                  if (qrData == null) {
-                                    context.pop();
-                                    return;
-                                  }
-
+                          style: ElevatedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 12,
+                            ),
+                            shape: const StadiumBorder(),
+                          ),
+                          onPressed: () {
+                            context.pushNamed(
+                              AppRoute.barcodeScanner.name,
+                              extra: (BarcodeCapture capture) async {
+                                // Check if barcodes list is not empty
+                                if (capture.barcodes.isEmpty) {
                                   context.pop();
-                                  await _handleQRCodeScan(qrData);
-                                },
-                              );
-                            },
-                            child: const Text(
-                              'Scan QR Code',
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            )),
+                                  return;
+                                }
+
+                                // Handle the scanned barcode
+                                final qrData = capture.barcodes.first.rawValue;
+
+                                // Check if rawValue is non-null
+                                if (qrData == null) {
+                                  context.pop();
+                                  return;
+                                }
+
+                                context.pop();
+                                await _handleQRCodeScan(qrData);
+                              },
+                            );
+                          },
+                          child: const Text(
+                            'Scan QR Code',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
                       ),
                       const SizedBox(height: 20),
                       SizedBox(
                         width: 141,
                         height: 42,
                         child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                                backgroundColor:
-                                    Theme.of(context).colorScheme.secondary,
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 12, vertical: 12),
-                                shape: const StadiumBorder()),
-                            onPressed: _isPasting ? null : _handleClipboardRead,
-                            child: _isPasting
-                                ? const SizedBox(
-                                    width: 16,
-                                    height: 16,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                      color: Colors.white,
-                                    ),
-                                  )
-                                : const Text(
-                                    'Read Clipboard',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  )),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Theme.of(
+                              context,
+                            ).colorScheme.secondary,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 12,
+                            ),
+                            shape: const StadiumBorder(),
+                          ),
+                          onPressed: _isPasting ? null : _handleClipboardRead,
+                          child: _isPasting
+                              ? const SizedBox(
+                                  width: 16,
+                                  height: 16,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: Colors.white,
+                                  ),
+                                )
+                              : const Text(
+                                  'Read Clipboard',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                        ),
                       ),
                     ],
                   ),

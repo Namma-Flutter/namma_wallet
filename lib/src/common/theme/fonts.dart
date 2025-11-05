@@ -1,17 +1,20 @@
 part of 'styles.dart';
 
 class AppFonts {
-  static TextStyle getAppFont(
-      {FontWeight? fontWeight,
-      double? fontSize,
-      Color? color,
-      TextDecoration? decoration}) {
+  static TextStyle getAppFont({
+    FontWeight? fontWeight,
+    double? fontSize,
+    Color? color,
+    TextDecoration? decoration,
+  }) {
     return GoogleFonts.inter(
-        textStyle: TextStyle(
-            fontSize: fontSize,
-            fontWeight: fontWeight,
-            color: color,
-            decoration: decoration));
+      textStyle: TextStyle(
+        fontSize: fontSize,
+        fontWeight: fontWeight,
+        color: color,
+        decoration: decoration,
+      ),
+    );
   }
 }
 
@@ -25,23 +28,26 @@ class AppFonts {
 ///   font weight, size, color, line height, and letter spacing. This method centralizes font styling, ensuring consistency.
 
 class InterFonts {
-  static TextStyle getAppFont(
-      {FontWeight? fontWeight,
-      double? fontSize,
-      Color? color,
-      double? height,
-      double? letterSpacing,
-      Color? decorationColor,
-      TextDecoration? decoration}) {
+  static TextStyle getAppFont({
+    FontWeight? fontWeight,
+    double? fontSize,
+    Color? color,
+    double? height,
+    double? letterSpacing,
+    Color? decorationColor,
+    TextDecoration? decoration,
+  }) {
     return GoogleFonts.inter(
-        textStyle: TextStyle(
-            fontSize: fontSize,
-            fontWeight: fontWeight,
-            color: color,
-            height: height,
-            letterSpacing: letterSpacing,
-            decoration: decoration,
-            decorationColor: decorationColor));
+      textStyle: TextStyle(
+        fontSize: fontSize,
+        fontWeight: fontWeight,
+        color: color,
+        height: height,
+        letterSpacing: letterSpacing,
+        decoration: decoration,
+        decorationColor: decorationColor,
+      ),
+    );
   }
 }
 
@@ -544,11 +550,12 @@ class Paragraph03 {
       decorationColor: decorationColor,
     );
     semiBold = InterFonts.getAppFont(
-        fontSize: 14,
-        fontWeight: FontWeight.w600,
-        height: 18 / 14,
-        color: color,
-        decoration: decoration);
+      fontSize: 14,
+      fontWeight: FontWeight.w600,
+      height: 18 / 14,
+      color: color,
+      decoration: decoration,
+    );
   }
   Color color;
   late TextStyle regular;

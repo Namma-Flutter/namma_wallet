@@ -60,7 +60,6 @@ class GemmaChatService {
 
       /// Maximum tokens per response
       loraRanks: [4, 8], // TODO(Keerthi): Make configurable in Model enum
-
       /// Lora fine-tuning ranks
     );
 

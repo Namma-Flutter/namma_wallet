@@ -72,7 +72,8 @@ class ModelDownloadService {
         if (file.existsSync()) {
           if (kDebugMode) {
             print(
-                'Remote content-length unavailable, assuming local file is valid');
+              'Remote content-length unavailable, assuming local file is valid',
+            );
           }
           return true;
         }
@@ -92,8 +93,10 @@ class ModelDownloadService {
   }) async {
     try {
       final stream = FlutterGemmaPlugin.instance.modelManager
-          .downloadModelFromNetworkWithProgress(modelUrl,
-              token: token.isNotEmpty ? token : AIConstants.huggingFaceKey);
+          .downloadModelFromNetworkWithProgress(
+            modelUrl,
+            token: token.isNotEmpty ? token : AIConstants.huggingFaceKey,
+          );
 
       await for (final progress in stream) {
         onProgress(progress.toDouble());

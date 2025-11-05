@@ -6,7 +6,8 @@ void main() {
     final parser = TNSTCBusParser();
 
     test('should parse standard SETC SMS correctly', () {
-      const smsText = 'TNSTC Corporation:SETC , PNR NO.:T63736642 , '
+      const smsText =
+          'TNSTC Corporation:SETC , PNR NO.:T63736642 , '
           'From:CHENNAI-PT DR. M.G.R. BS To KUMBAKONAM , '
           'Trip Code:2145CHEKUMAB , Journey Date:11/02/2025 , Time:22:35 , '
           'Seat No.:20,21, .Class:AC SLEEPER SEATER , '
@@ -45,7 +46,8 @@ void main() {
     });
 
     test('should handle malformed seat numbers', () {
-      const smsText = 'TNSTC Corporation:SETC , PNR NO.:T123 , '
+      const smsText =
+          'TNSTC Corporation:SETC , PNR NO.:T123 , '
           'Seat No.:, .Class:AC';
 
       final ticket = parser.parseTicket(smsText);
@@ -56,7 +58,8 @@ void main() {
     });
 
     test('should handle single seat number', () {
-      const smsText = 'TNSTC Corporation:SETC , PNR NO.:T123 , '
+      const smsText =
+          'TNSTC Corporation:SETC , PNR NO.:T123 , '
           'Seat No.:15, .Class:AC';
 
       final ticket = parser.parseTicket(smsText);
@@ -67,7 +70,8 @@ void main() {
     });
 
     test('should parse time with comma format correctly', () {
-      const smsText = 'TNSTC Corporation:SETC , PNR NO.:T69705233 , '
+      const smsText =
+          'TNSTC Corporation:SETC , PNR NO.:T69705233 , '
           'From:KUMBAKONAM To CHENNAI-PT DR. M.G.R. BS , '
           'Trip Code:2100KUMCHELB , Journey Date:21/10/2025 , '
           'Time:,21:00 , Seat No.:4LB .Class:NON AC LOWER BERTH SEATER , '
@@ -93,7 +97,8 @@ void main() {
     });
 
     test('should parse time without comma format correctly', () {
-      const smsText = 'TNSTC Corporation:SETC , PNR NO.:T12345 , '
+      const smsText =
+          'TNSTC Corporation:SETC , PNR NO.:T12345 , '
           'Journey Date:15/05/2025 , Time:14:30 , Seat No.:10A';
 
       final ticket = parser.parseTicket(smsText);
@@ -146,7 +151,8 @@ void main() {
       expect(ticket1!.boardingPoint, equals('KUMBAKONAM'));
 
       // Test boarding point with brackets
-      const smsText2 = 'TNSTC Boarding at:KOTTIVAKKAM(RTO OFFICE) . For e-Ticket';
+      const smsText2 =
+          'TNSTC Boarding at:KOTTIVAKKAM(RTO OFFICE) . For e-Ticket';
       final ticket2 = parser.parseTicket(smsText2);
       expect(ticket2, isNotNull);
       expect(ticket2!.boardingPoint, equals('KOTTIVAKKAM(RTO OFFICE)'));
@@ -157,7 +163,8 @@ void main() {
     final parser = TNSTCBusParser();
 
     test('should parse SMS with date prefix in time field', () {
-      const smsText = 'TNSTC Corporation:SETC, PNR NO.:T58823886, '
+      const smsText =
+          'TNSTC Corporation:SETC, PNR NO.:T58823886, '
           'From:CHENNAI-PT Dr.M.G.R. BS To KUMBAKONAM, '
           'Trip Code:2300CHEKUMLB, Journey Date:10/10/2024, '
           'Time:10/10/2024,23:55, Seat No.:4LB.Class:NON AC LOWER BIRTH SEATER, '
@@ -176,7 +183,8 @@ void main() {
     });
 
     test('should parse SMS with trailing comma in seat number', () {
-      const smsText = 'TNSTC Corporation:SETC, PNR NO.:T58825236, '
+      const smsText =
+          'TNSTC Corporation:SETC, PNR NO.:T58825236, '
           'From:KUMBAKONAM To CHENNAI KALAIGNAR CBT, '
           'Trip Code:2030KUMKCBNS, Journey Date:13/10/2024, '
           'Time:20:30, Seat No.:12,.Class:NON AC SLEEPER SEATER, '
@@ -195,7 +203,8 @@ void main() {
     });
 
     test('should parse SMS with complex seat number format', () {
-      const smsText = 'TNSTC Corporation:SETC , PNR NO.:T62602262 , '
+      const smsText =
+          'TNSTC Corporation:SETC , PNR NO.:T62602262 , '
           'From:CHENNAI-PT DR. M.G.R. BS To KUMBAKONAM , '
           'Trip Code:2300CHEKUMLB , Journey Date:17/01/2025 , '
           'Time:,23:55 , Seat No.:36-UB#10 .Class:NON AC LOWER BIRTH SEATER';
@@ -211,7 +220,8 @@ void main() {
     });
 
     test('should parse SMS with no space in seat number', () {
-      const smsText = 'TNSTC Corporation:SETC , PNR NO.:T68439967 , '
+      const smsText =
+          'TNSTC Corporation:SETC , PNR NO.:T68439967 , '
           'From:CHENNAI-PT DR. M.G.R. BS To KUMBAKONAM , '
           'Trip Code:2200CHEKUMLB , Journey Date:14/08/2025 , '
           'Time:,22:55 , Seat No.:13UB .Class:NON AC LOWER BERTH SEATER';
@@ -227,7 +237,8 @@ void main() {
     });
 
     test('should parse SMS from different corporation', () {
-      const smsText = 'TNSTC Corporation:COIMBATORE , PNR NO.:U70109781 , '
+      const smsText =
+          'TNSTC Corporation:COIMBATORE , PNR NO.:U70109781 , '
           'From:KUMBAKONAM To COIMBATORE , Trip Code:0400KUMCOICC01L , '
           'Journey Date:30/08/2025 , Time:,04:00 , Seat No.:24 .Class:DELUXE 3X2';
 
@@ -244,7 +255,8 @@ void main() {
     });
 
     test('should parse multiple seat numbers correctly', () {
-      const smsText = 'TNSTC Corporation:SETC , PNR NO.:T63736642 , '
+      const smsText =
+          'TNSTC Corporation:SETC , PNR NO.:T63736642 , '
           'From:CHENNAI-PT DR. M.G.R. BS To KUMBAKONAM , '
           'Trip Code:2145CHEKUMAB , Journey Date:11/02/2025 , '
           'Time:22:35 , Seat No.:20,21, .Class:AC SLEEPER SEATER';
@@ -263,8 +275,9 @@ void main() {
 
   group('TravelParserService.parseUpdateSMS Tests', () {
     test('should parse conductor SMS and extract details', () {
-      const smsText = '* TNSTC * PNR:T69705233, DOJ:21/10/2025, Conductor Mobile No: 8870571461, Vehicle No:TN01AN4317, Route No:307LB.';
-      
+      const smsText =
+          '* TNSTC * PNR:T69705233, DOJ:21/10/2025, Conductor Mobile No: 8870571461, Vehicle No:TN01AN4317, Route No:307LB.';
+
       final updateInfo = TravelParserService.parseUpdateSMS(smsText);
 
       expect(updateInfo, isNotNull);
@@ -281,27 +294,28 @@ void main() {
     });
 
     test('should handle update SMS with only conductor number', () {
-        const smsText = '* TNSTC * PNR:T123, Conductor Mobile No: 1234567890';
-        final updateInfo = TravelParserService.parseUpdateSMS(smsText);
-        expect(updateInfo, isNotNull);
-        expect(updateInfo!.pnrNumber, equals('T123'));
-        expect(updateInfo.updates.length, equals(1));
-        expect(updateInfo.updates, containsPair('contact_mobile', '1234567890'));
+      const smsText = '* TNSTC * PNR:T123, Conductor Mobile No: 1234567890';
+      final updateInfo = TravelParserService.parseUpdateSMS(smsText);
+      expect(updateInfo, isNotNull);
+      expect(updateInfo!.pnrNumber, equals('T123'));
+      expect(updateInfo.updates.length, equals(1));
+      expect(updateInfo.updates, containsPair('contact_mobile', '1234567890'));
     });
 
     test('should handle update SMS with only vehicle number', () {
-        const smsText = '* TNSTC * PNR:T456, Vehicle No:TN01AB1234';
-        final updateInfo = TravelParserService.parseUpdateSMS(smsText);
-        expect(updateInfo, isNotNull);
-        expect(updateInfo!.pnrNumber, equals('T456'));
-        expect(updateInfo.updates.length, equals(1));
-        expect(updateInfo.updates, containsPair('trip_code', 'TN01AB1234'));
+      const smsText = '* TNSTC * PNR:T456, Vehicle No:TN01AB1234';
+      final updateInfo = TravelParserService.parseUpdateSMS(smsText);
+      expect(updateInfo, isNotNull);
+      expect(updateInfo!.pnrNumber, equals('T456'));
+      expect(updateInfo.updates.length, equals(1));
+      expect(updateInfo.updates, containsPair('trip_code', 'TN01AB1234'));
     });
 
-     test('should return null if PNR is missing', () {
-        const smsText = '* TNSTC * Conductor Mobile No: 1234567890, Vehicle No:TN01AB1234';
-        final updateInfo = TravelParserService.parseUpdateSMS(smsText);
-        expect(updateInfo, isNull);
+    test('should return null if PNR is missing', () {
+      const smsText =
+          '* TNSTC * Conductor Mobile No: 1234567890, Vehicle No:TN01AB1234';
+      final updateInfo = TravelParserService.parseUpdateSMS(smsText);
+      expect(updateInfo, isNull);
     });
   });
 }

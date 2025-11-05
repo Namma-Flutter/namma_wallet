@@ -30,8 +30,9 @@ class IRCTCQRParser {
         quota: _extractValue(data, 'Quota'),
         trainNumber: _extractValue(data, 'Train No.'),
         trainName: _extractValue(data, 'Train Name'),
-        scheduledDeparture:
-            _parseDateTime(_extractValue(data, 'Scheduled Departure')),
+        scheduledDeparture: _parseDateTime(
+          _extractValue(data, 'Scheduled Departure'),
+        ),
         dateOfJourney: _parseDate(_extractValue(data, 'Date Of Journey')),
         boardingStation: _extractValue(data, 'Boarding Station'),
         travelClass: _extractClassFromString(_extractValue(data, 'Class')),
@@ -123,7 +124,7 @@ class IRCTCQRParser {
       'Sep': 9,
       'Oct': 10,
       'Nov': 11,
-      'Dec': 12
+      'Dec': 12,
     };
 
     return months[monthStr] ?? int.tryParse(monthStr) ?? 1;

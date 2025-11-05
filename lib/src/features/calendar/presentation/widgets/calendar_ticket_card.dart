@@ -34,9 +34,12 @@ class CalendarTicketCard extends StatelessWidget {
       tags.add(TagModel(value: ticket.displayTime, icon: 'access_time'));
     }
     if (ticket.amount != null) {
-      tags.add(TagModel(
+      tags.add(
+        TagModel(
           value: '₹${ticket.amount!.toStringAsFixed(0)}',
-          icon: 'currency_rupee'));
+          icon: 'currency_rupee',
+        ),
+      );
     }
 
     late final DateTime startTime;
@@ -103,8 +106,8 @@ class CalendarTicketCardContent extends StatelessWidget {
                       ticket.type == TicketType.bus
                           ? Icons.airport_shuttle_outlined
                           : ticket.type == TicketType.train
-                              ? Icons.train_outlined
-                              : Icons.tram_outlined,
+                          ? Icons.train_outlined
+                          : Icons.tram_outlined,
                     ),
                   ),
                   const SizedBox(width: 10),
@@ -189,35 +192,39 @@ class CalendarTicketCardContent extends StatelessWidget {
                   spacing: 10,
                   runSpacing: 8,
                   children: [
-                    ...ticket.tags!.take(2).map((tag) => Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 6,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.2),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                tag.iconData,
-                                size: 16,
-                                color: Colors.white,
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                tag.value ?? 'xxx',
-                                style: const TextStyle(
-                                  fontSize: 12,
+                    ...ticket.tags!
+                        .take(2)
+                        .map(
+                          (tag) => Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 6,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: 0.2),
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  tag.iconData,
+                                  size: 16,
                                   color: Colors.white,
-                                  fontWeight: FontWeight.w500,
                                 ),
-                              ),
-                            ],
+                                const SizedBox(width: 4),
+                                Text(
+                                  tag.value ?? 'xxx',
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                        ))
+                        ),
                   ],
                 ),
             ],
@@ -261,9 +268,9 @@ class CalendarTicketCardContent extends StatelessWidget {
                   Icons.info,
                   color: Colors.white,
                 ),
-              )
+              ),
             ],
-          )
+          ),
         ],
       ),
     );

@@ -115,8 +115,8 @@ class ThemeSectionWidget extends StatelessWidget {
                 themeProvider.isSystemMode
                     ? 'Following system settings'
                     : themeProvider.isDarkMode
-                        ? 'Dark theme enabled'
-                        : 'Light theme enabled',
+                    ? 'Dark theme enabled'
+                    : 'Light theme enabled',
               ),
               value: themeProvider.isDarkMode,
               onChanged: (value) {

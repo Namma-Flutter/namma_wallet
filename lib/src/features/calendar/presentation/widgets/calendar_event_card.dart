@@ -225,9 +225,9 @@ class CalendarEventCard extends StatelessWidget {
                   Icons.info,
                   color: Colors.white,
                 ),
-              )
+              ),
             ],
-          )
+          ),
         ],
       ),
     );

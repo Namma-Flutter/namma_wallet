@@ -83,19 +83,28 @@ class IRCTCScannerService {
           travelTicket: updatedTicket,
         );
       } on DuplicateTicketException catch (e) {
-        developer.log('Duplicate IRCTC ticket detected',
-            name: 'IRCTCScannerService', error: e);
+        developer.log(
+          'Duplicate IRCTC ticket detected',
+          name: 'IRCTCScannerService',
+          error: e,
+        );
         print('⚠️ IRCTC SCANNER DUPLICATE: ${e.message}');
         return IRCTCScannerResult.error(e.message);
       } catch (e) {
-        developer.log('Failed to save IRCTC ticket to database',
-            name: 'IRCTCScannerService', error: e);
+        developer.log(
+          'Failed to save IRCTC ticket to database',
+          name: 'IRCTCScannerService',
+          error: e,
+        );
         print('🔴 IRCTC SCANNER ERROR: Failed to save ticket: $e');
         return IRCTCScannerResult.error('Failed to save ticket: $e');
       }
     } on Exception catch (e) {
-      developer.log('Unexpected exception in IRCTC scanner service',
-          name: 'IRCTCScannerService', error: e);
+      developer.log(
+        'Unexpected exception in IRCTC scanner service',
+        name: 'IRCTCScannerService',
+        error: e,
+      );
       print('🔴 IRCTC SCANNER UNEXPECTED ERROR: $e');
       return IRCTCScannerResult.error('Unexpected error occurred: $e');
     }
@@ -103,7 +112,8 @@ class IRCTCScannerService {
 
   TravelTicketModel _convertIRCTCToTravelTicket(IRCTCTicket irctcTicket) {
     // Format dates as strings
-    final journeyDateStr = '${irctcTicket.dateOfJourney.year}-'
+    final journeyDateStr =
+        '${irctcTicket.dateOfJourney.year}-'
         '${irctcTicket.dateOfJourney.month.toString().padLeft(2, '0')}-'
         '${irctcTicket.dateOfJourney.day.toString().padLeft(2, '0')}';
 
@@ -115,8 +125,8 @@ class IRCTCScannerService {
     final ticketStatus = irctcTicket.status.toLowerCase().contains('cancelled')
         ? TicketStatus.cancelled
         : irctcTicket.status.toLowerCase().contains('pending')
-            ? TicketStatus.pending
-            : TicketStatus.confirmed;
+        ? TicketStatus.pending
+        : TicketStatus.confirmed;
 
     return TravelTicketModel(
       ticketType: TicketType.train,
@@ -155,15 +165,19 @@ class IRCTCScannerService {
       backgroundColor = Colors.green;
 
       // Log success to console
-      developer.log('IRCTC scanner operation succeeded: $message',
-          name: 'IRCTCScannerService');
+      developer.log(
+        'IRCTC scanner operation succeeded: $message',
+        name: 'IRCTCScannerService',
+      );
     } else {
       message = result.errorMessage ?? 'Unknown error occurred';
       backgroundColor = Colors.red;
 
       // Log error to console
-      developer.log('IRCTC scanner operation failed: $message',
-          name: 'IRCTCScannerService');
+      developer.log(
+        'IRCTC scanner operation failed: $message',
+        name: 'IRCTCScannerService',
+      );
     }
 
     ScaffoldMessenger.of(context).showSnackBar(

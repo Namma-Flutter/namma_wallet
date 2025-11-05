@@ -15,28 +15,30 @@ class SharingIntentService {
     required void Function(String) onFileReceived,
     required void Function(String) onError,
   }) {
-    _intentDataStreamSubscription =
-        ReceiveSharingIntent.instance.getMediaStream().listen(
-      (List<SharedMediaFile> files) {
-        _handleSharedFiles(files, onFileReceived, onError);
-      },
-      onError: (Object err) {
-        print('❌ Error in sharing intent stream: $err');
-        onError('Error receiving shared content: $err');
-      },
-    );
+    _intentDataStreamSubscription = ReceiveSharingIntent.instance
+        .getMediaStream()
+        .listen(
+          (List<SharedMediaFile> files) {
+            _handleSharedFiles(files, onFileReceived, onError);
+          },
+          onError: (Object err) {
+            print('❌ Error in sharing intent stream: $err');
+            onError('Error receiving shared content: $err');
+          },
+        );
 
     ReceiveSharingIntent.instance
         .getInitialMedia()
         .then((List<SharedMediaFile> files) {
-      if (files.isNotEmpty) {
-        print('=== App launched with shared files: ${files.length} ===');
-        _handleSharedFiles(files, onFileReceived, onError);
-      }
-    }).catchError((Object error) {
-      print('❌ Error getting initial shared media: $error');
-      onError('Error getting initial shared content: $error');
-    });
+          if (files.isNotEmpty) {
+            print('=== App launched with shared files: ${files.length} ===');
+            _handleSharedFiles(files, onFileReceived, onError);
+          }
+        })
+        .catchError((Object error) {
+          print('❌ Error getting initial shared media: $error');
+          onError('Error getting initial shared content: $error');
+        });
   }
 
   void _handleSharedFiles(
@@ -75,7 +77,8 @@ class SharingIntentService {
       try {
         final stats = fileObj.statSync();
         print(
-            'File Size: ${stats.size} bytes (${_formatFileSize(stats.size)})');
+          'File Size: ${stats.size} bytes (${_formatFileSize(stats.size)})',
+        );
         print('Last Modified: ${stats.modified}');
         print('File Accessible: Yes');
 

@@ -93,17 +93,24 @@ class _ModelDownloadTileState extends State<ModelDownloadTile> {
               ],
             )
           : (_needToDownload
-              ? const Text('Model not available')
-              : const Text('Model ready to use')),
+                ? const Text('Model not available')
+                : const Text('Model ready to use')),
       trailing: _progress > 0.0
           ? const SizedBox(
-              width: 24, height: 24, child: CircularProgressIndicator())
+              width: 24,
+              height: 24,
+              child: CircularProgressIndicator(),
+            )
           : (_needToDownload
-              ? IconButton(
-                  icon: const Icon(Icons.download),
-                  onPressed: _downloadModel,
-                )
-              : const Icon(Icons.check_circle, color: Colors.green, size: 28)),
+                ? IconButton(
+                    icon: const Icon(Icons.download),
+                    onPressed: _downloadModel,
+                  )
+                : const Icon(
+                    Icons.check_circle,
+                    color: Colors.green,
+                    size: 28,
+                  )),
       onTap: () {
         if (_needToDownload) {
           _downloadModel();
