@@ -495,14 +495,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                     ],
                   ),
                 ),
-                InkWell(
-                  onTap: () async {
-                    await GemmaChatService().sendMessage(
-                      "* TNSTC * PNR:T71691143, DOJ:06/10/2025, Conductor Mobile No: 9787909759, Vehicle No:TN01AN2309, Route No:123AB. Click https://www.tnstc.in/SETCWeb/FB.do Share your Comments https://www.radiantinfo.com ",
-                    );
-                  },
-                  child: Text("vanakam da mapla"),
-                ),
                 const SizedBox(height: 100),
               ],
             ),
