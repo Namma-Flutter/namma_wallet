@@ -8,9 +8,7 @@ class GemmaChatService {
   Future<void> init() async {
     const token = String.fromEnvironment('HUGGINGFACE_TOKEN');
     if (token.isEmpty) {
-      throw Exception(
-        'HuggingFace token is not set. Please provide a valid token.',
-      );
+      return;
     }
     await FlutterGemma.installModel(
           modelType: ModelType.gemmaIt,
