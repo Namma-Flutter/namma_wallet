@@ -10,6 +10,7 @@ import 'package:namma_wallet/src/common/helper/date_time_converter.dart';
 import 'package:namma_wallet/src/common/theme/styles.dart';
 import 'package:namma_wallet/src/common/widgets/custom_back_button.dart';
 import 'package:namma_wallet/src/common/widgets/snackbar_widget.dart';
+import 'package:namma_wallet/src/features/common/domain/travel_ticket_model.dart';
 import 'package:namma_wallet/src/features/home/domain/generic_details_model.dart';
 import 'package:namma_wallet/src/features/home/presentation/widgets/highlight_widget.dart';
 import 'package:namma_wallet/src/features/travel/presentation/widgets/custom_ticket_shape_line.dart';
@@ -194,7 +195,7 @@ class _TicketViewState extends State<TicketView> {
                                 radius: 20,
                                 backgroundColor: AppColor.whiteColor,
                                 child: Icon(
-                                    widget.ticket.type == EntryType.busTicket
+                                    widget.ticket.type == TicketType.bus
                                         ? Icons.airport_shuttle_outlined
                                         : Icons.tram_outlined)),
                             const SizedBox(width: 16),

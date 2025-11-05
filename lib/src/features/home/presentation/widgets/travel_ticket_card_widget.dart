@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:namma_wallet/src/common/helper/date_time_converter.dart';
 import 'package:namma_wallet/src/common/routing/app_routes.dart';
 import 'package:namma_wallet/src/common/theme/styles.dart';
+import 'package:namma_wallet/src/features/common/domain/travel_ticket_model.dart';
 import 'package:namma_wallet/src/features/home/domain/generic_details_model.dart';
 import 'package:namma_wallet/src/features/home/presentation/widgets/highlight_widget.dart';
 import 'package:namma_wallet/src/features/travel/presentation/widgets/ticket_view_widget.dart';
@@ -33,7 +34,7 @@ class TravelTicketCardWidget extends StatelessWidget {
               offset: const Offset(0, 6),
             ),
           ],
-          color: ticket.type == EntryType.busTicket
+          color: ticket.type == TicketType.bus
               ? AppColor.limeYellowThinkColor
               : AppColor.limeYellowColor),
       child: Column(
@@ -51,8 +52,8 @@ class TravelTicketCardWidget extends StatelessWidget {
                   CircleAvatar(
                       radius: 20,
                       backgroundColor: AppColor.whiteColor,
-                      child: Icon(ticket.type == EntryType.busTicket
-                          ? ticket.type == EntryType.busTicket
+                      child: Icon(ticket.type == TicketType.bus
+                          ? ticket.type == TicketType.bus
                               ? Icons.airport_shuttle_outlined
                               : Icons.badge_outlined
                           : Icons.tram_outlined)),

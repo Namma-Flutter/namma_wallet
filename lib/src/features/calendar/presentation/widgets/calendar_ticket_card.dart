@@ -24,13 +24,7 @@ class CalendarTicketCard extends StatelessWidget {
   }
 
   GenericDetailsModel _convertToGenericModel(TravelTicketModel ticket) {
-    final entryType = switch (ticket.ticketType) {
-      TicketType.bus => EntryType.busTicket,
-      TicketType.train => EntryType.trainTicket,
-      TicketType.flight => EntryType.none,
-      TicketType.event => EntryType.none,
-      TicketType.metro => EntryType.none,
-    };
+    final entryType = ticket.ticketType;
 
     final tags = <TagModel>[];
     if (ticket.seatNumbers != null && ticket.seatNumbers!.isNotEmpty) {
@@ -107,9 +101,9 @@ class CalendarTicketCardContent extends StatelessWidget {
                     radius: 20,
                     backgroundColor: AppColor.whiteColor,
                     child: Icon(
-                      ticket.type == EntryType.busTicket
+                      ticket.type == TicketType.bus
                           ? Icons.airport_shuttle_outlined
-                          : ticket.type == EntryType.trainTicket
+                          : ticket.type == TicketType.train
                               ? Icons.train_outlined
                               : Icons.tram_outlined,
                     ),

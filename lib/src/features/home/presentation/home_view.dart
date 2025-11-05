@@ -10,6 +10,8 @@ import 'package:go_router/go_router.dart';
 import 'package:namma_wallet/src/common/database/wallet_database.dart';
 import 'package:namma_wallet/src/common/routing/app_routes.dart';
 import 'package:namma_wallet/src/common/widgets/snackbar_widget.dart';
+import 'package:namma_wallet/src/features/ai/fallback-parser/application/gemma_service.dart'
+    show GemmaChatService;
 import 'package:namma_wallet/src/features/common/domain/travel_ticket_model.dart';
 import 'package:namma_wallet/src/features/home/domain/extras_model.dart';
 import 'package:namma_wallet/src/features/home/domain/generic_details_model.dart';
@@ -252,11 +254,7 @@ class _HomePageState extends State<HomePage> {
       secondaryText: secondaryText,
       startTime: startTime,
       location: displayLocation,
-      type: ticket.ticketType == TicketType.event
-          ? EntryType.event
-          : ticket.ticketType == TicketType.bus
-              ? EntryType.busTicket
-              : EntryType.trainTicket,
+      type: ticket.ticketType,
       endTime: startTime, // For simplicity, same as start time
       extras: extras.isNotEmpty ? extras : null,
       ticketId: ticket.id,
@@ -429,6 +427,13 @@ class _HomePageState extends State<HomePage> {
                         ),
                     ],
                   ),
+                ),
+                InkWell(
+                  onTap: () async {
+                    await GemmaChatService().sendMessage(
+                        "* TNSTC * PNR:T71691143, DOJ:06/10/2025, Conductor Mobile No: 9787909759, Vehicle No:TN01AN2309, Route No:123AB. Click https://www.tnstc.in/SETCWeb/FB.do Share your Comments https://www.radiantinfo.com ");
+                  },
+                  child: Text("vanakam da mapla"),
                 ),
                 const SizedBox(height: 100),
               ],
