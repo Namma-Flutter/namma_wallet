@@ -385,6 +385,13 @@ class TravelTicketModelMapper extends ClassMapperBase<TravelTicketModel> {
     key: r'venue_name',
     opt: true,
   );
+  static String? _$contactMobile(TravelTicketModel v) => v.contactMobile;
+  static const Field<TravelTicketModel, String> _f$contactMobile = Field(
+    'contactMobile',
+    _$contactMobile,
+    key: r'contact_mobile',
+    opt: true,
+  );
   static SourceType _$sourceType(TravelTicketModel v) => v.sourceType;
   static const Field<TravelTicketModel, SourceType> _f$sourceType = Field(
     'sourceType',
@@ -472,6 +479,7 @@ class TravelTicketModelMapper extends ClassMapperBase<TravelTicketModel> {
     #pickupLocation: _f$pickupLocation,
     #eventName: _f$eventName,
     #venueName: _f$venueName,
+    #contactMobile: _f$contactMobile,
     #sourceType: _f$sourceType,
     #rawData: _f$rawData,
     #createdAt: _f$createdAt,
@@ -512,6 +520,7 @@ class TravelTicketModelMapper extends ClassMapperBase<TravelTicketModel> {
       pickupLocation: data.dec(_f$pickupLocation),
       eventName: data.dec(_f$eventName),
       venueName: data.dec(_f$venueName),
+      contactMobile: data.dec(_f$contactMobile),
       sourceType: data.dec(_f$sourceType),
       rawData: data.dec(_f$rawData),
       createdAt: data.dec(_f$createdAt),
@@ -618,6 +627,7 @@ abstract class TravelTicketModelCopyWith<
     String? pickupLocation,
     String? eventName,
     String? venueName,
+    String? contactMobile,
     SourceType? sourceType,
     String? rawData,
     String? createdAt,
@@ -665,6 +675,7 @@ class _TravelTicketModelCopyWithImpl<$R, $Out>
     Object? pickupLocation = $none,
     Object? eventName = $none,
     Object? venueName = $none,
+    Object? contactMobile = $none,
     SourceType? sourceType,
     Object? rawData = $none,
     Object? createdAt = $none,
@@ -699,6 +710,7 @@ class _TravelTicketModelCopyWithImpl<$R, $Out>
       if (pickupLocation != $none) #pickupLocation: pickupLocation,
       if (eventName != $none) #eventName: eventName,
       if (venueName != $none) #venueName: venueName,
+      if (contactMobile != $none) #contactMobile: contactMobile,
       if (sourceType != null) #sourceType: sourceType,
       if (rawData != $none) #rawData: rawData,
       if (createdAt != $none) #createdAt: createdAt,
@@ -737,6 +749,7 @@ class _TravelTicketModelCopyWithImpl<$R, $Out>
     pickupLocation: data.get(#pickupLocation, or: $value.pickupLocation),
     eventName: data.get(#eventName, or: $value.eventName),
     venueName: data.get(#venueName, or: $value.venueName),
+    contactMobile: data.get(#contactMobile, or: $value.contactMobile),
     sourceType: data.get(#sourceType, or: $value.sourceType),
     rawData: data.get(#rawData, or: $value.rawData),
     createdAt: data.get(#createdAt, or: $value.createdAt),

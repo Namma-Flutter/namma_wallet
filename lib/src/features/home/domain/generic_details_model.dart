@@ -18,6 +18,7 @@ class GenericDetailsModel with GenericDetailsModelMappable {
     this.tags,
     this.extras,
     this.ticketId,
+    this.contactMobile,
   });
 
   GenericDetailsModel.fromTrainTicket(TNSTCModel ticket)
@@ -28,6 +29,7 @@ class GenericDetailsModel with GenericDetailsModelMappable {
         location = ticket.boardingAt,
         type = TicketType.train,
         ticketId = null,
+        contactMobile = null,
         tags = [
           TagModel(value: ticket.tripCode, icon: 'confirmation_number'),
           TagModel(value: ticket.pnrNo, icon: 'train'),
@@ -53,4 +55,5 @@ class GenericDetailsModel with GenericDetailsModelMappable {
   final List<TagModel>? tags;
   @MappableField(key: 'ticket_id')
   final int? ticketId;
+  final String? contactMobile;
 }

@@ -1,21 +1,31 @@
-import 'package:namma_wallet/src/features/home/domain/generic_details_model.dart';
+import 'package:namma_wallet/src/common/database/wallet_database.dart';
+import 'package:namma_wallet/src/features/tnstc/domain/tnstc_model.dart';
 
-bool hasPnrOrId(GenericDetailsModel ticket) {
-  return ticket.extras?.any((extra) {
-        final title = extra.title?.toLowerCase();
-        return title == 'pnr no.' || title == 'id';
-      }) ??
-      false;
-}
+Future<void> checkAndUpadteTNSTCTicket(TNSTCTicketModel ticket) async {
+  final db = WalletDatabase.instance;
 
-String? getPnrOrId(GenericDetailsModel ticket) {
-  if (ticket.extras == null) return null;
-
-  for (final extra in ticket.extras!) {
-    final title = extra.title?.toLowerCase();
-    if (title == 'PNR No.' || title == 'id') {
-      return extra.value; // return the value of the matched field
-    }
+  if (ticket.pnrNumber == null || ticket.corporation == null) {
+    // Or handle this case appropriately
+    return;
   }
-  return null; // nothing found
+
+  final existingTicket = await db.getTravelTicketByPNR(
+    ticket.pnrNumber!,
+  );
+
+  if (existingTicket != null) {
+    final updates = <String, Object?>{};
+    if (ticket.busIdNumber?.isNotEmpty ?? false) {
+      updates['trip_code'] = ticket.busIdNumber;
+    }
+    if (ticket.conductorMobileNo?.isNotEmpty ?? false) {
+      updates['contact_mobile'] = ticket.conductorMobileNo;
+    }
+
+    if (updates.isNotEmpty) {
+      await db.updateTravelTicketByPNR(ticket.pnrNumber!, updates);
+    }
+  } else {
+    await db.insertTravelTicket(ticket.toMap());
+  }
 }

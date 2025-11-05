@@ -80,6 +80,12 @@ class GenericDetailsModelMapper extends ClassMapperBase<GenericDetailsModel> {
     key: r'ticket_id',
     opt: true,
   );
+  static String? _$contactMobile(GenericDetailsModel v) => v.contactMobile;
+  static const Field<GenericDetailsModel, String> _f$contactMobile = Field(
+    'contactMobile',
+    _$contactMobile,
+    opt: true,
+  );
 
   @override
   final MappableFields<GenericDetailsModel> fields = const {
@@ -92,6 +98,7 @@ class GenericDetailsModelMapper extends ClassMapperBase<GenericDetailsModel> {
     #tags: _f$tags,
     #extras: _f$extras,
     #ticketId: _f$ticketId,
+    #contactMobile: _f$contactMobile,
   };
 
   static GenericDetailsModel _instantiate(DecodingData data) {
@@ -105,6 +112,7 @@ class GenericDetailsModelMapper extends ClassMapperBase<GenericDetailsModel> {
       tags: data.dec(_f$tags),
       extras: data.dec(_f$extras),
       ticketId: data.dec(_f$ticketId),
+      contactMobile: data.dec(_f$contactMobile),
     );
   }
 
@@ -196,6 +204,7 @@ abstract class GenericDetailsModelCopyWith<
     List<TagModel>? tags,
     List<ExtrasModel>? extras,
     int? ticketId,
+    String? contactMobile,
   });
   GenericDetailsModelCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
     Then<$Out2, $R2> t,
@@ -243,6 +252,7 @@ class _GenericDetailsModelCopyWithImpl<$R, $Out>
     Object? tags = $none,
     Object? extras = $none,
     Object? ticketId = $none,
+    Object? contactMobile = $none,
   }) => $apply(
     FieldCopyWithData({
       if (primaryText != null) #primaryText: primaryText,
@@ -254,6 +264,7 @@ class _GenericDetailsModelCopyWithImpl<$R, $Out>
       if (tags != $none) #tags: tags,
       if (extras != $none) #extras: extras,
       if (ticketId != $none) #ticketId: ticketId,
+      if (contactMobile != $none) #contactMobile: contactMobile,
     }),
   );
   @override
@@ -267,6 +278,7 @@ class _GenericDetailsModelCopyWithImpl<$R, $Out>
     tags: data.get(#tags, or: $value.tags),
     extras: data.get(#extras, or: $value.extras),
     ticketId: data.get(#ticketId, or: $value.ticketId),
+    contactMobile: data.get(#contactMobile, or: $value.contactMobile),
   );
 
   @override
