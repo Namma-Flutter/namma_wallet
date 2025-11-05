@@ -129,6 +129,12 @@ class GenericDetailsModelMapper extends ClassMapperBase<GenericDetailsModel> {
     _$ticketId,
     opt: true,
   );
+  static String? _$contactMobile(GenericDetailsModel v) => v.contactMobile;
+  static const Field<GenericDetailsModel, String> _f$contactMobile = Field(
+    'contactMobile',
+    _$contactMobile,
+    opt: true,
+  );
 
   @override
   final MappableFields<GenericDetailsModel> fields = const {
@@ -141,6 +147,7 @@ class GenericDetailsModelMapper extends ClassMapperBase<GenericDetailsModel> {
     #tags: _f$tags,
     #extras: _f$extras,
     #ticketId: _f$ticketId,
+    #contactMobile: _f$contactMobile,
   };
 
   static GenericDetailsModel _instantiate(DecodingData data) {
@@ -154,6 +161,7 @@ class GenericDetailsModelMapper extends ClassMapperBase<GenericDetailsModel> {
       tags: data.dec(_f$tags),
       extras: data.dec(_f$extras),
       ticketId: data.dec(_f$ticketId),
+      contactMobile: data.dec(_f$contactMobile),
     );
   }
 
@@ -180,10 +188,16 @@ mixin GenericDetailsModelMappable {
         .encodeMap<GenericDetailsModel>(this as GenericDetailsModel);
   }
 
-  GenericDetailsModelCopyWith<GenericDetailsModel, GenericDetailsModel,
-      GenericDetailsModel> get copyWith => _GenericDetailsModelCopyWithImpl<
-          GenericDetailsModel, GenericDetailsModel>(
-      this as GenericDetailsModel, $identity, $identity);
+  GenericDetailsModelCopyWith<
+    GenericDetailsModel,
+    GenericDetailsModel,
+    GenericDetailsModel
+  >
+  get copyWith =>
+      _GenericDetailsModelCopyWithImpl<
+        GenericDetailsModel,
+        GenericDetailsModel
+      >(this as GenericDetailsModel, $identity, $identity);
   @override
   String toString() {
     return GenericDetailsModelMapper.ensureInitialized().stringifyValue(
@@ -210,17 +224,25 @@ mixin GenericDetailsModelMappable {
 extension GenericDetailsModelValueCopy<$R, $Out>
     on ObjectCopyWith<$R, GenericDetailsModel, $Out> {
   GenericDetailsModelCopyWith<$R, GenericDetailsModel, $Out>
-      get $asGenericDetailsModel => $base.as(
-            (v, t, t2) => _GenericDetailsModelCopyWithImpl<$R, $Out>(v, t, t2),
-          );
+  get $asGenericDetailsModel => $base.as(
+    (v, t, t2) => _GenericDetailsModelCopyWithImpl<$R, $Out>(v, t, t2),
+  );
 }
 
-abstract class GenericDetailsModelCopyWith<$R, $In extends GenericDetailsModel,
-    $Out> implements ClassCopyWith<$R, $In, $Out> {
+abstract class GenericDetailsModelCopyWith<
+  $R,
+  $In extends GenericDetailsModel,
+  $Out
+>
+    implements ClassCopyWith<$R, $In, $Out> {
   ListCopyWith<$R, TagModel, TagModelCopyWith<$R, TagModel, TagModel>>?
-      get tags;
-  ListCopyWith<$R, ExtrasModel,
-      ExtrasModelCopyWith<$R, ExtrasModel, ExtrasModel>>? get extras;
+  get tags;
+  ListCopyWith<
+    $R,
+    ExtrasModel,
+    ExtrasModelCopyWith<$R, ExtrasModel, ExtrasModel>
+  >?
+  get extras;
   $R call({
     String? primaryText,
     String? secondaryText,
@@ -231,6 +253,7 @@ abstract class GenericDetailsModelCopyWith<$R, $In extends GenericDetailsModel,
     List<TagModel>? tags,
     List<ExtrasModel>? extras,
     int? ticketId,
+    String? contactMobile,
   });
   GenericDetailsModelCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
     Then<$Out2, $R2> t,
@@ -247,23 +270,26 @@ class _GenericDetailsModelCopyWithImpl<$R, $Out>
       GenericDetailsModelMapper.ensureInitialized();
   @override
   ListCopyWith<$R, TagModel, TagModelCopyWith<$R, TagModel, TagModel>>?
-      get tags => $value.tags != null
-          ? ListCopyWith(
-              $value.tags!,
-              (v, t) => v.copyWith.$chain(t),
-              (v) => call(tags: v),
-            )
-          : null;
+  get tags => $value.tags != null
+      ? ListCopyWith(
+          $value.tags!,
+          (v, t) => v.copyWith.$chain(t),
+          (v) => call(tags: v),
+        )
+      : null;
   @override
-  ListCopyWith<$R, ExtrasModel,
-          ExtrasModelCopyWith<$R, ExtrasModel, ExtrasModel>>?
-      get extras => $value.extras != null
-          ? ListCopyWith(
-              $value.extras!,
-              (v, t) => v.copyWith.$chain(t),
-              (v) => call(extras: v),
-            )
-          : null;
+  ListCopyWith<
+    $R,
+    ExtrasModel,
+    ExtrasModelCopyWith<$R, ExtrasModel, ExtrasModel>
+  >?
+  get extras => $value.extras != null
+      ? ListCopyWith(
+          $value.extras!,
+          (v, t) => v.copyWith.$chain(t),
+          (v) => call(extras: v),
+        )
+      : null;
   @override
   $R call({
     String? primaryText,
@@ -275,35 +301,38 @@ class _GenericDetailsModelCopyWithImpl<$R, $Out>
     Object? tags = $none,
     Object? extras = $none,
     Object? ticketId = $none,
-  }) =>
-      $apply(
-        FieldCopyWithData({
-          if (primaryText != null) #primaryText: primaryText,
-          if (secondaryText != null) #secondaryText: secondaryText,
-          if (startTime != null) #startTime: startTime,
-          if (location != null) #location: location,
-          if (type != null) #type: type,
-          if (endTime != $none) #endTime: endTime,
-          if (tags != $none) #tags: tags,
-          if (extras != $none) #extras: extras,
-          if (ticketId != $none) #ticketId: ticketId,
-        }),
-      );
+    Object? contactMobile = $none,
+  }) => $apply(
+    FieldCopyWithData({
+      if (primaryText != null) #primaryText: primaryText,
+      if (secondaryText != null) #secondaryText: secondaryText,
+      if (startTime != null) #startTime: startTime,
+      if (location != null) #location: location,
+      if (type != null) #type: type,
+      if (endTime != $none) #endTime: endTime,
+      if (tags != $none) #tags: tags,
+      if (extras != $none) #extras: extras,
+      if (ticketId != $none) #ticketId: ticketId,
+      if (contactMobile != $none) #contactMobile: contactMobile,
+    }),
+  );
   @override
   GenericDetailsModel $make(CopyWithData data) => GenericDetailsModel(
-        primaryText: data.get(#primaryText, or: $value.primaryText),
-        secondaryText: data.get(#secondaryText, or: $value.secondaryText),
-        startTime: data.get(#startTime, or: $value.startTime),
-        location: data.get(#location, or: $value.location),
-        type: data.get(#type, or: $value.type),
-        endTime: data.get(#endTime, or: $value.endTime),
-        tags: data.get(#tags, or: $value.tags),
-        extras: data.get(#extras, or: $value.extras),
-        ticketId: data.get(#ticketId, or: $value.ticketId),
-      );
+    primaryText: data.get(#primaryText, or: $value.primaryText),
+    secondaryText: data.get(#secondaryText, or: $value.secondaryText),
+    startTime: data.get(#startTime, or: $value.startTime),
+    location: data.get(#location, or: $value.location),
+    type: data.get(#type, or: $value.type),
+    endTime: data.get(#endTime, or: $value.endTime),
+    tags: data.get(#tags, or: $value.tags),
+    extras: data.get(#extras, or: $value.extras),
+    ticketId: data.get(#ticketId, or: $value.ticketId),
+    contactMobile: data.get(#contactMobile, or: $value.contactMobile),
+  );
 
   @override
   GenericDetailsModelCopyWith<$R2, GenericDetailsModel, $Out2>
-      $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
-          _GenericDetailsModelCopyWithImpl<$R2, $Out2>($value, $cast, t);
+  $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
+      _GenericDetailsModelCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }
+

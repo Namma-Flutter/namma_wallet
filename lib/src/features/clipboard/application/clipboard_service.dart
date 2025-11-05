@@ -68,7 +68,36 @@ class ClipboardService {
           );
         }
 
-        // Try to parse as travel ticket
+        // First, check if this is an update SMS (e.g., conductor details)
+        final updateInfo = TravelParserService.parseUpdateSMS(content);
+
+        if (updateInfo != null) {
+          // This is an update SMS. Attempt to apply the update.
+          final db = WalletDatabase.instance;
+          final count = await db.updateTravelTicketByPNR(
+            updateInfo.pnrNumber,
+            updateInfo.updates,
+          );
+
+          if (count > 0) {
+            developer.log('Ticket updated successfully via SMS',
+                name: 'ClipboardService');
+            print('✅ CLIPBOARD: Ticket updated successfully via SMS.');
+            return ClipboardResult.success(
+              ClipboardContentType.travelTicket,
+              content,
+            );
+          } else {
+            developer.log('Update SMS received, but no matching ticket found',
+                name: 'ClipboardService');
+            print(
+                '⚠️ CLIPBOARD: Update SMS received, but no matching ticket found.');
+            return ClipboardResult.error(
+                'Update SMS received, but the original ticket was not found in the wallet.');
+          }
+        }
+
+        // If it's not an update SMS, proceed with parsing as a new ticket.
         final parsedTicket = TravelParserService.parseTicketFromText(
           content,
           sourceType: SourceType.clipboard,
@@ -149,8 +178,9 @@ class ClipboardService {
     if (result.isSuccess) {
       message = switch (result.type) {
         ClipboardContentType.text => 'Text content read successfully',
-        ClipboardContentType.travelTicket =>
-          'Travel ticket saved successfully!',
+        ClipboardContentType.travelTicket => result.ticket != null
+            ? 'Travel ticket saved successfully!'
+            : 'Ticket updated with conductor details!',
         ClipboardContentType.invalid => 'Invalid content',
       };
       backgroundColor = Colors.green;

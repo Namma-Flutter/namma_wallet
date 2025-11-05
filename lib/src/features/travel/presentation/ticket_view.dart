@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:namma_wallet/src/common/database/wallet_database.dart';
-import 'package:namma_wallet/src/common/helper/check_pnr_id.dart';
 import 'package:namma_wallet/src/common/helper/date_time_converter.dart';
 import 'package:namma_wallet/src/common/theme/styles.dart';
 import 'package:namma_wallet/src/common/widgets/custom_back_button.dart';
@@ -15,6 +14,7 @@ import 'package:namma_wallet/src/features/home/presentation/widgets/highlight_wi
 import 'package:namma_wallet/src/features/travel/presentation/widgets/custom_ticket_shape_line.dart';
 import 'package:namma_wallet/src/features/travel/presentation/widgets/ticket_view_widget.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class TicketView extends StatefulWidget {
   const TicketView({required this.ticket, super.key});
@@ -32,6 +32,25 @@ class _TicketViewState extends State<TicketView> {
   // Helper method to handle empty values
   String getValueOrDefault(String? value) {
     return (value?.isEmpty ?? true) ? '--' : value!;
+  }
+
+  bool hasPnrOrId(GenericDetailsModel ticket) {
+    return getPnrOrId(ticket) != null;
+  }
+
+  String? getPnrOrId(GenericDetailsModel ticket) {
+    for (final extra in ticket.extras ?? []) {
+      if (extra.title?.toLowerCase() == 'pnr number') {
+        return extra.value as String;
+      }
+    }
+
+    for (final extra in ticket.extras ?? []) {
+      if (extra.title?.toLowerCase() == 'booking id') {
+        return extra.value as String;
+      }
+    }
+    return null;
   }
 
   Future<void> _pinToHomeScreen() async {
@@ -54,7 +73,7 @@ class _TicketViewState extends State<TicketView> {
       if (mounted) {
         showSnackbar(context, '📌 Ticket pinned to home screen successfully!');
       }
-    } catch (e) {
+    } on Object catch (e) {
       developer.log('Failed to pin ticket to home screen',
           name: 'TicketView', error: e);
       if (mounted) {
@@ -79,8 +98,7 @@ class _TicketViewState extends State<TicketView> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Delete Ticket'),
-        content: const Text(
-            'Are you sure you want to delete this ticket? This action cannot be undone.'),
+        content: const Text('Are you sure you want to delete this ticket?'),
         actions: [
           TextButton(
             onPressed: () => context.pop(false),
@@ -95,7 +113,7 @@ class _TicketViewState extends State<TicketView> {
       ),
     );
 
-    if (confirmed ?? false && mounted) {
+    if (mounted && (confirmed ?? false)) {
       await _deleteTicket();
     }
   }
@@ -113,15 +131,13 @@ class _TicketViewState extends State<TicketView> {
       developer.log(
           'Successfully deleted ticket with ID: ${widget.ticket.ticketId}',
           name: 'TicketView');
-      print('✅ TICKET DELETE: Ticket deleted successfully');
 
       if (mounted) {
         showSnackbar(context, 'Ticket deleted successfully');
         context.pop(true); // Return true to indicate ticket was deleted
       }
-    } catch (e) {
+    } on Object catch (e) {
       developer.log('Failed to delete ticket', name: 'TicketView', error: e);
-      print('🔴 TICKET DELETE ERROR: Failed to delete ticket: $e');
 
       if (mounted) {
         showSnackbar(context, 'Failed to delete ticket: $e', isError: true);
@@ -131,6 +147,30 @@ class _TicketViewState extends State<TicketView> {
         setState(() {
           _isDeleting = false;
         });
+      }
+    }
+  }
+
+  Future<void> _makePhoneCall() async {
+    final mobile = widget.ticket.contactMobile;
+    if (mobile == null || mobile.isEmpty) return;
+
+    final uri = Uri(scheme: 'tel', path: mobile);
+    try {
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri);
+        developer.log('Launched phone call to $mobile', name: 'TicketView');
+      } else {
+        if (mounted) {
+          showSnackbar(context, 'Cannot make phone calls on this device',
+              isError: true);
+        }
+      }
+    } on Object catch (e) {
+      developer.log('Failed to launch phone call',
+          name: 'TicketView', error: e);
+      if (mounted) {
+        showSnackbar(context, 'Failed to make call: $e', isError: true);
       }
     }
   }
@@ -314,7 +354,7 @@ class _TicketViewState extends State<TicketView> {
               ),
             ),
           ),
-          // Bottom section with Pin to Home Screen button
+          // Bottom section with action buttons
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
@@ -330,38 +370,106 @@ class _TicketViewState extends State<TicketView> {
               ],
             ),
             child: SafeArea(
-              child: SizedBox(
-                width: double.infinity,
-                height: 50,
-                child: ElevatedButton.icon(
-                  onPressed: _isPinning ? null : _pinToHomeScreen,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Theme.of(context).colorScheme.primary,
-                    foregroundColor: Colors.black87,
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  icon: _isPinning
-                      ? const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: Colors.black54,
+              child: widget.ticket.contactMobile != null &&
+                      widget.ticket.contactMobile!.isNotEmpty
+                  ? Row(
+                      spacing: 12,
+                      children: [
+                        // Call button (when mobile number is available)
+                        Expanded(
+                          child: SizedBox(
+                            height: 50,
+                            child: ElevatedButton.icon(
+                              onPressed: _makePhoneCall,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.green.shade600,
+                                foregroundColor: Colors.white,
+                                elevation: 0,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              icon: const Icon(Icons.phone, size: 20),
+                              label: const Text(
+                                'Call Conductor',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ),
                           ),
-                        )
-                      : const Icon(Icons.push_pin, size: 20),
-                  label: Text(
-                    _isPinning ? 'Pinning...' : 'Pin to Home Screen',
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
+                        ),
+                        // Pin button
+                        Expanded(
+                          child: SizedBox(
+                            height: 50,
+                            child: ElevatedButton.icon(
+                              onPressed: _isPinning ? null : _pinToHomeScreen,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor:
+                                    Theme.of(context).colorScheme.primary,
+                                foregroundColor: Colors.black87,
+                                elevation: 0,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              icon: _isPinning
+                                  ? const SizedBox(
+                                      width: 20,
+                                      height: 20,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        color: Colors.black54,
+                                      ),
+                                    )
+                                  : const Icon(Icons.push_pin, size: 20),
+                              label: Text(
+                                _isPinning ? 'Pinning...' : 'Pin',
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    )
+                  : SizedBox(
+                      width: double.infinity,
+                      height: 50,
+                      child: ElevatedButton.icon(
+                        onPressed: _isPinning ? null : _pinToHomeScreen,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor:
+                              Theme.of(context).colorScheme.primary,
+                          foregroundColor: Colors.black87,
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        icon: _isPinning
+                            ? const SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: Colors.black54,
+                                ),
+                              )
+                            : const Icon(Icons.push_pin, size: 20),
+                        label: Text(
+                          _isPinning ? 'Pinning...' : 'Pin to Home Screen',
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-              ),
             ),
           ),
         ],

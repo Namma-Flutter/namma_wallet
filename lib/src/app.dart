@@ -1,8 +1,11 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:namma_wallet/src/common/helper/check_pnr_id.dart';
 import 'package:namma_wallet/src/common/routing/app_router.dart';
 import 'package:namma_wallet/src/common/services/sharing_intent_service.dart';
 import 'package:namma_wallet/src/common/theme/app_theme.dart';
 import 'package:namma_wallet/src/common/theme/theme_provider.dart';
+import 'package:namma_wallet/src/features/tnstc/application/sms_service.dart';
 import 'package:provider/provider.dart';
 
 class NammaWalletApp extends StatefulWidget {
@@ -15,6 +18,7 @@ class NammaWalletApp extends StatefulWidget {
 class _NammaWalletAppState extends State<NammaWalletApp> {
   int currentPageIndex = 0;
   final SharingIntentService _sharingService = SharingIntentService();
+  final SMSService _smsService = SMSService();
   final GlobalKey<ScaffoldMessengerState> _scaffoldMessengerKey =
       GlobalKey<ScaffoldMessengerState>();
 
@@ -24,15 +28,29 @@ class _NammaWalletAppState extends State<NammaWalletApp> {
 
     // Initialize sharing intent service for file logging
     _sharingService.initialize(
-      onFileReceived: (fileName) {
-        // Show user that file was received
-        _scaffoldMessengerKey.currentState?.showSnackBar(
-          SnackBar(
-            content: Text('📄 Shared file received: $fileName'),
-            backgroundColor: Colors.blue,
-            duration: const Duration(seconds: 3),
-          ),
-        );
+      onFileReceived: (filePath) async {
+        try {
+          final file = File(filePath);
+          final content = await file.readAsString();
+          final ticket = _smsService.parseTicket(content);
+          await checkAndUpadteTNSTCTicket(ticket);
+
+          _scaffoldMessengerKey.currentState?.showSnackBar(
+            SnackBar(
+              content: Text('📄 Shared SMS processed for PNR: ${ticket.pnrNumber}'),
+              backgroundColor: Colors.green,
+              duration: const Duration(seconds: 3),
+            ),
+          );
+        } catch (e) {
+          _scaffoldMessengerKey.currentState?.showSnackBar(
+            SnackBar(
+              content: Text('❌ Error processing shared SMS: $e'),
+              backgroundColor: Colors.red,
+              duration: const Duration(seconds: 5),
+            ),
+          );
+        }
       },
       onError: (error) {
         //error message

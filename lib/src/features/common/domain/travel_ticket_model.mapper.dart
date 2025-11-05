@@ -198,6 +198,18 @@ class TravelTicketModelMapper extends ClassMapperBase<TravelTicketModel> {
   @override
   final String id = 'TravelTicketModel';
 
+  static TicketType _$ticketType(TravelTicketModel v) => v.ticketType;
+  static const Field<TravelTicketModel, TicketType> _f$ticketType = Field(
+    'ticketType',
+    _$ticketType,
+    key: r'ticket_type',
+  );
+  static String _$providerName(TravelTicketModel v) => v.providerName;
+  static const Field<TravelTicketModel, String> _f$providerName = Field(
+    'providerName',
+    _$providerName,
+    key: r'provider_name',
+  );
   static int? _$id(TravelTicketModel v) => v.id;
   static const Field<TravelTicketModel, int> _f$id = Field(
     'id',
@@ -211,18 +223,6 @@ class TravelTicketModelMapper extends ClassMapperBase<TravelTicketModel> {
     key: r'user_id',
     opt: true,
     def: 1,
-  );
-  static TicketType _$ticketType(TravelTicketModel v) => v.ticketType;
-  static const Field<TravelTicketModel, TicketType> _f$ticketType = Field(
-    'ticketType',
-    _$ticketType,
-    key: r'ticket_type',
-  );
-  static String _$providerName(TravelTicketModel v) => v.providerName;
-  static const Field<TravelTicketModel, String> _f$providerName = Field(
-    'providerName',
-    _$providerName,
-    key: r'provider_name',
   );
   static String? _$bookingReference(TravelTicketModel v) => v.bookingReference;
   static const Field<TravelTicketModel, String> _f$bookingReference = Field(
@@ -385,6 +385,13 @@ class TravelTicketModelMapper extends ClassMapperBase<TravelTicketModel> {
     key: r'venue_name',
     opt: true,
   );
+  static String? _$contactMobile(TravelTicketModel v) => v.contactMobile;
+  static const Field<TravelTicketModel, String> _f$contactMobile = Field(
+    'contactMobile',
+    _$contactMobile,
+    key: r'contact_mobile',
+    opt: true,
+  );
   static SourceType _$sourceType(TravelTicketModel v) => v.sourceType;
   static const Field<TravelTicketModel, SourceType> _f$sourceType = Field(
     'sourceType',
@@ -445,10 +452,10 @@ class TravelTicketModelMapper extends ClassMapperBase<TravelTicketModel> {
 
   @override
   final MappableFields<TravelTicketModel> fields = const {
-    #id: _f$id,
-    #userId: _f$userId,
     #ticketType: _f$ticketType,
     #providerName: _f$providerName,
+    #id: _f$id,
+    #userId: _f$userId,
     #bookingReference: _f$bookingReference,
     #pnrNumber: _f$pnrNumber,
     #tripCode: _f$tripCode,
@@ -472,6 +479,7 @@ class TravelTicketModelMapper extends ClassMapperBase<TravelTicketModel> {
     #pickupLocation: _f$pickupLocation,
     #eventName: _f$eventName,
     #venueName: _f$venueName,
+    #contactMobile: _f$contactMobile,
     #sourceType: _f$sourceType,
     #rawData: _f$rawData,
     #createdAt: _f$createdAt,
@@ -485,10 +493,10 @@ class TravelTicketModelMapper extends ClassMapperBase<TravelTicketModel> {
 
   static TravelTicketModel _instantiate(DecodingData data) {
     return TravelTicketModel(
-      id: data.dec(_f$id),
-      userId: data.dec(_f$userId),
       ticketType: data.dec(_f$ticketType),
       providerName: data.dec(_f$providerName),
+      id: data.dec(_f$id),
+      userId: data.dec(_f$userId),
       bookingReference: data.dec(_f$bookingReference),
       pnrNumber: data.dec(_f$pnrNumber),
       tripCode: data.dec(_f$tripCode),
@@ -512,6 +520,7 @@ class TravelTicketModelMapper extends ClassMapperBase<TravelTicketModel> {
       pickupLocation: data.dec(_f$pickupLocation),
       eventName: data.dec(_f$eventName),
       venueName: data.dec(_f$venueName),
+      contactMobile: data.dec(_f$contactMobile),
       sourceType: data.dec(_f$sourceType),
       rawData: data.dec(_f$rawData),
       createdAt: data.dec(_f$createdAt),
@@ -542,14 +551,17 @@ mixin TravelTicketModelMappable {
         .encodeMap<TravelTicketModel>(this as TravelTicketModel);
   }
 
-  TravelTicketModelCopyWith<TravelTicketModel, TravelTicketModel,
-          TravelTicketModel>
-      get copyWith =>
-          _TravelTicketModelCopyWithImpl<TravelTicketModel, TravelTicketModel>(
-            this as TravelTicketModel,
-            $identity,
-            $identity,
-          );
+  TravelTicketModelCopyWith<
+    TravelTicketModel,
+    TravelTicketModel,
+    TravelTicketModel
+  >
+  get copyWith =>
+      _TravelTicketModelCopyWithImpl<TravelTicketModel, TravelTicketModel>(
+        this as TravelTicketModel,
+        $identity,
+        $identity,
+      );
   @override
   String toString() {
     return TravelTicketModelMapper.ensureInitialized().stringifyValue(
@@ -576,18 +588,22 @@ mixin TravelTicketModelMappable {
 extension TravelTicketModelValueCopy<$R, $Out>
     on ObjectCopyWith<$R, TravelTicketModel, $Out> {
   TravelTicketModelCopyWith<$R, TravelTicketModel, $Out>
-      get $asTravelTicketModel => $base.as(
-            (v, t, t2) => _TravelTicketModelCopyWithImpl<$R, $Out>(v, t, t2),
-          );
+  get $asTravelTicketModel => $base.as(
+    (v, t, t2) => _TravelTicketModelCopyWithImpl<$R, $Out>(v, t, t2),
+  );
 }
 
-abstract class TravelTicketModelCopyWith<$R, $In extends TravelTicketModel,
-    $Out> implements ClassCopyWith<$R, $In, $Out> {
+abstract class TravelTicketModelCopyWith<
+  $R,
+  $In extends TravelTicketModel,
+  $Out
+>
+    implements ClassCopyWith<$R, $In, $Out> {
   $R call({
-    int? id,
-    int? userId,
     TicketType? ticketType,
     String? providerName,
+    int? id,
+    int? userId,
     String? bookingReference,
     String? pnrNumber,
     String? tripCode,
@@ -611,6 +627,7 @@ abstract class TravelTicketModelCopyWith<$R, $In extends TravelTicketModel,
     String? pickupLocation,
     String? eventName,
     String? venueName,
+    String? contactMobile,
     SourceType? sourceType,
     String? rawData,
     String? createdAt,
@@ -631,10 +648,10 @@ class _TravelTicketModelCopyWithImpl<$R, $Out>
       TravelTicketModelMapper.ensureInitialized();
   @override
   $R call({
-    Object? id = $none,
-    int? userId,
     TicketType? ticketType,
     String? providerName,
+    Object? id = $none,
+    int? userId,
     Object? bookingReference = $none,
     Object? pnrNumber = $none,
     Object? tripCode = $none,
@@ -658,89 +675,90 @@ class _TravelTicketModelCopyWithImpl<$R, $Out>
     Object? pickupLocation = $none,
     Object? eventName = $none,
     Object? venueName = $none,
+    Object? contactMobile = $none,
     SourceType? sourceType,
     Object? rawData = $none,
     Object? createdAt = $none,
     Object? updatedAt = $none,
-  }) =>
-      $apply(
-        FieldCopyWithData({
-          if (id != $none) #id: id,
-          if (userId != null) #userId: userId,
-          if (ticketType != null) #ticketType: ticketType,
-          if (providerName != null) #providerName: providerName,
-          if (bookingReference != $none) #bookingReference: bookingReference,
-          if (pnrNumber != $none) #pnrNumber: pnrNumber,
-          if (tripCode != $none) #tripCode: tripCode,
-          if (sourceLocation != $none) #sourceLocation: sourceLocation,
-          if (destinationLocation != $none)
-            #destinationLocation: destinationLocation,
-          if (journeyDate != $none) #journeyDate: journeyDate,
-          if (journeyTime != $none) #journeyTime: journeyTime,
-          if (departureTime != $none) #departureTime: departureTime,
-          if (arrivalTime != $none) #arrivalTime: arrivalTime,
-          if (passengerName != $none) #passengerName: passengerName,
-          if (passengerAge != $none) #passengerAge: passengerAge,
-          if (passengerGender != $none) #passengerGender: passengerGender,
-          if (seatNumbers != $none) #seatNumbers: seatNumbers,
-          if (coachNumber != $none) #coachNumber: coachNumber,
-          if (classOfService != $none) #classOfService: classOfService,
-          if (bookingDate != $none) #bookingDate: bookingDate,
-          if (amount != $none) #amount: amount,
-          if (currency != null) #currency: currency,
-          if (status != null) #status: status,
-          if (boardingPoint != $none) #boardingPoint: boardingPoint,
-          if (pickupLocation != $none) #pickupLocation: pickupLocation,
-          if (eventName != $none) #eventName: eventName,
-          if (venueName != $none) #venueName: venueName,
-          if (sourceType != null) #sourceType: sourceType,
-          if (rawData != $none) #rawData: rawData,
-          if (createdAt != $none) #createdAt: createdAt,
-          if (updatedAt != $none) #updatedAt: updatedAt,
-        }),
-      );
+  }) => $apply(
+    FieldCopyWithData({
+      if (ticketType != null) #ticketType: ticketType,
+      if (providerName != null) #providerName: providerName,
+      if (id != $none) #id: id,
+      if (userId != null) #userId: userId,
+      if (bookingReference != $none) #bookingReference: bookingReference,
+      if (pnrNumber != $none) #pnrNumber: pnrNumber,
+      if (tripCode != $none) #tripCode: tripCode,
+      if (sourceLocation != $none) #sourceLocation: sourceLocation,
+      if (destinationLocation != $none)
+        #destinationLocation: destinationLocation,
+      if (journeyDate != $none) #journeyDate: journeyDate,
+      if (journeyTime != $none) #journeyTime: journeyTime,
+      if (departureTime != $none) #departureTime: departureTime,
+      if (arrivalTime != $none) #arrivalTime: arrivalTime,
+      if (passengerName != $none) #passengerName: passengerName,
+      if (passengerAge != $none) #passengerAge: passengerAge,
+      if (passengerGender != $none) #passengerGender: passengerGender,
+      if (seatNumbers != $none) #seatNumbers: seatNumbers,
+      if (coachNumber != $none) #coachNumber: coachNumber,
+      if (classOfService != $none) #classOfService: classOfService,
+      if (bookingDate != $none) #bookingDate: bookingDate,
+      if (amount != $none) #amount: amount,
+      if (currency != null) #currency: currency,
+      if (status != null) #status: status,
+      if (boardingPoint != $none) #boardingPoint: boardingPoint,
+      if (pickupLocation != $none) #pickupLocation: pickupLocation,
+      if (eventName != $none) #eventName: eventName,
+      if (venueName != $none) #venueName: venueName,
+      if (contactMobile != $none) #contactMobile: contactMobile,
+      if (sourceType != null) #sourceType: sourceType,
+      if (rawData != $none) #rawData: rawData,
+      if (createdAt != $none) #createdAt: createdAt,
+      if (updatedAt != $none) #updatedAt: updatedAt,
+    }),
+  );
   @override
   TravelTicketModel $make(CopyWithData data) => TravelTicketModel(
-        id: data.get(#id, or: $value.id),
-        userId: data.get(#userId, or: $value.userId),
-        ticketType: data.get(#ticketType, or: $value.ticketType),
-        providerName: data.get(#providerName, or: $value.providerName),
-        bookingReference:
-            data.get(#bookingReference, or: $value.bookingReference),
-        pnrNumber: data.get(#pnrNumber, or: $value.pnrNumber),
-        tripCode: data.get(#tripCode, or: $value.tripCode),
-        sourceLocation: data.get(#sourceLocation, or: $value.sourceLocation),
-        destinationLocation: data.get(
-          #destinationLocation,
-          or: $value.destinationLocation,
-        ),
-        journeyDate: data.get(#journeyDate, or: $value.journeyDate),
-        journeyTime: data.get(#journeyTime, or: $value.journeyTime),
-        departureTime: data.get(#departureTime, or: $value.departureTime),
-        arrivalTime: data.get(#arrivalTime, or: $value.arrivalTime),
-        passengerName: data.get(#passengerName, or: $value.passengerName),
-        passengerAge: data.get(#passengerAge, or: $value.passengerAge),
-        passengerGender: data.get(#passengerGender, or: $value.passengerGender),
-        seatNumbers: data.get(#seatNumbers, or: $value.seatNumbers),
-        coachNumber: data.get(#coachNumber, or: $value.coachNumber),
-        classOfService: data.get(#classOfService, or: $value.classOfService),
-        bookingDate: data.get(#bookingDate, or: $value.bookingDate),
-        amount: data.get(#amount, or: $value.amount),
-        currency: data.get(#currency, or: $value.currency),
-        status: data.get(#status, or: $value.status),
-        boardingPoint: data.get(#boardingPoint, or: $value.boardingPoint),
-        pickupLocation: data.get(#pickupLocation, or: $value.pickupLocation),
-        eventName: data.get(#eventName, or: $value.eventName),
-        venueName: data.get(#venueName, or: $value.venueName),
-        sourceType: data.get(#sourceType, or: $value.sourceType),
-        rawData: data.get(#rawData, or: $value.rawData),
-        createdAt: data.get(#createdAt, or: $value.createdAt),
-        updatedAt: data.get(#updatedAt, or: $value.updatedAt),
-      );
+    ticketType: data.get(#ticketType, or: $value.ticketType),
+    providerName: data.get(#providerName, or: $value.providerName),
+    id: data.get(#id, or: $value.id),
+    userId: data.get(#userId, or: $value.userId),
+    bookingReference: data.get(#bookingReference, or: $value.bookingReference),
+    pnrNumber: data.get(#pnrNumber, or: $value.pnrNumber),
+    tripCode: data.get(#tripCode, or: $value.tripCode),
+    sourceLocation: data.get(#sourceLocation, or: $value.sourceLocation),
+    destinationLocation: data.get(
+      #destinationLocation,
+      or: $value.destinationLocation,
+    ),
+    journeyDate: data.get(#journeyDate, or: $value.journeyDate),
+    journeyTime: data.get(#journeyTime, or: $value.journeyTime),
+    departureTime: data.get(#departureTime, or: $value.departureTime),
+    arrivalTime: data.get(#arrivalTime, or: $value.arrivalTime),
+    passengerName: data.get(#passengerName, or: $value.passengerName),
+    passengerAge: data.get(#passengerAge, or: $value.passengerAge),
+    passengerGender: data.get(#passengerGender, or: $value.passengerGender),
+    seatNumbers: data.get(#seatNumbers, or: $value.seatNumbers),
+    coachNumber: data.get(#coachNumber, or: $value.coachNumber),
+    classOfService: data.get(#classOfService, or: $value.classOfService),
+    bookingDate: data.get(#bookingDate, or: $value.bookingDate),
+    amount: data.get(#amount, or: $value.amount),
+    currency: data.get(#currency, or: $value.currency),
+    status: data.get(#status, or: $value.status),
+    boardingPoint: data.get(#boardingPoint, or: $value.boardingPoint),
+    pickupLocation: data.get(#pickupLocation, or: $value.pickupLocation),
+    eventName: data.get(#eventName, or: $value.eventName),
+    venueName: data.get(#venueName, or: $value.venueName),
+    contactMobile: data.get(#contactMobile, or: $value.contactMobile),
+    sourceType: data.get(#sourceType, or: $value.sourceType),
+    rawData: data.get(#rawData, or: $value.rawData),
+    createdAt: data.get(#createdAt, or: $value.createdAt),
+    updatedAt: data.get(#updatedAt, or: $value.updatedAt),
+  );
 
   @override
   TravelTicketModelCopyWith<$R2, TravelTicketModel, $Out2> $chain<$R2, $Out2>(
     Then<$Out2, $R2> t,
-  ) =>
-      _TravelTicketModelCopyWithImpl<$R2, $Out2>($value, $cast, t);
+  ) => _TravelTicketModelCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }
+
