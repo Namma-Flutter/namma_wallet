@@ -1,6 +1,5 @@
 import 'dart:developer' as developer;
 
-import 'package:namma_wallet/src/common/database/wallet_database.dart';
 import 'package:namma_wallet/src/features/common/domain/travel_ticket_model.dart';
 
 abstract class TravelTicketParser {
@@ -64,13 +63,13 @@ class TNSTCBusParser implements TravelTicketParser {
     }
 
     // Try multiple PNR patterns (handles "PNR:", "PNR NO.", "PNR Number")
-    var pnrNumber = extractMatch(r'PNR\s*(?:NO\.?|Number)?\s*:\s*([^,\s]+)', text);
+    var pnrNumber =
+        extractMatch(r'PNR\s*(?:NO\.?|Number)?\s*:\s*([^,\s]+)', text);
 
     // Try multiple date patterns (DOJ, Journey Date, Date of Journey)
     final journeyDateStr = extractMatch(
-      r'(?:DOJ|Journey Date|Date of Journey)\s*:\s*(\d{2}[/-]\d{2}[/-]\d{4})',
-      text
-    );
+        r'(?:DOJ|Journey Date|Date of Journey)\s*:\s*(\d{2}[/-]\d{2}[/-]\d{4})',
+        text);
     var journeyDate = parseDate(journeyDateStr);
 
     // Try multiple patterns for route/vehicle information
@@ -107,12 +106,12 @@ class TNSTCBusParser implements TravelTicketParser {
     }
 
     journeyDate ??= parseDate(
-      extractMatch(
-          r'Date of Journey\s*:\s*(\d{2}[/-]\d{2}[/-]\d{4})', text),
+      extractMatch(r'Date of Journey\s*:\s*(\d{2}[/-]\d{2}[/-]\d{4})', text),
     );
 
     if (departureTime.isEmpty) {
-      departureTime = extractMatch(r'Service Start Time\s*:\s*(\d{2}:\d{2})', text);
+      departureTime =
+          extractMatch(r'Service Start Time\s*:\s*(\d{2}:\d{2})', text);
     }
 
     if (classOfService.isEmpty) {
@@ -289,8 +288,8 @@ class TravelParserService {
     if (text.toUpperCase().contains('TNSTC') &&
         (text.toLowerCase().contains('conductor mobile no') ||
             text.toLowerCase().contains('vehicle no'))) {
-      final pnrMatch = RegExp(r'PNR\s*:\s*([^,\s]+)', caseSensitive: false)
-          .firstMatch(text);
+      final pnrMatch =
+          RegExp(r'PNR\s*:\s*([^,\s]+)', caseSensitive: false).firstMatch(text);
 
       if (pnrMatch == null) return null;
 
@@ -307,8 +306,9 @@ class TravelParserService {
       }
 
       // Extract vehicle number
-      final vehicleMatch = RegExp(r'Vehicle No\s*:\s*([^,\s]+)', caseSensitive: false)
-          .firstMatch(text);
+      final vehicleMatch =
+          RegExp(r'Vehicle No\s*:\s*([^,\s]+)', caseSensitive: false)
+              .firstMatch(text);
       if (vehicleMatch != null) {
         updates['trip_code'] = vehicleMatch.group(1)!.trim();
       }
@@ -318,7 +318,6 @@ class TravelParserService {
           'Detected TNSTC update SMS for PNR: $pnr with updates: $updates',
           name: 'TravelParserService',
         );
-        print('🔄 UPDATE SMS: Found details for PNR $pnr');
 
         return TicketUpdateInfo(
           pnrNumber: pnr,
@@ -340,7 +339,6 @@ class TravelParserService {
           developer.log(
               'Attempting to parse with ${parser.providerName} parser',
               name: 'TravelParserService');
-          print('🔍 PARSING: Trying ${parser.providerName} parser');
 
           final ticket = parser.parseTicket(text);
           if (ticket != null) {
@@ -349,8 +347,6 @@ class TravelParserService {
             developer.log(
                 'Successfully parsed ticket with ${parser.providerName}',
                 name: 'TravelParserService');
-            print(
-                '✅ PARSED: Successfully parsed ${parser.providerName} ticket');
 
             if (sourceType != null) {
               return ticket.copyWith(sourceType: sourceType);
@@ -362,12 +358,10 @@ class TravelParserService {
 
       developer.log('No parser could handle the text',
           name: 'TravelParserService');
-      print('❌ PARSING: No parser could handle the text');
       return null;
-    } catch (e) {
+    } on Object catch (e) {
       developer.log('Error during ticket parsing',
           name: 'TravelParserService', error: e);
-      print('🔴 PARSING ERROR: $e');
       return null;
     }
   }

@@ -73,7 +73,7 @@ class _TicketViewState extends State<TicketView> {
       if (mounted) {
         showSnackbar(context, '📌 Ticket pinned to home screen successfully!');
       }
-    } catch (e) {
+    } on Object catch (e) {
       developer.log('Failed to pin ticket to home screen',
           name: 'TicketView', error: e);
       if (mounted) {
@@ -98,8 +98,7 @@ class _TicketViewState extends State<TicketView> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Delete Ticket'),
-        content: const Text(
-            'Are you sure you want to delete this ticket? This action cannot be undone.'),
+        content: const Text('Are you sure you want to delete this ticket?'),
         actions: [
           TextButton(
             onPressed: () => context.pop(false),
@@ -114,7 +113,7 @@ class _TicketViewState extends State<TicketView> {
       ),
     );
 
-    if (confirmed ?? false && mounted) {
+    if (mounted && (confirmed ?? false)) {
       await _deleteTicket();
     }
   }
@@ -132,15 +131,13 @@ class _TicketViewState extends State<TicketView> {
       developer.log(
           'Successfully deleted ticket with ID: ${widget.ticket.ticketId}',
           name: 'TicketView');
-      print('✅ TICKET DELETE: Ticket deleted successfully');
 
       if (mounted) {
         showSnackbar(context, 'Ticket deleted successfully');
         context.pop(true); // Return true to indicate ticket was deleted
       }
-    } catch (e) {
+    } on Object catch (e) {
       developer.log('Failed to delete ticket', name: 'TicketView', error: e);
-      print('🔴 TICKET DELETE ERROR: Failed to delete ticket: $e');
 
       if (mounted) {
         showSnackbar(context, 'Failed to delete ticket: $e', isError: true);
@@ -169,7 +166,7 @@ class _TicketViewState extends State<TicketView> {
               isError: true);
         }
       }
-    } catch (e) {
+    } on Object catch (e) {
       developer.log('Failed to launch phone call',
           name: 'TicketView', error: e);
       if (mounted) {

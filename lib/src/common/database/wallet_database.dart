@@ -17,7 +17,7 @@ class WalletDatabase {
   static final WalletDatabase instance = WalletDatabase._internal();
 
   static const String _dbName = 'namma_wallet.db';
-  static const int _dbVersion = 3;
+  static const int _dbVersion = 1;
 
   Database? _database;
 
@@ -36,20 +36,8 @@ class WalletDatabase {
       version: _dbVersion,
       onCreate: (Database db, int version) async {
         await _createSchema(db);
-        // await _seedDummyData(db);
       },
-      onUpgrade: (Database db, int oldVersion, int newVersion) async {
-        if (oldVersion < 2) {
-          // Drop old tickets table and recreate with new schema
-          await db.execute('DROP TABLE IF EXISTS tickets');
-          await _createTravelTicketsTable(db);
-        }
-        if (oldVersion < 3) {
-          // Add contact_mobile column for version 3
-          await db.execute(
-              'ALTER TABLE travel_tickets ADD COLUMN contact_mobile TEXT');
-        }
-      },
+      onUpgrade: (Database db, int oldVersion, int newVersion) async {},
     );
   }
 
@@ -138,86 +126,6 @@ CREATE INDEX idx_travel_tickets_ticket_type ON travel_tickets(ticket_type);
 ''');
   }
 
-  Future<void> _seedDummyData(Database db) async {
-    // Insert a demo user
-    final userId = await db.insert('users', <String, Object?>{
-      'full_name': 'Test User',
-      'email': 'test@example.com',
-      'phone': '+911234567890',
-      'password_hash': 'hashed_password',
-    });
-
-    // Insert some demo travel tickets with new schema
-    final travelTickets = <Map<String, Object?>>[
-      {
-        'user_id': userId,
-        'ticket_type': 'BUS',
-        'provider_name': 'TNSTC',
-        'booking_reference': 'TNSTC123456',
-        'pnr_number': 'PNR123456',
-        'trip_code': 'CHN-CBE-001',
-        'source_location': 'Chennai',
-        'destination_location': 'Coimbatore',
-        'journey_date':
-            DateTime.now().add(const Duration(days: 3)).toIso8601String(),
-        'departure_time': '08:30',
-        'passenger_name': 'Test User',
-        'seat_numbers': '12A,12B',
-        'class_of_service': 'AC',
-        'booking_date': DateTime.now().toIso8601String(),
-        'amount': 599.00,
-        'status': 'CONFIRMED',
-        'boarding_point': 'Koyambedu Bus Stand',
-        'source_type': 'SMS',
-      },
-      {
-        'user_id': userId,
-        'ticket_type': 'TRAIN',
-        'provider_name': 'IRCTC',
-        'booking_reference': 'E-TICKET',
-        'pnr_number': '9876543210',
-        'source_location': 'Bangalore',
-        'destination_location': 'Chennai',
-        'journey_date':
-            DateTime.now().add(const Duration(days: 10)).toIso8601String(),
-        'departure_time': '06:00',
-        'arrival_time': '11:30',
-        'passenger_name': 'Test User',
-        'seat_numbers': 'S2-34',
-        'coach_number': 'S2',
-        'class_of_service': 'Sleeper',
-        'booking_date':
-            DateTime.now().subtract(const Duration(days: 1)).toIso8601String(),
-        'amount': 450.50,
-        'status': 'CONFIRMED',
-        'source_type': 'PDF',
-      },
-      {
-        'user_id': userId,
-        'ticket_type': 'EVENT',
-        'provider_name': 'BookMyShow',
-        'booking_reference': 'BMS-2025-ABCD',
-        'passenger_name': 'Test User',
-        'event_name': 'Music Fest 2025',
-        'venue_name': 'Chennai Trade Centre',
-        'source_location': 'Chennai Trade Centre',
-        'destination_location': 'Chennai Trade Centre',
-        'journey_date':
-            DateTime.now().add(const Duration(days: 20)).toIso8601String(),
-        'journey_time': '19:00',
-        'seat_numbers': 'A-10',
-        'booking_date': DateTime.now().toIso8601String(),
-        'amount': 999.99,
-        'status': 'CONFIRMED',
-        'source_type': 'MANUAL',
-      },
-    ];
-
-    for (final ticket in travelTickets) {
-      await db.insert('travel_tickets', ticket);
-    }
-  }
-
   // Queries
   Future<List<Map<String, Object?>>> fetchAllUsers() async {
     final db = await database;
@@ -231,12 +139,10 @@ CREATE INDEX idx_travel_tickets_ticket_type ON travel_tickets(ticket_type);
           await db.query('travel_tickets', orderBy: 'created_at DESC');
       developer.log('Successfully fetched ${tickets.length} travel tickets',
           name: 'DatabaseHelper');
-      print('✅ DB FETCH: Retrieved ${tickets.length} travel tickets');
       return tickets;
     } catch (e) {
       developer.log('Failed to fetch travel tickets',
           name: 'DatabaseHelper', error: e);
-      print('🔴 DB FETCH ERROR: Failed to retrieve travel tickets: $e');
       rethrow;
     }
   }
@@ -284,7 +190,6 @@ ORDER BY t.created_at DESC
         if (existing.isNotEmpty) {
           developer.log('Duplicate ticket found with PNR: $pnrNumber',
               name: 'DatabaseHelper');
-          print('⚠️ DB DUPLICATE: Ticket with PNR $pnrNumber already exists');
           throw DuplicateTicketException(
               'Ticket with PNR $pnrNumber already exists');
         }
@@ -299,8 +204,6 @@ ORDER BY t.created_at DESC
           developer.log(
               'Duplicate ticket found with booking reference: $bookingRef',
               name: 'DatabaseHelper');
-          print(
-              '⚠️ DB DUPLICATE: Ticket with booking reference $bookingRef already exists');
           throw DuplicateTicketException(
               'Ticket with booking reference $bookingRef already exists');
         }
@@ -309,7 +212,6 @@ ORDER BY t.created_at DESC
       final id = await db.insert('travel_tickets', ticket);
       developer.log('Successfully inserted travel ticket with ID: $id',
           name: 'DatabaseHelper');
-      print('✅ DB INSERT: Travel ticket saved with ID: $id');
       return id;
     } catch (e) {
       if (e is DuplicateTicketException) {
@@ -317,7 +219,6 @@ ORDER BY t.created_at DESC
       }
       developer.log('Failed to insert travel ticket',
           name: 'DatabaseHelper', error: e);
-      print('🔴 DB INSERT ERROR: Failed to save travel ticket: $e');
       rethrow;
     }
   }
@@ -381,22 +282,17 @@ ORDER BY t.created_at DESC
       );
 
       if (count > 0) {
-        developer.log(
-            'Successfully updated ticket with PNR: $pnrNumber',
+        developer.log('Successfully updated ticket with PNR: $pnrNumber',
             name: 'DatabaseHelper');
-        print(
-            '✅ DB UPDATE: Updated ticket with PNR $pnrNumber');
       } else {
         developer.log('No ticket found with PNR: $pnrNumber',
             name: 'DatabaseHelper');
-        print('⚠️ DB UPDATE: No ticket found with PNR $pnrNumber');
       }
 
       return count;
     } catch (e) {
       developer.log('Failed to update ticket by PNR',
           name: 'DatabaseHelper', error: e);
-      print('🔴 DB UPDATE ERROR: Failed to update ticket: $e');
       rethrow;
     }
   }
