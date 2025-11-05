@@ -122,7 +122,6 @@ class _ProfilePageState extends State<ProfilePage> {
       ),
     );
   }
-
 }
 
 // ----------------- Theme Section Widget -----------------
