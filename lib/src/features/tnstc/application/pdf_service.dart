@@ -1,6 +1,7 @@
-import 'dart:developer' as developer;
 import 'dart:io';
 
+import 'package:namma_wallet/src/common/di/locator.dart';
+import 'package:namma_wallet/src/common/services/logger_interface.dart';
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 
 class PDFService {
@@ -16,29 +17,26 @@ class PDFService {
       document.dispose();
 
       // Log raw text before cleaning
-      developer.log('=== RAW PDF TEXT ===', name: 'PDFService');
-      developer.log(rawText, name: 'PDFService');
-      developer.log('=== END RAW PDF TEXT ===', name: 'PDFService');
+      getIt<ILogger>().debug('[PDFService] === RAW PDF TEXT ===');
+      getIt<ILogger>().debug('[PDFService] $rawText');
+      getIt<ILogger>().debug('[PDFService] === END RAW PDF TEXT ===');
 
       // Clean and normalize the extracted text
       final cleanedText = _cleanExtractedText(rawText);
 
       // Log for debugging
-      developer.log(
-        'Raw PDF text length: ${rawText.length}',
-        name: 'PDFService',
+      getIt<ILogger>().debug(
+        '[PDFService] Raw PDF text length: ${rawText.length}',
       );
-      developer.log(
-        'Cleaned PDF text length: ${cleanedText.length}',
-        name: 'PDFService',
+      getIt<ILogger>().debug(
+        '[PDFService] Cleaned PDF text length: ${cleanedText.length}',
       );
 
       return cleanedText;
     } catch (e) {
-      developer.log(
-        'Error extracting text from PDF',
-        name: 'PDFService',
-        error: e,
+      getIt<ILogger>().error(
+        '[PDFService] Error extracting text from PDF',
+        e is Exception ? e : Exception(e.toString()),
       );
       rethrow;
     }
@@ -97,7 +95,7 @@ class PDFService {
     final preview = cleanedText.length > 500
         ? '${cleanedText.substring(0, 500)}...'
         : cleanedText;
-    developer.log('Cleaned PDF text preview: $preview', name: 'PDFService');
+    getIt<ILogger>().debug('[PDFService] Cleaned PDF text preview: $preview');
 
     return cleanedText;
   }

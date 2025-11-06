@@ -1,4 +1,3 @@
-import 'package:namma_wallet/src/common/services/logger_service.dart';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -6,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:namma_wallet/src/common/database/wallet_database.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
+import 'package:namma_wallet/src/common/services/namma_logger.dart';
 import 'package:namma_wallet/src/features/calendar/domain/event_model.dart';
 import 'package:namma_wallet/src/features/calendar/presentation/widgets/calendar_toggle_buttons.dart';
 import 'package:namma_wallet/src/features/calendar/presentation/widgets/calendar_widget.dart';
@@ -15,7 +15,7 @@ import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class CalendarProvider extends ChangeNotifier {
-  final _logger = LoggerService();
+  final _logger = NammaLogger();
   DateTime _selectedDay = DateTime.now();
   List<Event> _events = [];
   List<TravelTicketModel> _tickets = [];

@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:developer' as developer;
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -7,6 +6,7 @@ import 'package:home_widget/home_widget.dart';
 import 'package:namma_wallet/src/common/database/wallet_database.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/helper/date_time_converter.dart';
+import 'package:namma_wallet/src/common/services/logger_interface.dart';
 import 'package:namma_wallet/src/common/theme/styles.dart';
 import 'package:namma_wallet/src/common/widgets/custom_back_button.dart';
 import 'package:namma_wallet/src/common/widgets/snackbar_widget.dart';
@@ -78,10 +78,9 @@ class _TicketViewState extends State<TicketView> {
         showSnackbar(context, '📌 Ticket pinned to home screen successfully!');
       }
     } on Object catch (e) {
-      developer.log(
-        'Failed to pin ticket to home screen',
-        name: 'TicketView',
-        error: e,
+      getIt<ILogger>().error(
+        '[TicketView] Failed to pin ticket to home screen',
+        e is Exception ? e : Exception(e.toString()),
       );
       if (mounted) {
         showSnackbar(context, 'Failed to pin ticket: $e', isError: true);
@@ -135,9 +134,9 @@ class _TicketViewState extends State<TicketView> {
     try {
       await getIt<WalletDatabase>().deleteTravelTicket(widget.ticket.ticketId!);
 
-      developer.log(
-        'Successfully deleted ticket with ID: ${widget.ticket.ticketId}',
-        name: 'TicketView',
+      getIt<ILogger>().info(
+        '[TicketView] Successfully deleted ticket with '
+        'ID: ${widget.ticket.ticketId}',
       );
 
       if (mounted) {
@@ -145,7 +144,10 @@ class _TicketViewState extends State<TicketView> {
         context.pop(true); // Return true to indicate ticket was deleted
       }
     } on Object catch (e) {
-      developer.log('Failed to delete ticket', name: 'TicketView', error: e);
+      getIt<ILogger>().error(
+        '[TicketView] Failed to delete ticket',
+        e is Exception ? e : Exception(e.toString()),
+      );
 
       if (mounted) {
         showSnackbar(context, 'Failed to delete ticket: $e', isError: true);
@@ -167,7 +169,7 @@ class _TicketViewState extends State<TicketView> {
     try {
       if (await canLaunchUrl(uri)) {
         await launchUrl(uri);
-        developer.log('Launched phone call to $mobile', name: 'TicketView');
+        getIt<ILogger>().info('[TicketView] Launched phone call to $mobile');
       } else {
         if (mounted) {
           showSnackbar(
@@ -178,10 +180,9 @@ class _TicketViewState extends State<TicketView> {
         }
       }
     } on Object catch (e) {
-      developer.log(
-        'Failed to launch phone call',
-        name: 'TicketView',
-        error: e,
+      getIt<ILogger>().error(
+        '[TicketView] Failed to launch phone call',
+        e is Exception ? e : Exception(e.toString()),
       );
       if (mounted) {
         showSnackbar(context, 'Failed to make call: $e', isError: true);
@@ -327,7 +328,8 @@ class _TicketViewState extends State<TicketView> {
                                     Flexible(
                                       flex: 2,
                                       child: Text(
-                                        '${widget.ticket.extras![i].title ?? 'xxx'}: ',
+                                        '${widget.ticket.extras![i].title ?? ''
+                                                'xxx'}: ',
                                         overflow: TextOverflow.ellipsis,
                                         maxLines: 1,
                                         style: Paragraph02(

@@ -1,5 +1,5 @@
-import 'dart:developer' as developer;
-
+import 'package:namma_wallet/src/common/di/locator.dart';
+import 'package:namma_wallet/src/common/services/logger_interface.dart';
 import 'package:namma_wallet/src/features/common/domain/travel_ticket_model.dart';
 
 abstract class TravelTicketParser {
@@ -292,14 +292,16 @@ class TicketUpdateInfo {
 }
 
 class TravelParserService {
-  static final List<TravelTicketParser> _parsers = [
+  TravelParserService();
+
+  final List<TravelTicketParser> _parsers = [
     TNSTCBusParser(),
     IRCTCTrainParser(),
     SETCBusParser(),
   ];
 
   /// Detects if this is an update SMS (e.g., conductor details for TNSTC)
-  static TicketUpdateInfo? parseUpdateSMS(String text) {
+  TicketUpdateInfo? parseUpdateSMS(String text) {
     // Check for TNSTC update SMS pattern
     if (text.toUpperCase().contains('TNSTC') &&
         (text.toLowerCase().contains('conductor mobile no') ||
@@ -333,9 +335,9 @@ class TravelParserService {
       }
 
       if (updates.isNotEmpty) {
-        developer.log(
-          'Detected TNSTC update SMS for PNR: $pnr with updates: $updates',
-          name: 'TravelParserService',
+        getIt<ILogger>().info(
+          '[TravelParserService] Detected TNSTC update SMS for '
+          'PNR: $pnr with updates: $updates',
         );
 
         return TicketUpdateInfo(
@@ -349,28 +351,27 @@ class TravelParserService {
     return null;
   }
 
-  static TravelTicketModel? parseTicketFromText(
+  TravelTicketModel? parseTicketFromText(
     String text, {
     SourceType? sourceType,
   }) {
     try {
       for (final parser in _parsers) {
         if (parser.canParse(text)) {
-          developer.log('ticket text : $text', name: 'TravelParserService');
-          developer.log(
-            'Attempting to parse with ${parser.providerName} parser',
-            name: 'TravelParserService',
+          getIt<ILogger>().debug('[TravelParserService] ticket text : $text');
+          getIt<ILogger>().info(
+            '[TravelParserService] Attempting to parse with '
+            '${parser.providerName} parser',
           );
 
           final ticket = parser.parseTicket(text);
           if (ticket != null) {
-            developer.log(
-              'Parsed ticket: $ticket',
-              name: 'TravelParserService',
+            getIt<ILogger>().debug(
+              '[TravelParserService] Parsed ticket: $ticket',
             );
-            developer.log(
-              'Successfully parsed ticket with ${parser.providerName}',
-              name: 'TravelParserService',
+            getIt<ILogger>().info(
+              '[TravelParserService] Successfully parsed ticket with '
+              '${parser.providerName}',
             );
 
             if (sourceType != null) {
@@ -381,26 +382,24 @@ class TravelParserService {
         }
       }
 
-      developer.log(
-        'No parser could handle the text',
-        name: 'TravelParserService',
+      getIt<ILogger>().warning(
+        '[TravelParserService] No parser could handle the text',
       );
       return null;
     } on Object catch (e) {
-      developer.log(
-        'Error during ticket parsing',
-        name: 'TravelParserService',
-        error: e,
+      getIt<ILogger>().error(
+        '[TravelParserService] Error during ticket parsing',
+        e is Exception ? e : Exception(e.toString()),
       );
       return null;
     }
   }
 
-  static List<String> getSupportedProviders() {
+  List<String> getSupportedProviders() {
     return _parsers.map((parser) => parser.providerName).toList();
   }
 
-  static bool isTicketText(String text) {
+  bool isTicketText(String text) {
     return _parsers.any((parser) => parser.canParse(text));
   }
 }

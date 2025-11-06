@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:namma_wallet/src/common/database/wallet_database.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
-import 'package:namma_wallet/src/common/services/logger_service.dart';
+import 'package:namma_wallet/src/common/services/logger_interface.dart';
 import 'package:namma_wallet/src/features/common/application/travel_parser_service.dart';
 import 'package:namma_wallet/src/features/common/domain/travel_ticket_model.dart';
 
@@ -50,7 +50,10 @@ class ClipboardResult {
 }
 
 class ClipboardService {
-  final _logger = LoggerService();
+  ClipboardService();
+
+  ILogger get _logger => getIt<ILogger>();
+  TravelParserService get _parserService => getIt<TravelParserService>();
 
   Future<ClipboardResult> readAndParseClipboard() async {
     try {
@@ -74,7 +77,7 @@ class ClipboardService {
         }
 
         // First, check if this is an update SMS (e.g., conductor details)
-        final updateInfo = TravelParserService.parseUpdateSMS(content);
+        final updateInfo = _parserService.parseUpdateSMS(content);
 
         if (updateInfo != null) {
           // This is an update SMS. Attempt to apply the update.
@@ -101,7 +104,7 @@ class ClipboardService {
         }
 
         // If it's not an update SMS, proceed with parsing as a new ticket.
-        final parsedTicket = TravelParserService.parseTicketFromText(
+        final parsedTicket = _parserService.parseTicketFromText(
           content,
           sourceType: SourceType.clipboard,
         );

@@ -1,8 +1,8 @@
-import 'package:namma_wallet/src/common/services/logger_service.dart';
+import 'package:namma_wallet/src/common/services/namma_logger.dart';
 import 'package:namma_wallet/src/features/irctc/application/irctc_ticket_model.dart';
 
 class IRCTCQRParser {
-  static final _logger = LoggerService();
+  static final _logger = NammaLogger();
 
   static IRCTCTicket? parseQRCode(String qrData) {
     try {

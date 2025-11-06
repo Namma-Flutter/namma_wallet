@@ -1,15 +1,15 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/helper/check_pnr_id.dart';
 import 'package:namma_wallet/src/common/routing/app_router.dart';
-import 'package:namma_wallet/src/common/services/logger_service.dart';
+import 'package:namma_wallet/src/common/services/logger_interface.dart';
 import 'package:namma_wallet/src/common/services/sharing_intent_service.dart';
 import 'package:namma_wallet/src/common/theme/app_theme.dart';
 import 'package:namma_wallet/src/common/theme/theme_provider.dart';
 import 'package:namma_wallet/src/features/tnstc/application/sms_service.dart';
 import 'package:provider/provider.dart';
-import 'package:namma_wallet/src/common/di/locator.dart';
 
 class NammaWalletApp extends StatefulWidget {
   const NammaWalletApp({super.key});
@@ -22,7 +22,7 @@ class _NammaWalletAppState extends State<NammaWalletApp> {
   int currentPageIndex = 0;
   final SharingIntentService _sharingService = getIt<SharingIntentService>();
   final SMSService _smsService = getIt<SMSService>();
-  final LoggerService _logger = getIt<LoggerService>();
+  final ILogger _logger = getIt<ILogger>();
   final GlobalKey<ScaffoldMessengerState> _scaffoldMessengerKey =
       GlobalKey<ScaffoldMessengerState>();
 

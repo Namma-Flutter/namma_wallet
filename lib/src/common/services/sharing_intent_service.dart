@@ -1,15 +1,15 @@
 import 'dart:async';
 import 'dart:io';
+
 import 'package:listen_sharing_intent/listen_sharing_intent.dart';
-import 'package:namma_wallet/src/common/services/logger_service.dart';
+import 'package:namma_wallet/src/common/di/locator.dart';
+import 'package:namma_wallet/src/common/services/logger_interface.dart';
 
 /// Service to handle sharing intents from other apps
 class SharingIntentService {
-  factory SharingIntentService() => _instance;
-  SharingIntentService._internal();
-  static final SharingIntentService _instance =
-      SharingIntentService._internal();
-  final _logger = LoggerService();
+  SharingIntentService();
+
+  ILogger get _logger => getIt<ILogger>();
 
   StreamSubscription<List<SharedMediaFile>>? _intentDataStreamSubscription;
 
@@ -58,7 +58,7 @@ class SharingIntentService {
 
         final fileName = file.path.split('/').last;
         onFileReceived('File received: $fileName');
-      } catch (e) {
+      } on Object catch (e) {
         _logger.error('Error handling shared file ${i + 1}: $e');
         onError('Error processing shared file: $e');
       }
@@ -69,20 +69,22 @@ class SharingIntentService {
 
   /// Print detailed file information to console
   void _printFileDetails(SharedMediaFile file) {
-    _logger.info('File Path: ${file.path}');
-    _logger.info('File Name: ${file.path.split('/').last}');
-    _logger.info('File Extension: ${file.path.split('.').last.toLowerCase()}');
-    _logger.info('MIME Type: ${file.type}');
+    _logger
+      ..info('File Path: ${file.path}')
+      ..info('File Name: ${file.path.split('/').last}')
+      ..info('File Extension: ${file.path.split('.').last.toLowerCase()}')
+      ..info('MIME Type: ${file.type}');
 
     final fileObj = File(file.path);
     if (fileObj.existsSync()) {
       try {
         final stats = fileObj.statSync();
-        _logger.info(
-          'File Size: ${stats.size} bytes (${_formatFileSize(stats.size)})',
-        );
-        _logger.info('Last Modified: ${stats.modified}');
-        _logger.info('File Accessible: Yes');
+        _logger
+          ..info(
+            'File Size: ${stats.size} bytes (${_formatFileSize(stats.size)})',
+          )
+          ..info('Last Modified: ${stats.modified}')
+          ..info('File Accessible: Yes');
 
         // Try to read text files for content preview (Copilot code)
         if (_isTextFile(file)) {
@@ -92,11 +94,11 @@ class SharingIntentService {
                 ? '${content.substring(0, 200)}...'
                 : content;
             _logger.info('Content Preview: $preview');
-          } catch (e) {
+          } on Object catch (e) {
             _logger.error('Could not read text content: $e');
           }
         }
-      } catch (e) {
+      } on Object catch (e) {
         _logger.error('Error reading file stats: $e');
       }
     } else {

@@ -1,10 +1,10 @@
 import 'package:namma_wallet/src/common/di/locator.dart';
-import 'package:namma_wallet/src/common/services/logger_service.dart';
+import 'package:namma_wallet/src/common/services/namma_logger.dart';
 import 'package:namma_wallet/src/features/tnstc/application/tnstc_sms_parser.dart';
 import 'package:namma_wallet/src/features/tnstc/domain/tnstc_model.dart';
 
 class SMSService {
-  LoggerService get _logger => getIt<LoggerService>();
+  NammaLogger get _logger => getIt<NammaLogger>();
 
   TNSTCTicketModel parseTicket(String text) {
     try {

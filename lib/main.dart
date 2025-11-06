@@ -2,11 +2,11 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:namma_wallet/src/app.dart';
 import 'package:namma_wallet/src/common/database/wallet_database.dart';
-import 'package:namma_wallet/src/common/services/logger_service.dart';
+import 'package:namma_wallet/src/common/di/locator.dart';
+import 'package:namma_wallet/src/common/services/logger_interface.dart';
 import 'package:namma_wallet/src/common/theme/theme_provider.dart';
 import 'package:namma_wallet/src/features/ai/fallback-parser/application/gemma_service.dart';
 import 'package:provider/provider.dart';
-import 'package:namma_wallet/src/common/di/locator.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -14,9 +14,8 @@ Future<void> main() async {
   // Setup dependency injection
   setupLocator();
 
-  // Initialize logger first
-  final logger = getIt<LoggerService>();
-  logger.initialize();
+  // Get logger instance
+  final logger = getIt<ILogger>();
   logger.info('🚀 Namma Wallet starting...');
 
   // Set up global error handling

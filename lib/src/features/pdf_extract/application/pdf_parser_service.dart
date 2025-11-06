@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:namma_wallet/src/common/database/wallet_database.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
-import 'package:namma_wallet/src/common/services/logger_service.dart';
+import 'package:namma_wallet/src/common/services/namma_logger.dart';
 import 'package:namma_wallet/src/features/common/domain/travel_ticket_model.dart';
 import 'package:namma_wallet/src/features/tnstc/application/pdf_service.dart';
 import 'package:namma_wallet/src/features/tnstc/application/tnstc_pdf_parser.dart';
@@ -52,7 +52,7 @@ class PDFParserResult {
 }
 
 class PDFParserService {
-  LoggerService get _logger => getIt<LoggerService>();
+  NammaLogger get _logger => getIt<NammaLogger>();
 
   Future<PDFParserResult> parseAndSavePDFTicket(File pdfFile) async {
     try {

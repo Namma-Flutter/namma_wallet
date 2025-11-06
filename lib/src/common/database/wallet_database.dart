@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:namma_wallet/src/common/di/locator.dart';
-import 'package:namma_wallet/src/common/services/logger_service.dart';
+import 'package:namma_wallet/src/common/services/logger_interface.dart';
 import 'package:path/path.dart' as p;
 import 'package:sqflite/sqflite.dart';
 
@@ -14,15 +14,14 @@ class DuplicateTicketException implements Exception {
 }
 
 class WalletDatabase {
-  WalletDatabase._internal();
-  static final WalletDatabase instance = WalletDatabase._internal();
+  WalletDatabase();
 
-  static const String _dbName = 'namma_wallet.db';
-  static const int _dbVersion = 1;
+  final String _dbName = 'namma_wallet.db';
+  final int _dbVersion = 1;
 
   Database? _database;
 
-  LoggerService get _logger => getIt<LoggerService>();
+  ILogger get _logger => getIt<ILogger>();
 
   Future<Database> get database async {
     final existing = _database;

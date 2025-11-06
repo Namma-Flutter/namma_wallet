@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:namma_wallet/src/common/services/logger_service.dart';
+import 'package:namma_wallet/src/common/services/namma_logger.dart';
 
 void showSnackbar(
   BuildContext context,
   String message, {
   bool isError = false,
 }) {
-  final logger = LoggerService();
+  final logger = NammaLogger();
   // Print to console for debugging
   if (isError) {
     logger.error(message);
