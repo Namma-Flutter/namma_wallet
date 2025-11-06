@@ -5,6 +5,7 @@ import 'package:dotted_border/dotted_border.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/routing/app_routes.dart';
 import 'package:namma_wallet/src/features/clipboard/application/clipboard_service.dart';
 import 'package:namma_wallet/src/features/irctc/application/irctc_qr_parser.dart';
@@ -33,7 +34,7 @@ class _ScannerViewState extends State<ScannerView> {
     try {
       // Check if it's an IRCTC QR code
       if (IRCTCQRParser.isIRCTCQRCode(qrData)) {
-        final irctcService = IRCTCScannerService();
+        final irctcService = getIt<IRCTCScannerService>();
         final result = await irctcService.parseAndSaveIRCTCTicket(qrData);
 
         if (!mounted) return;
@@ -73,7 +74,7 @@ class _ScannerViewState extends State<ScannerView> {
 
       if (result != null && result.files.single.path != null) {
         final file = File(result.files.single.path!);
-        final pdfParserService = PDFParserService();
+        final pdfParserService = getIt<PDFParserService>();
         final parseResult = await pdfParserService.parseAndSavePDFTicket(file);
 
         if (!mounted) return;
@@ -96,7 +97,7 @@ class _ScannerViewState extends State<ScannerView> {
     });
 
     try {
-      final clipboardService = ClipboardService();
+      final clipboardService = getIt<ClipboardService>();
       final result = await clipboardService.readClipboard();
 
       if (!mounted) return;

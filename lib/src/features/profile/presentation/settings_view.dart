@@ -15,9 +15,7 @@ class SettingsView extends StatelessWidget {
         title: const Text('Settings'),
       ),
       body: ListView(
-        children: const [
-          Text('This page is empty')
-        ],
+        children: const [Text('This page is empty')],
       ),
     );
   }

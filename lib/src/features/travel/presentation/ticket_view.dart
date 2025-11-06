@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:namma_wallet/src/common/database/wallet_database.dart';
+import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/helper/date_time_converter.dart';
 import 'package:namma_wallet/src/common/theme/styles.dart';
 import 'package:namma_wallet/src/common/widgets/custom_back_button.dart';
@@ -132,7 +133,7 @@ class _TicketViewState extends State<TicketView> {
     });
 
     try {
-      await WalletDatabase.instance.deleteTravelTicket(widget.ticket.ticketId!);
+      await getIt<WalletDatabase>().deleteTravelTicket(widget.ticket.ticketId!);
 
       developer.log(
         'Successfully deleted ticket with ID: ${widget.ticket.ticketId}',

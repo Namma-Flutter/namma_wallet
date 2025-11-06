@@ -1,8 +1,9 @@
 import 'package:namma_wallet/src/common/database/wallet_database.dart';
+import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/features/tnstc/domain/tnstc_model.dart';
 
 Future<void> checkAndUpdateTNSTCTicket(TNSTCTicketModel ticket) async {
-  final db = WalletDatabase.instance;
+  final db = getIt<WalletDatabase>();
 
   if (ticket.pnrNumber == null || ticket.corporation == null) {
     // Or handle this case appropriately

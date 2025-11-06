@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:namma_wallet/src/common/database/wallet_database.dart';
+import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/features/calendar/domain/event_model.dart';
 import 'package:namma_wallet/src/features/calendar/presentation/widgets/calendar_toggle_buttons.dart';
 import 'package:namma_wallet/src/features/calendar/presentation/widgets/calendar_widget.dart';
@@ -54,7 +55,7 @@ class CalendarProvider extends ChangeNotifier {
 
   Future<void> loadTickets() async {
     try {
-      final dbHelper = WalletDatabase.instance;
+      final dbHelper = getIt<WalletDatabase>();
       final ticketMaps = await dbHelper.fetchAllTravelTickets();
 
       _tickets = ticketMaps.map(TravelTicketModelMapper.fromMap).toList();

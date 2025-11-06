@@ -2,6 +2,7 @@ import 'dart:developer' as developer;
 
 import 'package:flutter/material.dart';
 import 'package:namma_wallet/src/common/database/wallet_database.dart';
+import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/features/common/domain/travel_ticket_model.dart';
 import 'package:namma_wallet/src/features/irctc/application/irctc_qr_parser.dart';
 import 'package:namma_wallet/src/features/irctc/application/irctc_ticket_model.dart';
@@ -71,7 +72,7 @@ class IRCTCScannerService {
 
       // Save to database
       try {
-        final ticketId = await WalletDatabase.instance.insertTravelTicket(
+        final ticketId = await getIt<WalletDatabase>().insertTravelTicket(
           travelTicket.toDatabase(),
         );
         final updatedTicket = travelTicket.copyWith(id: ticketId);
