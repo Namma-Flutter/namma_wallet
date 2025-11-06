@@ -1,9 +1,8 @@
-import 'dart:developer' as developer;
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:namma_wallet/src/common/database/wallet_database.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
+import 'package:namma_wallet/src/common/services/logger_service.dart';
 import 'package:namma_wallet/src/features/common/application/travel_parser_service.dart';
 import 'package:namma_wallet/src/features/common/domain/travel_ticket_model.dart';
 
@@ -51,6 +50,8 @@ class ClipboardResult {
 }
 
 class ClipboardService {
+  final _logger = LoggerService();
+
   Future<ClipboardResult> readAndParseClipboard() async {
     try {
       // First check if clipboard has any content
@@ -84,22 +85,14 @@ class ClipboardService {
           );
 
           if (count > 0) {
-            developer.log(
-              'Ticket updated successfully via SMS',
-              name: 'ClipboardService',
-            );
-            print('✅ CLIPBOARD: Ticket updated successfully via SMS.');
+            _logger.success('Ticket updated successfully via SMS');
             return ClipboardResult.success(
               ClipboardContentType.travelTicket,
               content,
             );
           } else {
-            developer.log(
+            _logger.warning(
               'Update SMS received, but no matching ticket found',
-              name: 'ClipboardService',
-            );
-            print(
-              '⚠️ CLIPBOARD: Update SMS received, but no matching ticket found.',
             );
             return ClipboardResult.error(
               'Update SMS received, but the original ticket was not found in the wallet.',
@@ -126,20 +119,10 @@ class ClipboardService {
               ticket: updatedTicket,
             );
           } on DuplicateTicketException catch (e) {
-            developer.log(
-              'Duplicate ticket detected',
-              name: 'ClipboardService',
-              error: e,
-            );
-            print('⚠️ CLIPBOARD DUPLICATE: ${e.message}');
+            _logger.warning('Duplicate ticket detected: ${e.message}');
             return ClipboardResult.error(e.message);
           } catch (e) {
-            developer.log(
-              'Failed to save ticket to database',
-              name: 'ClipboardService',
-              error: e,
-            );
-            print('🔴 CLIPBOARD ERROR: Failed to save ticket: $e');
+            _logger.error('Failed to save ticket to database: $e');
             return ClipboardResult.error('Failed to save ticket: $e');
           }
         }
@@ -153,12 +136,9 @@ class ClipboardService {
         'No text content found in clipboard. Please copy plain text.',
       );
     } on PlatformException catch (e) {
-      developer.log(
-        'Platform exception in clipboard service',
-        name: 'ClipboardService',
-        error: e,
+      _logger.error(
+        'Platform exception in clipboard service: ${e.code} - ${e.message}',
       );
-      print('🔴 CLIPBOARD PLATFORM ERROR: ${e.code} - ${e.message}');
 
       if (e.code == 'clipboard_error' ||
           (e.message?.contains('URI') ?? false)) {
@@ -168,12 +148,7 @@ class ClipboardService {
       }
       return ClipboardResult.error('Error accessing clipboard: ${e.message}');
     } on Exception catch (e) {
-      developer.log(
-        'Unexpected exception in clipboard service',
-        name: 'ClipboardService',
-        error: e,
-      );
-      print('🔴 CLIPBOARD UNEXPECTED ERROR: $e');
+      _logger.error('Unexpected exception in clipboard service: $e');
       return ClipboardResult.error('Unexpected error occurred: $e');
     }
   }
@@ -208,22 +183,12 @@ class ClipboardService {
       };
       backgroundColor = Colors.green;
 
-      // Log success to console
-      developer.log(
-        'Clipboard operation succeeded: $message',
-        name: 'ClipboardService',
-      );
-      print('✅ CLIPBOARD SUCCESS: $message');
+      _logger.success('Clipboard operation succeeded: $message');
     } else {
       message = result.errorMessage ?? 'Unknown error occurred';
       backgroundColor = Colors.red;
 
-      // Log error to console
-      developer.log(
-        'Clipboard operation failed: $message',
-        name: 'ClipboardService',
-      );
-      print('🔴 CLIPBOARD FAILED: $message');
+      _logger.error('Clipboard operation failed: $message');
     }
 
     ScaffoldMessenger.of(context).showSnackBar(

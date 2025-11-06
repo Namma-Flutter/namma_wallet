@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:listen_sharing_intent/listen_sharing_intent.dart';
+import 'package:namma_wallet/src/common/services/logger_service.dart';
 
 /// Service to handle sharing intents from other apps
 class SharingIntentService {
@@ -8,6 +9,7 @@ class SharingIntentService {
   SharingIntentService._internal();
   static final SharingIntentService _instance =
       SharingIntentService._internal();
+  final _logger = LoggerService();
 
   StreamSubscription<List<SharedMediaFile>>? _intentDataStreamSubscription;
 
@@ -22,7 +24,7 @@ class SharingIntentService {
             _handleSharedFiles(files, onFileReceived, onError);
           },
           onError: (Object err) {
-            print('❌ Error in sharing intent stream: $err');
+            _logger.error('Error in sharing intent stream: $err');
             onError('Error receiving shared content: $err');
           },
         );
@@ -31,12 +33,12 @@ class SharingIntentService {
         .getInitialMedia()
         .then((List<SharedMediaFile> files) {
           if (files.isNotEmpty) {
-            print('=== App launched with shared files: ${files.length} ===');
+            _logger.info('App launched with shared files: ${files.length}');
             _handleSharedFiles(files, onFileReceived, onError);
           }
         })
         .catchError((Object error) {
-          print('❌ Error getting initial shared media: $error');
+          _logger.error('Error getting initial shared media: $error');
           onError('Error getting initial shared content: $error');
         });
   }
@@ -46,41 +48,41 @@ class SharingIntentService {
     void Function(String) onFileReceived,
     void Function(String) onError,
   ) {
-    print('\n === SHARING INTENT TRIGGERED ===');
+    _logger.info('SHARING INTENT TRIGGERED');
 
     for (var i = 0; i < files.length; i++) {
       final file = files[i];
       try {
-        print('\n=== SHARED FILE ${i + 1}/${files.length} DETAILS ===');
+        _logger.info('SHARED FILE ${i + 1}/${files.length} DETAILS');
         _printFileDetails(file);
 
         final fileName = file.path.split('/').last;
         onFileReceived('File received: $fileName');
       } catch (e) {
-        print('❌ Error handling shared file ${i + 1}: $e');
+        _logger.error('Error handling shared file ${i + 1}: $e');
         onError('Error processing shared file: $e');
       }
     }
 
-    print('\n === END SHARING INTENT ANALYSIS ===\n');
+    _logger.info('END SHARING INTENT ANALYSIS');
   }
 
   /// Print detailed file information to console
   void _printFileDetails(SharedMediaFile file) {
-    print('File Path: ${file.path}');
-    print('File Name: ${file.path.split('/').last}');
-    print('File Extension: ${file.path.split('.').last.toLowerCase()}');
-    print('MIME Type: ${file.type}');
+    _logger.info('File Path: ${file.path}');
+    _logger.info('File Name: ${file.path.split('/').last}');
+    _logger.info('File Extension: ${file.path.split('.').last.toLowerCase()}');
+    _logger.info('MIME Type: ${file.type}');
 
     final fileObj = File(file.path);
     if (fileObj.existsSync()) {
       try {
         final stats = fileObj.statSync();
-        print(
+        _logger.info(
           'File Size: ${stats.size} bytes (${_formatFileSize(stats.size)})',
         );
-        print('Last Modified: ${stats.modified}');
-        print('File Accessible: Yes');
+        _logger.info('Last Modified: ${stats.modified}');
+        _logger.info('File Accessible: Yes');
 
         // Try to read text files for content preview (Copilot code)
         if (_isTextFile(file)) {
@@ -89,16 +91,16 @@ class SharingIntentService {
             final preview = content.length > 200
                 ? '${content.substring(0, 200)}...'
                 : content;
-            print('Content Preview: $preview');
+            _logger.info('Content Preview: $preview');
           } catch (e) {
-            print('Could not read text content: $e');
+            _logger.error('Could not read text content: $e');
           }
         }
       } catch (e) {
-        print('❌ Error reading file stats: $e');
+        _logger.error('Error reading file stats: $e');
       }
     } else {
-      print('❌ File Accessible: No - File not found at path');
+      _logger.error('File Accessible: No - File not found at path');
     }
   }
 
@@ -123,6 +125,6 @@ class SharingIntentService {
   /// Dispose resources
   void dispose() {
     _intentDataStreamSubscription?.cancel();
-    print('SharingIntentService disposed');
+    _logger.info('SharingIntentService disposed');
   }
 }

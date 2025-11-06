@@ -1,18 +1,17 @@
-import 'dart:developer' as developer;
 import 'package:flutter/material.dart';
+import 'package:namma_wallet/src/common/services/logger_service.dart';
 
 void showSnackbar(
   BuildContext context,
   String message, {
   bool isError = false,
 }) {
+  final logger = LoggerService();
   // Print to console for debugging
   if (isError) {
-    developer.log('ERROR: $message', name: 'SnackbarError');
-    print('🔴 ERROR: $message');
+    logger.error(message);
   } else {
-    developer.log('INFO: $message', name: 'SnackbarInfo');
-    print('ℹ️ INFO: $message');
+    logger.info(message);
   }
 
   ScaffoldMessenger.of(context).showSnackBar(

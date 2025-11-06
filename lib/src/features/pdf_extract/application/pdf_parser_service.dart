@@ -65,7 +65,7 @@ class PDFParserService {
       _logger.logService(
         'PDF',
         'File size: ${pdfFile.lengthSync()} bytes, '
-        'Extracted text length: ${extractedText.length}',
+            'Extracted text length: ${extractedText.length}',
       );
 
       if (extractedText.trim().isEmpty) {
@@ -110,7 +110,10 @@ class PDFParserService {
         (k) => ['TNSTC', 'Corporation', 'PNR'].contains(k),
       )) {
         try {
-          _logger.logTicketParsing('PDF', 'Attempting to parse as TNSTC ticket');
+          _logger.logTicketParsing(
+            'PDF',
+            'Attempting to parse as TNSTC ticket',
+          );
           final tnstcTicket = TNSTCPDFParser.parseTicket(extractedText);
 
           // Log all parsed TNSTC ticket values
@@ -119,26 +122,48 @@ class PDFParserService {
           _logger.debug('PNR Number: "${tnstcTicket.pnrNumber}"');
           _logger.debug('Journey Date: "${tnstcTicket.journeyDate}"');
           _logger.debug('Route No: "${tnstcTicket.routeNo}"');
-          _logger.debug('Service Start Place: "${tnstcTicket.serviceStartPlace}"');
+          _logger.debug(
+            'Service Start Place: "${tnstcTicket.serviceStartPlace}"',
+          );
           _logger.debug('Service End Place: "${tnstcTicket.serviceEndPlace}"');
-          _logger.debug('Service Start Time: "${tnstcTicket.serviceStartTime}"');
-          _logger.debug('Passenger Start Place: "${tnstcTicket.passengerStartPlace}"');
-          _logger.debug('Passenger End Place: "${tnstcTicket.passengerEndPlace}"');
-          _logger.debug('Passenger Pickup Point: "${tnstcTicket.passengerPickupPoint}"');
-          _logger.debug('Passenger Pickup Time: "${tnstcTicket.passengerPickupTime}"');
+          _logger.debug(
+            'Service Start Time: "${tnstcTicket.serviceStartTime}"',
+          );
+          _logger.debug(
+            'Passenger Start Place: "${tnstcTicket.passengerStartPlace}"',
+          );
+          _logger.debug(
+            'Passenger End Place: "${tnstcTicket.passengerEndPlace}"',
+          );
+          _logger.debug(
+            'Passenger Pickup Point: "${tnstcTicket.passengerPickupPoint}"',
+          );
+          _logger.debug(
+            'Passenger Pickup Time: "${tnstcTicket.passengerPickupTime}"',
+          );
           _logger.debug('Platform Number: "${tnstcTicket.platformNumber}"');
           _logger.debug('Class of Service: "${tnstcTicket.classOfService}"');
           _logger.debug('Trip Code: "${tnstcTicket.tripCode}"');
-          _logger.debug('OB Reference Number: "${tnstcTicket.obReferenceNumber}"');
+          _logger.debug(
+            'OB Reference Number: "${tnstcTicket.obReferenceNumber}"',
+          );
           _logger.debug('Number of Seats: "${tnstcTicket.numberOfSeats}"');
-          _logger.debug('Bank Transaction Number: "${tnstcTicket.bankTransactionNumber}"');
+          _logger.debug(
+            'Bank Transaction Number: "${tnstcTicket.bankTransactionNumber}"',
+          );
           _logger.debug('Bus ID Number: "${tnstcTicket.busIdNumber}"');
-          _logger.debug('Passenger Category: "${tnstcTicket.passengerCategory}"');
+          _logger.debug(
+            'Passenger Category: "${tnstcTicket.passengerCategory}"',
+          );
           _logger.debug('Passenger Name: "${tnstcTicket.passengerInfo?.name}"');
           _logger.debug('Passenger Age: "${tnstcTicket.passengerInfo?.age}"');
           _logger.debug('Passenger Type: "${tnstcTicket.passengerInfo?.type}"');
-          _logger.debug('Passenger Gender: "${tnstcTicket.passengerInfo?.gender}"');
-          _logger.debug('Passenger Seat Number: "${tnstcTicket.passengerInfo?.seatNumber}"');
+          _logger.debug(
+            'Passenger Gender: "${tnstcTicket.passengerInfo?.gender}"',
+          );
+          _logger.debug(
+            'Passenger Seat Number: "${tnstcTicket.passengerInfo?.seatNumber}"',
+          );
           _logger.debug('ID Card Type: "${tnstcTicket.idCardType}"');
           _logger.debug('ID Card Number: "${tnstcTicket.idCardNumber}"');
           _logger.debug('Total Fare: "${tnstcTicket.totalFare}"');

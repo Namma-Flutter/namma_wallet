@@ -1,13 +1,11 @@
-import 'package:flutter/foundation.dart';
 import 'package:talker_flutter/talker_flutter.dart';
 
 /// Logger service using Talker for comprehensive logging throughout the app
 class LoggerService {
-  static final LoggerService _instance = LoggerService._internal();
-
   factory LoggerService() => _instance;
 
   LoggerService._internal();
+  static final LoggerService _instance = LoggerService._internal();
 
   late final Talker _talker;
 
@@ -17,16 +15,9 @@ class LoggerService {
   /// Initialize the logger with custom configuration
   void initialize() {
     _talker = Talker(
-      settings: TalkerSettings(
-        enabled: true,
-        useConsoleLogs: kDebugMode,
-        maxHistoryItems: 1000,
-      ),
+      settings: TalkerSettings(),
       logger: TalkerLogger(
-        settings: TalkerLoggerSettings(
-          enableColors: true,
-          level: kDebugMode ? LogLevel.verbose : LogLevel.info,
-        ),
+        settings: TalkerLoggerSettings(),
       ),
     );
 
@@ -54,13 +45,17 @@ class LoggerService {
   }
 
   /// Log a critical error
-  void critical(String message, [Exception? exception, StackTrace? stackTrace]) {
+  void critical(
+    String message, [
+    Exception? exception,
+    StackTrace? stackTrace,
+  ]) {
     _talker.critical(message, exception, stackTrace);
   }
 
   /// Log a success message
   void success(String message) {
-    _talker.good(message);
+    _talker.info(message);
   }
 
   /// Log an HTTP request

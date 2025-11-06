@@ -1,10 +1,12 @@
-import 'package:flutter/foundation.dart';
+import 'package:namma_wallet/src/common/services/logger_service.dart';
 import 'package:namma_wallet/src/features/irctc/application/irctc_ticket_model.dart';
 
 class IRCTCQRParser {
+  static final _logger = LoggerService();
+
   static IRCTCTicket? parseQRCode(String qrData) {
     try {
-      debugPrint('Parsing IRCTC QR Data: $qrData');
+      _logger.debug('Parsing IRCTC QR Data: $qrData');
 
       final lines = qrData.split(',').map((line) => line.trim()).toList();
       final data = <String, String>{};
@@ -18,7 +20,7 @@ class IRCTCQRParser {
         }
       }
 
-      debugPrint('Parsed data: $data');
+      _logger.debug('Parsed data: $data');
 
       return IRCTCTicket(
         pnrNumber: _extractValue(data, 'PNR No.'),
@@ -42,8 +44,8 @@ class IRCTCQRParser {
         irctcFee: _parseAmount(_extractValue(data, 'IRCTC C Fee')),
       );
     } on Object catch (e, stackTrace) {
-      debugPrint('Error parsing IRCTC QR code: $e');
-      debugPrint('Stack trace: $stackTrace');
+      _logger.error('Error parsing IRCTC QR code: $e');
+      _logger.error('Stack trace: $stackTrace');
       return null;
     }
   }
@@ -86,7 +88,7 @@ class IRCTCQRParser {
         }
       }
     } on Object catch (e) {
-      debugPrint('Error parsing datetime: $value, error: $e');
+      _logger.error('Error parsing datetime: $value, error: $e');
     }
 
     return DateTime.now();
@@ -105,7 +107,7 @@ class IRCTCQRParser {
         return DateTime(year, month, day);
       }
     } catch (e) {
-      debugPrint('Error parsing date: $value, error: $e');
+      _logger.error('Error parsing date: $value, error: $e');
     }
 
     return DateTime.now();

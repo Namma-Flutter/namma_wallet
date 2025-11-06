@@ -1,3 +1,4 @@
+import 'package:namma_wallet/src/common/services/logger_service.dart';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -14,6 +15,7 @@ import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class CalendarProvider extends ChangeNotifier {
+  final _logger = LoggerService();
   DateTime _selectedDay = DateTime.now();
   List<Event> _events = [];
   List<TravelTicketModel> _tickets = [];
@@ -62,7 +64,7 @@ class CalendarProvider extends ChangeNotifier {
 
       notifyListeners();
     } catch (e) {
-      print('Error loading tickets: $e');
+      _logger.error('Error loading tickets: $e');
     }
   }
 

@@ -1,8 +1,10 @@
 import 'package:flutter_gemma/core/api/flutter_gemma.dart';
 import 'package:flutter_gemma/core/model.dart';
+import 'package:namma_wallet/src/common/services/logger_service.dart';
 
 /// Service class to interact with Gemma AI chat
 class GemmaChatService {
+  final _logger = LoggerService();
   //https://huggingface.co/litert-community/Gemma3-1B-IT/resolve/main/Gemma3-1B-IT_multi-prefill-seq_q4_block128_ekv4096.task
 
   Future<void> init() async {
@@ -18,7 +20,7 @@ class GemmaChatService {
           token: token,
         )
         .withProgress((progress) {
-          print('Downloading: ${progress}%');
+          _logger.info('Downloading: ${progress}%');
         })
         .install();
   }

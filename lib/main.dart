@@ -49,8 +49,11 @@ Future<void> main() async {
 
     logger.success('All services initialized successfully');
   } on Object catch (e, stackTrace) {
-    logger.error('Error during initialization: $e',
-      e is Exception ? e : null, stackTrace);
+    logger.error(
+      'Error during initialization: $e',
+      e is Exception ? e : null,
+      stackTrace,
+    );
   }
 
   runApp(
