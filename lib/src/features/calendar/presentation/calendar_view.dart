@@ -28,8 +28,9 @@ class CalendarProvider extends ChangeNotifier {
 
   Future<void> loadEvents() async {
     // Load events from JSON
-    final response =
-        await rootBundle.loadString('assets/data/other_cards.json');
+    final response = await rootBundle.loadString(
+      'assets/data/other_cards.json',
+    );
     final data = json.decode(response) as List;
     _events = data.map((e) {
       final item = e as Map<String, dynamic>;

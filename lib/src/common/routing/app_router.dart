@@ -13,10 +13,12 @@ import 'package:namma_wallet/src/features/profile/presentation/profile_page.dart
 import 'package:namma_wallet/src/features/scanner/presentation/scanner_view.dart';
 import 'package:namma_wallet/src/features/travel/presentation/ticket_view.dart';
 
-final GlobalKey<NavigatorState> _rootNavigatorKey =
-    GlobalKey<NavigatorState>(debugLabel: 'root');
-final GlobalKey<NavigatorState> _shellNavigatorKey =
-    GlobalKey<NavigatorState>(debugLabel: 'shell');
+final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>(
+  debugLabel: 'root',
+);
+final GlobalKey<NavigatorState> _shellNavigatorKey = GlobalKey<NavigatorState>(
+  debugLabel: 'shell',
+);
 
 final router = GoRouter(
   navigatorKey: _rootNavigatorKey,
@@ -72,7 +74,8 @@ final router = GoRouter(
             cornerRadius: 30,
             lineThickness: 10,
           ),
-          onDetect: onDetect ??
+          onDetect:
+              onDetect ??
               (BarcodeCapture capture) {
                 // Default handler if none provided
               },

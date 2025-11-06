@@ -28,8 +28,9 @@ class TNSTCBusParser implements TravelTicketParser {
       'Service Start Place',
       'Date of Journey',
     ];
-    return patterns
-        .any((pattern) => text.toLowerCase().contains(pattern.toLowerCase()));
+    return patterns.any(
+      (pattern) => text.toLowerCase().contains(pattern.toLowerCase()),
+    );
   }
 
   @override
@@ -63,13 +64,16 @@ class TNSTCBusParser implements TravelTicketParser {
     }
 
     // Try multiple PNR patterns (handles "PNR:", "PNR NO.", "PNR Number")
-    var pnrNumber =
-        extractMatch(r'PNR\s*(?:NO\.?|Number)?\s*:\s*([^,\s]+)', text);
+    var pnrNumber = extractMatch(
+      r'PNR\s*(?:NO\.?|Number)?\s*:\s*([^,\s]+)',
+      text,
+    );
 
     // Try multiple date patterns (DOJ, Journey Date, Date of Journey)
     final journeyDateStr = extractMatch(
-        r'(?:DOJ|Journey Date|Date of Journey)\s*:\s*(\d{2}[/-]\d{2}[/-]\d{4})',
-        text);
+      r'(?:DOJ|Journey Date|Date of Journey)\s*:\s*(\d{2}[/-]\d{2}[/-]\d{4})',
+      text,
+    );
     var journeyDate = parseDate(journeyDateStr);
 
     // Try multiple patterns for route/vehicle information
@@ -82,13 +86,21 @@ class TNSTCBusParser implements TravelTicketParser {
     var to = extractMatch(r'To\s+([^,]+)', text);
     final tripCode = extractMatch(r'Trip Code\s*:\s*(\S+)', text);
     var departureTime = extractMatch(
-        r'Time\s*:\s*(?:\d{2}/\d{2}/\d{4},)?\s*,?\s*(\d{2}:\d{2})', text);
-    var seatNumbers = extractMatch(r'Seat No\.\s*:\s*([0-9A-Z,\s\-#]+)', text)
-        .replaceAll(RegExp(r'[,\s]+$'), '');
+      r'Time\s*:\s*(?:\d{2}/\d{2}/\d{4},)?\s*,?\s*(\d{2}:\d{2})',
+      text,
+    );
+    var seatNumbers = extractMatch(
+      r'Seat No\.\s*:\s*([0-9A-Z,\s\-#]+)',
+      text,
+    ).replaceAll(RegExp(r'[,\s]+$'), '');
     var classOfService = extractMatch(
-        r'Class\s*:\s*(.*?)(?=\s*[,\.]|\s*Boarding|\s*For\s+e-Ticket|$)', text);
-    var boardingPoint =
-        extractMatch(r'Boarding at\s*:\s*(.*?)(?=\s*\.|$)', text);
+      r'Class\s*:\s*(.*?)(?=\s*[,\.]|\s*Boarding|\s*For\s+e-Ticket|$)',
+      text,
+    );
+    var boardingPoint = extractMatch(
+      r'Boarding at\s*:\s*(.*?)(?=\s*\.|$)',
+      text,
+    );
 
     // If SMS patterns failed, try PDF patterns
     if (corporation.isEmpty && pnrNumber.isEmpty) {
@@ -110,8 +122,10 @@ class TNSTCBusParser implements TravelTicketParser {
     );
 
     if (departureTime.isEmpty) {
-      departureTime =
-          extractMatch(r'Service Start Time\s*:\s*(\d{2}:\d{2})', text);
+      departureTime = extractMatch(
+        r'Service Start Time\s*:\s*(\d{2}:\d{2})',
+        text,
+      );
     }
 
     if (classOfService.isEmpty) {
@@ -166,8 +180,9 @@ class IRCTCTrainParser implements TravelTicketParser {
       r'Train\s*No',
       'E-TICKET',
     ];
-    return patterns
-        .any((pattern) => RegExp(pattern, caseSensitive: false).hasMatch(text));
+    return patterns.any(
+      (pattern) => RegExp(pattern, caseSensitive: false).hasMatch(text),
+    );
   }
 
   @override
@@ -224,8 +239,9 @@ class SETCBusParser implements TravelTicketParser {
       'Booking ID',
       'Bus No',
     ];
-    return patterns
-        .any((pattern) => RegExp(pattern, caseSensitive: false).hasMatch(text));
+    return patterns.any(
+      (pattern) => RegExp(pattern, caseSensitive: false).hasMatch(text),
+    );
   }
 
   @override
@@ -288,8 +304,10 @@ class TravelParserService {
     if (text.toUpperCase().contains('TNSTC') &&
         (text.toLowerCase().contains('conductor mobile no') ||
             text.toLowerCase().contains('vehicle no'))) {
-      final pnrMatch =
-          RegExp(r'PNR\s*:\s*([^,\s]+)', caseSensitive: false).firstMatch(text);
+      final pnrMatch = RegExp(
+        r'PNR\s*:\s*([^,\s]+)',
+        caseSensitive: false,
+      ).firstMatch(text);
 
       if (pnrMatch == null) return null;
 
@@ -306,9 +324,10 @@ class TravelParserService {
       }
 
       // Extract vehicle number
-      final vehicleMatch =
-          RegExp(r'Vehicle No\s*:\s*([^,\s]+)', caseSensitive: false)
-              .firstMatch(text);
+      final vehicleMatch = RegExp(
+        r'Vehicle No\s*:\s*([^,\s]+)',
+        caseSensitive: false,
+      ).firstMatch(text);
       if (vehicleMatch != null) {
         updates['trip_code'] = vehicleMatch.group(1)!.trim();
       }
@@ -330,23 +349,29 @@ class TravelParserService {
     return null;
   }
 
-  static TravelTicketModel? parseTicketFromText(String text,
-      {SourceType? sourceType}) {
+  static TravelTicketModel? parseTicketFromText(
+    String text, {
+    SourceType? sourceType,
+  }) {
     try {
       for (final parser in _parsers) {
         if (parser.canParse(text)) {
           developer.log('ticket text : $text', name: 'TravelParserService');
           developer.log(
-              'Attempting to parse with ${parser.providerName} parser',
-              name: 'TravelParserService');
+            'Attempting to parse with ${parser.providerName} parser',
+            name: 'TravelParserService',
+          );
 
           final ticket = parser.parseTicket(text);
           if (ticket != null) {
-            developer.log('Parsed ticket: $ticket',
-                name: 'TravelParserService');
             developer.log(
-                'Successfully parsed ticket with ${parser.providerName}',
-                name: 'TravelParserService');
+              'Parsed ticket: $ticket',
+              name: 'TravelParserService',
+            );
+            developer.log(
+              'Successfully parsed ticket with ${parser.providerName}',
+              name: 'TravelParserService',
+            );
 
             if (sourceType != null) {
               return ticket.copyWith(sourceType: sourceType);
@@ -356,12 +381,17 @@ class TravelParserService {
         }
       }
 
-      developer.log('No parser could handle the text',
-          name: 'TravelParserService');
+      developer.log(
+        'No parser could handle the text',
+        name: 'TravelParserService',
+      );
       return null;
     } on Object catch (e) {
-      developer.log('Error during ticket parsing',
-          name: 'TravelParserService', error: e);
+      developer.log(
+        'Error during ticket parsing',
+        name: 'TravelParserService',
+        error: e,
+      );
       return null;
     }
   }

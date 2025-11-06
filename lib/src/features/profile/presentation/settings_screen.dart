@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:namma_wallet/src/common/widgets/custom_back_button.dart';
-import 'package:namma_wallet/src/features/ai/fallback-parser/domain/enums/model_configs.dart';
-import 'package:namma_wallet/src/features/ai/fallback-parser/presentation/widget/model_download_tile.dart';
 
 /// class [SettingsScreen] is a Widget which can be placed on the setting screen
 /// to download the model
@@ -18,7 +16,7 @@ class SettingsScreen extends StatelessWidget {
       ),
       body: ListView(
         children: const [
-          ModelDownloadTile(model: Model.gemma3_1B),
+           Text('This page is empty')
         ],
       ),
     );

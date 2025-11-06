@@ -24,13 +24,7 @@ class CalendarTicketCard extends StatelessWidget {
   }
 
   GenericDetailsModel _convertToGenericModel(TravelTicketModel ticket) {
-    final entryType = switch (ticket.ticketType) {
-      TicketType.bus => EntryType.busTicket,
-      TicketType.train => EntryType.trainTicket,
-      TicketType.flight => EntryType.none,
-      TicketType.event => EntryType.none,
-      TicketType.metro => EntryType.none,
-    };
+    final entryType = ticket.ticketType;
 
     final tags = <TagModel>[];
     if (ticket.seatNumbers != null && ticket.seatNumbers!.isNotEmpty) {
@@ -40,9 +34,12 @@ class CalendarTicketCard extends StatelessWidget {
       tags.add(TagModel(value: ticket.displayTime, icon: 'access_time'));
     }
     if (ticket.amount != null) {
-      tags.add(TagModel(
+      tags.add(
+        TagModel(
           value: '₹${ticket.amount!.toStringAsFixed(0)}',
-          icon: 'currency_rupee'));
+          icon: 'currency_rupee',
+        ),
+      );
     }
 
     late final DateTime startTime;
@@ -106,11 +103,11 @@ class CalendarTicketCardContent extends StatelessWidget {
                     radius: 20,
                     backgroundColor: AppColor.whiteColor,
                     child: Icon(
-                      ticket.type == EntryType.busTicket
+                      ticket.type == TicketType.bus
                           ? Icons.airport_shuttle_outlined
-                          : ticket.type == EntryType.trainTicket
-                              ? Icons.train_outlined
-                              : Icons.tram_outlined,
+                          : ticket.type == TicketType.train
+                          ? Icons.train_outlined
+                          : Icons.tram_outlined,
                     ),
                   ),
                   const SizedBox(width: 10),
@@ -195,35 +192,39 @@ class CalendarTicketCardContent extends StatelessWidget {
                   spacing: 10,
                   runSpacing: 8,
                   children: [
-                    ...ticket.tags!.take(2).map((tag) => Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 6,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.2),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                tag.iconData,
-                                size: 16,
-                                color: Colors.white,
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                tag.value ?? 'xxx',
-                                style: const TextStyle(
-                                  fontSize: 12,
+                    ...ticket.tags!
+                        .take(2)
+                        .map(
+                          (tag) => Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 6,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: 0.2),
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  tag.iconData,
+                                  size: 16,
                                   color: Colors.white,
-                                  fontWeight: FontWeight.w500,
                                 ),
-                              ),
-                            ],
+                                const SizedBox(width: 4),
+                                Text(
+                                  tag.value ?? 'xxx',
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                        ))
+                        ),
                   ],
                 ),
             ],
@@ -267,9 +268,9 @@ class CalendarTicketCardContent extends StatelessWidget {
                   Icons.info,
                   color: Colors.white,
                 ),
-              )
+              ),
             ],
-          )
+          ),
         ],
       ),
     );

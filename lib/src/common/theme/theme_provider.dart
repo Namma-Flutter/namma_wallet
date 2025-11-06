@@ -31,8 +31,8 @@ class ThemeProvider extends ChangeNotifier {
     final stored = prefs.getInt(_themePreferenceKey);
     final idx =
         (stored != null && stored >= 0 && stored < ThemeMode.values.length)
-            ? stored
-            : 0;
+        ? stored
+        : 0;
     _themeMode = ThemeMode.values[idx];
     notifyListeners();
   }

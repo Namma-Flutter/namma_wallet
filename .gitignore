@@ -46,3 +46,6 @@ app.*.map.json
 
 # FVM Version Cache
 .fvm/
+
+# config file which stores env variables can be used as flutter run --dart-define-from-file=config.json
+config.json

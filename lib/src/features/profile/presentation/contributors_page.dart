@@ -49,20 +49,25 @@ class _ContributorsPageState extends State<ContributorsPage> {
     const timeout = Duration(seconds: 10);
 
     while (true) {
-      final uri = Uri.parse(
-        'https://api.github.com/repos/Namma-Flutter/namma_wallet/contributors',
-      ).replace(queryParameters: {
-        'per_page': perPage.toString(),
-        'page': page.toString(),
-      });
+      final uri =
+          Uri.parse(
+            'https://api.github.com/repos/Namma-Flutter/namma_wallet/contributors',
+          ).replace(
+            queryParameters: {
+              'per_page': perPage.toString(),
+              'page': page.toString(),
+            },
+          );
 
-      final response = await http.get(
-        uri,
-        headers: {
-          'User-Agent': 'namma_wallet',
-          'Accept': 'application/vnd.github.v3+json',
-        },
-      ).timeout(timeout);
+      final response = await http
+          .get(
+            uri,
+            headers: {
+              'User-Agent': 'namma_wallet',
+              'Accept': 'application/vnd.github.v3+json',
+            },
+          )
+          .timeout(timeout);
 
       if (response.statusCode == 200) {
         final body = json.decode(response.body) as List<dynamic>;
@@ -105,8 +110,11 @@ class _ContributorsPageState extends State<ContributorsPage> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.error_outline,
-                        size: 48, color: Colors.red),
+                    const Icon(
+                      Icons.error_outline,
+                      size: 48,
+                      color: Colors.red,
+                    ),
                     const SizedBox(height: 16),
                     Text(
                       'Error loading contributors',

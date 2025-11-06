@@ -7,60 +7,6 @@
 
 part of 'generic_details_model.dart';
 
-class EntryTypeMapper extends EnumMapper<EntryType> {
-  EntryTypeMapper._();
-
-  static EntryTypeMapper? _instance;
-  static EntryTypeMapper ensureInitialized() {
-    if (_instance == null) {
-      MapperContainer.globals.use(_instance = EntryTypeMapper._());
-    }
-    return _instance!;
-  }
-
-  static EntryType fromValue(dynamic value) {
-    ensureInitialized();
-    return MapperContainer.globals.fromValue(value);
-  }
-
-  @override
-  EntryType decode(dynamic value) {
-    switch (value) {
-      case r'event':
-        return EntryType.event;
-      case r'busTicket':
-        return EntryType.busTicket;
-      case r'trainTicket':
-        return EntryType.trainTicket;
-      case r'none':
-        return EntryType.none;
-      default:
-        throw MapperException.unknownEnumValue(value);
-    }
-  }
-
-  @override
-  dynamic encode(EntryType self) {
-    switch (self) {
-      case EntryType.event:
-        return r'event';
-      case EntryType.busTicket:
-        return r'busTicket';
-      case EntryType.trainTicket:
-        return r'trainTicket';
-      case EntryType.none:
-        return r'none';
-    }
-  }
-}
-
-extension EntryTypeMapperExtension on EntryType {
-  String toValue() {
-    EntryTypeMapper.ensureInitialized();
-    return MapperContainer.globals.toValue<EntryType>(this) as String;
-  }
-}
-
 class GenericDetailsModelMapper extends ClassMapperBase<GenericDetailsModel> {
   GenericDetailsModelMapper._();
 
@@ -68,7 +14,7 @@ class GenericDetailsModelMapper extends ClassMapperBase<GenericDetailsModel> {
   static GenericDetailsModelMapper ensureInitialized() {
     if (_instance == null) {
       MapperContainer.globals.use(_instance = GenericDetailsModelMapper._());
-      EntryTypeMapper.ensureInitialized();
+      TicketTypeMapper.ensureInitialized();
       TagModelMapper.ensureInitialized();
       ExtrasModelMapper.ensureInitialized();
     }
@@ -82,33 +28,37 @@ class GenericDetailsModelMapper extends ClassMapperBase<GenericDetailsModel> {
   static const Field<GenericDetailsModel, String> _f$primaryText = Field(
     'primaryText',
     _$primaryText,
+    key: r'primary_text',
   );
   static String _$secondaryText(GenericDetailsModel v) => v.secondaryText;
   static const Field<GenericDetailsModel, String> _f$secondaryText = Field(
     'secondaryText',
     _$secondaryText,
+    key: r'secondary_text',
   );
   static DateTime _$startTime(GenericDetailsModel v) => v.startTime;
   static const Field<GenericDetailsModel, DateTime> _f$startTime = Field(
     'startTime',
     _$startTime,
+    key: r'start_time',
   );
   static String _$location(GenericDetailsModel v) => v.location;
   static const Field<GenericDetailsModel, String> _f$location = Field(
     'location',
     _$location,
   );
-  static EntryType _$type(GenericDetailsModel v) => v.type;
-  static const Field<GenericDetailsModel, EntryType> _f$type = Field(
+  static TicketType _$type(GenericDetailsModel v) => v.type;
+  static const Field<GenericDetailsModel, TicketType> _f$type = Field(
     'type',
     _$type,
     opt: true,
-    def: EntryType.none,
+    def: TicketType.bus,
   );
   static DateTime? _$endTime(GenericDetailsModel v) => v.endTime;
   static const Field<GenericDetailsModel, DateTime> _f$endTime = Field(
     'endTime',
     _$endTime,
+    key: r'end_time',
     opt: true,
   );
   static List<TagModel>? _$tags(GenericDetailsModel v) => v.tags;
@@ -127,6 +77,7 @@ class GenericDetailsModelMapper extends ClassMapperBase<GenericDetailsModel> {
   static const Field<GenericDetailsModel, int> _f$ticketId = Field(
     'ticketId',
     _$ticketId,
+    key: r'ticket_id',
     opt: true,
   );
   static String? _$contactMobile(GenericDetailsModel v) => v.contactMobile;
@@ -248,7 +199,7 @@ abstract class GenericDetailsModelCopyWith<
     String? secondaryText,
     DateTime? startTime,
     String? location,
-    EntryType? type,
+    TicketType? type,
     DateTime? endTime,
     List<TagModel>? tags,
     List<ExtrasModel>? extras,
@@ -296,7 +247,7 @@ class _GenericDetailsModelCopyWithImpl<$R, $Out>
     String? secondaryText,
     DateTime? startTime,
     String? location,
-    EntryType? type,
+    TicketType? type,
     Object? endTime = $none,
     Object? tags = $none,
     Object? extras = $none,

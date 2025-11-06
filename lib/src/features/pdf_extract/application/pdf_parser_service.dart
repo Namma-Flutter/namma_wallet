@@ -57,18 +57,24 @@ class PDFParserService {
       final pdfService = PDFService();
       final extractedText = pdfService.extractTextFrom(pdfFile);
 
-      developer.log('PDF file size: ${pdfFile.lengthSync()} bytes',
-          name: 'PDFParserService');
-      developer.log('Extracted text length: ${extractedText.length}',
-          name: 'PDFParserService');
+      developer.log(
+        'PDF file size: ${pdfFile.lengthSync()} bytes',
+        name: 'PDFParserService',
+      );
+      developer.log(
+        'Extracted text length: ${extractedText.length}',
+        name: 'PDFParserService',
+      );
 
       if (extractedText.trim().isEmpty) {
         return PDFParserResult.error('No text content found in PDF');
       }
 
       // Log complete extracted text for debugging
-      developer.log('=== FULL EXTRACTED PDF TEXT ===',
-          name: 'PDFParserService');
+      developer.log(
+        '=== FULL EXTRACTED PDF TEXT ===',
+        name: 'PDFParserService',
+      );
       developer.log(extractedText, name: 'PDFParserService');
       developer.log('=== END EXTRACTED PDF TEXT ===', name: 'PDFParserService');
 
@@ -76,8 +82,10 @@ class PDFParserService {
       final textPreview = extractedText.length > 300
           ? '${extractedText.substring(0, 300)}...'
           : extractedText;
-      developer.log('Extracted text preview: $textPreview',
-          name: 'PDFParserService');
+      developer.log(
+        'Extracted text preview: $textPreview',
+        name: 'PDFParserService',
+      );
 
       // Check if any keywords are present
       final keywords = [
@@ -86,11 +94,13 @@ class PDFParserService {
         'Service',
         'Journey',
         'TNSTC',
-        'SETC'
+        'SETC',
       ];
       final foundKeywords = keywords
-          .where((keyword) =>
-              extractedText.toLowerCase().contains(keyword.toLowerCase()))
+          .where(
+            (keyword) =>
+                extractedText.toLowerCase().contains(keyword.toLowerCase()),
+          )
           .toList();
 
       developer.log('Found keywords: $foundKeywords', name: 'PDFParserService');
@@ -99,87 +109,140 @@ class PDFParserService {
       TravelTicketModel? parsedTicket;
 
       // Check if it's a TNSTC ticket
-      if (foundKeywords
-          .any((k) => ['TNSTC', 'Corporation', 'PNR'].contains(k))) {
+      if (foundKeywords.any(
+        (k) => ['TNSTC', 'Corporation', 'PNR'].contains(k),
+      )) {
         try {
           final tnstcTicket = TNSTCPDFParser.parseTicket(extractedText);
 
           // Log all parsed TNSTC ticket values
-          developer.log('=== PARSED TNSTC TICKET VALUES ===',
-              name: 'PDFParserService');
-          developer.log('Corporation: "${tnstcTicket.corporation}"',
-              name: 'PDFParserService');
-          developer.log('PNR Number: "${tnstcTicket.pnrNumber}"',
-              name: 'PDFParserService');
-          developer.log('Journey Date: "${tnstcTicket.journeyDate}"',
-              name: 'PDFParserService');
-          developer.log('Route No: "${tnstcTicket.routeNo}"',
-              name: 'PDFParserService');
           developer.log(
-              'Service Start Place: "${tnstcTicket.serviceStartPlace}"',
-              name: 'PDFParserService');
-          developer.log('Service End Place: "${tnstcTicket.serviceEndPlace}"',
-              name: 'PDFParserService');
-          developer.log('Service Start Time: "${tnstcTicket.serviceStartTime}"',
-              name: 'PDFParserService');
+            '=== PARSED TNSTC TICKET VALUES ===',
+            name: 'PDFParserService',
+          );
           developer.log(
-              'Passenger Start Place: "${tnstcTicket.passengerStartPlace}"',
-              name: 'PDFParserService');
+            'Corporation: "${tnstcTicket.corporation}"',
+            name: 'PDFParserService',
+          );
           developer.log(
-              'Passenger End Place: "${tnstcTicket.passengerEndPlace}"',
-              name: 'PDFParserService');
+            'PNR Number: "${tnstcTicket.pnrNumber}"',
+            name: 'PDFParserService',
+          );
           developer.log(
-              'Passenger Pickup Point: "${tnstcTicket.passengerPickupPoint}"',
-              name: 'PDFParserService');
+            'Journey Date: "${tnstcTicket.journeyDate}"',
+            name: 'PDFParserService',
+          );
           developer.log(
-              'Passenger Pickup Time: "${tnstcTicket.passengerPickupTime}"',
-              name: 'PDFParserService');
-          developer.log('Platform Number: "${tnstcTicket.platformNumber}"',
-              name: 'PDFParserService');
-          developer.log('Class of Service: "${tnstcTicket.classOfService}"',
-              name: 'PDFParserService');
-          developer.log('Trip Code: "${tnstcTicket.tripCode}"',
-              name: 'PDFParserService');
+            'Route No: "${tnstcTicket.routeNo}"',
+            name: 'PDFParserService',
+          );
           developer.log(
-              'OB Reference Number: "${tnstcTicket.obReferenceNumber}"',
-              name: 'PDFParserService');
-          developer.log('Number of Seats: "${tnstcTicket.numberOfSeats}"',
-              name: 'PDFParserService');
+            'Service Start Place: "${tnstcTicket.serviceStartPlace}"',
+            name: 'PDFParserService',
+          );
           developer.log(
-              'Bank Transaction Number: "${tnstcTicket.bankTransactionNumber}"',
-              name: 'PDFParserService');
-          developer.log('Bus ID Number: "${tnstcTicket.busIdNumber}"',
-              name: 'PDFParserService');
+            'Service End Place: "${tnstcTicket.serviceEndPlace}"',
+            name: 'PDFParserService',
+          );
           developer.log(
-              'Passenger Category: "${tnstcTicket.passengerCategory}"',
-              name: 'PDFParserService');
-          developer.log('Passenger Name: "${tnstcTicket.passengerInfo?.name}"',
-              name: 'PDFParserService');
-          developer.log('Passenger Age: "${tnstcTicket.passengerInfo?.age}"',
-              name: 'PDFParserService');
-          developer.log('Passenger Type: "${tnstcTicket.passengerInfo?.type}"',
-              name: 'PDFParserService');
+            'Service Start Time: "${tnstcTicket.serviceStartTime}"',
+            name: 'PDFParserService',
+          );
           developer.log(
-              'Passenger Gender: "${tnstcTicket.passengerInfo?.gender}"',
-              name: 'PDFParserService');
+            'Passenger Start Place: "${tnstcTicket.passengerStartPlace}"',
+            name: 'PDFParserService',
+          );
           developer.log(
-              'Passenger Seat Number: "${tnstcTicket.passengerInfo?.seatNumber}"',
-              name: 'PDFParserService');
-          developer.log('ID Card Type: "${tnstcTicket.idCardType}"',
-              name: 'PDFParserService');
-          developer.log('ID Card Number: "${tnstcTicket.idCardNumber}"',
-              name: 'PDFParserService');
-          developer.log('Total Fare: "${tnstcTicket.totalFare}"',
-              name: 'PDFParserService');
-          developer.log('=== END PARSED TNSTC TICKET VALUES ===',
-              name: 'PDFParserService');
+            'Passenger End Place: "${tnstcTicket.passengerEndPlace}"',
+            name: 'PDFParserService',
+          );
+          developer.log(
+            'Passenger Pickup Point: "${tnstcTicket.passengerPickupPoint}"',
+            name: 'PDFParserService',
+          );
+          developer.log(
+            'Passenger Pickup Time: "${tnstcTicket.passengerPickupTime}"',
+            name: 'PDFParserService',
+          );
+          developer.log(
+            'Platform Number: "${tnstcTicket.platformNumber}"',
+            name: 'PDFParserService',
+          );
+          developer.log(
+            'Class of Service: "${tnstcTicket.classOfService}"',
+            name: 'PDFParserService',
+          );
+          developer.log(
+            'Trip Code: "${tnstcTicket.tripCode}"',
+            name: 'PDFParserService',
+          );
+          developer.log(
+            'OB Reference Number: "${tnstcTicket.obReferenceNumber}"',
+            name: 'PDFParserService',
+          );
+          developer.log(
+            'Number of Seats: "${tnstcTicket.numberOfSeats}"',
+            name: 'PDFParserService',
+          );
+          developer.log(
+            'Bank Transaction Number: "${tnstcTicket.bankTransactionNumber}"',
+            name: 'PDFParserService',
+          );
+          developer.log(
+            'Bus ID Number: "${tnstcTicket.busIdNumber}"',
+            name: 'PDFParserService',
+          );
+          developer.log(
+            'Passenger Category: "${tnstcTicket.passengerCategory}"',
+            name: 'PDFParserService',
+          );
+          developer.log(
+            'Passenger Name: "${tnstcTicket.passengerInfo?.name}"',
+            name: 'PDFParserService',
+          );
+          developer.log(
+            'Passenger Age: "${tnstcTicket.passengerInfo?.age}"',
+            name: 'PDFParserService',
+          );
+          developer.log(
+            'Passenger Type: "${tnstcTicket.passengerInfo?.type}"',
+            name: 'PDFParserService',
+          );
+          developer.log(
+            'Passenger Gender: "${tnstcTicket.passengerInfo?.gender}"',
+            name: 'PDFParserService',
+          );
+          developer.log(
+            'Passenger Seat Number: "${tnstcTicket.passengerInfo?.seatNumber}"',
+            name: 'PDFParserService',
+          );
+          developer.log(
+            'ID Card Type: "${tnstcTicket.idCardType}"',
+            name: 'PDFParserService',
+          );
+          developer.log(
+            'ID Card Number: "${tnstcTicket.idCardNumber}"',
+            name: 'PDFParserService',
+          );
+          developer.log(
+            'Total Fare: "${tnstcTicket.totalFare}"',
+            name: 'PDFParserService',
+          );
+          developer.log(
+            '=== END PARSED TNSTC TICKET VALUES ===',
+            name: 'PDFParserService',
+          );
 
           parsedTicket = _convertTNSTCToTravelTicket(tnstcTicket);
-          developer.log('Successfully parsed TNSTC ticket',
-              name: 'PDFParserService');
+          developer.log(
+            'Successfully parsed TNSTC ticket',
+            name: 'PDFParserService',
+          );
         } on Exception catch (e) {
-          developer.log('Failed to parse as TNSTC ticket: $e',
-              name: 'PDFParserService');
+          developer.log(
+            'Failed to parse as TNSTC ticket: $e',
+            name: 'PDFParserService',
+          );
         }
       }
 
@@ -203,17 +266,26 @@ class PDFParserService {
           travelTicket: updatedTicket,
         );
       } on DuplicateTicketException catch (e) {
-        developer.log('Duplicate PDF ticket detected',
-            name: 'PDFParserService', error: e);
+        developer.log(
+          'Duplicate PDF ticket detected',
+          name: 'PDFParserService',
+          error: e,
+        );
         return PDFParserResult.error(e.message);
       } on Exception catch (e) {
-        developer.log('Failed to save PDF ticket to database',
-            name: 'PDFParserService', error: e);
+        developer.log(
+          'Failed to save PDF ticket to database',
+          name: 'PDFParserService',
+          error: e,
+        );
         return PDFParserResult.error('Failed to save ticket: $e');
       }
     } on Exception catch (e) {
-      developer.log('Unexpected exception in PDF parser service',
-          name: 'PDFParserService', error: e);
+      developer.log(
+        'Unexpected exception in PDF parser service',
+        name: 'PDFParserService',
+        error: e,
+      );
       return PDFParserResult.error('Error processing PDF: $e');
     }
   }
@@ -232,15 +304,19 @@ class PDFParserService {
       backgroundColor = Colors.green;
 
       // Log success to console
-      developer.log('PDF parser operation succeeded: $message',
-          name: 'PDFParserService');
+      developer.log(
+        'PDF parser operation succeeded: $message',
+        name: 'PDFParserService',
+      );
     } else {
       message = result.errorMessage ?? 'Unknown error occurred';
       backgroundColor = Colors.red;
 
       // Log error to console
-      developer.log('PDF parser operation failed: $message',
-          name: 'PDFParserService');
+      developer.log(
+        'PDF parser operation failed: $message',
+        name: 'PDFParserService',
+      );
     }
 
     ScaffoldMessenger.of(context).showSnackBar(
@@ -255,16 +331,26 @@ class PDFParserService {
   TravelTicketModel _convertTNSTCToTravelTicket(TNSTCTicket tnstcTicket) {
     // Debug logging for TNSTC conversion
     developer.log('Converting TNSTC to TravelTicket:', name: 'PDFParser');
-    developer.log('serviceStartPlace: "${tnstcTicket.serviceStartPlace}"',
-        name: 'PDFParser');
-    developer.log('serviceEndPlace: "${tnstcTicket.serviceEndPlace}"',
-        name: 'PDFParser');
-    developer.log('passengerStartPlace: "${tnstcTicket.passengerStartPlace}"',
-        name: 'PDFParser');
-    developer.log('passengerEndPlace: "${tnstcTicket.passengerEndPlace}"',
-        name: 'PDFParser');
-    developer.log('serviceStartTime: "${tnstcTicket.serviceStartTime}"',
-        name: 'PDFParser');
+    developer.log(
+      'serviceStartPlace: "${tnstcTicket.serviceStartPlace}"',
+      name: 'PDFParser',
+    );
+    developer.log(
+      'serviceEndPlace: "${tnstcTicket.serviceEndPlace}"',
+      name: 'PDFParser',
+    );
+    developer.log(
+      'passengerStartPlace: "${tnstcTicket.passengerStartPlace}"',
+      name: 'PDFParser',
+    );
+    developer.log(
+      'passengerEndPlace: "${tnstcTicket.passengerEndPlace}"',
+      name: 'PDFParser',
+    );
+    developer.log(
+      'serviceStartTime: "${tnstcTicket.serviceStartTime}"',
+      name: 'PDFParser',
+    );
     developer.log('pnrNumber: "${tnstcTicket.pnrNumber}"', name: 'PDFParser');
 
     // Convert TNSTC ticket to TravelTicketModel

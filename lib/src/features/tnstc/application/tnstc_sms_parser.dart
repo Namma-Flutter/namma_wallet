@@ -26,16 +26,25 @@ class TNSTCSMSParser {
     }
 
     // Common fields
-    final pnrNumber = extractMatch(r'PNR NO\.\s*:\s*([^,\s]+)|PNR:([^,\s]+)', smsText);
+    final pnrNumber = extractMatch(
+      r'PNR NO\.\s*:\s*([^,\s]+)|PNR:([^,\s]+)',
+      smsText,
+    );
     final journeyDate = parseDate(
-      extractMatch(r'Journey Date\s*:\s*(\d{2}/\d{2}/\d{4})|DOJ:(\d{2}/\d{2}/\d{4})', smsText),
+      extractMatch(
+        r'Journey Date\s*:\s*(\d{2}/\d{2}/\d{4})|DOJ:(\d{2}/\d{2}/\d{4})',
+        smsText,
+      ),
     );
 
     // Check if it's a conductor SMS
     final isConductorSMS = smsText.contains('Conductor Mobile No');
 
     if (isConductorSMS) {
-      final conductorMobileNo = extractMatch(r'Conductor Mobile No:\s*(\d+)', smsText);
+      final conductorMobileNo = extractMatch(
+        r'Conductor Mobile No:\s*(\d+)',
+        smsText,
+      );
       final vehicleNumber = extractMatch(r'Vehicle No:([A-Z0-9]+)', smsText);
 
       return TNSTCTicketModel(
@@ -47,21 +56,29 @@ class TNSTCSMSParser {
       );
     } else {
       // Booking confirmation SMS
-      final corporation =
-          extractMatch(r'Corporation\s*:\s*(.*?)(?=\s*,)', smsText);
+      final corporation = extractMatch(
+        r'Corporation\s*:\s*(.*?)(?=\s*,)',
+        smsText,
+      );
       final from = extractMatch(r'From\s*:\s*(.*?)(?=\s+To)', smsText);
       final to = extractMatch(r'To\s+([^,]+)', smsText);
       final tripCode = extractMatch(r'Trip Code\s*:\s*(\S+)', smsText);
       final departureTime = extractMatch(
-          r'Time\s*:\s*(?:\d{2}/\d{2}/\d{4},)?\s*,?\s*(\d{2}:\d{2})', smsText);
-      final seatNumbers =
-          extractMatch(r'Seat No\.\s*:\s*([0-9A-Z,\s\-#]+)', smsText)
-              .replaceAll(RegExp(r'[,\s]+$'), '');
+        r'Time\s*:\s*(?:\d{2}/\d{2}/\d{4},)?\s*,?\s*(\d{2}:\d{2})',
+        smsText,
+      );
+      final seatNumbers = extractMatch(
+        r'Seat No\.\s*:\s*([0-9A-Z,\s\-#]+)',
+        smsText,
+      ).replaceAll(RegExp(r'[,\s]+$'), '');
       final classOfService = extractMatch(
-          r'Class\s*:\s*(.*?)(?=\s*[,\.]|\s*Boarding|\s*For\s+e-Ticket|$)',
-          smsText);
-      final passengerPickupPoint =
-          extractMatch(r'Boarding at\s*:\s*(.*?)(?=\s*\.|$)', smsText);
+        r'Class\s*:\s*(.*?)(?=\s*[,\.]|\s*Boarding|\s*For\s+e-Ticket|$)',
+        smsText,
+      );
+      final passengerPickupPoint = extractMatch(
+        r'Boarding at\s*:\s*(.*?)(?=\s*\.|$)',
+        smsText,
+      );
 
       final numberOfSeats = seatNumbers.isNotEmpty
           ? seatNumbers.split(',').where((s) => s.trim().isNotEmpty).length
@@ -69,13 +86,15 @@ class TNSTCSMSParser {
 
       final passengers = <PassengerInfo>[];
       if (seatNumbers.isNotEmpty) {
-        passengers.add(PassengerInfo(
-          name: '',
-          age: 0,
-          type: 'Adult',
-          gender: '',
-          seatNumber: seatNumbers,
-        ));
+        passengers.add(
+          PassengerInfo(
+            name: '',
+            age: 0,
+            type: 'Adult',
+            gender: '',
+            seatNumber: seatNumbers,
+          ),
+        );
       }
 
       return TNSTCTicketModel(

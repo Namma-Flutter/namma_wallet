@@ -21,8 +21,11 @@ class ClipboardResult {
     this.errorMessage,
   });
 
-  factory ClipboardResult.success(ClipboardContentType type, String content,
-      {TravelTicketModel? ticket}) {
+  factory ClipboardResult.success(
+    ClipboardContentType type,
+    String content, {
+    TravelTicketModel? ticket,
+  }) {
     return ClipboardResult(
       type: type,
       content: content,
@@ -80,20 +83,26 @@ class ClipboardService {
           );
 
           if (count > 0) {
-            developer.log('Ticket updated successfully via SMS',
-                name: 'ClipboardService');
+            developer.log(
+              'Ticket updated successfully via SMS',
+              name: 'ClipboardService',
+            );
             print('✅ CLIPBOARD: Ticket updated successfully via SMS.');
             return ClipboardResult.success(
               ClipboardContentType.travelTicket,
               content,
             );
           } else {
-            developer.log('Update SMS received, but no matching ticket found',
-                name: 'ClipboardService');
+            developer.log(
+              'Update SMS received, but no matching ticket found',
+              name: 'ClipboardService',
+            );
             print(
-                '⚠️ CLIPBOARD: Update SMS received, but no matching ticket found.');
+              '⚠️ CLIPBOARD: Update SMS received, but no matching ticket found.',
+            );
             return ClipboardResult.error(
-                'Update SMS received, but the original ticket was not found in the wallet.');
+              'Update SMS received, but the original ticket was not found in the wallet.',
+            );
           }
         }
 
@@ -116,13 +125,19 @@ class ClipboardService {
               ticket: updatedTicket,
             );
           } on DuplicateTicketException catch (e) {
-            developer.log('Duplicate ticket detected',
-                name: 'ClipboardService', error: e);
+            developer.log(
+              'Duplicate ticket detected',
+              name: 'ClipboardService',
+              error: e,
+            );
             print('⚠️ CLIPBOARD DUPLICATE: ${e.message}');
             return ClipboardResult.error(e.message);
           } catch (e) {
-            developer.log('Failed to save ticket to database',
-                name: 'ClipboardService', error: e);
+            developer.log(
+              'Failed to save ticket to database',
+              name: 'ClipboardService',
+              error: e,
+            );
             print('🔴 CLIPBOARD ERROR: Failed to save ticket: $e');
             return ClipboardResult.error('Failed to save ticket: $e');
           }
@@ -137,8 +152,11 @@ class ClipboardService {
         'No text content found in clipboard. Please copy plain text.',
       );
     } on PlatformException catch (e) {
-      developer.log('Platform exception in clipboard service',
-          name: 'ClipboardService', error: e);
+      developer.log(
+        'Platform exception in clipboard service',
+        name: 'ClipboardService',
+        error: e,
+      );
       print('🔴 CLIPBOARD PLATFORM ERROR: ${e.code} - ${e.message}');
 
       if (e.code == 'clipboard_error' ||
@@ -149,8 +167,11 @@ class ClipboardService {
       }
       return ClipboardResult.error('Error accessing clipboard: ${e.message}');
     } on Exception catch (e) {
-      developer.log('Unexpected exception in clipboard service',
-          name: 'ClipboardService', error: e);
+      developer.log(
+        'Unexpected exception in clipboard service',
+        name: 'ClipboardService',
+        error: e,
+      );
       print('🔴 CLIPBOARD UNEXPECTED ERROR: $e');
       return ClipboardResult.error('Unexpected error occurred: $e');
     }
@@ -178,24 +199,29 @@ class ClipboardService {
     if (result.isSuccess) {
       message = switch (result.type) {
         ClipboardContentType.text => 'Text content read successfully',
-        ClipboardContentType.travelTicket => result.ticket != null
-            ? 'Travel ticket saved successfully!'
-            : 'Ticket updated with conductor details!',
+        ClipboardContentType.travelTicket =>
+          result.ticket != null
+              ? 'Travel ticket saved successfully!'
+              : 'Ticket updated with conductor details!',
         ClipboardContentType.invalid => 'Invalid content',
       };
       backgroundColor = Colors.green;
 
       // Log success to console
-      developer.log('Clipboard operation succeeded: $message',
-          name: 'ClipboardService');
+      developer.log(
+        'Clipboard operation succeeded: $message',
+        name: 'ClipboardService',
+      );
       print('✅ CLIPBOARD SUCCESS: $message');
     } else {
       message = result.errorMessage ?? 'Unknown error occurred';
       backgroundColor = Colors.red;
 
       // Log error to console
-      developer.log('Clipboard operation failed: $message',
-          name: 'ClipboardService');
+      developer.log(
+        'Clipboard operation failed: $message',
+        name: 'ClipboardService',
+      );
       print('🔴 CLIPBOARD FAILED: $message');
     }
 

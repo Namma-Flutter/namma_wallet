@@ -37,7 +37,9 @@ class _NammaWalletAppState extends State<NammaWalletApp> {
 
           _scaffoldMessengerKey.currentState?.showSnackBar(
             SnackBar(
-              content: Text('📄 Shared SMS processed for PNR: ${ticket.pnrNumber}'),
+              content: Text(
+                '📄 Shared SMS processed for PNR: ${ticket.pnrNumber}',
+              ),
               backgroundColor: Colors.green,
               duration: const Duration(seconds: 3),
             ),
