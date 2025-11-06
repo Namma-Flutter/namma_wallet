@@ -50,13 +50,14 @@ class _ContributorsViewState extends State<ContributorsView> {
 
     while (true) {
       final uri =
-          Uri.parse('https://api.github.com/repos/Namma-Flutter/namma_wallet/contributors')
-              .replace(
-        queryParameters: {
-          'per_page': perPage.toString(),
-          'page': page.toString(),
-        },
-      );
+          Uri.parse(
+            'https://api.github.com/repos/Namma-Flutter/namma_wallet/contributors',
+          ).replace(
+            queryParameters: {
+              'per_page': perPage.toString(),
+              'page': page.toString(),
+            },
+          );
 
       final response = await http
           .get(

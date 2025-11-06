@@ -8,6 +8,7 @@ import 'package:card_stack_widget/widget/card_stack_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:namma_wallet/src/common/database/wallet_database.dart';
+import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/routing/app_routes.dart';
 import 'package:namma_wallet/src/common/widgets/snackbar_widget.dart';
 import 'package:namma_wallet/src/features/common/domain/travel_ticket_model.dart';
@@ -55,7 +56,7 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
         _isLoading = true;
       });
 
-      final ticketMaps = await WalletDatabase.instance.fetchAllTravelTickets();
+      final ticketMaps = await getIt<WalletDatabase>().fetchAllTravelTickets();
 
       if (!mounted) return;
 

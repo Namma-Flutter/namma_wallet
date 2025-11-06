@@ -3,6 +3,7 @@ import 'dart:developer' as developer;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:namma_wallet/src/common/database/wallet_database.dart';
+import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/features/common/application/travel_parser_service.dart';
 import 'package:namma_wallet/src/features/common/domain/travel_ticket_model.dart';
 
@@ -76,7 +77,7 @@ class ClipboardService {
 
         if (updateInfo != null) {
           // This is an update SMS. Attempt to apply the update.
-          final db = WalletDatabase.instance;
+          final db = getIt<WalletDatabase>();
           final count = await db.updateTravelTicketByPNR(
             updateInfo.pnrNumber,
             updateInfo.updates,
@@ -115,7 +116,7 @@ class ClipboardService {
         if (parsedTicket != null) {
           // Save to database
           try {
-            final ticketId = await WalletDatabase.instance.insertTravelTicket(
+            final ticketId = await getIt<WalletDatabase>().insertTravelTicket(
               parsedTicket.toDatabase(),
             );
             final updatedTicket = parsedTicket.copyWith(id: ticketId);

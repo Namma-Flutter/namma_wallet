@@ -8,6 +8,7 @@ import 'package:namma_wallet/src/common/theme/app_theme.dart';
 import 'package:namma_wallet/src/common/theme/theme_provider.dart';
 import 'package:namma_wallet/src/features/tnstc/application/sms_service.dart';
 import 'package:provider/provider.dart';
+import 'package:namma_wallet/src/common/di/locator.dart';
 
 class NammaWalletApp extends StatefulWidget {
   const NammaWalletApp({super.key});
@@ -18,8 +19,8 @@ class NammaWalletApp extends StatefulWidget {
 
 class _NammaWalletAppState extends State<NammaWalletApp> {
   int currentPageIndex = 0;
-  final SharingIntentService _sharingService = SharingIntentService();
-  final SMSService _smsService = SMSService();
+  final SharingIntentService _sharingService = getIt<SharingIntentService>();
+  final SMSService _smsService = getIt<SMSService>();
   final GlobalKey<ScaffoldMessengerState> _scaffoldMessengerKey =
       GlobalKey<ScaffoldMessengerState>();
 
