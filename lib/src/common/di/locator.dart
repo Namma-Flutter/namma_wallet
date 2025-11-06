@@ -1,5 +1,6 @@
 import 'package:get_it/get_it.dart';
 import 'package:namma_wallet/src/common/database/wallet_database.dart';
+import 'package:namma_wallet/src/common/services/logger_service.dart';
 import 'package:namma_wallet/src/common/services/sharing_intent_service.dart';
 import 'package:namma_wallet/src/common/theme/theme_provider.dart';
 import 'package:namma_wallet/src/features/ai/fallback-parser/application/gemma_service.dart';
@@ -12,6 +13,8 @@ final GetIt getIt = GetIt.instance;
 
 void setupLocator() {
   getIt
+    // Logger - Initialize first
+    ..registerSingleton<LoggerService>(LoggerService())
     // Providers
     ..registerSingleton<ThemeProvider>(ThemeProvider())
     // Core services

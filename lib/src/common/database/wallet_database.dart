@@ -1,6 +1,7 @@
 import 'dart:async';
-import 'dart:developer' as developer;
 
+import 'package:namma_wallet/src/common/di/locator.dart';
+import 'package:namma_wallet/src/common/services/logger_service.dart';
 import 'package:path/path.dart' as p;
 import 'package:sqflite/sqflite.dart';
 
@@ -21,6 +22,8 @@ class WalletDatabase {
 
   Database? _database;
 
+  LoggerService get _logger => getIt<LoggerService>();
+
   Future<Database> get database async {
     final existing = _database;
     if (existing != null) return existing;
@@ -29,15 +32,25 @@ class WalletDatabase {
   }
 
   Future<Database> _initDatabase() async {
+    _logger.info('Initializing database...');
     final dbPath = await getDatabasesPath();
     final path = p.join(dbPath, _dbName);
+    _logger.logDatabase('Init', 'Database path: $path');
+
     return openDatabase(
       path,
       version: _dbVersion,
       onCreate: (Database db, int version) async {
+        _logger.logDatabase('Create', 'Creating database schema v$version');
         await _createSchema(db);
+        _logger.success('Database schema created successfully');
       },
-      onUpgrade: (Database db, int oldVersion, int newVersion) async {},
+      onUpgrade: (Database db, int oldVersion, int newVersion) async {
+        _logger.logDatabase(
+          'Upgrade',
+          'Upgrading from v$oldVersion to v$newVersion',
+        );
+      },
     );
   }
 
@@ -134,21 +147,22 @@ CREATE INDEX idx_travel_tickets_ticket_type ON travel_tickets(ticket_type);
 
   Future<List<Map<String, Object?>>> fetchAllTravelTickets() async {
     try {
+      _logger.logDatabase('Query', 'Fetching all travel tickets');
       final db = await database;
       final tickets = await db.query(
         'travel_tickets',
         orderBy: 'created_at DESC',
       );
-      developer.log(
-        'Successfully fetched ${tickets.length} travel tickets',
-        name: 'DatabaseHelper',
+      _logger.logDatabase(
+        'Success',
+        'Fetched ${tickets.length} travel tickets',
       );
       return tickets;
-    } catch (e) {
-      developer.log(
+    } catch (e, stackTrace) {
+      _logger.error(
         'Failed to fetch travel tickets',
-        name: 'DatabaseHelper',
-        error: e,
+        e is Exception ? e : null,
+        stackTrace,
       );
       rethrow;
     }
@@ -178,6 +192,7 @@ ORDER BY t.created_at DESC
 
   Future<int> insertTravelTicket(Map<String, Object?> ticket) async {
     try {
+      _logger.logDatabase('Insert', 'Inserting travel ticket');
       final db = await database;
       // Ensure user_id is set to 1 (single user app)
       ticket['user_id'] = 1;
@@ -196,10 +211,7 @@ ORDER BY t.created_at DESC
           limit: 1,
         );
         if (existing.isNotEmpty) {
-          developer.log(
-            'Duplicate ticket found with PNR: $pnrNumber',
-            name: 'DatabaseHelper',
-          );
+          _logger.warning('Duplicate ticket found with PNR: $pnrNumber');
           throw DuplicateTicketException(
             'Ticket with PNR $pnrNumber already exists',
           );
@@ -212,9 +224,8 @@ ORDER BY t.created_at DESC
           limit: 1,
         );
         if (existing.isNotEmpty) {
-          developer.log(
+          _logger.warning(
             'Duplicate ticket found with booking reference: $bookingRef',
-            name: 'DatabaseHelper',
           );
           throw DuplicateTicketException(
             'Ticket with booking reference $bookingRef already exists',
@@ -223,19 +234,16 @@ ORDER BY t.created_at DESC
       }
 
       final id = await db.insert('travel_tickets', ticket);
-      developer.log(
-        'Successfully inserted travel ticket with ID: $id',
-        name: 'DatabaseHelper',
-      );
+      _logger.logDatabase('Success', 'Inserted travel ticket with ID: $id');
       return id;
-    } catch (e) {
+    } catch (e, stackTrace) {
       if (e is DuplicateTicketException) {
         rethrow;
       }
-      developer.log(
+      _logger.error(
         'Failed to insert travel ticket',
-        name: 'DatabaseHelper',
-        error: e,
+        e is Exception ? e : null,
+        stackTrace,
       );
       rethrow;
     }
@@ -289,6 +297,7 @@ ORDER BY t.created_at DESC
     Map<String, Object?> updates,
   ) async {
     try {
+      _logger.logDatabase('Update', 'Updating ticket with PNR: $pnrNumber');
       final db = await database;
       updates['updated_at'] = DateTime.now().toIso8601String();
 
@@ -300,23 +309,20 @@ ORDER BY t.created_at DESC
       );
 
       if (count > 0) {
-        developer.log(
-          'Successfully updated ticket with PNR: $pnrNumber',
-          name: 'DatabaseHelper',
+        _logger.logDatabase(
+          'Success',
+          'Updated ticket with PNR: $pnrNumber',
         );
       } else {
-        developer.log(
-          'No ticket found with PNR: $pnrNumber',
-          name: 'DatabaseHelper',
-        );
+        _logger.warning('No ticket found with PNR: $pnrNumber');
       }
 
       return count;
-    } catch (e) {
-      developer.log(
-        'Failed to update ticket by PNR',
-        name: 'DatabaseHelper',
-        error: e,
+    } catch (e, stackTrace) {
+      _logger.error(
+        'Failed to update ticket by PNR: $pnrNumber',
+        e is Exception ? e : null,
+        stackTrace,
       );
       rethrow;
     }
