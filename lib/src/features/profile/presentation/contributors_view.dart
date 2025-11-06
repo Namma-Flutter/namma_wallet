@@ -25,15 +25,15 @@ class Contributor {
   final String profileUrl;
 }
 
-// ----------------- Contributors Page -----------------
-class ContributorsPage extends StatefulWidget {
-  const ContributorsPage({super.key});
+// ----------------- Contributors View -----------------
+class ContributorsView extends StatefulWidget {
+  const ContributorsView({super.key});
 
   @override
-  State<ContributorsPage> createState() => _ContributorsPageState();
+  State<ContributorsView> createState() => _ContributorsViewState();
 }
 
-class _ContributorsPageState extends State<ContributorsPage> {
+class _ContributorsViewState extends State<ContributorsView> {
   late Future<List<Contributor>> _contributorsFuture;
 
   @override
@@ -50,14 +50,13 @@ class _ContributorsPageState extends State<ContributorsPage> {
 
     while (true) {
       final uri =
-          Uri.parse(
-            'https://api.github.com/repos/Namma-Flutter/namma_wallet/contributors',
-          ).replace(
-            queryParameters: {
-              'per_page': perPage.toString(),
-              'page': page.toString(),
-            },
-          );
+          Uri.parse('https://api.github.com/repos/Namma-Flutter/namma_wallet/contributors')
+              .replace(
+        queryParameters: {
+          'per_page': perPage.toString(),
+          'page': page.toString(),
+        },
+      );
 
       final response = await http
           .get(

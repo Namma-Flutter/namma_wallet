@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:namma_wallet/src/common/widgets/custom_back_button.dart';
 
-/// class [SettingsScreen] is a Widget which can be placed on the setting screen
+/// class [SettingsView] is a Widget which can be placed on the setting screen
 /// to download the model
-class SettingsScreen extends StatelessWidget {
+class SettingsView extends StatelessWidget {
   /// Constructor
-  const SettingsScreen({super.key});
+  const SettingsView({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +16,7 @@ class SettingsScreen extends StatelessWidget {
       ),
       body: ListView(
         children: const [
-           Text('This page is empty')
+          Text('This page is empty')
         ],
       ),
     );

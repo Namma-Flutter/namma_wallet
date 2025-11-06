@@ -10,8 +10,6 @@ import 'package:go_router/go_router.dart';
 import 'package:namma_wallet/src/common/database/wallet_database.dart';
 import 'package:namma_wallet/src/common/routing/app_routes.dart';
 import 'package:namma_wallet/src/common/widgets/snackbar_widget.dart';
-import 'package:namma_wallet/src/features/ai/fallback-parser/application/gemma_service.dart'
-    show GemmaChatService;
 import 'package:namma_wallet/src/features/common/domain/travel_ticket_model.dart';
 import 'package:namma_wallet/src/features/home/domain/extras_model.dart';
 import 'package:namma_wallet/src/features/home/domain/generic_details_model.dart';
@@ -19,14 +17,14 @@ import 'package:namma_wallet/src/features/home/presentation/widgets/header_widge
 import 'package:namma_wallet/src/features/home/presentation/widgets/ticket_card_widget.dart';
 import 'package:namma_wallet/src/features/home/presentation/widgets/travel_ticket_card_widget.dart';
 
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+class HomeView extends StatefulWidget {
+  const HomeView({super.key});
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<HomeView> createState() => _HomeViewState();
 }
 
-class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
+class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
   bool _isLoading = true;
   List<TravelTicketModel> _travelTickets = [];
   List<TravelTicketModel> _eventTickets = [];
