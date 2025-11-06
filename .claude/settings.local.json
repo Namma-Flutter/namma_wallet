@@ -33,7 +33,9 @@
       "Bash(flutter analyze:*)",
       "Bash(git add:*)",
       "Bash(git commit:*)",
-      "Bash(flutter pub get:*)"
+      "Bash(flutter pub get:*)",
+      "Bash(dart test:*)",
+      "Bash(flutter test:*)"
     ],
     "deny": []
   },
