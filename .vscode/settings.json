@@ -23,7 +23,8 @@
     "TNSTC",
     "TNSTCPDF",
     "TNSTCSMS",
-    "xcodebuildmcp"
+    "xcodebuildmcp",
+    "webiny"
   ],
   "java.configuration.updateBuildConfiguration": "interactive"
 }

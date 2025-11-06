@@ -1,0 +1,18 @@
+name: Conventional Commits
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    name: Conventional Commits
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: webiny/action-conventional-commits@v1.3.0
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          allowed-commit-types: "feat,fix,docs,style,refactor,perf,test,build,ci,chore,revert,merge"
+          ignore-merge-commits: true
+          ignore-commit-pattern: "^Merge pull request"
