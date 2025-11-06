@@ -8,6 +8,7 @@ import 'package:card_stack_widget/widget/card_stack_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:namma_wallet/src/common/database/wallet_database.dart';
+import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/routing/app_routes.dart';
 import 'package:namma_wallet/src/common/widgets/snackbar_widget.dart';
 import 'package:namma_wallet/src/features/common/domain/travel_ticket_model.dart';
@@ -17,14 +18,14 @@ import 'package:namma_wallet/src/features/home/presentation/widgets/header_widge
 import 'package:namma_wallet/src/features/home/presentation/widgets/ticket_card_widget.dart';
 import 'package:namma_wallet/src/features/home/presentation/widgets/travel_ticket_card_widget.dart';
 
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+class HomeView extends StatefulWidget {
+  const HomeView({super.key});
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<HomeView> createState() => _HomeViewState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
   bool _isLoading = true;
   List<TravelTicketModel> _travelTickets = [];
   List<TravelTicketModel> _eventTickets = [];
@@ -32,7 +33,21 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _loadTicketData();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _loadTicketData();
+    }
   }
 
   Future<void> _loadTicketData() async {
@@ -41,7 +56,7 @@ class _HomePageState extends State<HomePage> {
         _isLoading = true;
       });
 
-      final ticketMaps = await WalletDatabase.instance.fetchAllTravelTickets();
+      final ticketMaps = await getIt<WalletDatabase>().fetchAllTravelTickets();
 
       if (!mounted) return;
 
@@ -135,67 +150,103 @@ class _HomePageState extends State<HomePage> {
 
     // Add departure time if available
     if (ticket.departureTime?.isNotEmpty ?? false) {
-      extras.add(ExtrasModel(
-        title: 'Departure Time',
-        value: ticket.departureTime!,
-      ));
+      extras.add(
+        ExtrasModel(
+          title: 'Departure Time',
+          value: ticket.departureTime!,
+        ),
+      );
     }
 
     // Add seat numbers if available
     if (ticket.seatNumbers?.isNotEmpty ?? false) {
-      extras.add(ExtrasModel(
-        title: 'Seat Numbers',
-        value: ticket.seatNumbers!,
-      ));
+      extras.add(
+        ExtrasModel(
+          title: 'Seat Numbers',
+          value: ticket.seatNumbers!,
+        ),
+      );
     }
 
     // Add class of service if available
     if (ticket.classOfService?.isNotEmpty ?? false) {
-      extras.add(ExtrasModel(
-        title: 'Class',
-        value: ticket.classOfService!,
-      ));
+      extras.add(
+        ExtrasModel(
+          title: 'Class',
+          value: ticket.classOfService!,
+        ),
+      );
     }
 
     // Add PNR/booking reference if different from primary text
     final pnrOrBooking = ticket.pnrNumber ?? ticket.bookingReference;
     if (pnrOrBooking?.isNotEmpty ?? false) {
-      extras.add(ExtrasModel(
-        title: ticket.pnrNumber != null ? 'PNR Number' : 'Booking Reference',
-        value: pnrOrBooking!,
-      ));
+      extras.add(
+        ExtrasModel(
+          title: ticket.pnrNumber != null ? 'PNR Number' : 'Booking Reference',
+          value: pnrOrBooking!,
+        ),
+      );
     }
 
     // Add trip code if available
+    developer.log(
+      'Checking for trip code: ${ticket.tripCode}',
+      name: 'UI_MAPPING',
+    );
     if (ticket.tripCode?.isNotEmpty ?? false) {
-      extras.add(ExtrasModel(
-        title: 'Trip Code',
-        value: ticket.tripCode!,
-      ));
+      extras.add(
+        ExtrasModel(
+          title: ticket.ticketType == TicketType.bus
+              ? 'Bus Number'
+              : 'Trip Code',
+          value: ticket.tripCode!,
+        ),
+      );
+      developer.log(
+        'Added trip code to extras: ${ticket.tripCode}',
+        name: 'UI_MAPPING',
+      );
     }
 
     // Add coach number if available (for trains)
     if (ticket.coachNumber?.isNotEmpty ?? false) {
-      extras.add(ExtrasModel(
-        title: 'Coach',
-        value: ticket.coachNumber!,
-      ));
+      extras.add(
+        ExtrasModel(
+          title: 'Coach',
+          value: ticket.coachNumber!,
+        ),
+      );
     }
 
     // Add boarding point if available
     if (ticket.boardingPoint?.isNotEmpty ?? false) {
-      extras.add(ExtrasModel(
-        title: 'Boarding Point',
-        value: ticket.boardingPoint!,
-      ));
+      extras.add(
+        ExtrasModel(
+          title: 'Boarding Point',
+          value: ticket.boardingPoint!,
+        ),
+      );
+    }
+
+    // Add contact mobile if available
+    if (ticket.contactMobile?.isNotEmpty ?? false) {
+      extras.add(
+        ExtrasModel(
+          title: 'Conductor Mobile',
+          value: ticket.contactMobile!,
+        ),
+      );
     }
 
     // Add amount if available
     if (ticket.amount != null) {
-      extras.add(ExtrasModel(
-        title: 'Amount',
-        value: '${ticket.currency} ${ticket.amount}',
-      ));
+      extras.add(
+        ExtrasModel(
+          title: 'Amount',
+          value: '${ticket.currency} ${ticket.amount}',
+        ),
+      );
     }
 
     // Create meaningful primary text with debug logging
@@ -203,32 +254,45 @@ class _HomePageState extends State<HomePage> {
 
     // Debug logging
     developer.log('Ticket fields for UI mapping:', name: 'UI_MAPPING');
-    developer.log('sourceLocation: "${ticket.sourceLocation}"',
-        name: 'UI_MAPPING');
-    developer.log('destinationLocation: "${ticket.destinationLocation}"',
-        name: 'UI_MAPPING');
+    developer.log(
+      'sourceLocation: "${ticket.sourceLocation}"',
+      name: 'UI_MAPPING',
+    );
+    developer.log(
+      'destinationLocation: "${ticket.destinationLocation}"',
+      name: 'UI_MAPPING',
+    );
     developer.log('pnrNumber: "${ticket.pnrNumber}"', name: 'UI_MAPPING');
     developer.log('providerName: "${ticket.providerName}"', name: 'UI_MAPPING');
     developer.log('displayName: "${ticket.displayName}"', name: 'UI_MAPPING');
 
     if ((ticket.sourceLocation?.isNotEmpty ?? false) &&
         (ticket.destinationLocation?.isNotEmpty ?? false)) {
-      primaryText = '${ticket.sourceLocation!} → '
+      primaryText =
+          '${ticket.sourceLocation!} → '
           '${ticket.destinationLocation!}';
-      developer.log('Using route as primary text: "$primaryText"',
-          name: 'UI_MAPPING');
+      developer.log(
+        'Using route as primary text: "$primaryText"',
+        name: 'UI_MAPPING',
+      );
     } else if (ticket.pnrNumber?.isNotEmpty ?? false) {
       primaryText = ticket.pnrNumber!;
-      developer.log('Using PNR as primary text: "$primaryText"',
-          name: 'UI_MAPPING');
+      developer.log(
+        'Using PNR as primary text: "$primaryText"',
+        name: 'UI_MAPPING',
+      );
     } else if (ticket.bookingReference?.isNotEmpty ?? false) {
       primaryText = ticket.bookingReference!;
-      developer.log('Using booking ref as primary text: "$primaryText"',
-          name: 'UI_MAPPING');
+      developer.log(
+        'Using booking ref as primary text: "$primaryText"',
+        name: 'UI_MAPPING',
+      );
     } else {
       primaryText = ticket.displayName;
-      developer.log('Using display name as primary text: "$primaryText"',
-          name: 'UI_MAPPING');
+      developer.log(
+        'Using display name as primary text: "$primaryText"',
+        name: 'UI_MAPPING',
+      );
     }
 
     // Create meaningful secondary text (provider name)
@@ -252,14 +316,11 @@ class _HomePageState extends State<HomePage> {
       secondaryText: secondaryText,
       startTime: startTime,
       location: displayLocation,
-      type: ticket.ticketType == TicketType.event
-          ? EntryType.event
-          : ticket.ticketType == TicketType.bus
-              ? EntryType.busTicket
-              : EntryType.trainTicket,
+      type: ticket.ticketType,
       endTime: startTime, // For simplicity, same as start time
       extras: extras.isNotEmpty ? extras : null,
       ticketId: ticket.id,
+      contactMobile: ticket.contactMobile,
     );
   }
 
@@ -271,20 +332,21 @@ class _HomePageState extends State<HomePage> {
         radius: const Radius.circular(30),
         shadowColor: Colors.transparent,
         child: InkWell(
-            onTap: () async {
-              final wasDeleted = await context.pushNamed<bool>(
-                AppRoute.ticketView.name,
-                extra: genericTicket,
-              );
+          onTap: () async {
+            final wasDeleted = await context.pushNamed<bool>(
+              AppRoute.ticketView.name,
+              extra: genericTicket,
+            );
 
-              if (mounted && (wasDeleted ?? false)) {
-                await _loadTicketData();
-              }
-            },
-            child: TravelTicketCardWidget(
-              ticket: genericTicket,
-              onTicketDeleted: _loadTicketData,
-            )),
+            if (mounted && (wasDeleted ?? false)) {
+              await _loadTicketData();
+            }
+          },
+          child: TravelTicketCardWidget(
+            ticket: genericTicket,
+            onTicketDeleted: _loadTicketData,
+          ),
+        ),
       );
     }).toList();
 
@@ -365,8 +427,9 @@ class _HomePageState extends State<HomePage> {
                               scaleFactor: 2,
                               alignment: Alignment.center,
                               animateCardScale: true,
-                              dismissedCardDuration:
-                                  const Duration(milliseconds: 150),
+                              dismissedCardDuration: const Duration(
+                                milliseconds: 150,
+                              ),
                             ),
                           ),
                         ),
@@ -407,15 +470,16 @@ class _HomePageState extends State<HomePage> {
                           itemCount: _eventTickets.length,
                           itemBuilder: (context, index) {
                             final eventTicket = _eventTickets[index];
-                            final genericEvent =
-                                _convertToGenericDetails(eventTicket);
+                            final genericEvent = _convertToGenericDetails(
+                              eventTicket,
+                            );
                             return InkWell(
                               onTap: () async {
-                                final wasDeleted =
-                                    await context.pushNamed<bool>(
-                                  AppRoute.ticketView.name,
-                                  extra: genericEvent,
-                                );
+                                final wasDeleted = await context
+                                    .pushNamed<bool>(
+                                      AppRoute.ticketView.name,
+                                      extra: genericEvent,
+                                    );
 
                                 if (mounted && (wasDeleted ?? false)) {
                                   await _loadTicketData();

@@ -4,21 +4,28 @@
   "cSpell.words": [
     "AKASH",
     "CHEKUMAB",
+    "commitlint",
+    "IRCTC",
     "kanna",
     "Keerthi",
     "KOTTIVAKKAM",
     "KUMBAKONAM",
     "Magesh",
     "Maragatham",
+    "Nadu",
     "namma",
     "nammaflutter",
     "nammawallet",
+    "prefs",
     "SAMAARO",
     "SETC",
+    "swiftlens",
     "syncfusion",
     "TNSTC",
     "TNSTCPDF",
-    "TNSTCSMS"
+    "TNSTCSMS",
+    "webiny",
+    "xcodebuildmcp"
   ],
   "java.configuration.updateBuildConfiguration": "interactive"
 }

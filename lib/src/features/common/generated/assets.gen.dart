@@ -30,12 +30,12 @@ class $AssetsDataGen {
 
   /// List of all assets
   List<String> get values => [
-        cards,
-        eventTicketsMockedData,
-        mockedTickets,
-        otherCards,
-        ticketMockedData
-      ];
+    cards,
+    eventTicketsMockedData,
+    mockedTickets,
+    otherCards,
+    ticketMockedData,
+  ];
 }
 
 class $AssetsImagesGen {

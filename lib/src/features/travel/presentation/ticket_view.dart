@@ -5,16 +5,18 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:namma_wallet/src/common/database/wallet_database.dart';
-import 'package:namma_wallet/src/common/helper/check_pnr_id.dart';
+import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/helper/date_time_converter.dart';
 import 'package:namma_wallet/src/common/theme/styles.dart';
 import 'package:namma_wallet/src/common/widgets/custom_back_button.dart';
 import 'package:namma_wallet/src/common/widgets/snackbar_widget.dart';
+import 'package:namma_wallet/src/features/common/domain/travel_ticket_model.dart';
 import 'package:namma_wallet/src/features/home/domain/generic_details_model.dart';
 import 'package:namma_wallet/src/features/home/presentation/widgets/highlight_widget.dart';
 import 'package:namma_wallet/src/features/travel/presentation/widgets/custom_ticket_shape_line.dart';
 import 'package:namma_wallet/src/features/travel/presentation/widgets/ticket_view_widget.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class TicketView extends StatefulWidget {
   const TicketView({required this.ticket, super.key});
@@ -34,6 +36,25 @@ class _TicketViewState extends State<TicketView> {
     return (value?.isEmpty ?? true) ? '--' : value!;
   }
 
+  bool hasPnrOrId(GenericDetailsModel ticket) {
+    return getPnrOrId(ticket) != null;
+  }
+
+  String? getPnrOrId(GenericDetailsModel ticket) {
+    for (final extra in ticket.extras ?? []) {
+      if (extra.title?.toLowerCase() == 'pnr number') {
+        return extra.value as String;
+      }
+    }
+
+    for (final extra in ticket.extras ?? []) {
+      if (extra.title?.toLowerCase() == 'booking id') {
+        return extra.value as String;
+      }
+    }
+    return null;
+  }
+
   Future<void> _pinToHomeScreen() async {
     setState(() {
       _isPinning = true;
@@ -49,14 +70,19 @@ class _TicketViewState extends State<TicketView> {
       await HomeWidget.saveWidgetData(dataKey, jsonEncode(ticketData));
 
       await HomeWidget.updateWidget(
-          androidName: androidWidgetName, iOSName: iOSWidgetName);
+        androidName: androidWidgetName,
+        iOSName: iOSWidgetName,
+      );
 
       if (mounted) {
         showSnackbar(context, '📌 Ticket pinned to home screen successfully!');
       }
-    } catch (e) {
-      developer.log('Failed to pin ticket to home screen',
-          name: 'TicketView', error: e);
+    } on Object catch (e) {
+      developer.log(
+        'Failed to pin ticket to home screen',
+        name: 'TicketView',
+        error: e,
+      );
       if (mounted) {
         showSnackbar(context, 'Failed to pin ticket: $e', isError: true);
       }
@@ -79,8 +105,7 @@ class _TicketViewState extends State<TicketView> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Delete Ticket'),
-        content: const Text(
-            'Are you sure you want to delete this ticket? This action cannot be undone.'),
+        content: const Text('Are you sure you want to delete this ticket?'),
         actions: [
           TextButton(
             onPressed: () => context.pop(false),
@@ -95,7 +120,7 @@ class _TicketViewState extends State<TicketView> {
       ),
     );
 
-    if (confirmed ?? false && mounted) {
+    if (mounted && (confirmed ?? false)) {
       await _deleteTicket();
     }
   }
@@ -108,20 +133,19 @@ class _TicketViewState extends State<TicketView> {
     });
 
     try {
-      await WalletDatabase.instance.deleteTravelTicket(widget.ticket.ticketId!);
+      await getIt<WalletDatabase>().deleteTravelTicket(widget.ticket.ticketId!);
 
       developer.log(
-          'Successfully deleted ticket with ID: ${widget.ticket.ticketId}',
-          name: 'TicketView');
-      print('✅ TICKET DELETE: Ticket deleted successfully');
+        'Successfully deleted ticket with ID: ${widget.ticket.ticketId}',
+        name: 'TicketView',
+      );
 
       if (mounted) {
         showSnackbar(context, 'Ticket deleted successfully');
         context.pop(true); // Return true to indicate ticket was deleted
       }
-    } catch (e) {
+    } on Object catch (e) {
       developer.log('Failed to delete ticket', name: 'TicketView', error: e);
-      print('🔴 TICKET DELETE ERROR: Failed to delete ticket: $e');
 
       if (mounted) {
         showSnackbar(context, 'Failed to delete ticket: $e', isError: true);
@@ -131,6 +155,36 @@ class _TicketViewState extends State<TicketView> {
         setState(() {
           _isDeleting = false;
         });
+      }
+    }
+  }
+
+  Future<void> _makePhoneCall() async {
+    final mobile = widget.ticket.contactMobile;
+    if (mobile == null || mobile.isEmpty) return;
+
+    final uri = Uri(scheme: 'tel', path: mobile);
+    try {
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri);
+        developer.log('Launched phone call to $mobile', name: 'TicketView');
+      } else {
+        if (mounted) {
+          showSnackbar(
+            context,
+            'Cannot make phone calls on this device',
+            isError: true,
+          );
+        }
+      }
+    } on Object catch (e) {
+      developer.log(
+        'Failed to launch phone call',
+        name: 'TicketView',
+        error: e,
+      );
+      if (mounted) {
+        showSnackbar(context, 'Failed to make call: $e', isError: true);
       }
     }
   }
@@ -159,13 +213,16 @@ class _TicketViewState extends State<TicketView> {
                       )
                     : IconButton(
                         onPressed: _isDeleting ? null : _showDeleteConfirmation,
-                        icon: const Icon(Icons.delete,
-                            size: 20, color: Colors.white),
+                        icon: const Icon(
+                          Icons.delete,
+                          size: 20,
+                          color: Colors.white,
+                        ),
                         tooltip: 'Delete ticket',
                       ),
               ),
             ),
-          const SizedBox(width: 16)
+          const SizedBox(width: 16),
         ],
       ),
       body: Column(
@@ -191,19 +248,23 @@ class _TicketViewState extends State<TicketView> {
                         Row(
                           children: [
                             CircleAvatar(
-                                radius: 20,
-                                backgroundColor: AppColor.whiteColor,
-                                child: Icon(
-                                    widget.ticket.type == EntryType.busTicket
-                                        ? Icons.airport_shuttle_outlined
-                                        : Icons.tram_outlined)),
+                              radius: 20,
+                              backgroundColor: AppColor.whiteColor,
+                              child: Icon(
+                                widget.ticket.type == TicketType.bus
+                                    ? Icons.airport_shuttle_outlined
+                                    : Icons.tram_outlined,
+                              ),
+                            ),
                             const SizedBox(width: 16),
                             //* Description (Secondry text)
                             Expanded(
-                              child: Text(widget.ticket.secondaryText,
-                                  style: SubHeading(color: Shades.s100).regular,
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 2),
+                              child: Text(
+                                widget.ticket.secondaryText,
+                                style: SubHeading(color: Shades.s100).regular,
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 2,
+                              ),
                             ),
                           ],
                         ),
@@ -211,10 +272,12 @@ class _TicketViewState extends State<TicketView> {
                         const SizedBox(height: 16),
 
                         //* From to To (Primary text)
-                        Text(widget.ticket.primaryText,
-                            style: HeadingH2Small(color: Shades.s100).bold,
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 3),
+                        Text(
+                          widget.ticket.primaryText,
+                          style: HeadingH2Small(color: Shades.s100).bold,
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 3,
+                        ),
 
                         const SizedBox(height: 16),
 
@@ -223,9 +286,11 @@ class _TicketViewState extends State<TicketView> {
                           title1: 'Journey Date',
                           title2: 'Time',
                           value1: getValueOrDefault(
-                              getTime(widget.ticket.startTime)),
+                            getTime(widget.ticket.startTime),
+                          ),
                           value2: getValueOrDefault(
-                              getDate(widget.ticket.startTime)),
+                            getDate(widget.ticket.startTime),
+                          ),
                         ),
 
                         if (widget.ticket.tags != null &&
@@ -235,12 +300,13 @@ class _TicketViewState extends State<TicketView> {
                             spacing: 10,
                             runSpacing: 10,
                             children: [
-                              ...widget.ticket.tags!
-                                  .map((tag) => HighlightChipsWidget(
-                                        bgColor: const Color(0xffCADC56),
-                                        label: tag.icon ?? '',
-                                        icon: Icons.star_border_rounded,
-                                      ))
+                              ...widget.ticket.tags!.map(
+                                (tag) => HighlightChipsWidget(
+                                  bgColor: const Color(0xffCADC56),
+                                  label: tag.icon ?? '',
+                                  icon: Icons.star_border_rounded,
+                                ),
+                              ),
                             ],
                           ),
                         ],
@@ -251,9 +317,11 @@ class _TicketViewState extends State<TicketView> {
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              for (var i = 0;
-                                  i < widget.ticket.extras!.length;
-                                  i++) ...[
+                              for (
+                                var i = 0;
+                                i < widget.ticket.extras!.length;
+                                i++
+                              ) ...[
                                 Row(
                                   children: [
                                     Flexible(
@@ -262,8 +330,9 @@ class _TicketViewState extends State<TicketView> {
                                         '${widget.ticket.extras![i].title ?? 'xxx'}: ',
                                         overflow: TextOverflow.ellipsis,
                                         maxLines: 1,
-                                        style: Paragraph02(color: Shades.s100)
-                                            .regular,
+                                        style: Paragraph02(
+                                          color: Shades.s100,
+                                        ).regular,
                                       ),
                                     ),
                                     Expanded(
@@ -272,15 +341,16 @@ class _TicketViewState extends State<TicketView> {
                                         widget.ticket.extras![i].value,
                                         overflow: TextOverflow.ellipsis,
                                         maxLines: 1,
-                                        style: Paragraph01(color: Shades.s100)
-                                            .regular,
+                                        style: Paragraph01(
+                                          color: Shades.s100,
+                                        ).regular,
                                       ),
                                     ),
                                   ],
                                 ),
                                 if (i < widget.ticket.extras!.length - 1)
                                   const SizedBox(height: 5),
-                              ]
+                              ],
                             ],
                           ),
                         ],
@@ -294,7 +364,10 @@ class _TicketViewState extends State<TicketView> {
                   if (hasPnrOrId(widget.ticket))
                     Container(
                       margin: const EdgeInsets.only(
-                          bottom: 16, left: 16, right: 16),
+                        bottom: 16,
+                        left: 16,
+                        right: 16,
+                      ),
                       padding: const EdgeInsets.all(24),
                       decoration: const BoxDecoration(
                         color: AppColor.limeYellowColor,
@@ -309,12 +382,12 @@ class _TicketViewState extends State<TicketView> {
                           size: 200,
                         ),
                       ),
-                    )
+                    ),
                 ],
               ),
             ),
           ),
-          // Bottom section with Pin to Home Screen button
+          // Bottom section with action buttons
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
@@ -330,38 +403,109 @@ class _TicketViewState extends State<TicketView> {
               ],
             ),
             child: SafeArea(
-              child: SizedBox(
-                width: double.infinity,
-                height: 50,
-                child: ElevatedButton.icon(
-                  onPressed: _isPinning ? null : _pinToHomeScreen,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Theme.of(context).colorScheme.primary,
-                    foregroundColor: Colors.black87,
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  icon: _isPinning
-                      ? const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: Colors.black54,
+              child:
+                  widget.ticket.contactMobile != null &&
+                      widget.ticket.contactMobile!.isNotEmpty
+                  ? Row(
+                      spacing: 12,
+                      children: [
+                        // Call button (when mobile number is available)
+                        Expanded(
+                          child: SizedBox(
+                            height: 50,
+                            child: ElevatedButton.icon(
+                              onPressed: _makePhoneCall,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.green.shade600,
+                                foregroundColor: Colors.white,
+                                elevation: 0,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              icon: const Icon(Icons.phone, size: 20),
+                              label: const Text(
+                                'Call Conductor',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ),
                           ),
-                        )
-                      : const Icon(Icons.push_pin, size: 20),
-                  label: Text(
-                    _isPinning ? 'Pinning...' : 'Pin to Home Screen',
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
+                        ),
+                        // Pin button
+                        Expanded(
+                          child: SizedBox(
+                            height: 50,
+                            child: ElevatedButton.icon(
+                              onPressed: _isPinning ? null : _pinToHomeScreen,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Theme.of(
+                                  context,
+                                ).colorScheme.primary,
+                                foregroundColor: Colors.black87,
+                                elevation: 0,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              icon: _isPinning
+                                  ? const SizedBox(
+                                      width: 20,
+                                      height: 20,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        color: Colors.black54,
+                                      ),
+                                    )
+                                  : const Icon(Icons.push_pin, size: 20),
+                              label: Text(
+                                _isPinning ? 'Pinning...' : 'Pin',
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    )
+                  : SizedBox(
+                      width: double.infinity,
+                      height: 50,
+                      child: ElevatedButton.icon(
+                        onPressed: _isPinning ? null : _pinToHomeScreen,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Theme.of(
+                            context,
+                          ).colorScheme.primary,
+                          foregroundColor: Colors.black87,
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        icon: _isPinning
+                            ? const SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: Colors.black54,
+                                ),
+                              )
+                            : const Icon(Icons.push_pin, size: 20),
+                        label: Text(
+                          _isPinning ? 'Pinning...' : 'Pin to Home Screen',
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-              ),
             ),
           ),
         ],

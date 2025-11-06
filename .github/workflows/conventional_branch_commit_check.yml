@@ -1,0 +1,58 @@
+name: Conventional Commits & Branch Naming
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  branch-name:
+    name: Validate Branch Name
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+    steps:
+      - name: Validate
+        env:
+          BRANCH: ${{ github.head_ref }}
+        run: |
+          echo "Branch: $BRANCH"
+
+          # Allowed:
+          #   main | master | develop
+          #   feature/<slug> | feat/<slug>
+          #   bugfix/<slug>  | fix/<slug>
+          #   hotfix/<slug>
+          #   release/<slug>
+          #   chore/<slug>
+          #
+          # slug = lowercase letters, numbers, dots, underscores, dashes
+
+          if [[ ! "$BRANCH" =~ ^((main|master|develop)|((feature|feat|bugfix|fix|hotfix|release|chore)\/[a-z0-9._-]+))$ ]]; then
+            echo "::error title=Invalid branch name::'$BRANCH' does not follow required naming rules."
+            echo "Allowed formats:"
+            echo "  main | master | develop"
+            echo "  feature/<slug> | feat/<slug>"
+            echo "  bugfix/<slug>  | fix/<slug>"
+            echo "  hotfix/<slug>"
+            echo "  release/<slug>"
+            echo "  chore/<slug>"
+            exit 1
+          fi
+
+  commitlint:
+    name: Conventional Commits
+    runs-on: ubuntu-latest
+    needs: branch-name
+    permissions:
+      contents: read
+      pull-requests: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: webiny/action-conventional-commits@v1.3.0
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          allowed-commit-types: "feat,fix,docs,style,refactor,perf,test,build,ci,chore,revert"
+          ignore-merge-commits: true
+          ignore-commit-pattern: "^Merge pull request"

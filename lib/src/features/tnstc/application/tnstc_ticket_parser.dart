@@ -51,7 +51,8 @@ class TNSTCTicket {
   final double? totalFare;
 
   @override
-  String toString() => 'BusTicket(\n'
+  String toString() =>
+      'BusTicket(\n'
       'Corporation: $corporation,\n'
       'PNR Number: $pnrNumber,\n'
       'Journey Date: $journeyDate,\n'
@@ -93,7 +94,8 @@ class PassengerInfo {
   final String seatNumber;
 
   @override
-  String toString() => 'PassengerInfo(\n'
+  String toString() =>
+      'PassengerInfo(\n'
       'Name: $name,\n'
       'Age: $age,\n'
       'Type: $type,\n'
@@ -140,8 +142,9 @@ TNSTCTicket parseTicket(String text) {
 
     try {
       // Handle both '-' and '/' separators for date
-      final dateParts =
-          parts[0].contains('/') ? parts[0].split('/') : parts[0].split('-');
+      final dateParts = parts[0].contains('/')
+          ? parts[0].split('/')
+          : parts[0].split('-');
       if (dateParts.length != 3) return DateTime.now();
 
       final day = int.parse(dateParts[0]);
@@ -174,17 +177,27 @@ TNSTCTicket parseTicket(String text) {
     extractMatch(r'Date of Journey\s*:\s*(\d{2}/\d{2}/\d{4})', text),
   );
   final routeNo = extractMatch(r'Route No\s*:\s*(\S+)', text);
-  final serviceStartPlace =
-      extractMatch(r'Service Start Place\s*:\s*(.*)', text);
+  final serviceStartPlace = extractMatch(
+    r'Service Start Place\s*:\s*(.*)',
+    text,
+  );
   final serviceEndPlace = extractMatch(r'Service End Place\s*:\s*(.*)', text);
-  final serviceStartTime =
-      extractMatch(r'Service Start Time\s*:\s*(\d{2}:\d{2})', text);
-  final passengerStartPlace =
-      extractMatch(r'Passenger Start Place\s*:\s*(.*)', text);
-  final passengerEndPlace =
-      extractMatch(r'Passenger End Place\s*:\s*(.*)', text);
-  final passengerPickupPoint =
-      extractMatch(r'Passenger Pickup Point\s*:\s*(.*)', text);
+  final serviceStartTime = extractMatch(
+    r'Service Start Time\s*:\s*(\d{2}:\d{2})',
+    text,
+  );
+  final passengerStartPlace = extractMatch(
+    r'Passenger Start Place\s*:\s*(.*)',
+    text,
+  );
+  final passengerEndPlace = extractMatch(
+    r'Passenger End Place\s*:\s*(.*)',
+    text,
+  );
+  final passengerPickupPoint = extractMatch(
+    r'Passenger Pickup Point\s*:\s*(.*)',
+    text,
+  );
   final passengerPickupTime = parseDateTime(
     extractMatch(
       r'Passenger Pickup Time\s*:\s*(\d{2}/\d{2}/\d{4} \d{2}:\d{2})',
@@ -194,16 +207,23 @@ TNSTCTicket parseTicket(String text) {
   final platformNumber = extractMatch(r'Platform Number\s*:\s*(\S+)', text);
   final classOfService = extractMatch(r'Class of Service\s*:\s*(.*)', text);
   final tripCode = extractMatch(r'Trip Code\s*:\s*(\S+)', text);
-  final obReferenceNumber =
-      extractMatch(r'OB Reference No\.\s*:\s*(\S+)', text);
+  final obReferenceNumber = extractMatch(
+    r'OB Reference No\.\s*:\s*(\S+)',
+    text,
+  );
   final numberOfSeatsStr = extractMatch(r'No\. of Seats\s*:\s*(\d+)', text);
-  final numberOfSeats =
-      numberOfSeatsStr.isNotEmpty ? int.tryParse(numberOfSeatsStr) ?? 1 : 1;
-  final bankTransactionNumber =
-      extractMatch(r'Bank Txn\. No\.\s*:\s*(\S+)', text);
+  final numberOfSeats = numberOfSeatsStr.isNotEmpty
+      ? int.tryParse(numberOfSeatsStr) ?? 1
+      : 1;
+  final bankTransactionNumber = extractMatch(
+    r'Bank Txn\. No\.\s*:\s*(\S+)',
+    text,
+  );
   final busIdNumber = extractMatch(r'Bus ID No\.\s*:\s*(\S+)', text);
-  final passengerCategory =
-      extractMatch(r'Passenger category\s*:\s*(.*)', text);
+  final passengerCategory = extractMatch(
+    r'Passenger category\s*:\s*(.*)',
+    text,
+  );
   final passengerName = extractMatch(
     r'Name\s+Age\s+Adult/Child\s+Gender\s+Seat No\.\n(.*)\s+\d+',
     text,
@@ -215,8 +235,9 @@ TNSTCTicket parseTicket(String text) {
   final idCardType = extractMatch(r'ID Card Type\s*:\s*(.*)', text);
   final idCardNumber = extractMatch(r'ID Card Number\s*:\s*(.*)', text);
   final totalFareStr = extractMatch(r'Total Fare\s*:\s*(\d+\.\d+)', text);
-  final totalFare =
-      totalFareStr.isNotEmpty ? double.tryParse(totalFareStr) ?? 0.0 : 0.0;
+  final totalFare = totalFareStr.isNotEmpty
+      ? double.tryParse(totalFareStr) ?? 0.0
+      : 0.0;
 
   final passengerInfo = PassengerInfo(
     name: passengerName,

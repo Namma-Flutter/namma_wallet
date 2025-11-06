@@ -39,8 +39,9 @@ class TNSTCPDFParser {
 
       try {
         // Handle both '-' and '/' separators for date
-        final dateParts =
-            parts[0].contains('/') ? parts[0].split('/') : parts[0].split('-');
+        final dateParts = parts[0].contains('/')
+            ? parts[0].split('/')
+            : parts[0].split('-');
         if (dateParts.length != 3) return DateTime.now();
 
         final day = int.parse(dateParts[0]);
@@ -75,18 +76,30 @@ class TNSTCPDFParser {
       extractMatch(r'Date of\s+\$1\s*:\s*(\d{2}[/-]\d{2}[/-]\d{4})', pdfText),
     );
     final routeNo = extractMatch(r'Route\s+\$1\s*:\s*(\S+)', pdfText);
-    final serviceStartPlace =
-        extractMatch(r'Service Start\s+\$1\s*:\s*([A-Z\s]+)', pdfText);
-    final serviceEndPlace =
-        extractMatch(r'Service End\s+\$1\s*:\s*([A-Z\s]+)', pdfText);
-    final serviceStartTime =
-        extractMatch(r'Service Start\s+\$1\s*:\s*(\d{2}:\d{2})', pdfText);
-    final passengerStartPlace =
-        extractMatch(r'Passenger Start\s+\$1\s*:\s*([A-Z\s]+)', pdfText);
-    final passengerEndPlace =
-        extractMatch(r'Passenger End\s+\$1\s*:\s*([A-Z\s]+)', pdfText);
-    final passengerPickupPoint =
-        extractMatch(r'Passenger Pickup\s+\$1\s*:\s*([A-Z\s]+)', pdfText);
+    final serviceStartPlace = extractMatch(
+      r'Service Start\s+\$1\s*:\s*([A-Z\s]+)',
+      pdfText,
+    );
+    final serviceEndPlace = extractMatch(
+      r'Service End\s+\$1\s*:\s*([A-Z\s]+)',
+      pdfText,
+    );
+    final serviceStartTime = extractMatch(
+      r'Service Start\s+\$1\s*:\s*(\d{2}:\d{2})',
+      pdfText,
+    );
+    final passengerStartPlace = extractMatch(
+      r'Passenger Start\s+\$1\s*:\s*([A-Z\s]+)',
+      pdfText,
+    );
+    final passengerEndPlace = extractMatch(
+      r'Passenger End\s+\$1\s*:\s*([A-Z\s]+)',
+      pdfText,
+    );
+    final passengerPickupPoint = extractMatch(
+      r'Passenger Pickup\s+\$1\s*:\s*([A-Z\s]+)',
+      pdfText,
+    );
     final passengerPickupTime = parseDateTime(
       extractMatch(
         r'Passenger Pickup\s+\$1\s*:\s*(\d{2}[/-]\d{2}[/-]\d{4} \d{2}:\d{2})',
@@ -94,50 +107,77 @@ class TNSTCPDFParser {
       ),
     );
     final platformNumber = extractMatch(r'Platform\s+\$1\s*:\s*(\S+)', pdfText);
-    final classOfService =
-        extractMatch(r'Class of\s+\$1\s*:\s*([A-Z0-9\s]+)', pdfText);
+    final classOfService = extractMatch(
+      r'Class of\s+\$1\s*:\s*([A-Z0-9\s]+)',
+      pdfText,
+    );
     final tripCode = extractMatch(r'Trip\s+\$1\s*:\s*(\S+)', pdfText);
-    final obReferenceNumber =
-        extractMatch(r'OB Reference No\.\s*:\s*(\S+)', pdfText);
+    final obReferenceNumber = extractMatch(
+      r'OB Reference No\.\s*:\s*(\S+)',
+      pdfText,
+    );
 
     // Safe parsing for numbers
-    final numberOfSeatsStr =
-        extractMatch(r'No\. of\s+\$1\s*:\s*(\d+)', pdfText);
-    final numberOfSeats =
-        numberOfSeatsStr.isNotEmpty ? int.tryParse(numberOfSeatsStr) ?? 1 : 1;
+    final numberOfSeatsStr = extractMatch(
+      r'No\. of\s+\$1\s*:\s*(\d+)',
+      pdfText,
+    );
+    final numberOfSeats = numberOfSeatsStr.isNotEmpty
+        ? int.tryParse(numberOfSeatsStr) ?? 1
+        : 1;
 
-    final bankTransactionNumber =
-        extractMatch(r'Bank Txn\. No\.\s*:\s*(\S+)', pdfText);
+    final bankTransactionNumber = extractMatch(
+      r'Bank Txn\. No\.\s*:\s*(\S+)',
+      pdfText,
+    );
     final busIdNumber = extractMatch(r'Bus ID No\.\s*:\s*(\S+)', pdfText);
-    final passengerCategory =
-        extractMatch(r'Passenger\s+\$1\s*:\s*([A-Z\s]+)', pdfText);
+    final passengerCategory = extractMatch(
+      r'Passenger\s+\$1\s*:\s*([A-Z\s]+)',
+      pdfText,
+    );
 
     // Extract passenger info from the table format
     // Looking for pattern: Name Age Adult/Child Gender Seat No.
     // Followed by: Maragatham 55 Adult F 14
     final passengerName = extractMatch(
-        r'Seat No\.\s*\n\s*([A-Za-z\s]+)\s+\d+\s+(?:Adult|Child)', pdfText);
+      r'Seat No\.\s*\n\s*([A-Za-z\s]+)\s+\d+\s+(?:Adult|Child)',
+      pdfText,
+    );
     final passengerAgeStr = extractMatch(
-        r'([A-Za-z\s]+)\s+(\d+)\s+(?:Adult|Child)', pdfText,
-        groupIndex: 2);
-    final passengerAge =
-        passengerAgeStr.isNotEmpty ? int.tryParse(passengerAgeStr) ?? 1 : 1;
-    final passengerType =
-        extractMatch(r'[A-Za-z\s]+\s+\d+\s+(Adult|Child)', pdfText);
-    final passengerGender =
-        extractMatch(r'[A-Za-z\s]+\s+\d+\s+(?:Adult|Child)\s+(M|F)', pdfText);
+      r'([A-Za-z\s]+)\s+(\d+)\s+(?:Adult|Child)',
+      pdfText,
+      groupIndex: 2,
+    );
+    final passengerAge = passengerAgeStr.isNotEmpty
+        ? int.tryParse(passengerAgeStr) ?? 1
+        : 1;
+    final passengerType = extractMatch(
+      r'[A-Za-z\s]+\s+\d+\s+(Adult|Child)',
+      pdfText,
+    );
+    final passengerGender = extractMatch(
+      r'[A-Za-z\s]+\s+\d+\s+(?:Adult|Child)\s+(M|F)',
+      pdfText,
+    );
     final passengerSeatNumber = extractMatch(
-        r'[A-Za-z\s]+\s+\d+\s+(?:Adult|Child)\s+[MF]\s+(\d+)', pdfText);
+      r'[A-Za-z\s]+\s+\d+\s+(?:Adult|Child)\s+[MF]\s+(\d+)',
+      pdfText,
+    );
 
-    final idCardType =
-        extractMatch(r'ID Card\s+\$1\s*:\s*([A-Za-z\s]+)', pdfText);
+    final idCardType = extractMatch(
+      r'ID Card\s+\$1\s*:\s*([A-Za-z\s]+)',
+      pdfText,
+    );
     final idCardNumber = extractMatch(r'ID Card\s+\$1\s*:\s*(\d+)', pdfText);
 
     // Safe parsing for total fare
-    final totalFareStr =
-        extractMatch(r'Total\s+\$1\s*:\s*(\d+\.?\d*)', pdfText);
-    final totalFare =
-        totalFareStr.isNotEmpty ? double.tryParse(totalFareStr) ?? 0.0 : 0.0;
+    final totalFareStr = extractMatch(
+      r'Total\s+\$1\s*:\s*(\d+\.?\d*)',
+      pdfText,
+    );
+    final totalFare = totalFareStr.isNotEmpty
+        ? double.tryParse(totalFareStr) ?? 0.0
+        : 0.0;
 
     final passengerInfo = PassengerInfo(
       name: passengerName,

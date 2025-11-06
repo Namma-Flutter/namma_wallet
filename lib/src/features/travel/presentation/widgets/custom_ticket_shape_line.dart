@@ -72,11 +72,11 @@ class DashedLinePainter extends CustomPainter {
     this.cap = StrokeCap.butt,
     Color? color,
   }) : linePaint = Paint()
-          ..color = color ?? Colors.black
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = strokeWidth
-          ..strokeCap = cap
-          ..isAntiAlias = true;
+         ..color = color ?? Colors.black
+         ..style = PaintingStyle.stroke
+         ..strokeWidth = strokeWidth
+         ..strokeCap = cap
+         ..isAntiAlias = true;
   final double padding;
   final double dashLength;
   final double dashGap;

@@ -33,7 +33,8 @@ class UserProfileWidget extends StatelessWidget {
             child: CircleAvatar(
               radius: 28,
               backgroundImage: const NetworkImage(
-                  'https://avatars.githubusercontent.com/u/583231?v=4'),
+                'https://avatars.githubusercontent.com/u/583231?v=4',
+              ),
               backgroundColor: Colors.grey[200],
             ),
           ),

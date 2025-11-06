@@ -29,6 +29,8 @@ class TNSTCTicketModel with TNSTCTicketModelMappable {
     this.idCardNumber,
     this.totalFare,
     this.boardingPoint,
+    this.conductorMobileNo,
+    this.vehicleNumber,
   });
   final String? corporation;
   final String? pnrNumber;
@@ -54,6 +56,8 @@ class TNSTCTicketModel with TNSTCTicketModelMappable {
   final String? idCardNumber;
   final double? totalFare;
   final String? boardingPoint;
+  final String? conductorMobileNo;
+  final String? vehicleNumber;
 
   @override
   String toString() {
@@ -92,13 +96,13 @@ Boarding Point: $boardingPoint
   String get displayFrom => (serviceStartPlace?.isNotEmpty ?? false)
       ? serviceStartPlace!
       : (passengerStartPlace?.isNotEmpty ?? false)
-          ? passengerStartPlace!
-          : 'Unknown';
+      ? passengerStartPlace!
+      : 'Unknown';
   String get displayTo => (serviceEndPlace?.isNotEmpty ?? false)
       ? serviceEndPlace!
       : (passengerEndPlace?.isNotEmpty ?? false)
-          ? passengerEndPlace!
-          : 'Unknown';
+      ? passengerEndPlace!
+      : 'Unknown';
   String get displayClass =>
       (classOfService?.isNotEmpty ?? false) ? classOfService! : 'Unknown';
   String get displayFare =>

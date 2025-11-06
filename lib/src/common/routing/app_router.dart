@@ -6,15 +6,20 @@ import 'package:namma_wallet/src/features/bottom_navigation/presentation/namma_n
 import 'package:namma_wallet/src/features/calendar/presentation/calendar_view.dart';
 import 'package:namma_wallet/src/features/home/domain/generic_details_model.dart';
 import 'package:namma_wallet/src/features/home/presentation/home_view.dart';
-import 'package:namma_wallet/src/features/profile/presentation/db_viewer_page.dart';
-import 'package:namma_wallet/src/features/profile/presentation/profile_page.dart';
+import 'package:namma_wallet/src/features/export/presentation/export_view.dart';
+import 'package:namma_wallet/src/features/profile/presentation/contributors_view.dart';
+import 'package:namma_wallet/src/features/profile/presentation/db_viewer_view.dart';
+import 'package:namma_wallet/src/features/profile/presentation/license_view.dart';
+import 'package:namma_wallet/src/features/profile/presentation/profile_view.dart';
 import 'package:namma_wallet/src/features/scanner/presentation/scanner_view.dart';
 import 'package:namma_wallet/src/features/travel/presentation/ticket_view.dart';
 
-final GlobalKey<NavigatorState> _rootNavigatorKey =
-    GlobalKey<NavigatorState>(debugLabel: 'root');
-final GlobalKey<NavigatorState> _shellNavigatorKey =
-    GlobalKey<NavigatorState>(debugLabel: 'shell');
+final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>(
+  debugLabel: 'root',
+);
+final GlobalKey<NavigatorState> _shellNavigatorKey = GlobalKey<NavigatorState>(
+  debugLabel: 'shell',
+);
 
 final router = GoRouter(
   navigatorKey: _rootNavigatorKey,
@@ -26,17 +31,22 @@ final router = GoRouter(
         GoRoute(
           path: AppRoute.home.path,
           name: AppRoute.home.name,
-          builder: (context, state) => const HomePage(),
+          builder: (context, state) => const HomeView(),
         ),
         GoRoute(
           path: AppRoute.scanner.path,
           name: AppRoute.scanner.name,
-          builder: (context, state) => const TicketScannerPage(),
+          builder: (context, state) => const ScannerView(),
         ),
         GoRoute(
           path: AppRoute.calendar.path,
           name: AppRoute.calendar.name,
           builder: (context, state) => const CalendarView(),
+        ),
+        GoRoute(
+          path: AppRoute.export.path,
+          name: AppRoute.export.name,
+          builder: (context, state) => const ExportView(),
         ),
       ],
     ),
@@ -56,7 +66,7 @@ final router = GoRouter(
     GoRoute(
       path: AppRoute.profile.path,
       name: AppRoute.profile.name,
-      builder: (context, state) => const ProfilePage(),
+      builder: (context, state) => const ProfileView(),
     ),
     GoRoute(
       path: AppRoute.barcodeScanner.path,
@@ -70,7 +80,8 @@ final router = GoRouter(
             cornerRadius: 30,
             lineThickness: 10,
           ),
-          onDetect: onDetect ??
+          onDetect:
+              onDetect ??
               (BarcodeCapture capture) {
                 // Default handler if none provided
               },
@@ -80,7 +91,17 @@ final router = GoRouter(
     GoRoute(
       path: AppRoute.dbViewer.path,
       name: AppRoute.dbViewer.name,
-      builder: (context, state) => const DbViewerPage(),
+      builder: (context, state) => const DbViewerView(),
+    ),
+    GoRoute(
+      path: AppRoute.license.path,
+      name: AppRoute.license.name,
+      builder: (context, state) => const LicenseView(),
+    ),
+    GoRoute(
+      path: AppRoute.contributors.path,
+      name: AppRoute.contributors.name,
+      builder: (context, state) => const ContributorsView(),
     ),
   ],
 );

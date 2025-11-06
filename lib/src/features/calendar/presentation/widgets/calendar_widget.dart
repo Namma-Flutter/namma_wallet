@@ -32,13 +32,15 @@ class CalendarWidget extends StatelessWidget {
         final tickets = provider.getTicketsForDay(day);
         return [
           ...events,
-          ...tickets.map((t) => Event(
-                icon: Icons.confirmation_number,
-                title: t.displayName,
-                subtitle: t.providerName,
-                date: day,
-                price: t.amount?.toString() ?? '',
-              ))
+          ...tickets.map(
+            (t) => Event(
+              icon: Icons.confirmation_number,
+              title: t.displayName,
+              subtitle: t.providerName,
+              date: day,
+              price: t.amount?.toString() ?? '',
+            ),
+          ),
         ];
       },
       calendarBuilders: CalendarBuilders(
