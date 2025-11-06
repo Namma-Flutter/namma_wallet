@@ -4,6 +4,7 @@
   "cSpell.words": [
     "AKASH",
     "CHEKUMAB",
+    "commitlint",
     "IRCTC",
     "kanna",
     "Keerthi",
@@ -23,8 +24,8 @@
     "TNSTC",
     "TNSTCPDF",
     "TNSTCSMS",
-    "xcodebuildmcp",
-    "webiny"
+    "webiny",
+    "xcodebuildmcp"
   ],
   "java.configuration.updateBuildConfiguration": "interactive"
 }
