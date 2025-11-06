@@ -5,8 +5,8 @@ import 'package:namma_wallet/src/common/theme/theme_provider.dart';
 import 'package:namma_wallet/src/common/widgets/custom_back_button.dart';
 import 'package:provider/provider.dart';
 
-class ProfilePage extends StatelessWidget {
-  const ProfilePage({super.key});
+class ProfileView extends StatelessWidget {
+  const ProfileView({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -115,8 +115,8 @@ class ThemeSectionWidget extends StatelessWidget {
                 themeProvider.isSystemMode
                     ? 'Following system settings'
                     : themeProvider.isDarkMode
-                    ? 'Dark theme enabled'
-                    : 'Light theme enabled',
+                        ? 'Dark theme enabled'
+                        : 'Light theme enabled',
               ),
               value: themeProvider.isDarkMode,
               onChanged: (value) {

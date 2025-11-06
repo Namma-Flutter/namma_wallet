@@ -6,14 +6,14 @@ import 'package:home_widget/home_widget.dart';
 import 'package:namma_wallet/src/common/database/wallet_database.dart';
 import 'package:namma_wallet/src/common/widgets/custom_back_button.dart';
 
-class DbViewerPage extends StatefulWidget {
-  const DbViewerPage({super.key});
+class DbViewerView extends StatefulWidget {
+  const DbViewerView({super.key});
 
   @override
-  State<DbViewerPage> createState() => _DbViewerPageState();
+  State<DbViewerView> createState() => _DbViewerViewState();
 }
 
-class _DbViewerPageState extends State<DbViewerPage>
+class _DbViewerViewState extends State<DbViewerView>
     with SingleTickerProviderStateMixin {
   late final TabController _tabController;
   List<Map<String, Object?>> users = <Map<String, Object?>>[];

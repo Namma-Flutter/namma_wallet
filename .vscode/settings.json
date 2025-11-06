@@ -18,10 +18,12 @@
     "prefs",
     "SAMAARO",
     "SETC",
+    "swiftlens",
     "syncfusion",
     "TNSTC",
     "TNSTCPDF",
-    "TNSTCSMS"
+    "TNSTCSMS",
+    "xcodebuildmcp"
   ],
   "java.configuration.updateBuildConfiguration": "interactive"
 }

@@ -1,4 +1,5 @@
 import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:namma_wallet/src/common/helper/check_pnr_id.dart';
 import 'package:namma_wallet/src/common/routing/app_router.dart';
@@ -33,7 +34,7 @@ class _NammaWalletAppState extends State<NammaWalletApp> {
           final file = File(filePath);
           final content = await file.readAsString();
           final ticket = _smsService.parseTicket(content);
-          await checkAndUpadteTNSTCTicket(ticket);
+          await checkAndUpdateTNSTCTicket(ticket);
 
           _scaffoldMessengerKey.currentState?.showSnackBar(
             SnackBar(
@@ -44,7 +45,7 @@ class _NammaWalletAppState extends State<NammaWalletApp> {
               duration: const Duration(seconds: 3),
             ),
           );
-        } catch (e) {
+        } on Object catch (e) {
           _scaffoldMessengerKey.currentState?.showSnackBar(
             SnackBar(
               content: Text('❌ Error processing shared SMS: $e'),

@@ -1,7 +1,7 @@
 import 'package:namma_wallet/src/common/database/wallet_database.dart';
 import 'package:namma_wallet/src/features/tnstc/domain/tnstc_model.dart';
 
-Future<void> checkAndUpadteTNSTCTicket(TNSTCTicketModel ticket) async {
+Future<void> checkAndUpdateTNSTCTicket(TNSTCTicketModel ticket) async {
   final db = WalletDatabase.instance;
 
   if (ticket.pnrNumber == null || ticket.corporation == null) {
