@@ -14,13 +14,11 @@ class DuplicateTicketException implements Exception {
 }
 
 class WalletDatabase {
+  WalletDatabase({ILogger? logger}) : _logger = logger ?? getIt<ILogger>();
   final ILogger _logger;
 
-  WalletDatabase({ILogger? logger})
-      : _logger = logger ?? getIt<ILogger>();
-
-  final String _dbName = 'namma_wallet.db';
-  final int _dbVersion = 1;
+  static const String _dbName = 'namma_wallet.db';
+  static const int _dbVersion = 1;
 
   Database? _database;
 
@@ -29,6 +27,19 @@ class WalletDatabase {
     if (existing != null) return existing;
     _database = await _initDatabase();
     return _database!;
+  }
+
+  /// Masks PNR for safe logging by showing only the last 3 characters
+  String _maskPnr(String pnrNumber) {
+    if (pnrNumber.length <= 3) return pnrNumber;
+    return '''${'*' * (pnrNumber.length - 3)}${pnrNumber.substring(pnrNumber.length - 3)}''';
+  }
+
+  /// Masks booking reference for safe logging by showing
+  ///  only the last 3 characters
+  String _maskBookingRef(String bookingRef) {
+    if (bookingRef.length <= 3) return bookingRef;
+    return '''${'*' * (bookingRef.length - 3)}${bookingRef.substring(bookingRef.length - 3)}''';
   }
 
   Future<Database> _initDatabase() async {
@@ -211,9 +222,11 @@ ORDER BY t.created_at DESC
           limit: 1,
         );
         if (existing.isNotEmpty) {
-          _logger.warning('Duplicate ticket found with PNR: $pnrNumber');
-          throw DuplicateTicketException(
-            'Ticket with PNR $pnrNumber already exists',
+          _logger.warning(
+            'Duplicate ticket found with PNR: ${_maskPnr(pnrNumber)}',
+          );
+          throw const DuplicateTicketException(
+            'Ticket already exists',
           );
         }
       } else if (bookingRef != null && bookingRef.isNotEmpty) {
@@ -225,10 +238,11 @@ ORDER BY t.created_at DESC
         );
         if (existing.isNotEmpty) {
           _logger.warning(
-            'Duplicate ticket found with booking reference: $bookingRef',
+            'Duplicate ticket found with booking reference: '
+            '${_maskBookingRef(bookingRef)}',
           );
-          throw DuplicateTicketException(
-            'Ticket with booking reference $bookingRef already exists',
+          throw const DuplicateTicketException(
+            'Ticket already exists',
           );
         }
       }
@@ -297,7 +311,10 @@ ORDER BY t.created_at DESC
     Map<String, Object?> updates,
   ) async {
     try {
-      _logger.logDatabase('Update', 'Updating ticket with PNR: $pnrNumber');
+      _logger.logDatabase(
+        'Update',
+        'Updating ticket with PNR: ${_maskPnr(pnrNumber)}',
+      );
       final db = await database;
       updates['updated_at'] = DateTime.now().toIso8601String();
 
@@ -311,16 +328,16 @@ ORDER BY t.created_at DESC
       if (count > 0) {
         _logger.logDatabase(
           'Success',
-          'Updated ticket with PNR: $pnrNumber',
+          'Updated ticket with PNR: ${_maskPnr(pnrNumber)}',
         );
       } else {
-        _logger.warning('No ticket found with PNR: $pnrNumber');
+        _logger.warning('No ticket found with PNR: ${_maskPnr(pnrNumber)}');
       }
 
       return count;
     } catch (e, stackTrace) {
       _logger.error(
-        'Failed to update ticket by PNR: $pnrNumber',
+        'Failed to update ticket by PNR: ${_maskPnr(pnrNumber)}',
         e,
         stackTrace,
       );

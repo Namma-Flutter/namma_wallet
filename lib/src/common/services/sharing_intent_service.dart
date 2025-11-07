@@ -7,10 +7,9 @@ import 'package:namma_wallet/src/common/services/logger_interface.dart';
 
 /// Service to handle sharing intents from other apps
 class SharingIntentService {
-  final ILogger _logger;
-
   SharingIntentService({ILogger? logger})
-      : _logger = logger ?? getIt<ILogger>();
+    : _logger = logger ?? getIt<ILogger>();
+  final ILogger _logger;
 
   StreamSubscription<List<SharedMediaFile>>? _intentDataStreamSubscription;
 
@@ -75,21 +74,21 @@ class SharingIntentService {
   /// Print detailed file information to console
   void _printFileDetails(SharedMediaFile file) {
     _logger
-      ..info('File Path: ${file.path}')
-      ..info('File Name: ${file.path.split('/').last}')
-      ..info('File Extension: ${file.path.split('.').last.toLowerCase()}')
-      ..info('MIME Type: ${file.type}');
+      ..debug('File Path: ${file.path}')
+      ..debug('File Name: ${file.path.split('/').last}')
+      ..debug('File Extension: ${file.path.split('.').last.toLowerCase()}')
+      ..debug('MIME Type: ${file.type}');
 
     final fileObj = File(file.path);
     if (fileObj.existsSync()) {
       try {
         final stats = fileObj.statSync();
         _logger
-          ..info(
+          ..debug(
             'File Size: ${stats.size} bytes (${_formatFileSize(stats.size)})',
           )
-          ..info('Last Modified: ${stats.modified}')
-          ..info('File Accessible: Yes');
+          ..debug('Last Modified: ${stats.modified}')
+          ..debug('File Accessible: Yes');
 
         // Try to read text files for content preview (Copilot code)
         if (_isTextFile(file)) {
@@ -98,7 +97,7 @@ class SharingIntentService {
             final preview = content.length > 200
                 ? '${content.substring(0, 200)}...'
                 : content;
-            _logger.info('Content Preview: $preview');
+            _logger.debug('Content Preview: $preview');
           } on Object catch (e, stackTrace) {
             _logger.error('Could not read text content: $e', e, stackTrace);
           }

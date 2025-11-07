@@ -5,10 +5,9 @@ import 'package:namma_wallet/src/common/services/logger_interface.dart';
 
 /// Service class to interact with Gemma AI chat
 class GemmaChatService {
+  GemmaChatService({ILogger? logger}) : _logger = logger ?? getIt<ILogger>();
   final ILogger _logger;
-
-  GemmaChatService({ILogger? logger})
-      : _logger = logger ?? getIt<ILogger>();
+  int? _lastLoggedProgress;
   //https://huggingface.co/litert-community/Gemma3-1B-IT/resolve/main/Gemma3-1B-IT_multi-prefill-seq_q4_block128_ekv4096.task
 
   Future<void> init() async {
@@ -24,7 +23,12 @@ class GemmaChatService {
           token: token,
         )
         .withProgress((progress) {
-          _logger.info('Downloading: $progress%');
+          if (_lastLoggedProgress == null ||
+              progress - _lastLoggedProgress! >= 10 ||
+              progress >= 100) {
+            _logger.info('Downloading: $progress%');
+            _lastLoggedProgress = progress;
+          }
         })
         .install();
   }

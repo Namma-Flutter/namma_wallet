@@ -15,9 +15,8 @@ import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class CalendarProvider extends ChangeNotifier {
-  final ILogger _logger;
-
   CalendarProvider({ILogger? logger}) : _logger = logger ?? getIt<ILogger>();
+  final ILogger _logger;
 
   DateTime _selectedDay = DateTime.now();
   List<Event> _events = [];

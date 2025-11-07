@@ -9,6 +9,73 @@ import 'package:namma_wallet/src/features/tnstc/application/pdf_service.dart';
 import 'package:namma_wallet/src/features/tnstc/application/tnstc_pdf_parser.dart';
 import 'package:namma_wallet/src/features/tnstc/application/tnstc_ticket_parser.dart';
 
+/// Extension to provide non-PII summary generation for TNSTCTicket
+extension TNSTCTicketSummary on TNSTCTicket {
+  /// Create a non-identifying summary map for safe logging
+  Map<String, dynamic> toNonPiiSummary() {
+    // List of all nullable fields to count
+    final nullableFields = <dynamic Function()?>[
+      () => corporation,
+      () => pnrNumber,
+      () => journeyDate,
+      () => routeNo,
+      () => serviceStartPlace,
+      () => serviceEndPlace,
+      () => serviceStartTime,
+      () => passengerStartPlace,
+      () => passengerEndPlace,
+      () => passengerPickupPoint,
+      () => passengerPickupTime,
+      () => platformNumber,
+      () => classOfService,
+      () => tripCode,
+      () => obReferenceNumber,
+      () => numberOfSeats,
+      () => bankTransactionNumber,
+      () => busIdNumber,
+      () => passengerCategory,
+      () => passengerInfo,
+      () => idCardType,
+      () => idCardNumber,
+      () => totalFare,
+    ];
+
+    // Count non-null fields
+    final fieldCount = nullableFields
+        .where((getter) => getter?.call() != null)
+        .length;
+
+    return {
+      'totalFieldsParsed': fieldCount,
+      'ticketType': 'TNSTC',
+      'hasCorporation': corporation != null,
+      'hasPnrNumber': pnrNumber != null,
+      'pnrLast4': pnrNumber != null && pnrNumber!.length >= 4
+          ? '...${pnrNumber!.substring(pnrNumber!.length - 4)}'
+          : null,
+      'hasJourneyDate': journeyDate != null,
+      'hasRouteInfo': routeNo != null,
+      'hasServicePlaces': serviceStartPlace != null && serviceEndPlace != null,
+      'hasPassengerPlaces':
+          passengerStartPlace != null && passengerEndPlace != null,
+      'hasPickupInfo':
+          passengerPickupPoint != null || passengerPickupTime != null,
+      'hasPlatformNumber': platformNumber != null,
+      'hasClassOfService': classOfService != null,
+      'hasTripCode': tripCode != null,
+      'hasBookingReference': obReferenceNumber != null,
+      'numberOfSeats': numberOfSeats,
+      'hasBankTransaction': bankTransactionNumber != null,
+      'hasBusIdNumber': busIdNumber != null,
+      'hasPassengerCategory': passengerCategory != null,
+      'hasPassengerInfo': passengerInfo != null,
+      'hasIdCard': idCardType != null || idCardNumber != null,
+      'idCardType': idCardType,
+      'hasTotalFare': totalFare != null,
+    };
+  }
+}
+
 enum PDFParserContentType {
   travelTicket,
   unsupported,
@@ -52,73 +119,16 @@ class PDFParserResult {
 }
 
 class PDFParserService {
+  PDFParserService({ILogger? logger, TNSTCPDFParser? pdfParser})
+    : _logger = logger ?? getIt<ILogger>(),
+      _pdfParser = pdfParser ?? getIt<TNSTCPDFParser>();
   final ILogger _logger;
   final TNSTCPDFParser _pdfParser;
-
-  PDFParserService({ILogger? logger, TNSTCPDFParser? pdfParser})
-      : _logger = logger ?? getIt<ILogger>(),
-        _pdfParser = pdfParser ?? getIt<TNSTCPDFParser>();
 
   /// Helper method to create a non-identifying summary of parsed ticket data
   /// for safe logging in dev/staging environments
   Map<String, dynamic> _createTicketSummary(TNSTCTicket ticket) {
-    // Count non-null fields
-    var fieldCount = 0;
-    if (ticket.corporation != null) fieldCount++;
-    if (ticket.pnrNumber != null) fieldCount++;
-    if (ticket.journeyDate != null) fieldCount++;
-    if (ticket.routeNo != null) fieldCount++;
-    if (ticket.serviceStartPlace != null) fieldCount++;
-    if (ticket.serviceEndPlace != null) fieldCount++;
-    if (ticket.serviceStartTime != null) fieldCount++;
-    if (ticket.passengerStartPlace != null) fieldCount++;
-    if (ticket.passengerEndPlace != null) fieldCount++;
-    if (ticket.passengerPickupPoint != null) fieldCount++;
-    if (ticket.passengerPickupTime != null) fieldCount++;
-    if (ticket.platformNumber != null) fieldCount++;
-    if (ticket.classOfService != null) fieldCount++;
-    if (ticket.tripCode != null) fieldCount++;
-    if (ticket.obReferenceNumber != null) fieldCount++;
-    if (ticket.numberOfSeats != null) fieldCount++;
-    if (ticket.bankTransactionNumber != null) fieldCount++;
-    if (ticket.busIdNumber != null) fieldCount++;
-    if (ticket.passengerCategory != null) fieldCount++;
-    if (ticket.passengerInfo != null) fieldCount++;
-    if (ticket.idCardType != null) fieldCount++;
-    if (ticket.idCardNumber != null) fieldCount++;
-    if (ticket.totalFare != null) fieldCount++;
-
-    return {
-      'totalFieldsParsed': fieldCount,
-      'ticketType': 'TNSTC',
-      'hasCorporation': ticket.corporation != null,
-      'hasPnrNumber': ticket.pnrNumber != null,
-      'pnrLast4': ticket.pnrNumber != null && ticket.pnrNumber!.length >= 4
-          ? '...${ticket.pnrNumber!.substring(ticket.pnrNumber!.length - 4)}'
-          : null,
-      'hasJourneyDate': ticket.journeyDate != null,
-      'hasRouteInfo': ticket.routeNo != null,
-      'hasServicePlaces':
-          ticket.serviceStartPlace != null && ticket.serviceEndPlace != null,
-      'hasPassengerPlaces':
-          ticket.passengerStartPlace != null &&
-          ticket.passengerEndPlace != null,
-      'hasPickupInfo':
-          ticket.passengerPickupPoint != null ||
-          ticket.passengerPickupTime != null,
-      'hasPlatformNumber': ticket.platformNumber != null,
-      'hasClassOfService': ticket.classOfService != null,
-      'hasTripCode': ticket.tripCode != null,
-      'hasBookingReference': ticket.obReferenceNumber != null,
-      'numberOfSeats': ticket.numberOfSeats,
-      'hasBankTransaction': ticket.bankTransactionNumber != null,
-      'hasBusIdNumber': ticket.busIdNumber != null,
-      'hasPassengerCategory': ticket.passengerCategory != null,
-      'hasPassengerInfo': ticket.passengerInfo != null,
-      'hasIdCard': ticket.idCardType != null || ticket.idCardNumber != null,
-      'idCardType': ticket.idCardType,
-      'hasTotalFare': ticket.totalFare != null,
-    };
+    return ticket.toNonPiiSummary();
   }
 
   Future<PDFParserResult> parseAndSavePDFTicket(File pdfFile) async {

@@ -4,12 +4,13 @@ import 'package:talker_flutter/talker_flutter.dart';
 
 /// Logger service using Talker for comprehensive logging throughout the app
 class NammaLogger implements ILogger {
-  NammaLogger() : _talker = Talker(
-      settings: _getTalkerSettings(),
-      logger: TalkerLogger(
-        settings: _getTalkerLoggerSettings(),
-      ),
-    ) {
+  NammaLogger()
+    : _talker = Talker(
+        settings: _getTalkerSettings(),
+        logger: TalkerLogger(
+          settings: _getTalkerLoggerSettings(),
+        ),
+      ) {
     const mode = kDebugMode ? 'DEBUG' : 'PRODUCTION';
     _talker.info('Logger initialized successfully in $mode mode');
   }

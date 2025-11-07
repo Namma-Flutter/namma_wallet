@@ -53,12 +53,11 @@ class IRCTCScannerResult {
 }
 
 class IRCTCScannerService {
+  IRCTCScannerService({ILogger? logger, IRCTCQRParser? qrParser})
+    : _logger = logger ?? getIt<ILogger>(),
+      _qrParser = qrParser ?? getIt<IRCTCQRParser>();
   final ILogger _logger;
   final IRCTCQRParser _qrParser;
-
-  IRCTCScannerService({ILogger? logger, IRCTCQRParser? qrParser})
-      : _logger = logger ?? getIt<ILogger>(),
-        _qrParser = qrParser ?? getIt<IRCTCQRParser>();
 
   Future<IRCTCScannerResult> parseAndSaveIRCTCTicket(String qrData) async {
     try {

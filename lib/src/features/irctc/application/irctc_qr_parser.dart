@@ -3,14 +3,13 @@ import 'package:namma_wallet/src/common/services/logger_interface.dart';
 import 'package:namma_wallet/src/features/irctc/application/irctc_ticket_model.dart';
 
 class IRCTCQRParser {
+  IRCTCQRParser({ILogger? logger}) : _logger = logger ?? getIt<ILogger>();
   final ILogger _logger;
-
-  IRCTCQRParser({ILogger? logger})
-      : _logger = logger ?? getIt<ILogger>();
 
   IRCTCTicket? parseQRCode(String qrData) {
     try {
-      // Create a simple non-reversible hash for correlation without exposing PII
+      // Create a simple non-reversible hash for
+      // correlation without exposing PII
       final fingerprint = qrData.hashCode.abs().toString();
       _logger.debug(
         'Parsing IRCTC QR Data (${qrData.length} chars, '

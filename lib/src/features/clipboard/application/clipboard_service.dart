@@ -50,12 +50,11 @@ class ClipboardResult {
 }
 
 class ClipboardService {
+  ClipboardService({ILogger? logger, TravelParserService? parserService})
+    : _logger = logger ?? getIt<ILogger>(),
+      _parserService = parserService ?? getIt<TravelParserService>();
   final ILogger _logger;
   final TravelParserService _parserService;
-
-  ClipboardService({ILogger? logger, TravelParserService? parserService})
-      : _logger = logger ?? getIt<ILogger>(),
-        _parserService = parserService ?? getIt<TravelParserService>();
 
   Future<ClipboardResult> readAndParseClipboard() async {
     try {
@@ -123,9 +122,19 @@ class ClipboardService {
               content,
               ticket: updatedTicket,
             );
-          } on DuplicateTicketException catch (e) {
-            _logger.warning('Duplicate ticket detected: ${e.message}');
-            return ClipboardResult.error(e.message);
+          } on DuplicateTicketException catch (_) {
+            final maskedPnr =
+                parsedTicket.pnrNumber != null &&
+                    parsedTicket.pnrNumber!.length >= 4
+                ? '...${parsedTicket.pnrNumber!.substring(
+                    parsedTicket.pnrNumber!.length - 4,
+                  )}'
+                : '***';
+            _logger.warning(
+              'Duplicate ticket detected while saving clipboard import '
+              '(PNR: $maskedPnr)',
+            );
+            return ClipboardResult.error('Duplicate ticket detected');
           } on Object catch (e) {
             _logger.error('Failed to save ticket to database: $e');
             return ClipboardResult.error('Failed to save ticket: $e');

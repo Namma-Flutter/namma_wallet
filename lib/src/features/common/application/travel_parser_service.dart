@@ -292,15 +292,13 @@ class TicketUpdateInfo {
 }
 
 class TravelParserService {
+  TravelParserService({ILogger? logger}) : _logger = logger ?? getIt<ILogger>();
   final ILogger _logger;
   final List<TravelTicketParser> _parsers = [
     TNSTCBusParser(),
     IRCTCTrainParser(),
     SETCBusParser(),
   ];
-
-  TravelParserService({ILogger? logger})
-      : _logger = logger ?? getIt<ILogger>();
 
   /// Create a sanitized summary of ticket for safe logging (no PII)
   Map<String, dynamic> _createTicketSummary(TravelTicketModel ticket) {
@@ -422,14 +420,15 @@ class TravelParserService {
           // Log metadata only (no PII from raw text)
           final lineCount = text.split('\n').length;
           final wordCount = text.split(RegExp(r'\s+')).length;
-          _logger.debug(
-            '[TravelParserService] Ticket text metadata: '
-            '${text.length} chars, $lineCount lines, $wordCount words',
-          );
-          _logger.info(
-            '[TravelParserService] Attempting to parse with '
-            '${parser.providerName} parser',
-          );
+          _logger
+            ..debug(
+              '[TravelParserService] Ticket text metadata: '
+              '${text.length} chars, $lineCount lines, $wordCount words',
+            )
+            ..info(
+              '[TravelParserService] Attempting to parse with '
+              '${parser.providerName} parser',
+            );
 
           final ticket = parser.parseTicket(text);
           if (ticket != null) {

@@ -4,12 +4,11 @@ import 'package:namma_wallet/src/features/tnstc/application/tnstc_sms_parser.dar
 import 'package:namma_wallet/src/features/tnstc/domain/tnstc_model.dart';
 
 class SMSService {
+  SMSService({ILogger? logger, TNSTCSMSParser? smsParser})
+    : _logger = logger ?? getIt<ILogger>(),
+      _smsParser = smsParser ?? getIt<TNSTCSMSParser>();
   final ILogger _logger;
   final TNSTCSMSParser _smsParser;
-
-  SMSService({ILogger? logger, TNSTCSMSParser? smsParser})
-      : _logger = logger ?? getIt<ILogger>(),
-        _smsParser = smsParser ?? getIt<TNSTCSMSParser>();
 
   TNSTCTicketModel parseTicket(String text) {
     try {
