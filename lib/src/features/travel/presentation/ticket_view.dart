@@ -78,10 +78,11 @@ class _TicketViewState extends State<TicketView> {
       if (mounted) {
         showSnackbar(context, '📌 Ticket pinned to home screen successfully!');
       }
-    } on Object catch (e) {
+    } on Object catch (e, stackTrace) {
       getIt<ILogger>().error(
         '[TicketView] Failed to pin ticket to home screen',
-        e is Exception ? e : Exception(e.toString()),
+        e,
+        stackTrace,
       );
       if (mounted) {
         showSnackbar(context, 'Failed to pin ticket: $e', isError: true);
@@ -144,10 +145,11 @@ class _TicketViewState extends State<TicketView> {
         showSnackbar(context, 'Ticket deleted successfully');
         context.pop(true); // Return true to indicate ticket was deleted
       }
-    } on Object catch (e) {
+    } on Object catch (e, stackTrace) {
       getIt<ILogger>().error(
         '[TicketView] Failed to delete ticket',
-        e is Exception ? e : Exception(e.toString()),
+        e,
+        stackTrace,
       );
 
       if (mounted) {
@@ -180,10 +182,11 @@ class _TicketViewState extends State<TicketView> {
           );
         }
       }
-    } on Object catch (e) {
+    } on Object catch (e, stackTrace) {
       getIt<ILogger>().error(
         '[TicketView] Failed to launch phone call',
-        e is Exception ? e : Exception(e.toString()),
+        e,
+        stackTrace,
       );
       if (mounted) {
         showSnackbar(context, 'Failed to make call: $e', isError: true);

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:namma_wallet/src/app.dart';
@@ -71,11 +73,36 @@ Future<void> main() async {
 
     logger?.success('All services initialized successfully');
   } on Object catch (e, stackTrace) {
+    // Log error using logger if available
     logger?.error(
       'Error during initialization: $e',
       e,
       stackTrace,
     );
+
+    // Fallback: ensure error is always visible even if logger is null
+    if (logger == null) {
+      // Write to stderr for visibility in production/debug
+      stderr
+        ..writeln('=' * 80)
+        ..writeln('CRITICAL: Initialization failed and logger unavailable')
+        ..writeln('=' * 80)
+        ..writeln('Error: $e')
+        ..writeln('Stack trace:')
+        ..writeln(stackTrace)
+        ..writeln('=' * 80);
+
+      // Also print for debug console visibility
+      // Print statements are necessary here as logger is unavailable
+      // ignore: avoid_print
+      print('CRITICAL INITIALIZATION ERROR: $e');
+      // Print statements are necessary here as logger is unavailable
+      // ignore: avoid_print
+      print('Stack trace: $stackTrace');
+
+      // Rethrow to prevent app from starting in broken state
+      rethrow;
+    }
   }
 
   runApp(

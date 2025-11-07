@@ -56,7 +56,7 @@ class _NammaWalletAppState extends State<NammaWalletApp> {
         } on Object catch (e, stackTrace) {
           _logger.error(
             'Error processing shared SMS',
-            e is Exception ? e : null,
+            e,
             stackTrace,
           );
           _scaffoldMessengerKey.currentState?.showSnackBar(

@@ -93,64 +93,91 @@ class NammaLogger implements ILogger {
   }
 
   /// Log an HTTP request
+  ///
+  /// By default, all query parameters are stripped for security.
+  /// Use [allowedQueryParams] to explicitly preserve specific safe parameters.
   @override
-  void logHttpRequest(String method, String url) {
-    final sanitizedUrl = _sanitizeUrl(url);
+  void logHttpRequest(
+    String method,
+    String url, {
+    Set<String>? allowedQueryParams,
+  }) {
+    final sanitizedUrl = _sanitizeUrl(url, allowedQueryParams);
     _talker.log('[HTTP] $method $sanitizedUrl');
   }
 
   /// Log an HTTP response
+  ///
+  /// By default, all query parameters are stripped for security.
+  /// Use [allowedQueryParams] to explicitly preserve specific safe parameters.
   @override
-  void logHttpResponse(String method, String url, int statusCode) {
-    final sanitizedUrl = _sanitizeUrl(url);
+  void logHttpResponse(
+    String method,
+    String url,
+    int statusCode, {
+    Set<String>? allowedQueryParams,
+  }) {
+    final sanitizedUrl = _sanitizeUrl(url, allowedQueryParams);
     _talker.log('[HTTP] $method $sanitizedUrl - Status: $statusCode');
   }
 
-  /// Sanitize URL to remove sensitive information from query parameters
+  /// Sanitize URL to remove query parameters
   ///
-  /// Removes sensitive query parameters to prevent leaking data like
-  /// tokens, API keys, session IDs, etc.
-  /// Returns a safe placeholder if URL parsing fails.
-  String _sanitizeUrl(String url) {
+  /// **Default behavior (secure by default):**
+  /// Strips ALL query parameters to prevent leaking PII, tokens, or any
+  /// sensitive data in logs. This is the safest approach as it prevents
+  /// accidentally logging new or unlisted sensitive parameters.
+  ///
+  /// **Opt-in preservation:**
+  /// Callers must explicitly provide [allowedQueryParams] to preserve
+  /// specific query parameters. Only parameters in this allowlist will be
+  /// included in the sanitized URL.
+  ///
+  /// **Examples:**
+  /// ```dart
+  /// // Default: strips all query params
+  /// _sanitizeUrl('https://api.com/data?token=abc&id=123')
+  /// // Returns: 'https://api.com/data'
+  ///
+  /// // With allowlist: preserves only specified params
+  /// _sanitizeUrl(
+  ///   'https://api.com/data?token=abc&id=123&page=1',
+  ///   {'id', 'page'},
+  /// )
+  /// // Returns: 'https://api.com/data?id=123&page=1'
+  /// ```
+  ///
+  /// Returns `[REDACTED_URL]` if URL parsing fails.
+  String _sanitizeUrl(String url, [Set<String>? allowedQueryParams]) {
     try {
       final uri = Uri.parse(url);
-
-      // List of sensitive query parameter keys to redact
-      const sensitiveKeys = {
-        'token',
-        'api_key',
-        'apikey',
-        'key',
-        'secret',
-        'password',
-        'session',
-        'session_id',
-        'sessionid',
-        'auth',
-        'authorization',
-        'access_token',
-        'refresh_token',
-      };
 
       // If there are no query parameters, return the URL as-is
       if (uri.queryParameters.isEmpty) {
         return url;
       }
 
-      // Filter out sensitive query parameters
-      final safeParams = <String, String>{};
+      // Default behavior: strip ALL query parameters (secure by default)
+      if (allowedQueryParams == null || allowedQueryParams.isEmpty) {
+        // Remove query to get clean base URL
+        return uri.replace(query: '').toString();
+      }
+
+      // Opt-in: only preserve explicitly allowed query parameters
+      final preservedParams = <String, String>{};
       uri.queryParameters.forEach((key, value) {
-        if (!sensitiveKeys.contains(key.toLowerCase())) {
-          safeParams[key] = value;
+        if (allowedQueryParams.contains(key)) {
+          preservedParams[key] = value;
         }
       });
 
-      // Rebuild the URI with only safe query parameters
-      final sanitizedUri = uri.replace(
-        queryParameters: safeParams.isEmpty ? null : safeParams,
-      );
+      // Rebuild the URI with only allowed query parameters
+      // If no params were preserved, strip query entirely
+      if (preservedParams.isEmpty) {
+        return uri.replace(query: '').toString();
+      }
 
-      return sanitizedUri.toString();
+      return uri.replace(queryParameters: preservedParams).toString();
     } on Object catch (_) {
       // If URL parsing fails, return a safe placeholder
       return '[REDACTED_URL]';

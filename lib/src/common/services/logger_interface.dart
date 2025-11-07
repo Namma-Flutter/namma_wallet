@@ -28,10 +28,25 @@ abstract class ILogger {
   void success(String message);
 
   /// Log an HTTP request
-  void logHttpRequest(String method, String url);
+  ///
+  /// By default, all query parameters are stripped for security.
+  /// Use [allowedQueryParams] to explicitly preserve specific safe parameters.
+  void logHttpRequest(
+    String method,
+    String url, {
+    Set<String>? allowedQueryParams,
+  });
 
   /// Log an HTTP response
-  void logHttpResponse(String method, String url, int statusCode);
+  ///
+  /// By default, all query parameters are stripped for security.
+  /// Use [allowedQueryParams] to explicitly preserve specific safe parameters.
+  void logHttpResponse(
+    String method,
+    String url,
+    int statusCode, {
+    Set<String>? allowedQueryParams,
+  });
 
   /// Log database operations
   void logDatabase(String operation, String details);

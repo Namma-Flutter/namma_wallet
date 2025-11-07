@@ -55,12 +55,21 @@ class FakeLogger implements ILogger {
   }
 
   @override
-  void logHttpRequest(String method, String url) {
+  void logHttpRequest(
+    String method,
+    String url, {
+    Set<String>? allowedQueryParams,
+  }) {
     // Do nothing in tests
   }
 
   @override
-  void logHttpResponse(String method, String url, int statusCode) {
+  void logHttpResponse(
+    String method,
+    String url,
+    int statusCode, {
+    Set<String>? allowedQueryParams,
+  }) {
     // Do nothing in tests
   }
 

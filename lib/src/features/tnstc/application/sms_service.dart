@@ -18,7 +18,7 @@ class SMSService {
     } catch (e, stackTrace) {
       _logger.error(
         'Failed to parse SMS ticket',
-        e is Exception ? e : null,
+        e,
         stackTrace,
       );
       rethrow;

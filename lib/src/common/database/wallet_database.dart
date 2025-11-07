@@ -160,7 +160,7 @@ CREATE INDEX idx_travel_tickets_ticket_type ON travel_tickets(ticket_type);
     } catch (e, stackTrace) {
       _logger.error(
         'Failed to fetch travel tickets',
-        e is Exception ? e : null,
+        e,
         stackTrace,
       );
       rethrow;
@@ -241,7 +241,7 @@ ORDER BY t.created_at DESC
       }
       _logger.error(
         'Failed to insert travel ticket',
-        e is Exception ? e : null,
+        e,
         stackTrace,
       );
       rethrow;
@@ -320,7 +320,7 @@ ORDER BY t.created_at DESC
     } catch (e, stackTrace) {
       _logger.error(
         'Failed to update ticket by PNR: $pnrNumber',
-        e is Exception ? e : null,
+        e,
         stackTrace,
       );
       rethrow;

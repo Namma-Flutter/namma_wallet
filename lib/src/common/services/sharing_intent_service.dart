@@ -58,8 +58,8 @@ class SharingIntentService {
 
         final fileName = file.path.split('/').last;
         onFileReceived('File received: $fileName');
-      } on Object catch (e) {
-        _logger.error('Error handling shared file ${i + 1}: $e');
+      } on Object catch (e, stackTrace) {
+        _logger.error('Error handling shared file ${i + 1}: $e', e, stackTrace);
         onError('Error processing shared file: $e');
       }
     }
@@ -94,12 +94,12 @@ class SharingIntentService {
                 ? '${content.substring(0, 200)}...'
                 : content;
             _logger.info('Content Preview: $preview');
-          } on Object catch (e) {
-            _logger.error('Could not read text content: $e');
+          } on Object catch (e, stackTrace) {
+            _logger.error('Could not read text content: $e', e, stackTrace);
           }
         }
-      } on Object catch (e) {
-        _logger.error('Error reading file stats: $e');
+      } on Object catch (e, stackTrace) {
+        _logger.error('Error reading file stats: $e', e, stackTrace);
       }
     } else {
       _logger.error('File Accessible: No - File not found at path');

@@ -386,10 +386,11 @@ class TravelParserService {
         '[TravelParserService] No parser could handle the text',
       );
       return null;
-    } on Object catch (e) {
+    } on Object catch (e, stackTrace) {
       getIt<ILogger>().error(
         '[TravelParserService] Error during ticket parsing',
-        e is Exception ? e : Exception(e.toString()),
+        e,
+        stackTrace,
       );
       return null;
     }

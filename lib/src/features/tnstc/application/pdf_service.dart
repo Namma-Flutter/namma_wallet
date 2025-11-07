@@ -16,27 +16,29 @@ class PDFService {
       // Dispose the document.
       document.dispose();
 
-      // Log raw text before cleaning
-      getIt<ILogger>().debug('[PDFService] === RAW PDF TEXT ===');
-      getIt<ILogger>().debug('[PDFService] $rawText');
-      getIt<ILogger>().debug('[PDFService] === END RAW PDF TEXT ===');
+      // Log text metadata only (no PII)
+      final lineCount = rawText.split('\n').length;
+      getIt<ILogger>().debug(
+        '[PDFService] Extracted text: ${rawText.length} chars, '
+        '$lineCount lines',
+      );
 
       // Clean and normalize the extracted text
       final cleanedText = _cleanExtractedText(rawText);
 
-      // Log for debugging
+      // Log metadata after cleaning (no PII)
+      final cleanedLineCount = cleanedText.split('\n').length;
       getIt<ILogger>().debug(
-        '[PDFService] Raw PDF text length: ${rawText.length}',
-      );
-      getIt<ILogger>().debug(
-        '[PDFService] Cleaned PDF text length: ${cleanedText.length}',
+        '[PDFService] Cleaned text: ${cleanedText.length} chars, '
+        '$cleanedLineCount lines',
       );
 
       return cleanedText;
-    } catch (e) {
+    } on Object catch (e, stackTrace) {
       getIt<ILogger>().error(
         '[PDFService] Error extracting text from PDF',
-        e is Exception ? e : Exception(e.toString()),
+        e,
+        stackTrace,
       );
       rethrow;
     }
@@ -91,11 +93,8 @@ class PDFService {
     // Clean up any remaining extra whitespace
     cleanedText = cleanedText.trim();
 
-    // Log cleaned text for debugging (first 500 chars)
-    final preview = cleanedText.length > 500
-        ? '${cleanedText.substring(0, 500)}...'
-        : cleanedText;
-    getIt<ILogger>().debug('[PDFService] Cleaned PDF text preview: $preview');
+    // No logging of actual text content to avoid PII exposure
+    // Text metadata is logged in extractTextFrom() instead
 
     return cleanedText;
   }

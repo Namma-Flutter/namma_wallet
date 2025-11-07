@@ -9,14 +9,10 @@ void main() {
       logger = NammaLogger();
     });
 
-    test('sanitizes URL with sensitive token parameter', () {
+    test('strips all query parameters by default (secure by default)', () {
       const url = 'https://api.example.com/data?token=secret123&id=456';
-      // Access the private method via reflection would be complex,
-      // so we test via the public methods that use it
 
-      // The logger should sanitize the URL before logging
-      // We can't directly test the output without mocking Talker,
-      // but we can verify it doesn't throw
+      // Default behavior: all query params should be stripped
       expect(
         () => logger.logHttpRequest('GET', url),
         returnsNormally,
@@ -27,11 +23,12 @@ void main() {
       );
     });
 
-    test('sanitizes URL with multiple sensitive parameters', () {
+    test('strips all query parameters including seemingly safe ones', () {
       const url =
           'https://api.example.com/user?'
-          'api_key=key123&session_id=sess456&name=John';
+          'api_key=key123&session_id=sess456&name=John&page=1';
 
+      // By default, ALL params are stripped (even 'page' and 'name')
       expect(
         () => logger.logHttpRequest('POST', url),
         returnsNormally,
@@ -55,15 +52,25 @@ void main() {
       );
     });
 
-    test('handles URL with only safe query parameters', () {
-      const url = 'https://api.example.com/search?q=flutter&page=1';
+    test('preserves only explicitly allowed query parameters', () {
+      const url = 'https://api.example.com/search?q=flutter&page=1&token=abc';
 
+      // Only preserve 'q' and 'page', strip 'token'
       expect(
-        () => logger.logHttpRequest('GET', url),
+        () => logger.logHttpRequest(
+          'GET',
+          url,
+          allowedQueryParams: {'q', 'page'},
+        ),
         returnsNormally,
       );
       expect(
-        () => logger.logHttpResponse('GET', url, 200),
+        () => logger.logHttpResponse(
+          'GET',
+          url,
+          200,
+          allowedQueryParams: {'q', 'page'},
+        ),
         returnsNormally,
       );
     });
@@ -81,7 +88,7 @@ void main() {
       );
     });
 
-    test('sanitizes URLs with various sensitive key formats', () {
+    test('strips all query params regardless of key names', () {
       const urls = [
         'https://api.example.com?Token=abc',
         'https://api.example.com?API_KEY=xyz',
@@ -89,9 +96,12 @@ void main() {
         'https://api.example.com?access_token=token123',
         'https://api.example.com?refresh_token=refresh123',
         'https://api.example.com?authorization=auth123',
+        'https://api.example.com?safe_param=value',
+        'https://api.example.com?id=123',
       ];
 
       for (final url in urls) {
+        // All params are stripped by default
         expect(
           () => logger.logHttpRequest('GET', url),
           returnsNormally,
@@ -101,6 +111,24 @@ void main() {
           returnsNormally,
         );
       }
+    });
+
+    test('allowlist with empty set strips all params', () {
+      const url = 'https://api.example.com/data?id=123&page=1';
+
+      expect(
+        () => logger.logHttpRequest('GET', url, allowedQueryParams: {}),
+        returnsNormally,
+      );
+      expect(
+        () => logger.logHttpResponse(
+          'GET',
+          url,
+          200,
+          allowedQueryParams: {},
+        ),
+        returnsNormally,
+      );
     });
 
     test('logger initialization completes successfully', () {
