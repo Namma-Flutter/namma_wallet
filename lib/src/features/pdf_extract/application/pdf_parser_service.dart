@@ -74,9 +74,10 @@ class PDFParserService {
       }
 
       // Log complete extracted text for debugging
-      _logger.debug('=== FULL EXTRACTED PDF TEXT ===');
-      _logger.debug(extractedText);
-      _logger.debug('=== END EXTRACTED PDF TEXT ===');
+      _logger
+        ..debug('=== FULL EXTRACTED PDF TEXT ===')
+        ..debug(extractedText)
+        ..debug('=== END EXTRACTED PDF TEXT ===');
 
       // Also log preview for quick reference
       final textPreview = extractedText.length > 300
@@ -117,64 +118,65 @@ class PDFParserService {
           final tnstcTicket = TNSTCPDFParser.parseTicket(extractedText);
 
           // Log all parsed TNSTC ticket values
-          _logger.debug('=== PARSED TNSTC TICKET VALUES ===');
-          _logger.debug('Corporation: "${tnstcTicket.corporation}"');
-          _logger.debug('PNR Number: "${tnstcTicket.pnrNumber}"');
-          _logger.debug('Journey Date: "${tnstcTicket.journeyDate}"');
-          _logger.debug('Route No: "${tnstcTicket.routeNo}"');
-          _logger.debug(
-            'Service Start Place: "${tnstcTicket.serviceStartPlace}"',
-          );
-          _logger.debug('Service End Place: "${tnstcTicket.serviceEndPlace}"');
-          _logger.debug(
-            'Service Start Time: "${tnstcTicket.serviceStartTime}"',
-          );
-          _logger.debug(
-            'Passenger Start Place: "${tnstcTicket.passengerStartPlace}"',
-          );
-          _logger.debug(
-            'Passenger End Place: "${tnstcTicket.passengerEndPlace}"',
-          );
-          _logger.debug(
-            'Passenger Pickup Point: "${tnstcTicket.passengerPickupPoint}"',
-          );
-          _logger.debug(
-            'Passenger Pickup Time: "${tnstcTicket.passengerPickupTime}"',
-          );
-          _logger.debug('Platform Number: "${tnstcTicket.platformNumber}"');
-          _logger.debug('Class of Service: "${tnstcTicket.classOfService}"');
-          _logger.debug('Trip Code: "${tnstcTicket.tripCode}"');
-          _logger.debug(
-            'OB Reference Number: "${tnstcTicket.obReferenceNumber}"',
-          );
-          _logger.debug('Number of Seats: "${tnstcTicket.numberOfSeats}"');
-          _logger.debug(
-            'Bank Transaction Number: "${tnstcTicket.bankTransactionNumber}"',
-          );
-          _logger.debug('Bus ID Number: "${tnstcTicket.busIdNumber}"');
-          _logger.debug(
-            'Passenger Category: "${tnstcTicket.passengerCategory}"',
-          );
-          _logger.debug('Passenger Name: "${tnstcTicket.passengerInfo?.name}"');
-          _logger.debug('Passenger Age: "${tnstcTicket.passengerInfo?.age}"');
-          _logger.debug('Passenger Type: "${tnstcTicket.passengerInfo?.type}"');
-          _logger.debug(
-            'Passenger Gender: "${tnstcTicket.passengerInfo?.gender}"',
-          );
-          _logger.debug(
-            'Passenger Seat Number: "${tnstcTicket.passengerInfo?.seatNumber}"',
-          );
-          _logger.debug('ID Card Type: "${tnstcTicket.idCardType}"');
-          _logger.debug('ID Card Number: "${tnstcTicket.idCardNumber}"');
-          _logger.debug('Total Fare: "${tnstcTicket.totalFare}"');
-          _logger.debug('=== END PARSED TNSTC TICKET VALUES ===');
+          _logger
+            ..debug('=== PARSED TNSTC TICKET VALUES ===')
+            ..debug('Corporation: "${tnstcTicket.corporation}"')
+            ..debug('PNR Number: "${tnstcTicket.pnrNumber}"')
+            ..debug('Journey Date: "${tnstcTicket.journeyDate}"')
+            ..debug('Route No: "${tnstcTicket.routeNo}"')
+            ..debug(
+              'Service Start Place: "${tnstcTicket.serviceStartPlace}"',
+            )
+            ..debug('Service End Place: "${tnstcTicket.serviceEndPlace}"')
+            ..debug(
+              'Service Start Time: "${tnstcTicket.serviceStartTime}"',
+            )
+            ..debug(
+              'Passenger Start Place: "${tnstcTicket.passengerStartPlace}"',
+            )
+            ..debug(
+              'Passenger End Place: "${tnstcTicket.passengerEndPlace}"',
+            )
+            ..debug(
+              'Passenger Pickup Point: "${tnstcTicket.passengerPickupPoint}"',
+            )
+            ..debug(
+              'Passenger Pickup Time: "${tnstcTicket.passengerPickupTime}"',
+            )
+            ..debug('Platform Number: "${tnstcTicket.platformNumber}"')
+            ..debug('Class of Service: "${tnstcTicket.classOfService}"')
+            ..debug('Trip Code: "${tnstcTicket.tripCode}"')
+            ..debug(
+              'OB Reference Number: "${tnstcTicket.obReferenceNumber}"',
+            )
+            ..debug('Number of Seats: "${tnstcTicket.numberOfSeats}"')
+            ..debug(
+              'Bank Transaction Number: "${tnstcTicket.bankTransactionNumber}"',
+            )
+            ..debug('Bus ID Number: "${tnstcTicket.busIdNumber}"')
+            ..debug(
+              'Passenger Category: "${tnstcTicket.passengerCategory}"',
+            )
+            ..debug('Passenger Name: "${tnstcTicket.passengerInfo?.name}"')
+            ..debug('Passenger Age: "${tnstcTicket.passengerInfo?.age}"')
+            ..debug('Passenger Type: "${tnstcTicket.passengerInfo?.type}"')
+            ..debug(
+              'Passenger Gender: "${tnstcTicket.passengerInfo?.gender}"',
+            )
+            ..debug(
+              'Passenger Seat No: "${tnstcTicket.passengerInfo?.seatNumber}"',
+            )
+            ..debug('ID Card Type: "${tnstcTicket.idCardType}"')
+            ..debug('ID Card Number: "${tnstcTicket.idCardNumber}"')
+            ..debug('Total Fare: "${tnstcTicket.totalFare}"')
+            ..debug('=== END PARSED TNSTC TICKET VALUES ===');
 
           parsedTicket = _convertTNSTCToTravelTicket(tnstcTicket);
           _logger.logTicketParsing(
             'PDF',
-            'Successfully parsed TNSTC ticket with PNR: ${tnstcTicket.pnrNumber}',
+            'Parsed TNSTC ticket with PNR: ${tnstcTicket.pnrNumber}',
           );
-        } on Exception catch (e, stackTrace) {
+        } on Object catch (e, stackTrace) {
           _logger.error(
             'Failed to parse as TNSTC ticket',
             e,
@@ -211,7 +213,7 @@ class PDFParserService {
       } on DuplicateTicketException catch (e) {
         _logger.warning('Duplicate PDF ticket detected: ${e.message}');
         return PDFParserResult.error(e.message);
-      } catch (e, stackTrace) {
+      } on Object catch (e, stackTrace) {
         _logger.error(
           'Failed to save PDF ticket to database',
           e,
@@ -219,7 +221,7 @@ class PDFParserService {
         );
         return PDFParserResult.error('Failed to save ticket: $e');
       }
-    } on Exception catch (e, stackTrace) {
+    } on Object catch (e, stackTrace) {
       _logger.error(
         'Unexpected exception in PDF parser service',
         e,
@@ -259,13 +261,14 @@ class PDFParserService {
 
   TravelTicketModel _convertTNSTCToTravelTicket(TNSTCTicket tnstcTicket) {
     // Debug logging for TNSTC conversion
-    _logger.debug('Converting TNSTC to TravelTicket');
-    _logger.debug('serviceStartPlace: "${tnstcTicket.serviceStartPlace}"');
-    _logger.debug('serviceEndPlace: "${tnstcTicket.serviceEndPlace}"');
-    _logger.debug('passengerStartPlace: "${tnstcTicket.passengerStartPlace}"');
-    _logger.debug('passengerEndPlace: "${tnstcTicket.passengerEndPlace}"');
-    _logger.debug('serviceStartTime: "${tnstcTicket.serviceStartTime}"');
-    _logger.debug('pnrNumber: "${tnstcTicket.pnrNumber}"');
+    _logger
+      ..debug('Converting TNSTC to TravelTicket')
+      ..debug('serviceStartPlace: "${tnstcTicket.serviceStartPlace}"')
+      ..debug('serviceEndPlace: "${tnstcTicket.serviceEndPlace}"')
+      ..debug('passengerStartPlace: "${tnstcTicket.passengerStartPlace}"')
+      ..debug('passengerEndPlace: "${tnstcTicket.passengerEndPlace}"')
+      ..debug('serviceStartTime: "${tnstcTicket.serviceStartTime}"')
+      ..debug('pnrNumber: "${tnstcTicket.pnrNumber}"');
 
     // Convert TNSTC ticket to TravelTicketModel
     return TravelTicketModel(

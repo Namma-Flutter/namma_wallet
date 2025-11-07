@@ -11,6 +11,7 @@ import 'package:namma_wallet/src/common/theme/styles.dart';
 import 'package:namma_wallet/src/common/widgets/custom_back_button.dart';
 import 'package:namma_wallet/src/common/widgets/snackbar_widget.dart';
 import 'package:namma_wallet/src/features/common/domain/travel_ticket_model.dart';
+import 'package:namma_wallet/src/features/home/domain/extras_model.dart';
 import 'package:namma_wallet/src/features/home/domain/generic_details_model.dart';
 import 'package:namma_wallet/src/features/home/presentation/widgets/highlight_widget.dart';
 import 'package:namma_wallet/src/features/travel/presentation/widgets/custom_ticket_shape_line.dart';
@@ -41,15 +42,15 @@ class _TicketViewState extends State<TicketView> {
   }
 
   String? getPnrOrId(GenericDetailsModel ticket) {
-    for (final extra in ticket.extras ?? []) {
+    for (final extra in ticket.extras ?? <ExtrasModel>[]) {
       if (extra.title?.toLowerCase() == 'pnr number') {
-        return extra.value as String;
+        return extra.value;
       }
     }
 
-    for (final extra in ticket.extras ?? []) {
+    for (final extra in ticket.extras ?? <ExtrasModel>[]) {
       if (extra.title?.toLowerCase() == 'booking id') {
-        return extra.value as String;
+        return extra.value;
       }
     }
     return null;
@@ -258,7 +259,7 @@ class _TicketViewState extends State<TicketView> {
                               ),
                             ),
                             const SizedBox(width: 16),
-                            //* Description (Secondry text)
+                            //* Description (Secondary text)
                             Expanded(
                               child: Text(
                                 widget.ticket.secondaryText,

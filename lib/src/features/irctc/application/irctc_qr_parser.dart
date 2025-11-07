@@ -44,8 +44,9 @@ class IRCTCQRParser {
         irctcFee: _parseAmount(_extractValue(data, 'IRCTC C Fee')),
       );
     } on Object catch (e, stackTrace) {
-      _logger.error('Error parsing IRCTC QR code: $e');
-      _logger.error('Stack trace: $stackTrace');
+      _logger
+        ..error('Error parsing IRCTC QR code: $e')
+        ..error('Stack trace: $stackTrace');
       return null;
     }
   }
@@ -106,7 +107,7 @@ class IRCTCQRParser {
 
         return DateTime(year, month, day);
       }
-    } catch (e) {
+    } on Object catch (e) {
       _logger.error('Error parsing date: $value, error: $e');
     }
 

@@ -17,8 +17,7 @@ Future<void> main() async {
   // Get logger instance
   ILogger? logger;
   try {
-    logger = getIt<ILogger>()
-    ..info('Namma Wallet starting...');
+    logger = getIt<ILogger>()..info('Namma Wallet starting...');
   } on Object catch (e, s) {
     // Fallback to print if logger initialization fails,
     // as logger is not available.
@@ -39,7 +38,7 @@ Future<void> main() async {
       // to ensure error messages are still visible.
       // ignore: avoid_print
       print(
-        'FALLBACK LOGGER - Flutter Error: ${details.exceptionAsString()}\n${details.stack}',
+        '''FALLBACK LOGGER - Flutter Error: ${details.exceptionAsString()}\n${details.stack}''',
       );
     }
   };

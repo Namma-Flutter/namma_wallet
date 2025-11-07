@@ -60,16 +60,9 @@ class TNSTCPDFParser {
       }
     }
 
-    int parseAge(String text) {
-      final ageMatch = RegExp(r'Age\s+(\d+)').firstMatch(text);
-      if (ageMatch == null) {
-        return 1;
-      }
-      return int.parse(ageMatch.group(1)!);
-    }
-
     // Extract all fields using PDF-specific patterns
-    // The PDF shows patterns like "PNR $1: U68789437" due to text extraction issues
+    // The PDF shows patterns like "PNR $1: U68789437"
+    // due to text extraction issues
     final corporation = extractMatch(r'\$1\s*:\s*([A-Z\s]+)', pdfText);
     final pnrNumber = extractMatch(r'PNR\s+\$1\s*:\s*(\S+)', pdfText);
     final journeyDate = parseDate(

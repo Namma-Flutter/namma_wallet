@@ -98,7 +98,7 @@ class ClipboardService {
               'Update SMS received, but no matching ticket found',
             );
             return ClipboardResult.error(
-              'Update SMS received, but the original ticket was not found in the wallet.',
+              '''Update SMS received, but the original ticket was not found in the wallet.''',
             );
           }
         }
@@ -124,7 +124,7 @@ class ClipboardService {
           } on DuplicateTicketException catch (e) {
             _logger.warning('Duplicate ticket detected: ${e.message}');
             return ClipboardResult.error(e.message);
-          } catch (e) {
+          } on Object catch (e) {
             _logger.error('Failed to save ticket to database: $e');
             return ClipboardResult.error('Failed to save ticket: $e');
           }

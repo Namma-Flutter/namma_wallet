@@ -139,7 +139,7 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
       } else {
         startTime = baseDate;
       }
-    } catch (e) {
+    } on Object catch (_) {
       startTime = DateTime.now();
     }
 
@@ -249,14 +249,15 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
     String primaryText;
 
     // Debug logging
-    _logger.debug('Ticket fields for UI mapping:');
-    _logger.debug('sourceLocation: "${ticket.sourceLocation}"');
-    _logger.debug('destinationLocation: "${ticket.destinationLocation}"');
-    _logger.debug(
-      'pnrNumber: "${ticket.pnrNumber}"',
-    );
-    _logger.debug('providerName: "${ticket.providerName}"');
-    _logger.debug('displayName: "${ticket.displayName}"');
+    _logger
+      ..debug('Ticket fields for UI mapping:')
+      ..debug('sourceLocation: "${ticket.sourceLocation}"')
+      ..debug('destinationLocation: "${ticket.destinationLocation}"')
+      ..debug(
+        'pnrNumber: "${ticket.pnrNumber}"',
+      )
+      ..debug('providerName: "${ticket.providerName}"')
+      ..debug('displayName: "${ticket.displayName}"');
 
     if ((ticket.sourceLocation?.isNotEmpty ?? false) &&
         (ticket.destinationLocation?.isNotEmpty ?? false)) {

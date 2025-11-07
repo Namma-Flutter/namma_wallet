@@ -86,7 +86,7 @@ class _DbViewerViewState extends State<DbViewerView>
           itemBuilder: (context, index) {
             final t = tickets[index];
             final subtitle =
-                '${t['provider_name']} - ${t['source_location']} → ${t['destination_location']}';
+                '''${t['provider_name']} - ${t['source_location']} → ${t['destination_location']}''';
             return Card(
               margin: const EdgeInsets.all(8),
               child: ListTile(

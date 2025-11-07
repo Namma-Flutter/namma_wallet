@@ -45,7 +45,7 @@ class TNSTCSMSParser {
         r'Conductor Mobile No:\s*(\d+)',
         smsText,
       );
-      final vehicleNumber = extractMatch(r'Vehicle No:([A-Z0-9]+)', smsText);
+      final vehicleNumber = extractMatch('Vehicle No:([A-Z0-9]+)', smsText);
 
       return TNSTCTicketModel(
         pnrNumber: pnrNumber,

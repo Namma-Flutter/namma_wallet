@@ -90,7 +90,8 @@ class _NammaNavigationBarState extends State<NammaNavigationBar> {
   Widget build(BuildContext context) {
     final location = GoRouterState.of(context).uri.toString();
     final locationIndex = _indexFromLocation(location);
-    // Use pending index for immediate UI feedback, fallback to location-based index
+    // Use pending index for immediate UI feedback,
+    // fallback to location-based index
     final currentIndex = _pendingIndex ?? locationIndex;
 
     return Scaffold(

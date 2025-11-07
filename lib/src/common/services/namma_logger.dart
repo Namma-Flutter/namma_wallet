@@ -12,7 +12,7 @@ class NammaLogger implements ILogger {
       ),
     );
 
-    final mode = kDebugMode ? 'DEBUG' : 'PRODUCTION';
+    const mode = kDebugMode ? 'DEBUG' : 'PRODUCTION';
     _talker.info('Logger initialized successfully in $mode mode');
   }
 
@@ -22,9 +22,7 @@ class NammaLogger implements ILogger {
   TalkerSettings _getTalkerSettings() {
     if (kDebugMode) {
       // Debug mode: Enable all features for comprehensive logging
-      return TalkerSettings(
-        maxHistoryItems: 1000,
-      );
+      return TalkerSettings();
     } else {
       // Production mode: Reduce history size
       return TalkerSettings(

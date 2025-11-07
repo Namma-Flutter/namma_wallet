@@ -87,7 +87,7 @@ class IRCTCScannerService {
       } on DuplicateTicketException catch (e) {
         _logger.warning('Duplicate IRCTC ticket detected: ${e.message}');
         return IRCTCScannerResult.error(e.message);
-      } catch (e) {
+      } on Object catch (e) {
         _logger.error('Failed to save IRCTC ticket to database: $e');
         return IRCTCScannerResult.error('Failed to save ticket: $e');
       }

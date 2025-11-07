@@ -18,14 +18,18 @@ class AppFonts {
   }
 }
 
-//--------------------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
-/// This Dart file, is part of the 'styles.dart' collection and focuses on defining font styles used throughout the application.
-/// It leverages the Google Fonts package, specifically the Inter font family, to create consistent text styling.
+/// This Dart file, is part of the 'styles.dart' collection and focuses on 
+/// defining font styles used throughout the application.
+/// It leverages the Google Fonts package, specifically the Inter font family, 
+/// to create consistent text styling.
 ///
 /// Classes:
-/// - `InterFonts` provides a static method `getAppFont` to generate `TextStyle` objects with customizable properties such as
-///   font weight, size, color, line height, and letter spacing. This method centralizes font styling, ensuring consistency.
+/// - `InterFonts` provides a static method `getAppFont` to generate `TextStyle`
+///  objects with customizable properties such as
+///   font weight, size, color, line height, and letter spacing. This method 
+/// centralizes font styling, ensuring consistency.
 
 class InterFonts {
   static TextStyle getAppFont({

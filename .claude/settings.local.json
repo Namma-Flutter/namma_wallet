@@ -37,7 +37,8 @@
       "Bash(dart test:*)",
       "Bash(flutter test:*)",
       "WebSearch",
-      "WebFetch(domain:pub.dev)"
+      "WebFetch(domain:pub.dev)",
+      "mcp__ide__getDiagnostics"
     ],
     "deny": []
   },

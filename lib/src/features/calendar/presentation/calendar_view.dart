@@ -63,7 +63,7 @@ class CalendarProvider extends ChangeNotifier {
       _tickets = ticketMaps.map(TravelTicketModelMapper.fromMap).toList();
 
       notifyListeners();
-    } catch (e) {
+    } on Object catch (e) {
       _logger.error('Error loading tickets: $e');
     }
   }
@@ -78,7 +78,7 @@ class CalendarProvider extends ChangeNotifier {
       try {
         final ticketDate = DateTime.parse(ticket.journeyDate!);
         return isSameDay(ticketDate, day);
-      } catch (e) {
+      } on Object catch (_) {
         return false;
       }
     }).toList();
@@ -93,7 +93,7 @@ class CalendarProvider extends ChangeNotifier {
           if (!dates.any((d) => isSameDay(d, date))) {
             dates.add(date);
           }
-        } catch (e) {
+        } on Object catch (_) {
           // Skip invalid dates
         }
       }
