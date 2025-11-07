@@ -28,7 +28,8 @@ void main() {
     });
 
     test('sanitizes URL with multiple sensitive parameters', () {
-      const url = 'https://api.example.com/user?'
+      const url =
+          'https://api.example.com/user?'
           'api_key=key123&session_id=sess456&name=John';
 
       expect(
