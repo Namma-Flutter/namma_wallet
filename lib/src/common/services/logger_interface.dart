@@ -49,6 +49,17 @@ abstract class ILogger {
   });
 
   /// Log database operations
+  ///
+  /// **WARNING**: Do NOT pass PII, credentials, or sensitive query details.
+  /// Only log operation types (e.g., "SELECT", "INSERT") and non-sensitive
+  /// metadata (e.g., table names, row counts). Never log actual data values,
+  /// WHERE clause conditions, or any user-identifying information.
+  ///
+  /// Examples:
+  /// - ✅ Good: `logDatabase('INSERT', 'tickets')`
+  /// - ✅ Good: `logDatabase('SELECT', '5 rows from tickets')`
+  /// - ❌ Bad: `logDatabase('SELECT', 'WHERE user_id=123')`
+  /// - ❌ Bad: `logDatabase('INSERT', 'values: $userData')`
   void logDatabase(String operation, String details);
 
   /// Log navigation events

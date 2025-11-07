@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:namma_wallet/src/common/database/wallet_database.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
-import 'package:namma_wallet/src/common/services/namma_logger.dart';
+import 'package:namma_wallet/src/common/services/logger_interface.dart';
 import 'package:namma_wallet/src/features/common/domain/travel_ticket_model.dart';
 import 'package:namma_wallet/src/features/tnstc/application/pdf_service.dart';
 import 'package:namma_wallet/src/features/tnstc/application/tnstc_pdf_parser.dart';
@@ -52,7 +52,7 @@ class PDFParserResult {
 }
 
 class PDFParserService {
-  NammaLogger get _logger => getIt<NammaLogger>();
+  ILogger get _logger => getIt<ILogger>();
 
   /// Helper method to create a non-identifying summary of parsed ticket data
   /// for safe logging in dev/staging environments

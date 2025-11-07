@@ -4,8 +4,6 @@ import 'package:talker_flutter/talker_flutter.dart';
 /// Fake logger implementation for testing purposes
 /// This logger does nothing, preventing console output during tests
 class FakeLogger implements ILogger {
-  FakeLogger();
-
   // Create a minimal Talker instance that does nothing
   final Talker _talker = Talker(
     settings: TalkerSettings(

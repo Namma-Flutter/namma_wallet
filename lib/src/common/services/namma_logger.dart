@@ -4,22 +4,20 @@ import 'package:talker_flutter/talker_flutter.dart';
 
 /// Logger service using Talker for comprehensive logging throughout the app
 class NammaLogger implements ILogger {
-  NammaLogger() {
-    _talker = Talker(
+  NammaLogger() : _talker = Talker(
       settings: _getTalkerSettings(),
       logger: TalkerLogger(
         settings: _getTalkerLoggerSettings(),
       ),
-    );
-
+    ) {
     const mode = kDebugMode ? 'DEBUG' : 'PRODUCTION';
     _talker.info('Logger initialized successfully in $mode mode');
   }
 
-  late Talker _talker;
+  final Talker _talker;
 
   /// Get environment-specific Talker settings
-  TalkerSettings _getTalkerSettings() {
+  static TalkerSettings _getTalkerSettings() {
     if (kDebugMode) {
       // Debug mode: Enable all features for comprehensive logging
       return TalkerSettings();
@@ -32,7 +30,7 @@ class NammaLogger implements ILogger {
   }
 
   /// Get environment-specific Talker logger settings
-  TalkerLoggerSettings _getTalkerLoggerSettings() {
+  static TalkerLoggerSettings _getTalkerLoggerSettings() {
     if (kDebugMode) {
       // Debug mode: Verbose logging with all details
       return TalkerLoggerSettings(
@@ -103,7 +101,7 @@ class NammaLogger implements ILogger {
     Set<String>? allowedQueryParams,
   }) {
     final sanitizedUrl = _sanitizeUrl(url, allowedQueryParams);
-    _talker.log('[HTTP] $method $sanitizedUrl');
+    _talker.debug('[HTTP] $method $sanitizedUrl');
   }
 
   /// Log an HTTP response
@@ -118,7 +116,7 @@ class NammaLogger implements ILogger {
     Set<String>? allowedQueryParams,
   }) {
     final sanitizedUrl = _sanitizeUrl(url, allowedQueryParams);
-    _talker.log('[HTTP] $method $sanitizedUrl - Status: $statusCode');
+    _talker.debug('[HTTP] $method $sanitizedUrl - Status: $statusCode');
   }
 
   /// Sanitize URL to remove query parameters
@@ -185,26 +183,37 @@ class NammaLogger implements ILogger {
   }
 
   /// Log database operations
+  ///
+  /// **WARNING**: Do NOT pass PII, credentials, or sensitive query details.
+  /// Only log operation types (e.g., "SELECT", "INSERT") and non-sensitive
+  /// metadata (e.g., table names, row counts). Never log actual data values,
+  /// WHERE clause conditions, or any user-identifying information.
+  ///
+  /// Examples:
+  /// - ✅ Good: `logDatabase('INSERT', 'tickets')`
+  /// - ✅ Good: `logDatabase('SELECT', '5 rows from tickets')`
+  /// - ❌ Bad: `logDatabase('SELECT', 'WHERE user_id=123')`
+  /// - ❌ Bad: `logDatabase('INSERT', 'values: $userData')`
   @override
   void logDatabase(String operation, String details) {
-    _talker.log('[DB] $operation: $details');
+    _talker.debug('[DB] $operation: $details');
   }
 
   /// Log navigation events
   @override
   void logNavigation(String route) {
-    _talker.log('[NAV] Navigating to: $route');
+    _talker.debug('[NAV] Navigating to: $route');
   }
 
   /// Log service operations
   @override
   void logService(String service, String operation) {
-    _talker.log('[$service] $operation');
+    _talker.debug('[$service] $operation');
   }
 
   /// Log ticket parsing operations
   @override
   void logTicketParsing(String type, String details) {
-    _talker.log('[TICKET] $type: $details');
+    _talker.debug('[TICKET] $type: $details');
   }
 }

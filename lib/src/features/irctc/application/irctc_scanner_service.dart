@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:namma_wallet/src/common/database/wallet_database.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
-import 'package:namma_wallet/src/common/services/namma_logger.dart';
+import 'package:namma_wallet/src/common/services/logger_interface.dart';
 import 'package:namma_wallet/src/features/common/domain/travel_ticket_model.dart';
 import 'package:namma_wallet/src/features/irctc/application/irctc_qr_parser.dart';
 import 'package:namma_wallet/src/features/irctc/application/irctc_ticket_model.dart';
@@ -53,7 +53,7 @@ class IRCTCScannerResult {
 }
 
 class IRCTCScannerService {
-  final _logger = NammaLogger();
+  final ILogger _logger = getIt<ILogger>();
 
   Future<IRCTCScannerResult> parseAndSaveIRCTCTicket(String qrData) async {
     try {

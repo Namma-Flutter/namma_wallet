@@ -300,6 +300,8 @@ class TravelParserService {
     SETCBusParser(),
   ];
 
+  ILogger get _logger => getIt<ILogger>();
+
   /// Create a sanitized summary of ticket for safe logging (no PII)
   Map<String, dynamic> _createTicketSummary(TravelTicketModel ticket) {
     // Mask PNR to show only last 4 characters
@@ -327,6 +329,33 @@ class TravelParserService {
       'hasCoachNumber': ticket.coachNumber != null,
       'sourceType': ticket.sourceType.toString(),
     };
+  }
+
+  /// Mask PNR to show only last 2 characters
+  String _maskPnr(String pnr) {
+    if (pnr.length <= 2) return '**';
+    return '${'*' * (pnr.length - 2)}${pnr.substring(pnr.length - 2)}';
+  }
+
+  /// Mask phone number to show only last 3 digits
+  String _maskPhoneNumber(String phone) {
+    if (phone.length <= 3) return '***';
+    return '${'*' * (phone.length - 3)}${phone.substring(phone.length - 3)}';
+  }
+
+  /// Create sanitized updates map for safe logging
+  Map<String, Object?> _sanitizeUpdates(Map<String, Object?> updates) {
+    final sanitized = <String, Object?>{};
+    updates.forEach((key, value) {
+      if (key == 'contact_mobile' && value is String) {
+        // Mask phone numbers
+        sanitized[key] = _maskPhoneNumber(value);
+      } else {
+        // Keep other values as-is (e.g., trip_code/vehicle number)
+        sanitized[key] = value;
+      }
+    });
+    return sanitized;
   }
 
   /// Detects if this is an update SMS (e.g., conductor details for TNSTC)
@@ -364,9 +393,12 @@ class TravelParserService {
       }
 
       if (updates.isNotEmpty) {
-        getIt<ILogger>().info(
+        // Sanitize PII before logging
+        final sanitizedPnr = _maskPnr(pnr);
+        final sanitizedUpdates = _sanitizeUpdates(updates);
+        _logger.info(
           '[TravelParserService] Detected TNSTC update SMS for '
-          'PNR: $pnr with updates: $updates',
+          'PNR: $sanitizedPnr with updates: $sanitizedUpdates',
         );
 
         return TicketUpdateInfo(
@@ -390,11 +422,11 @@ class TravelParserService {
           // Log metadata only (no PII from raw text)
           final lineCount = text.split('\n').length;
           final wordCount = text.split(RegExp(r'\s+')).length;
-          getIt<ILogger>().debug(
+          _logger.debug(
             '[TravelParserService] Ticket text metadata: '
             '${text.length} chars, $lineCount lines, $wordCount words',
           );
-          getIt<ILogger>().info(
+          _logger.info(
             '[TravelParserService] Attempting to parse with '
             '${parser.providerName} parser',
           );
@@ -403,13 +435,14 @@ class TravelParserService {
           if (ticket != null) {
             // Log sanitized summary (no PII)
             final ticketSummary = _createTicketSummary(ticket);
-            getIt<ILogger>().debug(
-              '[TravelParserService] Parsed ticket summary: $ticketSummary',
-            );
-            getIt<ILogger>().info(
-              '[TravelParserService] Successfully parsed ticket with '
-              '${parser.providerName}',
-            );
+            _logger
+              ..debug(
+                '[TravelParserService] Parsed ticket summary: $ticketSummary',
+              )
+              ..info(
+                '[TravelParserService] Successfully parsed ticket with '
+                '${parser.providerName}',
+              );
 
             if (sourceType != null) {
               return ticket.copyWith(sourceType: sourceType);
@@ -419,12 +452,12 @@ class TravelParserService {
         }
       }
 
-      getIt<ILogger>().warning(
+      _logger.warning(
         '[TravelParserService] No parser could handle the text',
       );
       return null;
     } on Object catch (e, stackTrace) {
-      getIt<ILogger>().error(
+      _logger.error(
         '[TravelParserService] Error during ticket parsing',
         e,
         stackTrace,
