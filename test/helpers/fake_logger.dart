@@ -34,7 +34,7 @@ class FakeLogger implements ILogger {
   @override
   void error(
     String message, [
-    Exception? exception,
+    Object? error,
     StackTrace? stackTrace,
   ]) {
     // Do nothing in tests
@@ -43,7 +43,7 @@ class FakeLogger implements ILogger {
   @override
   void critical(
     String message, [
-    Exception? exception,
+    Object? error,
     StackTrace? stackTrace,
   ]) {
     // Do nothing in tests

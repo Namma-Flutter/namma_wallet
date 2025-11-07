@@ -15,12 +15,12 @@ abstract class ILogger {
   void warning(String message);
 
   /// Log an error with optional exception and stack trace
-  void error(String message, [Exception? exception, StackTrace? stackTrace]);
+  void error(String message, [Object? error, StackTrace? stackTrace]);
 
   /// Log a critical error
   void critical(
     String message, [
-    Exception? exception,
+    Object? error,
     StackTrace? stackTrace,
   ]);
 

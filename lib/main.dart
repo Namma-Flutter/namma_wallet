@@ -15,42 +15,66 @@ Future<void> main() async {
   setupLocator();
 
   // Get logger instance
-  final logger = getIt<ILogger>();
-  logger.info('🚀 Namma Wallet starting...');
+  ILogger? logger;
+  try {
+    logger = getIt<ILogger>()
+    ..info('Namma Wallet starting...');
+  } on Object catch (e, s) {
+    // Fallback to print if logger initialization fails,
+    // as logger is not available.
+    // ignore: avoid_print
+    print('Error initializing logger or logging start message: $e\n$s');
+  }
 
   // Set up global error handling
   FlutterError.onError = (FlutterErrorDetails details) {
-    logger.error(
-      'Flutter Error: ${details.exceptionAsString()}',
-      details.exception is Exception ? details.exception as Exception : null,
-      details.stack,
-    );
+    if (logger != null) {
+      logger.error(
+        'Flutter Error: ${details.exceptionAsString()}',
+        details.exception,
+        details.stack,
+      );
+    } else {
+      // Fallback to print if logger is not available,
+      // to ensure error messages are still visible.
+      // ignore: avoid_print
+      print(
+        'FALLBACK LOGGER - Flutter Error: ${details.exceptionAsString()}\n${details.stack}',
+      );
+    }
   };
 
   // Catch errors not caught by Flutter
   PlatformDispatcher.instance.onError = (error, stack) {
-    logger.error(
-      'Platform Error: $error',
-      error is Exception ? error : null,
-      stack,
-    );
+    if (logger != null) {
+      logger.error(
+        'Platform Error: $error',
+        error,
+        stack,
+      );
+    } else {
+      // Fallback to print if logger is not available,
+      // to ensure error messages are still visible.
+      // ignore: avoid_print
+      print('FALLBACK LOGGER - Platform Error: $error\n$stack');
+    }
     return true;
   };
 
   try {
-    logger.info('Initializing Gemma Chat Service...');
+    logger?.info('Initializing Gemma Chat Service...');
     await getIt<GemmaChatService>().init();
-    logger.success('Gemma Chat Service initialized');
+    logger?.success('Gemma Chat Service initialized');
 
-    logger.info('Initializing database...');
+    logger?.info('Initializing database...');
     await getIt<WalletDatabase>().database;
-    logger.success('Database initialized');
+    logger?.success('Database initialized');
 
-    logger.success('All services initialized successfully');
+    logger?.success('All services initialized successfully');
   } on Object catch (e, stackTrace) {
-    logger.error(
+    logger?.error(
       'Error during initialization: $e',
-      e is Exception ? e : null,
+      e,
       stackTrace,
     );
   }

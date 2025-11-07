@@ -211,7 +211,7 @@ class PDFParserService {
       } on DuplicateTicketException catch (e) {
         _logger.warning('Duplicate PDF ticket detected: ${e.message}');
         return PDFParserResult.error(e.message);
-      } on Exception catch (e, stackTrace) {
+      } catch (e, stackTrace) {
         _logger.error(
           'Failed to save PDF ticket to database',
           e,

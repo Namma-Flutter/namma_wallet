@@ -35,7 +35,9 @@
       "Bash(git commit:*)",
       "Bash(flutter pub get:*)",
       "Bash(dart test:*)",
-      "Bash(flutter test:*)"
+      "Bash(flutter test:*)",
+      "WebSearch",
+      "WebFetch(domain:pub.dev)"
     ],
     "deny": []
   },
