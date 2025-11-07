@@ -76,7 +76,7 @@ class _TicketViewState extends State<TicketView> {
       );
 
       if (mounted) {
-        showSnackbar(context, '📌 Ticket pinned to home screen successfully!');
+        showSnackbar(context, 'Ticket pinned to home screen successfully!');
       }
     } on Object catch (e, stackTrace) {
       getIt<ILogger>().error(

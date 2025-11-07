@@ -30,13 +30,13 @@ class _NammaWalletAppState extends State<NammaWalletApp> {
   @override
   void initState() {
     super.initState();
-    _logger.info('🚀 App initialized');
+    _logger.info('App initialized');
 
     // Initialize sharing intent service for file logging
     _sharingService.initialize(
       onFileReceived: (filePath) async {
         try {
-          _logger.info('📄 Processing shared file: $filePath');
+          _logger.info('Processing shared file: $filePath');
           final file = File(filePath);
           final content = await file.readAsString();
           final ticket = _smsService.parseTicket(content);
@@ -48,7 +48,7 @@ class _NammaWalletAppState extends State<NammaWalletApp> {
           _scaffoldMessengerKey.currentState?.showSnackBar(
             SnackBar(
               content: Text(
-                '📄 Shared SMS processed for PNR: ${ticket.pnrNumber}',
+                'Shared SMS processed for PNR: ${ticket.pnrNumber}',
               ),
               backgroundColor: Colors.green,
               duration: const Duration(seconds: 3),
@@ -62,7 +62,7 @@ class _NammaWalletAppState extends State<NammaWalletApp> {
           );
           _scaffoldMessengerKey.currentState?.showSnackBar(
             SnackBar(
-              content: Text('❌ Error processing shared SMS: $e'),
+              content: Text('Error processing shared SMS: $e'),
               backgroundColor: Colors.red,
               duration: const Duration(seconds: 5),
             ),
@@ -73,7 +73,7 @@ class _NammaWalletAppState extends State<NammaWalletApp> {
         _logger.error('Sharing intent error: $error');
         _scaffoldMessengerKey.currentState?.showSnackBar(
           SnackBar(
-            content: Text('❌ Sharing error: $error'),
+            content: Text('Sharing error: $error'),
             backgroundColor: Colors.red,
             duration: const Duration(seconds: 5),
           ),

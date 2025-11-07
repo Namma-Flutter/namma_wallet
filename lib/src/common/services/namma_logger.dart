@@ -191,10 +191,10 @@ class NammaLogger implements ILogger {
   /// WHERE clause conditions, or any user-identifying information.
   ///
   /// Examples:
-  /// - ✅ Good: `logDatabase('INSERT', 'tickets')`
-  /// - ✅ Good: `logDatabase('SELECT', '5 rows from tickets')`
-  /// - ❌ Bad: `logDatabase('SELECT', 'WHERE user_id=123')`
-  /// - ❌ Bad: `logDatabase('INSERT', 'values: $userData')`
+  /// - Good: `logDatabase('INSERT', 'tickets')`
+  /// - Good: `logDatabase('SELECT', '5 rows from tickets')`
+  /// - Bad: `logDatabase('SELECT', 'WHERE user_id=123')`
+  /// - Bad: `logDatabase('INSERT', 'values: $userData')`
   @override
   void logDatabase(String operation, String details) {
     _talker.debug('[DB] $operation: $details');
