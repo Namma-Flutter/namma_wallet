@@ -20,6 +20,7 @@ class ScannerView extends StatefulWidget {
 }
 
 class _ScannerViewState extends State<ScannerView> {
+  late final IRCTCQRParser _qrParser = getIt<IRCTCQRParser>();
   bool _isPasting = false;
   bool _isScanning = false;
   bool _isProcessingPDF = false;
@@ -33,7 +34,7 @@ class _ScannerViewState extends State<ScannerView> {
 
     try {
       // Check if it's an IRCTC QR code
-      if (IRCTCQRParser.isIRCTCQRCode(qrData)) {
+      if (_qrParser.isIRCTCQRCode(qrData)) {
         final irctcService = getIt<IRCTCScannerService>();
         final result = await irctcService.parseAndSaveIRCTCTicket(qrData);
 

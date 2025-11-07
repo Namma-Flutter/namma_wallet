@@ -14,14 +14,15 @@ class DuplicateTicketException implements Exception {
 }
 
 class WalletDatabase {
-  WalletDatabase();
+  final ILogger _logger;
+
+  WalletDatabase({ILogger? logger})
+      : _logger = logger ?? getIt<ILogger>();
 
   final String _dbName = 'namma_wallet.db';
   final int _dbVersion = 1;
 
   Database? _database;
-
-  ILogger get _logger => getIt<ILogger>();
 
   Future<Database> get database async {
     final existing = _database;

@@ -7,9 +7,10 @@ import 'package:namma_wallet/src/common/services/logger_interface.dart';
 
 /// Service to handle sharing intents from other apps
 class SharingIntentService {
-  SharingIntentService();
+  final ILogger _logger;
 
-  ILogger get _logger => getIt<ILogger>();
+  SharingIntentService({ILogger? logger})
+      : _logger = logger ?? getIt<ILogger>();
 
   StreamSubscription<List<SharedMediaFile>>? _intentDataStreamSubscription;
 

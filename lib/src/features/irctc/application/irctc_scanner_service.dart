@@ -53,17 +53,22 @@ class IRCTCScannerResult {
 }
 
 class IRCTCScannerService {
-  final ILogger _logger = getIt<ILogger>();
+  final ILogger _logger;
+  final IRCTCQRParser _qrParser;
+
+  IRCTCScannerService({ILogger? logger, IRCTCQRParser? qrParser})
+      : _logger = logger ?? getIt<ILogger>(),
+        _qrParser = qrParser ?? getIt<IRCTCQRParser>();
 
   Future<IRCTCScannerResult> parseAndSaveIRCTCTicket(String qrData) async {
     try {
       // Check if this is IRCTC QR data
-      if (!IRCTCQRParser.isIRCTCQRCode(qrData)) {
+      if (!_qrParser.isIRCTCQRCode(qrData)) {
         return IRCTCScannerResult.error('Not a valid IRCTC QR code');
       }
 
       // Parse IRCTC ticket
-      final irctcTicket = IRCTCQRParser.parseQRCode(qrData);
+      final irctcTicket = _qrParser.parseQRCode(qrData);
       if (irctcTicket == null) {
         return IRCTCScannerResult.error('Failed to parse IRCTC ticket data');
       }

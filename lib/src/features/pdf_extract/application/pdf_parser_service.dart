@@ -52,7 +52,12 @@ class PDFParserResult {
 }
 
 class PDFParserService {
-  ILogger get _logger => getIt<ILogger>();
+  final ILogger _logger;
+  final TNSTCPDFParser _pdfParser;
+
+  PDFParserService({ILogger? logger, TNSTCPDFParser? pdfParser})
+      : _logger = logger ?? getIt<ILogger>(),
+        _pdfParser = pdfParser ?? getIt<TNSTCPDFParser>();
 
   /// Helper method to create a non-identifying summary of parsed ticket data
   /// for safe logging in dev/staging environments
@@ -173,7 +178,7 @@ class PDFParserService {
             'PDF',
             'Attempting to parse as TNSTC ticket',
           );
-          final tnstcTicket = TNSTCPDFParser.parseTicket(extractedText);
+          final tnstcTicket = _pdfParser.parseTicket(extractedText);
 
           // Log non-identifying summary of parsed ticket (safe for dev/staging)
           final ticketSummary = _createTicketSummary(tnstcTicket);

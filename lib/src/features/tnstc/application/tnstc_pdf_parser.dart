@@ -1,7 +1,7 @@
 import 'package:namma_wallet/src/features/tnstc/application/tnstc_ticket_parser.dart';
 
 class TNSTCPDFParser {
-  static TNSTCTicket parseTicket(String pdfText) {
+  TNSTCTicket parseTicket(String pdfText) {
     String extractMatch(String pattern, String input, {int groupIndex = 1}) {
       final regex = RegExp(pattern, multiLine: true);
       final match = regex.firstMatch(input);

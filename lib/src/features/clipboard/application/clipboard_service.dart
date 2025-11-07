@@ -50,10 +50,12 @@ class ClipboardResult {
 }
 
 class ClipboardService {
-  ClipboardService();
+  final ILogger _logger;
+  final TravelParserService _parserService;
 
-  ILogger get _logger => getIt<ILogger>();
-  TravelParserService get _parserService => getIt<TravelParserService>();
+  ClipboardService({ILogger? logger, TravelParserService? parserService})
+      : _logger = logger ?? getIt<ILogger>(),
+        _parserService = parserService ?? getIt<TravelParserService>();
 
   Future<ClipboardResult> readAndParseClipboard() async {
     try {

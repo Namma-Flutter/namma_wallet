@@ -20,9 +20,10 @@ class NammaWalletApp extends StatefulWidget {
 
 class _NammaWalletAppState extends State<NammaWalletApp> {
   int currentPageIndex = 0;
-  final SharingIntentService _sharingService = getIt<SharingIntentService>();
-  final SMSService _smsService = getIt<SMSService>();
-  final ILogger _logger = getIt<ILogger>();
+  late final SharingIntentService _sharingService =
+      getIt<SharingIntentService>();
+  late final SMSService _smsService = getIt<SMSService>();
+  late final ILogger _logger = getIt<ILogger>();
   final GlobalKey<ScaffoldMessengerState> _scaffoldMessengerKey =
       GlobalKey<ScaffoldMessengerState>();
 

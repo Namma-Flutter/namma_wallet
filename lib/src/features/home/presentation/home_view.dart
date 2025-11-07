@@ -23,7 +23,7 @@ class HomeView extends StatefulWidget {
 }
 
 class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
-  final ILogger _logger = getIt<ILogger>();
+  late final ILogger _logger = getIt<ILogger>();
   bool _isLoading = true;
   List<TravelTicketModel> _travelTickets = [];
   List<TravelTicketModel> _eventTickets = [];

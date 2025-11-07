@@ -15,7 +15,10 @@ import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class CalendarProvider extends ChangeNotifier {
-  final ILogger _logger = getIt<ILogger>();
+  final ILogger _logger;
+
+  CalendarProvider({ILogger? logger}) : _logger = logger ?? getIt<ILogger>();
+
   DateTime _selectedDay = DateTime.now();
   List<Event> _events = [];
   List<TravelTicketModel> _tickets = [];
@@ -78,7 +81,16 @@ class CalendarProvider extends ChangeNotifier {
       try {
         final ticketDate = DateTime.parse(ticket.journeyDate!);
         return isSameDay(ticketDate, day);
-      } on Object catch (_) {
+      } on FormatException catch (e) {
+        _logger.debug(
+          'Invalid journeyDate format for ticket filtering: '
+          '${ticket.journeyDate} - $e',
+        );
+        return false;
+      } on Exception catch (e, st) {
+        _logger.debug(
+          'Error parsing journeyDate for ticket filtering: $e\n$st',
+        );
         return false;
       }
     }).toList();
@@ -93,7 +105,16 @@ class CalendarProvider extends ChangeNotifier {
           if (!dates.any((d) => isSameDay(d, date))) {
             dates.add(date);
           }
-        } on Object catch (_) {
+        } on FormatException catch (e) {
+          _logger.debug(
+            'Invalid journeyDate format for date collection: '
+            '${ticket.journeyDate} - $e',
+          );
+          // Skip invalid dates
+        } on Exception catch (e, st) {
+          _logger.debug(
+            'Error parsing journeyDate for date collection: $e\n$st',
+          );
           // Skip invalid dates
         }
       }

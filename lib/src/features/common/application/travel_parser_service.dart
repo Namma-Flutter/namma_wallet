@@ -292,15 +292,15 @@ class TicketUpdateInfo {
 }
 
 class TravelParserService {
-  TravelParserService();
-
+  final ILogger _logger;
   final List<TravelTicketParser> _parsers = [
     TNSTCBusParser(),
     IRCTCTrainParser(),
     SETCBusParser(),
   ];
 
-  ILogger get _logger => getIt<ILogger>();
+  TravelParserService({ILogger? logger})
+      : _logger = logger ?? getIt<ILogger>();
 
   /// Create a sanitized summary of ticket for safe logging (no PII)
   Map<String, dynamic> _createTicketSummary(TravelTicketModel ticket) {
