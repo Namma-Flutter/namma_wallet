@@ -38,11 +38,9 @@ class NammaLogger implements ILogger {
         maxLineWidth: 120,
       );
     } else {
-      // Production mode: Only log info and above
-      // (filters out verbose and debug logs)
+      // Production mode: Disable all logging by setting level to none
       return TalkerLoggerSettings(
-        level: LogLevel.info, // Filter out verbose and debug logs
-        enableColors: false, // Disable colors in production
+        enable: false // Disable all logging in production
       );
     }
   }
