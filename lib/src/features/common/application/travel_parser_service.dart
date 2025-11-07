@@ -302,19 +302,10 @@ class TravelParserService {
 
   /// Create a sanitized summary of ticket for safe logging (no PII)
   Map<String, dynamic> _createTicketSummary(TravelTicketModel ticket) {
-    // Mask PNR to show only last 4 characters
-    String? maskedPnr;
-    if (ticket.pnrNumber != null && ticket.pnrNumber!.length >= 4) {
-      maskedPnr =
-          '...${ticket.pnrNumber!.substring(
-            ticket.pnrNumber!.length - 4,
-          )}';
-    }
-
     return {
       'ticketType': ticket.ticketType.toString(),
       'providerName': ticket.providerName,
-      'pnrMasked': maskedPnr,
+      'pnrMasked': _maskPnr(ticket.pnrNumber),
       'hasTripCode': ticket.tripCode != null,
       'hasSourceLocation': ticket.sourceLocation != null,
       'hasDestinationLocation': ticket.destinationLocation != null,
@@ -329,10 +320,13 @@ class TravelParserService {
     };
   }
 
-  /// Mask PNR to show only last 2 characters
-  String _maskPnr(String pnr) {
-    if (pnr.length <= 2) return '**';
-    return '${'*' * (pnr.length - 2)}${pnr.substring(pnr.length - 2)}';
+  /// Mask PNR to show only last 3 characters for safe logging
+  /// Returns '***' for null, empty, or short PNRs (≤3 chars)
+  String _maskPnr(String? pnr) {
+    if (pnr == null || pnr.isEmpty || pnr.length <= 3) {
+      return '***';
+    }
+    return '${'*' * (pnr.length - 3)}${pnr.substring(pnr.length - 3)}';
   }
 
   /// Mask phone number to show only last 3 digits
@@ -343,16 +337,36 @@ class TravelParserService {
 
   /// Create sanitized updates map for safe logging
   Map<String, Object?> _sanitizeUpdates(Map<String, Object?> updates) {
+    // Explicit allowlist of fields that can be safely logged
+    const allowedFields = <String>{
+      'contact_mobile',
+      'trip_code',
+      'vehicle_number',
+      'status',
+      'boarding_point',
+      'coach_number',
+      'seat_number',
+    };
+
     final sanitized = <String, Object?>{};
-    updates.forEach((key, value) {
-      if (key == 'contact_mobile' && value is String) {
-        // Mask phone numbers
-        sanitized[key] = _maskPhoneNumber(value);
-      } else {
-        // Keep other values as-is (e.g., trip_code/vehicle number)
-        sanitized[key] = value;
+
+    for (final entry in updates.entries) {
+      final key = entry.key;
+      final value = entry.value;
+
+      // Only include keys that are in the allowlist
+      if (allowedFields.contains(key)) {
+        if (key == 'contact_mobile' && value is String) {
+          // Mask phone numbers
+          sanitized[key] = _maskPhoneNumber(value);
+        } else {
+          // Pass through other allowed values
+          sanitized[key] = value;
+        }
       }
-    });
+      // Unknown fields are omitted (not logged)
+    }
+
     return sanitized;
   }
 
@@ -392,7 +406,7 @@ class TravelParserService {
 
       if (updates.isNotEmpty) {
         // Sanitize PII before logging
-        final sanitizedPnr = _maskPnr(pnr);
+        final sanitizedPnr = _maskPnr(pnr ?? '');
         final sanitizedUpdates = _sanitizeUpdates(updates);
         _logger.info(
           '[TravelParserService] Detected TNSTC update SMS for '

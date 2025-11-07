@@ -65,8 +65,8 @@ class CalendarProvider extends ChangeNotifier {
       _tickets = ticketMaps.map(TravelTicketModelMapper.fromMap).toList();
 
       notifyListeners();
-    } on Object catch (e) {
-      _logger.error('Error loading tickets: $e');
+    } on Exception catch (e, st) {
+      _logger.error('Error loading tickets: $e\n$st');
     }
   }
 
