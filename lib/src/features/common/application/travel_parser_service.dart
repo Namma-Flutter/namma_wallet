@@ -1,5 +1,5 @@
-import 'dart:developer' as developer;
-
+import 'package:namma_wallet/src/common/di/locator.dart';
+import 'package:namma_wallet/src/common/services/logger_interface.dart';
 import 'package:namma_wallet/src/features/common/domain/travel_ticket_model.dart';
 
 abstract class TravelTicketParser {
@@ -292,14 +292,86 @@ class TicketUpdateInfo {
 }
 
 class TravelParserService {
-  static final List<TravelTicketParser> _parsers = [
+  TravelParserService({ILogger? logger}) : _logger = logger ?? getIt<ILogger>();
+  final ILogger _logger;
+  final List<TravelTicketParser> _parsers = [
     TNSTCBusParser(),
     IRCTCTrainParser(),
     SETCBusParser(),
   ];
 
+  /// Create a sanitized summary of ticket for safe logging (no PII)
+  Map<String, dynamic> _createTicketSummary(TravelTicketModel ticket) {
+    return {
+      'ticketType': ticket.ticketType.toString(),
+      'providerName': ticket.providerName,
+      'pnrMasked': _maskPnr(ticket.pnrNumber),
+      'hasTripCode': ticket.tripCode != null,
+      'hasSourceLocation': ticket.sourceLocation != null,
+      'hasDestinationLocation': ticket.destinationLocation != null,
+      'hasJourneyDate': ticket.journeyDate != null,
+      'hasDepartureTime': ticket.departureTime != null,
+      'hasSeatNumbers': ticket.seatNumbers != null,
+      'hasClassOfService': ticket.classOfService != null,
+      'hasBoardingPoint': ticket.boardingPoint != null,
+      'hasAmount': ticket.amount != null,
+      'hasCoachNumber': ticket.coachNumber != null,
+      'sourceType': ticket.sourceType.toString(),
+    };
+  }
+
+  /// Mask PNR to show only last 3 characters for safe logging
+  /// Returns '***' for null, empty, or short PNRs (≤3 chars)
+  String _maskPnr(String? pnr) {
+    if (pnr == null || pnr.isEmpty || pnr.length <= 3) {
+      return '***';
+    }
+    return '${'*' * (pnr.length - 3)}${pnr.substring(pnr.length - 3)}';
+  }
+
+  /// Mask phone number to show only last 3 digits
+  String _maskPhoneNumber(String phone) {
+    if (phone.length <= 3) return '***';
+    return '${'*' * (phone.length - 3)}${phone.substring(phone.length - 3)}';
+  }
+
+  /// Create sanitized updates map for safe logging
+  Map<String, Object?> _sanitizeUpdates(Map<String, Object?> updates) {
+    // Explicit allowlist of fields that can be safely logged
+    const allowedFields = <String>{
+      'contact_mobile',
+      'trip_code',
+      'vehicle_number',
+      'status',
+      'boarding_point',
+      'coach_number',
+      'seat_number',
+    };
+
+    final sanitized = <String, Object?>{};
+
+    for (final entry in updates.entries) {
+      final key = entry.key;
+      final value = entry.value;
+
+      // Only include keys that are in the allowlist
+      if (allowedFields.contains(key)) {
+        if (key == 'contact_mobile' && value is String) {
+          // Mask phone numbers
+          sanitized[key] = _maskPhoneNumber(value);
+        } else {
+          // Pass through other allowed values
+          sanitized[key] = value;
+        }
+      }
+      // Unknown fields are omitted (not logged)
+    }
+
+    return sanitized;
+  }
+
   /// Detects if this is an update SMS (e.g., conductor details for TNSTC)
-  static TicketUpdateInfo? parseUpdateSMS(String text) {
+  TicketUpdateInfo? parseUpdateSMS(String text) {
     // Check for TNSTC update SMS pattern
     if (text.toUpperCase().contains('TNSTC') &&
         (text.toLowerCase().contains('conductor mobile no') ||
@@ -333,9 +405,12 @@ class TravelParserService {
       }
 
       if (updates.isNotEmpty) {
-        developer.log(
-          'Detected TNSTC update SMS for PNR: $pnr with updates: $updates',
-          name: 'TravelParserService',
+        // Sanitize PII before logging
+        final sanitizedPnr = _maskPnr(pnr);
+        final sanitizedUpdates = _sanitizeUpdates(updates);
+        _logger.info(
+          '[TravelParserService] Detected TNSTC update SMS for '
+          'PNR: $sanitizedPnr with updates: $sanitizedUpdates',
         );
 
         return TicketUpdateInfo(
@@ -349,29 +424,38 @@ class TravelParserService {
     return null;
   }
 
-  static TravelTicketModel? parseTicketFromText(
+  TravelTicketModel? parseTicketFromText(
     String text, {
     SourceType? sourceType,
   }) {
     try {
       for (final parser in _parsers) {
         if (parser.canParse(text)) {
-          developer.log('ticket text : $text', name: 'TravelParserService');
-          developer.log(
-            'Attempting to parse with ${parser.providerName} parser',
-            name: 'TravelParserService',
-          );
+          // Log metadata only (no PII from raw text)
+          final lineCount = text.split('\n').length;
+          final wordCount = text.split(RegExp(r'\s+')).length;
+          _logger
+            ..debug(
+              '[TravelParserService] Ticket text metadata: '
+              '${text.length} chars, $lineCount lines, $wordCount words',
+            )
+            ..info(
+              '[TravelParserService] Attempting to parse with '
+              '${parser.providerName} parser',
+            );
 
           final ticket = parser.parseTicket(text);
           if (ticket != null) {
-            developer.log(
-              'Parsed ticket: $ticket',
-              name: 'TravelParserService',
-            );
-            developer.log(
-              'Successfully parsed ticket with ${parser.providerName}',
-              name: 'TravelParserService',
-            );
+            // Log sanitized summary (no PII)
+            final ticketSummary = _createTicketSummary(ticket);
+            _logger
+              ..debug(
+                '[TravelParserService] Parsed ticket summary: $ticketSummary',
+              )
+              ..info(
+                '[TravelParserService] Successfully parsed ticket with '
+                '${parser.providerName}',
+              );
 
             if (sourceType != null) {
               return ticket.copyWith(sourceType: sourceType);
@@ -381,26 +465,25 @@ class TravelParserService {
         }
       }
 
-      developer.log(
-        'No parser could handle the text',
-        name: 'TravelParserService',
+      _logger.warning(
+        '[TravelParserService] No parser could handle the text',
       );
       return null;
-    } on Object catch (e) {
-      developer.log(
-        'Error during ticket parsing',
-        name: 'TravelParserService',
-        error: e,
+    } on Object catch (e, stackTrace) {
+      _logger.error(
+        '[TravelParserService] Error during ticket parsing',
+        e,
+        stackTrace,
       );
       return null;
     }
   }
 
-  static List<String> getSupportedProviders() {
+  List<String> getSupportedProviders() {
     return _parsers.map((parser) => parser.providerName).toList();
   }
 
-  static bool isTicketText(String text) {
+  bool isTicketText(String text) {
     return _parsers.any((parser) => parser.canParse(text));
   }
 }

@@ -5,7 +5,6 @@ import 'package:http/http.dart' as http;
 import 'package:namma_wallet/src/common/widgets/custom_back_button.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-// ----------------- Model -----------------
 class Contributor {
   Contributor({
     required this.name,
@@ -25,7 +24,6 @@ class Contributor {
   final String profileUrl;
 }
 
-// ----------------- Contributors View -----------------
 class ContributorsView extends StatefulWidget {
   const ContributorsView({super.key});
 

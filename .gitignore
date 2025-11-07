@@ -49,3 +49,7 @@ app.*.map.json
 
 # config file which stores env variables can be used as flutter run --dart-define-from-file=config.json
 config.json
+
+# Claude config
+.claude/settings.json
+.claude/settings.local.json

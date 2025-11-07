@@ -273,38 +273,3 @@ TNSTCTicket parseTicket(String text) {
     totalFare: totalFare,
   );
 }
-
-// void main() {
-//   const ticketText = '''
-// E-Ticket/Reservation Voucher-H
-
-// Corporation :
-// SETC
-// PNR Number :
-// T60856763
-// Date of Journey :
-// 10/01/2025
-// Route No :
-// 307ELB
-// Service Start Place :
-// CHENNAI-PT DR. M.G.R. BS
-// Service End Place :
-// KUMBAKONAM
-// Service Start Time :
-// 23:00
-//  Hrs.
-// ... (remaining text) ...
-// ''';
-
-//   final ticket = parseTicket(ticketText);
-//   print('PNR Number: ${ticket.pnrNumber}');
-//   print('Passenger Name: ${ticket.passengerInfo.name}');
-//   print('Total Fare: ${ticket.totalFare}');
-// }
-
-// sample data
-// TNSTC Corporation:SETC , PNR NO.:T63736642 , From:CHENNAI-PT DR. M.G.R.
-// BS To KUMBAKONAM , Trip Code:2145CHEKUMAB , Journey Date:11/02/2025 ,
-// Time:22:35 , Seat No.:20,21, .Class:AC SLEEPER SEATER ,
-// Boarding at:KOTTIVAKKAM(RTO OFFICE) . For e-Ticket: Download from
-// View Ticket. Please carry your photo ID during journey. T&C apply.

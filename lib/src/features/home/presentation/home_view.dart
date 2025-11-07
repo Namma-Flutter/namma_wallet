@@ -1,7 +1,3 @@
-// Home page shows the tickets saved
-// Top left has profile
-import 'dart:developer' as developer;
-
 import 'package:card_stack_widget/model/card_model.dart';
 import 'package:card_stack_widget/model/card_orientation.dart';
 import 'package:card_stack_widget/widget/card_stack_widget.dart';
@@ -10,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:namma_wallet/src/common/database/wallet_database.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/routing/app_routes.dart';
+import 'package:namma_wallet/src/common/services/logger_interface.dart';
 import 'package:namma_wallet/src/common/widgets/snackbar_widget.dart';
 import 'package:namma_wallet/src/features/common/domain/travel_ticket_model.dart';
 import 'package:namma_wallet/src/features/home/domain/extras_model.dart';
@@ -26,6 +23,7 @@ class HomeView extends StatefulWidget {
 }
 
 class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
+  late final ILogger _logger = getIt<ILogger>();
   bool _isLoading = true;
   List<TravelTicketModel> _travelTickets = [];
   List<TravelTicketModel> _eventTickets = [];
@@ -141,7 +139,7 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
       } else {
         startTime = baseDate;
       }
-    } catch (e) {
+    } on Object catch (_) {
       startTime = DateTime.now();
     }
 
@@ -190,9 +188,8 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
     }
 
     // Add trip code if available
-    developer.log(
+    _logger.debug(
       'Checking for trip code: ${ticket.tripCode}',
-      name: 'UI_MAPPING',
     );
     if (ticket.tripCode?.isNotEmpty ?? false) {
       extras.add(
@@ -203,9 +200,8 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
           value: ticket.tripCode!,
         ),
       );
-      developer.log(
+      _logger.debug(
         'Added trip code to extras: ${ticket.tripCode}',
-        name: 'UI_MAPPING',
       );
     }
 
@@ -253,46 +249,31 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
     String primaryText;
 
     // Debug logging
-    developer.log('Ticket fields for UI mapping:', name: 'UI_MAPPING');
-    developer.log(
-      'sourceLocation: "${ticket.sourceLocation}"',
-      name: 'UI_MAPPING',
-    );
-    developer.log(
-      'destinationLocation: "${ticket.destinationLocation}"',
-      name: 'UI_MAPPING',
-    );
-    developer.log('pnrNumber: "${ticket.pnrNumber}"', name: 'UI_MAPPING');
-    developer.log('providerName: "${ticket.providerName}"', name: 'UI_MAPPING');
-    developer.log('displayName: "${ticket.displayName}"', name: 'UI_MAPPING');
+    _logger
+      ..debug('Ticket fields for UI mapping:')
+      ..debug('sourceLocation: "${ticket.sourceLocation}"')
+      ..debug('destinationLocation: "${ticket.destinationLocation}"')
+      ..debug(
+        'pnrNumber: "${ticket.pnrNumber}"',
+      )
+      ..debug('providerName: "${ticket.providerName}"')
+      ..debug('displayName: "${ticket.displayName}"');
 
     if ((ticket.sourceLocation?.isNotEmpty ?? false) &&
         (ticket.destinationLocation?.isNotEmpty ?? false)) {
       primaryText =
           '${ticket.sourceLocation!} → '
           '${ticket.destinationLocation!}';
-      developer.log(
-        'Using route as primary text: "$primaryText"',
-        name: 'UI_MAPPING',
-      );
+      _logger.debug('Using route as primary text: "$primaryText"');
     } else if (ticket.pnrNumber?.isNotEmpty ?? false) {
       primaryText = ticket.pnrNumber!;
-      developer.log(
-        'Using PNR as primary text: "$primaryText"',
-        name: 'UI_MAPPING',
-      );
+      _logger.debug('Using PNR as primary text: "$primaryText"');
     } else if (ticket.bookingReference?.isNotEmpty ?? false) {
       primaryText = ticket.bookingReference!;
-      developer.log(
-        'Using booking ref as primary text: "$primaryText"',
-        name: 'UI_MAPPING',
-      );
+      _logger.debug('Using booking ref as primary text: "$primaryText"');
     } else {
       primaryText = ticket.displayName;
-      developer.log(
-        'Using display name as primary text: "$primaryText"',
-        name: 'UI_MAPPING',
-      );
+      _logger.debug('Using display name as primary text: "$primaryText"');
     }
 
     // Create meaningful secondary text (provider name)

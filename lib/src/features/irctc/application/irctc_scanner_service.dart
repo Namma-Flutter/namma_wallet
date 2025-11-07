@@ -1,8 +1,7 @@
-import 'dart:developer' as developer;
-
 import 'package:flutter/material.dart';
 import 'package:namma_wallet/src/common/database/wallet_database.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
+import 'package:namma_wallet/src/common/services/logger_interface.dart';
 import 'package:namma_wallet/src/features/common/domain/travel_ticket_model.dart';
 import 'package:namma_wallet/src/features/irctc/application/irctc_qr_parser.dart';
 import 'package:namma_wallet/src/features/irctc/application/irctc_ticket_model.dart';
@@ -54,15 +53,21 @@ class IRCTCScannerResult {
 }
 
 class IRCTCScannerService {
+  IRCTCScannerService({ILogger? logger, IRCTCQRParser? qrParser})
+    : _logger = logger ?? getIt<ILogger>(),
+      _qrParser = qrParser ?? getIt<IRCTCQRParser>();
+  final ILogger _logger;
+  final IRCTCQRParser _qrParser;
+
   Future<IRCTCScannerResult> parseAndSaveIRCTCTicket(String qrData) async {
     try {
       // Check if this is IRCTC QR data
-      if (!IRCTCQRParser.isIRCTCQRCode(qrData)) {
+      if (!_qrParser.isIRCTCQRCode(qrData)) {
         return IRCTCScannerResult.error('Not a valid IRCTC QR code');
       }
 
       // Parse IRCTC ticket
-      final irctcTicket = IRCTCQRParser.parseQRCode(qrData);
+      final irctcTicket = _qrParser.parseQRCode(qrData);
       if (irctcTicket == null) {
         return IRCTCScannerResult.error('Failed to parse IRCTC ticket data');
       }
@@ -84,29 +89,14 @@ class IRCTCScannerService {
           travelTicket: updatedTicket,
         );
       } on DuplicateTicketException catch (e) {
-        developer.log(
-          'Duplicate IRCTC ticket detected',
-          name: 'IRCTCScannerService',
-          error: e,
-        );
-        print('⚠️ IRCTC SCANNER DUPLICATE: ${e.message}');
+        _logger.warning('Duplicate IRCTC ticket detected: ${e.message}');
         return IRCTCScannerResult.error(e.message);
-      } catch (e) {
-        developer.log(
-          'Failed to save IRCTC ticket to database',
-          name: 'IRCTCScannerService',
-          error: e,
-        );
-        print('🔴 IRCTC SCANNER ERROR: Failed to save ticket: $e');
+      } on Object catch (e) {
+        _logger.error('Failed to save IRCTC ticket to database: $e');
         return IRCTCScannerResult.error('Failed to save ticket: $e');
       }
     } on Exception catch (e) {
-      developer.log(
-        'Unexpected exception in IRCTC scanner service',
-        name: 'IRCTCScannerService',
-        error: e,
-      );
-      print('🔴 IRCTC SCANNER UNEXPECTED ERROR: $e');
+      _logger.error('Unexpected exception in IRCTC scanner service: $e');
       return IRCTCScannerResult.error('Unexpected error occurred: $e');
     }
   }
@@ -165,20 +155,12 @@ class IRCTCScannerService {
       };
       backgroundColor = Colors.green;
 
-      // Log success to console
-      developer.log(
-        'IRCTC scanner operation succeeded: $message',
-        name: 'IRCTCScannerService',
-      );
+      _logger.success('IRCTC scanner operation succeeded: $message');
     } else {
       message = result.errorMessage ?? 'Unknown error occurred';
       backgroundColor = Colors.red;
 
-      // Log error to console
-      developer.log(
-        'IRCTC scanner operation failed: $message',
-        name: 'IRCTCScannerService',
-      );
+      _logger.error('IRCTC scanner operation failed: $message');
     }
 
     ScaffoldMessenger.of(context).showSnackBar(

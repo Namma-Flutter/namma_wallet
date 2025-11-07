@@ -1,10 +1,20 @@
-import 'package:flutter/foundation.dart';
+import 'package:namma_wallet/src/common/di/locator.dart';
+import 'package:namma_wallet/src/common/services/logger_interface.dart';
 import 'package:namma_wallet/src/features/irctc/application/irctc_ticket_model.dart';
 
 class IRCTCQRParser {
-  static IRCTCTicket? parseQRCode(String qrData) {
+  IRCTCQRParser({ILogger? logger}) : _logger = logger ?? getIt<ILogger>();
+  final ILogger _logger;
+
+  IRCTCTicket? parseQRCode(String qrData) {
     try {
-      debugPrint('Parsing IRCTC QR Data: $qrData');
+      // Create a simple non-reversible hash for
+      // correlation without exposing PII
+      final fingerprint = qrData.hashCode.abs().toString();
+      _logger.debug(
+        'Parsing IRCTC QR Data (${qrData.length} chars, '
+        'fingerprint: $fingerprint)',
+      );
 
       final lines = qrData.split(',').map((line) => line.trim()).toList();
       final data = <String, String>{};
@@ -18,7 +28,9 @@ class IRCTCQRParser {
         }
       }
 
-      debugPrint('Parsed data: $data');
+      _logger.debug(
+        'Successfully parsed IRCTC QR data (${data.length} fields)',
+      );
 
       return IRCTCTicket(
         pnrNumber: _extractValue(data, 'PNR No.'),
@@ -42,28 +54,27 @@ class IRCTCQRParser {
         irctcFee: _parseAmount(_extractValue(data, 'IRCTC C Fee')),
       );
     } on Object catch (e, stackTrace) {
-      debugPrint('Error parsing IRCTC QR code: $e');
-      debugPrint('Stack trace: $stackTrace');
+      _logger.error('Error parsing IRCTC QR code: $e', e, stackTrace);
       return null;
     }
   }
 
-  static String _extractValue(Map<String, String> data, String key) {
+  String _extractValue(Map<String, String> data, String key) {
     return data[key] ?? '';
   }
 
-  static int _parseInt(String value) {
+  int _parseInt(String value) {
     if (value.isEmpty) return 0;
     return int.tryParse(value.replaceAll(RegExp(r'[^\d]'), '')) ?? 0;
   }
 
-  static double _parseAmount(String value) {
+  double _parseAmount(String value) {
     if (value.isEmpty) return 0;
     final cleanValue = value.replaceAll(RegExp(r'[^\d.]'), '');
     return double.tryParse(cleanValue) ?? 0.0;
   }
 
-  static DateTime _parseDateTime(String value) {
+  DateTime _parseDateTime(String value) {
     if (value.isEmpty) return DateTime.now();
 
     try {
@@ -86,13 +97,13 @@ class IRCTCQRParser {
         }
       }
     } on Object catch (e) {
-      debugPrint('Error parsing datetime: $value, error: $e');
+      _logger.error('Error parsing datetime: $value, error: $e');
     }
 
     return DateTime.now();
   }
 
-  static DateTime _parseDate(String value) {
+  DateTime _parseDate(String value) {
     if (value.isEmpty) return DateTime.now();
 
     try {
@@ -104,14 +115,14 @@ class IRCTCQRParser {
 
         return DateTime(year, month, day);
       }
-    } catch (e) {
-      debugPrint('Error parsing date: $value, error: $e');
+    } on Object catch (e) {
+      _logger.error('Error parsing date: $value, error: $e');
     }
 
     return DateTime.now();
   }
 
-  static int _parseMonth(String monthStr) {
+  int _parseMonth(String monthStr) {
     const months = {
       'Jan': 1,
       'Feb': 2,
@@ -130,7 +141,7 @@ class IRCTCQRParser {
     return months[monthStr] ?? int.tryParse(monthStr) ?? 1;
   }
 
-  static String _extractClassFromString(String classData) {
+  String _extractClassFromString(String classData) {
     if (classData.isEmpty) return '';
 
     final match = RegExp(r'([A-Z_]+)\s*\(([^)]+)\)').firstMatch(classData);
@@ -141,7 +152,7 @@ class IRCTCQRParser {
     return classData;
   }
 
-  static bool isIRCTCQRCode(String qrData) {
+  bool isIRCTCQRCode(String qrData) {
     return qrData.contains('PNR No.:') ||
         qrData.contains('Train No.:') ||
         qrData.contains('IRCTC C Fee:');

@@ -118,7 +118,7 @@ class AppTheme {
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(color: _lightError, width: 2),
         ),
-        contentPadding: const EdgeInsets.all(16.0),
+        contentPadding: const EdgeInsets.all(16),
       ),
 
       // Bottom navigation bar theme
@@ -268,7 +268,7 @@ class AppTheme {
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(color: _darkError, width: 2),
         ),
-        contentPadding: const EdgeInsets.all(16.0),
+        contentPadding: const EdgeInsets.all(16),
       ),
 
       // Bottom navigation bar theme

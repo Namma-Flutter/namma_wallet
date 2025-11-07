@@ -1,7 +1,22 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:get_it/get_it.dart';
+import 'package:namma_wallet/src/common/services/logger_interface.dart';
 import 'package:namma_wallet/src/features/common/application/travel_parser_service.dart';
 
+import 'helpers/fake_logger.dart';
+
 void main() {
+  // Set up GetIt for tests
+  setUpAll(() {
+    final getIt = GetIt.instance;
+    if (!getIt.isRegistered<ILogger>()) {
+      getIt.registerSingleton<ILogger>(FakeLogger());
+    }
+  });
+
+  tearDownAll(() {
+    GetIt.instance.reset();
+  });
   group('TNSTCBusParser Tests', () {
     final parser = TNSTCBusParser();
 
@@ -274,11 +289,13 @@ void main() {
   });
 
   group('TravelParserService.parseUpdateSMS Tests', () {
+    final parserService = TravelParserService();
+
     test('should parse conductor SMS and extract details', () {
       const smsText =
           '* TNSTC * PNR:T69705233, DOJ:21/10/2025, Conductor Mobile No: 8870571461, Vehicle No:TN01AN4317, Route No:307LB.';
 
-      final updateInfo = TravelParserService.parseUpdateSMS(smsText);
+      final updateInfo = parserService.parseUpdateSMS(smsText);
 
       expect(updateInfo, isNotNull);
       expect(updateInfo!.pnrNumber, equals('T69705233'));
@@ -289,13 +306,13 @@ void main() {
 
     test('should return null for non-update SMS', () {
       const smsText = 'This is a regular SMS from TNSTC.';
-      final updateInfo = TravelParserService.parseUpdateSMS(smsText);
+      final updateInfo = parserService.parseUpdateSMS(smsText);
       expect(updateInfo, isNull);
     });
 
     test('should handle update SMS with only conductor number', () {
       const smsText = '* TNSTC * PNR:T123, Conductor Mobile No: 1234567890';
-      final updateInfo = TravelParserService.parseUpdateSMS(smsText);
+      final updateInfo = parserService.parseUpdateSMS(smsText);
       expect(updateInfo, isNotNull);
       expect(updateInfo!.pnrNumber, equals('T123'));
       expect(updateInfo.updates.length, equals(1));
@@ -304,7 +321,7 @@ void main() {
 
     test('should handle update SMS with only vehicle number', () {
       const smsText = '* TNSTC * PNR:T456, Vehicle No:TN01AB1234';
-      final updateInfo = TravelParserService.parseUpdateSMS(smsText);
+      final updateInfo = parserService.parseUpdateSMS(smsText);
       expect(updateInfo, isNotNull);
       expect(updateInfo!.pnrNumber, equals('T456'));
       expect(updateInfo.updates.length, equals(1));
@@ -314,7 +331,7 @@ void main() {
     test('should return null if PNR is missing', () {
       const smsText =
           '* TNSTC * Conductor Mobile No: 1234567890, Vehicle No:TN01AB1234';
-      final updateInfo = TravelParserService.parseUpdateSMS(smsText);
+      final updateInfo = parserService.parseUpdateSMS(smsText);
       expect(updateInfo, isNull);
     });
   });

@@ -1,6 +1,7 @@
-import 'dart:developer' as developer;
 import 'dart:io';
 
+import 'package:namma_wallet/src/common/di/locator.dart';
+import 'package:namma_wallet/src/common/services/logger_interface.dart';
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 
 class PDFService {
@@ -15,30 +16,29 @@ class PDFService {
       // Dispose the document.
       document.dispose();
 
-      // Log raw text before cleaning
-      developer.log('=== RAW PDF TEXT ===', name: 'PDFService');
-      developer.log(rawText, name: 'PDFService');
-      developer.log('=== END RAW PDF TEXT ===', name: 'PDFService');
+      // Log text metadata only (no PII)
+      final lineCount = rawText.split('\n').length;
+      getIt<ILogger>().debug(
+        '[PDFService] Extracted text: ${rawText.length} chars, '
+        '$lineCount lines',
+      );
 
       // Clean and normalize the extracted text
       final cleanedText = _cleanExtractedText(rawText);
 
-      // Log for debugging
-      developer.log(
-        'Raw PDF text length: ${rawText.length}',
-        name: 'PDFService',
-      );
-      developer.log(
-        'Cleaned PDF text length: ${cleanedText.length}',
-        name: 'PDFService',
+      // Log metadata after cleaning (no PII)
+      final cleanedLineCount = cleanedText.split('\n').length;
+      getIt<ILogger>().debug(
+        '[PDFService] Cleaned text: ${cleanedText.length} chars, '
+        '$cleanedLineCount lines',
       );
 
       return cleanedText;
-    } catch (e) {
-      developer.log(
-        'Error extracting text from PDF',
-        name: 'PDFService',
-        error: e,
+    } on Object catch (e, stackTrace) {
+      getIt<ILogger>().error(
+        '[PDFService] Error extracting text from PDF',
+        e,
+        stackTrace,
       );
       rethrow;
     }
@@ -93,11 +93,8 @@ class PDFService {
     // Clean up any remaining extra whitespace
     cleanedText = cleanedText.trim();
 
-    // Log cleaned text for debugging (first 500 chars)
-    final preview = cleanedText.length > 500
-        ? '${cleanedText.substring(0, 500)}...'
-        : cleanedText;
-    developer.log('Cleaned PDF text preview: $preview', name: 'PDFService');
+    // No logging of actual text content to avoid PII exposure
+    // Text metadata is logged in extractTextFrom() instead
 
     return cleanedText;
   }

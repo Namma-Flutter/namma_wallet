@@ -198,7 +198,7 @@ class TravelTicketModel with TravelTicketModelMappable {
       try {
         final date = DateTime.parse(journeyDate!);
         return '${date.day}/${date.month}/${date.year}';
-      } catch (e) {
+      } on Object catch (_) {
         return journeyDate!;
       }
     }
@@ -214,15 +214,15 @@ class TravelTicketModel with TravelTicketModelMappable {
     try {
       final date = DateTime.parse(journeyDate!);
       return date.isBefore(DateTime.now());
-    } catch (e) {
+    } on Object catch (_) {
       return false;
     }
   }
 
   Map<String, Object?> toDatabase() {
-    final map = toMap();
-    // Remove null values and the id field for inserts
-    map.removeWhere((key, value) => value == null);
+    final map = toMap()
+      // Remove null values and the id field for inserts
+      ..removeWhere((key, value) => value == null);
     if (id == null) map.remove('id');
     return map;
   }

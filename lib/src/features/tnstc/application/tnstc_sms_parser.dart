@@ -1,7 +1,7 @@
 import 'package:namma_wallet/src/features/tnstc/domain/tnstc_model.dart';
 
 class TNSTCSMSParser {
-  static TNSTCTicketModel parseTicket(String smsText) {
+  TNSTCTicketModel parseTicket(String smsText) {
     String extractMatch(String pattern, String input, {int groupIndex = 1}) {
       final regex = RegExp(pattern, multiLine: true);
       final match = regex.firstMatch(input);
@@ -45,7 +45,7 @@ class TNSTCSMSParser {
         r'Conductor Mobile No:\s*(\d+)',
         smsText,
       );
-      final vehicleNumber = extractMatch(r'Vehicle No:([A-Z0-9]+)', smsText);
+      final vehicleNumber = extractMatch('Vehicle No:([A-Z0-9]+)', smsText);
 
       return TNSTCTicketModel(
         pnrNumber: pnrNumber,

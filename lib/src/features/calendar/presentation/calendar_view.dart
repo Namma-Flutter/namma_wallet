@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:namma_wallet/src/common/database/wallet_database.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
+import 'package:namma_wallet/src/common/services/logger_interface.dart';
 import 'package:namma_wallet/src/features/calendar/domain/event_model.dart';
 import 'package:namma_wallet/src/features/calendar/presentation/widgets/calendar_toggle_buttons.dart';
 import 'package:namma_wallet/src/features/calendar/presentation/widgets/calendar_widget.dart';
@@ -14,6 +15,9 @@ import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class CalendarProvider extends ChangeNotifier {
+  CalendarProvider({ILogger? logger}) : _logger = logger ?? getIt<ILogger>();
+  final ILogger _logger;
+
   DateTime _selectedDay = DateTime.now();
   List<Event> _events = [];
   List<TravelTicketModel> _tickets = [];
@@ -61,8 +65,8 @@ class CalendarProvider extends ChangeNotifier {
       _tickets = ticketMaps.map(TravelTicketModelMapper.fromMap).toList();
 
       notifyListeners();
-    } catch (e) {
-      print('Error loading tickets: $e');
+    } on Exception catch (e, st) {
+      _logger.error('Error loading tickets: $e\n$st');
     }
   }
 
@@ -76,7 +80,16 @@ class CalendarProvider extends ChangeNotifier {
       try {
         final ticketDate = DateTime.parse(ticket.journeyDate!);
         return isSameDay(ticketDate, day);
-      } catch (e) {
+      } on FormatException catch (e) {
+        _logger.debug(
+          'Invalid journeyDate format for ticket filtering: '
+          '${ticket.journeyDate} - $e',
+        );
+        return false;
+      } on Exception catch (e, st) {
+        _logger.debug(
+          'Error parsing journeyDate for ticket filtering: $e\n$st',
+        );
         return false;
       }
     }).toList();
@@ -91,7 +104,16 @@ class CalendarProvider extends ChangeNotifier {
           if (!dates.any((d) => isSameDay(d, date))) {
             dates.add(date);
           }
-        } catch (e) {
+        } on FormatException catch (e) {
+          _logger.debug(
+            'Invalid journeyDate format for date collection: '
+            '${ticket.journeyDate} - $e',
+          );
+          // Skip invalid dates
+        } on Exception catch (e, st) {
+          _logger.debug(
+            'Error parsing journeyDate for date collection: $e\n$st',
+          );
           // Skip invalid dates
         }
       }
