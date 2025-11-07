@@ -406,7 +406,7 @@ class TravelParserService {
 
       if (updates.isNotEmpty) {
         // Sanitize PII before logging
-        final sanitizedPnr = _maskPnr(pnr ?? '');
+        final sanitizedPnr = _maskPnr(pnr);
         final sanitizedUpdates = _sanitizeUpdates(updates);
         _logger.info(
           '[TravelParserService] Detected TNSTC update SMS for '
