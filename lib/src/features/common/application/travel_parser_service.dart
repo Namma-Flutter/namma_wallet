@@ -300,6 +300,35 @@ class TravelParserService {
     SETCBusParser(),
   ];
 
+  /// Create a sanitized summary of ticket for safe logging (no PII)
+  Map<String, dynamic> _createTicketSummary(TravelTicketModel ticket) {
+    // Mask PNR to show only last 4 characters
+    String? maskedPnr;
+    if (ticket.pnrNumber != null && ticket.pnrNumber!.length >= 4) {
+      maskedPnr =
+          '...${ticket.pnrNumber!.substring(
+            ticket.pnrNumber!.length - 4,
+          )}';
+    }
+
+    return {
+      'ticketType': ticket.ticketType.toString(),
+      'providerName': ticket.providerName,
+      'pnrMasked': maskedPnr,
+      'hasTripCode': ticket.tripCode != null,
+      'hasSourceLocation': ticket.sourceLocation != null,
+      'hasDestinationLocation': ticket.destinationLocation != null,
+      'hasJourneyDate': ticket.journeyDate != null,
+      'hasDepartureTime': ticket.departureTime != null,
+      'hasSeatNumbers': ticket.seatNumbers != null,
+      'hasClassOfService': ticket.classOfService != null,
+      'hasBoardingPoint': ticket.boardingPoint != null,
+      'hasAmount': ticket.amount != null,
+      'hasCoachNumber': ticket.coachNumber != null,
+      'sourceType': ticket.sourceType.toString(),
+    };
+  }
+
   /// Detects if this is an update SMS (e.g., conductor details for TNSTC)
   TicketUpdateInfo? parseUpdateSMS(String text) {
     // Check for TNSTC update SMS pattern
@@ -358,7 +387,13 @@ class TravelParserService {
     try {
       for (final parser in _parsers) {
         if (parser.canParse(text)) {
-          getIt<ILogger>().debug('[TravelParserService] ticket text : $text');
+          // Log metadata only (no PII from raw text)
+          final lineCount = text.split('\n').length;
+          final wordCount = text.split(RegExp(r'\s+')).length;
+          getIt<ILogger>().debug(
+            '[TravelParserService] Ticket text metadata: '
+            '${text.length} chars, $lineCount lines, $wordCount words',
+          );
           getIt<ILogger>().info(
             '[TravelParserService] Attempting to parse with '
             '${parser.providerName} parser',
@@ -366,8 +401,10 @@ class TravelParserService {
 
           final ticket = parser.parseTicket(text);
           if (ticket != null) {
+            // Log sanitized summary (no PII)
+            final ticketSummary = _createTicketSummary(ticket);
             getIt<ILogger>().debug(
-              '[TravelParserService] Parsed ticket: $ticket',
+              '[TravelParserService] Parsed ticket summary: $ticketSummary',
             );
             getIt<ILogger>().info(
               '[TravelParserService] Successfully parsed ticket with '

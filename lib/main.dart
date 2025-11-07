@@ -99,10 +99,10 @@ Future<void> main() async {
       // Print statements are necessary here as logger is unavailable
       // ignore: avoid_print
       print('Stack trace: $stackTrace');
-
-      // Rethrow to prevent app from starting in broken state
-      rethrow;
     }
+
+    // Always rethrow to prevent app from starting in broken state
+    rethrow;
   }
 
   runApp(

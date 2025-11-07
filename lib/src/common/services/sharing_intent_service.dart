@@ -56,8 +56,12 @@ class SharingIntentService {
         _logger.info('SHARED FILE ${i + 1}/${files.length} DETAILS');
         _printFileDetails(file);
 
+        // Log human-readable message
         final fileName = file.path.split('/').last;
-        onFileReceived('File received: $fileName');
+        _logger.info('File received: $fileName');
+
+        // Pass actual file path to callback (not log string)
+        onFileReceived(file.path);
       } on Object catch (e, stackTrace) {
         _logger.error('Error handling shared file ${i + 1}: $e', e, stackTrace);
         onError('Error processing shared file: $e');
