@@ -275,7 +275,7 @@ class PDFParserService {
         PDFParserContentType.travelTicket => 'PDF ticket saved successfully!',
         PDFParserContentType.unsupported => 'PDF format not supported',
       };
-      backgroundColor = Colors.green;
+      backgroundColor = const Color(0xff3067FE);
       _logger.success('PDF parser operation succeeded: $message');
     } else {
       message = result.errorMessage ?? 'Unknown error occurred';

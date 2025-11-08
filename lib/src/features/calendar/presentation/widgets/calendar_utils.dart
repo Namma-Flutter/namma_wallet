@@ -5,7 +5,7 @@ class CalendarUtils {
   static Color getTicketTypeColor(TicketType type) {
     switch (type) {
       case TicketType.bus:
-        return Colors.green;
+        return const Color(0xff3067FE);
       case TicketType.train:
         return Colors.blue;
       case TicketType.flight:

@@ -8,21 +8,20 @@ class AppTheme {
   AppTheme._();
 
   // Light theme colors
-  static const _lightPrimary = Color(0xffE7FC57); // Lime yellow
-  static const Color _lightBackground = Colors.white;
+  static const _lightPrimary = Color(0xff3067FE); // Primary blue from HTML
+  static const Color _lightBackground = Color(0xffF0F2F5);
   static const Color _lightSurface = Colors.white;
-  static const Color _lightOnPrimary = Colors.black;
-  static const Color _lightOnBackground = Colors.black;
+  static const Color _lightOnBackground = Color(0xff1C1C1E);
   static const Color _lightOnSurface = Colors.black;
   static const _lightSecondary = Color(0xff4CAF50); // Green
   static const _lightError = Color(0xffF44336);
 
   // Dark theme colors
-  static const _darkPrimary = Color(0xffE0FB25); // Lime yellow (darker variant)
+  static const _darkPrimary = Color(0xff3067FE); // Primary blue from HTML
   static const _darkBackground = Color(0xff121212);
   static const _darkSurface = Color(0xff1E1E1E);
-  static const Color _darkOnPrimary = Colors.black;
-  static const Color _darkOnBackground = Colors.white;
+  static const Color _darkOnPrimary = Colors.white;
+  static const Color _darkOnBackground = Color(0xffE1E1E1);
   static const Color _darkOnSurface = Colors.white;
   static const _darkSecondary = Color(0xff66BB6A); // Light green
   static const _darkError = Color(0xffEF5350);
@@ -38,8 +37,6 @@ class AppTheme {
         primary: _lightPrimary,
         secondary: _lightSecondary,
         error: _lightError,
-        onPrimary: _lightOnPrimary,
-        onSecondary: Colors.white,
       ),
 
       // Scaffold background
@@ -74,7 +71,7 @@ class AppTheme {
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: _lightPrimary,
-          foregroundColor: _lightOnPrimary,
+          foregroundColor: Colors.white,
           elevation: 0,
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
           shape: RoundedRectangleBorder(
@@ -162,7 +159,7 @@ class AppTheme {
       // Floating action button theme
       floatingActionButtonTheme: const FloatingActionButtonThemeData(
         backgroundColor: _lightPrimary,
-        foregroundColor: _lightOnPrimary,
+        foregroundColor: Colors.white,
       ),
 
       // Progress indicator theme
@@ -345,7 +342,7 @@ class AppTheme {
   /// Helper method to get primary color based on theme brightness
   static Color getPrimaryColor(BuildContext context) {
     return Theme.of(context).brightness == Brightness.light
-        ? const Color(0xffE7FC57)
-        : const Color(0xffE0FB25);
+        ? const Color(0xff3067FE)
+        : const Color(0xff3067FE);
   }
 }

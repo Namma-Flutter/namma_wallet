@@ -153,7 +153,7 @@ class IRCTCScannerService {
           'IRCTC ticket saved successfully!',
         IRCTCScannerContentType.invalid => 'Invalid content',
       };
-      backgroundColor = Colors.green;
+      backgroundColor = const Color(0xff3067FE);
 
       _logger.success('IRCTC scanner operation succeeded: $message');
     } else {

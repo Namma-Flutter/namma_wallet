@@ -239,12 +239,20 @@ class _TicketViewState extends State<TicketView> {
                   Container(
                     margin: const EdgeInsets.only(top: 16, left: 16, right: 16),
                     padding: const EdgeInsets.all(24),
-                    decoration: const BoxDecoration(
-                      color: AppColor.limeYellowColor,
-                      borderRadius: BorderRadius.only(
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.surface,
+                      borderRadius: const BorderRadius.only(
                         topLeft: Radius.circular(16),
                         topRight: Radius.circular(16),
                       ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.1),
+                          blurRadius: 8,
+                          spreadRadius: 1,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -253,12 +261,16 @@ class _TicketViewState extends State<TicketView> {
                         Row(
                           children: [
                             CircleAvatar(
-                              radius: 20,
-                              backgroundColor: AppColor.whiteColor,
+                              radius: 16,
+                              backgroundColor: Theme.of(
+                                context,
+                              ).colorScheme.primary.withValues(alpha: 0.1),
                               child: Icon(
                                 widget.ticket.type == TicketType.bus
                                     ? Icons.airport_shuttle_outlined
                                     : Icons.tram_outlined,
+                                size: 18,
+                                color: Theme.of(context).colorScheme.primary,
                               ),
                             ),
                             const SizedBox(width: 16),
@@ -266,7 +278,11 @@ class _TicketViewState extends State<TicketView> {
                             Expanded(
                               child: Text(
                                 widget.ticket.secondaryText,
-                                style: SubHeading(color: Shades.s100).regular,
+                                style: Paragraph03(
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onSurface,
+                                ).regular,
                                 overflow: TextOverflow.ellipsis,
                                 maxLines: 2,
                               ),
@@ -279,12 +295,14 @@ class _TicketViewState extends State<TicketView> {
                         //* From to To (Primary text)
                         Text(
                           widget.ticket.primaryText,
-                          style: HeadingH2Small(color: Shades.s100).bold,
+                          style: Paragraph01(
+                            color: Theme.of(context).colorScheme.onSurface,
+                          ).semiBold,
                           overflow: TextOverflow.ellipsis,
                           maxLines: 3,
                         ),
 
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 12),
 
                         //* Date - Time
                         TicketRowWidget(
@@ -300,14 +318,16 @@ class _TicketViewState extends State<TicketView> {
 
                         if (widget.ticket.tags != null &&
                             widget.ticket.tags!.isNotEmpty) ...[
-                          const SizedBox(height: 16),
+                          const SizedBox(height: 12),
                           Wrap(
-                            spacing: 10,
-                            runSpacing: 10,
+                            spacing: 6,
+                            runSpacing: 6,
                             children: [
                               ...widget.ticket.tags!.map(
                                 (tag) => HighlightChipsWidget(
-                                  bgColor: const Color(0xffCADC56),
+                                  bgColor: Theme.of(
+                                    context,
+                                  ).colorScheme.primary.withValues(alpha: 0.1),
                                   label: tag.icon ?? '',
                                   icon: Icons.star_border_rounded,
                                 ),
@@ -318,7 +338,7 @@ class _TicketViewState extends State<TicketView> {
 
                         if (widget.ticket.extras != null &&
                             widget.ticket.extras!.isNotEmpty) ...[
-                          const SizedBox(height: 16),
+                          const SizedBox(height: 12),
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -327,35 +347,39 @@ class _TicketViewState extends State<TicketView> {
                                 i < widget.ticket.extras!.length;
                                 i++
                               ) ...[
-                                Row(
-                                  children: [
-                                    Flexible(
-                                      flex: 2,
-                                      child: Text(
-                                        '${widget.ticket.extras![i].title ?? ''
-                                                'xxx'}: ',
-                                        overflow: TextOverflow.ellipsis,
-                                        maxLines: 1,
-                                        style: Paragraph02(
-                                          color: Shades.s100,
-                                        ).regular,
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 4,
+                                  ),
+                                  child: Row(
+                                    spacing: 4,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Flexible(
+                                        flex: 2,
+                                        child: Text(
+                                          widget.ticket.extras![i].title ??
+                                              '-'
+                                                  '}: ',
+                                        ),
                                       ),
-                                    ),
-                                    Expanded(
-                                      flex: 3,
-                                      child: Text(
-                                        widget.ticket.extras![i].value,
-                                        overflow: TextOverflow.ellipsis,
-                                        maxLines: 1,
-                                        style: Paragraph01(
-                                          color: Shades.s100,
-                                        ).regular,
+                                      Expanded(
+                                        flex: 3,
+                                        child: Text(
+                                          widget.ticket.extras![i].value,
+                                          overflow: TextOverflow.ellipsis,
+                                          maxLines: 1,
+                                          style: Paragraph03(
+                                            color: Theme.of(
+                                              context,
+                                            ).colorScheme.onSurface,
+                                          ).semiBold,
+                                        ),
                                       ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
-                                if (i < widget.ticket.extras!.length - 1)
-                                  const SizedBox(height: 5),
                               ],
                             ],
                           ),
@@ -365,7 +389,13 @@ class _TicketViewState extends State<TicketView> {
                   ),
                   CustomPaint(
                     size: Size(MediaQuery.of(context).size.width * 0.95, 40),
-                    painter: CustomTicketShapeLine(),
+                    painter: CustomTicketShapeLine(
+                      backgroundColor: Theme.of(context).colorScheme.surface,
+                      dashedLineColor: Theme.of(context).colorScheme.onSurface
+                          .withValues(
+                            alpha: 0.3,
+                          ),
+                    ),
                   ),
                   if (hasPnrOrId(widget.ticket))
                     Container(
@@ -375,17 +405,33 @@ class _TicketViewState extends State<TicketView> {
                         right: 16,
                       ),
                       padding: const EdgeInsets.all(24),
-                      decoration: const BoxDecoration(
-                        color: AppColor.limeYellowColor,
-                        borderRadius: BorderRadius.only(
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.surface,
+                        borderRadius: const BorderRadius.only(
                           bottomLeft: Radius.circular(16),
                           bottomRight: Radius.circular(16),
                         ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.1),
+                            blurRadius: 8,
+                            spreadRadius: 1,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
                       ),
                       child: Center(
                         child: QrImageView(
                           data: getPnrOrId(widget.ticket) ?? 'xxx',
                           size: 200,
+                          eyeStyle: QrEyeStyle(
+                            eyeShape: QrEyeShape.square,
+                            color: Theme.of(context).colorScheme.onSurface,
+                          ),
+                          dataModuleStyle: QrDataModuleStyle(
+                            dataModuleShape: QrDataModuleShape.square,
+                            color: Theme.of(context).colorScheme.onSurface,
+                          ),
                         ),
                       ),
                     ),
@@ -422,19 +468,21 @@ class _TicketViewState extends State<TicketView> {
                             child: ElevatedButton.icon(
                               onPressed: _makePhoneCall,
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.green.shade600,
+                                backgroundColor: Theme.of(
+                                  context,
+                                ).colorScheme.primary,
                                 foregroundColor: Colors.white,
                                 elevation: 0,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                               ),
-                              icon: const Icon(Icons.phone, size: 20),
+                              icon: const Icon(Icons.phone, size: 18),
                               label: const Text(
                                 'Call Conductor',
                                 style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 12,
                                 ),
                               ),
                             ),
@@ -450,7 +498,7 @@ class _TicketViewState extends State<TicketView> {
                                 backgroundColor: Theme.of(
                                   context,
                                 ).colorScheme.primary,
-                                foregroundColor: Colors.black87,
+                                foregroundColor: Colors.white,
                                 elevation: 0,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12),
@@ -462,15 +510,22 @@ class _TicketViewState extends State<TicketView> {
                                       height: 20,
                                       child: CircularProgressIndicator(
                                         strokeWidth: 2,
-                                        color: Colors.black54,
+                                        valueColor:
+                                            AlwaysStoppedAnimation<Color>(
+                                              Colors.white,
+                                            ),
                                       ),
                                     )
-                                  : const Icon(Icons.push_pin, size: 20),
+                                  : const Icon(
+                                      Icons.push_pin,
+                                      size: 20,
+                                      color: Colors.white,
+                                    ),
                               label: Text(
                                 _isPinning ? 'Pinning...' : 'Pin',
                                 style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 12,
                                 ),
                               ),
                             ),
@@ -487,7 +542,7 @@ class _TicketViewState extends State<TicketView> {
                           backgroundColor: Theme.of(
                             context,
                           ).colorScheme.primary,
-                          foregroundColor: Colors.black87,
+                          foregroundColor: Colors.white,
                           elevation: 0,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
@@ -499,15 +554,21 @@ class _TicketViewState extends State<TicketView> {
                                 height: 20,
                                 child: CircularProgressIndicator(
                                   strokeWidth: 2,
-                                  color: Colors.black54,
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                    Colors.white,
+                                  ),
                                 ),
                               )
-                            : const Icon(Icons.push_pin, size: 20),
+                            : const Icon(
+                                Icons.push_pin,
+                                size: 20,
+                                color: Colors.white,
+                              ),
                         label: Text(
                           _isPinning ? 'Pinning...' : 'Pin to Home Screen',
                           style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 12,
                           ),
                         ),
                       ),

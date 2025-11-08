@@ -50,7 +50,7 @@ class _NammaWalletAppState extends State<NammaWalletApp> {
               content: Text(
                 'Shared SMS processed for PNR: ${ticket.pnrNumber}',
               ),
-              backgroundColor: Colors.green,
+              backgroundColor: const Color(0xff3067FE),
               duration: const Duration(seconds: 3),
             ),
           );

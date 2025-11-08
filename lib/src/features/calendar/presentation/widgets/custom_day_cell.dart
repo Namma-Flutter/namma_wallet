@@ -33,9 +33,9 @@ class CustomDayCell extends StatelessWidget {
     var borderColor = Colors.transparent;
 
     if (isSelected) {
-      borderColor = Colors.blue;
+      borderColor = Theme.of(context).colorScheme.primary;
     } else if (isToday) {
-      borderColor = Colors.blueAccent;
+      borderColor = Theme.of(context).colorScheme.primary;
     }
 
     return Container(
@@ -57,7 +57,7 @@ class CustomDayCell extends StatelessWidget {
               style: const TextStyle(
                 fontSize: 10,
                 fontWeight: FontWeight.bold,
-                color: Colors.black87,
+                color: Colors.white,
               ),
             ),
           ),
@@ -65,7 +65,7 @@ class CustomDayCell extends StatelessWidget {
             child: Icon(
               primaryIcon,
               size: 16,
-              color: Colors.black87,
+              color: Colors.white,
             ),
           ),
         ],

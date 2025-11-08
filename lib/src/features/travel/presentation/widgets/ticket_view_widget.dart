@@ -18,8 +18,18 @@ class TicketLabelValueWidget extends StatelessWidget {
     return Column(
       crossAxisAlignment: alignment,
       children: [
-        Text(label, style: Paragraph02(color: Shades.s100).regular),
-        Text(value, style: HeadingH6(color: Shades.s100).semiBold),
+        Text(
+          label,
+          style: Paragraph03(
+            color: Theme.of(context).colorScheme.onSurface,
+          ).regular,
+        ),
+        Text(
+          value,
+          style: Paragraph02(
+            color: Theme.of(context).colorScheme.onSurface,
+          ).semiBold,
+        ),
       ],
     );
   }
@@ -82,10 +92,17 @@ class TicketFromToRowWidget extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('From', style: Paragraph02(color: Shades.s100).regular),
+              Text(
+                'From',
+                style: Paragraph03(
+                  color: Theme.of(context).colorScheme.onSurface,
+                ).regular,
+              ),
               Text(
                 from.isNotEmpty ? from : '--',
-                style: HeadingH6(color: Shades.s100).semiBold,
+                style: Paragraph02(
+                  color: Theme.of(context).colorScheme.onSurface,
+                ).semiBold,
                 textAlign: TextAlign.start,
                 overflow: TextOverflow.clip,
               ),
@@ -96,10 +113,17 @@ class TicketFromToRowWidget extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              Text('To', style: Paragraph02(color: Shades.s100).regular),
+              Text(
+                'To',
+                style: Paragraph03(
+                  color: Theme.of(context).colorScheme.onSurface,
+                ).regular,
+              ),
               Text(
                 to.isNotEmpty ? to : '--',
-                style: HeadingH6(color: Shades.s100).semiBold,
+                style: Paragraph02(
+                  color: Theme.of(context).colorScheme.onSurface,
+                ).semiBold,
               ),
             ],
           ),
