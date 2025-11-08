@@ -1,19 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:namma_wallet/src/common/theme/styles.dart';
 import 'package:namma_wallet/src/features/common/domain/travel_ticket_model.dart';
 
 class CalendarUtils {
   static Color getTicketTypeColor(TicketType type) {
     switch (type) {
       case TicketType.bus:
-        return const Color(0xff3067FE);
+        return AppColor.busTicketColor;
       case TicketType.train:
-        return Colors.blue;
+        return AppColor.trainTicketColor;
       case TicketType.flight:
-        return Colors.red;
+        return AppColor.flightTicketColor;
       case TicketType.event:
-        return Colors.purple;
+        return AppColor.eventTicketColor;
       case TicketType.metro:
-        return Colors.orange;
+        return AppColor.metroTicketColor;
     }
   }
 

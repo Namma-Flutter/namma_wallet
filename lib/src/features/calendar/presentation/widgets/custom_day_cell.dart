@@ -29,7 +29,7 @@ class CustomDayCell extends StatelessWidget {
       primaryIcon = events.first.icon;
     }
 
-    const backgroundColor = AppColor.limeYellowColor;
+    const backgroundColor = AppColor.primaryBlue;
     var borderColor = Colors.transparent;
 
     if (isSelected) {
