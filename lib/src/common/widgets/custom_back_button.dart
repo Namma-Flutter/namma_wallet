@@ -11,8 +11,6 @@ class CustomBackButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
     return Center(
       child: Padding(
         padding: const EdgeInsets.only(left: 16),
@@ -21,10 +19,10 @@ class CustomBackButton extends StatelessWidget {
           backgroundColor: Theme.of(context).colorScheme.primary,
           child: InkWell(
             onTap: onPressed ?? () => context.pop(),
-            child: Icon(
+            child: const Icon(
               Icons.chevron_left,
               size: 28,
-              color: isDark ? Colors.black : Colors.black87,
+              color: Colors.white,
             ),
           ),
         ),

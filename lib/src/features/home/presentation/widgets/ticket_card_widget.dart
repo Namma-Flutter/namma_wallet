@@ -100,7 +100,7 @@ class EventTicketCardWidget extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),
-          color: AppColor.secondaryColor,
+          color: Theme.of(context).colorScheme.surface,
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -116,7 +116,9 @@ class EventTicketCardWidget extends StatelessWidget {
                       //* ticket title
                       Text(
                         ticket.primaryText,
-                        style: const TextStyle(color: AppColor.whiteColor),
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
                         overflow: TextOverflow.ellipsis,
                         maxLines: 2,
                       ),
@@ -127,7 +129,9 @@ class EventTicketCardWidget extends StatelessWidget {
                           Text(
                             // ticket.dateTime?.toString() ?? 'xxx xxx',
                             getTime(ticket.startTime),
-                            style: const TextStyle(color: AppColor.whiteColor),
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.onSurface,
+                            ),
                             overflow: TextOverflow.ellipsis,
                             maxLines: 1,
                           ),
@@ -135,7 +139,9 @@ class EventTicketCardWidget extends StatelessWidget {
                           Text(
                             // ticket.dateTime?.toString() ?? 'xxx xxx',
                             getDate(ticket.startTime),
-                            style: const TextStyle(color: AppColor.whiteColor),
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.onSurface,
+                            ),
                             overflow: TextOverflow.ellipsis,
                             maxLines: 1,
                           ),
@@ -145,10 +151,10 @@ class EventTicketCardWidget extends StatelessWidget {
                   ),
                 ),
                 //* ticket icon
-                const Icon(
+                Icon(
                   // ticket.eventIcon,
                   Icons.star,
-                  color: AppColor.whiteColor,
+                  color: Theme.of(context).colorScheme.primary,
                 ),
               ],
             ),
@@ -156,7 +162,9 @@ class EventTicketCardWidget extends StatelessWidget {
             Text(
               // ticket.venue ?? 'xxx xxx',
               ticket.location,
-              style: const TextStyle(color: AppColor.whiteColor),
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
               overflow: TextOverflow.ellipsis,
               maxLines: 1,
             ),

@@ -40,7 +40,7 @@ class NammaLogger implements ILogger {
     } else {
       // Production mode: Disable all logging by setting level to none
       return TalkerLoggerSettings(
-        enable: false // Disable all logging in production
+        enable: false, // Disable all logging in production
       );
     }
   }

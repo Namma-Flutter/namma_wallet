@@ -26,12 +26,19 @@ class HighlightChipsWidget extends StatelessWidget {
             Icon(
               icon,
               size: 20,
+              color: Theme.of(context).colorScheme.primary,
             ),
             if (icon != null)
               const SizedBox(
                 width: 5,
               ),
-            Text(label),
+            Text(
+              label,
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.primary,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
           ],
         ),
       ),

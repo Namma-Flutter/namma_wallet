@@ -7,6 +7,7 @@ import 'package:namma_wallet/src/common/routing/app_router.dart';
 import 'package:namma_wallet/src/common/services/logger_interface.dart';
 import 'package:namma_wallet/src/common/services/sharing_intent_service.dart';
 import 'package:namma_wallet/src/common/theme/app_theme.dart';
+import 'package:namma_wallet/src/common/theme/styles.dart';
 import 'package:namma_wallet/src/common/theme/theme_provider.dart';
 import 'package:namma_wallet/src/features/tnstc/application/sms_service.dart';
 import 'package:provider/provider.dart';
@@ -50,7 +51,7 @@ class _NammaWalletAppState extends State<NammaWalletApp> {
               content: Text(
                 'Shared SMS processed for PNR: ${ticket.pnrNumber}',
               ),
-              backgroundColor: Colors.green,
+              backgroundColor: AppColor.primaryBlue,
               duration: const Duration(seconds: 3),
             ),
           );

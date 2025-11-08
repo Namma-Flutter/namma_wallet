@@ -3,6 +3,14 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 class CustomTicketShapeLine extends CustomPainter {
+  CustomTicketShapeLine({
+    required this.backgroundColor,
+    this.dashedLineColor,
+  });
+
+  final Color backgroundColor;
+  final Color? dashedLineColor;
+
   @override
   void paint(Canvas canvas, Size size) {
     // Ticket shape
@@ -47,19 +55,20 @@ class CustomTicketShapeLine extends CustomPainter {
     // Fill ticket
     final paint0Fill = Paint()
       ..style = PaintingStyle.fill
-      // paint0Fill.color = AppColor.periwinkleBlue;
-      ..color = const Color(0xffE7FC57);
+      ..color = backgroundColor;
     canvas.drawPath(path_0, paint0Fill);
 
     // Dashed (hyphen) center divider
     DashedLinePainter(
       padding: 40,
-      color: Colors.black38,
+      color: dashedLineColor ?? Colors.white70,
     ).paint(canvas, size);
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
+  bool shouldRepaint(covariant CustomTicketShapeLine oldDelegate) =>
+      backgroundColor != oldDelegate.backgroundColor ||
+      dashedLineColor != oldDelegate.dashedLineColor;
 }
 
 class DashedLinePainter extends CustomPainter {

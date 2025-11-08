@@ -195,7 +195,7 @@ class ClipboardService {
               : 'Ticket updated with conductor details!',
         ClipboardContentType.invalid => 'Invalid content',
       };
-      backgroundColor = Colors.green;
+      backgroundColor = Theme.of(context).colorScheme.primary;
 
       _logger.success('Clipboard operation succeeded: $message');
     } else {
