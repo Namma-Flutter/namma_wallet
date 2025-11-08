@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:namma_wallet/src/common/database/wallet_database.dart';
+import 'package:namma_wallet/src/common/di/locator.dart';
+import 'package:namma_wallet/src/common/services/logger_interface.dart';
+import 'package:namma_wallet/src/features/common/application/travel_parser_service.dart';
+import 'package:namma_wallet/src/features/common/domain/travel_ticket_model.dart';
 
 enum ClipboardContentType {
   text,
+  travelTicket,
   invalid,
 }
 
@@ -11,13 +17,19 @@ class ClipboardResult {
     required this.type,
     required this.isSuccess,
     this.content,
+    this.ticket,
     this.errorMessage,
   });
 
-  factory ClipboardResult.success(ClipboardContentType type, String content) {
+  factory ClipboardResult.success(
+    ClipboardContentType type,
+    String content, {
+    TravelTicketModel? ticket,
+  }) {
     return ClipboardResult(
       type: type,
       content: content,
+      ticket: ticket,
       isSuccess: true,
     );
   }
@@ -32,12 +44,19 @@ class ClipboardResult {
 
   final ClipboardContentType type;
   final String? content;
+  final TravelTicketModel? ticket;
   final String? errorMessage;
   final bool isSuccess;
 }
 
 class ClipboardService {
-  Future<ClipboardResult> readClipboard() async {
+  ClipboardService({ILogger? logger, TravelParserService? parserService})
+    : _logger = logger ?? getIt<ILogger>(),
+      _parserService = parserService ?? getIt<TravelParserService>();
+  final ILogger _logger;
+  final TravelParserService _parserService;
+
+  Future<ClipboardResult> readAndParseClipboard() async {
     try {
       // First check if clipboard has any content
       final hasStrings = await Clipboard.hasStrings();
@@ -52,13 +71,78 @@ class ClipboardService {
         final content = textData.text!.trim();
 
         // Only allow plain text content
-        if (_isValidTextContent(content)) {
-          return ClipboardResult.success(ClipboardContentType.text, content);
-        } else {
+        if (!_isValidTextContent(content)) {
           return ClipboardResult.error(
             'Only plain text content is allowed from clipboard.',
           );
         }
+
+        // First, check if this is an update SMS (e.g., conductor details)
+        final updateInfo = _parserService.parseUpdateSMS(content);
+
+        if (updateInfo != null) {
+          // This is an update SMS. Attempt to apply the update.
+          final db = getIt<WalletDatabase>();
+          final count = await db.updateTravelTicketByPNR(
+            updateInfo.pnrNumber,
+            updateInfo.updates,
+          );
+
+          if (count > 0) {
+            _logger.success('Ticket updated successfully via SMS');
+            return ClipboardResult.success(
+              ClipboardContentType.travelTicket,
+              content,
+            );
+          } else {
+            _logger.warning(
+              'Update SMS received, but no matching ticket found',
+            );
+            return ClipboardResult.error(
+              '''Update SMS received, but the original ticket was not found in the wallet.''',
+            );
+          }
+        }
+
+        // If it's not an update SMS, proceed with parsing as a new ticket.
+        final parsedTicket = _parserService.parseTicketFromText(
+          content,
+          sourceType: SourceType.clipboard,
+        );
+
+        if (parsedTicket != null) {
+          // Save to database
+          try {
+            final ticketId = await getIt<WalletDatabase>().insertTravelTicket(
+              parsedTicket.toDatabase(),
+            );
+            final updatedTicket = parsedTicket.copyWith(id: ticketId);
+            return ClipboardResult.success(
+              ClipboardContentType.travelTicket,
+              content,
+              ticket: updatedTicket,
+            );
+          } on DuplicateTicketException catch (_) {
+            final maskedPnr =
+                parsedTicket.pnrNumber != null &&
+                    parsedTicket.pnrNumber!.length >= 4
+                ? '...${parsedTicket.pnrNumber!.substring(
+                    parsedTicket.pnrNumber!.length - 4,
+                  )}'
+                : '***';
+            _logger.warning(
+              'Duplicate ticket detected while saving clipboard import '
+              '(PNR: $maskedPnr)',
+            );
+            return ClipboardResult.error('Duplicate ticket detected');
+          } on Object catch (e) {
+            _logger.error('Failed to save ticket to database: $e');
+            return ClipboardResult.error('Failed to save ticket: $e');
+          }
+        }
+
+        // If not a travel ticket, return as plain text
+        return ClipboardResult.success(ClipboardContentType.text, content);
       }
 
       // If no text data found
@@ -66,6 +150,10 @@ class ClipboardService {
         'No text content found in clipboard. Please copy plain text.',
       );
     } on PlatformException catch (e) {
+      _logger.error(
+        'Platform exception in clipboard service: ${e.code} - ${e.message}',
+      );
+
       if (e.code == 'clipboard_error' ||
           (e.message?.contains('URI') ?? false)) {
         return ClipboardResult.error(
@@ -74,8 +162,13 @@ class ClipboardService {
       }
       return ClipboardResult.error('Error accessing clipboard: ${e.message}');
     } on Exception catch (e) {
+      _logger.error('Unexpected exception in clipboard service: $e');
       return ClipboardResult.error('Unexpected error occurred: $e');
     }
+  }
+
+  Future<ClipboardResult> readClipboard() async {
+    return readAndParseClipboard();
   }
 
   bool _isValidTextContent(String text) {
@@ -96,12 +189,20 @@ class ClipboardService {
     if (result.isSuccess) {
       message = switch (result.type) {
         ClipboardContentType.text => 'Text content read successfully',
+        ClipboardContentType.travelTicket =>
+          result.ticket != null
+              ? 'Travel ticket saved successfully!'
+              : 'Ticket updated with conductor details!',
         ClipboardContentType.invalid => 'Invalid content',
       };
-      backgroundColor = Colors.green;
+      backgroundColor = Theme.of(context).colorScheme.primary;
+
+      _logger.success('Clipboard operation succeeded: $message');
     } else {
       message = result.errorMessage ?? 'Unknown error occurred';
       backgroundColor = Colors.red;
+
+      _logger.error('Clipboard operation failed: $message');
     }
 
     ScaffoldMessenger.of(context).showSnackBar(

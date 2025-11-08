@@ -1,6 +1,6 @@
-
 import 'package:flutter/material.dart';
-import 'package:namma_wallet/src/core/styles/styles.dart';
+import 'package:go_router/go_router.dart';
+import 'package:namma_wallet/src/common/routing/app_routes.dart';
 
 class UserProfileWidget extends StatelessWidget {
   const UserProfileWidget({
@@ -19,21 +19,24 @@ class UserProfileWidget extends StatelessWidget {
           const Expanded(
             child: Text(
               'Namma Wallet',
-              style: TextStyle(
-                  color: AppColor.blackColor,
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
               overflow: TextOverflow.ellipsis,
               maxLines: 1,
             ),
           ),
 
           //* Profile
-          CircleAvatar(
-            radius: 28,
-            backgroundImage: const NetworkImage(
-                'https://avatars.githubusercontent.com/u/583231?v=4'),
-            backgroundColor: Colors.grey[200],
+          InkWell(
+            onTap: () {
+              context.pushNamed(AppRoute.profile.name);
+            },
+            child: CircleAvatar(
+              radius: 28,
+              backgroundImage: const NetworkImage(
+                'https://avatars.githubusercontent.com/u/583231?v=4',
+              ),
+              backgroundColor: Colors.grey[200],
+            ),
           ),
         ],
       ),

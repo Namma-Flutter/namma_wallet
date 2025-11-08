@@ -7,7 +7,15 @@
         {
             "name": "namma_wallet",
             "request": "launch",
-            "type": "dart"
+            "type": "dart",
+        },
+        {
+            "name": "namma_wallet (with config)",
+            "request": "launch",
+            "type": "dart",
+            "toolArgs": [
+                "--dart-define-from-file=config.json"
+            ]
         },
         {
             "name": "namma_wallet (profile mode)",

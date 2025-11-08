@@ -51,7 +51,8 @@ class TNSTCTicket {
   final double? totalFare;
 
   @override
-  String toString() => 'BusTicket(\n'
+  String toString() =>
+      'BusTicket(\n'
       'Corporation: $corporation,\n'
       'PNR Number: $pnrNumber,\n'
       'Journey Date: $journeyDate,\n'
@@ -93,7 +94,8 @@ class PassengerInfo {
   final String seatNumber;
 
   @override
-  String toString() => 'PassengerInfo(\n'
+  String toString() =>
+      'PassengerInfo(\n'
       'Name: $name,\n'
       'Age: $age,\n'
       'Type: $type,\n'
@@ -102,8 +104,6 @@ class PassengerInfo {
       ')';
 }
 
-@Deprecated(
-    'Use TNSTCPDFParser.parseTicket() for PDF parsing or TNSTCSMSParser.parseTicket() for SMS parsing')
 TNSTCTicket parseTicket(String text) {
   String extractMatch(String pattern, String input, {int groupIndex = 1}) {
     final regex = RegExp(pattern, multiLine: true);
@@ -142,8 +142,9 @@ TNSTCTicket parseTicket(String text) {
 
     try {
       // Handle both '-' and '/' separators for date
-      final dateParts =
-          parts[0].contains('/') ? parts[0].split('/') : parts[0].split('-');
+      final dateParts = parts[0].contains('/')
+          ? parts[0].split('/')
+          : parts[0].split('-');
       if (dateParts.length != 3) return DateTime.now();
 
       final day = int.parse(dateParts[0]);
@@ -176,17 +177,27 @@ TNSTCTicket parseTicket(String text) {
     extractMatch(r'Date of Journey\s*:\s*(\d{2}/\d{2}/\d{4})', text),
   );
   final routeNo = extractMatch(r'Route No\s*:\s*(\S+)', text);
-  final serviceStartPlace =
-      extractMatch(r'Service Start Place\s*:\s*(.*)', text);
+  final serviceStartPlace = extractMatch(
+    r'Service Start Place\s*:\s*(.*)',
+    text,
+  );
   final serviceEndPlace = extractMatch(r'Service End Place\s*:\s*(.*)', text);
-  final serviceStartTime =
-      extractMatch(r'Service Start Time\s*:\s*(\d{2}:\d{2})', text);
-  final passengerStartPlace =
-      extractMatch(r'Passenger Start Place\s*:\s*(.*)', text);
-  final passengerEndPlace =
-      extractMatch(r'Passenger End Place\s*:\s*(.*)', text);
-  final passengerPickupPoint =
-      extractMatch(r'Passenger Pickup Point\s*:\s*(.*)', text);
+  final serviceStartTime = extractMatch(
+    r'Service Start Time\s*:\s*(\d{2}:\d{2})',
+    text,
+  );
+  final passengerStartPlace = extractMatch(
+    r'Passenger Start Place\s*:\s*(.*)',
+    text,
+  );
+  final passengerEndPlace = extractMatch(
+    r'Passenger End Place\s*:\s*(.*)',
+    text,
+  );
+  final passengerPickupPoint = extractMatch(
+    r'Passenger Pickup Point\s*:\s*(.*)',
+    text,
+  );
   final passengerPickupTime = parseDateTime(
     extractMatch(
       r'Passenger Pickup Time\s*:\s*(\d{2}/\d{2}/\d{4} \d{2}:\d{2})',
@@ -196,16 +207,23 @@ TNSTCTicket parseTicket(String text) {
   final platformNumber = extractMatch(r'Platform Number\s*:\s*(\S+)', text);
   final classOfService = extractMatch(r'Class of Service\s*:\s*(.*)', text);
   final tripCode = extractMatch(r'Trip Code\s*:\s*(\S+)', text);
-  final obReferenceNumber =
-      extractMatch(r'OB Reference No\.\s*:\s*(\S+)', text);
+  final obReferenceNumber = extractMatch(
+    r'OB Reference No\.\s*:\s*(\S+)',
+    text,
+  );
   final numberOfSeatsStr = extractMatch(r'No\. of Seats\s*:\s*(\d+)', text);
-  final numberOfSeats =
-      numberOfSeatsStr.isNotEmpty ? int.tryParse(numberOfSeatsStr) ?? 1 : 1;
-  final bankTransactionNumber =
-      extractMatch(r'Bank Txn\. No\.\s*:\s*(\S+)', text);
+  final numberOfSeats = numberOfSeatsStr.isNotEmpty
+      ? int.tryParse(numberOfSeatsStr) ?? 1
+      : 1;
+  final bankTransactionNumber = extractMatch(
+    r'Bank Txn\. No\.\s*:\s*(\S+)',
+    text,
+  );
   final busIdNumber = extractMatch(r'Bus ID No\.\s*:\s*(\S+)', text);
-  final passengerCategory =
-      extractMatch(r'Passenger category\s*:\s*(.*)', text);
+  final passengerCategory = extractMatch(
+    r'Passenger category\s*:\s*(.*)',
+    text,
+  );
   final passengerName = extractMatch(
     r'Name\s+Age\s+Adult/Child\s+Gender\s+Seat No\.\n(.*)\s+\d+',
     text,
@@ -217,8 +235,9 @@ TNSTCTicket parseTicket(String text) {
   final idCardType = extractMatch(r'ID Card Type\s*:\s*(.*)', text);
   final idCardNumber = extractMatch(r'ID Card Number\s*:\s*(.*)', text);
   final totalFareStr = extractMatch(r'Total Fare\s*:\s*(\d+\.\d+)', text);
-  final totalFare =
-      totalFareStr.isNotEmpty ? double.tryParse(totalFareStr) ?? 0.0 : 0.0;
+  final totalFare = totalFareStr.isNotEmpty
+      ? double.tryParse(totalFareStr) ?? 0.0
+      : 0.0;
 
   final passengerInfo = PassengerInfo(
     name: passengerName,
@@ -254,38 +273,3 @@ TNSTCTicket parseTicket(String text) {
     totalFare: totalFare,
   );
 }
-
-// void main() {
-//   const ticketText = '''
-// E-Ticket/Reservation Voucher-H
-
-// Corporation :
-// SETC
-// PNR Number :
-// T60856763
-// Date of Journey :
-// 10/01/2025
-// Route No :
-// 307ELB
-// Service Start Place :
-// CHENNAI-PT DR. M.G.R. BS
-// Service End Place :
-// KUMBAKONAM
-// Service Start Time :
-// 23:00
-//  Hrs.
-// ... (remaining text) ...
-// ''';
-
-//   final ticket = parseTicket(ticketText);
-//   print('PNR Number: ${ticket.pnrNumber}');
-//   print('Passenger Name: ${ticket.passengerInfo.name}');
-//   print('Total Fare: ${ticket.totalFare}');
-// }
-
-// sample data
-// TNSTC Corporation:SETC , PNR NO.:T63736642 , From:CHENNAI-PT DR. M.G.R.
-// BS To KUMBAKONAM , Trip Code:2145CHEKUMAB , Journey Date:11/02/2025 ,
-// Time:22:35 , Seat No.:20,21, .Class:AC SLEEPER SEATER ,
-// Boarding at:KOTTIVAKKAM(RTO OFFICE) . For e-Ticket: Download from
-// View Ticket. Please carry your photo ID during journey. T&C apply.

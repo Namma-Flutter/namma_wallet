@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.namma_wallet"
+    namespace = "com.nammaflutter.nammawallet"
     compileSdk = 36
     ndkVersion = "28.2.13676358"
 
@@ -22,7 +22,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.example.namma_wallet"
+        applicationId = "com.nammaflutter.nammawallet"
         minSdk = 26
         targetSdk = 36
         versionCode = flutter.versionCode
