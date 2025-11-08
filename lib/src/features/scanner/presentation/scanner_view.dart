@@ -7,6 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/routing/app_routes.dart';
+import 'package:namma_wallet/src/common/services/haptic_service_extension.dart';
+import 'package:namma_wallet/src/common/services/haptic_service_interface.dart';
 import 'package:namma_wallet/src/features/clipboard/application/clipboard_service.dart';
 import 'package:namma_wallet/src/features/irctc/application/irctc_qr_parser.dart';
 import 'package:namma_wallet/src/features/irctc/application/irctc_scanner_service.dart';
@@ -31,13 +33,16 @@ class _ScannerViewState extends State<ScannerView> {
     setState(() {
       _isScanning = true;
     });
-
     try {
       // Check if it's an IRCTC QR code
       if (_qrParser.isIRCTCQRCode(qrData)) {
         final irctcService = getIt<IRCTCScannerService>();
+        final hapticService = getIt<IHapticService>();
         final result = await irctcService.parseAndSaveIRCTCTicket(qrData);
 
+        hapticService.triggerHaptic(
+          HapticType.selection,
+        );
         if (!mounted) return;
         irctcService.showResultMessage(context, result);
       } else {

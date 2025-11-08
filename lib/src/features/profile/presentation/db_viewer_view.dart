@@ -5,6 +5,8 @@ import 'package:go_router/go_router.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:namma_wallet/src/common/database/wallet_database.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
+import 'package:namma_wallet/src/common/services/haptic_service_extension.dart';
+import 'package:namma_wallet/src/common/services/haptic_service_interface.dart';
 import 'package:namma_wallet/src/common/widgets/custom_back_button.dart';
 
 class DbViewerView extends StatefulWidget {
@@ -19,6 +21,7 @@ class _DbViewerViewState extends State<DbViewerView>
   late final TabController _tabController;
   List<Map<String, Object?>> users = <Map<String, Object?>>[];
   List<Map<String, Object?>> tickets = <Map<String, Object?>>[];
+  final IHapticService hapticService = getIt<IHapticService>();
 
   @override
   void initState() {
@@ -35,6 +38,7 @@ class _DbViewerViewState extends State<DbViewerView>
     setState(() {
       users = u;
       tickets = t;
+      hapticService.triggerHaptic(HapticType.success);
     });
   }
 
@@ -48,7 +52,7 @@ class _DbViewerViewState extends State<DbViewerView>
   Widget build(BuildContext context) => Scaffold(
     appBar: AppBar(
       title: const Text('Database Viewer'),
-      leading: const CustomBackButton(),
+      leading: CustomBackButton(),
       bottom: TabBar(
         controller: _tabController,
         tabs: const <Widget>[

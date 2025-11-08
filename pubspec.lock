@@ -416,6 +416,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.0.0"
+  gaimon:
+    dependency: "direct main"
+    description:
+      name: gaimon
+      sha256: fca9d9bef76604a4d3ad5d212a349406c68f78ed01172f40bebcbd5b4f55087a
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.4.1"
   get_it:
     dependency: "direct main"
     description:

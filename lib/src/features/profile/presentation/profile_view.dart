@@ -1,20 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/routing/app_routes.dart';
+import 'package:namma_wallet/src/common/services/haptic_service_extension.dart';
+import 'package:namma_wallet/src/common/services/haptic_service_interface.dart';
 import 'package:namma_wallet/src/common/theme/theme_provider.dart';
 import 'package:namma_wallet/src/common/widgets/custom_back_button.dart';
 import 'package:provider/provider.dart';
 
-class ProfileView extends StatelessWidget {
+class ProfileView extends StatefulWidget {
   const ProfileView({super.key});
 
+  @override
+  State<ProfileView> createState() => _ProfileViewState();
+}
+
+class _ProfileViewState extends State<ProfileView> {
+  final IHapticService hapticService = getIt<IHapticService>();
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
 
     return Scaffold(
       appBar: AppBar(
-        leading: const CustomBackButton(),
+        leading: CustomBackButton(),
         title: const Text('Profile'),
       ),
       body: ListView(
@@ -37,6 +46,9 @@ class ProfileView extends StatelessWidget {
               subtitle: const Text('View project contributors'),
               trailing: const Icon(Icons.chevron_right),
               onTap: () {
+                hapticService.triggerHaptic(
+                  HapticType.selection,
+                );
                 context.pushNamed(AppRoute.contributors.name);
               },
             ),
@@ -57,6 +69,25 @@ class ProfileView extends StatelessWidget {
               trailing: const Icon(Icons.chevron_right),
               onTap: () {
                 context.pushNamed(AppRoute.license.name);
+              },
+            ),
+          ),
+
+          const SizedBox(height: 8),
+
+          // Haptic Demo Section
+          Card(
+            elevation: 2,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: ListTile(
+              leading: const Icon(Icons.vibration),
+              title: const Text('Haptic Feedback Demo'),
+              subtitle: const Text('Test all haptic feedback types'),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () {
+                context.pushNamed(AppRoute.hapticDemo.name);
               },
             ),
           ),

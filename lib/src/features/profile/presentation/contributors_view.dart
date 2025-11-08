@@ -2,6 +2,9 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:namma_wallet/src/common/di/locator.dart';
+import 'package:namma_wallet/src/common/services/haptic_service_extension.dart';
+import 'package:namma_wallet/src/common/services/haptic_service_interface.dart';
 import 'package:namma_wallet/src/common/widgets/custom_back_button.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -33,6 +36,7 @@ class ContributorsView extends StatefulWidget {
 
 class _ContributorsViewState extends State<ContributorsView> {
   late Future<List<Contributor>> _contributorsFuture;
+  final IHapticService hapticService = getIt<IHapticService>();
 
   @override
   void initState() {
@@ -41,6 +45,8 @@ class _ContributorsViewState extends State<ContributorsView> {
   }
 
   Future<List<Contributor>> _fetchContributors() async {
+    hapticService.triggerHaptic(HapticType.rigid);
+
     final contributors = <Contributor>[];
     var page = 1;
     const perPage = 100;
@@ -93,7 +99,7 @@ class _ContributorsViewState extends State<ContributorsView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: const CustomBackButton(),
+        leading: CustomBackButton(),
         title: const Text('Contributors'),
       ),
       body: FutureBuilder<List<Contributor>>(
