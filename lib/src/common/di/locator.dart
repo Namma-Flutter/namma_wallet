@@ -1,5 +1,7 @@
 import 'package:get_it/get_it.dart';
 import 'package:namma_wallet/src/common/database/wallet_database.dart';
+import 'package:namma_wallet/src/common/services/haptic_service_interface.dart';
+import 'package:namma_wallet/src/common/services/haptic_services.dart';
 import 'package:namma_wallet/src/common/services/logger_interface.dart';
 import 'package:namma_wallet/src/common/services/namma_logger.dart';
 import 'package:namma_wallet/src/common/services/sharing_intent_service.dart';
@@ -26,6 +28,7 @@ void setupLocator() {
     ..registerLazySingleton<SharingIntentService>(SharingIntentService.new)
     ..registerLazySingleton<SMSService>(SMSService.new)
     ..registerLazySingleton<GemmaChatService>(GemmaChatService.new)
+    ..registerLazySingleton<IHapticService>(() => const HapticService())
     // Feature services
     ..registerLazySingleton<IRCTCQRParser>(IRCTCQRParser.new)
     ..registerLazySingleton<IRCTCScannerService>(IRCTCScannerService.new)
