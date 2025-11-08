@@ -28,10 +28,36 @@ class TravelTicketCardWidget extends StatelessWidget {
         borderRadius: BorderRadius.circular(30),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withAlpha(25),
-            blurRadius: 8,
-            spreadRadius: 1,
-            offset: const Offset(0, 6),
+            color: Theme.of(context)
+                .colorScheme
+                .primary
+                .withValues(alpha: 0.08),
+            blurRadius: 6,
+            offset: const Offset(0, 3),
+          ),
+          BoxShadow(
+            color: Theme.of(context)
+                .colorScheme
+                .primary
+                .withValues(alpha: 0.05),
+            blurRadius: 6,
+            offset: const Offset(0, -3),
+          ),
+          BoxShadow(
+            color: Theme.of(context)
+                .colorScheme
+                .primary
+                .withValues(alpha: 0.05),
+            blurRadius: 6,
+            offset: const Offset(-3, 0),
+          ),
+          BoxShadow(
+            color: Theme.of(context)
+                .colorScheme
+                .primary
+                .withValues(alpha: 0.05),
+            blurRadius: 6,
+            offset: const Offset(3, 0),
           ),
         ],
         color: Theme.of(context).colorScheme.surface,
@@ -123,48 +149,26 @@ class TravelTicketCardWidget extends StatelessWidget {
             ],
           ),
 
-          //*  See more action button
-          Row(
-            spacing: 15,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              //* Location
-              Expanded(
-                child: Row(
-                  children: [
-                    const Icon(Icons.location_on_outlined),
-                    Expanded(
-                      child: Text(
-                        ticket.location,
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 14,
-                          color: Theme.of(context).colorScheme.onSurface,
-                        ),
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 1,
-                      ),
+          //* Boarding Point
+          if (ticket.location.isNotEmpty)
+            Row(
+              spacing: 8,
+              children: [
+                const Icon(Icons.flag_outlined),
+                Expanded(
+                  child: Text(
+                    ticket.location,
+                    style: TextStyle(
+                      fontWeight: FontWeight.w500,
+                      fontSize: 14,
+                      color: Theme.of(context).colorScheme.onSurface,
                     ),
-                  ],
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                  ),
                 ),
-              ),
-
-              //* See more button
-              IconButton(
-                onPressed: () async {
-                  final wasDeleted = await context.pushNamed<bool>(
-                    AppRoute.ticketView.name,
-                    extra: ticket,
-                  );
-
-                  if (onTicketDeleted != null && (wasDeleted ?? false)) {
-                    onTicketDeleted!();
-                  }
-                },
-                icon: const Icon(Icons.info),
-              ),
-            ],
-          ),
+              ],
+            ),
         ],
       ),
     );

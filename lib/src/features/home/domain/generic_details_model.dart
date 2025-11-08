@@ -2,7 +2,8 @@ import 'package:dart_mappable/dart_mappable.dart';
 import 'package:namma_wallet/src/features/common/domain/travel_ticket_model.dart';
 import 'package:namma_wallet/src/features/home/domain/extras_model.dart';
 import 'package:namma_wallet/src/features/home/domain/tag_model.dart';
-import 'package:namma_wallet/src/features/home/domain/tnstc_model.dart';
+import 'package:namma_wallet/src/features/tnstc/domain/tnstc_model.dart'
+    as tnstc_domain;
 
 part 'generic_details_model.mapper.dart';
 
@@ -21,20 +22,28 @@ class GenericDetailsModel with GenericDetailsModelMappable {
     this.contactMobile,
   });
 
-  GenericDetailsModel.fromTrainTicket(TNSTCModel ticket)
-    : primaryText = ticket.pnrNo,
-      secondaryText = '${ticket.from} → ${ticket.to}',
-      startTime = DateTime.parse(ticket.journeyDate),
-      endTime = DateTime.parse(ticket.journeyDate),
-      location = ticket.boardingAt,
-      type = TicketType.train,
+  GenericDetailsModel.fromTNSTC(tnstc_domain.TNSTCTicketModel ticket)
+    : primaryText = '${ticket.displayFrom} → ${ticket.displayTo}',
+      secondaryText =
+          '${ticket.corporation ?? 'TNSTC'} - ${ticket.routeNo ?? 'Bus'}',
+      startTime = ticket.journeyDate ?? DateTime.now(),
+      endTime = ticket.journeyDate ?? DateTime.now(),
+      location =
+          ticket.boardingPoint ?? ticket.passengerPickupPoint ?? 'Unknown',
+      type = TicketType.bus,
       ticketId = null,
-      contactMobile = null,
+      contactMobile = ticket.conductorMobileNo,
       tags = [
-        TagModel(value: ticket.tripCode, icon: 'confirmation_number'),
-        TagModel(value: ticket.pnrNo, icon: 'train'),
-        TagModel(value: ticket.time, icon: 'access_time'),
-        TagModel(value: ticket.seatNumbers.join(', '), icon: 'event_seat'),
+        if (ticket.tripCode != null)
+          TagModel(value: ticket.tripCode, icon: 'confirmation_number'),
+        if (ticket.displayPnr.isNotEmpty)
+          TagModel(value: ticket.displayPnr, icon: 'qr_code'),
+        if (ticket.serviceStartTime != null)
+          TagModel(value: ticket.serviceStartTime, icon: 'access_time'),
+        if (ticket.seatNumbers.isNotEmpty)
+          TagModel(value: ticket.seatNumbers, icon: 'event_seat'),
+        if (ticket.displayFare.isNotEmpty)
+          TagModel(value: ticket.displayFare, icon: 'attach_money'),
       ],
       extras = null;
   @MappableField(key: 'primary_text')
