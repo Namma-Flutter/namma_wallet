@@ -101,6 +101,40 @@ class EventTicketCardWidget extends StatelessWidget {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),
           color: Theme.of(context).colorScheme.surface,
+          boxShadow: [
+            BoxShadow(
+              color: Theme.of(context)
+                  .colorScheme
+                  .primary
+                  .withValues(alpha: 0.06),
+              blurRadius: 6,
+              offset: const Offset(0, 3),
+            ),
+            BoxShadow(
+              color: Theme.of(context)
+                  .colorScheme
+                  .primary
+                  .withValues(alpha: 0.04),
+              blurRadius: 6,
+              offset: const Offset(0, -3),
+            ),
+            BoxShadow(
+              color: Theme.of(context)
+                  .colorScheme
+                  .primary
+                  .withValues(alpha: 0.04),
+              blurRadius: 6,
+              offset: const Offset(-3, 0),
+            ),
+            BoxShadow(
+              color: Theme.of(context)
+                  .colorScheme
+                  .primary
+                  .withValues(alpha: 0.04),
+              blurRadius: 6,
+              offset: const Offset(3, 0),
+            ),
+          ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

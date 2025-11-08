@@ -311,7 +311,7 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
       final genericTicket = _convertToGenericDetails(ticket);
       return CardModel(
         radius: const Radius.circular(30),
-        shadowColor: Colors.transparent,
+        shadowColor: Colors.black26,
         child: InkWell(
           onTap: () async {
             final wasDeleted = await context.pushNamed<bool>(
