@@ -10,19 +10,18 @@ import 'package:namma_wallet/src/common/services/logger_interface.dart';
 import 'package:namma_wallet/src/common/theme/styles.dart';
 import 'package:namma_wallet/src/common/widgets/custom_back_button.dart';
 import 'package:namma_wallet/src/common/widgets/snackbar_widget.dart';
-import 'package:namma_wallet/src/features/common/domain/travel_ticket_model.dart';
+import 'package:namma_wallet/src/features/common/enums/ticket_type.dart';
 import 'package:namma_wallet/src/features/home/domain/extras_model.dart';
-import 'package:namma_wallet/src/features/home/domain/generic_details_model.dart';
+import 'package:namma_wallet/src/features/home/domain/ticket.dart';
 import 'package:namma_wallet/src/features/home/presentation/widgets/highlight_widget.dart';
 import 'package:namma_wallet/src/features/travel/presentation/widgets/custom_ticket_shape_line.dart';
 import 'package:namma_wallet/src/features/travel/presentation/widgets/ticket_view_widget.dart';
 import 'package:qr_flutter/qr_flutter.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class TicketView extends StatefulWidget {
   const TicketView({required this.ticket, super.key});
 
-  final GenericDetailsModel ticket;
+  final Ticket ticket;
 
   @override
   State<TicketView> createState() => _TicketViewState();
@@ -37,11 +36,11 @@ class _TicketViewState extends State<TicketView> {
     return (value?.isEmpty ?? true) ? '--' : value!;
   }
 
-  bool hasPnrOrId(GenericDetailsModel ticket) {
+  bool hasPnrOrId(Ticket ticket) {
     return getPnrOrId(ticket) != null;
   }
 
-  String? getPnrOrId(GenericDetailsModel ticket) {
+  String? getPnrOrId(Ticket ticket) {
     for (final extra in ticket.extras ?? <ExtrasModel>[]) {
       if (extra.title?.toLowerCase() == 'pnr number') {
         return extra.value;
@@ -134,7 +133,7 @@ class _TicketViewState extends State<TicketView> {
     });
 
     try {
-      await getIt<WalletDatabase>().deleteTravelTicket(widget.ticket.ticketId!);
+      await getIt<WalletDatabase>().deleteTicket(widget.ticket.ticketId!);
 
       getIt<ILogger>().info(
         '[TicketView] Successfully deleted ticket with '
@@ -164,35 +163,36 @@ class _TicketViewState extends State<TicketView> {
     }
   }
 
-  Future<void> _makePhoneCall() async {
-    final mobile = widget.ticket.contactMobile;
-    if (mobile == null || mobile.isEmpty) return;
-
-    final uri = Uri(scheme: 'tel', path: mobile);
-    try {
-      if (await canLaunchUrl(uri)) {
-        await launchUrl(uri);
-        getIt<ILogger>().info('[TicketView] Launched phone call to $mobile');
-      } else {
-        if (mounted) {
-          showSnackbar(
-            context,
-            'Cannot make phone calls on this device',
-            isError: true,
-          );
-        }
-      }
-    } on Object catch (e, stackTrace) {
-      getIt<ILogger>().error(
-        '[TicketView] Failed to launch phone call',
-        e,
-        stackTrace,
-      );
-      if (mounted) {
-        showSnackbar(context, 'Failed to make call: $e', isError: true);
-      }
-    }
-  }
+  // TODO(keerthivasan-ai): Need clarification from harishwarrior
+  // Future<void> _makePhoneCall() async {
+  //   // final mobile = widget.ticket.contactMobile;
+  //   if (mobile == null || mobile.isEmpty) return;
+  //
+  //   final uri = Uri(scheme: 'tel', path: mobile);
+  //   try {
+  //     if (await canLaunchUrl(uri)) {
+  //       await launchUrl(uri);
+  //       getIt<ILogger>().info('[TicketView] Launched phone call to $mobile');
+  //     } else {
+  //       if (mounted) {
+  //         showSnackbar(
+  //           context,
+  //           'Cannot make phone calls on this device',
+  //           isError: true,
+  //         );
+  //       }
+  //     }
+  //   } on Object catch (e, stackTrace) {
+  //     getIt<ILogger>().error(
+  //       '[TicketView] Failed to launch phone call',
+  //       e,
+  //       stackTrace,
+  //     );
+  //     if (mounted) {
+  //       showSnackbar(context, 'Failed to make call: $e', isError: true);
+  //     }
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -454,126 +454,126 @@ class _TicketViewState extends State<TicketView> {
                 ),
               ],
             ),
-            child: SafeArea(
-              child:
-                  widget.ticket.contactMobile != null &&
-                      widget.ticket.contactMobile!.isNotEmpty
-                  ? Row(
-                      spacing: 12,
-                      children: [
-                        // Call button (when mobile number is available)
-                        Expanded(
-                          child: SizedBox(
-                            height: 50,
-                            child: ElevatedButton.icon(
-                              onPressed: _makePhoneCall,
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Theme.of(
-                                  context,
-                                ).colorScheme.primary,
-                                foregroundColor: Colors.white,
-                                elevation: 0,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                              ),
-                              icon: const Icon(Icons.phone, size: 18),
-                              label: const Text(
-                                'Call Conductor',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 12,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                        // Pin button
-                        Expanded(
-                          child: SizedBox(
-                            height: 50,
-                            child: ElevatedButton.icon(
-                              onPressed: _isPinning ? null : _pinToHomeScreen,
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Theme.of(
-                                  context,
-                                ).colorScheme.primary,
-                                foregroundColor: Colors.white,
-                                elevation: 0,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                              ),
-                              icon: _isPinning
-                                  ? const SizedBox(
-                                      width: 20,
-                                      height: 20,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                        valueColor:
-                                            AlwaysStoppedAnimation<Color>(
-                                              Colors.white,
-                                            ),
-                                      ),
-                                    )
-                                  : const Icon(
-                                      Icons.push_pin,
-                                      size: 20,
-                                      color: Colors.white,
-                                    ),
-                              label: Text(
-                                _isPinning ? 'Pinning...' : 'Pin',
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 12,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    )
-                  : SizedBox(
-                      width: double.infinity,
-                      height: 50,
-                      child: ElevatedButton.icon(
-                        onPressed: _isPinning ? null : _pinToHomeScreen,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Theme.of(
-                            context,
-                          ).colorScheme.primary,
-                          foregroundColor: Colors.white,
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        icon: _isPinning
-                            ? const SizedBox(
-                                width: 20,
-                                height: 20,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  valueColor: AlwaysStoppedAnimation<Color>(
-                                    Colors.white,
-                                  ),
-                                ),
-                              )
-                            : const Icon(
-                                Icons.push_pin,
-                                size: 20,
-                                color: Colors.white,
-                              ),
-                        label: Text(
-                          _isPinning ? 'Pinning...' : 'Pin to Home Screen',
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 12,
-                          ),
-                        ),
-                      ),
-                    ),
-            ),
+            // child: SafeArea(
+            //   child:
+            //       widget.ticket.contactMobile != null &&
+            //           widget.ticket.contactMobile!.isNotEmpty
+            //       ? Row(
+            //           spacing: 12,
+            //           children: [
+            //             // Call button (when mobile number is available)
+            //             Expanded(
+            //               child: SizedBox(
+            //                 height: 50,
+            //                 child: ElevatedButton.icon(
+            //                   onPressed: _makePhoneCall,
+            //                   style: ElevatedButton.styleFrom(
+            //                     backgroundColor: Theme.of(
+            //                       context,
+            //                     ).colorScheme.primary,
+            //                     foregroundColor: Colors.white,
+            //                     elevation: 0,
+            //                     shape: RoundedRectangleBorder(
+            //                       borderRadius: BorderRadius.circular(12),
+            //                     ),
+            //                   ),
+            //                   icon: const Icon(Icons.phone, size: 18),
+            //                   label: const Text(
+            //                     'Call Conductor',
+            //                     style: TextStyle(
+            //                       fontWeight: FontWeight.w600,
+            //                       fontSize: 12,
+            //                     ),
+            //                   ),
+            //                 ),
+            //               ),
+            //             ),
+            //             // Pin button
+            //             Expanded(
+            //               child: SizedBox(
+            //                 height: 50,
+            //                 child: ElevatedButton.icon(
+            //                   onPressed: _isPinning ? null : _pinToHomeScreen,
+            //                   style: ElevatedButton.styleFrom(
+            //                     backgroundColor: Theme.of(
+            //                       context,
+            //                     ).colorScheme.primary,
+            //                     foregroundColor: Colors.white,
+            //                     elevation: 0,
+            //                     shape: RoundedRectangleBorder(
+            //                       borderRadius: BorderRadius.circular(12),
+            //                     ),
+            //                   ),
+            //                   icon: _isPinning
+            //                       ? const SizedBox(
+            //                           width: 20,
+            //                           height: 20,
+            //                           child: CircularProgressIndicator(
+            //                             strokeWidth: 2,
+            //                             valueColor:
+            //                                 AlwaysStoppedAnimation<Color>(
+            //                                   Colors.white,
+            //                                 ),
+            //                           ),
+            //                         )
+            //                       : const Icon(
+            //                           Icons.push_pin,
+            //                           size: 20,
+            //                           color: Colors.white,
+            //                         ),
+            //                   label: Text(
+            //                     _isPinning ? 'Pinning...' : 'Pin',
+            //                     style: const TextStyle(
+            //                       fontWeight: FontWeight.w600,
+            //                       fontSize: 12,
+            //                     ),
+            //                   ),
+            //                 ),
+            //               ),
+            //             ),
+            //           ],
+            //         )
+            //       : SizedBox(
+            //           width: double.infinity,
+            //           height: 50,
+            //           child: ElevatedButton.icon(
+            //             onPressed: _isPinning ? null : _pinToHomeScreen,
+            //             style: ElevatedButton.styleFrom(
+            //               backgroundColor: Theme.of(
+            //                 context,
+            //               ).colorScheme.primary,
+            //               foregroundColor: Colors.white,
+            //               elevation: 0,
+            //               shape: RoundedRectangleBorder(
+            //                 borderRadius: BorderRadius.circular(12),
+            //               ),
+            //             ),
+            //             icon: _isPinning
+            //                 ? const SizedBox(
+            //                     width: 20,
+            //                     height: 20,
+            //                     child: CircularProgressIndicator(
+            //                       strokeWidth: 2,
+            //                       valueColor: AlwaysStoppedAnimation<Color>(
+            //                         Colors.white,
+            //                       ),
+            //                     ),
+            //                   )
+            //                 : const Icon(
+            //                     Icons.push_pin,
+            //                     size: 20,
+            //                     color: Colors.white,
+            //                   ),
+            //             label: Text(
+            //               _isPinning ? 'Pinning...' : 'Pin to Home Screen',
+            //               style: const TextStyle(
+            //                 fontWeight: FontWeight.w600,
+            //                 fontSize: 12,
+            //               ),
+            //             ),
+            //           ),
+            //         ),
+            // ),
           ),
         ],
       ),

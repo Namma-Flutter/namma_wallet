@@ -1,5 +1,6 @@
 import 'package:namma_wallet/src/common/database/wallet_database.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
+import 'package:namma_wallet/src/features/home/domain/ticket.dart';
 import 'package:namma_wallet/src/features/tnstc/domain/tnstc_model.dart';
 
 Future<void> checkAndUpdateTNSTCTicket(TNSTCTicketModel ticket) async {
@@ -10,8 +11,8 @@ Future<void> checkAndUpdateTNSTCTicket(TNSTCTicketModel ticket) async {
     return;
   }
 
-  final existingTicket = await db.getTravelTicketByPNR(
-    ticket.pnrNumber!,
+  final existingTicket = await db.getTicketById(
+    int.parse(ticket.pnrNumber ?? '0'),
   );
 
   if (existingTicket != null) {
@@ -24,9 +25,9 @@ Future<void> checkAndUpdateTNSTCTicket(TNSTCTicketModel ticket) async {
     }
 
     if (updates.isNotEmpty) {
-      await db.updateTravelTicketByPNR(ticket.pnrNumber!, updates);
+      await db.updateTicketById(int.parse(ticket.pnrNumber ?? '0'), updates);
     }
   } else {
-    await db.insertTravelTicket(ticket.toMap());
+    await db.insertTicket(Ticket.fromTNSTC(ticket));
   }
 }

@@ -30,15 +30,16 @@ class CalendarWidget extends StatelessWidget {
       eventLoader: (day) {
         final events = provider.getEventsForDay(day);
         final tickets = provider.getTicketsForDay(day);
+        // TODO(keerthivasan-ai): need to get clarification from harishwarrior
         return [
           ...events,
           ...tickets.map(
             (t) => Event(
               icon: Icons.confirmation_number,
-              title: t.displayName,
-              subtitle: t.providerName,
+              title: t.primaryText,
+              subtitle: t.secondaryText,
               date: day,
-              price: t.amount?.toString() ?? '',
+              price: '',
             ),
           ),
         ];

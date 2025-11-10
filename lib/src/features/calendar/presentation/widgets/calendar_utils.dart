@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:namma_wallet/src/common/theme/styles.dart';
-import 'package:namma_wallet/src/features/common/domain/travel_ticket_model.dart';
+import 'package:namma_wallet/src/features/common/enums/ticket_type.dart';
 
 class CalendarUtils {
   static Color getTicketTypeColor(TicketType type) {

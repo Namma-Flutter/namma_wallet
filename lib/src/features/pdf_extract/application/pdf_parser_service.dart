@@ -4,13 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:namma_wallet/src/common/database/wallet_database.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/services/logger_interface.dart';
-import 'package:namma_wallet/src/features/common/domain/travel_ticket_model.dart';
+import 'package:namma_wallet/src/features/home/domain/ticket.dart';
 import 'package:namma_wallet/src/features/tnstc/application/pdf_service.dart';
 import 'package:namma_wallet/src/features/tnstc/application/tnstc_pdf_parser.dart';
-import 'package:namma_wallet/src/features/tnstc/application/tnstc_ticket_parser.dart';
+import 'package:namma_wallet/src/features/tnstc/domain/tnstc_model.dart';
 
 /// Extension to provide non-PII summary generation for TNSTCTicket
-extension TNSTCTicketSummary on TNSTCTicket {
+extension TNSTCTicketSummary on TNSTCTicketModel {
   /// Create a non-identifying summary map for safe logging
   Map<String, dynamic> toNonPiiSummary() {
     // List of all nullable fields to count
@@ -34,7 +34,7 @@ extension TNSTCTicketSummary on TNSTCTicket {
       () => bankTransactionNumber,
       () => busIdNumber,
       () => passengerCategory,
-      () => passengerInfo,
+      () => passengers,
       () => idCardType,
       () => idCardNumber,
       () => totalFare,
@@ -68,7 +68,7 @@ extension TNSTCTicketSummary on TNSTCTicket {
       'hasBankTransaction': bankTransactionNumber != null,
       'hasBusIdNumber': busIdNumber != null,
       'hasPassengerCategory': passengerCategory != null,
-      'hasPassengerInfo': passengerInfo != null,
+      'hasPassengerInfo': passengers.isNotEmpty,
       'hasIdCard': idCardType != null || idCardNumber != null,
       'idCardType': idCardType,
       'hasTotalFare': totalFare != null,
@@ -93,7 +93,7 @@ class PDFParserResult {
   factory PDFParserResult.success(
     PDFParserContentType type,
     String content, {
-    TravelTicketModel? travelTicket,
+    Ticket? travelTicket,
   }) {
     return PDFParserResult(
       type: type,
@@ -113,7 +113,7 @@ class PDFParserResult {
 
   final PDFParserContentType type;
   final String? content;
-  final TravelTicketModel? travelTicket;
+  final Ticket? travelTicket;
   final String? errorMessage;
   final bool isSuccess;
 }
@@ -127,7 +127,7 @@ class PDFParserService {
 
   /// Helper method to create a non-identifying summary of parsed ticket data
   /// for safe logging in dev/staging environments
-  Map<String, dynamic> _createTicketSummary(TNSTCTicket ticket) {
+  Map<String, dynamic> _createTicketSummary(TNSTCTicketModel ticket) {
     return ticket.toNonPiiSummary();
   }
 
@@ -177,7 +177,7 @@ class PDFParserService {
       _logger.debug('Found keywords: $foundKeywords');
 
       // Try to parse using TNSTC PDF parser first
-      TravelTicketModel? parsedTicket;
+      Ticket? parsedTicket;
 
       // Check if it's a TNSTC ticket
       if (foundKeywords.any(
@@ -197,7 +197,7 @@ class PDFParserService {
             ..debug('Ticket Summary: $ticketSummary')
             ..debug('=== END PARSED TNSTC TICKET SUMMARY ===');
 
-          parsedTicket = _convertTNSTCToTravelTicket(tnstcTicket);
+          parsedTicket = Ticket.fromTNSTC(tnstcTicket);
           final pnrMasked =
               tnstcTicket.pnrNumber != null &&
                   tnstcTicket.pnrNumber!.length >= 4
@@ -232,10 +232,10 @@ class PDFParserService {
       // Save to database
       try {
         _logger.logDatabase('Insert', 'Saving parsed PDF ticket to database');
-        final ticketId = await getIt<WalletDatabase>().insertTravelTicket(
-          parsedTicket.toDatabase(),
+        final ticketId = await getIt<WalletDatabase>().insertTicket(
+          parsedTicket,
         );
-        final updatedTicket = parsedTicket.copyWith(id: ticketId);
+        final updatedTicket = parsedTicket.copyWith(ticketId: ticketId);
 
         _logger.success('PDF ticket saved successfully with ID: $ticketId');
         return PDFParserResult.success(
@@ -289,48 +289,6 @@ class PDFParserService {
         backgroundColor: backgroundColor,
         duration: Duration(seconds: result.isSuccess ? 2 : 3),
       ),
-    );
-  }
-
-  TravelTicketModel _convertTNSTCToTravelTicket(TNSTCTicket tnstcTicket) {
-    // Debug logging for TNSTC conversion (non-identifying summary)
-    final hasServicePlaces =
-        tnstcTicket.serviceStartPlace != null &&
-        tnstcTicket.serviceEndPlace != null;
-    final hasPassengerPlaces =
-        tnstcTicket.passengerStartPlace != null &&
-        tnstcTicket.passengerEndPlace != null;
-    _logger.debug(
-      'Converting TNSTC to TravelTicket: '
-      'hasServicePlaces=$hasServicePlaces, '
-      'hasPassengerPlaces=$hasPassengerPlaces, '
-      'hasServiceStartTime=${tnstcTicket.serviceStartTime != null}, '
-      'hasPnr=${tnstcTicket.pnrNumber != null}',
-    );
-
-    // Convert TNSTC ticket to TravelTicketModel
-    return TravelTicketModel(
-      ticketType: TicketType.bus,
-      providerName: tnstcTicket.corporation ?? 'TNSTC',
-      pnrNumber: tnstcTicket.pnrNumber,
-      tripCode: tnstcTicket.tripCode,
-      sourceLocation:
-          tnstcTicket.serviceStartPlace ?? tnstcTicket.passengerStartPlace,
-      destinationLocation:
-          tnstcTicket.serviceEndPlace ?? tnstcTicket.passengerEndPlace,
-      journeyDate: tnstcTicket.journeyDate?.toIso8601String(),
-      departureTime: tnstcTicket.serviceStartTime,
-      seatNumbers: tnstcTicket.passengerInfo?.seatNumber,
-      classOfService: tnstcTicket.classOfService,
-      boardingPoint: tnstcTicket.passengerPickupPoint,
-      amount: tnstcTicket.totalFare,
-      passengerName: tnstcTicket.passengerInfo?.name,
-      passengerAge: tnstcTicket.passengerInfo?.age,
-      passengerGender: tnstcTicket.passengerInfo?.gender,
-      bookingReference: tnstcTicket.obReferenceNumber,
-      coachNumber: tnstcTicket.busIdNumber,
-      sourceType: SourceType.pdf,
-      rawData: tnstcTicket.toString(),
     );
   }
 }

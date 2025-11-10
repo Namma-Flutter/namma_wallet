@@ -1,7 +1,9 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/services/logger_interface.dart';
+import 'package:namma_wallet/src/features/home/domain/ticket.dart';
 import 'package:path/path.dart' as p;
 import 'package:sqflite/sqflite.dart';
 
@@ -30,9 +32,9 @@ class WalletDatabase {
   }
 
   /// Masks PNR for safe logging by showing only the last 3 characters
-  String _maskPnr(String pnrNumber) {
-    if (pnrNumber.length <= 3) return pnrNumber;
-    return '''${'*' * (pnrNumber.length - 3)}${pnrNumber.substring(pnrNumber.length - 3)}''';
+  String _maskTicketId(String ticketId) {
+    if (ticketId.length <= 3) return ticketId;
+    return '''${'*' * (ticketId.length - 3)}${ticketId.substring(ticketId.length - 3)}''';
   }
 
   /// Masks booking reference for safe logging by showing
@@ -68,86 +70,17 @@ class WalletDatabase {
   Future<void> _createSchema(Database db) async {
     // users table
     await db.execute('''
-CREATE TABLE users (
-  user_id INTEGER PRIMARY KEY AUTOINCREMENT,
-  full_name TEXT NOT NULL,
-  email TEXT UNIQUE NOT NULL,
-  phone TEXT UNIQUE,
-  password_hash TEXT NOT NULL,
-  created_at TEXT DEFAULT (datetime('now'))
-);
-''');
+  CREATE TABLE users (
+    user_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    full_name TEXT NOT NULL,
+    email TEXT UNIQUE NOT NULL,
+    phone TEXT UNIQUE,
+    password_hash TEXT NOT NULL,
+    created_at TEXT DEFAULT (datetime('now'))
+  );
+  ''');
 
-    await _createTravelTicketsTable(db);
-  }
-
-  Future<void> _createTravelTicketsTable(Database db) async {
-    // Enhanced travel tickets table - generic for all travel types
-    await db.execute('''
-CREATE TABLE travel_tickets (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  user_id INTEGER NOT NULL,
-
-  -- Core travel info
-  ticket_type TEXT NOT NULL CHECK(ticket_type IN ('BUS','TRAIN','EVENT','FLIGHT','METRO')),
-  provider_name TEXT NOT NULL,
-  booking_reference TEXT,
-  pnr_number TEXT,
-  trip_code TEXT,
-
-  -- Journey details
-  source_location TEXT,
-  destination_location TEXT,
-  journey_date TEXT,
-  journey_time TEXT,
-  departure_time TEXT,
-  arrival_time TEXT,
-
-  -- Passenger details
-  passenger_name TEXT,
-  passenger_age INTEGER,
-  passenger_gender TEXT,
-
-  -- Seat/ticket details
-  seat_numbers TEXT, -- JSON array or comma-separated
-  coach_number TEXT,
-  class_of_service TEXT,
-
-  -- Booking details
-  booking_date TEXT,
-  amount REAL,
-  currency TEXT DEFAULT 'INR',
-  status TEXT DEFAULT 'CONFIRMED' CHECK(status IN ('CONFIRMED','CANCELLED','PENDING','COMPLETED')),
-
-  -- Additional metadata
-  boarding_point TEXT,
-  pickup_location TEXT,
-  event_name TEXT, -- For event tickets
-  venue_name TEXT, -- For event tickets
-  contact_mobile TEXT, -- Contact number for conductor/operator
-
-  -- Source tracking
-  source_type TEXT CHECK(source_type IN ('SMS','PDF','MANUAL','CLIPBOARD','QR')),
-  raw_data TEXT, -- Store original SMS/PDF content for reference
-
-  -- Timestamps
-  created_at TEXT DEFAULT (datetime('now')),
-  updated_at TEXT DEFAULT (datetime('now')),
-
-  FOREIGN KEY (user_id) REFERENCES users(user_id)
-);
-''');
-
-    // Create indexes for better query performance
-    await db.execute('''
-CREATE INDEX idx_travel_tickets_user_id ON travel_tickets(user_id);
-''');
-    await db.execute('''
-CREATE INDEX idx_travel_tickets_journey_date ON travel_tickets(journey_date);
-''');
-    await db.execute('''
-CREATE INDEX idx_travel_tickets_ticket_type ON travel_tickets(ticket_type);
-''');
+    await _createTicketTable(db);
   }
 
   // Queries
@@ -156,22 +89,166 @@ CREATE INDEX idx_travel_tickets_ticket_type ON travel_tickets(ticket_type);
     return db.query('users', orderBy: 'user_id DESC');
   }
 
-  Future<List<Map<String, Object?>>> fetchAllTravelTickets() async {
-    try {
-      _logger.logDatabase('Query', 'Fetching all travel tickets');
-      final db = await database;
-      final tickets = await db.query(
-        'travel_tickets',
-        orderBy: 'created_at DESC',
+  /// Generic Model UseCase
+
+  /// function [_createTicketTable] will helps to create
+  /// table generic_model in the database
+  Future<void> _createTicketTable(Database db) async {
+    const query = '''
+      CREATE TABLE tickets (
+         id INTEGER PRIMARY KEY AUTOINCREMENT,
+         primary_text TEXT NOT NULL,
+         secondary_text TEXT NOT NULL,
+         type TEXT NOT NULL,
+         start_time TEXT NOT NULL,
+         end_time TEXT,
+         location TEXT NOT NULL,
+         tags TEXT,
+         extras TEXT,
+         created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+         updated_at TEXT DEFAULT NULL
       );
+    ''';
+
+    await db.execute(query);
+
+    await db.execute(
+      'CREATE INDEX IF NOT EXISTS idx_tickets_id ON tickets (id);',
+    );
+    await db.execute(
+      'CREATE INDEX IF NOT EXISTS idx_tickets_type ON tickets (type);',
+    );
+    await db.execute(
+      'CREATE INDEX IF NOT EXISTS idx_tickets_start_time ON tickets (start_time);',
+    );
+  }
+
+  Future<int> insertTicket(Ticket ticket) async {
+    try {
+      _logger.logDatabase('Insert', 'Inserting ticket: ${ticket.primaryText}');
+
+      final db = await database;
+
+      final map = ticket.toEntity()
+        ..['tags'] = jsonEncode(ticket.tags?.map((e) => e.toMap()).toList())
+        ..['extras'] = jsonEncode(ticket.extras?.map((e) => e.toMap()).toList())
+        ..['created_at'] = DateTime.now().toIso8601String()
+        ..['updated_at'] = DateTime.now().toIso8601String();
+
+      final id = await db.insert(
+        'tickets',
+        map,
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+
+      if (id > 0) {
+        _logger.logDatabase('Success', 'Inserted ticket with ID: $id');
+      } else {
+        _logger.warning(
+          'Insert operation completed but no row ID returned for ticket: ${ticket.primaryText}',
+        );
+      }
+
+      return id;
+    } catch (e, stackTrace) {
+      _logger.error(
+        'Failed to insert ticket: ${ticket.primaryText}',
+        e,
+        stackTrace,
+      );
+      rethrow;
+    }
+  }
+
+  /// Get Ticket by ID
+  Future<Ticket?> getTicketById(int id) async {
+    try {
+      _logger.logDatabase(
+        'Query',
+        'Fetching ticket with ID: ${_maskTicketId(id.toString())}',
+      );
+
+      final db = await database;
+      final result = await db.query(
+        'tickets',
+        where: 'id = ?',
+        whereArgs: [id],
+      );
+
+      if (result.isEmpty) {
+        _logger.warning('No ticket found with ID: $id');
+        return null;
+      }
+
       _logger.logDatabase(
         'Success',
-        'Fetched ${tickets.length} travel tickets',
+        'Fetched ticket with ID: ${_maskTicketId(id.toString())}',
       );
+
+      final map = result.first;
+
+      // Decode JSON fields back to List<Map<String, dynamic>>
+      final decodedMap = {
+        ...map,
+        'tags': map['tags'] == null || (map['tags']! as String).isEmpty
+            ? null
+            : (jsonDecode(map['tags']! as String) as List)
+                  .cast<Map<String, dynamic>>(),
+        'extras': map['extras'] == null || (map['extras']! as String).isEmpty
+            ? null
+            : (jsonDecode(map['extras']! as String) as List)
+                  .cast<Map<String, dynamic>>(),
+      };
+
+      return TicketMapper.fromMap(decodedMap);
+    } catch (e, stackTrace) {
+      _logger.error(
+        'Failed to fetch ticket with ID: ${_maskTicketId(id.toString())}',
+        e,
+        stackTrace,
+      );
+      rethrow;
+    }
+  }
+
+  /// Get all tickets
+  Future<List<Ticket>> getAllTickets() async {
+    try {
+      _logger.logDatabase('Query', 'Fetching all tickets');
+
+      final db = await database;
+      final result = await db.query('tickets', orderBy: 'start_time DESC');
+
+      if (result.isEmpty) {
+        _logger.warning('No tickets found in database');
+        return [];
+      }
+
+      _logger.logDatabase(
+        'Success',
+        'Fetched ${result.length} tickets from database',
+      );
+
+      final tickets = result.map((map) {
+        final decodedMap = {
+          ...map,
+          'tags': map['tags'] == null || (map['tags']! as String).isEmpty
+              ? null
+              : (jsonDecode(map['tags']! as String) as List)
+                    .cast<Map<String, dynamic>>(),
+          'extras': map['extras'] == null || (map['extras']! as String).isEmpty
+              ? null
+              : (jsonDecode(map['extras']! as String) as List)
+                    .cast<Map<String, dynamic>>(),
+        };
+
+        return TicketMapper.fromMap(decodedMap);
+      }).toList();
+
       return tickets;
     } catch (e, stackTrace) {
       _logger.error(
-        'Failed to fetch travel tickets',
+        'Failed to fetch all tickets from database',
         e,
         stackTrace,
       );
@@ -179,83 +256,48 @@ CREATE INDEX idx_travel_tickets_ticket_type ON travel_tickets(ticket_type);
     }
   }
 
-  Future<List<Map<String, Object?>>> fetchTravelTicketsWithUser() async {
-    final db = await database;
-    return db.rawQuery('''
-SELECT t.*, u.full_name AS user_full_name, u.email AS user_email
-FROM travel_tickets t
-JOIN users u ON u.user_id = t.user_id
-ORDER BY t.created_at DESC
-''');
-  }
-
-  Future<List<Map<String, Object?>>> fetchTravelTicketsByType(
-    String ticketType,
-  ) async {
-    final db = await database;
-    return db.query(
-      'travel_tickets',
-      where: 'ticket_type = ?',
-      whereArgs: [ticketType],
-      orderBy: 'created_at DESC',
-    );
-  }
-
-  Future<int> insertTravelTicket(Map<String, Object?> ticket) async {
+  /// Get ticket by type
+  Future<List<Ticket>> getTicketsByType(String type) async {
     try {
-      _logger.logDatabase('Insert', 'Inserting travel ticket');
+      _logger.logDatabase('Query', 'Fetching tickets of type: $type');
+
       final db = await database;
-      // Ensure user_id is set to 1 (single user app)
-      ticket['user_id'] = 1;
-      ticket['created_at'] = DateTime.now().toIso8601String();
-      ticket['updated_at'] = DateTime.now().toIso8601String();
+      final result = await db.query(
+        'tickets',
+        where: 'type = ?',
+        whereArgs: [type],
+        orderBy: 'start_time DESC',
+      );
 
-      // Check for duplicates based on PNR number or booking reference
-      final pnrNumber = ticket['pnr_number'] as String?;
-      final bookingRef = ticket['booking_reference'] as String?;
-
-      if (pnrNumber != null && pnrNumber.isNotEmpty) {
-        final existing = await db.query(
-          'travel_tickets',
-          where: 'pnr_number = ?',
-          whereArgs: [pnrNumber],
-          limit: 1,
-        );
-        if (existing.isNotEmpty) {
-          _logger.warning(
-            'Duplicate ticket found with PNR: ${_maskPnr(pnrNumber)}',
-          );
-          throw const DuplicateTicketException(
-            'Ticket already exists',
-          );
-        }
-      } else if (bookingRef != null && bookingRef.isNotEmpty) {
-        final existing = await db.query(
-          'travel_tickets',
-          where: 'booking_reference = ?',
-          whereArgs: [bookingRef],
-          limit: 1,
-        );
-        if (existing.isNotEmpty) {
-          _logger.warning(
-            'Duplicate ticket found with booking reference: '
-            '${_maskBookingRef(bookingRef)}',
-          );
-          throw const DuplicateTicketException(
-            'Ticket already exists',
-          );
-        }
+      if (result.isEmpty) {
+        _logger.warning('No tickets found for type: $type');
+        return [];
       }
 
-      final id = await db.insert('travel_tickets', ticket);
-      _logger.logDatabase('Success', 'Inserted travel ticket with ID: $id');
-      return id;
+      _logger.logDatabase(
+        'Success',
+        'Fetched ${result.length} tickets of type: $type',
+      );
+
+      final tickets = result.map((map) {
+        final decodedMap = {
+          ...map,
+          'tags': map['tags'] == null || (map['tags'] as String).isEmpty
+              ? null
+              : (jsonDecode(map['tags'] as String) as List)
+                    .cast<Map<String, dynamic>>(),
+          'extras': map['extras'] == null || (map['extras'] as String).isEmpty
+              ? null
+              : (jsonDecode(map['extras'] as String) as List)
+                    .cast<Map<String, dynamic>>(),
+        };
+        return TicketMapper.fromMap(decodedMap);
+      }).toList();
+
+      return tickets;
     } catch (e, stackTrace) {
-      if (e is DuplicateTicketException) {
-        rethrow;
-      }
       _logger.error(
-        'Failed to insert travel ticket',
+        'Failed to fetch tickets of type: $type',
         e,
         stackTrace,
       );
@@ -263,81 +305,85 @@ ORDER BY t.created_at DESC
     }
   }
 
-  Future<int> updateTravelTicket(int id, Map<String, Object?> ticket) async {
-    final db = await database;
-    // Update timestamp
-    ticket['updated_at'] = DateTime.now().toIso8601String();
-    return db.update(
-      'travel_tickets',
-      ticket,
-      where: 'id = ?',
-      whereArgs: [id],
-    );
-  }
-
-  Future<int> deleteTravelTicket(int id) async {
-    final db = await database;
-    return db.delete(
-      'travel_tickets',
-      where: 'id = ?',
-      whereArgs: [id],
-    );
-  }
-
-  Future<Map<String, Object?>?> getTravelTicketById(int id) async {
-    final db = await database;
-    final results = await db.query(
-      'travel_tickets',
-      where: 'id = ?',
-      whereArgs: [id],
-      limit: 1,
-    );
-    return results.isNotEmpty ? results.first : null;
-  }
-
-  Future<Map<String, Object?>?> getTravelTicketByPNR(String pnrNumber) async {
-    final db = await database;
-    final results = await db.query(
-      'travel_tickets',
-      where: 'pnr_number = ?',
-      whereArgs: [pnrNumber],
-      limit: 1,
-    );
-    return results.isNotEmpty ? results.first : null;
-  }
-
-  Future<int> updateTravelTicketByPNR(
-    String pnrNumber,
+  /// Update by Ticket Id
+  Future<int> updateTicketById(
+    int ticketId,
     Map<String, Object?> updates,
   ) async {
     try {
+      // Log start of update
       _logger.logDatabase(
         'Update',
-        'Updating ticket with PNR: ${_maskPnr(pnrNumber)}',
+        'Updating ticket with ID: ${_maskTicketId(ticketId.toString())}',
       );
+
       final db = await database;
-      updates['updated_at'] = DateTime.now().toIso8601String();
 
+      // Add or update modified time
+      // updates['updated_at'] = DateTime.now().toIso8601String();
+
+      // Perform update
       final count = await db.update(
-        'travel_tickets',
+        'tickets',
         updates,
-        where: 'pnr_number = ?',
-        whereArgs: [pnrNumber],
+        where: 'id = ?',
+        whereArgs: [ticketId],
       );
 
+      // Log based on outcome
       if (count > 0) {
         _logger.logDatabase(
           'Success',
-          'Updated ticket with PNR: ${_maskPnr(pnrNumber)}',
+          'Updated ticket with ID: ${_maskTicketId(ticketId.toString())}',
         );
       } else {
-        _logger.warning('No ticket found with PNR: ${_maskPnr(pnrNumber)}');
+        _logger.warning(
+          'No ticket found with ID: ${_maskTicketId(ticketId.toString())}',
+        );
       }
 
       return count;
     } catch (e, stackTrace) {
       _logger.error(
-        'Failed to update ticket by PNR: ${_maskPnr(pnrNumber)}',
+        'Failed to update ticket with ID: ${_maskTicketId(ticketId.toString())}',
+        e,
+        stackTrace,
+      );
+      rethrow;
+    }
+  }
+
+  /// Delete a ticket
+  Future<int> deleteTicket(int id) async {
+    try {
+      _logger.logDatabase(
+        'Delete',
+        'Deleting ticket with ID: ${_maskTicketId(id.toString())}',
+      );
+
+      final db = await database;
+
+      final count = await db.delete(
+        'tickets',
+        where: 'id = ?',
+        whereArgs: [id],
+      );
+
+      if (count > 0) {
+        _logger.logDatabase(
+          'Success',
+          'Deleted ticket with ID: ${_maskTicketId(id.toString())}',
+        );
+      } else {
+        _logger.warning(
+          'No ticket found to delete with ID: ${_maskTicketId(id.toString())}',
+        );
+      }
+
+      return count;
+    } catch (e, stackTrace) {
+      _logger.error(
+        'Failed to delete ticket with ID: ${_maskTicketId(id.toString())}',
         e,
         stackTrace,
       );

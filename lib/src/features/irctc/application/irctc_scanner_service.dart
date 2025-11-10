@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:namma_wallet/src/common/database/wallet_database.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/services/logger_interface.dart';
-import 'package:namma_wallet/src/features/common/domain/travel_ticket_model.dart';
+import 'package:namma_wallet/src/features/home/domain/ticket.dart';
 import 'package:namma_wallet/src/features/irctc/application/irctc_qr_parser.dart';
 import 'package:namma_wallet/src/features/irctc/application/irctc_ticket_model.dart';
 
@@ -25,7 +25,7 @@ class IRCTCScannerResult {
     IRCTCScannerContentType type,
     String content, {
     IRCTCTicket? irctcTicket,
-    TravelTicketModel? travelTicket,
+    Ticket? travelTicket,
   }) {
     return IRCTCScannerResult(
       type: type,
@@ -47,7 +47,7 @@ class IRCTCScannerResult {
   final IRCTCScannerContentType type;
   final String? content;
   final IRCTCTicket? irctcTicket;
-  final TravelTicketModel? travelTicket;
+  final Ticket? travelTicket;
   final String? errorMessage;
   final bool isSuccess;
 }
@@ -73,14 +73,14 @@ class IRCTCScannerService {
       }
 
       // Convert to travel ticket model for database storage
-      final travelTicket = _convertIRCTCToTravelTicket(irctcTicket);
+      final travelTicket = Ticket.fromIRCTC(irctcTicket);
 
       // Save to database
       try {
-        final ticketId = await getIt<WalletDatabase>().insertTravelTicket(
-          travelTicket.toDatabase(),
+        final ticketId = await getIt<WalletDatabase>().insertTicket(
+          travelTicket,
         );
-        final updatedTicket = travelTicket.copyWith(id: ticketId);
+        final updatedTicket = travelTicket.copyWith(ticketId: ticketId);
 
         return IRCTCScannerResult.success(
           IRCTCScannerContentType.irctcTicket,
@@ -99,46 +99,6 @@ class IRCTCScannerService {
       _logger.error('Unexpected exception in IRCTC scanner service: $e');
       return IRCTCScannerResult.error('Unexpected error occurred: $e');
     }
-  }
-
-  TravelTicketModel _convertIRCTCToTravelTicket(IRCTCTicket irctcTicket) {
-    // Format dates as strings
-    final journeyDateStr =
-        '${irctcTicket.dateOfJourney.year}-'
-        '${irctcTicket.dateOfJourney.month.toString().padLeft(2, '0')}-'
-        '${irctcTicket.dateOfJourney.day.toString().padLeft(2, '0')}';
-
-    final departureTimeStr =
-        '${irctcTicket.scheduledDeparture.hour.toString().padLeft(2, '0')}:'
-        '${irctcTicket.scheduledDeparture.minute.toString().padLeft(2, '0')}';
-
-    // Convert status string to TicketStatus enum
-    final ticketStatus = irctcTicket.status.toLowerCase().contains('cancelled')
-        ? TicketStatus.cancelled
-        : irctcTicket.status.toLowerCase().contains('pending')
-        ? TicketStatus.pending
-        : TicketStatus.confirmed;
-
-    return TravelTicketModel(
-      ticketType: TicketType.train,
-      providerName: 'IRCTC',
-      pnrNumber: irctcTicket.pnrNumber,
-      passengerName: irctcTicket.passengerName,
-      sourceLocation: irctcTicket.fromStation,
-      destinationLocation: irctcTicket.toStation,
-      boardingPoint: irctcTicket.boardingStation,
-      departureTime: departureTimeStr,
-      journeyDate: journeyDateStr,
-      tripCode: irctcTicket.trainNumber,
-      amount: irctcTicket.ticketFare + irctcTicket.irctcFee,
-      sourceType: SourceType.scanner,
-      rawData: irctcTicket.toReadableString(),
-      classOfService: irctcTicket.travelClass,
-      passengerAge: irctcTicket.age,
-      passengerGender: irctcTicket.gender,
-      status: ticketStatus,
-      bookingReference: irctcTicket.transactionId,
-    );
   }
 
   void showResultMessage(BuildContext context, IRCTCScannerResult result) {
