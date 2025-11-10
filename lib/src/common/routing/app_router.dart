@@ -9,7 +9,6 @@ import 'package:namma_wallet/src/features/home/domain/ticket.dart';
 import 'package:namma_wallet/src/features/home/presentation/home_view.dart';
 import 'package:namma_wallet/src/features/profile/presentation/contributors_view.dart';
 import 'package:namma_wallet/src/features/profile/presentation/db_viewer_view.dart';
-import 'package:namma_wallet/src/features/profile/presentation/generic_table_test_view.dart';
 import 'package:namma_wallet/src/features/profile/presentation/license_view.dart';
 import 'package:namma_wallet/src/features/profile/presentation/profile_view.dart';
 import 'package:namma_wallet/src/features/scanner/presentation/scanner_view.dart';

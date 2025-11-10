@@ -1,6 +1,7 @@
 import 'package:dart_mappable/dart_mappable.dart';
 
 part 'source_type.mapper.dart';
+
 @MappableEnum()
 enum SourceType {
   @MappableValue('SMS')
