@@ -1,0 +1,65 @@
+name: Upload coverage reports to Codecov
+
+on:
+  push:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  run:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    env:
+      OS: ${{ matrix.os }}
+      FLUTTER_VERSION: "3.35.2"
+    steps:
+      - uses: actions/checkout@main
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version-file: pubspec.yaml
+          cache: true
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Generate code files
+        run: dart run build_runner build --delete-conflicting-outputs
+
+      - name: Run tests with coverage
+        run: flutter test --coverage
+
+      - name: Install lcov (Ubuntu only)
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y lcov
+
+      - name: Convert coverage to lcov format (Ubuntu only)
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          # Flutter generates lcov.info by default, but we may need to ensure it's in the right format
+          lcov --list-coverage coverage/lcov.info || true
+
+      - name: Upload coverage to Codecov
+        if: matrix.os == 'ubuntu-latest'
+        uses: codecov/codecov-action@v5
+        with:
+          directory: ./coverage
+          env_vars: OS,FLUTTER_VERSION
+          fail_ci_if_error: true
+          files: ./coverage/lcov.info
+          flags: unittests
+          name: codecov-umbrella
+          token: ${{ secrets.CODECOV_TOKEN }}
+          verbose: true
