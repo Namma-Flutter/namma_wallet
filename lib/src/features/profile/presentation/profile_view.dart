@@ -25,13 +25,7 @@ class _ProfileViewState extends State<ProfileView> {
   }
 
   Future<void> _initHapticFlag() async {
-    try {
-      // Ensure the service has loaded its persisted preference.
-      // If main() already did this, loadPreference() will return quickly.
-      await hapticService.loadPreference();
-    } catch (_) {
-      // ignore errors — service will use its default value if load fails
-    }
+    await hapticService.loadPreference();
 
     // Read current enabled state from the service and update UI.
     setState(() {
@@ -40,7 +34,8 @@ class _ProfileViewState extends State<ProfileView> {
   }
 
   /// Persist the flag via the service
-  Future<void> _saveFlag(bool value) => hapticService.setEnabled(value);
+  Future<void> _saveFlag(bool value) =>
+      hapticService.setEnabled(enabled: value);
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
