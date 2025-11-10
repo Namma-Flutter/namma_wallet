@@ -41,4 +41,13 @@ abstract class IHapticService {
   ///
   /// Represents a soft, gentle physical impact for smooth interactions.
   void soft();
+
+  /// Load saved preference (from SharedPreferences).
+  Future<void> loadPreference();
+
+  /// Enable/disable haptics and persist the choice.
+  Future<void> setEnabled(bool enabled);
+
+  /// Current enabled state.
+  bool get isEnabled;
 }

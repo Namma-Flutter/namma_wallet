@@ -125,6 +125,9 @@ class _TicketViewState extends State<TicketView> {
     );
 
     if (mounted && (confirmed ?? false)) {
+      hapticService.triggerHaptic(
+        HapticType.selection,
+      );
       await _deleteTicket();
     }
   }
@@ -213,7 +216,7 @@ class _TicketViewState extends State<TicketView> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        leading: CustomBackButton(),
+        leading: const CustomBackButton(),
         title: const Text('Ticket View'),
         actions: [
           if (widget.ticket.ticketId != null)

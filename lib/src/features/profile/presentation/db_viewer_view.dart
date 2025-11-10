@@ -52,7 +52,7 @@ class _DbViewerViewState extends State<DbViewerView>
   Widget build(BuildContext context) => Scaffold(
     appBar: AppBar(
       title: const Text('Database Viewer'),
-      leading: CustomBackButton(),
+      leading: const CustomBackButton(),
       bottom: TabBar(
         controller: _tabController,
         tabs: const <Widget>[

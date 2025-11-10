@@ -8,7 +8,7 @@ class ExportView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: CustomBackButton(),
+        leading: const CustomBackButton(),
         title: const Text('Export'),
       ),
       body: const Center(
