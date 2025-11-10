@@ -99,7 +99,7 @@ class _ContributorsViewState extends State<ContributorsView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: CustomBackButton(),
+        leading: const CustomBackButton(),
         title: const Text('Contributors'),
       ),
       body: FutureBuilder<List<Contributor>>(

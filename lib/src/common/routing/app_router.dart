@@ -66,7 +66,7 @@ final router = GoRouter(
     GoRoute(
       path: AppRoute.profile.path,
       name: AppRoute.profile.name,
-      builder: (context, state) => ProfileView(),
+      builder: (context, state) => const ProfileView(),
     ),
     GoRoute(
       path: AppRoute.barcodeScanner.path,

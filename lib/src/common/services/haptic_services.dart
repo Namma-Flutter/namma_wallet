@@ -1,5 +1,6 @@
 import 'package:gaimon/gaimon.dart';
 import 'package:namma_wallet/src/common/services/haptic_service_interface.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 /// Implementation of [IHapticService] using the `gaimon` package.
 ///
@@ -18,8 +19,12 @@ import 'package:namma_wallet/src/common/services/haptic_service_interface.dart';
 /// HapticServices.selection();
 /// ```
 class HapticService implements IHapticService {
+  // default true or choose false if desired
+  HapticService();
+
   /// Creates a new instance of [HapticService].
-  const HapticService();
+  static const _prefKey = 'isHapticEnabled';
+  bool _isEnabled = true;
 
   @override
   Future<bool> canSupportHaptic() async {
@@ -28,36 +33,64 @@ class HapticService implements IHapticService {
 
   @override
   void selection() {
+    if (!_isEnabled) return;
+
     Gaimon.selection();
   }
 
   @override
   void success() {
+    if (!_isEnabled) return;
+
     // Use medium impact for success feedback (positive, moderate)
     Gaimon.medium();
   }
 
   @override
   void error() {
+    if (!_isEnabled) return;
+
     // Use rigid impact for error feedback (sharp, negative)
     Gaimon.rigid();
   }
 
   @override
   void warning() {
+    if (!_isEnabled) return;
+
     // Use light impact for warning feedback (gentle alert)
     Gaimon.light();
   }
 
   @override
   void rigid() {
+    if (!_isEnabled) return;
+
     Gaimon.rigid();
   }
 
   @override
   void soft() {
+    if (!_isEnabled) return;
+
     Gaimon.soft();
   }
+
+  @override
+  Future<void> loadPreference() async {
+    final prefs = await SharedPreferences.getInstance();
+    _isEnabled = prefs.getBool(_prefKey) ?? _isEnabled;
+  }
+
+  @override
+  Future<void> setEnabled(bool enabled) async {
+    _isEnabled = enabled;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_prefKey, enabled);
+  }
+
+  @override
+  bool get isEnabled => _isEnabled;
 }
 
 /// Static convenience wrapper for [HapticService].
@@ -74,7 +107,11 @@ class HapticServices {
   /// Private constructor to prevent instantiation.
   HapticServices._();
 
-  static const _service = HapticService();
+  static final _service = HapticService();
+  // existing static methods...
+  static Future<void> loadPreference() => _service.loadPreference();
+  static Future<void> setEnabled(bool enabled) => _service.setEnabled(enabled);
+  static bool get isEnabled => _service.isEnabled;
 
   /// Checks if the device supports haptic feedback.
   ///

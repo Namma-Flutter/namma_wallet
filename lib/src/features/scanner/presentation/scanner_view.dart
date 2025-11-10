@@ -81,8 +81,13 @@ class _ScannerViewState extends State<ScannerView> {
       if (result != null && result.files.single.path != null) {
         final file = File(result.files.single.path!);
         final pdfParserService = getIt<PDFParserService>();
+        final hapticService = getIt<IHapticService>();
+
         final parseResult = await pdfParserService.parseAndSavePDFTicket(file);
 
+        hapticService.triggerHaptic(
+          HapticType.selection,
+        );
         if (!mounted) return;
         pdfParserService.showResultMessage(context, parseResult);
       }
@@ -105,8 +110,12 @@ class _ScannerViewState extends State<ScannerView> {
     try {
       final clipboardService = getIt<ClipboardService>();
       final result = await clipboardService.readClipboard();
-
+      final hapticService = getIt<IHapticService>();
       if (!mounted) return;
+
+      hapticService.triggerHaptic(
+        HapticType.selection,
+      );
 
       clipboardService.showResultMessage(context, result);
     } finally {

@@ -28,7 +28,7 @@ void setupLocator() {
     ..registerLazySingleton<SharingIntentService>(SharingIntentService.new)
     ..registerLazySingleton<SMSService>(SMSService.new)
     ..registerLazySingleton<GemmaChatService>(GemmaChatService.new)
-    ..registerLazySingleton<IHapticService>(() => const HapticService())
+    ..registerLazySingleton<IHapticService>(HapticService.new)
     // Feature services
     ..registerLazySingleton<IRCTCQRParser>(IRCTCQRParser.new)
     ..registerLazySingleton<IRCTCScannerService>(IRCTCScannerService.new)

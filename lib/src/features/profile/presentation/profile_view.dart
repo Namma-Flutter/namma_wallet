@@ -17,13 +17,37 @@ class ProfileView extends StatefulWidget {
 
 class _ProfileViewState extends State<ProfileView> {
   final IHapticService hapticService = getIt<IHapticService>();
+  bool _isHapticEnabled = false;
+  @override
+  void initState() {
+    super.initState();
+    _initHapticFlag();
+  }
+
+  Future<void> _initHapticFlag() async {
+    try {
+      // Ensure the service has loaded its persisted preference.
+      // If main() already did this, loadPreference() will return quickly.
+      await hapticService.loadPreference();
+    } catch (_) {
+      // ignore errors — service will use its default value if load fails
+    }
+
+    // Read current enabled state from the service and update UI.
+    setState(() {
+      _isHapticEnabled = hapticService.isEnabled;
+    });
+  }
+
+  /// Persist the flag via the service
+  Future<void> _saveFlag(bool value) => hapticService.setEnabled(value);
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
 
     return Scaffold(
       appBar: AppBar(
-        leading: CustomBackButton(),
+        leading: const CustomBackButton(),
         title: const Text('Profile'),
       ),
       body: ListView(
@@ -68,31 +92,42 @@ class _ProfileViewState extends State<ProfileView> {
               subtitle: const Text('View open source licenses'),
               trailing: const Icon(Icons.chevron_right),
               onTap: () {
+                hapticService.triggerHaptic(
+                  HapticType.selection,
+                );
                 context.pushNamed(AppRoute.license.name);
               },
             ),
           ),
 
-          const SizedBox(height: 8),
-
-          // Haptic Demo Section
+          // Haptics Enabled
           Card(
             elevation: 2,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(16),
             ),
             child: ListTile(
-              leading: const Icon(Icons.vibration),
-              title: const Text('Haptic Feedback Demo'),
-              subtitle: const Text('Test all haptic feedback types'),
-              trailing: const Icon(Icons.chevron_right),
-              onTap: () {
-                context.pushNamed(AppRoute.hapticDemo.name);
-              },
+              leading: const Icon(Icons.vibration_outlined),
+              title: const Text('Haptics Enabled'),
+              trailing: Switch(
+                value: _isHapticEnabled,
+                onChanged: (value) async {
+                  // Persist via service
+                  // (updates in-memory and SharedPreferences)
+                  await _saveFlag(value);
+
+                  // Update UI
+                  setState(() {
+                    _isHapticEnabled = value;
+                  });
+
+                  // Optional: give immediate feedback only when enabling.
+                  if (value) hapticService.triggerHaptic(HapticType.selection);
+                },
+              ),
             ),
           ),
-
-          const SizedBox(height: 100), // Space for FAB
+          // const SizedBox(height: 100), // Space for FAB
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
