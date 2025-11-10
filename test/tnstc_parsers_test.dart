@@ -7,18 +7,22 @@ import 'helpers/fake_logger.dart';
 
 void main() {
   // Set up GetIt for tests
-  setUpAll(() {
+  setUp(() {
     final getIt = GetIt.instance;
     if (!getIt.isRegistered<ILogger>()) {
       getIt.registerSingleton<ILogger>(FakeLogger());
     }
   });
 
-  tearDownAll(() {
-    GetIt.instance.reset();
+  tearDown(() async {
+    await GetIt.instance.reset();
   });
   group('TNSTCBusParser Tests', () {
-    final parser = TNSTCBusParser();
+    late TNSTCBusParser parser;
+
+    setUp(() {
+      parser = TNSTCBusParser();
+    });
 
     test('should parse standard SETC SMS correctly', () {
       const smsText =
@@ -175,7 +179,11 @@ void main() {
   });
 
   group('Real SMS Data Tests', () {
-    final parser = TNSTCBusParser();
+    late TNSTCBusParser parser;
+
+    setUp(() {
+      parser = TNSTCBusParser();
+    });
 
     test('should parse SMS with date prefix in time field', () {
       const smsText =
@@ -289,7 +297,11 @@ void main() {
   });
 
   group('TravelParserService.parseUpdateSMS Tests', () {
-    final parserService = TravelParserService();
+    late TravelParserService parserService;
+
+    setUp(() {
+      parserService = TravelParserService();
+    });
 
     test('should parse conductor SMS and extract details', () {
       const smsText =
