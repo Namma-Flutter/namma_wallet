@@ -83,7 +83,7 @@ class HapticService implements IHapticService {
   }
 
   @override
-  Future<void> setEnabled(bool enabled) async {
+  Future<void> setEnabled({required bool enabled}) async {
     _isEnabled = enabled;
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_prefKey, enabled);
@@ -110,7 +110,8 @@ class HapticServices {
   static final _service = HapticService();
   // existing static methods...
   static Future<void> loadPreference() => _service.loadPreference();
-  static Future<void> setEnabled(bool enabled) => _service.setEnabled(enabled);
+  static Future<void> setEnabled({required bool enabled}) =>
+      _service.setEnabled(enabled: enabled);
   static bool get isEnabled => _service.isEnabled;
 
   /// Checks if the device supports haptic feedback.

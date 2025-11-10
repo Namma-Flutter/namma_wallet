@@ -46,7 +46,7 @@ abstract class IHapticService {
   Future<void> loadPreference();
 
   /// Enable/disable haptics and persist the choice.
-  Future<void> setEnabled(bool enabled);
+  Future<void> setEnabled({required bool enabled});
 
   /// Current enabled state.
   bool get isEnabled;
