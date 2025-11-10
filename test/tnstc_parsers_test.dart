@@ -14,8 +14,8 @@ void main() {
     }
   });
 
-  tearDown(() {
-    GetIt.instance.reset();
+  tearDown(() async {
+    await GetIt.instance.reset();
   });
   group('TNSTCBusParser Tests', () {
     late TNSTCBusParser parser;
