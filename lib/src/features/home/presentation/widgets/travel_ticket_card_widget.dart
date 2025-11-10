@@ -26,34 +26,30 @@ class TravelTicketCardWidget extends StatelessWidget {
         borderRadius: BorderRadius.circular(30),
         boxShadow: [
           BoxShadow(
-            color: Theme.of(context)
-                .colorScheme
-                .primary
-                .withValues(alpha: 0.08),
+            color: Theme.of(
+              context,
+            ).colorScheme.primary.withValues(alpha: 0.08),
             blurRadius: 6,
             offset: const Offset(0, 3),
           ),
           BoxShadow(
-            color: Theme.of(context)
-                .colorScheme
-                .primary
-                .withValues(alpha: 0.05),
+            color: Theme.of(
+              context,
+            ).colorScheme.primary.withValues(alpha: 0.05),
             blurRadius: 6,
             offset: const Offset(0, -3),
           ),
           BoxShadow(
-            color: Theme.of(context)
-                .colorScheme
-                .primary
-                .withValues(alpha: 0.05),
+            color: Theme.of(
+              context,
+            ).colorScheme.primary.withValues(alpha: 0.05),
             blurRadius: 6,
             offset: const Offset(-3, 0),
           ),
           BoxShadow(
-            color: Theme.of(context)
-                .colorScheme
-                .primary
-                .withValues(alpha: 0.05),
+            color: Theme.of(
+              context,
+            ).colorScheme.primary.withValues(alpha: 0.05),
             blurRadius: 6,
             offset: const Offset(3, 0),
           ),
