@@ -26,6 +26,7 @@ class _ProfileViewState extends State<ProfileView> {
 
   Future<void> _initHapticFlag() async {
     await hapticService.loadPreference();
+    if (!mounted) return;
 
     // Read current enabled state from the service and update UI.
     setState(() {
@@ -110,6 +111,7 @@ class _ProfileViewState extends State<ProfileView> {
                   // Persist via service
                   // (updates in-memory and SharedPreferences)
                   await _saveFlag(value);
+                  if (!mounted) return;
 
                   // Update UI
                   setState(() {
