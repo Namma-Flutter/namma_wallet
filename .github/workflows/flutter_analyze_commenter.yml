@@ -11,15 +11,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Get Flutter version from pubspec.yaml
-        id: flutter-version
-        run: |
-          FLUTTER_VERSION=$(grep 'flutter:' pubspec.yaml -A 1 | grep -oP '(?<=flutter: ").*(?=")')
-          echo "version=$FLUTTER_VERSION" >> $GITHUB_OUTPUT
-
-      - uses: subosito/flutter-action@v2
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
         with:
-          flutter-version: ${{ steps.flutter-version.outputs.version }}
+          channel: stable
+          flutter-version-file: pubspec.yaml
           cache: true
 
       - run: flutter pub get
@@ -32,5 +28,4 @@ jobs:
         uses: yorifuji/flutter-analyze-commenter@v1
         with:
           analyze-log: flutter_analyze.log # file path for analyze log, if multiple files, separated by commas
-          custom-lint-log: custom_lint.log # file path for custom lint log (optional), if multiple files, separated by commas
           verbose: false # verbose output (optional)
