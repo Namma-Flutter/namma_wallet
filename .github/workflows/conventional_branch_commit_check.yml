@@ -54,5 +54,3 @@ jobs:
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           allowed-commit-types: "feat,fix,docs,style,refactor,perf,test,build,ci,chore,revert"
-          ignore-merge-commits: true
-          ignore-commit-pattern: "^Merge pull request"

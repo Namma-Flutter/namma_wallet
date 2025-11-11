@@ -18,20 +18,26 @@ jobs:
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
-          distribution: 'temurin'
-          java-version: '17'
+          distribution: "temurin"
+          java-version: "17"
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: "lts/*"
-          cache: 'npm'
+          cache: "npm"
+
+      - name: Get Flutter version from pubspec.yaml
+        id: flutter-version
+        run: |
+          FLUTTER_VERSION=$(grep 'flutter:' pubspec.yaml -A 1 | grep -oP '(?<=flutter: ").*(?=")')
+          echo "version=$FLUTTER_VERSION" >> $GITHUB_OUTPUT
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
           channel: stable
-          flutter-version: 3.35.2
+          flutter-version: ${{ steps.flutter-version.outputs.version }}
           cache: true
 
       - name: Cache Gradle
