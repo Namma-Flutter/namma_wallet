@@ -27,10 +27,6 @@ jobs:
       # Run flutter analyze with --write option
       - run: flutter analyze --write=flutter_analyze.log
 
-      # (Optional) Run custom lint with --format=json option
-      - if: ${{ !cancelled() }}
-        run: dart run custom_lint --format=json > custom_lint.log
-
       # Use flutter-analyze-commenter
       - if: ${{ !cancelled() }} # Required to run this step even if failure
         uses: yorifuji/flutter-analyze-commenter@v1
