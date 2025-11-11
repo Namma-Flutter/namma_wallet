@@ -67,7 +67,8 @@ class ProfileView extends StatelessWidget {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
                             content: Text(
-                              'No email app found. Please install a mail client.',
+                              'No email app found. '
+                              'Please install a mail client.',
                             ),
                           ),
                         );
@@ -194,7 +195,7 @@ class ProfileTile extends StatelessWidget {
   final IconData icon;
   final String title;
   final String subtitle;
-  final GestureTapCallback onTap;
+  final void Function() onTap;
 
   @override
   Widget build(BuildContext context) {
