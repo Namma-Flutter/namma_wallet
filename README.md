@@ -257,30 +257,26 @@ refactor/database-schema
 ## 📌 Roadmap
 
 ### ✅ Completed Features
-* [x] SMS ticket parsing (TNSTC, IRCTC, SETC)
-* [x] PDF ticket extraction (TNSTC)
+* [x] SMS ticket parsing (TNSTC)
 * [x] QR code scanning (IRCTC)
 * [x] Clipboard text processing
-* [x] SQLite database with migration support
-* [x] Card stack UI with swipe functionality
 * [x] Calendar view for events and travel
-* [x] Bottom navigation with three main sections
-* [x] Duplicate ticket prevention
 * [x] Share intent handling for PDFs
+* [x] Dark mode theme support
 
 ### 🚧 In Progress
+* [x] SMS ticket parsing (SETC)
+* [x] PDF ticket extraction (TNSTC)
 * [ ] Enhanced error handling and user feedback
 * [ ] Performance optimizations for large datasets
 * [ ] Additional transport provider support
+* [ ] Home screen widgets for quick access
 
 ### 📅 Future Plans
 * [ ] Cloud backup & synchronization
 * [ ] Ticket sharing with friends and family
-* [ ] Home screen widgets for quick access
-* [ ] Offline ticket access and storage
 * [ ] Push notifications for travel reminders
 * [ ] Multi-language support (Tamil, Hindi, etc.)
-* [ ] Dark mode theme support
 * [ ] Advanced filtering and search capabilities
 
 ---
