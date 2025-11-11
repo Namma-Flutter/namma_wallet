@@ -6,6 +6,8 @@ import 'package:go_router/go_router.dart';
 import 'package:namma_wallet/src/common/database/wallet_database.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/routing/app_routes.dart';
+import 'package:namma_wallet/src/common/services/haptic_service_extension.dart';
+import 'package:namma_wallet/src/common/services/haptic_service_interface.dart';
 import 'package:namma_wallet/src/common/services/logger_interface.dart';
 import 'package:namma_wallet/src/common/widgets/snackbar_widget.dart';
 import 'package:namma_wallet/src/features/common/domain/travel_ticket_model.dart';
@@ -27,6 +29,7 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
   bool _isLoading = true;
   List<TravelTicketModel> _travelTickets = [];
   List<TravelTicketModel> _eventTickets = [];
+  final IHapticService hapticService = getIt<IHapticService>();
 
   @override
   void initState() {
@@ -81,6 +84,10 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
         _eventTickets = eventTickets;
         _isLoading = false;
       });
+
+      hapticService.triggerHaptic(
+        HapticType.selection,
+      );
     } on Object catch (e) {
       if (!mounted) return;
       showSnackbar(context, 'Error loading ticket data: $e', isError: true);
@@ -314,6 +321,9 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
         shadowColor: Colors.black26,
         child: InkWell(
           onTap: () async {
+            hapticService.triggerHaptic(
+              HapticType.selection,
+            );
             final wasDeleted = await context.pushNamed<bool>(
               AppRoute.ticketView.name,
               extra: genericTicket,
@@ -340,7 +350,7 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const UserProfileWidget(),
+               UserProfileWidget(),
                 const Padding(
                   padding: EdgeInsets.all(16),
                   child: Row(

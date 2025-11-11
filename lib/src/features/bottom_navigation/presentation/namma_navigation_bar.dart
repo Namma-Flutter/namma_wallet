@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:namma_wallet/src/common/routing/app_routes.dart';
 import 'package:namma_wallet/src/features/bottom_navigation/presentation/widgets/nav_bar.dart';
@@ -69,8 +68,6 @@ class _NammaNavigationBarState extends State<NammaNavigationBar> {
       setState(() {
         _pendingIndex = index;
       });
-
-      HapticFeedback.selectionClick();
 
       // Use cancellable Timer for navigation delay
       _navigationTimer = Timer(const Duration(milliseconds: 100), () {
