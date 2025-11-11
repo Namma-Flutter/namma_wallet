@@ -56,9 +56,40 @@ class ProfileView extends StatelessWidget {
                 title: 'Contact Us',
                 subtitle: 'Get support or send feedback',
                 onTap: () async {
-                  await launchUrl(
-                    Uri(scheme: 'mailto', path: 'support@nammawallet.com'),
+                  final uri = Uri(
+                    scheme: 'mailto',
+                    path: 'support@nammawallet.com',
                   );
+
+                  try {
+                    if (!await canLaunchUrl(uri)) {
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text(
+                              'No email app found. Please install a mail client.',
+                            ),
+                          ),
+                        );
+                      }
+                      return;
+                    }
+
+                    await launchUrl(
+                      uri,
+                      mode: LaunchMode.externalApplication,
+                    );
+                  } on Exception {
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text(
+                            'Failed to open email app. Please try again.',
+                          ),
+                        ),
+                      );
+                    }
+                  }
                 },
               ),
             ],
@@ -163,7 +194,7 @@ class ProfileTile extends StatelessWidget {
   final IconData icon;
   final String title;
   final String subtitle;
-  final VoidCallback onTap;
+  final GestureTapCallback onTap;
 
   @override
   Widget build(BuildContext context) {
