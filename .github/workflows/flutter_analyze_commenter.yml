@@ -22,10 +22,10 @@ jobs:
           flutter-version: ${{ steps.flutter-version.outputs.version }}
           cache: true
 
-      - run: fvm flutter pub get
+      - run: flutter pub get
 
       # Run flutter analyze with --write option
-      - run: fvm flutter analyze --write=flutter_analyze.log
+      - run: flutter analyze --write=flutter_analyze.log
 
       # (Optional) Run custom lint with --format=json option
       - if: ${{ !cancelled() }}
