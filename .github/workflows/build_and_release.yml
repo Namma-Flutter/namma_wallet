@@ -18,20 +18,20 @@ jobs:
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
-          distribution: 'temurin'
-          java-version: '17'
+          distribution: "temurin"
+          java-version: "17"
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: "lts/*"
-          cache: 'npm'
+          cache: "npm"
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2.21.0
         with:
           channel: stable
-          flutter-version: 3.35.2
+          flutter-version-file: pubspec.yaml
           cache: true
 
       - name: Cache Gradle

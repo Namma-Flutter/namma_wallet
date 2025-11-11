@@ -6,8 +6,10 @@
     "apikey",
     "AUTOINCREMENT",
     "buildlog",
+    "burrunan",
     "CHEKUMAB",
     "commitlint",
+    "cycjimmy",
     "HUGGINGFACE",
     "IRCTC",
     "IRCTCQR",
@@ -22,6 +24,7 @@
     "nammaflutter",
     "nammawallet",
     "prefs",
+    "pubspec",
     "SAMAARO",
     "sessionid",
     "SETC",
@@ -36,7 +39,8 @@
     "TNSTCSMS",
     "unittests",
     "webiny",
-    "xcodebuildmcp"
+    "xcodebuildmcp",
+    "yorifuji"
   ],
   "java.configuration.updateBuildConfiguration": "interactive"
 }
