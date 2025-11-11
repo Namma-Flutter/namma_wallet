@@ -7,13 +7,7 @@ on:
 
 jobs:
   run:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-    env:
-      OS: ${{ matrix.os }}
-      FLUTTER_VERSION: "3.35.2"
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@main
 
@@ -24,7 +18,7 @@ jobs:
           java-version: '17'
 
       - name: Set up Flutter
-        uses: subosito/flutter-action@v2
+        uses: subosito/flutter-action@2.21.0
         with:
           channel: stable
           flutter-version-file: pubspec.yaml
@@ -39,24 +33,20 @@ jobs:
       - name: Run tests with coverage
         run: flutter test --coverage
 
-      - name: Install lcov (Ubuntu only)
-        if: matrix.os == 'ubuntu-latest'
+      - name: Install lcov
         run: |
           sudo apt-get update
           sudo apt-get install -y lcov
 
-      - name: Convert coverage to lcov format (Ubuntu only)
-        if: matrix.os == 'ubuntu-latest'
+      - name: Convert coverage to lcov format
         run: |
           # Flutter generates lcov.info by default, but we may need to ensure it's in the right format
           lcov --list-coverage coverage/lcov.info || true
 
       - name: Upload coverage to Codecov
-        if: matrix.os == 'ubuntu-latest'
         uses: codecov/codecov-action@v5
         with:
           directory: ./coverage
-          env_vars: OS,FLUTTER_VERSION
           fail_ci_if_error: true
           files: ./coverage/lcov.info
           flags: unittests
