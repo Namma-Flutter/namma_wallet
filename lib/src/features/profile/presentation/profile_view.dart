@@ -4,6 +4,7 @@ import 'package:namma_wallet/src/common/routing/app_routes.dart';
 import 'package:namma_wallet/src/common/theme/theme_provider.dart';
 import 'package:namma_wallet/src/common/widgets/custom_back_button.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ProfileView extends StatelessWidget {
   const ProfileView({super.key});
@@ -17,52 +18,52 @@ class ProfileView extends StatelessWidget {
         leading: const CustomBackButton(),
         title: const Text('Profile'),
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          // Theme Settings Section
-          ThemeSectionWidget(themeProvider: themeProvider),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            spacing: 8,
+            children: [
+              // Theme Settings Section
+              ThemeSectionWidget(themeProvider: themeProvider),
 
-          const SizedBox(height: 24),
+              const SizedBox(
+                height: 8,
+              ),
+              // Contributors Section
+              ProfileTile(
+                icon: Icons.people_outline,
+                title: 'Contributors',
+                subtitle: 'View project contributors',
+                onTap: () {
+                  context.pushNamed(AppRoute.contributors.name);
+                },
+              ),
 
-          // Contributors Section
-          Card(
-            elevation: 2,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: ListTile(
-              leading: const Icon(Icons.people_outline),
-              title: const Text('Contributors'),
-              subtitle: const Text('View project contributors'),
-              trailing: const Icon(Icons.chevron_right),
-              onTap: () {
-                context.pushNamed(AppRoute.contributors.name);
-              },
-            ),
+              // Licenses Section
+              ProfileTile(
+                icon: Icons.article_outlined,
+                title: 'Licenses',
+                subtitle: 'View open source licenses',
+                onTap: () {
+                  context.pushNamed(AppRoute.license.name);
+                },
+              ),
+
+              // Contact Us Section
+              ProfileTile(
+                icon: Icons.contact_mail_outlined,
+                title: 'Contact Us',
+                subtitle: 'Get support or send feedback',
+                onTap: () async {
+                  await launchUrl(
+                    Uri(scheme: 'mailto', path: 'support@nammawallet.com'),
+                  );
+                },
+              ),
+            ],
           ),
-
-          const SizedBox(height: 8),
-
-          // License Section
-          Card(
-            elevation: 2,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: ListTile(
-              leading: const Icon(Icons.article_outlined),
-              title: const Text('Licenses'),
-              subtitle: const Text('View open source licenses'),
-              trailing: const Icon(Icons.chevron_right),
-              onTap: () {
-                context.pushNamed(AppRoute.license.name);
-              },
-            ),
-          ),
-
-          const SizedBox(height: 100), // Space for FAB
-        ],
+        ),
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
@@ -146,6 +147,37 @@ class ThemeSectionWidget extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class ProfileTile extends StatelessWidget {
+  const ProfileTile({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.onTap,
+    super.key,
+  });
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: ListTile(
+        leading: Icon(icon),
+        title: Text(title),
+        subtitle: Text(subtitle),
+        trailing: const Icon(Icons.chevron_right),
+        onTap: onTap,
       ),
     );
   }
