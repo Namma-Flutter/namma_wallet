@@ -48,7 +48,7 @@ jobs:
       contents: read
       pull-requests: read
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - uses: webiny/action-conventional-commits@v1.3.0
         with:

@@ -9,7 +9,7 @@ jobs:
       contents: read
       pull-requests: write # Write permission is required to add comments on a PR
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
