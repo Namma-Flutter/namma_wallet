@@ -37,6 +37,7 @@
     "TNSTC",
     "TNSTCPDF",
     "TNSTCSMS",
+    "unittests",
     "webiny",
     "xcodebuildmcp",
     "yorifuji"
