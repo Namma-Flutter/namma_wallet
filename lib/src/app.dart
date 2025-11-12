@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
+import 'package:namma_wallet/src/common/database/wallet_database.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/helper/check_pnr_id.dart';
 import 'package:namma_wallet/src/common/routing/app_router.dart';
@@ -9,8 +9,8 @@ import 'package:namma_wallet/src/common/routing/app_routes.dart';
 import 'package:namma_wallet/src/common/services/logger_interface.dart';
 import 'package:namma_wallet/src/common/services/sharing_intent_service.dart';
 import 'package:namma_wallet/src/common/theme/app_theme.dart';
-import 'package:namma_wallet/src/common/theme/styles.dart';
 import 'package:namma_wallet/src/common/theme/theme_provider.dart';
+import 'package:namma_wallet/src/features/common/application/travel_parser_service.dart';
 import 'package:namma_wallet/src/features/tnstc/application/sms_service.dart';
 import 'package:provider/provider.dart';
 
@@ -26,6 +26,8 @@ class _NammaWalletAppState extends State<NammaWalletApp> {
   late final SharingIntentService _sharingService =
       getIt<SharingIntentService>();
   late final SMSService _smsService = getIt<SMSService>();
+  late final TravelParserService _travelParserService =
+      getIt<TravelParserService>();
   late final ILogger _logger = getIt<ILogger>();
   final GlobalKey<ScaffoldMessengerState> _scaffoldMessengerKey =
       GlobalKey<ScaffoldMessengerState>();
@@ -35,18 +37,83 @@ class _NammaWalletAppState extends State<NammaWalletApp> {
     super.initState();
     _logger.info('App initialized');
 
-    // Initialize sharing intent service for file logging
+    // Initialize sharing intent service for file and text content
     _sharingService.initialize(
-      onFileReceived: (filePath) async {
+      onContentReceived: (content) async {
         try {
-          _logger.info('Processing shared file: $filePath');
-          final file = File(filePath);
-          final content = await file.readAsString();
-          final ticket = _smsService.parseTicket(content);
+          _logger.info('Processing shared content: $content');
+
+          String ticketContent;
+
+          // Check if content is a file path or text content
+          if (content.contains('/') && File(content).existsSync()) {
+            // It's a file, read its content
+            final file = File(content);
+            ticketContent = await file.readAsString();
+            _logger.info('Read content from file');
+          } else {
+            // It's text content directly (SMS, etc.)
+            ticketContent = content;
+            _logger.info('Using content directly as text');
+          }
+
+          // First, check if this is an update SMS (e.g., conductor details)
+          final updateInfo = _travelParserService.parseUpdateSMS(ticketContent);
+
+          if (updateInfo != null) {
+            // This is an update SMS. Attempt to apply the update.
+            final db = getIt<WalletDatabase>();
+            final count = await db.updateTravelTicketByPNR(
+              updateInfo.pnrNumber,
+              updateInfo.updates,
+            );
+
+            if (count > 0) {
+              _logger.success(
+                'Ticket updated successfully via shared content',
+              );
+
+              // Navigate to success screen with update message
+              router.go(
+                AppRoute.shareSuccess.path,
+                extra: {
+                  'pnrNumber': updateInfo.pnrNumber,
+                  'from': 'Updated',
+                  'to': 'Conductor Details',
+                  'fare': 'Updated',
+                  'date': 'Just Now',
+                },
+              );
+              return;
+            } else {
+              _logger.warning(
+                'Update SMS received via sharing, but no matching ticket found',
+              );
+              
+              // Show error message
+              _scaffoldMessengerKey.currentState?.showSnackBar(
+                const SnackBar(
+                  content: Text(
+                    'Update received, but the original ticket was not found.',
+                  ),
+                  backgroundColor: Colors.orange,
+                  duration: Duration(seconds: 5),
+                ),
+              );
+              
+              // Navigate back to home on error
+              router.go(AppRoute.home.path);
+              return;
+            }
+          }
+
+          // If it's not an update SMS, proceed with parsing as a new ticket.
+          final ticket = _smsService.parseTicket(ticketContent);
           await checkAndUpdateTNSTCTicket(ticket);
 
           _logger.success(
-            'Shared SMS processed successfully for PNR: ${ticket.pnrNumber}',
+            'Shared content processed successfully for PNR: '
+            '${ticket.pnrNumber}',
           );
 
           // Navigate to success screen
@@ -62,21 +129,28 @@ class _NammaWalletAppState extends State<NammaWalletApp> {
           );
         } on Object catch (e, stackTrace) {
           _logger.error(
-            'Error processing shared SMS',
+            'Error processing shared content',
             e,
             stackTrace,
           );
+          
+          // Show error message
           _scaffoldMessengerKey.currentState?.showSnackBar(
             SnackBar(
-              content: Text('Error processing shared SMS: $e'),
+              content: Text('Error processing shared content: $e'),
               backgroundColor: Colors.red,
               duration: const Duration(seconds: 5),
             ),
           );
+          
+          // Navigate back to home on error
+          router.go(AppRoute.home.path);
         }
       },
       onError: (error) {
         _logger.error('Sharing intent error: $error');
+        
+        // Show error message
         _scaffoldMessengerKey.currentState?.showSnackBar(
           SnackBar(
             content: Text('Sharing error: $error'),
@@ -84,6 +158,9 @@ class _NammaWalletAppState extends State<NammaWalletApp> {
             duration: const Duration(seconds: 5),
           ),
         );
+        
+        // Navigate back to home on error
+        router.go(AppRoute.home.path);
       },
     );
   }

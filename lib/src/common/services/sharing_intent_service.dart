@@ -14,14 +14,14 @@ class SharingIntentService {
   StreamSubscription<List<SharedMediaFile>>? _intentDataStreamSubscription;
 
   void initialize({
-    required void Function(String) onFileReceived,
+    required void Function(String) onContentReceived,
     required void Function(String) onError,
   }) {
     _intentDataStreamSubscription = ReceiveSharingIntent.instance
         .getMediaStream()
         .listen(
           (List<SharedMediaFile> files) {
-            _handleSharedFiles(files, onFileReceived, onError);
+            _handleSharedContent(files, onContentReceived, onError);
           },
           onError: (Object err) {
             _logger.error('Error in sharing intent stream: $err');
@@ -33,19 +33,19 @@ class SharingIntentService {
         .getInitialMedia()
         .then((List<SharedMediaFile> files) {
           if (files.isNotEmpty) {
-            _logger.info('App launched with shared files: ${files.length}');
-            _handleSharedFiles(files, onFileReceived, onError);
+            _logger.info('App launched with shared content: ${files.length}');
+            _handleSharedContent(files, onContentReceived, onError);
           }
         })
         .catchError((Object error) {
-          _logger.error('Error getting initial shared media: $error');
+          _logger.error('Error getting initial shared content: $error');
           onError('Error getting initial shared content: $error');
         });
   }
 
-  void _handleSharedFiles(
+  void _handleSharedContent(
     List<SharedMediaFile> files,
-    void Function(String) onFileReceived,
+    void Function(String) onContentReceived,
     void Function(String) onError,
   ) {
     _logger.info('SHARING INTENT TRIGGERED');
@@ -53,18 +53,27 @@ class SharingIntentService {
     for (var i = 0; i < files.length; i++) {
       final file = files[i];
       try {
-        _logger.info('SHARED FILE ${i + 1}/${files.length} DETAILS');
+        _logger.info('SHARED CONTENT ${i + 1}/${files.length} DETAILS');
         _printFileDetails(file);
 
-        // Log human-readable message
-        final fileName = file.path.split('/').last;
-        _logger.info('File received: $fileName');
-
-        // Pass actual file path to callback (not log string)
-        onFileReceived(file.path);
+        // Check if this is actually a file or text content
+        final fileObj = File(file.path);
+        if (fileObj.existsSync()) {
+          // It's a real file, pass the file path
+          _logger.info('File received: ${file.path.split('/').last}');
+          onContentReceived(file.path);
+        } else {
+          // It's text content (like SMS), pass the text directly
+          _logger.info('Text content received');
+          onContentReceived(file.path);
+        }
       } on Object catch (e, stackTrace) {
-        _logger.error('Error handling shared file ${i + 1}: $e', e, stackTrace);
-        onError('Error processing shared file: $e');
+        _logger.error(
+          'Error handling shared content ${i + 1}: $e',
+          e,
+          stackTrace,
+        );
+        onError('Error processing shared content: $e');
       }
     }
 
