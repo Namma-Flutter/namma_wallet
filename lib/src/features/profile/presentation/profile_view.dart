@@ -30,6 +30,7 @@ class ProfileView extends StatelessWidget {
               const SizedBox(
                 height: 8,
               ),
+
               // Contributors Section
               ProfileTile(
                 icon: Icons.people_outline,
