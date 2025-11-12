@@ -1,9 +1,11 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/helper/check_pnr_id.dart';
 import 'package:namma_wallet/src/common/routing/app_router.dart';
+import 'package:namma_wallet/src/common/routing/app_routes.dart';
 import 'package:namma_wallet/src/common/services/logger_interface.dart';
 import 'package:namma_wallet/src/common/services/sharing_intent_service.dart';
 import 'package:namma_wallet/src/common/theme/app_theme.dart';
@@ -46,14 +48,17 @@ class _NammaWalletAppState extends State<NammaWalletApp> {
           _logger.success(
             'Shared SMS processed successfully for PNR: ${ticket.pnrNumber}',
           );
-          _scaffoldMessengerKey.currentState?.showSnackBar(
-            SnackBar(
-              content: Text(
-                'Shared SMS processed for PNR: ${ticket.pnrNumber}',
-              ),
-              backgroundColor: AppColor.primaryBlue,
-              duration: const Duration(seconds: 3),
-            ),
+
+          // Navigate to success screen
+          router.go(
+            AppRoute.shareSuccess.path,
+            extra: {
+              'pnrNumber': ticket.displayPnr,
+              'from': ticket.displayFrom,
+              'to': ticket.displayTo,
+              'fare': ticket.displayFare,
+              'date': ticket.displayDate,
+            },
           );
         } on Object catch (e, stackTrace) {
           _logger.error(

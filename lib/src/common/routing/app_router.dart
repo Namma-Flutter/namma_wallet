@@ -12,6 +12,7 @@ import 'package:namma_wallet/src/features/profile/presentation/db_viewer_view.da
 import 'package:namma_wallet/src/features/profile/presentation/license_view.dart';
 import 'package:namma_wallet/src/features/profile/presentation/profile_view.dart';
 import 'package:namma_wallet/src/features/scanner/presentation/scanner_view.dart';
+import 'package:namma_wallet/src/features/share/presentation/share_success_view.dart';
 import 'package:namma_wallet/src/features/travel/presentation/ticket_view.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>(
@@ -102,6 +103,25 @@ final router = GoRouter(
       path: AppRoute.contributors.path,
       name: AppRoute.contributors.name,
       builder: (context, state) => const ContributorsView(),
+    ),
+    GoRoute(
+      path: AppRoute.shareSuccess.path,
+      name: AppRoute.shareSuccess.name,
+      builder: (context, state) {
+        final extra = state.extra as Map<String, String>?;
+        if (extra == null) {
+          return const Scaffold(
+            body: Center(child: Text('Invalid share data')),
+          );
+        }
+        return ShareSuccessView(
+          pnrNumber: extra['pnrNumber'] ?? 'Unknown',
+          from: extra['from'] ?? 'Unknown',
+          to: extra['to'] ?? 'Unknown',
+          fare: extra['fare'] ?? '₹0.00',
+          date: extra['date'] ?? 'Unknown',
+        );
+      },
     ),
   ],
 );
