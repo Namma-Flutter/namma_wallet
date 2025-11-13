@@ -40,6 +40,7 @@ class WalletDatabase {
 
   /// Masks booking reference for safe logging by showing
   ///  only the last 3 characters
+  // ignore: unused_element
   String _maskBookingRef(String bookingRef) {
     if (bookingRef.length <= 3) return bookingRef;
     return '''${'*' * (bookingRef.length - 3)}${bookingRef.substring(bookingRef.length - 3)}''';
@@ -120,7 +121,8 @@ class WalletDatabase {
       'CREATE INDEX IF NOT EXISTS idx_tickets_type ON tickets (type);',
     );
     await db.execute(
-      'CREATE INDEX IF NOT EXISTS idx_tickets_start_time ON tickets (start_time);',
+      'CREATE INDEX IF NOT EXISTS idx_tickets_start_time ON tickets '
+      '(start_time);',
     );
   }
 
@@ -159,7 +161,8 @@ class WalletDatabase {
         _logger.logDatabase('Success', 'Inserted ticket with ID: $id');
       } else {
         _logger.warning(
-          'Insert operation completed but no row ID returned for ticket: ${ticket.primaryText}',
+          'Insert operation completed but no row ID returned for ticket:'
+          '${ticket.primaryText}',
         );
       }
 
@@ -321,9 +324,9 @@ class WalletDatabase {
 
   /// Update by Ticket Id
   Future<int> updateTicketById(
-      int ticketId,
-      Map<String, Object?> updates,
-      ) async {
+    int ticketId,
+    Map<String, Object?> updates,
+  ) async {
     try {
       _logger.logDatabase(
         'Update',
@@ -346,19 +349,22 @@ class WalletDatabase {
 
           // --- Merge extras ---
           if (updates.containsKey('extras')) {
-            final existingExtras = existing['extras'] != null &&
-                (existing['extras'] as String).isNotEmpty
-                ? (jsonDecode(existing['extras'] as String) as List)
-                .cast<Map<String, dynamic>>()
+            final existingExtras =
+                existing['extras'] != null &&
+                    (existing['extras']! as String).isNotEmpty
+                ? (jsonDecode(existing['extras']! as String) as List)
+                      .cast<Map<String, dynamic>>()
                 : <Map<String, dynamic>>[];
 
-            final newExtras = (jsonDecode(updates['extras'] as String) as List)
+            final newExtras = (jsonDecode(updates['extras']! as String) as List)
                 .cast<Map<String, dynamic>>();
 
             // Merge based on unique "title" keys (replace if same title)
-            final mergedExtras = {...{
-              for (var e in existingExtras) e['title']: e,
-            }};
+            final mergedExtras = {
+              ...{
+                for (final e in existingExtras) e['title']: e,
+              },
+            };
 
             for (final newE in newExtras) {
               mergedExtras[newE['title']] = newE;
@@ -369,18 +375,21 @@ class WalletDatabase {
 
           // --- Merge tags (if needed) ---
           if (updates.containsKey('tags')) {
-            final existingTags = existing['tags'] != null &&
-                (existing['tags'] as String).isNotEmpty
-                ? (jsonDecode(existing['tags'] as String) as List)
-                .cast<Map<String, dynamic>>()
+            final existingTags =
+                existing['tags'] != null &&
+                    (existing['tags']! as String).isNotEmpty
+                ? (jsonDecode(existing['tags']! as String) as List)
+                      .cast<Map<String, dynamic>>()
                 : <Map<String, dynamic>>[];
 
-            final newTags = (jsonDecode(updates['tags'] as String) as List)
+            final newTags = (jsonDecode(updates['tags']! as String) as List)
                 .cast<Map<String, dynamic>>();
 
-            final mergedTags = {...{
-              for (var t in existingTags) t['value']: t,
-            }};
+            final mergedTags = {
+              ...{
+                for (final t in existingTags) t['value']: t,
+              },
+            };
 
             for (final newT in newTags) {
               mergedTags[newT['value']] = newT;
@@ -416,7 +425,8 @@ class WalletDatabase {
       return count;
     } catch (e, stackTrace) {
       _logger.error(
-        'Failed to update ticket with ID: ${_maskTicketId(ticketId.toString())}',
+        'Failed to update ticket with ID: '
+        '${_maskTicketId(ticketId.toString())}',
         e,
         stackTrace,
       );

@@ -159,9 +159,11 @@ class TNSTCBusParser implements TravelTicketParser {
     return Ticket(
       ticketId: int.tryParse(pnrNumber),
       primaryText:
-          '${from.isNotEmpty ? from : 'Unknown'} → ${to.isNotEmpty ? to : 'Unknown'}',
+          '${from.isNotEmpty ? from : 'Unknown'} → '
+          '${to.isNotEmpty ? to : 'Unknown'}',
       secondaryText:
-          '${corporation.isNotEmpty ? corporation : 'TNSTC'} - ${finalTripCode.isNotEmpty ? finalTripCode : 'Bus'}',
+          '${corporation.isNotEmpty ? corporation : 'TNSTC'} - '
+          '${finalTripCode.isNotEmpty ? finalTripCode : 'Bus'}',
       startTime: journeyDate ?? DateTime.now(),
       endTime: journeyDate?.add(const Duration(hours: 6)),
       location: boardingPoint.isNotEmpty
@@ -257,9 +259,12 @@ class IRCTCTrainParser implements TravelTicketParser {
     return Ticket(
       ticketId: pnrNumber.isNotEmpty ? int.tryParse(pnrNumber) : null,
       primaryText:
-          '${from.isNotEmpty ? from : 'Unknown'} → ${to.isNotEmpty ? to : 'Unknown'}',
+          '${from.isNotEmpty ? from : 'Unknown'} →'
+          ' ${to.isNotEmpty ? to : 'Unknown'}',
       secondaryText:
-          'Train ${trainNumber.isNotEmpty ? trainNumber : 'N/A'} • ${classService.isNotEmpty ? classService : 'Class N/A'} • ${seat.isNotEmpty ? seat : 'Seat N/A'}',
+          'Train ${trainNumber.isNotEmpty ? trainNumber : 'N/A'} • '
+          '${classService.isNotEmpty ? classService : 'Class N/A'} • '
+          '${seat.isNotEmpty ? seat : 'Seat N/A'}',
       startTime: parsedDate,
       location: from.isNotEmpty ? from : 'Unknown',
       tags: [
@@ -342,9 +347,11 @@ class SETCBusParser implements TravelTicketParser {
     return Ticket(
       ticketId: bookingId.isNotEmpty ? int.tryParse(bookingId) : null,
       primaryText:
-          '${from.isNotEmpty ? from : 'Unknown'} → ${to.isNotEmpty ? to : 'Unknown'}',
+          '${from.isNotEmpty ? from : 'Unknown'} → '
+          '${to.isNotEmpty ? to : 'Unknown'}',
       secondaryText:
-          '${busNumber.isNotEmpty ? busNumber : 'SETC Bus'} • ${seat.isNotEmpty ? seat : 'Seat N/A'}',
+          '${busNumber.isNotEmpty ? busNumber : 'SETC Bus'} • '
+          '${seat.isNotEmpty ? seat : 'Seat N/A'}',
       type: TicketType.bus,
       startTime: parsedDate,
       location: from.isNotEmpty ? from : 'Unknown',
@@ -429,6 +436,7 @@ class TravelParserService {
   }
 
   /// Create sanitized updates map for safe logging
+  // ignore: unused_element
   Map<String, Object?> _sanitizeUpdates(Map<String, Object?> updates) {
     // Explicit allowlist of fields that can be safely logged
     const allowedFields = <String>{
@@ -469,7 +477,6 @@ class TravelParserService {
     if (text.toUpperCase().contains('TNSTC') &&
         (text.toLowerCase().contains('conductor mobile no') ||
             text.toLowerCase().contains('vehicle no'))) {
-
       // Extract PNR
       final pnrMatch = RegExp(
         r'PNR\s*:\s*([^,\s]+)',
@@ -518,8 +525,8 @@ class TravelParserService {
       // Safe logging
       final sanitizedPnr = _maskPnr(pnr);
       _logger.info(
-          '[TicketParserService] TNSTC update SMS for PNR: $sanitizedPnr '
-              '(extras updated: ${extrasUpdates.length})'
+        '[TicketParserService] TNSTC update SMS for PNR: $sanitizedPnr '
+        '(extras updated: ${extrasUpdates.length})',
       );
 
       return TicketUpdateInfo(

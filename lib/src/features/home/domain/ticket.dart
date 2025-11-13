@@ -27,7 +27,8 @@ class Ticket with TicketMappable {
       ticketId: int.tryParse(model.pnrNumber),
       primaryText: '${model.fromStation} → ${model.toStation}',
       secondaryText:
-          'Train ${model.trainNumber} • ${model.travelClass} • ${model.passengerName}',
+          'Train ${model.trainNumber} • ${model.travelClass} • '
+          '${model.passengerName}',
       startTime: DateTime(
         model.dateOfJourney.year,
         model.dateOfJourney.month,
@@ -69,12 +70,15 @@ class Ticket with TicketMappable {
         ExtrasModel(
           title: 'Departure',
           value:
-              '${model.scheduledDeparture.hour.toString().padLeft(2, '0')}:${model.scheduledDeparture.minute.toString().padLeft(2, '0')}',
+              '${model.scheduledDeparture.hour.toString().padLeft(2, '0')}'
+              ':${model.scheduledDeparture.minute.toString().padLeft(2, '0')}',
         ),
         ExtrasModel(
           title: 'Date of Journey',
           value:
-              '${model.dateOfJourney.year}-${model.dateOfJourney.month.toString().padLeft(2, '0')}-${model.dateOfJourney.day.toString().padLeft(2, '0')}',
+              '${model.dateOfJourney.year}-${model.dateOfJourney.month.
+              toString().padLeft(2, '0')}-${model.dateOfJourney.day
+                  .toString().padLeft(2, '0')}',
         ),
         ExtrasModel(title: 'Fare', value: model.ticketFare.toStringAsFixed(2)),
         ExtrasModel(
@@ -103,7 +107,8 @@ class Ticket with TicketMappable {
       ticketId: int.tryParse(model.pnrNumber ?? ''),
       primaryText: '$primarySource → $primaryDestination',
       secondaryText:
-          '${model.corporation ?? 'TNSTC'} - ${model.tripCode ?? model.routeNo ?? 'Bus'}',
+          '${model.corporation ?? 'TNSTC'} - '
+              '${model.tripCode ?? model.routeNo ?? 'Bus'}',
       startTime: model.journeyDate ?? DateTime.now(),
       endTime: model.journeyDate ?? DateTime.now(),
       location:

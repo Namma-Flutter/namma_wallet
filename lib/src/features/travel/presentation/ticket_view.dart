@@ -29,6 +29,9 @@ class TicketView extends StatefulWidget {
 
 class _TicketViewState extends State<TicketView> {
   bool _isDeleting = false;
+
+  ///
+  // ignore: unused_element
   bool _isPinning = false;
 
   // Helper method to handle empty values
@@ -55,6 +58,8 @@ class _TicketViewState extends State<TicketView> {
     return null;
   }
 
+  ///
+  // ignore: unused_element
   Future<void> _pinToHomeScreen() async {
     setState(() {
       _isPinning = true;
@@ -493,7 +498,8 @@ class _TicketViewState extends State<TicketView> {
             //               child: SizedBox(
             //                 height: 50,
             //                 child: ElevatedButton.icon(
-            //                   onPressed: _isPinning ? null : _pinToHomeScreen,
+            //                   onPressed: _isPinning ? null : _pinToHomeScreen
+            //                   ,
             //                   style: ElevatedButton.styleFrom(
             //                     backgroundColor: Theme.of(
             //                       context,
