@@ -28,4 +28,4 @@ jobs:
         uses: yorifuji/flutter-analyze-commenter@v1
         with:
           analyze-log: flutter_analyze.log # file path for analyze log, if multiple files, separated by commas
-          verbose: false # verbose output (optional)
+          verbose: true # verbose output (optional)
