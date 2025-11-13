@@ -96,6 +96,8 @@ class Ticket with TicketMappable {
     final firstPassenger = model.passengers.isNotEmpty
         ? model.passengers.first
         : null;
+    final seatNumber = firstPassenger?.seatNumber;
+    final gender = firstPassenger?.gender;
 
     return Ticket(
       ticketId: int.tryParse(model.pnrNumber ?? ''),
@@ -118,8 +120,8 @@ class Ticket with TicketMappable {
           TagModel(value: model.pnrNumber, icon: 'qr_code'),
         if (model.serviceStartTime != null)
           TagModel(value: model.serviceStartTime, icon: 'access_time'),
-        if (firstPassenger?.seatNumber.isNotEmpty ?? false)
-          TagModel(value: firstPassenger!.seatNumber, icon: 'event_seat'),
+        if (seatNumber != null && seatNumber.isNotEmpty)
+          TagModel(value: seatNumber, icon: 'event_seat'),
         if (model.totalFare != null)
           TagModel(
             value: '₹${model.totalFare!.toStringAsFixed(2)}',
@@ -132,8 +134,8 @@ class Ticket with TicketMappable {
           ExtrasModel(title: 'Passenger Name', value: firstPassenger.name),
         if (firstPassenger?.age != null)
           ExtrasModel(title: 'Age', value: firstPassenger!.age.toString()),
-        if (firstPassenger?.gender.isNotEmpty ?? false)
-          ExtrasModel(title: 'Gender', value: firstPassenger!.gender),
+        if (gender != null && gender.isNotEmpty)
+          ExtrasModel(title: 'Gender', value: gender),
         if (model.busIdNumber != null)
           ExtrasModel(title: 'Bus Number', value: model.busIdNumber!),
         if (model.vehicleNumber != null)

@@ -9,6 +9,7 @@ import 'package:sqflite/sqflite.dart';
 
 class DuplicateTicketException implements Exception {
   const DuplicateTicketException(this.message);
+
   final String message;
 
   @override
@@ -130,10 +131,23 @@ class WalletDatabase {
       final db = await database;
 
       final map = ticket.toEntity()
-        ..['tags'] = jsonEncode(ticket.tags?.map((e) => e.toMap()).toList())
-        ..['extras'] = jsonEncode(ticket.extras?.map((e) => e.toMap()).toList())
-        ..['created_at'] = DateTime.now().toIso8601String()
-        ..['updated_at'] = DateTime.now().toIso8601String();
+        ..remove('tags')
+        ..remove('extras');
+
+      if (ticket.tags != null && ticket.tags!.isNotEmpty) {
+        map['tags'] = jsonEncode(
+          ticket.tags!.map((e) => e.toMap()).toList(),
+        );
+      }
+
+      if (ticket.extras != null && ticket.extras!.isNotEmpty) {
+        map['extras'] = jsonEncode(
+          ticket.extras!.map((e) => e.toMap()).toList(),
+        );
+      }
+
+      map['created_at'] = DateTime.now().toIso8601String();
+      map['updated_at'] = DateTime.now().toIso8601String();
 
       final id = await db.insert(
         'tickets',
@@ -282,13 +296,13 @@ class WalletDatabase {
       final tickets = result.map((map) {
         final decodedMap = {
           ...map,
-          'tags': map['tags'] == null || (map['tags'] as String).isEmpty
+          'tags': map['tags'] == null || (map['tags']! as String).isEmpty
               ? null
-              : (jsonDecode(map['tags'] as String) as List)
+              : (jsonDecode(map['tags']! as String) as List)
                     .cast<Map<String, dynamic>>(),
-          'extras': map['extras'] == null || (map['extras'] as String).isEmpty
+          'extras': map['extras'] == null || (map['extras']! as String).isEmpty
               ? null
-              : (jsonDecode(map['extras'] as String) as List)
+              : (jsonDecode(map['extras']! as String) as List)
                     .cast<Map<String, dynamic>>(),
         };
         return TicketMapper.fromMap(decodedMap);
@@ -307,11 +321,10 @@ class WalletDatabase {
 
   /// Update by Ticket Id
   Future<int> updateTicketById(
-    int ticketId,
-    Map<String, Object?> updates,
-  ) async {
+      int ticketId,
+      Map<String, Object?> updates,
+      ) async {
     try {
-      // Log start of update
       _logger.logDatabase(
         'Update',
         'Updating ticket with ID: ${_maskTicketId(ticketId.toString())}',
@@ -319,10 +332,69 @@ class WalletDatabase {
 
       final db = await database;
 
-      // Add or update modified time
-      // updates['updated_at'] = DateTime.now().toIso8601String();
+      // 🧩 Step 1: If updating extras or tags, merge them with existing
+      if (updates.containsKey('extras') || updates.containsKey('tags')) {
+        final existingResult = await db.query(
+          'tickets',
+          where: 'id = ?',
+          whereArgs: [ticketId],
+          limit: 1,
+        );
 
-      // Perform update
+        if (existingResult.isNotEmpty) {
+          final existing = existingResult.first;
+
+          // --- Merge extras ---
+          if (updates.containsKey('extras')) {
+            final existingExtras = existing['extras'] != null &&
+                (existing['extras'] as String).isNotEmpty
+                ? (jsonDecode(existing['extras'] as String) as List)
+                .cast<Map<String, dynamic>>()
+                : <Map<String, dynamic>>[];
+
+            final newExtras = (jsonDecode(updates['extras'] as String) as List)
+                .cast<Map<String, dynamic>>();
+
+            // Merge based on unique "title" keys (replace if same title)
+            final mergedExtras = {...{
+              for (var e in existingExtras) e['title']: e,
+            }};
+
+            for (final newE in newExtras) {
+              mergedExtras[newE['title']] = newE;
+            }
+
+            updates['extras'] = jsonEncode(mergedExtras.values.toList());
+          }
+
+          // --- Merge tags (if needed) ---
+          if (updates.containsKey('tags')) {
+            final existingTags = existing['tags'] != null &&
+                (existing['tags'] as String).isNotEmpty
+                ? (jsonDecode(existing['tags'] as String) as List)
+                .cast<Map<String, dynamic>>()
+                : <Map<String, dynamic>>[];
+
+            final newTags = (jsonDecode(updates['tags'] as String) as List)
+                .cast<Map<String, dynamic>>();
+
+            final mergedTags = {...{
+              for (var t in existingTags) t['value']: t,
+            }};
+
+            for (final newT in newTags) {
+              mergedTags[newT['value']] = newT;
+            }
+
+            updates['tags'] = jsonEncode(mergedTags.values.toList());
+          }
+        }
+      }
+
+      // 🕒 Step 2: Update timestamp
+      updates['updated_at'] = DateTime.now().toIso8601String();
+
+      // 📝 Step 3: Run update
       final count = await db.update(
         'tickets',
         updates,
@@ -330,7 +402,6 @@ class WalletDatabase {
         whereArgs: [ticketId],
       );
 
-      // Log based on outcome
       if (count > 0) {
         _logger.logDatabase(
           'Success',

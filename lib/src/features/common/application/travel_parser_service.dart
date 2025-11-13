@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/services/logger_interface.dart';
 import 'package:namma_wallet/src/features/common/enums/source_type.dart';
@@ -463,10 +465,12 @@ class TravelParserService {
 
   /// Detects if this is an update SMS (e.g., conductor details for TNSTC)
   TicketUpdateInfo? parseUpdateSMS(String text) {
-    // Check for TNSTC update SMS pattern
+    // Match TNSTC update pattern
     if (text.toUpperCase().contains('TNSTC') &&
         (text.toLowerCase().contains('conductor mobile no') ||
             text.toLowerCase().contains('vehicle no'))) {
+
+      // Extract PNR
       final pnrMatch = RegExp(
         r'PNR\s*:\s*([^,\s]+)',
         caseSensitive: false,
@@ -476,40 +480,53 @@ class TravelParserService {
 
       final pnr = pnrMatch.group(1)!.trim();
       final updates = <String, Object?>{};
+      final extrasUpdates = <Map<String, dynamic>>[];
 
-      // Extract conductor mobile number
+      // Extract Conductor Mobile No
       final mobileMatch = RegExp(
         r'Conductor Mobile No\s*:\s*(\d+)',
         caseSensitive: false,
       ).firstMatch(text);
+
       if (mobileMatch != null) {
-        updates['contact_mobile'] = mobileMatch.group(1)!.trim();
+        extrasUpdates.add({
+          'title': 'Conductor Mobile No',
+          'value': mobileMatch.group(1)!.trim(),
+        });
       }
 
-      // Extract vehicle number
+      // Extract Vehicle No
       final vehicleMatch = RegExp(
         r'Vehicle No\s*:\s*([^,\s]+)',
         caseSensitive: false,
       ).firstMatch(text);
+
       if (vehicleMatch != null) {
-        updates['trip_code'] = vehicleMatch.group(1)!.trim();
+        extrasUpdates.add({
+          'title': 'Vehicle No',
+          'value': vehicleMatch.group(1)!.trim(),
+        });
       }
 
-      if (updates.isNotEmpty) {
-        // Sanitize PII before logging
-        final sanitizedPnr = _maskPnr(pnr);
-        final sanitizedUpdates = _sanitizeUpdates(updates);
-        _logger.info(
-          '[TravelParserService] Detected TNSTC update SMS for '
-          'PNR: $sanitizedPnr with updates: $sanitizedUpdates',
-        );
+      // If nothing extracted, return null
+      if (extrasUpdates.isEmpty) return null;
 
-        return TicketUpdateInfo(
-          pnrNumber: pnr,
-          providerName: 'TNSTC', // Default provider for these updates
-          updates: updates,
-        );
-      }
+      // Convert extras into JSON (so updateTicketById can merge it)
+      updates['extras'] = jsonEncode(extrasUpdates);
+      updates['updated_at'] = DateTime.now().toIso8601String();
+
+      // Safe logging
+      final sanitizedPnr = _maskPnr(pnr);
+      _logger.info(
+          '[TicketParserService] TNSTC update SMS for PNR: $sanitizedPnr '
+              '(extras updated: ${extrasUpdates.length})'
+      );
+
+      return TicketUpdateInfo(
+        pnrNumber: pnr,
+        providerName: 'TNSTC', // logical info, NOT stored in DB
+        updates: updates,
+      );
     }
 
     return null;
