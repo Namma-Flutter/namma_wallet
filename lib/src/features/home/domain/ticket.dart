@@ -36,13 +36,6 @@ class Ticket with TicketMappable {
         model.scheduledDeparture.hour,
         model.scheduledDeparture.minute,
       ),
-      endTime: DateTime(
-        model.dateOfJourney.year,
-        model.dateOfJourney.month,
-        model.dateOfJourney.day,
-        model.scheduledDeparture.hour + 6, // estimated duration
-        model.scheduledDeparture.minute,
-      ),
       location: model.boardingStation,
       tags: [
         TagModel(value: model.pnrNumber, icon: 'confirmation_number'),
@@ -76,9 +69,7 @@ class Ticket with TicketMappable {
         ExtrasModel(
           title: 'Date of Journey',
           value:
-              '${model.dateOfJourney.year}-${model.dateOfJourney.month.
-              toString().padLeft(2, '0')}-${model.dateOfJourney.day
-                  .toString().padLeft(2, '0')}',
+              '${model.dateOfJourney.year}-${model.dateOfJourney.month.toString().padLeft(2, '0')}-${model.dateOfJourney.day.toString().padLeft(2, '0')}',
         ),
         ExtrasModel(title: 'Fare', value: model.ticketFare.toStringAsFixed(2)),
         ExtrasModel(
@@ -108,9 +99,8 @@ class Ticket with TicketMappable {
       primaryText: '$primarySource → $primaryDestination',
       secondaryText:
           '${model.corporation ?? 'TNSTC'} - '
-              '${model.tripCode ?? model.routeNo ?? 'Bus'}',
+          '${model.tripCode ?? model.routeNo ?? 'Bus'}',
       startTime: model.journeyDate ?? DateTime.now(),
-      endTime: model.journeyDate ?? DateTime.now(),
       location:
           model.passengerPickupPoint ??
           model.boardingPoint ??

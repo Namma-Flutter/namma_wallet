@@ -19,6 +19,8 @@ abstract class TravelTicketParser {
 }
 
 class TNSTCBusParser implements TravelTicketParser {
+  late final ILogger _logger = getIt<ILogger>();
+
   @override
   String get providerName => 'TNSTC';
 
@@ -207,6 +209,8 @@ class TNSTCBusParser implements TravelTicketParser {
 }
 
 class IRCTCTrainParser implements TravelTicketParser {
+  late final ILogger _logger = getIt<ILogger>();
+
   @override
   String get providerName => 'IRCTC';
 
@@ -253,7 +257,10 @@ class IRCTCTrainParser implements TravelTicketParser {
     try {
       parsedDate = DateTime.parse(dateTime);
     } on Exception catch (_) {
-      parsedDate = DateTime.now();
+      _logger.warning(
+        '[IRCTCTrainParser] Failed to parse date: "$dateTime", using current date as fallback',
+      );
+      parsedDate = null;
     }
 
     return Ticket(
@@ -265,7 +272,7 @@ class IRCTCTrainParser implements TravelTicketParser {
           'Train ${trainNumber.isNotEmpty ? trainNumber : 'N/A'} • '
           '${classService.isNotEmpty ? classService : 'Class N/A'} • '
           '${seat.isNotEmpty ? seat : 'Seat N/A'}',
-      startTime: parsedDate,
+      startTime: parsedDate ?? DateTime.now(),
       location: from.isNotEmpty ? from : 'Unknown',
       tags: [
         if (pnrNumber.isNotEmpty)
@@ -297,6 +304,8 @@ class IRCTCTrainParser implements TravelTicketParser {
 }
 
 class SETCBusParser implements TravelTicketParser {
+  late final ILogger _logger = getIt<ILogger>();
+
   @override
   String get providerName => 'SETC';
 
@@ -341,7 +350,10 @@ class SETCBusParser implements TravelTicketParser {
     try {
       parsedDate = DateTime.parse(dateTime);
     } on Exception catch (_) {
-      parsedDate = DateTime.now(); // fallback
+      _logger.warning(
+        '[IRCTCTrainParser] Failed to parse date: "$dateTime", using current date as fallback',
+      );
+      parsedDate = null; // fallback
     }
 
     return Ticket(
@@ -353,7 +365,7 @@ class SETCBusParser implements TravelTicketParser {
           '${busNumber.isNotEmpty ? busNumber : 'SETC Bus'} • '
           '${seat.isNotEmpty ? seat : 'Seat N/A'}',
       type: TicketType.bus,
-      startTime: parsedDate,
+      startTime: parsedDate ?? DateTime.now(),
       location: from.isNotEmpty ? from : 'Unknown',
       tags: [
         if (bookingId.isNotEmpty)
