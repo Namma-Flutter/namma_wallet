@@ -30,9 +30,7 @@ class TicketView extends StatefulWidget {
 class _TicketViewState extends State<TicketView> {
   bool _isDeleting = false;
 
-  ///
-  // ignore: unused_element
-  bool _isPinning = false;
+  // bool _isPinning = false;
 
   // Helper method to handle empty values
   String getValueOrDefault(String? value) {
@@ -61,9 +59,9 @@ class _TicketViewState extends State<TicketView> {
   ///
   // ignore: unused_element
   Future<void> _pinToHomeScreen() async {
-    setState(() {
-      _isPinning = true;
-    });
+    // setState(() {
+    //   _isPinning = true;
+    // });
 
     try {
       const iOSWidgetName = 'TicketHomeWidget';
@@ -93,9 +91,9 @@ class _TicketViewState extends State<TicketView> {
       }
     } finally {
       if (mounted) {
-        setState(() {
-          _isPinning = false;
-        });
+        // setState(() {
+        //   _isPinning = false;
+        // });
       }
     }
   }
