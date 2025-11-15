@@ -69,7 +69,9 @@ class Ticket with TicketMappable {
         ExtrasModel(
           title: 'Date of Journey',
           value:
-              '${model.dateOfJourney.year}-${model.dateOfJourney.month.toString().padLeft(2, '0')}-${model.dateOfJourney.day.toString().padLeft(2, '0')}',
+              '${model.dateOfJourney.year}-'
+              '${model.dateOfJourney.month.toString().padLeft(2, '0')}-'
+              '${model.dateOfJourney.day.toString().padLeft(2, '0')}',
         ),
         ExtrasModel(title: 'Fare', value: model.ticketFare.toStringAsFixed(2)),
         ExtrasModel(

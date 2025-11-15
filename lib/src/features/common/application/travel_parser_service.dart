@@ -19,7 +19,6 @@ abstract class TravelTicketParser {
 }
 
 class TNSTCBusParser implements TravelTicketParser {
-  late final ILogger _logger = getIt<ILogger>();
 
   @override
   String get providerName => 'TNSTC';
@@ -258,7 +257,8 @@ class IRCTCTrainParser implements TravelTicketParser {
       parsedDate = DateTime.parse(dateTime);
     } on Exception catch (_) {
       _logger.warning(
-        '[IRCTCTrainParser] Failed to parse date: "$dateTime", using current date as fallback',
+        '[IRCTCTrainParser] Failed to parse date: "$dateTime", '
+            'using current date as fallback',
       );
       parsedDate = null;
     }
@@ -351,7 +351,8 @@ class SETCBusParser implements TravelTicketParser {
       parsedDate = DateTime.parse(dateTime);
     } on Exception catch (_) {
       _logger.warning(
-        '[IRCTCTrainParser] Failed to parse date: "$dateTime", using current date as fallback',
+        '[IRCTCTrainParser] Failed to parse date: "$dateTime", '
+            'using current date as fallback',
       );
       parsedDate = null; // fallback
     }

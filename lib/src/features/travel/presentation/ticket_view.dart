@@ -30,8 +30,6 @@ class TicketView extends StatefulWidget {
 class _TicketViewState extends State<TicketView> {
   bool _isDeleting = false;
 
-  // bool _isPinning = false;
-
   // Helper method to handle empty values
   String getValueOrDefault(String? value) {
     return (value?.isEmpty ?? true) ? '--' : value!;
@@ -457,127 +455,6 @@ class _TicketViewState extends State<TicketView> {
                 ),
               ],
             ),
-            // child: SafeArea(
-            //   child:
-            //       widget.ticket.contactMobile != null &&
-            //           widget.ticket.contactMobile!.isNotEmpty
-            //       ? Row(
-            //           spacing: 12,
-            //           children: [
-            //             // Call button (when mobile number is available)
-            //             Expanded(
-            //               child: SizedBox(
-            //                 height: 50,
-            //                 child: ElevatedButton.icon(
-            //                   onPressed: _makePhoneCall,
-            //                   style: ElevatedButton.styleFrom(
-            //                     backgroundColor: Theme.of(
-            //                       context,
-            //                     ).colorScheme.primary,
-            //                     foregroundColor: Colors.white,
-            //                     elevation: 0,
-            //                     shape: RoundedRectangleBorder(
-            //                       borderRadius: BorderRadius.circular(12),
-            //                     ),
-            //                   ),
-            //                   icon: const Icon(Icons.phone, size: 18),
-            //                   label: const Text(
-            //                     'Call Conductor',
-            //                     style: TextStyle(
-            //                       fontWeight: FontWeight.w600,
-            //                       fontSize: 12,
-            //                     ),
-            //                   ),
-            //                 ),
-            //               ),
-            //             ),
-            //             // Pin button
-            //             Expanded(
-            //               child: SizedBox(
-            //                 height: 50,
-            //                 child: ElevatedButton.icon(
-            //                   onPressed: _isPinning ? null : _pinToHomeScreen
-            //                   ,
-            //                   style: ElevatedButton.styleFrom(
-            //                     backgroundColor: Theme.of(
-            //                       context,
-            //                     ).colorScheme.primary,
-            //                     foregroundColor: Colors.white,
-            //                     elevation: 0,
-            //                     shape: RoundedRectangleBorder(
-            //                       borderRadius: BorderRadius.circular(12),
-            //                     ),
-            //                   ),
-            //                   icon: _isPinning
-            //                       ? const SizedBox(
-            //                           width: 20,
-            //                           height: 20,
-            //                           child: CircularProgressIndicator(
-            //                             strokeWidth: 2,
-            //                             valueColor:
-            //                                 AlwaysStoppedAnimation<Color>(
-            //                                   Colors.white,
-            //                                 ),
-            //                           ),
-            //                         )
-            //                       : const Icon(
-            //                           Icons.push_pin,
-            //                           size: 20,
-            //                           color: Colors.white,
-            //                         ),
-            //                   label: Text(
-            //                     _isPinning ? 'Pinning...' : 'Pin',
-            //                     style: const TextStyle(
-            //                       fontWeight: FontWeight.w600,
-            //                       fontSize: 12,
-            //                     ),
-            //                   ),
-            //                 ),
-            //               ),
-            //             ),
-            //           ],
-            //         )
-            //       : SizedBox(
-            //           width: double.infinity,
-            //           height: 50,
-            //           child: ElevatedButton.icon(
-            //             onPressed: _isPinning ? null : _pinToHomeScreen,
-            //             style: ElevatedButton.styleFrom(
-            //               backgroundColor: Theme.of(
-            //                 context,
-            //               ).colorScheme.primary,
-            //               foregroundColor: Colors.white,
-            //               elevation: 0,
-            //               shape: RoundedRectangleBorder(
-            //                 borderRadius: BorderRadius.circular(12),
-            //               ),
-            //             ),
-            //             icon: _isPinning
-            //                 ? const SizedBox(
-            //                     width: 20,
-            //                     height: 20,
-            //                     child: CircularProgressIndicator(
-            //                       strokeWidth: 2,
-            //                       valueColor: AlwaysStoppedAnimation<Color>(
-            //                         Colors.white,
-            //                       ),
-            //                     ),
-            //                   )
-            //                 : const Icon(
-            //                     Icons.push_pin,
-            //                     size: 20,
-            //                     color: Colors.white,
-            //                   ),
-            //             label: Text(
-            //               _isPinning ? 'Pinning...' : 'Pin to Home Screen',
-            //               style: const TextStyle(
-            //                 fontWeight: FontWeight.w600,
-            //                 fontSize: 12,
-            //               ),
-            //             ),
-            //           ),
-            //         ),
-            // ),
           ),
         ],
       ),
