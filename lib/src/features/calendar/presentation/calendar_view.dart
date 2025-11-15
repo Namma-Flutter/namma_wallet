@@ -10,7 +10,7 @@ import 'package:namma_wallet/src/features/calendar/domain/event_model.dart';
 import 'package:namma_wallet/src/features/calendar/presentation/widgets/calendar_toggle_buttons.dart';
 import 'package:namma_wallet/src/features/calendar/presentation/widgets/calendar_widget.dart';
 import 'package:namma_wallet/src/features/calendar/presentation/widgets/tickets_list.dart';
-import 'package:namma_wallet/src/features/common/domain/travel_ticket_model.dart';
+import 'package:namma_wallet/src/features/home/domain/ticket.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 
@@ -20,11 +20,11 @@ class CalendarProvider extends ChangeNotifier {
 
   DateTime _selectedDay = DateTime.now();
   List<Event> _events = [];
-  List<TravelTicketModel> _tickets = [];
+  List<Ticket> _tickets = [];
 
   DateTime get selectedDay => _selectedDay;
   List<Event> get events => _events;
-  List<TravelTicketModel> get tickets => _tickets;
+  List<Ticket> get tickets => _tickets;
 
   void setSelectedDay(DateTime day) {
     _selectedDay = day;
@@ -60,9 +60,8 @@ class CalendarProvider extends ChangeNotifier {
   Future<void> loadTickets() async {
     try {
       final dbHelper = getIt<WalletDatabase>();
-      final ticketMaps = await dbHelper.fetchAllTravelTickets();
 
-      _tickets = ticketMaps.map(TravelTicketModelMapper.fromMap).toList();
+      _tickets = await dbHelper.getAllTickets();
 
       notifyListeners();
     } on Exception catch (e, st) {
@@ -74,16 +73,14 @@ class CalendarProvider extends ChangeNotifier {
     return _events.where((event) => isSameDay(event.date, day)).toList();
   }
 
-  List<TravelTicketModel> getTicketsForDay(DateTime day) {
+  List<Ticket> getTicketsForDay(DateTime day) {
     return _tickets.where((ticket) {
-      if (ticket.journeyDate == null) return false;
       try {
-        final ticketDate = DateTime.parse(ticket.journeyDate!);
-        return isSameDay(ticketDate, day);
+        return isSameDay(ticket.startTime, day);
       } on FormatException catch (e) {
         _logger.debug(
           'Invalid journeyDate format for ticket filtering: '
-          '${ticket.journeyDate} - $e',
+          '${ticket.startTime} - $e',
         );
         return false;
       } on Exception catch (e, st) {
@@ -98,24 +95,20 @@ class CalendarProvider extends ChangeNotifier {
   List<DateTime> getDatesWithTickets() {
     final dates = <DateTime>[];
     for (final ticket in _tickets) {
-      if (ticket.journeyDate != null) {
-        try {
-          final date = DateTime.parse(ticket.journeyDate!);
-          if (!dates.any((d) => isSameDay(d, date))) {
-            dates.add(date);
-          }
-        } on FormatException catch (e) {
-          _logger.debug(
-            'Invalid journeyDate format for date collection: '
-            '${ticket.journeyDate} - $e',
-          );
-          // Skip invalid dates
-        } on Exception catch (e, st) {
-          _logger.debug(
-            'Error parsing journeyDate for date collection: $e\n$st',
-          );
-          // Skip invalid dates
+      try {
+        if (!dates.any((d) => isSameDay(d, ticket.startTime))) {
+          dates.add(ticket.startTime);
         }
+      } on FormatException catch (e) {
+        _logger.debug(
+          'Invalid journeyDate format for date collection: '
+          '${ticket.startTime} - $e',
+        );
+        // Skip invalid dates
+      } on Exception catch (e, st) {
+        _logger.debug(
+          'Error parsing journeyDate for date collection: $e\n$st',
+        );
       }
     }
     return dates;

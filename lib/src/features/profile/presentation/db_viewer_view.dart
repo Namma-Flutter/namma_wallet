@@ -6,6 +6,7 @@ import 'package:home_widget/home_widget.dart';
 import 'package:namma_wallet/src/common/database/wallet_database.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/widgets/custom_back_button.dart';
+import 'package:namma_wallet/src/features/home/domain/ticket.dart';
 
 class DbViewerView extends StatefulWidget {
   const DbViewerView({super.key});
@@ -18,7 +19,7 @@ class _DbViewerViewState extends State<DbViewerView>
     with SingleTickerProviderStateMixin {
   late final TabController _tabController;
   List<Map<String, Object?>> users = <Map<String, Object?>>[];
-  List<Map<String, Object?>> tickets = <Map<String, Object?>>[];
+  List<Ticket> tickets = <Ticket>[];
 
   @override
   void initState() {
@@ -30,7 +31,7 @@ class _DbViewerViewState extends State<DbViewerView>
   Future<void> _load() async {
     final db = getIt<WalletDatabase>();
     final u = await db.fetchAllUsers();
-    final t = await db.fetchTravelTicketsWithUser();
+    final t = await db.getAllTickets();
     if (!mounted) return;
     setState(() {
       users = u;
@@ -85,16 +86,15 @@ class _DbViewerViewState extends State<DbViewerView>
           itemCount: tickets.length,
           itemBuilder: (context, index) {
             final t = tickets[index];
-            final subtitle =
-                '''${t['provider_name']} - ${t['source_location']} → ${t['destination_location']}''';
+            final subtitle = t.secondaryText;
             return Card(
               margin: const EdgeInsets.all(8),
               child: ListTile(
                 title: Text(
-                  '${t['pnr_number'] ?? t['booking_reference'] ?? 'N/A'}',
+                  t.ticketId.toString(),
                 ),
                 subtitle: Text(subtitle),
-                trailing: Text('${t['amount'] ?? 'N/A'}'),
+                // trailing: Text('${t['amount'] ?? 'N/A'}'),
                 onTap: () => showTicketDetails(context, t, subtitle),
               ),
             );
@@ -106,7 +106,7 @@ class _DbViewerViewState extends State<DbViewerView>
 
   void showTicketDetails(
     BuildContext context,
-    Map<String, Object?> t,
+    Ticket t,
     String subtitle,
   ) {
     showDialog<void>(
@@ -132,7 +132,7 @@ class _DbViewerViewState extends State<DbViewerView>
                   padding: const EdgeInsets.all(16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: t.entries
+                    children: (t.extras ?? [])
                         .map(
                           (entry) => Padding(
                             padding: const EdgeInsets.symmetric(vertical: 4),
@@ -141,13 +141,13 @@ class _DbViewerViewState extends State<DbViewerView>
                                 style: DefaultTextStyle.of(context).style,
                                 children: [
                                   TextSpan(
-                                    text: '${entry.key}: ',
+                                    text: '${entry.title}: ',
                                     style: const TextStyle(
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
                                   TextSpan(
-                                    text: '${entry.value}',
+                                    text: entry.value,
                                   ),
                                 ],
                               ),

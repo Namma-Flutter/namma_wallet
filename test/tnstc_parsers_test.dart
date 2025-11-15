@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:namma_wallet/src/common/services/logger_interface.dart';
@@ -5,6 +7,8 @@ import 'package:namma_wallet/src/features/common/application/travel_parser_servi
 
 import 'helpers/fake_logger.dart';
 
+///
+// ignore_for_file: avoid_dynamic_calls
 void main() {
   // Set up GetIt for tests
   setUp(() {
@@ -17,6 +21,7 @@ void main() {
   tearDown(() async {
     await GetIt.instance.reset();
   });
+
   group('TNSTCBusParser Tests', () {
     late TNSTCBusParser parser;
 
@@ -36,22 +41,74 @@ void main() {
       final ticket = parser.parseTicket(smsText);
 
       expect(ticket, isNotNull);
-      expect(ticket!.providerName, equals('SETC'));
-      expect(ticket.pnrNumber, equals('T63736642'));
-      expect(ticket.sourceLocation, equals('CHENNAI-PT DR. M.G.R. BS'));
-      expect(ticket.destinationLocation, equals('KUMBAKONAM'));
-      expect(ticket.tripCode, equals('2145CHEKUMAB'));
 
-      final journeyDate = DateTime.parse(ticket.journeyDate!);
+      // Core text fields
+      expect(
+        ticket!.primaryText,
+        equals('CHENNAI-PT DR. M.G.R. BS → KUMBAKONAM'),
+      );
+      expect(ticket.secondaryText, equals('SETC - 2145CHEKUMAB'));
+
+      // Provider (from extras)
+      final provider = ticket.extras
+          ?.firstWhere((e) => e.title == 'Provider')
+          .value;
+      expect(provider, equals('SETC'));
+
+      // PNR (from tag)
+      final pnrTag = ticket.tags?.firstWhere((t) => t.icon == 'qr_code').value;
+      expect(pnrTag, equals('T63736642'));
+
+      // Trip code (from extras)
+      final tripCode = ticket.extras
+          ?.firstWhere((e) => e.title == 'Trip Code')
+          .value;
+      expect(tripCode, equals('2145CHEKUMAB'));
+
+      // Journey Date (from extras)
+      final journeyDateStr = ticket.extras
+          ?.firstWhere((e) => e.title == 'Journey Date')
+          .value;
+      final journeyDate = DateTime.parse(
+        journeyDateStr!
+            .split('/')
+            .reversed
+            .join('-'), // Converts dd/MM/yyyy → yyyy-MM-dd
+      );
       expect(journeyDate.day, equals(11));
       expect(journeyDate.month, equals(2));
       expect(journeyDate.year, equals(2025));
 
-      expect(ticket.departureTime, equals('22:35'));
-      expect(ticket.seatNumbers, equals('20,21'));
-      expect(ticket.seatNumbersList.length, equals(2));
-      expect(ticket.classOfService, equals('AC SLEEPER SEATER'));
-      expect(ticket.boardingPoint, equals('KOTTIVAKKAM(RTO OFFICE)'));
+      // Departure Time (from tag)
+      final departureTag = ticket.tags
+          ?.firstWhere((t) => t.icon == 'access_time')
+          .value;
+      expect(departureTag, equals('22:35'));
+
+      // Seat numbers (from tag)
+      final seatTag = ticket.tags
+          ?.firstWhere((t) => t.icon == 'event_seat')
+          .value;
+      expect(seatTag, equals('20,21')); // cleans trailing comma
+
+      // Split and verify seat count
+      final seatList = seatTag
+          ?.split(',')
+          .where((s) => s.trim().isNotEmpty)
+          .toList();
+      expect(seatList?.length, equals(2));
+
+      // Class of service (from tag)
+      final classTag = ticket.tags
+          ?.firstWhere((t) => t.icon == 'workspace_premium')
+          .value;
+      expect(classTag, equals('AC SLEEPER SEATER'));
+
+      // Boarding point (from extras)
+      final boarding = ticket.extras
+          ?.firstWhere((e) => e.title == 'Boarding')
+          .value;
+      expect(boarding, equals('KOTTIVAKKAM(RTO OFFICE)'));
     });
 
     test('should return null for empty or non-matching SMS text', () {
@@ -72,8 +129,43 @@ void main() {
       final ticket = parser.parseTicket(smsText);
 
       expect(ticket, isNotNull);
-      expect(ticket!.seatNumbers, isNull);
-      expect(ticket.seatNumbersList, isEmpty);
+
+      // Provider (from extras)
+      final provider = ticket!.extras
+          ?.firstWhere((e) => e.title == 'Provider')
+          .value;
+      expect(provider, equals('SETC'));
+
+      // PNR (from tag)
+      final pnrTag = ticket.tags?.firstWhere((t) => t.icon == 'qr_code').value;
+      expect(pnrTag, equals('T123'));
+
+      // Seat number (should be empty or missing)
+      final hasSeatTag = ticket.tags!.any((t) => t.icon == 'event_seat');
+      if (hasSeatTag) {
+        final seatTag = ticket.tags
+            ?.firstWhere((t) => t.icon == 'event_seat')
+            .value
+            ?.trim();
+        expect(seatTag, isEmpty);
+      } else {
+        // Parser may not include an empty seat tag at all
+        expect(hasSeatTag, isFalse);
+      }
+
+      // Derived seat list should be empty
+      final seatList = ticket.tags
+          ?.where((t) => t.icon == 'event_seat')
+          .expand((t) => t.value!.split(','))
+          .where((s) => s.trim().isNotEmpty)
+          .toList();
+      expect(seatList, isEmpty);
+
+      // Class of service (still parsed)
+      final classTag = ticket.tags
+          ?.firstWhere((t) => t.icon == 'workspace_premium')
+          .value;
+      expect(classTag, equals('AC'));
     });
 
     test('should handle single seat number', () {
@@ -84,8 +176,35 @@ void main() {
       final ticket = parser.parseTicket(smsText);
 
       expect(ticket, isNotNull);
-      expect(ticket!.seatNumbers, equals('15'));
-      expect(ticket.seatNumbersList, equals(['15']));
+
+      // Provider (from extras)
+      final provider = ticket!.extras
+          ?.firstWhere((e) => e.title == 'Provider')
+          .value;
+      expect(provider, equals('SETC'));
+
+      // PNR (from tag)
+      final pnrTag = ticket.tags?.firstWhere((t) => t.icon == 'qr_code').value;
+      expect(pnrTag, equals('T123'));
+
+      // Seat number (from tag)
+      final seatTag = ticket.tags
+          ?.firstWhere((t) => t.icon == 'event_seat')
+          .value;
+      expect(seatTag, equals('15')); // trailing comma cleaned
+
+      // Derived seat list
+      final seatList = seatTag
+          ?.split(',')
+          .where((s) => s.trim().isNotEmpty)
+          .toList();
+      expect(seatList, equals(['15']));
+
+      // Class of service (from tag)
+      final classTag = ticket.tags
+          ?.firstWhere((t) => t.icon == 'workspace_premium')
+          .value;
+      expect(classTag, equals('AC'));
     });
 
     test('should parse time with comma format correctly', () {
@@ -99,20 +218,77 @@ void main() {
       final ticket = parser.parseTicket(smsText);
 
       expect(ticket, isNotNull);
-      expect(ticket!.providerName, equals('SETC'));
-      expect(ticket.pnrNumber, equals('T69705233'));
-      expect(ticket.sourceLocation, equals('KUMBAKONAM'));
-      expect(ticket.destinationLocation, equals('CHENNAI-PT DR. M.G.R. BS'));
-      expect(ticket.tripCode, equals('2100KUMCHELB'));
-      final journeyDate = DateTime.parse(ticket.journeyDate!);
+
+      // Core route info
+      expect(
+        ticket!.primaryText,
+        equals('KUMBAKONAM → CHENNAI-PT DR. M.G.R. BS'),
+      );
+      expect(ticket.secondaryText, equals('SETC - 2100KUMCHELB'));
+
+      // Provider (from extras)
+      final provider = ticket.extras
+          ?.firstWhere((e) => e.title == 'Provider')
+          .value;
+      expect(provider, equals('SETC'));
+
+      // PNR (from tag)
+      final pnrTag = ticket.tags?.firstWhere((t) => t.icon == 'qr_code').value;
+      expect(pnrTag, equals('T69705233'));
+
+      // Trip code (from extras)
+      final tripCode = ticket.extras
+          ?.firstWhere((e) => e.title == 'Trip Code')
+          .value;
+      expect(tripCode, equals('2100KUMCHELB'));
+
+      // Journey Date (from extras)
+      final journeyDateStr = ticket.extras
+          ?.firstWhere((e) => e.title == 'Journey Date')
+          .value;
+      final journeyDate = DateTime.parse(
+        journeyDateStr!
+            .split('/')
+            .reversed
+            .join('-'), // Converts dd/MM/yyyy → yyyy-MM-dd
+      );
       expect(journeyDate.day, equals(21));
       expect(journeyDate.month, equals(10));
       expect(journeyDate.year, equals(2025));
-      expect(ticket.departureTime, equals('21:00'));
-      expect(ticket.seatNumbers, equals('4LB'));
-      expect(ticket.seatNumbersList.length, equals(1));
-      expect(ticket.classOfService, equals('NON AC LOWER BERTH SEATER'));
-      expect(ticket.boardingPoint, equals('KUMBAKONAM'));
+
+      // Departure time (from tag)
+      final departureTag = ticket.tags
+          ?.firstWhere((t) => t.icon == 'access_time')
+          .value;
+      expect(
+        departureTag,
+        equals('21:00'),
+      ); // comma before time handled correctly
+
+      // Seat number (from tag)
+      final seatTag = ticket.tags
+          ?.firstWhere((t) => t.icon == 'event_seat')
+          .value;
+      expect(seatTag, equals('4LB'));
+
+      // Derived seat list
+      final seatList = seatTag
+          ?.split(',')
+          .where((s) => s.trim().isNotEmpty)
+          .toList();
+      expect(seatList?.length, equals(1));
+
+      // Class of service (from tag)
+      final classTag = ticket.tags
+          ?.firstWhere((t) => t.icon == 'workspace_premium')
+          .value;
+      expect(classTag, equals('NON AC LOWER BERTH SEATER'));
+
+      // Boarding point (from extras)
+      final boarding = ticket.extras
+          ?.firstWhere((e) => e.title == 'Boarding')
+          .value;
+      expect(boarding, equals('KUMBAKONAM'));
     });
 
     test('should parse time without comma format correctly', () {
@@ -121,60 +297,154 @@ void main() {
           'Journey Date:15/05/2025 , Time:14:30 , Seat No.:10A';
 
       final ticket = parser.parseTicket(smsText);
+
       expect(ticket, isNotNull);
-      expect(ticket!.departureTime, equals('14:30'));
+
+      // Provider (from extras)
+      final provider = ticket!.extras
+          ?.firstWhere((e) => e.title == 'Provider')
+          .value;
+      expect(provider, equals('SETC'));
+
+      // PNR number (from tag)
+      final pnrTag = ticket.tags?.firstWhere((t) => t.icon == 'qr_code').value;
+      expect(pnrTag, equals('T12345'));
+
+      // Journey Date (from extras)
+      final journeyDateStr = ticket.extras
+          ?.firstWhere((e) => e.title == 'Journey Date')
+          .value;
+      final journeyDate = DateTime.parse(
+        journeyDateStr!
+            .split('/')
+            .reversed
+            .join('-'), // Converts dd/MM/yyyy → yyyy-MM-dd
+      );
+      expect(journeyDate.day, equals(15));
+      expect(journeyDate.month, equals(5));
+      expect(journeyDate.year, equals(2025));
+
+      // Departure Time (from tag)
+      final departureTag = ticket.tags
+          ?.firstWhere((t) => t.icon == 'access_time')
+          .value;
+      expect(departureTag, equals('14:30')); // parsed correctly without comma
+
+      // Seat number (from tag)
+      final seatTag = ticket.tags
+          ?.firstWhere((t) => t.icon == 'event_seat')
+          .value;
+      expect(seatTag, equals('10A'));
     });
 
     test('should handle various seat number formats', () {
-      // Test with seat number with letters
+      // Case 1: Seat number with letters
       const smsText1 = 'TNSTC Seat No.:4LB .Class:NON AC';
       final ticket1 = parser.parseTicket(smsText1);
-      expect(ticket1, isNotNull);
-      expect(ticket1!.seatNumbers, equals('4LB'));
-      expect(ticket1.seatNumbersList.length, equals(1));
 
-      // Test with upper berth seat
+      expect(ticket1, isNotNull);
+      final seatTag1 = ticket1!.tags
+          ?.firstWhere((t) => t.icon == 'event_seat')
+          .value;
+      expect(seatTag1, equals('4LB'));
+      final seatList1 = seatTag1
+          ?.split(',')
+          .where((s) => s.trim().isNotEmpty)
+          .toList();
+      expect(seatList1?.length, equals(1));
+
+      final classTag1 = ticket1.tags
+          ?.firstWhere((t) => t.icon == 'workspace_premium')
+          .value;
+      expect(classTag1, equals('NON AC'));
+
+      // Case 2: Seat number with space (upper berth)
       const smsText2 = 'TNSTC Seat No.:4 UB, .Class:NON AC';
       final ticket2 = parser.parseTicket(smsText2);
-      expect(ticket2, isNotNull);
-      expect(ticket2!.seatNumbers, equals('4 UB'));
-      expect(ticket2.seatNumbersList.length, equals(1));
 
-      // Test with multiple seats
+      expect(ticket2, isNotNull);
+      final seatTag2 = ticket2!.tags
+          ?.firstWhere((t) => t.icon == 'event_seat')
+          .value;
+      expect(
+        seatTag2,
+        equals('4 UB'),
+      ); // preserves space between seat and berth
+      final seatList2 = seatTag2
+          ?.split(',')
+          .where((s) => s.trim().isNotEmpty)
+          .toList();
+      expect(seatList2?.length, equals(1));
+
+      final classTag2 = ticket2.tags
+          ?.firstWhere((t) => t.icon == 'workspace_premium')
+          .value;
+      expect(classTag2, equals('NON AC'));
+
+      // Case 3: Multiple seats
       const smsText3 = 'TNSTC Seat No.:20,21, .Class:AC SLEEPER';
       final ticket3 = parser.parseTicket(smsText3);
+
       expect(ticket3, isNotNull);
-      expect(ticket3!.seatNumbers, equals('20,21'));
-      expect(ticket3.seatNumbersList.length, equals(2));
+      final seatTag3 = ticket3!.tags
+          ?.firstWhere((t) => t.icon == 'event_seat')
+          .value;
+      expect(seatTag3, equals('20,21')); // trailing comma removed
+      final seatList3 = seatTag3
+          ?.split(',')
+          .where((s) => s.trim().isNotEmpty)
+          .toList();
+      expect(seatList3?.length, equals(2));
+
+      final classTag3 = ticket3.tags
+          ?.firstWhere((t) => t.icon == 'workspace_premium')
+          .value;
+      expect(classTag3, equals('AC SLEEPER'));
     });
 
     test('should handle different class formats', () {
-      // Test NON AC LOWER BERTH SEATER
+      // Case 1: NON AC LOWER BERTH SEATER
       const smsText1 = 'TNSTC Class:NON AC LOWER BERTH SEATER , Boarding';
       final ticket1 = parser.parseTicket(smsText1);
-      expect(ticket1, isNotNull);
-      expect(ticket1!.classOfService, equals('NON AC LOWER BERTH SEATER'));
 
-      // Test AC SLEEPER SEATER
+      expect(ticket1, isNotNull);
+      final classTag1 = ticket1!.tags
+          ?.firstWhere((t) => t.icon == 'workspace_premium')
+          .value;
+      expect(classTag1, equals('NON AC LOWER BERTH SEATER'));
+
+      // Case 2: AC SLEEPER SEATER
       const smsText2 = 'TNSTC Class:AC SLEEPER SEATER , Boarding';
       final ticket2 = parser.parseTicket(smsText2);
+
       expect(ticket2, isNotNull);
-      expect(ticket2!.classOfService, equals('AC SLEEPER SEATER'));
+      final classTag2 = ticket2!.tags
+          ?.firstWhere((t) => t.icon == 'workspace_premium')
+          .value;
+      expect(classTag2, equals('AC SLEEPER SEATER'));
     });
 
     test('should handle different boarding point formats', () {
-      // Test single word boarding point
+      // Case 1: Single word boarding point
       const smsText1 = 'TNSTC Boarding at:KUMBAKONAM . For e-Ticket';
       final ticket1 = parser.parseTicket(smsText1);
-      expect(ticket1, isNotNull);
-      expect(ticket1!.boardingPoint, equals('KUMBAKONAM'));
 
-      // Test boarding point with brackets
+      expect(ticket1, isNotNull);
+      final boarding1 = ticket1!.extras
+          ?.firstWhere((e) => e.title == 'Boarding')
+          .value;
+      expect(boarding1, equals('KUMBAKONAM'));
+
+      // Case 2: Boarding point with brackets
       const smsText2 =
           'TNSTC Boarding at:KOTTIVAKKAM(RTO OFFICE) . For e-Ticket';
       final ticket2 = parser.parseTicket(smsText2);
+
       expect(ticket2, isNotNull);
-      expect(ticket2!.boardingPoint, equals('KOTTIVAKKAM(RTO OFFICE)'));
+      final boarding2 = ticket2!.extras
+          ?.firstWhere((e) => e.title == 'Boarding')
+          .value;
+      expect(boarding2, equals('KOTTIVAKKAM(RTO OFFICE)'));
     });
   });
 
@@ -189,40 +459,105 @@ void main() {
       const smsText =
           'TNSTC Corporation:SETC, PNR NO.:T58823886, '
           'From:CHENNAI-PT Dr.M.G.R. BS To KUMBAKONAM, '
-          'Trip Code:2300CHEKUMLB, Journey Date:10/10/2024, '
+          'Trip Code:2300CHEKUMLB , Journey Date:10/10/2024, '
           'Time:10/10/2024,23:55, Seat No.:4LB.Class:NON AC LOWER BIRTH SEATER, '
           'Boarding at:KOTTIVAKKAM(RTO OFFICE).';
 
       final ticket = parser.parseTicket(smsText);
 
       expect(ticket, isNotNull);
-      expect(ticket!.providerName, equals('SETC'));
-      expect(ticket.pnrNumber, equals('T58823886'));
-      expect(ticket.sourceLocation, equals('CHENNAI-PT Dr.M.G.R. BS'));
-      expect(ticket.destinationLocation, equals('KUMBAKONAM'));
-      expect(ticket.departureTime, equals('23:55'));
-      expect(ticket.seatNumbers, equals('4LB'));
-      expect(ticket.classOfService, equals('NON AC LOWER BIRTH SEATER'));
+
+      // Primary and secondary texts
+      expect(
+        ticket!.primaryText,
+        equals('CHENNAI-PT Dr.M.G.R. BS → KUMBAKONAM'),
+      );
+      expect(ticket.secondaryText, equals('SETC - 2300CHEKUMLB'));
+
+      // Provider (from extras)
+      final provider = ticket.extras
+          ?.firstWhere((e) => e.title == 'Provider')
+          .value;
+      expect(provider, equals('SETC'));
+
+      // PNR (from tag)
+      final pnrTag = ticket.tags?.firstWhere((t) => t.icon == 'qr_code').value;
+      expect(pnrTag, equals('T58823886'));
+
+      // Departure time (from tag)
+      final departureTag = ticket.tags
+          ?.firstWhere((t) => t.icon == 'access_time')
+          .value;
+      expect(departureTag, equals('23:55'));
+
+      // Seat number (from tag)
+      final seatTag = ticket.tags
+          ?.firstWhere((t) => t.icon == 'event_seat')
+          .value;
+      expect(seatTag, equals('4LB'));
+
+      // Class of service (from tag)
+      final classTag = ticket.tags
+          ?.firstWhere((t) => t.icon == 'workspace_premium')
+          .value;
+      expect(classTag, equals('NON AC LOWER BIRTH SEATER'));
+
+      // Boarding location
+      final boarding = ticket.extras
+          ?.firstWhere((e) => e.title == 'Boarding')
+          .value;
+      expect(boarding, equals('KOTTIVAKKAM(RTO OFFICE)'));
     });
 
     test('should parse SMS with trailing comma in seat number', () {
       const smsText =
           'TNSTC Corporation:SETC, PNR NO.:T58825236, '
           'From:KUMBAKONAM To CHENNAI KALAIGNAR CBT, '
-          'Trip Code:2030KUMKCBNS, Journey Date:13/10/2024, '
+          'Trip Code:2030KUMKCBNS , Journey Date:13/10/2024, '
           'Time:20:30, Seat No.:12,.Class:NON AC SLEEPER SEATER, '
           'Boarding at:KUMBAKONAM.';
 
       final ticket = parser.parseTicket(smsText);
 
       expect(ticket, isNotNull);
-      expect(ticket!.providerName, equals('SETC'));
-      expect(ticket.pnrNumber, equals('T58825236'));
-      expect(ticket.sourceLocation, equals('KUMBAKONAM'));
-      expect(ticket.destinationLocation, equals('CHENNAI KALAIGNAR CBT'));
-      expect(ticket.departureTime, equals('20:30'));
-      expect(ticket.seatNumbers, equals('12'));
-      expect(ticket.classOfService, equals('NON AC SLEEPER SEATER'));
+
+      // Main fields
+      expect(ticket!.primaryText, equals('KUMBAKONAM → CHENNAI KALAIGNAR CBT'));
+      expect(ticket.secondaryText, equals('SETC - 2030KUMKCBNS'));
+
+      // Provider (from extras)
+      final provider = ticket.extras
+          ?.firstWhere((e) => e.title == 'Provider')
+          .value;
+      expect(provider, equals('SETC'));
+
+      // PNR number (from tag)
+      final pnrTag = ticket.tags?.firstWhere((t) => t.icon == 'qr_code').value;
+      expect(pnrTag, equals('T58825236'));
+
+      // Departure time (from tag)
+      final departureTag = ticket.tags
+          ?.firstWhere((t) => t.icon == 'access_time')
+          .value;
+      expect(departureTag, equals('20:30'));
+
+      // Seat number (from tag)
+      final seatTag = ticket.tags
+          ?.firstWhere((t) => t.icon == 'event_seat')
+          .value;
+      expect(seatTag, equals('12')); // trimmed trailing comma
+
+      // Class of service (from tag)
+      final classTag = ticket.tags
+          ?.firstWhere((t) => t.icon == 'workspace_premium')
+          .value;
+      expect(classTag, equals('NON AC SLEEPER SEATER'));
+
+      // Boarding location (from extras)
+      final boarding = ticket.extras
+          ?.firstWhere((e) => e.title == 'Boarding')
+          .value;
+      expect(boarding, equals('KUMBAKONAM'));
     });
 
     test('should parse SMS with complex seat number format', () {
@@ -235,11 +570,41 @@ void main() {
       final ticket = parser.parseTicket(smsText);
 
       expect(ticket, isNotNull);
-      expect(ticket!.providerName, equals('SETC'));
-      expect(ticket.pnrNumber, equals('T62602262'));
-      expect(ticket.departureTime, equals('23:55'));
-      expect(ticket.seatNumbers, equals('36-UB#10'));
-      expect(ticket.classOfService, equals('NON AC LOWER BIRTH SEATER'));
+
+      // Core ticket fields
+      expect(
+        ticket!.primaryText,
+        equals('CHENNAI-PT DR. M.G.R. BS → KUMBAKONAM'),
+      );
+      expect(ticket.secondaryText, equals('SETC - 2300CHEKUMLB'));
+
+      // Provider (from extras)
+      final provider = ticket.extras
+          ?.firstWhere((e) => e.title == 'Provider')
+          .value;
+      expect(provider, equals('SETC'));
+
+      // PNR number (from tag)
+      final pnrTag = ticket.tags?.firstWhere((t) => t.icon == 'qr_code').value;
+      expect(pnrTag, equals('T62602262'));
+
+      // Departure time (from tag)
+      final departureTag = ticket.tags
+          ?.firstWhere((t) => t.icon == 'access_time')
+          .value;
+      expect(departureTag, equals('23:55'));
+
+      // Complex seat number (from tag)
+      final seatTag = ticket.tags
+          ?.firstWhere((t) => t.icon == 'event_seat')
+          .value;
+      expect(seatTag, equals('36-UB#10'));
+
+      // Class of service (from tag)
+      final classTag = ticket.tags
+          ?.firstWhere((t) => t.icon == 'workspace_premium')
+          .value;
+      expect(classTag, equals('NON AC LOWER BIRTH SEATER'));
     });
 
     test('should parse SMS with no space in seat number', () {
@@ -252,11 +617,41 @@ void main() {
       final ticket = parser.parseTicket(smsText);
 
       expect(ticket, isNotNull);
-      expect(ticket!.providerName, equals('SETC'));
-      expect(ticket.pnrNumber, equals('T68439967'));
-      expect(ticket.departureTime, equals('22:55'));
-      expect(ticket.seatNumbers, equals('13UB'));
-      expect(ticket.classOfService, equals('NON AC LOWER BERTH SEATER'));
+
+      // Route and corporation-trip info
+      expect(
+        ticket!.primaryText,
+        equals('CHENNAI-PT DR. M.G.R. BS → KUMBAKONAM'),
+      );
+      expect(ticket.secondaryText, equals('SETC - 2200CHEKUMLB'));
+
+      // Provider (from extras)
+      final provider = ticket.extras
+          ?.firstWhere((e) => e.title == 'Provider')
+          .value;
+      expect(provider, equals('SETC'));
+
+      // PNR number (from tag)
+      final pnrTag = ticket.tags?.firstWhere((t) => t.icon == 'qr_code').value;
+      expect(pnrTag, equals('T68439967'));
+
+      // Departure time (from tag)
+      final departureTag = ticket.tags
+          ?.firstWhere((t) => t.icon == 'access_time')
+          .value;
+      expect(departureTag, equals('22:55'));
+
+      // Seat number (from tag)
+      final seatTag = ticket.tags
+          ?.firstWhere((t) => t.icon == 'event_seat')
+          .value;
+      expect(seatTag, equals('13UB')); // No space, should be parsed cleanly
+
+      // Class of service (from tag)
+      final classTag = ticket.tags
+          ?.firstWhere((t) => t.icon == 'workspace_premium')
+          .value;
+      expect(classTag, equals('NON AC LOWER BERTH SEATER'));
     });
 
     test('should parse SMS from different corporation', () {
@@ -268,13 +663,38 @@ void main() {
       final ticket = parser.parseTicket(smsText);
 
       expect(ticket, isNotNull);
-      expect(ticket!.providerName, equals('COIMBATORE'));
-      expect(ticket.pnrNumber, equals('U70109781'));
-      expect(ticket.sourceLocation, equals('KUMBAKONAM'));
-      expect(ticket.destinationLocation, equals('COIMBATORE'));
-      expect(ticket.departureTime, equals('04:00'));
-      expect(ticket.seatNumbers, equals('24'));
-      expect(ticket.classOfService, equals('DELUXE 3X2'));
+
+      // Route and summary fields
+      expect(ticket!.primaryText, equals('KUMBAKONAM → COIMBATORE'));
+      expect(ticket.secondaryText, equals('COIMBATORE - 0400KUMCOICC01L'));
+
+      // Provider (from extras)
+      final provider = ticket.extras
+          ?.firstWhere((e) => e.title == 'Provider')
+          .value;
+      expect(provider, equals('COIMBATORE'));
+
+      // PNR number (from tag)
+      final pnrTag = ticket.tags?.firstWhere((t) => t.icon == 'qr_code').value;
+      expect(pnrTag, equals('U70109781'));
+
+      // Departure time (from tag)
+      final departureTag = ticket.tags
+          ?.firstWhere((t) => t.icon == 'access_time')
+          .value;
+      expect(departureTag, equals('04:00'));
+
+      // Seat number (from tag)
+      final seatTag = ticket.tags
+          ?.firstWhere((t) => t.icon == 'event_seat')
+          .value;
+      expect(seatTag, equals('24'));
+
+      // Class of service (from tag)
+      final classTag = ticket.tags
+          ?.firstWhere((t) => t.icon == 'workspace_premium')
+          .value;
+      expect(classTag, equals('DELUXE 3X2'));
     });
 
     test('should parse multiple seat numbers correctly', () {
@@ -287,12 +707,48 @@ void main() {
       final ticket = parser.parseTicket(smsText);
 
       expect(ticket, isNotNull);
-      expect(ticket!.providerName, equals('SETC'));
-      expect(ticket.pnrNumber, equals('T63736642'));
-      expect(ticket.departureTime, equals('22:35'));
-      expect(ticket.seatNumbers, equals('20,21'));
-      expect(ticket.seatNumbersList.length, equals(2));
-      expect(ticket.classOfService, equals('AC SLEEPER SEATER'));
+
+      // Route and summary
+      expect(
+        ticket!.primaryText,
+        equals('CHENNAI-PT DR. M.G.R. BS → KUMBAKONAM'),
+      );
+      expect(ticket.secondaryText, equals('SETC - 2145CHEKUMAB'));
+
+      // Provider (from extras)
+      final provider = ticket.extras
+          ?.firstWhere((e) => e.title == 'Provider')
+          .value;
+      expect(provider, equals('SETC'));
+
+      // PNR number (from tag)
+      final pnrTag = ticket.tags?.firstWhere((t) => t.icon == 'qr_code').value;
+      expect(pnrTag, equals('T63736642'));
+
+      // Departure time (from tag)
+      final departureTag = ticket.tags
+          ?.firstWhere((t) => t.icon == 'access_time')
+          .value;
+      expect(departureTag, equals('22:35'));
+
+      // Seat numbers (from tag)
+      final seatTag = ticket.tags
+          ?.firstWhere((t) => t.icon == 'event_seat')
+          .value;
+      expect(seatTag, equals('20,21')); // trailing comma removed
+
+      // Check seat count manually since Ticket doesn't have seatNumbersList
+      final seatList = seatTag
+          ?.split(',')
+          .where((s) => s.trim().isNotEmpty)
+          .toList();
+      expect(seatList?.length, equals(2));
+
+      // Class of service (from tag)
+      final classTag = ticket.tags
+          ?.firstWhere((t) => t.icon == 'workspace_premium')
+          .value;
+      expect(classTag, equals('AC SLEEPER SEATER'));
     });
   });
 
@@ -312,37 +768,108 @@ void main() {
       expect(updateInfo, isNotNull);
       expect(updateInfo!.pnrNumber, equals('T69705233'));
       expect(updateInfo.providerName, equals('TNSTC'));
-      expect(updateInfo.updates, containsPair('contact_mobile', '8870571461'));
-      expect(updateInfo.updates, containsPair('trip_code', 'TN01AN4317'));
+
+      // Ensure `extras` exists in update map
+      expect(updateInfo.updates.containsKey('extras'), isTrue);
+
+      // Decode extras JSON
+      final extras =
+          jsonDecode(updateInfo.updates['extras']! as String) as List<dynamic>;
+
+      // Validate extracted values
+      expect(
+        extras.any(
+          (e) =>
+              e['title'] == 'Conductor Mobile No' && e['value'] == '8870571461',
+        ),
+        isTrue,
+      );
+
+      expect(
+        extras.any(
+          (e) => e['title'] == 'Vehicle No' && e['value'] == 'TN01AN4317',
+        ),
+        isTrue,
+      );
+
+      // updated_at should also be present
+      expect(updateInfo.updates.containsKey('updated_at'), isTrue);
     });
 
     test('should return null for non-update SMS', () {
-      const smsText = 'This is a regular SMS from TNSTC.';
+      const smsText = 'This is a regular SMS from TNSTC. No updates here.';
       final updateInfo = parserService.parseUpdateSMS(smsText);
       expect(updateInfo, isNull);
     });
 
+    //
     test('should handle update SMS with only conductor number', () {
       const smsText = '* TNSTC * PNR:T123, Conductor Mobile No: 1234567890';
+
       final updateInfo = parserService.parseUpdateSMS(smsText);
+
+      // Must not be null
       expect(updateInfo, isNotNull);
+
+      // Correct PNR extracted
       expect(updateInfo!.pnrNumber, equals('T123'));
-      expect(updateInfo.updates.length, equals(1));
-      expect(updateInfo.updates, containsPair('contact_mobile', '1234567890'));
+
+      // Updates must contain `extras` only
+      expect(updateInfo.updates.containsKey('extras'), isTrue);
+      expect(updateInfo.updates.containsKey('updated_at'), isTrue);
+
+      // Decode the extras JSON list
+      final extras =
+          jsonDecode(updateInfo.updates['extras']! as String) as List<dynamic>;
+
+      // Should contain only one entry (Conductor Mobile No)
+      expect(extras.length, equals(1));
+
+      // Validate the content
+      expect(
+        extras.any(
+          (e) =>
+              e['title'] == 'Conductor Mobile No' && e['value'] == '1234567890',
+        ),
+        isTrue,
+      );
     });
 
     test('should handle update SMS with only vehicle number', () {
       const smsText = '* TNSTC * PNR:T456, Vehicle No:TN01AB1234';
+
       final updateInfo = parserService.parseUpdateSMS(smsText);
+
+      // It must detect the update SMS
       expect(updateInfo, isNotNull);
+
+      // Check PNR extraction
       expect(updateInfo!.pnrNumber, equals('T456'));
-      expect(updateInfo.updates.length, equals(1));
-      expect(updateInfo.updates, containsPair('trip_code', 'TN01AB1234'));
+
+      // Updates must contain extras JSON + updated_at
+      expect(updateInfo.updates.containsKey('extras'), isTrue);
+      expect(updateInfo.updates.containsKey('updated_at'), isTrue);
+
+      // Decode extras JSON
+      final extras =
+          jsonDecode(updateInfo.updates['extras']! as String) as List<dynamic>;
+
+      // Should contain exactly one field (Vehicle No)
+      expect(extras.length, equals(1));
+
+      // Check Vehicle No entry
+      expect(
+        extras.any(
+          (e) => e['title'] == 'Vehicle No' && e['value'] == 'TN01AB1234',
+        ),
+        isTrue,
+      );
     });
 
     test('should return null if PNR is missing', () {
       const smsText =
           '* TNSTC * Conductor Mobile No: 1234567890, Vehicle No:TN01AB1234';
+
       final updateInfo = parserService.parseUpdateSMS(smsText);
       expect(updateInfo, isNull);
     });

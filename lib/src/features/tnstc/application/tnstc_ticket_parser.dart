@@ -1,110 +1,10 @@
 import 'dart:core';
 
-class TNSTCTicket {
-  TNSTCTicket({
-    this.corporation,
-    this.pnrNumber,
-    this.journeyDate,
-    this.routeNo,
-    this.serviceStartPlace,
-    this.serviceEndPlace,
-    this.serviceStartTime,
-    this.passengerStartPlace,
-    this.passengerEndPlace,
-    this.passengerPickupPoint,
-    this.passengerPickupTime,
-    this.platformNumber,
-    this.classOfService,
-    this.tripCode,
-    this.obReferenceNumber,
-    this.numberOfSeats,
-    this.bankTransactionNumber,
-    this.busIdNumber,
-    this.passengerCategory,
-    this.passengerInfo,
-    this.idCardType,
-    this.idCardNumber,
-    this.totalFare,
-  });
-  final String? corporation;
-  final String? pnrNumber;
-  final DateTime? journeyDate;
-  final String? routeNo;
-  final String? serviceStartPlace;
-  final String? serviceEndPlace;
-  final String? serviceStartTime;
-  final String? passengerStartPlace;
-  final String? passengerEndPlace;
-  final String? passengerPickupPoint;
-  final DateTime? passengerPickupTime;
-  final String? platformNumber;
-  final String? classOfService;
-  final String? tripCode;
-  final String? obReferenceNumber;
-  final int? numberOfSeats;
-  final String? bankTransactionNumber;
-  final String? busIdNumber;
-  final String? passengerCategory;
-  final PassengerInfo? passengerInfo;
-  final String? idCardType;
-  final String? idCardNumber;
-  final double? totalFare;
+import 'package:namma_wallet/src/features/tnstc/domain/tnstc_model.dart';
 
-  @override
-  String toString() =>
-      'BusTicket(\n'
-      'Corporation: $corporation,\n'
-      'PNR Number: $pnrNumber,\n'
-      'Journey Date: $journeyDate,\n'
-      'Route No: $routeNo,\n'
-      'Service Start Place: $serviceStartPlace,\n'
-      'Service End Place: $serviceEndPlace,\n'
-      'Service Start Time: $serviceStartTime,\n'
-      'Passenger Start Place: $passengerStartPlace,\n'
-      'Passenger End Place: $passengerEndPlace,\n'
-      'Passenger Pickup Point: $passengerPickupPoint,\n'
-      'Passenger Pickup Time: $passengerPickupTime,\n'
-      'Platform Number: $platformNumber,\n'
-      'Class of Service: $classOfService,\n'
-      'Trip Code: $tripCode,\n'
-      'OB Reference No: $obReferenceNumber,\n'
-      'Number of Seats: $numberOfSeats,\n'
-      'Bank Transaction No: $bankTransactionNumber,\n'
-      'Bus ID No: $busIdNumber,\n'
-      'Passenger Category: $passengerCategory,\n'
-      'Passenger Info: $passengerInfo,\n'
-      'ID Card Type: $idCardType,\n'
-      'ID Card Number: $idCardNumber,\n'
-      'Total Fare: $totalFare\n'
-      ')';
-}
+TNSTCTicketModel parseTicket(String text) {
+  final passengers = <PassengerInfo>[];
 
-class PassengerInfo {
-  PassengerInfo({
-    required this.name,
-    required this.age,
-    required this.type,
-    required this.gender,
-    required this.seatNumber,
-  });
-  final String name;
-  final int age;
-  final String type; // "Adult" or "Child"
-  final String gender;
-  final String seatNumber;
-
-  @override
-  String toString() =>
-      'PassengerInfo(\n'
-      'Name: $name,\n'
-      'Age: $age,\n'
-      'Type: $type,\n'
-      'Gender: $gender,\n'
-      'Seat Number: $seatNumber\n'
-      ')';
-}
-
-TNSTCTicket parseTicket(String text) {
   String extractMatch(String pattern, String input, {int groupIndex = 1}) {
     final regex = RegExp(pattern, multiLine: true);
     final match = regex.firstMatch(input);
@@ -246,8 +146,9 @@ TNSTCTicket parseTicket(String text) {
     gender: passengerGender,
     seatNumber: passengerSeatNumber,
   );
+  passengers.add(passengerInfo);
 
-  return TNSTCTicket(
+  return TNSTCTicketModel(
     corporation: corporation,
     pnrNumber: pnrNumber,
     journeyDate: journeyDate,
@@ -267,7 +168,7 @@ TNSTCTicket parseTicket(String text) {
     bankTransactionNumber: bankTransactionNumber,
     busIdNumber: busIdNumber,
     passengerCategory: passengerCategory,
-    passengerInfo: passengerInfo,
+    passengers: passengers,
     idCardType: idCardType,
     idCardNumber: idCardNumber,
     totalFare: totalFare,
