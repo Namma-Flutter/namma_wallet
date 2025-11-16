@@ -77,10 +77,12 @@ class IRCTCScannerService {
 
       // Save to database
       try {
-        final ticketId = await getIt<WalletDatabase>().insertTicket(
+        final _ = await getIt<WalletDatabase>().insertTicket(
           travelTicket,
         );
-        final updatedTicket = travelTicket.copyWith(ticketId: ticketId);
+        final updatedTicket = travelTicket.copyWith(
+          ticketId: travelTicket.ticketId,
+        );
 
         return IRCTCScannerResult.success(
           IRCTCScannerContentType.irctcTicket,

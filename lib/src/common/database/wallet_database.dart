@@ -99,6 +99,7 @@ class WalletDatabase {
     const query = '''
       CREATE TABLE tickets (
          id INTEGER PRIMARY KEY AUTOINCREMENT,
+         ticket_id TEXT NOT NULL,
          primary_text TEXT NOT NULL,
          secondary_text TEXT NOT NULL,
          type TEXT NOT NULL,
@@ -178,17 +179,17 @@ class WalletDatabase {
   }
 
   /// Get Ticket by ID
-  Future<Ticket?> getTicketById(int id) async {
+  Future<Ticket?> getTicketById(String id) async {
     try {
       _logger.logDatabase(
         'Query',
-        'Fetching ticket with ID: ${_maskTicketId(id.toString())}',
+        'Fetching ticket with ID: ${_maskTicketId(id)}',
       );
 
       final db = await database;
       final result = await db.query(
         'tickets',
-        where: 'id = ?',
+        where: 'ticket_id = ?',
         whereArgs: [id],
       );
 
@@ -199,7 +200,7 @@ class WalletDatabase {
 
       _logger.logDatabase(
         'Success',
-        'Fetched ticket with ID: ${_maskTicketId(id.toString())}',
+        'Fetched ticket with ID: ${_maskTicketId(id)}',
       );
 
       final map = result.first;
@@ -220,7 +221,7 @@ class WalletDatabase {
       return TicketMapper.fromMap(decodedMap);
     } catch (e, stackTrace) {
       _logger.error(
-        'Failed to fetch ticket with ID: ${_maskTicketId(id.toString())}',
+        'Failed to fetch ticket with ID: ${_maskTicketId(id)}',
         e,
         stackTrace,
       );
@@ -324,22 +325,22 @@ class WalletDatabase {
 
   /// Update by Ticket Id
   Future<int> updateTicketById(
-    int ticketId,
+    String ticketId,
     Map<String, Object?> updates,
   ) async {
     try {
       _logger.logDatabase(
         'Update',
-        'Updating ticket with ID: ${_maskTicketId(ticketId.toString())}',
+        'Updating ticket with ID: ${_maskTicketId(ticketId)}',
       );
 
       final db = await database;
 
-      // 🧩 Step 1: If updating extras or tags, merge them with existing
+      // Step 1: If updating extras or tags, merge them with existing
       if (updates.containsKey('extras') || updates.containsKey('tags')) {
         final existingResult = await db.query(
           'tickets',
-          where: 'id = ?',
+          where: 'ticket_id = ?',
           whereArgs: [ticketId],
           limit: 1,
         );
@@ -400,25 +401,25 @@ class WalletDatabase {
         }
       }
 
-      // 🕒 Step 2: Update timestamp
+      // Step 2: Update timestamp
       updates['updated_at'] = DateTime.now().toIso8601String();
 
-      // 📝 Step 3: Run update
+      // Step 3: Run update
       final count = await db.update(
         'tickets',
         updates,
-        where: 'id = ?',
+        where: 'ticket_id = ?',
         whereArgs: [ticketId],
       );
 
       if (count > 0) {
         _logger.logDatabase(
           'Success',
-          'Updated ticket with ID: ${_maskTicketId(ticketId.toString())}',
+          'Updated ticket with ID: ${_maskTicketId(ticketId)}',
         );
       } else {
         _logger.warning(
-          'No ticket found with ID: ${_maskTicketId(ticketId.toString())}',
+          'No ticket found with ID: ${_maskTicketId(ticketId)}',
         );
       }
 
@@ -426,7 +427,7 @@ class WalletDatabase {
     } catch (e, stackTrace) {
       _logger.error(
         'Failed to update ticket with ID: '
-        '${_maskTicketId(ticketId.toString())}',
+        '${_maskTicketId(ticketId)}',
         e,
         stackTrace,
       );
@@ -435,36 +436,36 @@ class WalletDatabase {
   }
 
   /// Delete a ticket
-  Future<int> deleteTicket(int id) async {
+  Future<int> deleteTicket(String id) async {
     try {
       _logger.logDatabase(
         'Delete',
-        'Deleting ticket with ID: ${_maskTicketId(id.toString())}',
+        'Deleting ticket with ID: ${_maskTicketId(id)}',
       );
 
       final db = await database;
 
       final count = await db.delete(
         'tickets',
-        where: 'id = ?',
+        where: 'ticket_id = ?',
         whereArgs: [id],
       );
 
       if (count > 0) {
         _logger.logDatabase(
           'Success',
-          'Deleted ticket with ID: ${_maskTicketId(id.toString())}',
+          'Deleted ticket with ID: ${_maskTicketId(id)}',
         );
       } else {
         _logger.warning(
-          'No ticket found to delete with ID: ${_maskTicketId(id.toString())}',
+          'No ticket found to delete with ID: ${_maskTicketId(id)}',
         );
       }
 
       return count;
     } catch (e, stackTrace) {
       _logger.error(
-        'Failed to delete ticket with ID: ${_maskTicketId(id.toString())}',
+        'Failed to delete ticket with ID: ${_maskTicketId(id)}',
         e,
         stackTrace,
       );

@@ -19,7 +19,6 @@ abstract class TravelTicketParser {
 }
 
 class TNSTCBusParser implements TravelTicketParser {
-
   @override
   String get providerName => 'TNSTC';
 
@@ -158,7 +157,7 @@ class TNSTCBusParser implements TravelTicketParser {
 
     // ✅ Map extracted values into Ticket
     return Ticket(
-      ticketId: int.tryParse(pnrNumber),
+      ticketId: pnrNumber,
       primaryText:
           '${from.isNotEmpty ? from : 'Unknown'} → '
           '${to.isNotEmpty ? to : 'Unknown'}',
@@ -258,13 +257,13 @@ class IRCTCTrainParser implements TravelTicketParser {
     } on Exception catch (_) {
       _logger.warning(
         '[IRCTCTrainParser] Failed to parse date: "$dateTime", '
-            'using current date as fallback',
+        'using current date as fallback',
       );
       parsedDate = null;
     }
 
     return Ticket(
-      ticketId: pnrNumber.isNotEmpty ? int.tryParse(pnrNumber) : null,
+      ticketId: pnrNumber,
       primaryText:
           '${from.isNotEmpty ? from : 'Unknown'} →'
           ' ${to.isNotEmpty ? to : 'Unknown'}',
@@ -352,13 +351,13 @@ class SETCBusParser implements TravelTicketParser {
     } on Exception catch (_) {
       _logger.warning(
         '[IRCTCTrainParser] Failed to parse date: "$dateTime", '
-            'using current date as fallback',
+        'using current date as fallback',
       );
       parsedDate = null; // fallback
     }
 
     return Ticket(
-      ticketId: bookingId.isNotEmpty ? int.tryParse(bookingId) : null,
+      ticketId: bookingId,
       primaryText:
           '${from.isNotEmpty ? from : 'Unknown'} → '
           '${to.isNotEmpty ? to : 'Unknown'}',
@@ -585,6 +584,7 @@ class TravelParserService {
                 '${parser.providerName}',
               );
 
+            // TODO(keerthivasan-ai): need to clarify this with harishwarrior
             // if (sourceType != null) {
             //   return ticket.copyWith(sourceType: sourceType);
             // }

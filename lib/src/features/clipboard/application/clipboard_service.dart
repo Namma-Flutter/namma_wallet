@@ -85,7 +85,7 @@ class ClipboardService {
           // This is an update SMS. Attempt to apply the update.
           final db = getIt<WalletDatabase>();
           final count = await db.updateTicketById(
-            int.parse(updateInfo.pnrNumber),
+            updateInfo.pnrNumber,
             updateInfo.updates,
           );
 
@@ -114,10 +114,12 @@ class ClipboardService {
         if (parsedTicket != null) {
           // Save to database
           try {
-            final ticketId = await getIt<WalletDatabase>().insertTicket(
+            final _ = await getIt<WalletDatabase>().insertTicket(
               parsedTicket,
             );
-            final updatedTicket = parsedTicket.copyWith(ticketId: ticketId);
+            final updatedTicket = parsedTicket.copyWith(
+              ticketId: parsedTicket.ticketId,
+            );
             return ClipboardResult.success(
               ClipboardContentType.travelTicket,
               content,

@@ -235,7 +235,9 @@ class PDFParserService {
         final ticketId = await getIt<WalletDatabase>().insertTicket(
           parsedTicket,
         );
-        final updatedTicket = parsedTicket.copyWith(ticketId: ticketId);
+        final updatedTicket = parsedTicket.copyWith(
+          ticketId: parsedTicket.ticketId,
+        );
 
         _logger.success('PDF ticket saved successfully with ID: $ticketId');
         return PDFParserResult.success(

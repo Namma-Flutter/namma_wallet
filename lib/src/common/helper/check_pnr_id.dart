@@ -12,7 +12,7 @@ Future<void> checkAndUpdateTNSTCTicket(TNSTCTicketModel ticket) async {
   }
 
   final existingTicket = await db.getTicketById(
-    int.parse(ticket.pnrNumber ?? '0'),
+    ticket.pnrNumber ?? '',
   );
 
   if (existingTicket != null) {
@@ -25,7 +25,7 @@ Future<void> checkAndUpdateTNSTCTicket(TNSTCTicketModel ticket) async {
     }
 
     if (updates.isNotEmpty) {
-      await db.updateTicketById(int.parse(ticket.pnrNumber ?? '0'), updates);
+      await db.updateTicketById(ticket.pnrNumber ?? '', updates);
     }
   } else {
     await db.insertTicket(Ticket.fromTNSTC(ticket));

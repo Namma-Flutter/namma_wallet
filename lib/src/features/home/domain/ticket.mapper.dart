@@ -73,11 +73,11 @@ class TicketMapper extends ClassMapperBase<Ticket> {
     _$extras,
     opt: true,
   );
-  static int? _$ticketId(Ticket v) => v.ticketId;
-  static const Field<Ticket, int> _f$ticketId = Field(
+  static String? _$ticketId(Ticket v) => v.ticketId;
+  static const Field<Ticket, String> _f$ticketId = Field(
     'ticketId',
     _$ticketId,
-    key: r'id',
+    key: r'ticket_id',
     opt: true,
   );
 
@@ -171,7 +171,7 @@ abstract class TicketCopyWith<$R, $In extends Ticket, $Out>
     DateTime? endTime,
     List<TagModel>? tags,
     List<ExtrasModel>? extras,
-    int? ticketId,
+    String? ticketId,
   });
   TicketCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }

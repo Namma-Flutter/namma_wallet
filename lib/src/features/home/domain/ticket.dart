@@ -24,7 +24,7 @@ class Ticket with TicketMappable {
 
   factory Ticket.fromIRCTC(IRCTCTicket model) {
     return Ticket(
-      ticketId: int.tryParse(model.pnrNumber),
+      ticketId: model.pnrNumber,
       primaryText: '${model.fromStation} → ${model.toStation}',
       secondaryText:
           'Train ${model.trainNumber} • ${model.travelClass} • '
@@ -97,7 +97,7 @@ class Ticket with TicketMappable {
     final gender = firstPassenger?.gender;
 
     return Ticket(
-      ticketId: int.tryParse(model.pnrNumber ?? ''),
+      ticketId: model.pnrNumber,
       primaryText: '$primarySource → $primaryDestination',
       secondaryText:
           '${model.corporation ?? 'TNSTC'} - '
@@ -174,8 +174,8 @@ class Ticket with TicketMappable {
     );
   }
 
-  @MappableField(key: 'id')
-  final int? ticketId;
+  @MappableField(key: 'ticket_id')
+  final String? ticketId;
   @MappableField(key: 'primary_text')
   final String primaryText;
   @MappableField(key: 'secondary_text')
