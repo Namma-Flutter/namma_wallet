@@ -24,7 +24,7 @@ class CustomDayCell extends StatelessWidget {
 
     var primaryIcon = Icons.directions_bus;
     if (tickets.isNotEmpty) {
-      primaryIcon = CalendarUtils.getTicketTypeIcon(tickets.first.ticketType);
+      primaryIcon = CalendarUtils.getTicketTypeIcon(tickets.first.type);
     } else if (events.isNotEmpty) {
       primaryIcon = events.first.icon;
     }

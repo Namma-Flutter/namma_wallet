@@ -1,11 +1,20 @@
+import 'dart:convert';
+
 import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/services/logger_interface.dart';
-import 'package:namma_wallet/src/features/common/domain/travel_ticket_model.dart';
+import 'package:namma_wallet/src/features/common/enums/source_type.dart';
+import 'package:namma_wallet/src/features/common/enums/ticket_type.dart';
+import 'package:namma_wallet/src/features/home/domain/extras_model.dart';
+import 'package:namma_wallet/src/features/home/domain/tag_model.dart';
+import 'package:namma_wallet/src/features/home/domain/ticket.dart';
 
 abstract class TravelTicketParser {
   bool canParse(String text);
-  TravelTicketModel? parseTicket(String text);
+
+  Ticket? parseTicket(String text);
+
   String get providerName;
+
   TicketType get ticketType;
 }
 
@@ -34,7 +43,7 @@ class TNSTCBusParser implements TravelTicketParser {
   }
 
   @override
-  TravelTicketModel? parseTicket(String text) {
+  Ticket? parseTicket(String text) {
     if (!canParse(text)) return null;
 
     String extractMatch(String pattern, String input, {int groupIndex = 1}) {
@@ -146,25 +155,60 @@ class TNSTCBusParser implements TravelTicketParser {
         ? tripCode
         : (vehicleNo.isNotEmpty ? vehicleNo : routeNo);
 
-    return TravelTicketModel(
-      ticketType: TicketType.bus,
-      providerName: corporation.isNotEmpty ? corporation : 'TNSTC',
-      pnrNumber: pnrNumber.isNotEmpty ? pnrNumber : null,
-      tripCode: finalTripCode.isNotEmpty ? finalTripCode : null,
-      sourceLocation: from.isNotEmpty ? from : null,
-      destinationLocation: to.isNotEmpty ? to : null,
-      journeyDate: journeyDate?.toIso8601String(),
-      departureTime: departureTime.isNotEmpty ? departureTime : null,
-      seatNumbers: seatNumbers.isNotEmpty ? seatNumbers : null,
-      classOfService: classOfService.isNotEmpty ? classOfService : null,
-      boardingPoint: boardingPoint.isNotEmpty ? boardingPoint : null,
-      sourceType: SourceType.sms,
-      rawData: text,
+    // ✅ Map extracted values into Ticket
+    return Ticket(
+      ticketId: pnrNumber,
+      primaryText:
+          '${from.isNotEmpty ? from : 'Unknown'} → '
+          '${to.isNotEmpty ? to : 'Unknown'}',
+      secondaryText:
+          '${corporation.isNotEmpty ? corporation : 'TNSTC'} - '
+          '${finalTripCode.isNotEmpty ? finalTripCode : 'Bus'}',
+      startTime: journeyDate ?? DateTime.now(),
+      endTime: journeyDate?.add(const Duration(hours: 6)),
+      location: boardingPoint.isNotEmpty
+          ? boardingPoint
+          : (from.isNotEmpty ? from : 'Unknown'),
+      type: TicketType.bus,
+      tags: [
+        if (finalTripCode.isNotEmpty)
+          TagModel(value: finalTripCode, icon: 'confirmation_number'),
+        if (pnrNumber.isNotEmpty) TagModel(value: pnrNumber, icon: 'qr_code'),
+        if (departureTime.isNotEmpty)
+          TagModel(value: departureTime, icon: 'access_time'),
+        if (seatNumbers.isNotEmpty)
+          TagModel(value: seatNumbers, icon: 'event_seat'),
+        if (classOfService.isNotEmpty)
+          TagModel(value: classOfService, icon: 'workspace_premium'),
+      ],
+      extras: [
+        ExtrasModel(
+          title: 'Provider',
+          value: corporation.isNotEmpty ? corporation : 'TNSTC',
+        ),
+        if (finalTripCode.isNotEmpty)
+          ExtrasModel(title: 'Trip Code', value: finalTripCode),
+        if (from.isNotEmpty) ExtrasModel(title: 'From', value: from),
+        if (to.isNotEmpty) ExtrasModel(title: 'To', value: to),
+        if (seatNumbers.isNotEmpty)
+          ExtrasModel(title: 'Seat', value: seatNumbers),
+        if (journeyDateStr.isNotEmpty)
+          ExtrasModel(title: 'Journey Date', value: journeyDateStr),
+        if (departureTime.isNotEmpty)
+          ExtrasModel(title: 'Departure Time', value: departureTime),
+        if (classOfService.isNotEmpty)
+          ExtrasModel(title: 'Class', value: classOfService),
+        if (boardingPoint.isNotEmpty)
+          ExtrasModel(title: 'Boarding', value: boardingPoint),
+        ExtrasModel(title: 'Source Type', value: 'SMS'),
+      ],
     );
   }
 }
 
 class IRCTCTrainParser implements TravelTicketParser {
+  late final ILogger _logger = getIt<ILogger>();
+
   @override
   String get providerName => 'IRCTC';
 
@@ -186,7 +230,7 @@ class IRCTCTrainParser implements TravelTicketParser {
   }
 
   @override
-  TravelTicketModel? parseTicket(String text) {
+  Ticket? parseTicket(String text) {
     if (!canParse(text)) return null;
 
     String extractMatch(String pattern, String input, {int groupIndex = 1}) {
@@ -207,24 +251,60 @@ class IRCTCTrainParser implements TravelTicketParser {
     final seat = extractMatch(r'Seat\s*[:-]\s*([A-Z0-9,\s]+)', text);
     final classService = extractMatch(r'Class\s*[:-]\s*([^-\n]+)', text);
 
-    return TravelTicketModel(
-      ticketType: TicketType.train,
-      providerName: 'IRCTC',
-      pnrNumber: pnrNumber.isNotEmpty ? pnrNumber : null,
-      tripCode: trainNumber.isNotEmpty ? trainNumber : null,
-      sourceLocation: from.isNotEmpty ? from : null,
-      destinationLocation: to.isNotEmpty ? to : null,
-      journeyDate: dateTime.isNotEmpty ? dateTime : null,
-      seatNumbers: seat.isNotEmpty ? seat : null,
-      coachNumber: coach.isNotEmpty ? coach : null,
-      classOfService: classService.isNotEmpty ? classService : null,
-      sourceType: SourceType.sms,
-      rawData: text,
+    DateTime? parsedDate;
+    try {
+      parsedDate = DateTime.parse(dateTime);
+    } on Exception catch (_) {
+      _logger.warning(
+        '[IRCTCTrainParser] Failed to parse date: "$dateTime", '
+        'using current date as fallback',
+      );
+      parsedDate = null;
+    }
+
+    return Ticket(
+      ticketId: pnrNumber,
+      primaryText:
+          '${from.isNotEmpty ? from : 'Unknown'} →'
+          ' ${to.isNotEmpty ? to : 'Unknown'}',
+      secondaryText:
+          'Train ${trainNumber.isNotEmpty ? trainNumber : 'N/A'} • '
+          '${classService.isNotEmpty ? classService : 'Class N/A'} • '
+          '${seat.isNotEmpty ? seat : 'Seat N/A'}',
+      startTime: parsedDate ?? DateTime.now(),
+      location: from.isNotEmpty ? from : 'Unknown',
+      tags: [
+        if (pnrNumber.isNotEmpty)
+          TagModel(value: pnrNumber, icon: 'confirmation_number'),
+        if (trainNumber.isNotEmpty) TagModel(value: trainNumber, icon: 'train'),
+        if (coach.isNotEmpty)
+          TagModel(value: coach, icon: 'directions_transit'),
+        if (seat.isNotEmpty) TagModel(value: seat, icon: 'event_seat'),
+        if (classService.isNotEmpty)
+          TagModel(value: classService, icon: 'workspace_premium'),
+        if (dateTime.isNotEmpty) TagModel(value: dateTime, icon: 'today'),
+      ],
+      extras: [
+        ExtrasModel(title: 'Provider', value: 'IRCTC'),
+        if (trainNumber.isNotEmpty)
+          ExtrasModel(title: 'Train Number', value: trainNumber),
+        if (from.isNotEmpty) ExtrasModel(title: 'From', value: from),
+        if (to.isNotEmpty) ExtrasModel(title: 'To', value: to),
+        if (coach.isNotEmpty) ExtrasModel(title: 'Coach', value: coach),
+        if (seat.isNotEmpty) ExtrasModel(title: 'Seat', value: seat),
+        if (classService.isNotEmpty)
+          ExtrasModel(title: 'Class', value: classService),
+        if (dateTime.isNotEmpty)
+          ExtrasModel(title: 'Journey Date', value: dateTime),
+        ExtrasModel(title: 'Source Type', value: 'SMS'),
+      ],
     );
   }
 }
 
 class SETCBusParser implements TravelTicketParser {
+  late final ILogger _logger = getIt<ILogger>();
+
   @override
   String get providerName => 'SETC';
 
@@ -245,7 +325,7 @@ class SETCBusParser implements TravelTicketParser {
   }
 
   @override
-  TravelTicketModel? parseTicket(String text) {
+  Ticket? parseTicket(String text) {
     if (!canParse(text)) return null;
 
     String extractMatch(String pattern, String input, {int groupIndex = 1}) {
@@ -264,17 +344,50 @@ class SETCBusParser implements TravelTicketParser {
     final dateTime = extractMatch(r'Date\s*[:-]\s*([^-\n]+)', text);
     final seat = extractMatch(r'Seat\s*[:-]\s*([A-Z0-9,\s]+)', text);
 
-    return TravelTicketModel(
-      ticketType: TicketType.bus,
-      providerName: 'SETC',
-      bookingReference: bookingId.isNotEmpty ? bookingId : null,
-      tripCode: busNumber.isNotEmpty ? busNumber : null,
-      sourceLocation: from.isNotEmpty ? from : null,
-      destinationLocation: to.isNotEmpty ? to : null,
-      journeyDate: dateTime.isNotEmpty ? dateTime : null,
-      seatNumbers: seat.isNotEmpty ? seat : null,
-      sourceType: SourceType.sms,
-      rawData: text,
+    // 🕒 Try parsing date if available
+    DateTime? parsedDate;
+    try {
+      parsedDate = DateTime.parse(dateTime);
+    } on Exception catch (_) {
+      _logger.warning(
+        '[IRCTCTrainParser] Failed to parse date: "$dateTime", '
+        'using current date as fallback',
+      );
+      parsedDate = null; // fallback
+    }
+
+    return Ticket(
+      ticketId: bookingId,
+      primaryText:
+          '${from.isNotEmpty ? from : 'Unknown'} → '
+          '${to.isNotEmpty ? to : 'Unknown'}',
+      secondaryText:
+          '${busNumber.isNotEmpty ? busNumber : 'SETC Bus'} • '
+          '${seat.isNotEmpty ? seat : 'Seat N/A'}',
+      type: TicketType.bus,
+      startTime: parsedDate ?? DateTime.now(),
+      location: from.isNotEmpty ? from : 'Unknown',
+      tags: [
+        if (bookingId.isNotEmpty)
+          TagModel(value: bookingId, icon: 'confirmation_number'),
+        if (busNumber.isNotEmpty)
+          TagModel(value: busNumber, icon: 'directions_bus'),
+        if (seat.isNotEmpty) TagModel(value: seat, icon: 'event_seat'),
+        if (dateTime.isNotEmpty) TagModel(value: dateTime, icon: 'today'),
+      ],
+      extras: [
+        ExtrasModel(title: 'Provider', value: 'SETC'),
+        if (bookingId.isNotEmpty)
+          ExtrasModel(title: 'Booking ID', value: bookingId),
+        if (busNumber.isNotEmpty)
+          ExtrasModel(title: 'Bus Number', value: busNumber),
+        if (from.isNotEmpty) ExtrasModel(title: 'From', value: from),
+        if (to.isNotEmpty) ExtrasModel(title: 'To', value: to),
+        if (seat.isNotEmpty) ExtrasModel(title: 'Seat', value: seat),
+        if (dateTime.isNotEmpty)
+          ExtrasModel(title: 'Journey Date', value: dateTime),
+        ExtrasModel(title: 'Source Type', value: 'SMS'),
+      ],
     );
   }
 }
@@ -301,22 +414,21 @@ class TravelParserService {
   ];
 
   /// Create a sanitized summary of ticket for safe logging (no PII)
-  Map<String, dynamic> _createTicketSummary(TravelTicketModel ticket) {
+  Map<String, dynamic> _createTicketSummary(Ticket ticket) {
     return {
-      'ticketType': ticket.ticketType.toString(),
-      'providerName': ticket.providerName,
-      'pnrMasked': _maskPnr(ticket.pnrNumber),
-      'hasTripCode': ticket.tripCode != null,
-      'hasSourceLocation': ticket.sourceLocation != null,
-      'hasDestinationLocation': ticket.destinationLocation != null,
-      'hasJourneyDate': ticket.journeyDate != null,
-      'hasDepartureTime': ticket.departureTime != null,
-      'hasSeatNumbers': ticket.seatNumbers != null,
-      'hasClassOfService': ticket.classOfService != null,
-      'hasBoardingPoint': ticket.boardingPoint != null,
-      'hasAmount': ticket.amount != null,
-      'hasCoachNumber': ticket.coachNumber != null,
-      'sourceType': ticket.sourceType.toString(),
+      'ticketType': ticket.type.name,
+      'ticketId': ticket.ticketId,
+      'primaryText': ticket.primaryText,
+      'secondaryText': ticket.secondaryText,
+      'hasStartTime': ticket.startTime,
+      'hasEndTime': ticket.endTime != null,
+      'hasLocation': ticket.location.isNotEmpty,
+      'hasTags': ticket.tags != null && ticket.tags!.isNotEmpty,
+      'hasExtras': ticket.extras != null && ticket.extras!.isNotEmpty,
+      'tagCount': ticket.tags?.length ?? 0,
+      'extraCount': ticket.extras?.length ?? 0,
+      'startTime': ticket.startTime.toIso8601String(),
+      'endTime': ticket.endTime?.toIso8601String(),
     };
   }
 
@@ -336,6 +448,7 @@ class TravelParserService {
   }
 
   /// Create sanitized updates map for safe logging
+  // ignore: unused_element
   Map<String, Object?> _sanitizeUpdates(Map<String, Object?> updates) {
     // Explicit allowlist of fields that can be safely logged
     const allowedFields = <String>{
@@ -372,10 +485,11 @@ class TravelParserService {
 
   /// Detects if this is an update SMS (e.g., conductor details for TNSTC)
   TicketUpdateInfo? parseUpdateSMS(String text) {
-    // Check for TNSTC update SMS pattern
+    // Match TNSTC update pattern
     if (text.toUpperCase().contains('TNSTC') &&
         (text.toLowerCase().contains('conductor mobile no') ||
             text.toLowerCase().contains('vehicle no'))) {
+      // Extract PNR
       final pnrMatch = RegExp(
         r'PNR\s*:\s*([^,\s]+)',
         caseSensitive: false,
@@ -385,46 +499,59 @@ class TravelParserService {
 
       final pnr = pnrMatch.group(1)!.trim();
       final updates = <String, Object?>{};
+      final extrasUpdates = <Map<String, dynamic>>[];
 
-      // Extract conductor mobile number
+      // Extract Conductor Mobile No
       final mobileMatch = RegExp(
         r'Conductor Mobile No\s*:\s*(\d+)',
         caseSensitive: false,
       ).firstMatch(text);
+
       if (mobileMatch != null) {
-        updates['contact_mobile'] = mobileMatch.group(1)!.trim();
+        extrasUpdates.add({
+          'title': 'Conductor Mobile No',
+          'value': mobileMatch.group(1)!.trim(),
+        });
       }
 
-      // Extract vehicle number
+      // Extract Vehicle No
       final vehicleMatch = RegExp(
         r'Vehicle No\s*:\s*([^,\s]+)',
         caseSensitive: false,
       ).firstMatch(text);
+
       if (vehicleMatch != null) {
-        updates['trip_code'] = vehicleMatch.group(1)!.trim();
+        extrasUpdates.add({
+          'title': 'Vehicle No',
+          'value': vehicleMatch.group(1)!.trim(),
+        });
       }
 
-      if (updates.isNotEmpty) {
-        // Sanitize PII before logging
-        final sanitizedPnr = _maskPnr(pnr);
-        final sanitizedUpdates = _sanitizeUpdates(updates);
-        _logger.info(
-          '[TravelParserService] Detected TNSTC update SMS for '
-          'PNR: $sanitizedPnr with updates: $sanitizedUpdates',
-        );
+      // If nothing extracted, return null
+      if (extrasUpdates.isEmpty) return null;
 
-        return TicketUpdateInfo(
-          pnrNumber: pnr,
-          providerName: 'TNSTC', // Default provider for these updates
-          updates: updates,
-        );
-      }
+      // Convert extras into JSON (so updateTicketById can merge it)
+      updates['extras'] = jsonEncode(extrasUpdates);
+      updates['updated_at'] = DateTime.now().toIso8601String();
+
+      // Safe logging
+      final sanitizedPnr = _maskPnr(pnr);
+      _logger.info(
+        '[TicketParserService] TNSTC update SMS for PNR: $sanitizedPnr '
+        '(extras updated: ${extrasUpdates.length})',
+      );
+
+      return TicketUpdateInfo(
+        pnrNumber: pnr,
+        providerName: 'TNSTC', // logical info, NOT stored in DB
+        updates: updates,
+      );
     }
 
     return null;
   }
 
-  TravelTicketModel? parseTicketFromText(
+  Ticket? parseTicketFromText(
     String text, {
     SourceType? sourceType,
   }) {
@@ -457,9 +584,10 @@ class TravelParserService {
                 '${parser.providerName}',
               );
 
-            if (sourceType != null) {
-              return ticket.copyWith(sourceType: sourceType);
-            }
+            // TODO(keerthivasan-ai): need to clarify this with harishwarrior
+            // if (sourceType != null) {
+            //   return ticket.copyWith(sourceType: sourceType);
+            // }
             return ticket;
           }
         }

@@ -2,8 +2,8 @@
 import 'package:flutter/material.dart';
 import 'package:namma_wallet/src/common/helper/date_time_converter.dart';
 import 'package:namma_wallet/src/common/theme/styles.dart';
-import 'package:namma_wallet/src/features/common/domain/travel_ticket_model.dart';
-import 'package:namma_wallet/src/features/home/domain/generic_details_model.dart';
+import 'package:namma_wallet/src/features/common/enums/ticket_type.dart';
+import 'package:namma_wallet/src/features/home/domain/ticket.dart';
 import 'package:namma_wallet/src/features/home/presentation/widgets/highlight_widget.dart';
 import 'package:namma_wallet/src/features/travel/presentation/widgets/ticket_view_widget.dart';
 
@@ -13,7 +13,8 @@ class TravelTicketCardWidget extends StatelessWidget {
     this.onTicketDeleted,
     super.key,
   });
-  final GenericDetailsModel ticket;
+
+  final Ticket ticket;
   final VoidCallback? onTicketDeleted;
 
   @override

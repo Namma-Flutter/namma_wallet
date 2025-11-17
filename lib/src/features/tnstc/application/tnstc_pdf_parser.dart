@@ -1,7 +1,8 @@
-import 'package:namma_wallet/src/features/tnstc/application/tnstc_ticket_parser.dart';
+import 'package:namma_wallet/src/features/tnstc/domain/tnstc_model.dart';
 
 class TNSTCPDFParser {
-  TNSTCTicket parseTicket(String pdfText) {
+  TNSTCTicketModel parseTicket(String pdfText) {
+    final passengers = <PassengerInfo>[];
     String extractMatch(String pattern, String input, {int groupIndex = 1}) {
       final regex = RegExp(pattern, multiLine: true);
       final match = regex.firstMatch(input);
@@ -179,8 +180,9 @@ class TNSTCPDFParser {
       gender: passengerGender,
       seatNumber: passengerSeatNumber,
     );
+    passengers.add(passengerInfo);
 
-    return TNSTCTicket(
+    return TNSTCTicketModel(
       corporation: corporation,
       pnrNumber: pnrNumber,
       journeyDate: journeyDate,
@@ -200,7 +202,7 @@ class TNSTCPDFParser {
       bankTransactionNumber: bankTransactionNumber,
       busIdNumber: busIdNumber,
       passengerCategory: passengerCategory,
-      passengerInfo: passengerInfo,
+      passengers: passengers,
       idCardType: idCardType,
       idCardNumber: idCardNumber,
       totalFare: totalFare,
