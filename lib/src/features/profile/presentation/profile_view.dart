@@ -137,6 +137,17 @@ class _ProfileViewState extends State<ProfileView> {
                     // Persist via service
                     // (updates in-memory and SharedPreferences)
                     await _saveFlag(value);
+                    try {
+                      await _saveFlag(value);
+                    } catch (e) {
+                      if (!mounted) return;
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Failed to save haptic preference: $e'),
+                        ),
+                      );
+                      return;
+                    }
                     if (!mounted) return;
 
                     // Update UI
