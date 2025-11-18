@@ -147,8 +147,9 @@ class _ProfileViewState extends State<ProfileView> {
                       });
 
                       // Optional: give immediate feedback only when enabling.
-                      if (value)
+                      if (value) {
                         hapticService.triggerHaptic(HapticType.selection);
+                      }
                     },
                   ),
                 ),
