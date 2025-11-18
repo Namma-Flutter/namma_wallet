@@ -65,6 +65,7 @@ class _ProfileViewState extends State<ProfileView> {
                 icon: Icons.people_outline,
                 title: 'Contributors',
                 subtitle: 'View project contributors',
+                trailing: const Icon(Icons.chevron_right),
                 onTap: () {
                   context.pushNamed(AppRoute.contributors.name);
                 },
@@ -75,6 +76,7 @@ class _ProfileViewState extends State<ProfileView> {
                 icon: Icons.article_outlined,
                 title: 'Licenses',
                 subtitle: 'View open source licenses',
+                trailing: const Icon(Icons.chevron_right),
                 onTap: () {
                   context.pushNamed(AppRoute.license.name);
                 },
@@ -85,6 +87,7 @@ class _ProfileViewState extends State<ProfileView> {
                 icon: Icons.contact_mail_outlined,
                 title: 'Contact Us',
                 subtitle: 'Get support or send feedback',
+                trailing: const Icon(Icons.chevron_right),
                 onTap: () async {
                   final uri = Uri(
                     scheme: 'mailto',
@@ -125,34 +128,29 @@ class _ProfileViewState extends State<ProfileView> {
               ),
 
               // Haptics Enabled
-              Card(
-                elevation: 2,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: ListTile(
-                  leading: const Icon(Icons.vibration_outlined),
-                  title: const Text('Haptics Enabled'),
-                  trailing: Switch(
-                    value: _isHapticEnabled,
-                    onChanged: (value) async {
-                      // Persist via service
-                      // (updates in-memory and SharedPreferences)
-                      await _saveFlag(value);
-                      if (!mounted) return;
+              ProfileTile(
+                title: 'Haptics Enabled',
+                icon: Icons.vibration_outlined,
+                trailing: Switch(
+                  value: _isHapticEnabled,
+                  onChanged: (value) async {
+                    // Persist via service
+                    // (updates in-memory and SharedPreferences)
+                    await _saveFlag(value);
+                    if (!mounted) return;
 
-                      // Update UI
-                      setState(() {
-                        _isHapticEnabled = value;
-                      });
+                    // Update UI
+                    setState(() {
+                      _isHapticEnabled = value;
+                    });
 
-                      // Optional: give immediate feedback only when enabling.
-                      if (value) {
-                        hapticService.triggerHaptic(HapticType.selection);
-                      }
-                    },
-                  ),
+                    // Optional: give immediate feedback only when enabling.
+                    if (value) {
+                      hapticService.triggerHaptic(HapticType.selection);
+                    }
+                  },
                 ),
+                onTap: () {},
               ),
             ],
           ),
@@ -249,13 +247,15 @@ class ProfileTile extends StatelessWidget {
   const ProfileTile({
     required this.icon,
     required this.title,
-    required this.subtitle,
+    required this.trailing,
     required this.onTap,
+    this.subtitle,
     super.key,
   });
   final IconData icon;
   final String title;
-  final String subtitle;
+  final String? subtitle;
+  final Widget trailing;
   final void Function() onTap;
 
   @override
@@ -268,8 +268,8 @@ class ProfileTile extends StatelessWidget {
       child: ListTile(
         leading: Icon(icon),
         title: Text(title),
-        subtitle: Text(subtitle),
-        trailing: const Icon(Icons.chevron_right),
+        subtitle: subtitle != null ? Text(subtitle ?? '') : null,
+        trailing: trailing,
         onTap: onTap,
       ),
     );
