@@ -123,39 +123,39 @@ class _ProfileViewState extends State<ProfileView> {
                   }
                 },
               ),
+
+              // Haptics Enabled
+              Card(
+                elevation: 2,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: ListTile(
+                  leading: const Icon(Icons.vibration_outlined),
+                  title: const Text('Haptics Enabled'),
+                  trailing: Switch(
+                    value: _isHapticEnabled,
+                    onChanged: (value) async {
+                      // Persist via service
+                      // (updates in-memory and SharedPreferences)
+                      await _saveFlag(value);
+                      if (!mounted) return;
+
+                      // Update UI
+                      setState(() {
+                        _isHapticEnabled = value;
+                      });
+
+                      // Optional: give immediate feedback only when enabling.
+                      if (value)
+                        hapticService.triggerHaptic(HapticType.selection);
+                    },
+                  ),
+                ),
+              ),
             ],
           ),
         ),
-          // Haptics Enabled
-          Card(
-            elevation: 2,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: ListTile(
-              leading: const Icon(Icons.vibration_outlined),
-              title: const Text('Haptics Enabled'),
-              trailing: Switch(
-                value: _isHapticEnabled,
-                onChanged: (value) async {
-                  // Persist via service
-                  // (updates in-memory and SharedPreferences)
-                  await _saveFlag(value);
-                  if (!mounted) return;
-
-                  // Update UI
-                  setState(() {
-                    _isHapticEnabled = value;
-                  });
-
-                  // Optional: give immediate feedback only when enabling.
-                  if (value) hapticService.triggerHaptic(HapticType.selection);
-                },
-              ),
-            ),
-          ),
-          // const SizedBox(height: 100), // Space for FAB
-        ],
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
