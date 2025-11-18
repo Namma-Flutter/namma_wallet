@@ -7,6 +7,7 @@ import 'package:namma_wallet/src/common/services/haptic_service_interface.dart';
 import 'package:namma_wallet/src/common/theme/theme_provider.dart';
 import 'package:namma_wallet/src/common/widgets/custom_back_button.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ProfileView extends StatefulWidget {
   const ProfileView({super.key});
@@ -46,56 +47,85 @@ class _ProfileViewState extends State<ProfileView> {
         leading: const CustomBackButton(),
         title: const Text('Profile'),
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          // Theme Settings Section
-          ThemeSectionWidget(themeProvider: themeProvider),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            spacing: 8,
+            children: [
+              // Theme Settings Section
+              ThemeSectionWidget(themeProvider: themeProvider),
 
-          const SizedBox(height: 24),
+              const SizedBox(
+                height: 8,
+              ),
 
-          // Contributors Section
-          Card(
-            elevation: 2,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: ListTile(
-              leading: const Icon(Icons.people_outline),
-              title: const Text('Contributors'),
-              subtitle: const Text('View project contributors'),
-              trailing: const Icon(Icons.chevron_right),
-              onTap: () {
-                hapticService.triggerHaptic(
-                  HapticType.selection,
-                );
-                context.pushNamed(AppRoute.contributors.name);
-              },
-            ),
+              // Contributors Section
+              ProfileTile(
+                icon: Icons.people_outline,
+                title: 'Contributors',
+                subtitle: 'View project contributors',
+                onTap: () {
+                  context.pushNamed(AppRoute.contributors.name);
+                },
+              ),
+
+              // Licenses Section
+              ProfileTile(
+                icon: Icons.article_outlined,
+                title: 'Licenses',
+                subtitle: 'View open source licenses',
+                onTap: () {
+                  context.pushNamed(AppRoute.license.name);
+                },
+              ),
+
+              // Contact Us Section
+              ProfileTile(
+                icon: Icons.contact_mail_outlined,
+                title: 'Contact Us',
+                subtitle: 'Get support or send feedback',
+                onTap: () async {
+                  final uri = Uri(
+                    scheme: 'mailto',
+                    path: 'support@nammawallet.com',
+                  );
+
+                  try {
+                    if (!await canLaunchUrl(uri)) {
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text(
+                              'No email app found. '
+                              'Please install a mail client.',
+                            ),
+                          ),
+                        );
+                      }
+                      return;
+                    }
+
+                    await launchUrl(
+                      uri,
+                      mode: LaunchMode.externalApplication,
+                    );
+                  } on Exception {
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text(
+                            'Failed to open email app. Please try again.',
+                          ),
+                        ),
+                      );
+                    }
+                  }
+                },
+              ),
+            ],
           ),
-
-          const SizedBox(height: 8),
-
-          // License Section
-          Card(
-            elevation: 2,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: ListTile(
-              leading: const Icon(Icons.article_outlined),
-              title: const Text('Licenses'),
-              subtitle: const Text('View open source licenses'),
-              trailing: const Icon(Icons.chevron_right),
-              onTap: () {
-                hapticService.triggerHaptic(
-                  HapticType.selection,
-                );
-                context.pushNamed(AppRoute.license.name);
-              },
-            ),
-          ),
-
+        ),
           // Haptics Enabled
           Card(
             elevation: 2,
@@ -209,6 +239,37 @@ class ThemeSectionWidget extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class ProfileTile extends StatelessWidget {
+  const ProfileTile({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.onTap,
+    super.key,
+  });
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final void Function() onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: ListTile(
+        leading: Icon(icon),
+        title: Text(title),
+        subtitle: Text(subtitle),
+        trailing: const Icon(Icons.chevron_right),
+        onTap: onTap,
       ),
     );
   }

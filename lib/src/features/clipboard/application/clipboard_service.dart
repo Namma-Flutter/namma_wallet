@@ -4,7 +4,8 @@ import 'package:namma_wallet/src/common/database/wallet_database.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/services/logger_interface.dart';
 import 'package:namma_wallet/src/features/common/application/travel_parser_service.dart';
-import 'package:namma_wallet/src/features/common/domain/travel_ticket_model.dart';
+import 'package:namma_wallet/src/features/common/enums/source_type.dart';
+import 'package:namma_wallet/src/features/home/domain/ticket.dart';
 
 enum ClipboardContentType {
   text,
@@ -24,7 +25,7 @@ class ClipboardResult {
   factory ClipboardResult.success(
     ClipboardContentType type,
     String content, {
-    TravelTicketModel? ticket,
+    Ticket? ticket,
   }) {
     return ClipboardResult(
       type: type,
@@ -44,7 +45,7 @@ class ClipboardResult {
 
   final ClipboardContentType type;
   final String? content;
-  final TravelTicketModel? ticket;
+  final Ticket? ticket;
   final String? errorMessage;
   final bool isSuccess;
 }
@@ -83,7 +84,7 @@ class ClipboardService {
         if (updateInfo != null) {
           // This is an update SMS. Attempt to apply the update.
           final db = getIt<WalletDatabase>();
-          final count = await db.updateTravelTicketByPNR(
+          final count = await db.updateTicketById(
             updateInfo.pnrNumber,
             updateInfo.updates,
           );
@@ -113,10 +114,12 @@ class ClipboardService {
         if (parsedTicket != null) {
           // Save to database
           try {
-            final ticketId = await getIt<WalletDatabase>().insertTravelTicket(
-              parsedTicket.toDatabase(),
+            final _ = await getIt<WalletDatabase>().insertTicket(
+              parsedTicket,
             );
-            final updatedTicket = parsedTicket.copyWith(id: ticketId);
+            final updatedTicket = parsedTicket.copyWith(
+              ticketId: parsedTicket.ticketId,
+            );
             return ClipboardResult.success(
               ClipboardContentType.travelTicket,
               content,
@@ -124,10 +127,10 @@ class ClipboardService {
             );
           } on DuplicateTicketException catch (_) {
             final maskedPnr =
-                parsedTicket.pnrNumber != null &&
-                    parsedTicket.pnrNumber!.length >= 4
-                ? '...${parsedTicket.pnrNumber!.substring(
-                    parsedTicket.pnrNumber!.length - 4,
+                parsedTicket.ticketId != null &&
+                    parsedTicket.ticketId.toString().length >= 4
+                ? '...${parsedTicket.ticketId.toString().substring(
+                    parsedTicket.ticketId.toString().length - 4,
                   )}'
                 : '***';
             _logger.warning(
