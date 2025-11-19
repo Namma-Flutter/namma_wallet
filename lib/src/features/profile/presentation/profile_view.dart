@@ -134,14 +134,15 @@ class _ProfileViewState extends State<ProfileView> {
                 trailing: Switch(
                   value: _isHapticEnabled,
                   onChanged: (value) async {
+                    final messenger = ScaffoldMessenger.of(context);
                     // Persist via service
                     // (updates in-memory and SharedPreferences)
                     await _saveFlag(value);
                     try {
                       await _saveFlag(value);
-                    } catch (e) {
+                    } on Object catch (e) {
                       if (!mounted) return;
-                      ScaffoldMessenger.of(context).showSnackBar(
+                      messenger.showSnackBar(
                         SnackBar(
                           content: Text('Failed to save haptic preference: $e'),
                         ),
