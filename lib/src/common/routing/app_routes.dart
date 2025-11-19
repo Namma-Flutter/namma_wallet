@@ -7,6 +7,7 @@ enum AppRoute {
 
   // Ticket related routes
   ticketView(path: '/ticket', name: 'ticketView'),
+  allTickets(path: '/all-tickets', name: 'allTickets'),
 
   // Scanner related routes
   barcodeScanner(path: '/barcode-scanner', name: 'barcodeScanner'),

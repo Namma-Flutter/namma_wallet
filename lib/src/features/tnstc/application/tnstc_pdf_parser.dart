@@ -99,7 +99,7 @@ class TNSTCPDFParser {
     // Extract all fields using PDF-specific patterns
     // Use non-greedy matching and stop at newlines
     final corporation = extractMatch(
-      r'Corporation\s*:\s*([A-Za-z\s]+?)(?:\n|$)',
+      r'Corporation\s*:\s*([A-Za-z\s-]+?)(?:\n|$)',
       pdfText,
     );
     final pnrNumber = extractMatch(

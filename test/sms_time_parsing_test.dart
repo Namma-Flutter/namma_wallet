@@ -10,7 +10,8 @@ void main() {
     });
 
     test('should parse SETC SMS with time correctly', () {
-      const smsText = 'TNSTC Corporation:SETC , PNR NO.:T73309927 , '
+      const smsText =
+          'TNSTC Corporation:SETC , PNR NO.:T73309927 , '
           'From:KUMBAKONAM To CHENNAI-PT DR. M.G.R. BS , '
           'Trip Code:1315KUMCHEAB , Journey Date:18/01/2026 , '
           'Time:,13:15 , Seat No.:4UB .Class:AC SLEEPER SEATER , '
