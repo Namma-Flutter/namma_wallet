@@ -13,7 +13,7 @@ import 'package:namma_wallet/src/features/tnstc/application/tnstc_sms_parser.dar
 abstract class TravelTicketParser {
   bool canParse(String text);
 
-  Ticket? parseTicket(String text);
+  Ticket parseTicket(String text);
 
   String get providerName;
 
@@ -84,9 +84,7 @@ class TNSTCBusParser implements TravelTicketParser {
   }
 
   @override
-  Ticket? parseTicket(String text) {
-    if (!canParse(text)) return null;
-
+  Ticket parseTicket(String text) {
     // Detect if this is SMS or PDF format
     final isSMS = _isSMSFormat(text);
 
@@ -125,9 +123,7 @@ class IRCTCTrainParser implements TravelTicketParser {
   }
 
   @override
-  Ticket? parseTicket(String text) {
-    if (!canParse(text)) return null;
-
+  Ticket parseTicket(String text) {
     String extractMatch(String pattern, String input, {int groupIndex = 1}) {
       final regex = RegExp(pattern, multiLine: true, caseSensitive: false);
       final match = regex.firstMatch(input);
@@ -220,9 +216,7 @@ class SETCBusParser implements TravelTicketParser {
   }
 
   @override
-  Ticket? parseTicket(String text) {
-    if (!canParse(text)) return null;
-
+  Ticket parseTicket(String text) {
     String extractMatch(String pattern, String input, {int groupIndex = 1}) {
       final regex = RegExp(pattern, multiLine: true, caseSensitive: false);
       final match = regex.firstMatch(input);
@@ -467,24 +461,23 @@ class TravelParserService {
             );
 
           final ticket = parser.parseTicket(text);
-          if (ticket != null) {
-            // Log sanitized summary (no PII)
-            final ticketSummary = _createTicketSummary(ticket);
-            _logger
-              ..debug(
-                '[TravelParserService] Parsed ticket summary: $ticketSummary',
-              )
-              ..info(
-                '[TravelParserService] Successfully parsed ticket with '
-                '${parser.providerName}',
-              );
 
-            // TODO(keerthivasan-ai): need to clarify this with harishwarrior
-            // if (sourceType != null) {
-            //   return ticket.copyWith(sourceType: sourceType);
-            // }
-            return ticket;
-          }
+          // Log sanitized summary (no PII)
+          final ticketSummary = _createTicketSummary(ticket);
+          _logger
+            ..debug(
+              '[TravelParserService] Parsed ticket summary: $ticketSummary',
+            )
+            ..info(
+              '[TravelParserService] Successfully parsed ticket with '
+              '${parser.providerName}',
+            );
+
+          // TODO(keerthivasan-ai): need to clarify this with harishwarrior
+          // if (sourceType != null) {
+          //   return ticket.copyWith(sourceType: sourceType);
+          // }
+          return ticket;
         }
       }
 
