@@ -22,7 +22,7 @@ Future<void> checkAndUpdateTNSTCTicket(Ticket ticket) async {
     final busIdExtra = ticket.extras
         ?.where((e) => e.title == 'Bus ID')
         .firstOrNull;
-    if (busIdExtra?.value != null && busIdExtra!.value!.isNotEmpty) {
+    if (busIdExtra?.value != null && busIdExtra!.value.isNotEmpty) {
       updates['trip_code'] = busIdExtra.value;
     }
 
@@ -30,7 +30,7 @@ Future<void> checkAndUpdateTNSTCTicket(Ticket ticket) async {
     final conductorExtra = ticket.extras
         ?.where((e) => e.title == 'Conductor Contact')
         .firstOrNull;
-    if (conductorExtra?.value != null && conductorExtra!.value!.isNotEmpty) {
+    if (conductorExtra?.value != null && conductorExtra!.value.isNotEmpty) {
       updates['contact_mobile'] = conductorExtra.value;
     }
 

@@ -85,7 +85,10 @@ class Ticket with TicketMappable {
     );
   }
 
-  factory Ticket.fromTNSTC(TNSTCTicketModel model, {String sourceType = 'PDF'}) {
+  factory Ticket.fromTNSTC(
+    TNSTCTicketModel model, {
+    String sourceType = 'PDF',
+  }) {
     final primarySource =
         model.serviceStartPlace ?? model.passengerStartPlace ?? 'Unknown';
     final primaryDestination =
@@ -172,11 +175,9 @@ class Ticket with TicketMappable {
       extras: [
         if (model.pnrNumber?.isNotEmpty ?? false)
           ExtrasModel(title: 'PNR Number', value: model.pnrNumber!),
-        if (firstPassenger != null &&
-            firstPassenger.name.isNotEmpty)
+        if (firstPassenger != null && firstPassenger.name.isNotEmpty)
           ExtrasModel(title: 'Passenger Name', value: firstPassenger.name),
-        if (firstPassenger?.age != null &&
-            firstPassenger!.age > 0)
+        if (firstPassenger?.age != null && firstPassenger!.age > 0)
           ExtrasModel(title: 'Age', value: firstPassenger.age.toString()),
         if (gender != null && gender.isNotEmpty)
           ExtrasModel(title: 'Gender', value: gender),

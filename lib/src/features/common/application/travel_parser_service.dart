@@ -47,7 +47,8 @@ class TNSTCBusParser implements TravelTicketParser {
 
   /// Detects if the text is SMS format by checking for SMS-specific patterns
   bool _isSMSFormat(String text) {
-    // SMS contains "SETC" or has SMS-style patterns like "From :", "To ", "Trip :"
+    // SMS contains "SETC" or has SMS-style patterns
+    // like "From :", "To ", "Trip :"
     // PDF has "Service Start Place", "PNR Number", "Date of Journey"
     final smsPatterns = [
       'SETC',

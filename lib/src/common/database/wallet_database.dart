@@ -138,7 +138,8 @@ class WalletDatabase {
         if (existing != null) {
           _logger.logDatabase(
             'Update',
-            'Ticket with PNR ${_maskTicketId(ticket.ticketId!)} already exists, updating instead',
+            'Ticket with PNR ${_maskTicketId(ticket.ticketId!)} already'
+                ' exists, updating instead',
           );
 
           // Prepare updates map with new data
@@ -184,7 +185,7 @@ class WalletDatabase {
           );
 
           if (result.isNotEmpty) {
-            final id = result.first['id'] as int;
+            final id = result.first['id']! as int;
             _logger.logDatabase(
               'Success',
               'Updated existing ticket with database ID: $id',

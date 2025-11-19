@@ -93,7 +93,7 @@ class TNSTCSMSParser {
         passengers.add(
           PassengerInfo(
             name: '', // Empty - will be filtered out in UI
-            age: 0,   // Zero - will be filtered out in UI
+            age: 0, // Zero - will be filtered out in UI
             type: 'Adult',
             gender: '', // Empty - will be filtered out in UI
             seatNumber: seatNumbers,

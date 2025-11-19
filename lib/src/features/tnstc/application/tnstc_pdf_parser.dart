@@ -36,7 +36,9 @@ class TNSTCPDFParser {
       // Handle both '-' and '/' separators
       final parts = date.contains('/') ? date.split('/') : date.split('-');
       if (parts.length != 3) {
-        debugPrint('Invalid date format: $date (expected DD/MM/YYYY or DD-MM-YYYY)');
+        debugPrint(
+          'Invalid date format: $date (expected DD/MM/YYYY or DD-MM-YYYY)',
+        );
         return DateTime.now();
       }
 
@@ -56,7 +58,9 @@ class TNSTCPDFParser {
 
       final parts = dateTime.split(' '); // Split into date and time
       if (parts.length < 2) {
-        debugPrint('Invalid datetime format: $dateTime (expected "DD/MM/YYYY HH:mm")');
+        debugPrint(
+          'Invalid datetime format: $dateTime (expected "DD/MM/YYYY HH:mm")',
+        );
         return DateTime.now();
       }
 
@@ -308,6 +312,6 @@ class TNSTCPDFParser {
     );
 
     // Convert TNSTCTicketModel to Ticket using the factory method
-    return Ticket.fromTNSTC(tnstcModel, sourceType: 'PDF');
+    return Ticket.fromTNSTC(tnstcModel);
   }
 }

@@ -31,15 +31,12 @@ void main() {
       // Departure Time: "01:15 PM" (time only)
       // Pickup Time: "18-01-2026 01:15 PM" (full datetime)
 
-      print('Departure Time: ${departureExtra!.value}');
-      print('Pickup Time: ${pickupExtra!.value}');
-
       // Verify Departure Time is in 12h format with AM/PM
-      expect(departureExtra.value, '01:15 PM');
+      expect(departureExtra?.value, '01:15 PM');
 
       // Verify Pickup Time still has full datetime in 12h format
-      expect(pickupExtra.value, contains('01:15 PM'));
-      expect(pickupExtra.value, contains('18-01-2026'));
+      expect(pickupExtra?.value, contains('01:15 PM'));
+      expect(pickupExtra?.value, contains('18-01-2026'));
     },
   );
 }

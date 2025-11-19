@@ -125,12 +125,6 @@ class PDFParserService {
   final ILogger _logger;
   final TNSTCPDFParser _pdfParser;
 
-  /// Helper method to create a non-identifying summary of parsed ticket data
-  /// for safe logging in dev/staging environments
-  Map<String, dynamic> _createTicketSummary(TNSTCTicketModel ticket) {
-    return ticket.toNonPiiSummary();
-  }
-
   Future<PDFParserResult> parseAndSavePDFTicket(File pdfFile) async {
     try {
       _logger.logService('PDF', 'Starting PDF ticket parsing');
@@ -205,8 +199,7 @@ class PDFParserService {
 
           parsedTicket = tnstcTicket;
           final pnrMasked =
-              tnstcTicket.ticketId != null &&
-                  tnstcTicket.ticketId!.length >= 4
+              tnstcTicket.ticketId != null && tnstcTicket.ticketId!.length >= 4
               ? '...${tnstcTicket.ticketId!.substring(
                   tnstcTicket.ticketId!.length - 4,
                 )}'
