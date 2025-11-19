@@ -92,15 +92,6 @@ class PDFService {
           '$lineCount lines',
         );
 
-        // Debug: Log first 200 characters to help diagnose issues
-        if (rawText.isNotEmpty) {
-          final preview = rawText.substring(0, rawText.length.clamp(0, 200));
-          getIt<ILogger>().debug(
-            '[PDFService] Text preview (first 200 chars): '
-            '${preview.replaceAll('\n', r'\n')}',
-          );
-        }
-
         // Clean and normalize the extracted text
         final cleanedText = _cleanExtractedText(rawText);
 
