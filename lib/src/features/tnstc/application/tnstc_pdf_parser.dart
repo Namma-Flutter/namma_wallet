@@ -12,8 +12,8 @@ import 'package:namma_wallet/src/features/tnstc/domain/tnstc_model.dart';
 /// Falls back to default values if parsing fails for individual fields.
 /// Never throws - returns a model with partial data on errors.
 class TNSTCPDFParser {
-  // TODO(optimization): Use pre-compiled regex patterns instead of
-  // compiling them on each parse. See CODE_REVIEW_FINDINGS.md for details.
+  // TODO(optimization): Move RegExp compilation to static final fields
+  // to avoid recompiling patterns on each parse call, improving performance.
 
   /// Parses the given PDF text and returns a [Ticket].
   Ticket parseTicket(String pdfText) {
