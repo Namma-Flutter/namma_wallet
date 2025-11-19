@@ -21,10 +21,14 @@ class OCRService {
       final textRecognizer = TextRecognizer();
       final extractedTexts = <String>[];
 
+      // Get temp directory once outside the loop
+      final tempDir = await getTemporaryDirectory();
+
       // Process each page
       for (var pageNum = 0; pageNum < doc.pages.length; pageNum++) {
         logger.debug('[OCRService] Processing page ${pageNum + 1}...');
 
+        File? tempImageFile;
         try {
           // Get the page
           final page = doc.pages[pageNum];
@@ -51,9 +55,10 @@ class OCRService {
           pageImage.dispose();
 
           // Save temporarily for ML Kit processing
-          final tempDir = await getTemporaryDirectory();
-          final tempImageFile = File(
-            '${tempDir.path}/ocr_page_${pageNum + 1}.png',
+          // Use timestamp to avoid conflicts between concurrent calls
+          tempImageFile = File(
+            '${tempDir.path}/ocr_${DateTime.now().microsecondsSinceEpoch}_'
+            'page_${pageNum + 1}.png',
           );
 
           await tempImageFile.writeAsBytes(pngBytes);
@@ -75,19 +80,21 @@ class OCRService {
           if (recognizedText.text.isNotEmpty) {
             extractedTexts.add(recognizedText.text);
           }
-
-          // Clean up temporary file
-          try {
-            await tempImageFile.delete();
-          } on Object catch (e) {
-            logger.debug('[OCRService] Failed to delete temp file: $e');
-          }
         } on Object catch (e, stackTrace) {
           logger.error(
             '[OCRService] Error processing page ${pageNum + 1}',
             e,
             stackTrace,
           );
+        } finally {
+          // Always clean up temporary file, even if an exception occurred
+          if (tempImageFile != null && tempImageFile.existsSync()) {
+            try {
+              await tempImageFile.delete();
+            } on Object catch (e) {
+              logger.debug('[OCRService] Failed to delete temp file: $e');
+            }
+          }
         }
       }
 
