@@ -1,6 +1,7 @@
 import 'package:dart_mappable/dart_mappable.dart';
-import 'package:flutter/foundation.dart';
+import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/helper/date_time_converter.dart';
+import 'package:namma_wallet/src/common/services/logger_interface.dart';
 import 'package:namma_wallet/src/features/common/enums/ticket_type.dart';
 import 'package:namma_wallet/src/features/home/domain/extras_model.dart';
 import 'package:namma_wallet/src/features/home/domain/tag_model.dart';
@@ -101,8 +102,16 @@ class Ticket with TicketMappable {
     final seatNumber = firstPassenger?.seatNumber;
     final gender = firstPassenger?.gender;
 
-    var startTime =
-        model.passengerPickupTime ?? model.journeyDate ?? DateTime.now();
+    var startTime = model.passengerPickupTime ?? model.journeyDate;
+
+    // Log when falling back to DateTime.now() to help debug parsing issues
+    if (startTime == null) {
+      getIt<ILogger>().warning(
+        '[Ticket.fromTNSTC] Both passengerPickupTime and journeyDate are null, '
+        'falling back to DateTime.now()',
+      );
+      startTime = DateTime.now();
+    }
 
     // If pickup time is missing, try to combine
     // journeyDate and serviceStartTime
@@ -128,16 +137,14 @@ class Ticket with TicketMappable {
           }
         }
       } on FormatException catch (e) {
-        // Log parse failure for debugging
-        debugPrint(
-          'Failed to parse serviceStartTime: ${model.serviceStartTime}, '
-          'error: $e',
+        // Log parse failure for debugging (no PII)
+        getIt<ILogger>().warning(
+          '[Ticket.fromTNSTC] Failed to parse serviceStartTime: $e',
         );
       } on Exception catch (e) {
-        // Log any other parsing errors (including invalid time values)
-        debugPrint(
-          'Error parsing serviceStartTime: ${model.serviceStartTime}, '
-          'error: $e',
+        // Log any other parsing errors (no PII)
+        getIt<ILogger>().warning(
+          '[Ticket.fromTNSTC] Error parsing serviceStartTime: $e',
         );
       }
     }
@@ -148,7 +155,7 @@ class Ticket with TicketMappable {
       secondaryText:
           '${model.corporation ?? 'TNSTC'} - '
           '${model.tripCode ?? model.routeNo ?? 'Bus'}',
-      startTime: startTime,
+      startTime: startTime!, // Safe: we ensure startTime is non-null above
       location:
           model.passengerPickupPoint ??
           model.boardingPoint ??
@@ -181,17 +188,29 @@ class Ticket with TicketMappable {
           ExtrasModel(title: 'Age', value: firstPassenger.age.toString()),
         if (gender != null && gender.isNotEmpty)
           ExtrasModel(title: 'Gender', value: gender),
-        if (model.busIdNumber != null && model.busIdNumber!.isNotEmpty)
-          ExtrasModel(title: 'Bus ID', value: model.busIdNumber!),
-        if (model.vehicleNumber != null && model.vehicleNumber!.isNotEmpty)
-          ExtrasModel(title: 'Bus Number', value: model.vehicleNumber!),
+        if (model.busIdNumber != null && model.busIdNumber!.trim().isNotEmpty)
+          ExtrasModel(title: 'Bus ID', value: model.busIdNumber!.trim()),
+        if (model.vehicleNumber != null &&
+            model.vehicleNumber!.trim().isNotEmpty)
+          ExtrasModel(
+            title: 'Bus Number',
+            value: model.vehicleNumber!.trim(),
+          ),
         if (model.obReferenceNumber != null &&
-            model.obReferenceNumber!.isNotEmpty)
-          ExtrasModel(title: 'Booking Ref', value: model.obReferenceNumber!),
-        if (model.classOfService != null && model.classOfService!.isNotEmpty)
-          ExtrasModel(title: 'Service Class', value: model.classOfService!),
-        if (model.platformNumber != null && model.platformNumber!.isNotEmpty)
-          ExtrasModel(title: 'Platform', value: model.platformNumber!),
+            model.obReferenceNumber!.trim().isNotEmpty)
+          ExtrasModel(
+            title: 'Booking Ref',
+            value: model.obReferenceNumber!.trim(),
+          ),
+        if (model.classOfService != null &&
+            model.classOfService!.trim().isNotEmpty)
+          ExtrasModel(
+            title: 'Service Class',
+            value: model.classOfService!.trim(),
+          ),
+        if (model.platformNumber != null &&
+            model.platformNumber!.trim().isNotEmpty)
+          ExtrasModel(title: 'Platform', value: model.platformNumber!.trim()),
         if (model.passengerPickupTime != null)
           ExtrasModel(
             title: 'Pickup Time',
