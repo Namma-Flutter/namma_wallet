@@ -51,9 +51,3 @@ String formatTimeString(String timeStr) {
     return timeStr;
   }
 }
-
-/// @deprecated Use formatDate instead. This function name is misleading.
-String getDate(DateTime dt) => formatDate(dt);
-
-/// @deprecated Use formatTime instead. This function name is misleading.
-String getTime(DateTime dt) => formatTime(dt);
