@@ -11,6 +11,9 @@ class PDFService {
 
   final OCRService _ocrService;
 
+  // Minimum expected text length threshold for successful extraction
+  static const _minExpectedTextLength = 10;
+
   Future<String> extractTextFrom(File pdf) async {
     try {
       // Load an existing PDF document.
@@ -26,7 +29,8 @@ class PDFService {
         var rawText = PdfTextExtractor(document).extractText();
 
         // If extraction yields very little text, try page-by-page extraction
-        if (rawText.length < 10 && document.pages.count > 0) {
+        if (rawText.length < _minExpectedTextLength &&
+            document.pages.count > 0) {
           getIt<ILogger>().debug(
             '[PDFService] Initial extraction yielded only '
             '${rawText.length} chars, trying page-by-page extraction',
