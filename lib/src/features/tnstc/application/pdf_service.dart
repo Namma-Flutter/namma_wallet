@@ -138,9 +138,6 @@ class PDFService {
     // Fix common PDF extraction issues
     // Sometimes colons get separated from labels -
     // fix spacing but keep original text
-    // Fix common PDF extraction issues
-    // Sometimes colons get separated from labels -
-    // fix spacing but keep original text
     cleanedText = cleanedText.replaceAllMapped(
       RegExp(r'(\w+)\s+:\s*'),
       (match) => '${match.group(1)}: ',
