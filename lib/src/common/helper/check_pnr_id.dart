@@ -1,33 +1,43 @@
 import 'package:namma_wallet/src/common/database/wallet_database.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/features/home/domain/ticket.dart';
-import 'package:namma_wallet/src/features/tnstc/domain/tnstc_model.dart';
 
-Future<void> checkAndUpdateTNSTCTicket(TNSTCTicketModel ticket) async {
+Future<void> checkAndUpdateTNSTCTicket(Ticket ticket) async {
   final db = getIt<WalletDatabase>();
 
-  if (ticket.pnrNumber == null || ticket.corporation == null) {
+  if (ticket.ticketId == null) {
     // Or handle this case appropriately
     return;
   }
 
   final existingTicket = await db.getTicketById(
-    ticket.pnrNumber ?? '',
+    ticket.ticketId!,
   );
 
   if (existingTicket != null) {
+    // Extract updates from ticket extras
     final updates = <String, Object?>{};
-    if (ticket.busIdNumber?.isNotEmpty ?? false) {
-      updates['trip_code'] = ticket.busIdNumber;
+
+    // Check for trip code/bus ID
+    final busIdExtra = ticket.extras
+        ?.where((e) => e.title == 'Bus ID')
+        .firstOrNull;
+    if (busIdExtra?.value != null && busIdExtra!.value!.isNotEmpty) {
+      updates['trip_code'] = busIdExtra.value;
     }
-    if (ticket.conductorMobileNo?.isNotEmpty ?? false) {
-      updates['contact_mobile'] = ticket.conductorMobileNo;
+
+    // Check for conductor mobile
+    final conductorExtra = ticket.extras
+        ?.where((e) => e.title == 'Conductor Contact')
+        .firstOrNull;
+    if (conductorExtra?.value != null && conductorExtra!.value!.isNotEmpty) {
+      updates['contact_mobile'] = conductorExtra.value;
     }
 
     if (updates.isNotEmpty) {
-      await db.updateTicketById(ticket.pnrNumber ?? '', updates);
+      await db.updateTicketById(ticket.ticketId!, updates);
     }
   } else {
-    await db.insertTicket(Ticket.fromTNSTC(ticket));
+    await db.insertTicket(ticket);
   }
 }

@@ -131,6 +131,70 @@ class WalletDatabase {
     try {
       _logger.logDatabase('Insert', 'Inserting ticket: ${ticket.primaryText}');
 
+      // Check if ticket with same PNR already exists
+      if (ticket.ticketId != null && ticket.ticketId!.isNotEmpty) {
+        final existing = await getTicketById(ticket.ticketId!);
+
+        if (existing != null) {
+          _logger.logDatabase(
+            'Update',
+            'Ticket with PNR ${_maskTicketId(ticket.ticketId!)} already exists, updating instead',
+          );
+
+          // Prepare updates map with new data
+          final updates = <String, Object?>{};
+
+          // Update basic fields if they have meaningful values
+          if (ticket.primaryText.isNotEmpty &&
+              ticket.primaryText != 'Unknown → Unknown') {
+            updates['primary_text'] = ticket.primaryText;
+          }
+          if (ticket.secondaryText.isNotEmpty) {
+            updates['secondary_text'] = ticket.secondaryText;
+          }
+          if (ticket.location.isNotEmpty && ticket.location != 'Unknown') {
+            updates['location'] = ticket.location;
+          }
+
+          // Merge tags
+          if (ticket.tags != null && ticket.tags!.isNotEmpty) {
+            updates['tags'] = jsonEncode(
+              ticket.tags!.map((e) => e.toMap()).toList(),
+            );
+          }
+
+          // Merge extras
+          if (ticket.extras != null && ticket.extras!.isNotEmpty) {
+            updates['extras'] = jsonEncode(
+              ticket.extras!.map((e) => e.toMap()).toList(),
+            );
+          }
+
+          // Update the existing ticket
+          await updateTicketById(ticket.ticketId!, updates);
+
+          // Return the existing ticket's database ID
+          final db = await database;
+          final result = await db.query(
+            'tickets',
+            columns: ['id'],
+            where: 'ticket_id = ?',
+            whereArgs: [ticket.ticketId],
+            limit: 1,
+          );
+
+          if (result.isNotEmpty) {
+            final id = result.first['id'] as int;
+            _logger.logDatabase(
+              'Success',
+              'Updated existing ticket with database ID: $id',
+            );
+            return id;
+          }
+        }
+      }
+
+      // No existing ticket found, insert as new
       final db = await database;
 
       final map = ticket.toEntity()

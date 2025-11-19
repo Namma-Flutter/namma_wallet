@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:namma_wallet/src/features/home/domain/ticket.dart';
 import 'package:namma_wallet/src/features/tnstc/domain/tnstc_model.dart';
 
 /// Parses TNSTC (Tamil Nadu State Transport Corporation) PDF tickets
@@ -14,8 +15,8 @@ class TNSTCPDFParser {
   // TODO(optimization): Use pre-compiled regex patterns instead of
   // compiling them on each parse. See CODE_REVIEW_FINDINGS.md for details.
 
-  /// Parses the given PDF text and returns a [TNSTCTicketModel].
-  TNSTCTicketModel parseTicket(String pdfText) {
+  /// Parses the given PDF text and returns a [Ticket].
+  Ticket parseTicket(String pdfText) {
     final passengers = <PassengerInfo>[];
     String extractMatch(String pattern, String input, {int groupIndex = 1}) {
       final regex = RegExp(pattern, multiLine: true);
@@ -279,7 +280,7 @@ class TNSTCPDFParser {
         ? passengerPickupPoint
         : null;
 
-    return TNSTCTicketModel(
+    final tnstcModel = TNSTCTicketModel(
       corporation: corporation,
       pnrNumber: pnrNumber,
       journeyDate: journeyDate,
@@ -305,5 +306,8 @@ class TNSTCPDFParser {
       totalFare: totalFare,
       boardingPoint: boardingPoint,
     );
+
+    // Convert TNSTCTicketModel to Ticket using the factory method
+    return Ticket.fromTNSTC(tnstcModel, sourceType: 'PDF');
   }
 }

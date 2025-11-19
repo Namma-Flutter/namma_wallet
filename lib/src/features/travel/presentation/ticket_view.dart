@@ -53,6 +53,52 @@ class _TicketViewState extends State<TicketView> {
     return null;
   }
 
+  String? getFromLocation(Ticket ticket) {
+    for (final extra in ticket.extras ?? <ExtrasModel>[]) {
+      if (extra.title?.toLowerCase() == 'from') {
+        return extra.value;
+      }
+    }
+    return null;
+  }
+
+  String? getToLocation(Ticket ticket) {
+    for (final extra in ticket.extras ?? <ExtrasModel>[]) {
+      if (extra.title?.toLowerCase() == 'to') {
+        return extra.value;
+      }
+    }
+    return null;
+  }
+
+  List<ExtrasModel> getFilteredExtras(Ticket ticket) {
+    if (ticket.extras == null) return [];
+
+    // Filter out From and To if both exist
+    final from = getFromLocation(ticket);
+    final to = getToLocation(ticket);
+
+    if (from != null && to != null) {
+      return ticket.extras!.where((extra) {
+        final title = extra.title?.toLowerCase();
+        return title != 'from' && title != 'to';
+      }).toList();
+    }
+
+    return ticket.extras!;
+  }
+
+  String getRouteDisplay(Ticket ticket) {
+    final from = getFromLocation(ticket);
+    final to = getToLocation(ticket);
+
+    if (from != null && to != null) {
+      return '$from → $to';
+    }
+
+    return ticket.primaryText;
+  }
+
   ///
   // ignore: unused_element
   Future<void> _pinToHomeScreen() async {
@@ -292,15 +338,154 @@ class _TicketViewState extends State<TicketView> {
 
                         const SizedBox(height: 16),
 
-                        //* From to To (Primary text)
-                        Text(
-                          widget.ticket.primaryText,
-                          style: Paragraph01(
-                            color: Theme.of(context).colorScheme.onSurface,
-                          ).semiBold,
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 3,
-                        ),
+                        //* Route Display (From → To with chips)
+                        ...() {
+                          final from = getFromLocation(widget.ticket);
+                          final to = getToLocation(widget.ticket);
+
+                          if (from != null && to != null) {
+                            return <Widget>[
+                              // Origin chip
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 12,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Theme.of(context).colorScheme.surface,
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurface
+                                        .withValues(alpha: 0.1),
+                                    width: 0.5,
+                                  ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withValues(
+                                        alpha: 0.05,
+                                      ),
+                                      blurRadius: 4,
+                                      spreadRadius: 0,
+                                      offset: const Offset(0, 2),
+                                    ),
+                                  ],
+                                ),
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Icons.trip_origin,
+                                      size: 20,
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.primary,
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: Text(
+                                        from,
+                                        style: Paragraph02(
+                                          color: Theme.of(
+                                            context,
+                                          ).colorScheme.onSurface,
+                                        ).semiBold,
+                                        overflow: TextOverflow.ellipsis,
+                                        maxLines: 2,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+
+                              // Arrow
+                              Center(
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 8,
+                                  ),
+                                  child: Icon(
+                                    Icons.arrow_downward_rounded,
+                                    size: 24,
+                                    color:
+                                        Theme.of(
+                                          context,
+                                        ).colorScheme.primary.withValues(
+                                          alpha: 0.6,
+                                        ),
+                                  ),
+                                ),
+                              ),
+
+                              // Destination chip
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 12,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Theme.of(context).colorScheme.surface,
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurface
+                                        .withValues(alpha: 0.1),
+                                    width: 0.5,
+                                  ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withValues(
+                                        alpha: 0.05,
+                                      ),
+                                      blurRadius: 4,
+                                      spreadRadius: 0,
+                                      offset: const Offset(0, 2),
+                                    ),
+                                  ],
+                                ),
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Icons.location_on,
+                                      size: 20,
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.primary,
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: Text(
+                                        to,
+                                        style: Paragraph02(
+                                          color: Theme.of(
+                                            context,
+                                          ).colorScheme.onSurface,
+                                        ).semiBold,
+                                        overflow: TextOverflow.ellipsis,
+                                        maxLines: 2,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ];
+                          } else {
+                            // Fallback to primaryText
+                            return <Widget>[
+                              Text(
+                                widget.ticket.primaryText,
+                                style: Paragraph01(
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onSurface,
+                                ).semiBold,
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 3,
+                              ),
+                            ];
+                          }
+                        }(),
 
                         const SizedBox(height: 12),
 
@@ -316,54 +501,53 @@ class _TicketViewState extends State<TicketView> {
                           ),
                         ),
 
-                        if (widget.ticket.extras != null &&
-                            widget.ticket.extras!.isNotEmpty) ...[
-                          const SizedBox(height: 12),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              for (
-                                var i = 0;
-                                i < widget.ticket.extras!.length;
-                                i++
-                              ) ...[
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 4,
-                                  ),
-                                  child: Row(
-                                    spacing: 4,
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Flexible(
-                                        flex: 2,
-                                        child: Text(
-                                          widget.ticket.extras![i].title ??
-                                              '-'
-                                                  ': ',
+                        ...() {
+                          final filteredExtras = getFilteredExtras(
+                            widget.ticket,
+                          );
+                          if (filteredExtras.isEmpty) return <Widget>[];
+
+                          return <Widget>[
+                            const SizedBox(height: 12),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                for (var i = 0; i < filteredExtras.length; i++)
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 4,
+                                    ),
+                                    child: Row(
+                                      spacing: 4,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Flexible(
+                                          flex: 2,
+                                          child: Text(
+                                            filteredExtras[i].title ?? '-:',
+                                          ),
                                         ),
-                                      ),
-                                      Expanded(
-                                        flex: 3,
-                                        child: Text(
-                                          widget.ticket.extras![i].value,
-                                          overflow: TextOverflow.ellipsis,
-                                          maxLines: 1,
-                                          style: Paragraph03(
-                                            color: Theme.of(
-                                              context,
-                                            ).colorScheme.onSurface,
-                                          ).semiBold,
+                                        Expanded(
+                                          flex: 3,
+                                          child: Text(
+                                            filteredExtras[i].value,
+                                            overflow: TextOverflow.ellipsis,
+                                            maxLines: 1,
+                                            style: Paragraph03(
+                                              color: Theme.of(
+                                                context,
+                                              ).colorScheme.onSurface,
+                                            ).semiBold,
+                                          ),
                                         ),
-                                      ),
-                                    ],
+                                      ],
+                                    ),
                                   ),
-                                ),
                               ],
-                            ],
-                          ),
-                        ],
+                            ),
+                          ];
+                        }(),
                       ],
                     ),
                   ),

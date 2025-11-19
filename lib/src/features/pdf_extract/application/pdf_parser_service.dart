@@ -198,18 +198,17 @@ class PDFParserService {
           final tnstcTicket = _pdfParser.parseTicket(extractedText);
 
           // Log non-identifying summary of parsed ticket (safe for dev/staging)
-          final ticketSummary = _createTicketSummary(tnstcTicket);
           _logger
             ..debug('=== PARSED TNSTC TICKET SUMMARY (Non-PII) ===')
-            ..debug('Ticket Summary: $ticketSummary')
+            ..debug('Ticket parsed successfully')
             ..debug('=== END PARSED TNSTC TICKET SUMMARY ===');
 
-          parsedTicket = Ticket.fromTNSTC(tnstcTicket);
+          parsedTicket = tnstcTicket;
           final pnrMasked =
-              tnstcTicket.pnrNumber != null &&
-                  tnstcTicket.pnrNumber!.length >= 4
-              ? '...${tnstcTicket.pnrNumber!.substring(
-                  tnstcTicket.pnrNumber!.length - 4,
+              tnstcTicket.ticketId != null &&
+                  tnstcTicket.ticketId!.length >= 4
+              ? '...${tnstcTicket.ticketId!.substring(
+                  tnstcTicket.ticketId!.length - 4,
                 )}'
               : 'N/A';
           _logger.logTicketParsing(

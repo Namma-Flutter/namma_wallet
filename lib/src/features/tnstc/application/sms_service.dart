@@ -1,7 +1,7 @@
 import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/services/logger_interface.dart';
+import 'package:namma_wallet/src/features/home/domain/ticket.dart';
 import 'package:namma_wallet/src/features/tnstc/application/tnstc_sms_parser.dart';
-import 'package:namma_wallet/src/features/tnstc/domain/tnstc_model.dart';
 
 class SMSService {
   SMSService({ILogger? logger, TNSTCSMSParser? smsParser})
@@ -10,11 +10,11 @@ class SMSService {
   final ILogger _logger;
   final TNSTCSMSParser _smsParser;
 
-  TNSTCTicketModel parseTicket(String text) {
+  Ticket parseTicket(String text) {
     try {
       _logger.logService('SMS', 'Parsing ticket from SMS text');
       final ticket = _smsParser.parseTicket(text);
-      final pnr = ticket.pnrNumber;
+      final pnr = ticket.ticketId;
       final pnrSuffix = pnr != null && pnr.length >= 4
           ? pnr.substring(pnr.length - 4)
           : 'N/A';

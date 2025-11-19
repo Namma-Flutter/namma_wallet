@@ -85,7 +85,7 @@ class Ticket with TicketMappable {
     );
   }
 
-  factory Ticket.fromTNSTC(TNSTCTicketModel model) {
+  factory Ticket.fromTNSTC(TNSTCTicketModel model, {String sourceType = 'PDF'}) {
     final primarySource =
         model.serviceStartPlace ?? model.passengerStartPlace ?? 'Unknown';
     final primaryDestination =
@@ -172,40 +172,50 @@ class Ticket with TicketMappable {
       extras: [
         if (model.pnrNumber?.isNotEmpty ?? false)
           ExtrasModel(title: 'PNR Number', value: model.pnrNumber!),
-        if (firstPassenger != null)
+        if (firstPassenger != null &&
+            firstPassenger.name.isNotEmpty)
           ExtrasModel(title: 'Passenger Name', value: firstPassenger.name),
-        if (firstPassenger?.age != null)
-          ExtrasModel(title: 'Age', value: firstPassenger!.age.toString()),
+        if (firstPassenger?.age != null &&
+            firstPassenger!.age > 0)
+          ExtrasModel(title: 'Age', value: firstPassenger.age.toString()),
         if (gender != null && gender.isNotEmpty)
           ExtrasModel(title: 'Gender', value: gender),
-        if (model.busIdNumber != null)
+        if (model.busIdNumber != null && model.busIdNumber!.isNotEmpty)
           ExtrasModel(title: 'Bus ID', value: model.busIdNumber!),
-        if (model.vehicleNumber != null)
+        if (model.vehicleNumber != null && model.vehicleNumber!.isNotEmpty)
           ExtrasModel(title: 'Bus Number', value: model.vehicleNumber!),
-        if (model.obReferenceNumber != null)
+        if (model.obReferenceNumber != null &&
+            model.obReferenceNumber!.isNotEmpty)
           ExtrasModel(title: 'Booking Ref', value: model.obReferenceNumber!),
-        if (model.classOfService != null)
+        if (model.classOfService != null && model.classOfService!.isNotEmpty)
           ExtrasModel(title: 'Service Class', value: model.classOfService!),
-        if (model.platformNumber != null)
+        if (model.platformNumber != null && model.platformNumber!.isNotEmpty)
           ExtrasModel(title: 'Platform', value: model.platformNumber!),
         if (model.passengerPickupTime != null)
           ExtrasModel(
             title: 'Pickup Time',
             value: formatFullDateTime(model.passengerPickupTime!),
           ),
-        if (model.serviceStartTime != null)
-          ExtrasModel(title: 'Departure Time', value: model.serviceStartTime!),
+        if (model.serviceStartTime != null &&
+            model.serviceStartTime!.isNotEmpty)
+          ExtrasModel(
+            title: 'Departure Time',
+            value: formatTimeString(model.serviceStartTime!),
+          ),
+        if (seatNumber != null && seatNumber.isNotEmpty)
+          ExtrasModel(title: 'Seat', value: seatNumber),
         if (model.numberOfSeats != null)
           ExtrasModel(
             title: 'Seats',
             value: model.numberOfSeats.toString(),
           ),
-        if (model.idCardNumber != null)
+        if (model.idCardNumber != null && model.idCardNumber!.isNotEmpty)
           ExtrasModel(
             title: 'Verification ID',
             value: model.idCardNumber!,
           ),
-        if (model.conductorMobileNo != null)
+        if (model.conductorMobileNo != null &&
+            model.conductorMobileNo!.isNotEmpty)
           ExtrasModel(
             title: 'Conductor Contact',
             value: model.conductorMobileNo!,
@@ -215,6 +225,25 @@ class Ticket with TicketMappable {
             title: 'Fare',
             value: '₹${model.totalFare!.toStringAsFixed(2)}',
           ),
+        if (model.corporation != null && model.corporation!.isNotEmpty)
+          ExtrasModel(
+            title: 'Provider',
+            value: model.corporation!,
+          ),
+        if (model.tripCode != null && model.tripCode!.isNotEmpty)
+          ExtrasModel(title: 'Trip Code', value: model.tripCode!),
+        if (model.serviceStartPlace != null &&
+            model.serviceStartPlace!.isNotEmpty)
+          ExtrasModel(title: 'From', value: model.serviceStartPlace!)
+        else if (model.passengerStartPlace != null &&
+            model.passengerStartPlace!.isNotEmpty)
+          ExtrasModel(title: 'From', value: model.passengerStartPlace!),
+        if (model.serviceEndPlace != null && model.serviceEndPlace!.isNotEmpty)
+          ExtrasModel(title: 'To', value: model.serviceEndPlace!)
+        else if (model.passengerEndPlace != null &&
+            model.passengerEndPlace!.isNotEmpty)
+          ExtrasModel(title: 'To', value: model.passengerEndPlace!),
+        ExtrasModel(title: 'Source Type', value: sourceType),
       ],
     );
   }

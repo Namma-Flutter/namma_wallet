@@ -1,7 +1,8 @@
+import 'package:namma_wallet/src/features/home/domain/ticket.dart';
 import 'package:namma_wallet/src/features/tnstc/domain/tnstc_model.dart';
 
 class TNSTCSMSParser {
-  TNSTCTicketModel parseTicket(String smsText) {
+  Ticket parseTicket(String smsText) {
     String extractMatch(String pattern, String input, {int groupIndex = 1}) {
       final regex = RegExp(pattern, multiLine: true);
       final match = regex.firstMatch(input);
@@ -47,13 +48,14 @@ class TNSTCSMSParser {
       );
       final vehicleNumber = extractMatch('Vehicle No:([A-Z0-9]+)', smsText);
 
-      return TNSTCTicketModel(
+      final tnstcModel = TNSTCTicketModel(
         pnrNumber: pnrNumber,
         journeyDate: journeyDate,
         conductorMobileNo: conductorMobileNo,
         vehicleNumber: vehicleNumber,
         corporation: 'TNSTC', // Assuming TNSTC for conductor SMS
       );
+      return Ticket.fromTNSTC(tnstcModel, sourceType: 'SMS');
     } else {
       // Booking confirmation SMS
       final corporation = extractMatch(
@@ -84,20 +86,22 @@ class TNSTCSMSParser {
           ? seatNumbers.split(',').where((s) => s.trim().isNotEmpty).length
           : 1;
 
+      // For SMS, we only have seat numbers, no passenger details
+      // Create a minimal passenger info with just seat numbers for display
       final passengers = <PassengerInfo>[];
       if (seatNumbers.isNotEmpty) {
         passengers.add(
           PassengerInfo(
-            name: '',
-            age: 0,
+            name: '', // Empty - will be filtered out in UI
+            age: 0,   // Zero - will be filtered out in UI
             type: 'Adult',
-            gender: '',
+            gender: '', // Empty - will be filtered out in UI
             seatNumber: seatNumbers,
           ),
         );
       }
 
-      return TNSTCTicketModel(
+      final tnstcModel = TNSTCTicketModel(
         corporation: corporation,
         pnrNumber: pnrNumber,
         serviceStartPlace: from,
@@ -110,6 +114,7 @@ class TNSTCSMSParser {
         numberOfSeats: numberOfSeats,
         passengers: passengers,
       );
+      return Ticket.fromTNSTC(tnstcModel, sourceType: 'SMS');
     }
   }
 }
