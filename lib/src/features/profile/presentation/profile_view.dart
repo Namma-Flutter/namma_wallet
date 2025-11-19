@@ -26,7 +26,12 @@ class _ProfileViewState extends State<ProfileView> {
   }
 
   Future<void> _initHapticFlag() async {
-    await hapticService.loadPreference();
+    try {
+      await hapticService.loadPreference();
+    } on Exception catch (e) {
+      // Log error; fallback to default (false) is safe
+      debugPrint('Failed to load haptic preference: $e');
+    }
     if (!mounted) return;
 
     // Read current enabled state from the service and update UI.
@@ -135,10 +140,9 @@ class _ProfileViewState extends State<ProfileView> {
                   value: _isHapticEnabled,
                   onChanged: (value) async {
                     final messenger = ScaffoldMessenger.of(context);
-                    // Persist via service
-                    // (updates in-memory and SharedPreferences)
-                    await _saveFlag(value);
                     try {
+                      // Persist via service
+                      // (updates in-memory and SharedPreferences)
                       await _saveFlag(value);
                     } on Object catch (e) {
                       if (!mounted) return;
@@ -280,7 +284,7 @@ class ProfileTile extends StatelessWidget {
       child: ListTile(
         leading: Icon(icon),
         title: Text(title),
-        subtitle: subtitle != null ? Text(subtitle ?? '') : null,
+        subtitle: subtitle != null ? Text(subtitle!) : null,
         trailing: trailing,
         onTap: onTap,
       ),
