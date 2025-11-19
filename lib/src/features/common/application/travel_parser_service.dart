@@ -51,7 +51,6 @@ class TNSTCBusParser implements TravelTicketParser {
     // like "From :", "To ", "Trip :"
     // PDF has "Service Start Place", "PNR Number", "Date of Journey"
     final smsPatterns = [
-      'SETC',
       r'From\s*:\s*[A-Z]',
       r'To\s*[A-Z]',
       r'Trip\s*:\s*',
@@ -78,9 +77,10 @@ class TNSTCBusParser implements TravelTicketParser {
     );
 
     // If has SMS patterns and no PDF patterns, it's SMS
-    // If has SETC, it's definitely SMS (SETC only comes via SMS)
+    // If has SETC and no PDF patterns, it's SMS
+    // (SETC can appear in both formats)
     return (hasSmsPattern && !hasPdfPattern) ||
-        text.toUpperCase().contains('SETC');
+        (text.toUpperCase().contains('SETC') && !hasPdfPattern);
   }
 
   @override
