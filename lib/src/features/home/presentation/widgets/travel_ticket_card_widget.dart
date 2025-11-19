@@ -258,26 +258,6 @@ class TravelTicketCardWidget extends StatelessWidget {
                 value1: formatDate(ticket.startTime),
                 value2: formatTime(ticket.startTime),
               ),
-
-              //* Highlights - Hidden as per user request
-              // if (ticket.tags != null && ticket.tags!.isNotEmpty)
-              //   Wrap(
-              //     spacing: 6,
-              //     runSpacing: 6,
-              //     children: [
-              //       ...ticket.tags!
-              //           .take(2)
-              //           .map(
-              //             (tag) => HighlightChipsWidget(
-              //               bgColor: Theme.of(
-              //                 context,
-              //               ).colorScheme.primary.withValues(alpha: 0.1),
-              //               label: tag.value ?? 'xxx',
-              //               icon: tag.iconData,
-              //             ),
-              //           ),
-              //     ],
-              //   ),
             ],
           ),
 
