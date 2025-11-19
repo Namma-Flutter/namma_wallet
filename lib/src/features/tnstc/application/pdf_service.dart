@@ -16,100 +16,107 @@ class PDFService {
       // Load an existing PDF document.
       final document = PdfDocument(inputBytes: pdf.readAsBytesSync());
 
-      getIt<ILogger>().debug(
-        '[PDFService] PDF loaded, pages: ${document.pages.count}',
-      );
-
-      // Try extracting text from all pages at once first
-      var rawText = PdfTextExtractor(document).extractText();
-
-      // If extraction yields very little text, try page-by-page extraction
-      if (rawText.length < 10 && document.pages.count > 0) {
+      // Use try-finally to ensure document is always disposed
+      try {
         getIt<ILogger>().debug(
-          '[PDFService] Initial extraction yielded only '
-          '${rawText.length} chars, trying page-by-page extraction',
+          '[PDFService] PDF loaded, pages: ${document.pages.count}',
         );
 
-        final pageTexts = <String>[];
-        for (var i = 0; i < document.pages.count; i++) {
-          final pageText = PdfTextExtractor(
-            document,
-          ).extractText(startPageIndex: i, endPageIndex: i);
+        // Try extracting text from all pages at once first
+        var rawText = PdfTextExtractor(document).extractText();
+
+        // If extraction yields very little text, try page-by-page extraction
+        if (rawText.length < 10 && document.pages.count > 0) {
           getIt<ILogger>().debug(
-            '[PDFService] Page ${i + 1}: ${pageText.length} chars',
+            '[PDFService] Initial extraction yielded only '
+            '${rawText.length} chars, trying page-by-page extraction',
           );
-          if (pageText.isNotEmpty) {
-            pageTexts.add(pageText);
+
+          final pageTexts = <String>[];
+          for (var i = 0; i < document.pages.count; i++) {
+            final pageText = PdfTextExtractor(
+              document,
+            ).extractText(startPageIndex: i, endPageIndex: i);
+            getIt<ILogger>().debug(
+              '[PDFService] Page ${i + 1}: ${pageText.length} chars',
+            );
+            if (pageText.isNotEmpty) {
+              pageTexts.add(pageText);
+            }
+          }
+
+          if (pageTexts.isNotEmpty) {
+            rawText = pageTexts.join('\n');
+            getIt<ILogger>().debug(
+              '[PDFService] Page-by-page extraction: '
+              '${rawText.length} chars total',
+            );
           }
         }
 
-        if (pageTexts.isNotEmpty) {
-          rawText = pageTexts.join('\n');
-          getIt<ILogger>().debug(
-            '[PDFService] Page-by-page extraction: '
-            '${rawText.length} chars total',
+        // Check if PDF might be image-based or use unsupported fonts
+        if (rawText.trim().isEmpty) {
+          getIt<ILogger>().warning(
+            '[PDFService] No text extracted from PDF. This PDF may be '
+            'image-based or use fonts that are not supported. '
+            'PDF has ${document.pages.count} pages. Trying OCR fallback...',
           );
+
+          // Dispose Syncfusion document before trying OCR
+          document.dispose();
+
+          // Try OCR as fallback for image-based PDFs
+          try {
+            rawText = await _ocrService.extractTextFromPDF(pdf);
+            getIt<ILogger>().info(
+              '[PDFService] OCR fallback extracted ${rawText.length} chars',
+            );
+          } on Object catch (e, stackTrace) {
+            getIt<ILogger>().error(
+              '[PDFService] OCR fallback also failed',
+              e,
+              stackTrace,
+            );
+            // Return empty text if OCR also fails
+            return '';
+          }
+        } else {
+          // Dispose the document if we got text from Syncfusion
+          document.dispose();
         }
-      }
 
-      // Check if PDF might be image-based or use unsupported fonts
-      if (rawText.trim().isEmpty) {
-        getIt<ILogger>().warning(
-          '[PDFService] No text extracted from PDF. This PDF may be '
-          'image-based or use fonts that are not supported. '
-          'PDF has ${document.pages.count} pages. Trying OCR fallback...',
-        );
-
-        // Dispose Syncfusion document before trying OCR
-        document.dispose();
-
-        // Try OCR as fallback for image-based PDFs
-        try {
-          rawText = await _ocrService.extractTextFromPDF(pdf);
-          getIt<ILogger>().info(
-            '[PDFService] OCR fallback extracted ${rawText.length} chars',
-          );
-        } on Object catch (e, stackTrace) {
-          getIt<ILogger>().error(
-            '[PDFService] OCR fallback also failed',
-            e,
-            stackTrace,
-          );
-          // Return empty text if OCR also fails
-          return '';
-        }
-      } else {
-        // Dispose the document if we got text from Syncfusion
-        document.dispose();
-      }
-
-      // Log text metadata only (no PII)
-      final lineCount = rawText.split('\n').length;
-      getIt<ILogger>().debug(
-        '[PDFService] Extracted text: ${rawText.length} chars, '
-        '$lineCount lines',
-      );
-
-      // Debug: Log first 200 characters to help diagnose issues
-      if (rawText.isNotEmpty) {
-        final preview = rawText.substring(0, rawText.length.clamp(0, 200));
+        // Log text metadata only (no PII)
+        final lineCount = rawText.split('\n').length;
         getIt<ILogger>().debug(
-          '[PDFService] Text preview (first 200 chars): '
-          '${preview.replaceAll('\n', r'\n')}',
+          '[PDFService] Extracted text: ${rawText.length} chars, '
+          '$lineCount lines',
         );
+
+        // Debug: Log first 200 characters to help diagnose issues
+        if (rawText.isNotEmpty) {
+          final preview = rawText.substring(0, rawText.length.clamp(0, 200));
+          getIt<ILogger>().debug(
+            '[PDFService] Text preview (first 200 chars): '
+            '${preview.replaceAll('\n', r'\n')}',
+          );
+        }
+
+        // Clean and normalize the extracted text
+        final cleanedText = _cleanExtractedText(rawText);
+
+        // Log metadata after cleaning (no PII)
+        final cleanedLineCount = cleanedText.split('\n').length;
+        getIt<ILogger>().debug(
+          '[PDFService] Cleaned text: ${cleanedText.length} chars, '
+          '$cleanedLineCount lines',
+        );
+
+        return cleanedText;
+      } finally {
+        // Ensure document is disposed even if an exception occurs
+        // Note: document.dispose() is safe to call multiple times
+        document.dispose();
       }
-
-      // Clean and normalize the extracted text
-      final cleanedText = _cleanExtractedText(rawText);
-
-      // Log metadata after cleaning (no PII)
-      final cleanedLineCount = cleanedText.split('\n').length;
-      getIt<ILogger>().debug(
-        '[PDFService] Cleaned text: ${cleanedText.length} chars, '
-        '$cleanedLineCount lines',
-      );
-
-      return cleanedText;
     } on Object catch (e, stackTrace) {
       getIt<ILogger>().error(
         '[PDFService] Error extracting text from PDF',
