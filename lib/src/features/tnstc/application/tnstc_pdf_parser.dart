@@ -1,6 +1,20 @@
+import 'package:flutter/foundation.dart';
 import 'package:namma_wallet/src/features/tnstc/domain/tnstc_model.dart';
 
+/// Parses TNSTC (Tamil Nadu State Transport Corporation) PDF tickets
+/// into structured ticket data.
+///
+/// This parser handles both table-formatted and loose-text formats
+/// that may appear in TNSTC e-tickets. It uses regex patterns to
+/// extract fields like PNR, journey dates, passenger info, etc.
+///
+/// Falls back to default values if parsing fails for individual fields.
+/// Never throws - returns a model with partial data on errors.
 class TNSTCPDFParser {
+  // TODO(optimization): Use pre-compiled regex patterns instead of
+  // compiling them on each parse. See CODE_REVIEW_FINDINGS.md for details.
+
+  /// Parses the given PDF text and returns a [TNSTCTicketModel].
   TNSTCTicketModel parseTicket(String pdfText) {
     final passengers = <PassengerInfo>[];
     String extractMatch(String pattern, String input, {int groupIndex = 1}) {
@@ -20,14 +34,18 @@ class TNSTCPDFParser {
 
       // Handle both '-' and '/' separators
       final parts = date.contains('/') ? date.split('/') : date.split('-');
-      if (parts.length != 3) return DateTime.now();
+      if (parts.length != 3) {
+        debugPrint('Invalid date format: $date (expected DD/MM/YYYY or DD-MM-YYYY)');
+        return DateTime.now();
+      }
 
       try {
         final day = int.parse(parts[0]);
         final month = int.parse(parts[1]);
         final year = int.parse(parts[2]);
-        return DateTime(year, month, day); // Construct the DateTime object
-      } on FormatException {
+        return DateTime(year, month, day);
+      } on FormatException catch (e) {
+        debugPrint('Failed to parse date: $date, error: $e');
         return DateTime.now();
       }
     }
@@ -36,14 +54,20 @@ class TNSTCPDFParser {
       if (dateTime.isEmpty) return DateTime.now();
 
       final parts = dateTime.split(' '); // Split into date and time
-      if (parts.length < 2) return DateTime.now();
+      if (parts.length < 2) {
+        debugPrint('Invalid datetime format: $dateTime (expected "DD/MM/YYYY HH:mm")');
+        return DateTime.now();
+      }
 
       try {
         // Handle both '-' and '/' separators for date
         final dateParts = parts[0].contains('/')
             ? parts[0].split('/')
             : parts[0].split('-');
-        if (dateParts.length != 3) return DateTime.now();
+        if (dateParts.length != 3) {
+          debugPrint('Invalid date part in datetime: ${parts[0]}');
+          return DateTime.now();
+        }
 
         final day = int.parse(dateParts[0]);
         final month = int.parse(dateParts[1]);
@@ -52,13 +76,17 @@ class TNSTCPDFParser {
         // Extract time part (might have "Hrs." suffix)
         final timePart = parts[1].replaceAll(RegExp(r'\s*Hrs\.?'), '');
         final timeParts = timePart.split(':'); // Split the time by ':'
-        if (timeParts.length != 2) return DateTime.now();
+        if (timeParts.length != 2) {
+          debugPrint('Invalid time part in datetime: ${parts[1]}');
+          return DateTime.now();
+        }
 
         final hour = int.parse(timeParts[0]);
         final minute = int.parse(timeParts[1]);
 
         return DateTime(year, month, day, hour, minute);
-      } on FormatException {
+      } on FormatException catch (e) {
+        debugPrint('Failed to parse datetime: $dateTime, error: $e');
         return DateTime.now();
       }
     }

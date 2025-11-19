@@ -117,8 +117,8 @@ class TravelTicketCardWidget extends StatelessWidget {
               TicketRowWidget(
                 title1: 'Journey Date',
                 title2: 'Time',
-                value1: getTime(ticket.startTime),
-                value2: getDate(ticket.startTime),
+                value1: formatDate(ticket.startTime),
+                value2: formatTime(ticket.startTime),
               ),
 
               //* Highlights - Hidden as per user request

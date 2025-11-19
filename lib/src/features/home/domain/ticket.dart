@@ -1,4 +1,6 @@
 import 'package:dart_mappable/dart_mappable.dart';
+import 'package:flutter/foundation.dart';
+import 'package:namma_wallet/src/common/helper/date_time_converter.dart';
 import 'package:namma_wallet/src/features/common/enums/ticket_type.dart';
 import 'package:namma_wallet/src/features/home/domain/extras_model.dart';
 import 'package:namma_wallet/src/features/home/domain/tag_model.dart';
@@ -110,31 +112,31 @@ class Ticket with TicketMappable {
         if (timeParts.length == 2) {
           final hour = int.parse(timeParts[0]);
           final minute = int.parse(timeParts[1]);
-          startTime = DateTime(
-            startTime.year,
-            startTime.month,
-            startTime.day,
-            hour,
-            minute,
-          );
-        }
-      } on Object catch (_) {
-        // Fallback to just date if time parsing fails
-      }
-    }
 
-    String formatDateTime(DateTime dt) {
-      // Convert to local time to handle UTC datetimes from database
-      final local = dt.toLocal();
-      final hour = local.hour > 12
-          ? local.hour - 12
-          : (local.hour == 0 ? 12 : local.hour);
-      final period = local.hour >= 12 ? 'PM' : 'AM';
-      final day = local.day.toString().padLeft(2, '0');
-      final month = local.month.toString().padLeft(2, '0');
-      final hourStr = hour.toString().padLeft(2, '0');
-      final minuteStr = local.minute.toString().padLeft(2, '0');
-      return '$day-$month-${local.year} $hourStr:$minuteStr $period';
+          // Validate hour and minute ranges
+          if (hour >= 0 && hour < 24 && minute >= 0 && minute < 60) {
+            startTime = DateTime(
+              startTime.year,
+              startTime.month,
+              startTime.day,
+              hour,
+              minute,
+            );
+          }
+        }
+      } on FormatException catch (e) {
+        // Log parse failure for debugging
+        debugPrint(
+          'Failed to parse serviceStartTime: ${model.serviceStartTime}, '
+          'error: $e',
+        );
+      } on Exception catch (e) {
+        // Log any other parsing errors (including invalid time values)
+        debugPrint(
+          'Error parsing serviceStartTime: ${model.serviceStartTime}, '
+          'error: $e',
+        );
+      }
     }
 
     return Ticket(
@@ -189,7 +191,7 @@ class Ticket with TicketMappable {
         if (model.passengerPickupTime != null)
           ExtrasModel(
             title: 'Pickup Time',
-            value: formatDateTime(model.passengerPickupTime!),
+            value: formatFullDateTime(model.passengerPickupTime!),
           ),
         if (model.serviceStartTime != null)
           ExtrasModel(title: 'Departure Time', value: model.serviceStartTime!),

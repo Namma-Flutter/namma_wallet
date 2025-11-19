@@ -41,8 +41,8 @@ Total Fare: 735.00 Rs.
       // This will be 7 (UTC)
 
       // Now test the display functions
-      final displayedTime = getDate(deserializedTicket.startTime);
-      final displayedDate = getTime(deserializedTicket.startTime);
+      final displayedTime = formatTime(deserializedTicket.startTime);
+      final displayedDate = formatDate(deserializedTicket.startTime);
 
       // Should be 01:15 pm
       // Should be 18/01/2026
