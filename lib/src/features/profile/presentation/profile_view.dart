@@ -166,7 +166,6 @@ class _ProfileViewState extends State<ProfileView> {
                     }
                   },
                 ),
-                onTap: () {},
               ),
             ],
           ),
@@ -264,7 +263,7 @@ class ProfileTile extends StatelessWidget {
     required this.icon,
     required this.title,
     required this.trailing,
-    required this.onTap,
+    this.onTap,
     this.subtitle,
     super.key,
   });
@@ -272,7 +271,7 @@ class ProfileTile extends StatelessWidget {
   final String title;
   final String? subtitle;
   final Widget trailing;
-  final void Function() onTap;
+  final void Function()? onTap;
 
   @override
   Widget build(BuildContext context) {
