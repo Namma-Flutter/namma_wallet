@@ -137,7 +137,7 @@ class PDFParserService {
 
       // Extract text from PDF
       final pdfService = PDFService();
-      final extractedText = pdfService.extractTextFrom(pdfFile);
+      final extractedText = await pdfService.extractTextFrom(pdfFile);
 
       _logger.logService(
         'PDF',
@@ -146,8 +146,15 @@ class PDFParserService {
       );
 
       if (extractedText.trim().isEmpty) {
-        _logger.warning('No text content found in PDF');
-        return PDFParserResult.error('No text content found in PDF');
+        _logger.warning(
+          'No text content found in PDF - '
+          'PDF may be image-based or use unsupported fonts',
+        );
+        return PDFParserResult.error(
+          'Unable to read text from this PDF. '
+          'This ticket may be in image format. '
+          'Please try importing using the SMS/clipboard method instead.',
+        );
       }
 
       // Log text metadata only (no PII)
