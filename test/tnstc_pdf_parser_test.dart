@@ -8,7 +8,7 @@ import 'package:namma_wallet/src/features/tnstc/application/pdf_service.dart';
 import 'package:namma_wallet/src/features/tnstc/application/tnstc_pdf_parser.dart';
 
 import 'helpers/fake_logger.dart';
-import 'helpers/fake_ocr_service.dart';
+import 'helpers/mock_ocr_service.dart';
 
 void main() {
   // Set up GetIt for tests
@@ -18,7 +18,7 @@ void main() {
       getIt.registerSingleton<ILogger>(FakeLogger());
     }
     if (!getIt.isRegistered<OCRService>()) {
-      getIt.registerSingleton<OCRService>(FakeOCRService());
+      getIt.registerSingleton<OCRService>(MockOCRService());
     }
   });
 
@@ -42,8 +42,6 @@ void main() {
 
       // Skip test if PDF file doesn't exist
       if (!pdfFile.existsSync()) {
-        // ignore: avoid_print
-        print('Skipping test - PDF file not found at ${pdfFile.path}');
         return;
       }
 
@@ -54,10 +52,9 @@ void main() {
       // ignore: avoid_print
       print('PDF text length: ${pdfText.length} characters');
 
-      // Skip if no text was extracted (PDF might be empty or unreadable in test)
+      // Skip if no text was extracted
+      //(PDF might be empty or unreadable in test)
       if (pdfText.isEmpty) {
-        // ignore: avoid_print
-        print('Skipping test - PDF text extraction returned empty');
         return;
       }
 

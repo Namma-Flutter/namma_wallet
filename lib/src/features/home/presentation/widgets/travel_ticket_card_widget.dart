@@ -4,7 +4,6 @@ import 'package:namma_wallet/src/common/helper/date_time_converter.dart';
 import 'package:namma_wallet/src/common/theme/styles.dart';
 import 'package:namma_wallet/src/features/common/enums/ticket_type.dart';
 import 'package:namma_wallet/src/features/home/domain/ticket.dart';
-import 'package:namma_wallet/src/features/home/presentation/widgets/highlight_widget.dart';
 import 'package:namma_wallet/src/features/travel/presentation/widgets/ticket_view_widget.dart';
 
 class TravelTicketCardWidget extends StatelessWidget {
@@ -122,25 +121,25 @@ class TravelTicketCardWidget extends StatelessWidget {
                 value2: getDate(ticket.startTime),
               ),
 
-              //* Highlights
-              if (ticket.tags != null && ticket.tags!.isNotEmpty)
-                Wrap(
-                  spacing: 6,
-                  runSpacing: 6,
-                  children: [
-                    ...ticket.tags!
-                        .take(2)
-                        .map(
-                          (tag) => HighlightChipsWidget(
-                            bgColor: Theme.of(
-                              context,
-                            ).colorScheme.primary.withValues(alpha: 0.1),
-                            label: tag.value ?? 'xxx',
-                            icon: tag.iconData,
-                          ),
-                        ),
-                  ],
-                ),
+              //* Highlights - Hidden as per user request
+              // if (ticket.tags != null && ticket.tags!.isNotEmpty)
+              //   Wrap(
+              //     spacing: 6,
+              //     runSpacing: 6,
+              //     children: [
+              //       ...ticket.tags!
+              //           .take(2)
+              //           .map(
+              //             (tag) => HighlightChipsWidget(
+              //               bgColor: Theme.of(
+              //                 context,
+              //               ).colorScheme.primary.withValues(alpha: 0.1),
+              //               label: tag.value ?? 'xxx',
+              //               icon: tag.iconData,
+              //             ),
+              //           ),
+              //     ],
+              //   ),
             ],
           ),
 

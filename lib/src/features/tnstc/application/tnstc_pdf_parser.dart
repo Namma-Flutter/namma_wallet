@@ -66,7 +66,7 @@ class TNSTCPDFParser {
     // Extract all fields using PDF-specific patterns
     // Use non-greedy matching and stop at newlines
     final corporation = extractMatch(
-      r'Corporation\s*:\s*([A-Z\s]+?)(?:\n|$)',
+      r'Corporation\s*:\s*([A-Za-z\s]+?)(?:\n|$)',
       pdfText,
     );
     final pnrNumber = extractMatch(
@@ -78,11 +78,11 @@ class TNSTCPDFParser {
     );
     final routeNo = extractMatch(r'Route No\s*:\s*(\S+)', pdfText);
     final serviceStartPlace = extractMatch(
-      r'Service Start Place\s*:\s*([A-Z\s]+?)(?:\n|$)',
+      r'Service Start Place\s*:\s*([A-Za-z\s]+?)(?:\n|$)',
       pdfText,
     );
     final serviceEndPlace = extractMatch(
-      r'Service End Place\s*:\s*([A-Z\s.,-]+?)(?:\n|$)',
+      r'Service End Place\s*:\s*([A-Za-z\s.,-]+?)(?:\n|$)',
       pdfText,
     );
     final serviceStartTime = extractMatch(
@@ -90,15 +90,15 @@ class TNSTCPDFParser {
       pdfText,
     );
     final passengerStartPlace = extractMatch(
-      r'Passenger Start Place\s*:\s*([A-Z\s]+?)(?:\n|$)',
+      r'Passenger Start Place\s*:\s*([A-Za-z\s]+?)(?:\n|$)',
       pdfText,
     );
     final passengerEndPlace = extractMatch(
-      r'Passenger End Place\s*:\s*([A-Z\s.,-]+?)(?:\n|$)',
+      r'Passenger End Place\s*:\s*([A-Za-z\s.,-]+?)(?:\n|$)',
       pdfText,
     );
     final passengerPickupPoint = extractMatch(
-      r'Passenger Pickup Point\s*:\s*([A-Z\s]+?)(?:\n|$)',
+      r'Passenger Pickup Point\s*:\s*([A-Za-z\s]+?)(?:\n|$)',
       pdfText,
     );
     final passengerPickupTime = parseDateTime(
@@ -108,11 +108,11 @@ class TNSTCPDFParser {
       ),
     );
     final platformNumber = extractMatch(
-      r'Platform Number\s*:\s*([^\n]*?)\n',
+      r'Platform Number\s*:[ \t]*([^\n]*?)(?:\n|$)',
       pdfText,
     );
     final classOfService = extractMatch(
-      r'Class of Service\s*:\s*([A-Z0-9\s]+?)(?:\n|$)',
+      r'Class of Service\s*:\s*([A-Za-z0-9\s]+?)(?:\n|$)',
       pdfText,
     );
     final tripCode = extractMatch(r'Trip Code\s*:\s*(\S+)', pdfText);
@@ -131,18 +131,20 @@ class TNSTCPDFParser {
         : 1;
 
     final bankTransactionNumber = extractMatch(
-      r'Bank Txn\. No\.\s*:\s*([A-Z0-9]+)',
+      r'Bank Txn\. No[;.]?\s*:\s*([A-Z0-9]+)',
       pdfText,
     );
-    final busIdNumber = extractMatch(r'Bus ID No\.\s*:\s*([A-Z0-9-]+)', pdfText);
+    final busIdNumber = extractMatch(
+      r'Bus ID No\.\s*:\s*([A-Z0-9-]+)',
+      pdfText,
+    );
     final passengerCategory = extractMatch(
-      r'Passenger category\s*:\s*([A-Z\s]+?)(?:\n|$)',
+      r'Passenger [Cc]ategory\s*:\s*([A-Za-z\s]+?)(?:\n|$)',
       pdfText,
     );
 
-    // Extract passenger info from the table format
-    // Pattern: Name Age Adult/Child Gender Seat No.
-    // Followed by: HarishAnbalagan 26 Adult M 4UB
+    // Extract passenger info
+    // First try the table format
     final passengerPattern = RegExp(
       r'Name\s+Age\s+Adult/Child\s+Gender\s+Seat No\.\s*\n\s*([A-Za-z]+)\s+(\d+)\s+(Adult|Child)\s+(M|F)\s+([A-Z0-9]+)',
       multiLine: true,
@@ -161,12 +163,64 @@ class TNSTCPDFParser {
       passengerType = passengerMatch.group(3) ?? '';
       passengerGender = passengerMatch.group(4) ?? '';
       passengerSeatNumber = passengerMatch.group(5) ?? '';
+    } else {
+      // Fallback: Extract fields individually if table format is broken
+      // Name is usually after "Passenger Information"
+      final nameMatch = RegExp(
+        r'Passenger Information\s*\n\s*([A-Za-z]+)',
+        multiLine: true,
+      ).firstMatch(pdfText);
+      if (nameMatch != null) {
+        passengerName = nameMatch.group(1) ?? '';
+      }
+
+      final ageMatch = RegExp(r'Age\s*\n\s*(\d+)', multiLine: true).firstMatch(
+        pdfText,
+      );
+      if (ageMatch != null) {
+        passengerAge = int.tryParse(ageMatch.group(1) ?? '0') ?? 0;
+      }
+
+      final genderMatch = RegExp(
+        r'Gender\s*\n\s*([MF])',
+        multiLine: true,
+      ).firstMatch(pdfText);
+      if (genderMatch != null) {
+        passengerGender = genderMatch.group(1) ?? '';
+      }
+
+      // Extract Adult/Child type
+      final typeMatch = RegExp(
+        r'Adult/Child\s*\n\s*(Adult|Child)',
+        multiLine: true,
+      ).firstMatch(pdfText);
+      if (typeMatch != null) {
+        passengerType = typeMatch.group(1) ?? '';
+      }
+
+      // Try to find seat number if possible, though it's harder without context
     }
 
-    final idCardType = extractMatch(
+    var idCardType = extractMatch(
       r'ID Card Type\s*:\s*([A-Za-z\s]+?)(?=\s*ID Card Number)',
       pdfText,
     );
+    // Fallback for ID Card Type if the specific lookahead fails
+    if (idCardType.isEmpty) {
+      // Look for "Government Issued Photo" specifically as it
+      // appears in the raw text
+      if (pdfText.contains('Government Issued Photo')) {
+        idCardType = 'Government Issued Photo ID Card';
+      } else {
+        // Try looser match
+        idCardType = extractMatch(r'ID Card Type\s*(.*)', pdfText);
+        // Clean up if it grabbed too much or garbage
+        if (idCardType.contains('rD Card')) {
+          idCardType = idCardType.replaceAll('rD Card', '').trim();
+        }
+      }
+    }
+
     final idCardNumber = extractMatch(
       r'ID Card Number\s*:\s*([0-9]+)',
       pdfText,
@@ -192,6 +246,11 @@ class TNSTCPDFParser {
       passengers.add(passengerInfo);
     }
 
+    // Set boarding point to passenger pickup point if not explicitly provided
+    final boardingPoint = passengerPickupPoint.isNotEmpty
+        ? passengerPickupPoint
+        : null;
+
     return TNSTCTicketModel(
       corporation: corporation,
       pnrNumber: pnrNumber,
@@ -216,6 +275,7 @@ class TNSTCPDFParser {
       idCardType: idCardType,
       idCardNumber: idCardNumber,
       totalFare: totalFare,
+      boardingPoint: boardingPoint,
     );
   }
 }

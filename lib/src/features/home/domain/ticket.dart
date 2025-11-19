@@ -96,13 +96,54 @@ class Ticket with TicketMappable {
     final seatNumber = firstPassenger?.seatNumber;
     final gender = firstPassenger?.gender;
 
+    var startTime =
+        model.passengerPickupTime ?? model.journeyDate ?? DateTime.now();
+
+    // If pickup time is missing, try to combine
+    // journeyDate and serviceStartTime
+    if (model.passengerPickupTime == null &&
+        model.serviceStartTime != null &&
+        model.serviceStartTime!.isNotEmpty) {
+      try {
+        // serviceStartTime format is usually "HH:mm"
+        final timeParts = model.serviceStartTime!.split(':');
+        if (timeParts.length == 2) {
+          final hour = int.parse(timeParts[0]);
+          final minute = int.parse(timeParts[1]);
+          startTime = DateTime(
+            startTime.year,
+            startTime.month,
+            startTime.day,
+            hour,
+            minute,
+          );
+        }
+      } on Object catch (_) {
+        // Fallback to just date if time parsing fails
+      }
+    }
+
+    String formatDateTime(DateTime dt) {
+      // Convert to local time to handle UTC datetimes from database
+      final local = dt.toLocal();
+      final hour = local.hour > 12
+          ? local.hour - 12
+          : (local.hour == 0 ? 12 : local.hour);
+      final period = local.hour >= 12 ? 'PM' : 'AM';
+      final day = local.day.toString().padLeft(2, '0');
+      final month = local.month.toString().padLeft(2, '0');
+      final hourStr = hour.toString().padLeft(2, '0');
+      final minuteStr = local.minute.toString().padLeft(2, '0');
+      return '$day-$month-${local.year} $hourStr:$minuteStr $period';
+    }
+
     return Ticket(
       ticketId: model.pnrNumber,
       primaryText: '$primarySource → $primaryDestination',
       secondaryText:
           '${model.corporation ?? 'TNSTC'} - '
           '${model.tripCode ?? model.routeNo ?? 'Bus'}',
-      startTime: model.journeyDate ?? DateTime.now(),
+      startTime: startTime,
       location:
           model.passengerPickupPoint ??
           model.boardingPoint ??
@@ -127,6 +168,8 @@ class Ticket with TicketMappable {
       ],
 
       extras: [
+        if (model.pnrNumber?.isNotEmpty ?? false)
+          ExtrasModel(title: 'PNR Number', value: model.pnrNumber!),
         if (firstPassenger != null)
           ExtrasModel(title: 'Passenger Name', value: firstPassenger.name),
         if (firstPassenger?.age != null)
@@ -134,9 +177,9 @@ class Ticket with TicketMappable {
         if (gender != null && gender.isNotEmpty)
           ExtrasModel(title: 'Gender', value: gender),
         if (model.busIdNumber != null)
-          ExtrasModel(title: 'Bus Number', value: model.busIdNumber!),
+          ExtrasModel(title: 'Bus ID', value: model.busIdNumber!),
         if (model.vehicleNumber != null)
-          ExtrasModel(title: 'Vehicle Number', value: model.vehicleNumber!),
+          ExtrasModel(title: 'Bus Number', value: model.vehicleNumber!),
         if (model.obReferenceNumber != null)
           ExtrasModel(title: 'Booking Ref', value: model.obReferenceNumber!),
         if (model.classOfService != null)
@@ -146,7 +189,7 @@ class Ticket with TicketMappable {
         if (model.passengerPickupTime != null)
           ExtrasModel(
             title: 'Pickup Time',
-            value: model.passengerPickupTime.toString(),
+            value: formatDateTime(model.passengerPickupTime!),
           ),
         if (model.serviceStartTime != null)
           ExtrasModel(title: 'Departure Time', value: model.serviceStartTime!),
@@ -155,10 +198,10 @@ class Ticket with TicketMappable {
             title: 'Seats',
             value: model.numberOfSeats.toString(),
           ),
-        if (model.idCardType != null && model.idCardNumber != null)
+        if (model.idCardNumber != null)
           ExtrasModel(
-            title: 'ID',
-            value: '${model.idCardType}: ${model.idCardNumber}',
+            title: 'Verification ID',
+            value: model.idCardNumber!,
           ),
         if (model.conductorMobileNo != null)
           ExtrasModel(

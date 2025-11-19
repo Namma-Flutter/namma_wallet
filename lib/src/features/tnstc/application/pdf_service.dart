@@ -7,7 +7,7 @@ import 'package:syncfusion_flutter_pdf/pdf.dart';
 
 class PDFService {
   PDFService({OCRService? ocrService})
-      : _ocrService = ocrService ?? getIt<OCRService>();
+    : _ocrService = ocrService ?? getIt<OCRService>();
 
   final OCRService _ocrService;
 
@@ -32,8 +32,9 @@ class PDFService {
 
         final pageTexts = <String>[];
         for (var i = 0; i < document.pages.count; i++) {
-          final pageText = PdfTextExtractor(document)
-              .extractText(startPageIndex: i, endPageIndex: i);
+          final pageText = PdfTextExtractor(
+            document,
+          ).extractText(startPageIndex: i, endPageIndex: i);
           getIt<ILogger>().debug(
             '[PDFService] Page ${i + 1}: ${pageText.length} chars',
           );
@@ -137,32 +138,38 @@ class PDFService {
     // Fix common PDF extraction issues
     // Sometimes colons get separated from labels -
     // fix spacing but keep original text
-    cleanedText = cleanedText.replaceAll(RegExp(r'(\w+)\s+:\s*'), r'$1: ');
+    // Fix common PDF extraction issues
+    // Sometimes colons get separated from labels -
+    // fix spacing but keep original text
+    cleanedText = cleanedText.replaceAllMapped(
+      RegExp(r'(\w+)\s+:\s*'),
+      (match) => '${match.group(1)}: ',
+    );
 
     // Sometimes values get split across lines - try to rejoin obvious cases
-    cleanedText = cleanedText.replaceAll(
+    cleanedText = cleanedText.replaceAllMapped(
       RegExp(r'Corporation\s*:\s*\n([A-Z\s]+)\n'),
-      r'Corporation: $1\n',
+      (match) => 'Corporation: ${match.group(1)}\n',
     );
-    cleanedText = cleanedText.replaceAll(
+    cleanedText = cleanedText.replaceAllMapped(
       RegExp(r'Service Start Place\s*:\s*\n([A-Z\s.-]+)\n'),
-      r'Service Start Place: $1\n',
+      (match) => 'Service Start Place: ${match.group(1)}\n',
     );
-    cleanedText = cleanedText.replaceAll(
+    cleanedText = cleanedText.replaceAllMapped(
       RegExp(r'Service End Place\s*:\s*\n([A-Z\s.-]+)\n'),
-      r'Service End Place: $1\n',
+      (match) => 'Service End Place: ${match.group(1)}\n',
     );
-    cleanedText = cleanedText.replaceAll(
+    cleanedText = cleanedText.replaceAllMapped(
       RegExp(r'Passenger Start Place\s*:\s*\n([A-Z\s.-]+)\n'),
-      r'Passenger Start Place: $1\n',
+      (match) => 'Passenger Start Place: ${match.group(1)}\n',
     );
-    cleanedText = cleanedText.replaceAll(
+    cleanedText = cleanedText.replaceAllMapped(
       RegExp(r'Passenger End Place\s*:\s*\n([A-Z\s.-]+)\n'),
-      r'Passenger End Place: $1\n',
+      (match) => 'Passenger End Place: ${match.group(1)}\n',
     );
-    cleanedText = cleanedText.replaceAll(
+    cleanedText = cleanedText.replaceAllMapped(
       RegExp(r'Passenger Pickup Point\s*:\s*\n([A-Z\s.\-()]+)\n'),
-      r'Passenger Pickup Point: $1\n',
+      (match) => 'Passenger Pickup Point: ${match.group(1)}\n',
     );
 
     // Clean up any remaining extra whitespace

@@ -13,7 +13,6 @@ import 'package:namma_wallet/src/common/widgets/snackbar_widget.dart';
 import 'package:namma_wallet/src/features/common/enums/ticket_type.dart';
 import 'package:namma_wallet/src/features/home/domain/extras_model.dart';
 import 'package:namma_wallet/src/features/home/domain/ticket.dart';
-import 'package:namma_wallet/src/features/home/presentation/widgets/highlight_widget.dart';
 import 'package:namma_wallet/src/features/travel/presentation/widgets/custom_ticket_shape_line.dart';
 import 'package:namma_wallet/src/features/travel/presentation/widgets/ticket_view_widget.dart';
 import 'package:qr_flutter/qr_flutter.dart';
@@ -317,26 +316,6 @@ class _TicketViewState extends State<TicketView> {
                           ),
                         ),
 
-                        if (widget.ticket.tags != null &&
-                            widget.ticket.tags!.isNotEmpty) ...[
-                          const SizedBox(height: 12),
-                          Wrap(
-                            spacing: 6,
-                            runSpacing: 6,
-                            children: [
-                              ...widget.ticket.tags!.map(
-                                (tag) => HighlightChipsWidget(
-                                  bgColor: Theme.of(
-                                    context,
-                                  ).colorScheme.primary.withValues(alpha: 0.1),
-                                  label: tag.icon ?? '',
-                                  icon: Icons.star_border_rounded,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-
                         if (widget.ticket.extras != null &&
                             widget.ticket.extras!.isNotEmpty) ...[
                           const SizedBox(height: 12),
@@ -362,7 +341,7 @@ class _TicketViewState extends State<TicketView> {
                                         child: Text(
                                           widget.ticket.extras![i].title ??
                                               '-'
-                                                  '}: ',
+                                                  ': ',
                                         ),
                                       ),
                                       Expanded(
