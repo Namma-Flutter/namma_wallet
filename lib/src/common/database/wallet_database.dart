@@ -99,7 +99,7 @@ class WalletDatabase {
     const query = '''
       CREATE TABLE tickets (
          id INTEGER PRIMARY KEY AUTOINCREMENT,
-         ticket_id TEXT NOT NULL,
+         ticket_id TEXT NOT NULL UNIQUE,
          primary_text TEXT NOT NULL,
          secondary_text TEXT NOT NULL,
          type TEXT NOT NULL,
@@ -131,14 +131,14 @@ class WalletDatabase {
     try {
       _logger.logDatabase('Insert', 'Inserting ticket: ${ticket.primaryText}');
 
-      // Check if ticket with same PNR already exists
+      // Check if ticket with same ticket ID already exists
       if (ticket.ticketId != null && ticket.ticketId!.isNotEmpty) {
         final existing = await getTicketById(ticket.ticketId!);
 
         if (existing != null) {
           _logger.logDatabase(
             'Update',
-            'Ticket with PNR ${_maskTicketId(ticket.ticketId!)} already'
+            'Ticket with ID ${_maskTicketId(ticket.ticketId!)} already'
                 ' exists, updating instead',
           );
 
