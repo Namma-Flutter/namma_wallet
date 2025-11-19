@@ -111,11 +111,11 @@ class TNSTCPDFParser {
     );
     final routeNo = extractMatch(r'Route No\s*:\s*(\S+)', pdfText);
     final serviceStartPlace = extractMatch(
-      r'Service Start Place\s*:\s*([A-Za-z\s]+?)(?:\n|$)',
+      r'Service Start Place\s*:\s*([A-Za-z0-9\s.,()\-]+?)(?:\n|$)',
       pdfText,
     );
     final serviceEndPlace = extractMatch(
-      r'Service End Place\s*:\s*([A-Za-z\s.,-]+?)(?:\n|$)',
+      r'Service End Place\s*:\s*([A-Za-z0-9\s.,()\-]+?)(?:\n|$)',
       pdfText,
     );
     final serviceStartTime = extractMatch(
@@ -123,15 +123,15 @@ class TNSTCPDFParser {
       pdfText,
     );
     final passengerStartPlace = extractMatch(
-      r'Passenger Start Place\s*:\s*([A-Za-z\s]+?)(?:\n|$)',
+      r'Passenger Start Place\s*:\s*([A-Za-z0-9\s.,()\-]+?)(?:\n|$)',
       pdfText,
     );
     final passengerEndPlace = extractMatch(
-      r'Passenger End Place\s*:\s*([A-Za-z\s.,-]+?)(?:\n|$)',
+      r'Passenger End Place\s*:\s*([A-Za-z0-9\s.,()\-]+?)(?:\n|$)',
       pdfText,
     );
     final passengerPickupPoint = extractMatch(
-      r'Passenger Pickup Point\s*:\s*([A-Za-z\s]+?)(?:\n|$)',
+      r'Passenger Pickup Point\s*:\s*([A-Za-z0-9\s.,()\-]+?)(?:\n|$)',
       pdfText,
     );
     final passengerPickupTime = parseDateTime(
