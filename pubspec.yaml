@@ -5,8 +5,7 @@ publish_to: "none"
 version: 0.0.1+1
 
 environment:
-  sdk: "3.9.0"
-  flutter: "3.35.2"
+  sdk: ">=3.9.0 <4.0.0"
 
 dependencies:
   ai_barcode_scanner: ^7.0.0

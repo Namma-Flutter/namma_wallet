@@ -17,45 +17,65 @@ class CalendarToggleButtons extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
       child: Container(
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
+          color: AppColor.periwinkleBlue,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.1),
+              blurRadius: 19,
+            ),
+          ],
         ),
-        child: ToggleButtons(
-          isSelected: [
-            selectedFilter == 0,
-            selectedFilter == 1,
-            selectedFilter == 2,
+        padding: const EdgeInsets.all(4),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            _buildToggleButton('Week', selectedFilter == 0, () {
+              onFilterChanged(0);
+            }),
+            _buildToggleButton('Month', selectedFilter == 1, () {
+              onFilterChanged(1);
+            }),
+            _buildToggleButton('Range', selectedFilter == 2, () {
+              onFilterChanged(2);
+            }),
           ],
-          onPressed: onFilterChanged,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildToggleButton(
+    String label,
+    bool isSelected,
+    VoidCallback onTap,
+  ) {
+    return Expanded(
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
           borderRadius: BorderRadius.circular(16),
-          selectedBorderColor: AppColor.periwinkleBlue,
-          selectedColor: Colors.white,
-          borderWidth: 2,
-          fillColor: AppColor.periwinkleBlue,
-          color: Colors.grey[700],
-          constraints: const BoxConstraints(minHeight: 40, minWidth: 80),
-          children: const [
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            decoration: BoxDecoration(
+              color: isSelected ? Colors.white : Colors.transparent,
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Center(
               child: Text(
-                'Week',
-                style: TextStyle(fontWeight: FontWeight.w500),
+                label,
+                style: TextStyle(
+                  fontFamily: 'Roboto',
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14,
+                  color: isSelected
+                      ? AppColor.periwinkleBlue
+                      : Colors.white.withValues(alpha: 0.8),
+                ),
               ),
             ),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              child: Text(
-                'Month',
-                style: TextStyle(fontWeight: FontWeight.w500),
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              child: Text(
-                'Range',
-                style: TextStyle(fontWeight: FontWeight.w500),
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );
