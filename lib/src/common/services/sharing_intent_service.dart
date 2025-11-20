@@ -57,11 +57,20 @@ class SharingIntentService {
         _printFileDetails(file);
 
         // Check if this is actually a file or text content
-        final fileObj = File(file.path);
+        File fileObj;
+        if (file.path.startsWith('file://') ||
+            (Uri.tryParse(file.path)?.hasScheme ?? false)) {
+          fileObj = File.fromUri(Uri.parse(file.path));
+        } else {
+          fileObj = File(file.path);
+        }
+
         if (fileObj.existsSync()) {
           // It's a real file, pass the file path
-          _logger.info('File received: ${file.path.split('/').last}');
-          onContentReceived(file.path);
+          _logger.info(
+            'File received: ${fileObj.path.split(Platform.pathSeparator).last}',
+          );
+          onContentReceived(fileObj.path);
         } else {
           // It's text content (like SMS), pass the text directly
           _logger.info('Text content received');
