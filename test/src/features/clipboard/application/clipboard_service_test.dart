@@ -9,7 +9,7 @@ import 'package:namma_wallet/src/features/common/application/travel_parser_servi
 import 'package:namma_wallet/src/features/common/enums/source_type.dart';
 import 'package:namma_wallet/src/features/home/domain/ticket.dart';
 
-import '../../../common/helpers/fake_logger.dart';
+import '../../../../helpers/fake_logger.dart';
 
 /// Mock implementation of IClipboardRepository for testing
 class MockClipboardRepository implements IClipboardRepository {

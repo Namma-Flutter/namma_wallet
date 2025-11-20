@@ -3,7 +3,7 @@ import 'package:get_it/get_it.dart';
 import 'package:namma_wallet/src/common/services/logger_interface.dart';
 import 'package:namma_wallet/src/features/common/application/travel_parser_service.dart';
 
-import '../../../common/helpers/fake_logger.dart';
+import '../../../../helpers/fake_logger.dart';
 
 void main() {
   // Set up GetIt for tests

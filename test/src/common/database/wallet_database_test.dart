@@ -9,9 +9,9 @@ import 'package:namma_wallet/src/features/home/domain/extras_model.dart';
 import 'package:namma_wallet/src/features/home/domain/tag_model.dart';
 import 'package:namma_wallet/src/features/home/domain/ticket.dart';
 
-import '../../common/helpers/fake_database.dart';
-import '../../common/helpers/fake_logger.dart';
-import '../../common/helpers/fake_wallet_database.dart';
+import '../../../helpers/fake_database.dart';
+import '../../../helpers/fake_logger.dart';
+import '../../../helpers/fake_wallet_database.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();

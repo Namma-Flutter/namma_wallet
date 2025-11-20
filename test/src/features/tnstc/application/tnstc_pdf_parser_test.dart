@@ -7,8 +7,8 @@ import 'package:namma_wallet/src/features/tnstc/application/ocr_service.dart';
 import 'package:namma_wallet/src/features/tnstc/application/pdf_service.dart';
 import 'package:namma_wallet/src/features/tnstc/application/tnstc_pdf_parser.dart';
 
-import '../../../common/helpers/fake_logger.dart';
-import '../../../common/helpers/mock_ocr_service.dart';
+import '../../../../helpers/fake_logger.dart';
+import '../../../../helpers/mock_ocr_service.dart';
 
 void main() {
   // Set up GetIt for tests

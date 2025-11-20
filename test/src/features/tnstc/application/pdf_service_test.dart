@@ -2,7 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:namma_wallet/src/common/services/logger_interface.dart';
 
-import '../../../common/helpers/fake_logger.dart';
+import '../../../../helpers/fake_logger.dart';
 
 void main() {
   setUp(() {

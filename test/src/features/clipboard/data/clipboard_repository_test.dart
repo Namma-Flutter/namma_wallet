@@ -5,7 +5,7 @@ import 'package:namma_wallet/src/common/services/logger_interface.dart';
 import 'package:namma_wallet/src/features/clipboard/data/clipboard_repository.dart';
 import 'package:namma_wallet/src/features/clipboard/domain/i_clipboard_repository.dart';
 
-import '../../../common/helpers/fake_logger.dart';
+import '../../../../helpers/fake_logger.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();

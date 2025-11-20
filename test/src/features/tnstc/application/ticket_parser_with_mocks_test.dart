@@ -9,8 +9,8 @@ import 'package:namma_wallet/src/features/tnstc/application/ocr_service.dart';
 import 'package:namma_wallet/src/features/tnstc/application/tnstc_pdf_parser.dart';
 import 'package:namma_wallet/src/features/tnstc/application/tnstc_sms_parser.dart';
 
-import '../../../common/helpers/fake_logger.dart';
-import '../../../common/helpers/mock_ocr_service.dart';
+import '../../../../helpers/fake_logger.dart';
+import '../../../../helpers/mock_ocr_service.dart';
 
 /// Mock implementation of ITicketParser for testing
 class MockTicketParser implements ITicketParser {
