@@ -389,8 +389,8 @@ class TravelTicketListCardWidget extends StatelessWidget {
                 const SizedBox(height: 4),
                 // Date and time
                 Text(
-                  '${getDate(ticket.startTime)} • '
-                  '${getTime(ticket.startTime)}'
+                  '${formatDate(ticket.startTime)} • '
+                  '${formatTime(ticket.startTime)}'
                   '',
                   style: TextStyle(
                     fontSize: 11,

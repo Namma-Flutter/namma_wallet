@@ -255,8 +255,8 @@ class TravelTicketCardWidget extends StatelessWidget {
               TicketRowWidget(
                 title1: 'Journey Date',
                 title2: 'Time',
-                value1: getDate(ticket.startTime),
-                value2: getTime(ticket.startTime),
+                value1: formatDate(ticket.startTime),
+                value2: formatTime(ticket.startTime),
               ),
             ],
           ),
