@@ -1,4 +1,5 @@
-import 'package:flutter/foundation.dart';
+import 'package:namma_wallet/src/common/di/locator.dart';
+import 'package:namma_wallet/src/common/services/logger_interface.dart';
 import 'package:namma_wallet/src/features/home/domain/ticket.dart';
 import 'package:namma_wallet/src/features/tnstc/application/i_ticket_parser.dart';
 import 'package:namma_wallet/src/features/tnstc/domain/tnstc_model.dart';
@@ -13,6 +14,8 @@ import 'package:namma_wallet/src/features/tnstc/domain/tnstc_model.dart';
 /// Falls back to default values if parsing fails for individual fields.
 /// Never throws - returns a model with partial data on errors.
 class TNSTCPDFParser implements ITicketParser {
+  TNSTCPDFParser({ILogger? logger}) : _logger = logger ?? getIt<ILogger>();
+  final ILogger _logger;
   // TODO(optimization): Move RegExp compilation to static final fields
   // to avoid recompiling patterns on each parse call, improving performance.
 
@@ -38,8 +41,8 @@ class TNSTCPDFParser implements ITicketParser {
       // Handle both '-' and '/' separators
       final parts = date.contains('/') ? date.split('/') : date.split('-');
       if (parts.length != 3) {
-        debugPrint(
-          'Invalid date format: $date (expected DD/MM/YYYY or DD-MM-YYYY)',
+        _logger.warning(
+          'Invalid date format encountered in TNSTC PDF',
         );
         return DateTime.now();
       }
@@ -50,7 +53,7 @@ class TNSTCPDFParser implements ITicketParser {
         final year = int.parse(parts[2]);
         return DateTime(year, month, day);
       } on FormatException catch (e) {
-        debugPrint('Failed to parse date: $date, error: $e');
+        _logger.warning('Failed to parse date in TNSTC PDF: $e');
         return DateTime.now();
       }
     }
@@ -60,9 +63,7 @@ class TNSTCPDFParser implements ITicketParser {
 
       final parts = dateTime.split(' '); // Split into date and time
       if (parts.length < 2) {
-        debugPrint(
-          'Invalid datetime format: $dateTime (expected "DD/MM/YYYY HH:mm")',
-        );
+        _logger.warning('Invalid datetime format encountered in TNSTC PDF');
         return DateTime.now();
       }
 
@@ -72,7 +73,7 @@ class TNSTCPDFParser implements ITicketParser {
             ? parts[0].split('/')
             : parts[0].split('-');
         if (dateParts.length != 3) {
-          debugPrint('Invalid date part in datetime: ${parts[0]}');
+          _logger.warning('Invalid date part in TNSTC datetime');
           return DateTime.now();
         }
 
@@ -84,7 +85,7 @@ class TNSTCPDFParser implements ITicketParser {
         final timePart = parts[1].replaceAll(RegExp(r'\s*Hrs\.?'), '');
         final timeParts = timePart.split(':'); // Split the time by ':'
         if (timeParts.length != 2) {
-          debugPrint('Invalid time part in datetime: ${parts[1]}');
+          _logger.warning('Invalid time part in TNSTC datetime');
           return DateTime.now();
         }
 
@@ -93,7 +94,7 @@ class TNSTCPDFParser implements ITicketParser {
 
         return DateTime(year, month, day, hour, minute);
       } on FormatException catch (e) {
-        debugPrint('Failed to parse datetime: $dateTime, error: $e');
+        _logger.warning('Failed to parse datetime in TNSTC PDF: $e');
         return DateTime.now();
       }
     }
