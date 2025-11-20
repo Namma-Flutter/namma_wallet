@@ -202,11 +202,17 @@ Trip Code : TEST123
 
           // Assert (Then)
           expect(ticket, isNotNull);
-          // Should default to 1 seat
+          // Should default to 1 seat when seat count is invalid
           final seatsExtra = ticket.extras
               ?.where((e) => e.title == 'Seats')
               .firstOrNull;
-          expect(seatsExtra?.value, anyOf('1', isNull));
+          expect(seatsExtra?.value, equals('1'));
+
+          // Should default to 0.0 for total fare when fare is invalid
+          final fareExtra = ticket.extras
+              ?.where((e) => e.title == 'Fare')
+              .firstOrNull;
+          expect(fareExtra?.value, equals('₹0.00'));
         },
       );
 
