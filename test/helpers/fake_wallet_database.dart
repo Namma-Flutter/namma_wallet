@@ -9,7 +9,7 @@ import 'fake_database.dart';
 /// Test wrapper that uses real WalletDatabase with FakeDatabase
 class FakeWalletDatabase implements IWalletDatabase {
   FakeWalletDatabase({required this.fakeDb, ILogger? logger})
-      : _walletDb = _TestWalletDatabase(fakeDb, logger ?? getIt<ILogger>());
+    : _walletDb = _TestWalletDatabase(fakeDb, logger ?? getIt<ILogger>());
 
   final FakeDatabase fakeDb;
   final _TestWalletDatabase _walletDb;

@@ -12,8 +12,7 @@ class ClipboardRepository implements IClipboardRepository {
   ///
   /// [logger] - Optional logger for debugging. Uses GetIt instance if not
   /// provided.
-  ClipboardRepository({ILogger? logger})
-      : _logger = logger ?? getIt<ILogger>();
+  ClipboardRepository({ILogger? logger}) : _logger = logger ?? getIt<ILogger>();
 
   final ILogger _logger;
 

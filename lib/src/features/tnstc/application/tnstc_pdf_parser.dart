@@ -181,7 +181,7 @@ class TNSTCPDFParser implements ITicketParser {
     // Extract passenger info
     // First try the table format
     final passengerPattern = RegExp(
-      r'Name\s+Age\s+Adult/Child\s+Gender\s+Seat No\.\s*\n\s*([A-Za-z]+)\s+(\d+)\s+(Adult|Child)\s+(M|F)\s+([A-Z0-9]+)',
+      r"Name\s+Age\s+Adult/Child\s+Gender\s+Seat No\.\s*\n\s*([A-Za-z](?:[A-Za-z\s\-'])*[A-Za-z])\s+(\d+)\s+(Adult|Child)\s+(M|F)\s+([A-Z0-9]+)",
       multiLine: true,
     );
     final passengerMatch = passengerPattern.firstMatch(pdfText);

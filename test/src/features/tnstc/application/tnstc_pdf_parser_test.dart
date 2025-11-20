@@ -39,80 +39,82 @@ void main() {
       'Given valid TNSTC PDF text, When parsing ticket, '
       'Then extracts all fields correctly',
       () async {
-      final pdfFile = File(
-        'assets/data/E-Ticket_T73309927_18-01-2026.pdf',
-      );
+        final pdfFile = File(
+          'assets/data/E-Ticket_T73309927_18-01-2026.pdf',
+        );
 
-      // Skip test if PDF file doesn't exist
-      if (!pdfFile.existsSync()) {
-        return;
-      }
+        // Skip test if PDF file doesn't exist
+        if (!pdfFile.existsSync()) {
+          return;
+        }
 
-      // Extract text from PDF
-      final pdfText = await pdfService.extractTextFrom(pdfFile);
+        // Extract text from PDF
+        final pdfText = await pdfService.extractTextFrom(pdfFile);
 
-      // Skip if no text was extracted
-      //(PDF might be empty or unreadable in test)
-      if (pdfText.isEmpty) {
-        return;
-      }
+        // Skip if no text was extracted
+        //(PDF might be empty or unreadable in test)
+        if (pdfText.isEmpty) {
+          return;
+        }
 
-      // Parse the PDF - now returns Ticket
-      final ticket = parser.parseTicket(pdfText);
+        // Parse the PDF - now returns Ticket
+        final ticket = parser.parseTicket(pdfText);
 
-      // Verify PNR from ticketId
-      expect(ticket.ticketId, equals('T73309927'));
+        // Verify PNR from ticketId
+        expect(ticket.ticketId, equals('T73309927'));
 
-      // Verify primary and secondary text
-      expect(ticket.primaryText, isNotEmpty);
-      expect(ticket.secondaryText, contains('SETC'));
+        // Verify primary and secondary text
+        expect(ticket.primaryText, isNotEmpty);
+        expect(ticket.secondaryText, contains('SETC'));
 
-      // Verify extras contain expected fields
-      final pnrExtra = ticket.extras
-          ?.firstWhere((e) => e.title == 'PNR Number')
-          .value;
-      expect(pnrExtra, equals('T73309927'));
+        // Verify extras contain expected fields
+        final pnrExtra = ticket.extras
+            ?.firstWhere((e) => e.title == 'PNR Number')
+            .value;
+        expect(pnrExtra, equals('T73309927'));
 
-      final tripCodeExtra = ticket.extras
-          ?.firstWhere((e) => e.title == 'Trip Code')
-          .value;
-      expect(tripCodeExtra, equals('1315KUMCHEAB'));
+        final tripCodeExtra = ticket.extras
+            ?.firstWhere((e) => e.title == 'Trip Code')
+            .value;
+        expect(tripCodeExtra, equals('1315KUMCHEAB'));
 
-      final serviceClassExtra = ticket.extras
-          ?.firstWhere((e) => e.title == 'Service Class')
-          .value;
-      expect(serviceClassExtra, equals('AC SLEEPER SEATER'));
+        final serviceClassExtra = ticket.extras
+            ?.firstWhere((e) => e.title == 'Service Class')
+            .value;
+        expect(serviceClassExtra, equals('AC SLEEPER SEATER'));
 
-      final fareExtra = ticket.extras
-          ?.firstWhere((e) => e.title == 'Fare')
-          .value;
-      expect(fareExtra, equals('₹735.00'));
+        final fareExtra = ticket.extras
+            ?.firstWhere((e) => e.title == 'Fare')
+            .value;
+        expect(fareExtra, equals('₹735.00'));
 
-      // Verify passenger info in extras
-      final passengerNameExtra = ticket.extras
-          ?.firstWhere((e) => e.title == 'Passenger Name')
-          .value;
-      expect(passengerNameExtra, equals('HarishAnbalagan'));
+        // Verify passenger info in extras
+        final passengerNameExtra = ticket.extras
+            ?.firstWhere((e) => e.title == 'Passenger Name')
+            .value;
+        expect(passengerNameExtra, equals('HarishAnbalagan'));
 
-      final ageExtra = ticket.extras?.firstWhere((e) => e.title == 'Age').value;
-      expect(ageExtra, equals('26'));
+        final ageExtra = ticket.extras
+            ?.firstWhere((e) => e.title == 'Age')
+            .value;
+        expect(ageExtra, equals('26'));
 
-      final genderExtra = ticket.extras
-          ?.firstWhere((e) => e.title == 'Gender')
-          .value;
-      expect(genderExtra, equals('M'));
+        final genderExtra = ticket.extras
+            ?.firstWhere((e) => e.title == 'Gender')
+            .value;
+        expect(genderExtra, equals('M'));
 
-      // Verify tags
-      final seatTag = ticket.tags
-          ?.firstWhere((t) => t.icon == 'event_seat')
-          .value;
-      expect(seatTag, equals('4UB'));
+        // Verify tags
+        final seatTag = ticket.tags
+            ?.firstWhere((t) => t.icon == 'event_seat')
+            .value;
+        expect(seatTag, equals('4UB'));
 
-      // Verify Source Type is PDF
-      final sourceType = ticket.extras
-          ?.firstWhere((e) => e.title == 'Source Type')
-          .value;
-      expect(sourceType, equals('PDF'));
+        // Verify Source Type is PDF
+        final sourceType = ticket.extras
+            ?.firstWhere((e) => e.title == 'Source Type')
+            .value;
+        expect(sourceType, equals('PDF'));
 
         // Verify journey date and time from startTime
         expect(ticket.startTime.day, equals(18));
@@ -127,8 +129,8 @@ void main() {
       'Given cleaned PDF text patterns, When parsing ticket, '
       'Then extracts fields correctly',
       () {
-      // Simulate cleaned PDF text based on the actual structure
-      const pdfText = '''
+        // Simulate cleaned PDF text based on the actual structure
+        const pdfText = '''
 Corporation : SETC
 PNR Number : T12345678
 Date of Journey : 15/12/2024
@@ -155,59 +157,61 @@ ID Card Number : 123456789012
 Total Fare : 500.00 Rs.
 ''';
 
-      final ticket = parser.parseTicket(pdfText);
+        final ticket = parser.parseTicket(pdfText);
 
-      // Verify core fields are extracted correctly from Ticket model
-      expect(ticket.ticketId, equals('T12345678'));
-      expect(ticket.primaryText, equals('CHENNAI → BANGALORE'));
-      expect(ticket.secondaryText, equals('SETC - TEST123'));
+        // Verify core fields are extracted correctly from Ticket model
+        expect(ticket.ticketId, equals('T12345678'));
+        expect(ticket.primaryText, equals('CHENNAI → BANGALORE'));
+        expect(ticket.secondaryText, equals('SETC - TEST123'));
 
-      // Verify extras
-      final tripCodeExtra = ticket.extras
-          ?.firstWhere((e) => e.title == 'Trip Code')
-          .value;
-      expect(tripCodeExtra, equals('TEST123'));
+        // Verify extras
+        final tripCodeExtra = ticket.extras
+            ?.firstWhere((e) => e.title == 'Trip Code')
+            .value;
+        expect(tripCodeExtra, equals('TEST123'));
 
-      final passengerNameExtra = ticket.extras
-          ?.firstWhere((e) => e.title == 'Passenger Name')
-          .value;
-      expect(passengerNameExtra, equals('TestUser'));
+        final passengerNameExtra = ticket.extras
+            ?.firstWhere((e) => e.title == 'Passenger Name')
+            .value;
+        expect(passengerNameExtra, equals('TestUser'));
 
-      final ageExtra = ticket.extras?.firstWhere((e) => e.title == 'Age').value;
-      expect(ageExtra, equals('25'));
+        final ageExtra = ticket.extras
+            ?.firstWhere((e) => e.title == 'Age')
+            .value;
+        expect(ageExtra, equals('25'));
 
-      final genderExtra = ticket.extras
-          ?.firstWhere((e) => e.title == 'Gender')
-          .value;
-      expect(genderExtra, equals('M'));
+        final genderExtra = ticket.extras
+            ?.firstWhere((e) => e.title == 'Gender')
+            .value;
+        expect(genderExtra, equals('M'));
 
-      final busIdExtra = ticket.extras
-          ?.firstWhere((e) => e.title == 'Bus ID')
-          .value;
-      expect(busIdExtra, equals('BUS-123'));
+        final busIdExtra = ticket.extras
+            ?.firstWhere((e) => e.title == 'Bus ID')
+            .value;
+        expect(busIdExtra, equals('BUS-123'));
 
-      final serviceClassExtra = ticket.extras
-          ?.firstWhere((e) => e.title == 'Service Class')
-          .value;
-      expect(serviceClassExtra, equals('AC SLEEPER'));
+        final serviceClassExtra = ticket.extras
+            ?.firstWhere((e) => e.title == 'Service Class')
+            .value;
+        expect(serviceClassExtra, equals('AC SLEEPER'));
 
-      final fareExtra = ticket.extras
-          ?.firstWhere((e) => e.title == 'Fare')
-          .value;
-      expect(fareExtra, equals('₹500.00'));
+        final fareExtra = ticket.extras
+            ?.firstWhere((e) => e.title == 'Fare')
+            .value;
+        expect(fareExtra, equals('₹500.00'));
 
-      // Verify tags
-      final seatTag = ticket.tags
-          ?.firstWhere((t) => t.icon == 'event_seat')
-          .value;
-      expect(seatTag, equals('1A'));
+        // Verify tags
+        final seatTag = ticket.tags
+            ?.firstWhere((t) => t.icon == 'event_seat')
+            .value;
+        expect(seatTag, equals('1A'));
 
-      // Verify journey date from startTime
-      expect(ticket.startTime.day, equals(15));
-      expect(ticket.startTime.month, equals(12));
-      expect(ticket.startTime.year, equals(2024));
-      expect(ticket.startTime.hour, equals(14));
-      expect(ticket.startTime.minute, equals(30));
+        // Verify journey date from startTime
+        expect(ticket.startTime.day, equals(15));
+        expect(ticket.startTime.month, equals(12));
+        expect(ticket.startTime.year, equals(2024));
+        expect(ticket.startTime.hour, equals(14));
+        expect(ticket.startTime.minute, equals(30));
 
         // Verify Source Type is PDF
         final sourceType = ticket.extras
@@ -221,7 +225,7 @@ Total Fare : 500.00 Rs.
       'Given PDF with empty platform number, When parsing ticket, '
       'Then platform is not included in extras',
       () {
-      const pdfText = '''
+        const pdfText = '''
 Corporation : SETC
 PNR Number : T12345678
 Date of Journey : 15/12/2024
@@ -229,9 +233,9 @@ Platform Number :
 Trip Code : TEST123
 ''';
 
-      final ticket = parser.parseTicket(pdfText);
+        final ticket = parser.parseTicket(pdfText);
 
-      expect(ticket, isNotNull);
+        expect(ticket, isNotNull);
 
         // Platform should not be in extras if empty
         final platformExtra = ticket.extras
@@ -245,7 +249,7 @@ Trip Code : TEST123
       'Given passenger pickup time with Hrs suffix, When parsing ticket, '
       'Then pickup time is parsed correctly',
       () {
-      const pdfText = '''
+        const pdfText = '''
 Corporation : SETC
 PNR Number : T12345678
 Date of Journey : 15/12/2024
@@ -256,7 +260,7 @@ Name Age Adult/Child Gender Seat No.
 TestUser 25 Adult M 1A
 ''';
 
-      final ticket = parser.parseTicket(pdfText);
+        final ticket = parser.parseTicket(pdfText);
 
         // Verify pickup time is parsed correctly
         final pickupTimeExtra = ticket.extras
@@ -272,19 +276,19 @@ TestUser 25 Adult M 1A
       'Given total fare with decimal values, When parsing ticket, '
       'Then fare is formatted correctly',
       () {
-      const pdfText = '''
+        const pdfText = '''
 Corporation : SETC
 PNR Number : T12345678
 Total Fare : 123.50 Rs.
 Trip Code : TEST123
 ''';
 
-      final ticket = parser.parseTicket(pdfText);
+        final ticket = parser.parseTicket(pdfText);
 
-      final fareExtra = ticket.extras
-          ?.firstWhere((e) => e.title == 'Fare')
-          .value;
-      expect(fareExtra, equals('₹123.50'));
+        final fareExtra = ticket.extras
+            ?.firstWhere((e) => e.title == 'Fare')
+            .value;
+        expect(fareExtra, equals('₹123.50'));
 
         // Also check tag
         final fareTag = ticket.tags
@@ -300,14 +304,14 @@ Trip Code : TEST123
         'Given date with slash separator, When parsing ticket, '
         'Then date is parsed correctly',
         () {
-        const pdfText = '''
+          const pdfText = '''
 Corporation : SETC
 PNR Number : T12345678
 Date of Journey : 15/10/2025
 Trip Code : TEST123
 ''';
 
-        final ticket = parser.parseTicket(pdfText);
+          final ticket = parser.parseTicket(pdfText);
 
           // Verify date is parsed (if parsing fails, falls back to today)
           expect(ticket.startTime, isNotNull);
@@ -319,14 +323,14 @@ Trip Code : TEST123
         'Given date with dash separator, When parsing ticket, '
         'Then date is parsed correctly',
         () {
-        const pdfText = '''
+          const pdfText = '''
 Corporation : SETC
 PNR Number : T12345678
 Date of Journey : 15-10-2025
 Trip Code : TEST123
 ''';
 
-        final ticket = parser.parseTicket(pdfText);
+          final ticket = parser.parseTicket(pdfText);
 
           // Verify date is parsed
           expect(ticket.startTime, isNotNull);
@@ -338,24 +342,22 @@ Trip Code : TEST123
         'Given invalid date format, When parsing ticket, '
         'Then falls back to current date',
         () {
-        const pdfText = '''
+          const pdfText = '''
 Corporation : SETC
 PNR Number : T12345678
 Date of Journey : invalid-date
 Trip Code : TEST123
 ''';
 
-        final ticket = parser.parseTicket(pdfText);
+          final ticket = parser.parseTicket(pdfText);
 
           // Should fall back to current date (DateTime.now())
           expect(ticket.startTime, isNotNull);
         },
       );
 
-      test(
-        'Given empty date string, When parsing ticket, '
-        'Then falls back to current date',
-        () {
+      test('Given empty date string, When parsing ticket, '
+          'Then falls back to current date', () {
         const pdfText = '''
 Corporation : SETC
 PNR Number : T12345678
@@ -368,10 +370,8 @@ Trip Code : TEST123
         expect(ticket.startTime, isNotNull);
       });
 
-      test(
-        'Given malformed date parts, When parsing ticket, '
-        'Then falls back to current date',
-        () {
+      test('Given malformed date parts, When parsing ticket, '
+          'Then falls back to current date', () {
         const pdfText = '''
 Corporation : SETC
 PNR Number : T12345678
@@ -388,10 +388,8 @@ Trip Code : TEST123
 
     // ============== DateTime Parsing Edge Cases ==============
     group('DateTime Parsing', () {
-      test(
-        'Given datetime with slash and Hrs suffix, When parsing, '
-        'Then datetime is parsed correctly',
-        () {
+      test('Given datetime with slash and Hrs suffix, When parsing, '
+          'Then datetime is parsed correctly', () {
         const pdfText = '''
 Corporation : SETC
 PNR Number : T12345678
@@ -409,10 +407,8 @@ Trip Code : TEST123
         expect(ticket.startTime.minute, equals(30));
       });
 
-      test(
-        'Given datetime with dash separator, When parsing, '
-        'Then datetime is parsed correctly',
-        () {
+      test('Given datetime with dash separator, When parsing, '
+          'Then datetime is parsed correctly', () {
         const pdfText = '''
 Corporation : SETC
 PNR Number : T12345678
@@ -430,10 +426,8 @@ Trip Code : TEST123
         expect(ticket.startTime.minute, equals(45));
       });
 
-      test(
-        'Given invalid datetime format, When parsing ticket, '
-        'Then falls back to current datetime',
-        () {
+      test('Given invalid datetime format, When parsing ticket, '
+          'Then falls back to current datetime', () {
         const pdfText = '''
 Corporation : SETC
 PNR Number : T12345678
@@ -448,10 +442,8 @@ Trip Code : TEST123
         expect(ticket.startTime, isNotNull);
       });
 
-      test(
-        'Given missing time component in datetime, When parsing, '
-        'Then falls back to current datetime',
-        () {
+      test('Given missing time component in datetime, When parsing, '
+          'Then falls back to current datetime', () {
         const pdfText = '''
 Corporation : SETC
 PNR Number : T12345678
@@ -466,10 +458,8 @@ Trip Code : TEST123
         expect(ticket.startTime, isNotNull);
       });
 
-      test(
-        'Given invalid time values, When parsing ticket, '
-        'Then falls back to current datetime',
-        () {
+      test('Given invalid time values, When parsing ticket, '
+          'Then falls back to current datetime', () {
         const pdfText = '''
 Corporation : SETC
 PNR Number : T12345678
@@ -484,10 +474,8 @@ Trip Code : TEST123
         expect(ticket.startTime, isNotNull);
       });
 
-      test(
-        'Given journey date with service time and no pickup time, '
-        'When parsing, Then combines date and time correctly',
-        () {
+      test('Given journey date with service time and no pickup time, '
+          'When parsing, Then combines date and time correctly', () {
         const pdfText = '''
 Corporation : SETC
 PNR Number : T12345678
@@ -510,10 +498,8 @@ Trip Code : TEST123
 
     // ============== Passenger Information Parsing ==============
     group('Passenger Information', () {
-      test(
-        'Given passenger info in table format, When parsing ticket, '
-        'Then extracts passenger details correctly',
-        () {
+      test('Given passenger info in table format, When parsing ticket, '
+          'Then extracts passenger details correctly', () {
         const pdfText = '''
 Corporation : SETC
 PNR Number : T12345678
@@ -529,9 +515,7 @@ JohnDoe 30 Adult M 2B
             .value;
         expect(passengerName, equals('JohnDoe'));
 
-        final age = ticket.extras
-            ?.firstWhere((e) => e.title == 'Age')
-            .value;
+        final age = ticket.extras?.firstWhere((e) => e.title == 'Age').value;
         expect(age, equals('30'));
 
         final gender = ticket.extras
@@ -545,10 +529,8 @@ JohnDoe 30 Adult M 2B
         expect(seat, equals('2B'));
       });
 
-      test(
-        'Given child passenger info, When parsing ticket, '
-        'Then extracts child details correctly',
-        () {
+      test('Given child passenger info, When parsing ticket, '
+          'Then extracts child details correctly', () {
         const pdfText = '''
 Corporation : SETC
 PNR Number : T12345678
@@ -564,9 +546,7 @@ JaneDoe 12 Child F 3C
             .value;
         expect(passengerName, equals('JaneDoe'));
 
-        final age = ticket.extras
-            ?.firstWhere((e) => e.title == 'Age')
-            .value;
+        final age = ticket.extras?.firstWhere((e) => e.title == 'Age').value;
         expect(age, equals('12'));
 
         final gender = ticket.extras
@@ -575,10 +555,8 @@ JaneDoe 12 Child F 3C
         expect(gender, equals('F'));
       });
 
-      test(
-        'Given broken table format, When parsing with fallback, '
-        'Then extracts passenger info',
-        () {
+      test('Given broken table format, When parsing with fallback, '
+          'Then extracts passenger info', () {
         const pdfText = '''
 Corporation : SETC
 PNR Number : T12345678
@@ -600,9 +578,7 @@ Adult
             .value;
         expect(passengerName, equals('JohnDoe'));
 
-        final age = ticket.extras
-            ?.firstWhere((e) => e.title == 'Age')
-            .value;
+        final age = ticket.extras?.firstWhere((e) => e.title == 'Age').value;
         expect(age, equals('28'));
 
         final gender = ticket.extras
@@ -611,10 +587,8 @@ Adult
         expect(gender, equals('M'));
       });
 
-      test(
-        'Given missing passenger information, When parsing ticket, '
-        'Then handles gracefully without passenger fields',
-        () {
+      test('Given missing passenger information, When parsing ticket, '
+          'Then handles gracefully without passenger fields', () {
         const pdfText = '''
 Corporation : SETC
 PNR Number : T12345678
@@ -633,10 +607,8 @@ Trip Code : TEST123
 
     // ============== Field Extraction Edge Cases ==============
     group('Field Extraction', () {
-      test(
-        'Given place names with special characters, When parsing, '
-        'Then preserves special characters',
-        () {
+      test('Given place names with special characters, When parsing, '
+          'Then preserves special characters', () {
         const pdfText = '''
 Corporation : SETC
 PNR Number : T12345678
@@ -655,10 +627,8 @@ Trip Code : TEST123
         );
       });
 
-      test(
-        'Given long corporation name, When parsing ticket, '
-        'Then extracts full corporation name',
-        () {
+      test('Given long corporation name, When parsing ticket, '
+          'Then extracts full corporation name', () {
         const pdfText = '''
 Corporation : State Express Transport Corporation
 PNR Number : T12345678
@@ -673,10 +643,8 @@ Trip Code : TEST123
         expect(provider, equals('State Express Transport Corporation'));
       });
 
-      test(
-        'Given various ID card types, When parsing ticket, '
-        'Then extracts ID number correctly',
-        () {
+      test('Given various ID card types, When parsing ticket, '
+          'Then extracts ID number correctly', () {
         const pdfText = '''
 Corporation : SETC
 PNR Number : T12345678
@@ -693,10 +661,8 @@ Trip Code : TEST123
         expect(idNumber, equals('123456789012'));
       });
 
-      test(
-        'Given Government Issued Photo ID, When parsing ticket, '
-        'Then extracts ID number correctly',
-        () {
+      test('Given Government Issued Photo ID, When parsing ticket, '
+          'Then extracts ID number correctly', () {
         const pdfText = '''
 Corporation : SETC
 PNR Number : T12345678
@@ -713,10 +679,8 @@ Trip Code : TEST123
         expect(idNumber, equals('987654321012'));
       });
 
-      test(
-        'Given complete route information, When parsing ticket, '
-        'Then extracts all route fields',
-        () {
+      test('Given complete route information, When parsing ticket, '
+          'Then extracts all route fields', () {
         const pdfText = '''
 Corporation : SETC
 PNR Number : T12345678
@@ -733,24 +697,18 @@ Trip Code : TEST123
 
         expect(ticket.primaryText, equals('CHENNAI → COIMBATORE'));
 
-        final from = ticket.extras
-            ?.firstWhere((e) => e.title == 'From')
-            .value;
+        final from = ticket.extras?.firstWhere((e) => e.title == 'From').value;
         expect(from, equals('CHENNAI'));
 
-        final to = ticket.extras
-            ?.firstWhere((e) => e.title == 'To')
-            .value;
+        final to = ticket.extras?.firstWhere((e) => e.title == 'To').value;
         expect(to, equals('COIMBATORE'));
 
         final location = ticket.location;
         expect(location, equals('KOYAMBEDU BUS STAND'));
       });
 
-      test(
-        'Given bank transaction number with period, When parsing, '
-        'Then extracts transaction number',
-        () {
+      test('Given bank transaction number with period, When parsing, '
+          'Then extracts transaction number', () {
         const pdfText = '''
 Corporation : SETC
 PNR Number : T12345678
@@ -763,10 +721,8 @@ Trip Code : TEST123
         expect(ticket, isNotNull);
       });
 
-      test(
-        'Given bank transaction with semicolon, When parsing, '
-        'Then extracts transaction number',
-        () {
+      test('Given bank transaction with semicolon, When parsing, '
+          'Then extracts transaction number', () {
         const pdfText = '''
 Corporation : SETC
 PNR Number : T12345678
@@ -779,10 +735,8 @@ Trip Code : TEST123
         expect(ticket, isNotNull);
       });
 
-      test(
-        'Given passenger category variations, When parsing ticket, '
-        'Then handles different category formats',
-        () {
+      test('Given passenger category variations, When parsing ticket, '
+          'Then handles different category formats', () {
         const pdfText = '''
 Corporation : SETC
 PNR Number : T12345678
@@ -795,10 +749,8 @@ Trip Code : TEST123
         expect(ticket, isNotNull);
       });
 
-      test(
-        'Given lowercase passenger category, When parsing ticket, '
-        'Then extracts category correctly',
-        () {
+      test('Given lowercase passenger category, When parsing ticket, '
+          'Then extracts category correctly', () {
         const pdfText = '''
 Corporation : SETC
 PNR Number : T12345678
@@ -814,10 +766,8 @@ Trip Code : TEST123
 
     // ============== Number Parsing Edge Cases ==============
     group('Number Parsing', () {
-      test(
-        'Given zero fare, When parsing ticket, '
-        'Then formats fare as zero',
-        () {
+      test('Given zero fare, When parsing ticket, '
+          'Then formats fare as zero', () {
         const pdfText = '''
 Corporation : SETC
 PNR Number : T12345678
@@ -833,10 +783,8 @@ Trip Code : TEST123
         expect(fareExtra, equals('₹0.00'));
       });
 
-      test(
-        'Given fare without decimal, When parsing ticket, '
-        'Then formats fare with decimal',
-        () {
+      test('Given fare without decimal, When parsing ticket, '
+          'Then formats fare with decimal', () {
         const pdfText = '''
 Corporation : SETC
 PNR Number : T12345678
@@ -852,10 +800,8 @@ Trip Code : TEST123
         expect(fareExtra, equals('₹500.00'));
       });
 
-      test(
-        'Given missing fare, When parsing ticket, '
-        'Then defaults to zero fare',
-        () {
+      test('Given missing fare, When parsing ticket, '
+          'Then defaults to zero fare', () {
         const pdfText = '''
 Corporation : SETC
 PNR Number : T12345678
@@ -872,10 +818,8 @@ Trip Code : TEST123
         expect(fareExtra?.value, equals('₹0.00'));
       });
 
-      test(
-        'Given zero seats, When parsing ticket, '
-        'Then handles gracefully',
-        () {
+      test('Given zero seats, When parsing ticket, '
+          'Then handles gracefully', () {
         const pdfText = '''
 Corporation : SETC
 PNR Number : T12345678
@@ -889,10 +833,8 @@ Trip Code : TEST123
         expect(ticket, isNotNull);
       });
 
-      test(
-        'Given multiple seats, When parsing ticket, '
-        'Then extracts seat count correctly',
-        () {
+      test('Given multiple seats, When parsing ticket, '
+          'Then extracts seat count correctly', () {
         const pdfText = '''
 Corporation : SETC
 PNR Number : T12345678
@@ -908,10 +850,8 @@ Trip Code : TEST123
         expect(seats, equals('3'));
       });
 
-      test(
-        'Given invalid number format, When parsing ticket, '
-        'Then falls back to default value',
-        () {
+      test('Given invalid number format, When parsing ticket, '
+          'Then falls back to default value', () {
         const pdfText = '''
 Corporation : SETC
 PNR Number : T12345678
@@ -928,10 +868,8 @@ Trip Code : TEST123
 
     // ============== Multiple Passengers ==============
     group('Multiple Passengers', () {
-      test(
-        'Given multiple passengers in table, When parsing ticket, '
-        'Then extracts first passenger',
-        () {
+      test('Given multiple passengers in table, When parsing ticket, '
+          'Then extracts first passenger', () {
         // Note: Current parser only extracts first passenger
         // This test documents expected behavior
         const pdfText = '''
@@ -957,10 +895,8 @@ JaneDoe 28 Adult F 3C
         expect(seat, equals('2B'));
       });
 
-      test(
-        'Given passenger with no seat, When parsing ticket, '
-        'Then handles missing seat gracefully',
-        () {
+      test('Given passenger with no seat, When parsing ticket, '
+          'Then handles missing seat gracefully', () {
         const pdfText = '''
 Corporation : SETC
 PNR Number : T12345678
@@ -978,10 +914,8 @@ TestUser 25 Adult M
 
     // ============== PNR Number Variations ==============
     group('PNR Number Variations', () {
-      test(
-        'Given PNR with E prefix, When parsing ticket, '
-        'Then extracts PNR correctly',
-        () {
+      test('Given PNR with E prefix, When parsing ticket, '
+          'Then extracts PNR correctly', () {
         const pdfText = '''
 Corporation : SETC
 PNR Number : E12345678
@@ -993,10 +927,8 @@ Trip Code : TEST123
         expect(ticket.ticketId, equals('E12345678'));
       });
 
-      test(
-        'Given alphanumeric PNR, When parsing ticket, '
-        'Then extracts PNR correctly',
-        () {
+      test('Given alphanumeric PNR, When parsing ticket, '
+          'Then extracts PNR correctly', () {
         const pdfText = '''
 Corporation : SETC
 PNR Number : ABC123XYZ
@@ -1008,10 +940,8 @@ Trip Code : TEST123
         expect(ticket.ticketId, equals('ABC123XYZ'));
       });
 
-      test(
-        'Given missing PNR Number, When parsing ticket, '
-        'Then PNR is null or empty',
-        () {
+      test('Given missing PNR Number, When parsing ticket, '
+          'Then PNR is null or empty', () {
         const pdfText = '''
 Corporation : SETC
 Trip Code : TEST123
@@ -1026,10 +956,8 @@ Trip Code : TEST123
 
     // ============== Corporation Name Variations ==============
     group('Corporation Name Variations', () {
-      test(
-        'Given TNSTC corporation, When parsing ticket, '
-        'Then extracts TNSTC as provider',
-        () {
+      test('Given TNSTC corporation, When parsing ticket, '
+          'Then extracts TNSTC as provider', () {
         const pdfText = '''
 Corporation : TNSTC
 PNR Number : T12345678
@@ -1045,10 +973,8 @@ Trip Code : TEST123
         expect(ticket.secondaryText, contains('TNSTC'));
       });
 
-      test(
-        'Given corporation with hyphens, When parsing ticket, '
-        'Then extracts full corporation name',
-        () {
+      test('Given corporation with hyphens, When parsing ticket, '
+          'Then extracts full corporation name', () {
         const pdfText = '''
 Corporation : SETC-Tamil Nadu
 PNR Number : T12345678
@@ -1063,10 +989,8 @@ Trip Code : TEST123
         expect(provider, equals('SETC-Tamil Nadu'));
       });
 
-      test(
-        'Given missing corporation name, When parsing ticket, '
-        'Then uses default corporation',
-        () {
+      test('Given missing corporation name, When parsing ticket, '
+          'Then uses default corporation', () {
         const pdfText = '''
 PNR Number : T12345678
 Trip Code : TEST123
@@ -1085,10 +1009,8 @@ Trip Code : TEST123
 
     // ============== Route Number Edge Cases ==============
     group('Route Number Variations', () {
-      test(
-        'Given route with alphanumeric format, When parsing, '
-        'Then extracts route number',
-        () {
+      test('Given route with alphanumeric format, When parsing, '
+          'Then extracts route number', () {
         const pdfText = '''
 Corporation : SETC
 PNR Number : T12345678
@@ -1101,10 +1023,8 @@ Trip Code : TEST123
         expect(ticket, isNotNull);
       });
 
-      test(
-        'Given route with special characters, When parsing, '
-        'Then extracts route number',
-        () {
+      test('Given route with special characters, When parsing, '
+          'Then extracts route number', () {
         const pdfText = '''
 Corporation : SETC
 PNR Number : T12345678
@@ -1117,10 +1037,8 @@ Trip Code : TEST123
         expect(ticket, isNotNull);
       });
 
-      test(
-        'Given missing route number, When parsing ticket, '
-        'Then uses trip code in secondary text',
-        () {
+      test('Given missing route number, When parsing ticket, '
+          'Then uses trip code in secondary text', () {
         const pdfText = '''
 Corporation : SETC
 PNR Number : T12345678
@@ -1136,10 +1054,8 @@ Trip Code : TEST123
 
     // ============== Service Start Time Variations ==============
     group('Service Start Time Variations', () {
-      test(
-        'Given time with Hrs suffix, When parsing ticket, '
-        'Then departure time is extracted',
-        () {
+      test('Given time with Hrs suffix, When parsing ticket, '
+          'Then departure time is extracted', () {
         const pdfText = '''
 Corporation : SETC
 PNR Number : T12345678
@@ -1156,10 +1072,8 @@ Trip Code : TEST123
         expect(departureTime, isNotNull);
       });
 
-      test(
-        'Given 24-hour time format, When parsing ticket, '
-        'Then time is valid',
-        () {
+      test('Given 24-hour time format, When parsing ticket, '
+          'Then time is valid', () {
         const pdfText = '''
 Corporation : SETC
 PNR Number : T12345678
@@ -1176,10 +1090,8 @@ Trip Code : TEST123
         expect(ticket.startTime.minute, lessThan(60));
       });
 
-      test(
-        'Given midnight time (00:00), When parsing ticket, '
-        'Then time is valid',
-        () {
+      test('Given midnight time (00:00), When parsing ticket, '
+          'Then time is valid', () {
         const pdfText = '''
 Corporation : SETC
 PNR Number : T12345678
@@ -1196,10 +1108,8 @@ Trip Code : TEST123
         expect(ticket.startTime.minute, greaterThanOrEqualTo(0));
       });
 
-      test(
-        'Given invalid service start time, When parsing ticket, '
-        'Then falls back to date without time',
-        () {
+      test('Given invalid service start time, When parsing ticket, '
+          'Then falls back to date without time', () {
         const pdfText = '''
 Corporation : SETC
 PNR Number : T12345678
@@ -1217,10 +1127,8 @@ Trip Code : TEST123
 
     // ============== Ticket.fromTNSTC Behavior ==============
     group('Ticket.fromTNSTC Factory Method', () {
-      test(
-        'Given all data available, When creating ticket from TNSTC, '
-        'Then creates proper tags',
-        () {
+      test('Given all data available, When creating ticket from TNSTC, '
+          'Then creates proper tags', () {
         const pdfText = '''
 Corporation : SETC
 PNR Number : T12345678
@@ -1260,10 +1168,8 @@ Total Fare : 500.00 Rs.
         expect(seatTag, isNotNull);
       });
 
-      test(
-        'Given sparse data, When creating ticket from TNSTC, '
-        'Then creates minimal tags',
-        () {
+      test('Given sparse data, When creating ticket from TNSTC, '
+          'Then creates minimal tags', () {
         const pdfText = '''
 Corporation : SETC
 PNR Number : T12345678
@@ -1280,7 +1186,7 @@ Trip Code : TEST123
         'should prioritize service places over passenger places '
         'for primaryText',
         () {
-        const pdfText = '''
+          const pdfText = '''
 Corporation : SETC
 PNR Number : T12345678
 Service Start Place : SERVICE START
@@ -1290,17 +1196,15 @@ Passenger End Place : PASSENGER END
 Trip Code : TEST123
 ''';
 
-        final ticket = parser.parseTicket(pdfText);
+          final ticket = parser.parseTicket(pdfText);
 
           // Should use service places as per current implementation
           expect(ticket.primaryText, equals('SERVICE START → SERVICE END'));
         },
       );
 
-      test(
-        'Given passenger pickup point, When creating ticket, '
-        'Then sets location from pickup point',
-        () {
+      test('Given passenger pickup point, When creating ticket, '
+          'Then sets location from pickup point', () {
         const pdfText = '''
 Corporation : SETC
 PNR Number : T12345678
@@ -1318,14 +1222,14 @@ Trip Code : TEST123
         'should fallback location to service start place when '
         'pickup point missing',
         () {
-        const pdfText = '''
+          const pdfText = '''
 Corporation : SETC
 PNR Number : T12345678
 Service Start Place : CHENNAI
 Trip Code : TEST123
 ''';
 
-        final ticket = parser.parseTicket(pdfText);
+          final ticket = parser.parseTicket(pdfText);
 
           // Location fallback chain in Ticket.fromTNSTC:
           // passengerPickupPoint > boardingPoint > serviceStartPlace >
@@ -1340,10 +1244,8 @@ Trip Code : TEST123
 
     // ============== Vehicle and Conductor Information ==============
     group('Vehicle and Conductor Information', () {
-      test(
-        'Given vehicle number present, When parsing ticket, '
-        'Then extracts bus ID',
-        () {
+      test('Given vehicle number present, When parsing ticket, '
+          'Then extracts bus ID', () {
         const pdfText = '''
 Corporation : SETC
 PNR Number : T12345678
@@ -1359,10 +1261,8 @@ Bus ID No. : TN-01-AB-1234
         expect(busId, equals('TN-01-AB-1234'));
       });
 
-      test(
-        'Given bus ID in different format, When parsing ticket, '
-        'Then extracts bus ID correctly',
-        () {
+      test('Given bus ID in different format, When parsing ticket, '
+          'Then extracts bus ID correctly', () {
         const pdfText = '''
 Corporation : SETC
 PNR Number : T12345678
@@ -1378,10 +1278,8 @@ Bus ID No. : E-5494
         expect(busId, equals('E-5494'));
       });
 
-      test(
-        'Given missing vehicle information, When parsing ticket, '
-        'Then bus ID is not in extras',
-        () {
+      test('Given missing vehicle information, When parsing ticket, '
+          'Then bus ID is not in extras', () {
         const pdfText = '''
 Corporation : SETC
 PNR Number : T12345678
@@ -1400,10 +1298,8 @@ Trip Code : TEST123
 
     // ============== Boarding Point and Pickup Location ==============
     group('Boarding Point and Pickup Logic', () {
-      test(
-        'Given passenger pickup point, When parsing ticket, '
-        'Then uses as boarding point',
-        () {
+      test('Given passenger pickup point, When parsing ticket, '
+          'Then uses as boarding point', () {
         const pdfText = '''
 Corporation : SETC
 PNR Number : T12345678
@@ -1417,10 +1313,8 @@ Trip Code : TEST123
         expect(ticket.location, equals('KOYAMBEDU BUS TERMINAL'));
       });
 
-      test(
-        'Given pickup point with special chars, When parsing ticket, '
-        'Then preserves special characters',
-        () {
+      test('Given pickup point with special chars, When parsing ticket, '
+          'Then preserves special characters', () {
         const pdfText = '''
 Corporation : SETC
 PNR Number : T12345678
@@ -1436,10 +1330,8 @@ Trip Code : TEST123
 
     // ============== OB Reference Number ==============
     group('OB Reference Number', () {
-      test(
-        'Given OB reference with standard format, When parsing, '
-        'Then extracts OB reference',
-        () {
+      test('Given OB reference with standard format, When parsing, '
+          'Then extracts OB reference', () {
         const pdfText = '''
 Corporation : SETC
 PNR Number : T12345678
@@ -1455,10 +1347,8 @@ Trip Code : TEST123
         expect(obRef, equals('OB12345678'));
       });
 
-      test(
-        'Given OB reference alphanumeric format, When parsing, '
-        'Then extracts OB reference',
-        () {
+      test('Given OB reference alphanumeric format, When parsing, '
+          'Then extracts OB reference', () {
         const pdfText = '''
 Corporation : SETC
 PNR Number : T12345678
@@ -1474,10 +1364,8 @@ Trip Code : TEST123
         expect(obRef, equals('OB31475439'));
       });
 
-      test(
-        'Given missing OB reference, When parsing ticket, '
-        'Then OB reference is null',
-        () {
+      test('Given missing OB reference, When parsing ticket, '
+          'Then OB reference is null', () {
         const pdfText = '''
 Corporation : SETC
 PNR Number : T12345678
@@ -1495,10 +1383,8 @@ Trip Code : TEST123
 
     // ============== Class of Service Variations ==============
     group('Class of Service', () {
-      test(
-        'Given AC SLEEPER class, When parsing ticket, '
-        'Then extracts service class',
-        () {
+      test('Given AC SLEEPER class, When parsing ticket, '
+          'Then extracts service class', () {
         const pdfText = '''
 Corporation : SETC
 PNR Number : T12345678
@@ -1514,10 +1400,8 @@ Trip Code : TEST123
         expect(serviceClass, equals('AC SLEEPER'));
       });
 
-      test(
-        'Given AC SLEEPER SEATER class, When parsing ticket, '
-        'Then extracts service class',
-        () {
+      test('Given AC SLEEPER SEATER class, When parsing ticket, '
+          'Then extracts service class', () {
         const pdfText = '''
 Corporation : SETC
 PNR Number : T12345678
@@ -1533,10 +1417,8 @@ Trip Code : TEST123
         expect(serviceClass, equals('AC SLEEPER SEATER'));
       });
 
-      test(
-        'Given NON AC class, When parsing ticket, '
-        'Then extracts service class',
-        () {
+      test('Given NON AC class, When parsing ticket, '
+          'Then extracts service class', () {
         const pdfText = '''
 Corporation : SETC
 PNR Number : T12345678
@@ -1552,10 +1434,8 @@ Trip Code : TEST123
         expect(serviceClass, equals('NON AC SEATER'));
       });
 
-      test(
-        'Given missing class of service, When parsing ticket, '
-        'Then service class is null',
-        () {
+      test('Given missing class of service, When parsing ticket, '
+          'Then service class is null', () {
         const pdfText = '''
 Corporation : SETC
 PNR Number : T12345678
@@ -1573,10 +1453,8 @@ Trip Code : TEST123
 
     // ============== Seat Number Formats ==============
     group('Seat Number Formats', () {
-      test(
-        'Given single digit seat, When parsing ticket, '
-        'Then extracts seat number',
-        () {
+      test('Given single digit seat, When parsing ticket, '
+          'Then extracts seat number', () {
         const pdfText = '''
 Corporation : SETC
 PNR Number : T12345678
@@ -1593,10 +1471,8 @@ TestUser 25 Adult M 1
         expect(seat, equals('1'));
       });
 
-      test(
-        'Given alphanumeric seat format, When parsing ticket, '
-        'Then extracts seat number',
-        () {
+      test('Given alphanumeric seat format, When parsing ticket, '
+          'Then extracts seat number', () {
         const pdfText = '''
 Corporation : SETC
 PNR Number : T12345678
@@ -1613,10 +1489,8 @@ TestUser 25 Adult M 12B
         expect(seat, equals('12B'));
       });
 
-      test(
-        'Given seat with UB/LB suffix, When parsing ticket, '
-        'Then extracts seat number',
-        () {
+      test('Given seat with UB/LB suffix, When parsing ticket, '
+          'Then extracts seat number', () {
         const pdfText = '''
 Corporation : SETC
 PNR Number : T12345678
@@ -1636,10 +1510,8 @@ TestUser 25 Adult M 4UB
 
     // ============== Trip Code Variations ==============
     group('Trip Code Variations', () {
-      test(
-        'Given alphanumeric trip code, When parsing ticket, '
-        'Then extracts trip code',
-        () {
+      test('Given alphanumeric trip code, When parsing ticket, '
+          'Then extracts trip code', () {
         const pdfText = '''
 Corporation : SETC
 PNR Number : T12345678
@@ -1655,10 +1527,8 @@ Trip Code : 1315KUMCHEAB
         expect(ticket.secondaryText, contains('1315KUMCHEAB'));
       });
 
-      test(
-        'Given numeric trip code, When parsing ticket, '
-        'Then extracts trip code',
-        () {
+      test('Given numeric trip code, When parsing ticket, '
+          'Then extracts trip code', () {
         const pdfText = '''
 Corporation : SETC
 PNR Number : T12345678
@@ -1676,13 +1546,13 @@ Trip Code : 123456
       test(
         'should use route number in secondaryText when trip code missing',
         () {
-        const pdfText = '''
+          const pdfText = '''
 Corporation : SETC
 PNR Number : T12345678
 Route No : 307AB
 ''';
 
-        final ticket = parser.parseTicket(pdfText);
+          final ticket = parser.parseTicket(pdfText);
 
           // Ticket.fromTNSTC uses tripCode ?? routeNo ?? 'Bus'
           // When trip code is missing, it should use route number
@@ -1696,10 +1566,8 @@ Route No : 307AB
 
     // ============== Edge Cases for Place Names ==============
     group('Place Name Edge Cases', () {
-      test(
-        'Given very long place names, When parsing ticket, '
-        'Then preserves full place names',
-        () {
+      test('Given very long place names, When parsing ticket, '
+          'Then preserves full place names', () {
         const pdfText = '''
 Corporation : SETC
 PNR Number : T12345678
@@ -1719,10 +1587,8 @@ Trip Code : TEST123
         );
       });
 
-      test(
-        'Given place names with dots, When parsing ticket, '
-        'Then preserves dots in place names',
-        () {
+      test('Given place names with dots, When parsing ticket, '
+          'Then preserves dots in place names', () {
         const pdfText = '''
 Corporation : SETC
 PNR Number : T12345678
@@ -1739,10 +1605,8 @@ Trip Code : TEST123
         );
       });
 
-      test(
-        'Given place names with numbers, When parsing ticket, '
-        'Then preserves numbers in place names',
-        () {
+      test('Given place names with numbers, When parsing ticket, '
+          'Then preserves numbers in place names', () {
         const pdfText = '''
 Corporation : SETC
 PNR Number : T12345678
@@ -1762,10 +1626,8 @@ Trip Code : TEST123
 
     // ============== Integration and Error Handling ==============
     group('Integration and Error Handling', () {
-      test(
-        'Given minimal valid ticket, When parsing, '
-        'Then extracts basic fields',
-        () {
+      test('Given minimal valid ticket, When parsing, '
+          'Then extracts basic fields', () {
         const pdfText = '''
 Corporation : SETC
 PNR Number : T12345678
@@ -1779,10 +1641,8 @@ Trip Code : TEST123
         expect(ticket.secondaryText, contains('TEST123'));
       });
 
-      test(
-        'Given empty PDF text, When parsing ticket, '
-        'Then returns ticket with default values',
-        () {
+      test('Given empty PDF text, When parsing ticket, '
+          'Then returns ticket with default values', () {
         const pdfText = '';
 
         final ticket = parser.parseTicket(pdfText);
@@ -1792,10 +1652,8 @@ Trip Code : TEST123
         expect(ticket.primaryText, isNotNull);
       });
 
-      test(
-        'Given PDF with only whitespace, When parsing ticket, '
-        'Then handles gracefully',
-        () {
+      test('Given PDF with only whitespace, When parsing ticket, '
+          'Then handles gracefully', () {
         const pdfText = '   \n\n   \t\t  \n  ';
 
         final ticket = parser.parseTicket(pdfText);
@@ -1804,10 +1662,8 @@ Trip Code : TEST123
         expect(ticket, isNotNull);
       });
 
-      test(
-        'Given PDF with garbage text, When parsing ticket, '
-        'Then returns ticket with default values',
-        () {
+      test('Given PDF with garbage text, When parsing ticket, '
+          'Then returns ticket with default values', () {
         const pdfText = r'''
 asdkfjlaksjdflkasjdflkj
 asldkfjalskdjflaksdjf
@@ -1821,10 +1677,8 @@ asldkfjalskdjflaksdjf
         expect(ticket, isNotNull);
       });
 
-      test(
-        'Given complete ticket with all fields, When parsing, '
-        'Then extracts all available fields',
-        () {
+      test('Given complete ticket with all fields, When parsing, '
+          'Then extracts all available fields', () {
         const pdfText = '''
 Corporation : SETC
 PNR Number : T99999999
@@ -1887,10 +1741,8 @@ Total Fare : 9999.99 Rs.
         expect(seatTag, equals('99Z'));
       });
 
-      test(
-        'Given service places only, When parsing ticket, '
-        'Then uses service places for primaryText',
-        () {
+      test('Given service places only, When parsing ticket, '
+          'Then uses service places for primaryText', () {
         const pdfText = '''
 Corporation : SETC
 PNR Number : T12345678
@@ -1904,10 +1756,8 @@ Trip Code : TEST123
         expect(ticket.primaryText, equals('SERVICE START → SERVICE END'));
       });
 
-      test(
-        'Given passenger places only, When parsing ticket, '
-        'Then uses passenger places for primaryText',
-        () {
+      test('Given passenger places only, When parsing ticket, '
+          'Then uses passenger places for primaryText', () {
         const pdfText = '''
 Corporation : SETC
 PNR Number : T12345678
@@ -1930,10 +1780,8 @@ Trip Code : TEST123
         );
       });
 
-      test(
-        'Given mixed case field labels, When parsing ticket, '
-        'Then extracts fields correctly',
-        () {
+      test('Given mixed case field labels, When parsing ticket, '
+          'Then extracts fields correctly', () {
         const pdfText = '''
 Corporation : SETC
 PNR Number : T12345678

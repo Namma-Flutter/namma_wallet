@@ -6,8 +6,8 @@ import 'package:namma_wallet/src/common/services/logger_interface.dart';
 /// Data Access Object for User operations
 class UserDao implements IUserDao {
   UserDao({IWalletDatabase? database, ILogger? logger})
-      : _database = database ?? getIt<IWalletDatabase>(),
-        _logger = logger ?? getIt<ILogger>();
+    : _database = database ?? getIt<IWalletDatabase>(),
+      _logger = logger ?? getIt<ILogger>();
 
   final IWalletDatabase _database;
   final ILogger _logger;

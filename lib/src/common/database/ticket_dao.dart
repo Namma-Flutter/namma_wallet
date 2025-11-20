@@ -10,8 +10,8 @@ import 'package:sqflite/sqflite.dart';
 /// Data Access Object for Ticket operations
 class TicketDao implements ITicketDao {
   TicketDao({IWalletDatabase? database, ILogger? logger})
-      : _database = database ?? getIt<IWalletDatabase>(),
-        _logger = logger ?? getIt<ILogger>();
+    : _database = database ?? getIt<IWalletDatabase>(),
+      _logger = logger ?? getIt<ILogger>();
 
   final IWalletDatabase _database;
   final ILogger _logger;
@@ -38,7 +38,7 @@ class TicketDao implements ITicketDao {
           _logger.logDatabase(
             'Update',
             'Ticket with ID ${_maskTicketId(ticket.ticketId!)} already '
-            'exists, updating instead',
+                'exists, updating instead',
           );
 
           // Prepare updates map with new data

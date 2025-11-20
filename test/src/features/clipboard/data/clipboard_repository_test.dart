@@ -74,14 +74,14 @@ void main() {
           // Arrange (Given)
           TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
               .setMockMethodCallHandler(
-            SystemChannels.platform,
-            (MethodCall methodCall) async {
-              if (methodCall.method == 'Clipboard.hasStrings') {
-                return <String, dynamic>{'value': true};
-              }
-              return null;
-            },
-          );
+                SystemChannels.platform,
+                (MethodCall methodCall) async {
+                  if (methodCall.method == 'Clipboard.hasStrings') {
+                    return <String, dynamic>{'value': true};
+                  }
+                  return null;
+                },
+              );
 
           // Act (When)
           final hasContent = await repository.hasTextContent();
@@ -98,14 +98,14 @@ void main() {
           // Arrange (Given)
           TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
               .setMockMethodCallHandler(
-            SystemChannels.platform,
-            (MethodCall methodCall) async {
-              if (methodCall.method == 'Clipboard.hasStrings') {
-                return <String, dynamic>{'value': false};
-              }
-              return null;
-            },
-          );
+                SystemChannels.platform,
+                (MethodCall methodCall) async {
+                  if (methodCall.method == 'Clipboard.hasStrings') {
+                    return <String, dynamic>{'value': false};
+                  }
+                  return null;
+                },
+              );
 
           // Act (When)
           final hasContent = await repository.hasTextContent();
@@ -122,17 +122,17 @@ void main() {
           // Arrange (Given)
           TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
               .setMockMethodCallHandler(
-            SystemChannels.platform,
-            (MethodCall methodCall) async {
-              if (methodCall.method == 'Clipboard.hasStrings') {
-                throw PlatformException(
-                  code: 'CLIPBOARD_ERROR',
-                  message: 'Unable to access clipboard',
-                );
-              }
-              return null;
-            },
-          );
+                SystemChannels.platform,
+                (MethodCall methodCall) async {
+                  if (methodCall.method == 'Clipboard.hasStrings') {
+                    throw PlatformException(
+                      code: 'CLIPBOARD_ERROR',
+                      message: 'Unable to access clipboard',
+                    );
+                  }
+                  return null;
+                },
+              );
 
           // Act (When)
           final hasContent = await repository.hasTextContent();
@@ -149,14 +149,14 @@ void main() {
           // Arrange (Given)
           TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
               .setMockMethodCallHandler(
-            SystemChannels.platform,
-            (MethodCall methodCall) async {
-              if (methodCall.method == 'Clipboard.hasStrings') {
-                throw Exception('Unexpected error');
-              }
-              return null;
-            },
-          );
+                SystemChannels.platform,
+                (MethodCall methodCall) async {
+                  if (methodCall.method == 'Clipboard.hasStrings') {
+                    throw Exception('Unexpected error');
+                  }
+                  return null;
+                },
+              );
 
           // Act (When)
           final hasContent = await repository.hasTextContent();
@@ -176,14 +176,14 @@ void main() {
           const clipboardText = '  Hello from clipboard  ';
           TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
               .setMockMethodCallHandler(
-            SystemChannels.platform,
-            (MethodCall methodCall) async {
-              if (methodCall.method == 'Clipboard.getData') {
-                return <String, dynamic>{'text': clipboardText};
-              }
-              return null;
-            },
-          );
+                SystemChannels.platform,
+                (MethodCall methodCall) async {
+                  if (methodCall.method == 'Clipboard.getData') {
+                    return <String, dynamic>{'text': clipboardText};
+                  }
+                  return null;
+                },
+              );
 
           // Act (When)
           final text = await repository.readText();
@@ -203,14 +203,14 @@ void main() {
           const clipboardText = '  Line 1\nLine 2\nLine 3  ';
           TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
               .setMockMethodCallHandler(
-            SystemChannels.platform,
-            (MethodCall methodCall) async {
-              if (methodCall.method == 'Clipboard.getData') {
-                return <String, dynamic>{'text': clipboardText};
-              }
-              return null;
-            },
-          );
+                SystemChannels.platform,
+                (MethodCall methodCall) async {
+                  if (methodCall.method == 'Clipboard.getData') {
+                    return <String, dynamic>{'text': clipboardText};
+                  }
+                  return null;
+                },
+              );
 
           // Act (When)
           final text = await repository.readText();
@@ -230,14 +230,14 @@ void main() {
           // Arrange (Given)
           TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
               .setMockMethodCallHandler(
-            SystemChannels.platform,
-            (MethodCall methodCall) async {
-              if (methodCall.method == 'Clipboard.getData') {
-                return null; // Null for empty clipboard
-              }
-              return null;
-            },
-          );
+                SystemChannels.platform,
+                (MethodCall methodCall) async {
+                  if (methodCall.method == 'Clipboard.getData') {
+                    return null; // Null for empty clipboard
+                  }
+                  return null;
+                },
+              );
 
           // Act (When)
           final text = await repository.readText();
@@ -255,14 +255,14 @@ void main() {
           const clipboardText = '   \n\t   ';
           TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
               .setMockMethodCallHandler(
-            SystemChannels.platform,
-            (MethodCall methodCall) async {
-              if (methodCall.method == 'Clipboard.getData') {
-                return <String, dynamic>{'text': clipboardText};
-              }
-              return null;
-            },
-          );
+                SystemChannels.platform,
+                (MethodCall methodCall) async {
+                  if (methodCall.method == 'Clipboard.getData') {
+                    return <String, dynamic>{'text': clipboardText};
+                  }
+                  return null;
+                },
+              );
 
           // Act (When)
           final text = await repository.readText();
@@ -279,17 +279,17 @@ void main() {
           // Arrange (Given)
           TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
               .setMockMethodCallHandler(
-            SystemChannels.platform,
-            (MethodCall methodCall) async {
-              if (methodCall.method == 'Clipboard.getData') {
-                throw PlatformException(
-                  code: 'CLIPBOARD_ERROR',
-                  message: 'Unable to read clipboard',
-                );
-              }
-              return null;
-            },
-          );
+                SystemChannels.platform,
+                (MethodCall methodCall) async {
+                  if (methodCall.method == 'Clipboard.getData') {
+                    throw PlatformException(
+                      code: 'CLIPBOARD_ERROR',
+                      message: 'Unable to read clipboard',
+                    );
+                  }
+                  return null;
+                },
+              );
 
           // Act (When)
           final text = await repository.readText();
@@ -306,14 +306,14 @@ void main() {
           // Arrange (Given)
           TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
               .setMockMethodCallHandler(
-            SystemChannels.platform,
-            (MethodCall methodCall) async {
-              if (methodCall.method == 'Clipboard.getData') {
-                throw Exception('Network error');
-              }
-              return null;
-            },
-          );
+                SystemChannels.platform,
+                (MethodCall methodCall) async {
+                  if (methodCall.method == 'Clipboard.getData') {
+                    throw Exception('Network error');
+                  }
+                  return null;
+                },
+              );
 
           // Act (When)
           final text = await repository.readText();
@@ -331,14 +331,14 @@ void main() {
           const clipboardText = r'Test@#$%^&*()_+{}|:"<>?';
           TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
               .setMockMethodCallHandler(
-            SystemChannels.platform,
-            (MethodCall methodCall) async {
-              if (methodCall.method == 'Clipboard.getData') {
-                return <String, dynamic>{'text': clipboardText};
-              }
-              return null;
-            },
-          );
+                SystemChannels.platform,
+                (MethodCall methodCall) async {
+                  if (methodCall.method == 'Clipboard.getData') {
+                    return <String, dynamic>{'text': clipboardText};
+                  }
+                  return null;
+                },
+              );
 
           // Act (When)
           final text = await repository.readText();
@@ -358,14 +358,14 @@ void main() {
           const clipboardText = 'தமிழ் 中文 한국어 🎫';
           TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
               .setMockMethodCallHandler(
-            SystemChannels.platform,
-            (MethodCall methodCall) async {
-              if (methodCall.method == 'Clipboard.getData') {
-                return <String, dynamic>{'text': clipboardText};
-              }
-              return null;
-            },
-          );
+                SystemChannels.platform,
+                (MethodCall methodCall) async {
+                  if (methodCall.method == 'Clipboard.getData') {
+                    return <String, dynamic>{'text': clipboardText};
+                  }
+                  return null;
+                },
+              );
 
           // Act (When)
           final text = await repository.readText();
@@ -385,14 +385,14 @@ void main() {
           final clipboardText = 'A' * 15000;
           TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
               .setMockMethodCallHandler(
-            SystemChannels.platform,
-            (MethodCall methodCall) async {
-              if (methodCall.method == 'Clipboard.getData') {
-                return <String, dynamic>{'text': clipboardText};
-              }
-              return null;
-            },
-          );
+                SystemChannels.platform,
+                (MethodCall methodCall) async {
+                  if (methodCall.method == 'Clipboard.getData') {
+                    return <String, dynamic>{'text': clipboardText};
+                  }
+                  return null;
+                },
+              );
 
           // Act (When)
           final text = await repository.readText();
@@ -412,14 +412,14 @@ void main() {
           // Arrange (Given)
           TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
               .setMockMethodCallHandler(
-            SystemChannels.platform,
-            (MethodCall methodCall) async {
-              throw PlatformException(
-                code: 'ACCESS_DENIED',
-                message: 'Clipboard access denied',
+                SystemChannels.platform,
+                (MethodCall methodCall) async {
+                  throw PlatformException(
+                    code: 'ACCESS_DENIED',
+                    message: 'Clipboard access denied',
+                  );
+                },
               );
-            },
-          );
 
           // Act (When)
           final hasContent = await repository.hasTextContent();
@@ -438,11 +438,11 @@ void main() {
           // Arrange (Given)
           TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
               .setMockMethodCallHandler(
-            SystemChannels.platform,
-            (MethodCall methodCall) async {
-              return null;
-            },
-          );
+                SystemChannels.platform,
+                (MethodCall methodCall) async {
+                  return null;
+                },
+              );
 
           // Act (When)
           final text = await repository.readText();

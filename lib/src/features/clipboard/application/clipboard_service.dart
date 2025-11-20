@@ -30,10 +30,10 @@ class ClipboardService {
     ILogger? logger,
     TravelParserService? parserService,
     ITicketDao? ticketDao,
-  })  : _repository = repository ?? getIt<IClipboardRepository>(),
-        _logger = logger ?? getIt<ILogger>(),
-        _parserService = parserService ?? getIt<TravelParserService>(),
-        _ticketDao = ticketDao ?? getIt<ITicketDao>();
+  }) : _repository = repository ?? getIt<IClipboardRepository>(),
+       _logger = logger ?? getIt<ILogger>(),
+       _parserService = parserService ?? getIt<TravelParserService>(),
+       _ticketDao = ticketDao ?? getIt<ITicketDao>();
 
   final IClipboardRepository _repository;
   final ILogger _logger;
