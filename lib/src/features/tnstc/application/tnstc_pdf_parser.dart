@@ -122,7 +122,7 @@ class TNSTCPDFParser implements ITicketParser {
       pdfText,
     );
     final serviceStartTime = extractMatch(
-      r'Service Start Time\s*:\s*(\d{2}:\d{2})',
+      r'Service Start Time\s*:\s*(\d{1,2}:\d{2})(?:\s*Hrs\.?)?',
       pdfText,
     );
     final passengerStartPlace = extractMatch(
