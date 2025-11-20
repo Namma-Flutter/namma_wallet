@@ -61,9 +61,7 @@ class _ProfileViewState extends State<ProfileView> {
               // Theme Settings Section
               ThemeSectionWidget(themeProvider: themeProvider),
 
-              const SizedBox(
-                height: 8,
-              ),
+              const SizedBox(height: 8),
 
               // Contributors Section
               ProfileTile(
@@ -166,6 +164,7 @@ class _ProfileViewState extends State<ProfileView> {
                     }
                   },
                 ),
+                trailingIsInteractive: true,
               ),
             ],
           ),
@@ -265,16 +264,24 @@ class ProfileTile extends StatelessWidget {
     required this.trailing,
     this.onTap,
     this.subtitle,
+    this.trailingIsInteractive = false,
     super.key,
   });
+
   final IconData icon;
   final String title;
   final String? subtitle;
   final Widget trailing;
   final void Function()? onTap;
+  final bool trailingIsInteractive;
 
   @override
   Widget build(BuildContext context) {
+    // If trailing is interactive, ensure the
+    // tile itself isn't treated as a tap target
+    // even if someone accidentally passes a non-null onTap.
+    final tileOnTap = trailingIsInteractive ? null : onTap;
+
     return Card(
       elevation: 2,
       shape: RoundedRectangleBorder(
@@ -285,7 +292,8 @@ class ProfileTile extends StatelessWidget {
         title: Text(title),
         subtitle: subtitle != null ? Text(subtitle!) : null,
         trailing: trailing,
-        onTap: onTap,
+        onTap: tileOnTap,
+        enabled: tileOnTap != null,
       ),
     );
   }
