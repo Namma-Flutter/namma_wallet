@@ -48,6 +48,9 @@ jobs:
       - name: Generate code files
         run: dart run build_runner build --delete-conflicting-outputs
 
+      - name: Remove WASM modules for release build
+        run: dart run pdfrx:remove_wasm_modules
+
       - name: Semantic Release
         uses: cycjimmy/semantic-release-action@v4
         id: semantic

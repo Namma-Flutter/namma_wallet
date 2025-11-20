@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:namma_wallet/src/common/database/wallet_database.dart';
+import 'package:namma_wallet/src/common/database/ticket_dao_interface.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/services/logger_interface.dart';
 import 'package:namma_wallet/src/features/home/domain/ticket.dart';
@@ -53,11 +53,17 @@ class IRCTCScannerResult {
 }
 
 class IRCTCScannerService {
-  IRCTCScannerService({ILogger? logger, IRCTCQRParser? qrParser})
-    : _logger = logger ?? getIt<ILogger>(),
-      _qrParser = qrParser ?? getIt<IRCTCQRParser>();
+  IRCTCScannerService({
+    ILogger? logger,
+    IRCTCQRParser? qrParser,
+    ITicketDAO? ticketDao,
+  }) : _logger = logger ?? getIt<ILogger>(),
+       _qrParser = qrParser ?? getIt<IRCTCQRParser>(),
+       _ticketDao = ticketDao ?? getIt<ITicketDAO>();
+
   final ILogger _logger;
   final IRCTCQRParser _qrParser;
+  final ITicketDAO _ticketDao;
 
   Future<IRCTCScannerResult> parseAndSaveIRCTCTicket(String qrData) async {
     try {
@@ -77,29 +83,27 @@ class IRCTCScannerService {
 
       // Save to database
       try {
-        final _ = await getIt<WalletDatabase>().insertTicket(
-          travelTicket,
-        );
-        final updatedTicket = travelTicket.copyWith(
-          ticketId: travelTicket.ticketId,
-        );
+        await _ticketDao.insertTicket(travelTicket);
 
         return IRCTCScannerResult.success(
           IRCTCScannerContentType.irctcTicket,
           qrData,
           irctcTicket: irctcTicket,
-          travelTicket: updatedTicket,
+          travelTicket: travelTicket,
         );
-      } on DuplicateTicketException catch (e) {
-        _logger.warning('Duplicate IRCTC ticket detected: ${e.message}');
-        return IRCTCScannerResult.error(e.message);
-      } on Object catch (e) {
-        _logger.error('Failed to save IRCTC ticket to database: $e');
-        return IRCTCScannerResult.error('Failed to save ticket: $e');
+      } on Object catch (e, stackTrace) {
+        _logger.error('Failed to save IRCTC ticket to database', e, stackTrace);
+        return IRCTCScannerResult.error(
+          'Failed to save ticket. Please try again.',
+        );
       }
-    } on Exception catch (e) {
-      _logger.error('Unexpected exception in IRCTC scanner service: $e');
-      return IRCTCScannerResult.error('Unexpected error occurred: $e');
+    } on Object catch (e, stackTrace) {
+      _logger.error(
+        'Unexpected exception in IRCTC scanner service',
+        e,
+        stackTrace,
+      );
+      return IRCTCScannerResult.error('Unexpected error. Please try again.');
     }
   }
 

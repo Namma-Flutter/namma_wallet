@@ -31,6 +31,7 @@ class TNSTCTicketModel with TNSTCTicketModelMappable {
     this.boardingPoint,
     this.conductorMobileNo,
     this.vehicleNumber,
+    this.smsSeatNumbers,
   });
   final String? corporation;
   final String? pnrNumber;
@@ -58,6 +59,7 @@ class TNSTCTicketModel with TNSTCTicketModelMappable {
   final String? boardingPoint;
   final String? conductorMobileNo;
   final String? vehicleNumber;
+  final String? smsSeatNumbers;
 
   @override
   String toString() {
@@ -110,8 +112,17 @@ Boarding Point: $boardingPoint
   String get displayDate => journeyDate != null
       ? '${journeyDate!.day.toString().padLeft(2, '0')}/${journeyDate!.month.toString().padLeft(2, '0')}/${journeyDate!.year}'
       : 'Unknown';
-  String get seatNumbers =>
-      passengers.map((p) => p.seatNumber).where((s) => s.isNotEmpty).join(', ');
+  String get seatNumbers {
+    // If we have SMS seat numbers (from SMS parsing), use those
+    if (smsSeatNumbers != null && smsSeatNumbers!.isNotEmpty) {
+      return smsSeatNumbers!;
+    }
+    // Otherwise, extract from passenger info (from PDF parsing)
+    return passengers
+        .map((p) => p.seatNumber)
+        .where((s) => s.isNotEmpty)
+        .join(', ');
+  }
 }
 
 @MappableClass()
