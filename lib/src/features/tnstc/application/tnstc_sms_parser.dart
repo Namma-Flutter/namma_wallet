@@ -77,7 +77,7 @@ class TNSTCSMSParser implements ITicketParser {
         smsText,
       );
       final seatNumbers = extractMatch(
-        r'Seat No\.\s*:\s*([0-9A-Z,\s\-#]+)',
+        r'Seat No\.\s*:\s*([0-9A-Z,\-#]+(?:,\s*[0-9A-Z,\-#]+)*)',
         smsText,
       ).replaceAll(RegExp(r'[,\s]+$'), '');
       final classOfService = extractMatch(
