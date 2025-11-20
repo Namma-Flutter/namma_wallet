@@ -142,7 +142,7 @@ class _ProfileViewState extends State<ProfileView> {
                       // Persist via service
                       // (updates in-memory and SharedPreferences)
                       await _saveFlag(value);
-                    } on Object catch (e) {
+                    } on Exception catch (e) {
                       if (!mounted) return;
                       messenger.showSnackBar(
                         SnackBar(
@@ -281,7 +281,7 @@ class ProfileTile extends StatelessWidget {
     // tile itself isn't treated as a tap target
     // even if someone accidentally passes a non-null onTap.
     final tileOnTap = trailingIsInteractive ? null : onTap;
-
+    final tileEnabled = onTap != null || trailingIsInteractive;
     return Card(
       elevation: 2,
       shape: RoundedRectangleBorder(
@@ -293,7 +293,7 @@ class ProfileTile extends StatelessWidget {
         subtitle: subtitle != null ? Text(subtitle!) : null,
         trailing: trailing,
         onTap: tileOnTap,
-        enabled: tileOnTap != null,
+        enabled: tileEnabled,
       ),
     );
   }
