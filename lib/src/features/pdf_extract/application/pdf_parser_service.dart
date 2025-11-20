@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:namma_wallet/src/common/database/wallet_database.dart';
+import 'package:namma_wallet/src/common/database/i_ticket_dao.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/services/logger_interface.dart';
 import 'package:namma_wallet/src/features/home/domain/ticket.dart';
@@ -231,7 +231,7 @@ class PDFParserService {
       // Save to database
       try {
         _logger.logDatabase('Insert', 'Saving parsed PDF ticket to database');
-        final ticketId = await getIt<WalletDatabase>().insertTicket(
+        final ticketId = await getIt<ITicketDao>().insertTicket(
           parsedTicket,
         );
         final updatedTicket = parsedTicket.copyWith(
@@ -244,9 +244,9 @@ class PDFParserService {
           extractedText,
           travelTicket: updatedTicket,
         );
-      } on DuplicateTicketException catch (e) {
-        _logger.warning('Duplicate PDF ticket detected: ${e.message}');
-        return PDFParserResult.error(e.message);
+      } on Exception catch (e, stackTrace) {
+        _logger.error('Error saving PDF ticket', e, stackTrace);
+        return PDFParserResult.error(e.toString());
       } on Object catch (e, stackTrace) {
         _logger.error(
           'Failed to save PDF ticket to database',

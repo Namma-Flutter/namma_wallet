@@ -3,7 +3,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:home_widget/home_widget.dart';
-import 'package:namma_wallet/src/common/database/wallet_database.dart';
+import 'package:namma_wallet/src/common/database/i_ticket_dao.dart';
+import 'package:namma_wallet/src/common/database/i_user_dao.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/widgets/custom_back_button.dart';
 import 'package:namma_wallet/src/features/home/domain/ticket.dart';
@@ -29,9 +30,10 @@ class _DbViewerViewState extends State<DbViewerView>
   }
 
   Future<void> _load() async {
-    final db = getIt<WalletDatabase>();
-    final u = await db.fetchAllUsers();
-    final t = await db.getAllTickets();
+    final userDao = getIt<IUserDao>();
+    final ticketDao = getIt<ITicketDao>();
+    final u = await userDao.fetchAllUsers();
+    final t = await ticketDao.getAllTickets();
     if (!mounted) return;
     setState(() {
       users = u;

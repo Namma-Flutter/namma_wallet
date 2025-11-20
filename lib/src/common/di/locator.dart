@@ -1,4 +1,9 @@
 import 'package:get_it/get_it.dart';
+import 'package:namma_wallet/src/common/database/i_ticket_dao.dart';
+import 'package:namma_wallet/src/common/database/i_user_dao.dart';
+import 'package:namma_wallet/src/common/database/i_wallet_database.dart';
+import 'package:namma_wallet/src/common/database/ticket_dao.dart';
+import 'package:namma_wallet/src/common/database/user_dao.dart';
 import 'package:namma_wallet/src/common/database/wallet_database.dart';
 import 'package:namma_wallet/src/common/services/logger_interface.dart';
 import 'package:namma_wallet/src/common/services/namma_logger.dart';
@@ -42,5 +47,8 @@ void setupLocator() {
     ..registerLazySingleton<TNSTCSMSParser>(TNSTCSMSParser.new)
     ..registerLazySingleton<TNSTCPDFParser>(TNSTCPDFParser.new)
     // Database
-    ..registerSingleton<WalletDatabase>(WalletDatabase());
+    ..registerSingleton<IWalletDatabase>(WalletDatabase())
+    // DAOs
+    ..registerLazySingleton<ITicketDao>(TicketDao.new)
+    ..registerLazySingleton<IUserDao>(UserDao.new);
 }

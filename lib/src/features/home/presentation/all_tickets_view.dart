@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:namma_wallet/src/common/database/wallet_database.dart';
+import 'package:namma_wallet/src/common/database/i_ticket_dao.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/helper/date_time_converter.dart';
 import 'package:namma_wallet/src/common/routing/app_routes.dart';
@@ -34,7 +34,7 @@ class _AllTicketsViewState extends State<AllTicketsView> {
         _isLoading = true;
       });
 
-      final tickets = await getIt<WalletDatabase>().getAllTickets();
+      final tickets = await getIt<ITicketDao>().getAllTickets();
 
       if (!mounted) return;
 

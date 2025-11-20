@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:home_widget/home_widget.dart';
-import 'package:namma_wallet/src/common/database/wallet_database.dart';
+import 'package:namma_wallet/src/common/database/i_ticket_dao.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/helper/date_time_converter.dart';
 import 'package:namma_wallet/src/common/services/logger_interface.dart';
@@ -145,7 +145,7 @@ class _TicketViewState extends State<TicketView> {
     });
 
     try {
-      await getIt<WalletDatabase>().deleteTicket(widget.ticket.ticketId!);
+      await getIt<ITicketDao>().deleteTicket(widget.ticket.ticketId!);
 
       getIt<ILogger>().info(
         '[TicketView] Successfully deleted ticket with '

@@ -203,7 +203,7 @@ class TNSTCPDFParser implements ITicketParser {
       // Name is usually after "Passenger Information"
       // Support multi-word names with spaces, hyphens, and apostrophes
       final nameMatch = RegExp(
-        r"Passenger Information\s*\n\s*([A-Za-z](?:[A-Za-z\s\-'])*[A-Za-z])",
+        r'Passenger Information\s*\n\s*([^\n]+)',
         multiLine: true,
       ).firstMatch(pdfText);
       if (nameMatch != null) {

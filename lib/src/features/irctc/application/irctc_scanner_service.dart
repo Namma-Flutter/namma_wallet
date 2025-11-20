@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:namma_wallet/src/common/database/wallet_database.dart';
+import 'package:namma_wallet/src/common/database/i_ticket_dao.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/services/logger_interface.dart';
 import 'package:namma_wallet/src/features/home/domain/ticket.dart';
@@ -77,7 +77,7 @@ class IRCTCScannerService {
 
       // Save to database
       try {
-        final _ = await getIt<WalletDatabase>().insertTicket(
+        final _ = await getIt<ITicketDao>().insertTicket(
           travelTicket,
         );
         final updatedTicket = travelTicket.copyWith(
@@ -90,11 +90,11 @@ class IRCTCScannerService {
           irctcTicket: irctcTicket,
           travelTicket: updatedTicket,
         );
-      } on DuplicateTicketException catch (e) {
-        _logger.warning('Duplicate IRCTC ticket detected: ${e.message}');
-        return IRCTCScannerResult.error(e.message);
-      } on Object catch (e) {
-        _logger.error('Failed to save IRCTC ticket to database: $e');
+      } on Exception catch (e, stackTrace) {
+        _logger.error('Error saving IRCTC ticket', e, stackTrace);
+        return IRCTCScannerResult.error('Failed to save ticket: $e');
+      } on Object catch (e, stackTrace) {
+        _logger.error('Failed to save IRCTC ticket to database', e, stackTrace);
         return IRCTCScannerResult.error('Failed to save ticket: $e');
       }
     } on Exception catch (e) {

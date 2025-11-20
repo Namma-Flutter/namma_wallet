@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:namma_wallet/src/common/database/wallet_database.dart';
+import 'package:namma_wallet/src/common/database/i_ticket_dao.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/services/logger_interface.dart';
 import 'package:namma_wallet/src/features/clipboard/domain/clipboard_content_type.dart';
@@ -22,23 +22,23 @@ class ClipboardService {
   /// [repository] - Repository for clipboard access
   /// [logger] - Logger for debugging
   /// [parserService] - Service for parsing travel tickets
-  /// [database] - Database for storing tickets
+  /// [ticketDao] - DAO for ticket database operations
   ///
   /// Uses GetIt to resolve dependencies if not provided.
   ClipboardService({
     IClipboardRepository? repository,
     ILogger? logger,
     TravelParserService? parserService,
-    WalletDatabase? database,
+    ITicketDao? ticketDao,
   })  : _repository = repository ?? getIt<IClipboardRepository>(),
         _logger = logger ?? getIt<ILogger>(),
         _parserService = parserService ?? getIt<TravelParserService>(),
-        _database = database ?? getIt<WalletDatabase>();
+        _ticketDao = ticketDao ?? getIt<ITicketDao>();
 
   final IClipboardRepository _repository;
   final ILogger _logger;
   final TravelParserService _parserService;
-  final WalletDatabase _database;
+  final ITicketDao _ticketDao;
 
   /// Maximum allowed text length to prevent spam/abuse
   static const int maxTextLength = 10000;
@@ -117,7 +117,7 @@ class ClipboardService {
     TicketUpdateInfo updateInfo,
     String content,
   ) async {
-    final count = await _database.updateTicketById(
+    final count = await _ticketDao.updateTicketById(
       updateInfo.pnrNumber,
       updateInfo.updates,
     );
@@ -148,7 +148,7 @@ class ClipboardService {
     String content,
   ) async {
     try {
-      await _database.insertTicket(parsedTicket);
+      await _ticketDao.insertTicket(parsedTicket);
       final updatedTicket = parsedTicket.copyWith(
         ticketId: parsedTicket.ticketId,
       );
@@ -158,19 +158,8 @@ class ClipboardService {
         content,
         ticket: updatedTicket,
       );
-    } on DuplicateTicketException catch (_) {
-      final ticketId = parsedTicket.ticketId ?? '';
-      final maskedPnr = ticketId.length >= 4
-          ? '...${ticketId.substring(ticketId.length - 4)}'
-          : '***';
-
-      _logger.warning(
-        'Duplicate ticket detected while saving clipboard import '
-        '(PNR: $maskedPnr)',
-      );
-      return ClipboardResult.error('Duplicate ticket detected');
-    } on Object catch (e) {
-      _logger.error('Failed to save ticket to database: $e');
+    } on Object catch (e, stackTrace) {
+      _logger.error('Failed to save ticket to database', e, stackTrace);
       return ClipboardResult.error('Failed to save ticket: $e');
     }
   }

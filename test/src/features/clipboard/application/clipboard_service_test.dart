@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
-import 'package:namma_wallet/src/common/database/wallet_database.dart';
+import 'package:namma_wallet/src/common/database/i_ticket_dao.dart';
 import 'package:namma_wallet/src/common/services/logger_interface.dart';
 import 'package:namma_wallet/src/features/clipboard/application/clipboard_service.dart';
 import 'package:namma_wallet/src/features/clipboard/domain/clipboard_content_type.dart';
@@ -46,13 +46,10 @@ class MockTravelParserService implements TravelParserService {
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
-/// Mock implementation of WalletDatabase for testing
-class MockWalletDatabase extends WalletDatabase {
-  MockWalletDatabase() : super(logger: FakeLogger());
-
+/// Mock implementation of ITicketDao for testing
+class MockTicketDao implements ITicketDao {
   int updateRowCount = 0;
   int insertedId = 1;
-  bool shouldThrowDuplicate = false;
   bool shouldThrowError = false;
 
   @override
@@ -65,14 +62,23 @@ class MockWalletDatabase extends WalletDatabase {
 
   @override
   Future<int> insertTicket(Ticket ticket) async {
-    if (shouldThrowDuplicate) {
-      throw const DuplicateTicketException('Duplicate ticket');
-    }
     if (shouldThrowError) {
       throw Exception('Database error');
     }
     return insertedId;
   }
+
+  @override
+  Future<Ticket?> getTicketById(String id) async => null;
+
+  @override
+  Future<List<Ticket>> getAllTickets() async => [];
+
+  @override
+  Future<List<Ticket>> getTicketsByType(String type) async => [];
+
+  @override
+  Future<int> deleteTicket(String id) async => 1;
 }
 
 void main() {
@@ -80,14 +86,14 @@ void main() {
     late ClipboardService service;
     late MockClipboardRepository mockRepository;
     late MockTravelParserService mockParserService;
-    late MockWalletDatabase mockDatabase;
+    late MockTicketDao mockDatabase;
     final getIt = GetIt.instance;
 
     setUp(() {
       // Create mocks
       mockRepository = MockClipboardRepository();
       mockParserService = MockTravelParserService();
-      mockDatabase = MockWalletDatabase();
+      mockDatabase = MockTicketDao();
 
       // Register dependencies
       if (!getIt.isRegistered<ILogger>()) {
@@ -99,7 +105,7 @@ void main() {
         repository: mockRepository,
         logger: FakeLogger(),
         parserService: mockParserService,
-        database: mockDatabase,
+        ticketDao: mockDatabase,
       );
     });
 
@@ -313,14 +319,14 @@ void main() {
           mockParserService
             ..updateInfo = null
             ..parsedTicket = parsedTicket;
-          mockDatabase.shouldThrowDuplicate = true;
+          mockDatabase.shouldThrowError = true;
 
           // Act (When)
           final result = await service.readAndParseClipboard();
 
           // Assert (Then)
           expect(result.isSuccess, isFalse);
-          expect(result.errorMessage, contains('Duplicate ticket'));
+          expect(result.errorMessage, contains('Failed to save ticket'));
         },
       );
 
@@ -496,7 +502,7 @@ void main() {
             repository: customRepository,
             logger: FakeLogger(),
             parserService: mockParserService,
-            database: mockDatabase,
+            ticketDao: mockDatabase,
           );
 
           // Act (When)
@@ -529,7 +535,7 @@ void main() {
           mockParserService
             ..updateInfo = null
             ..parsedTicket = parsedTicket;
-          mockDatabase.shouldThrowDuplicate = true;
+          mockDatabase.shouldThrowError = true;
 
           // Act (When)
           final result = await service.readAndParseClipboard();
@@ -541,8 +547,8 @@ void main() {
       );
 
       test(
-        'Given duplicate ticket with short PNR, When logging error, '
-        'Then uses *** as masked PNR',
+        'Given database error with short PNR, When saving ticket, '
+        'Then returns error result',
         () async {
           // Arrange (Given)
           const smsText = 'PNR NO.: T12';
@@ -560,14 +566,14 @@ void main() {
           mockParserService
             ..updateInfo = null
             ..parsedTicket = parsedTicket;
-          mockDatabase.shouldThrowDuplicate = true;
+          mockDatabase.shouldThrowError = true;
 
           // Act (When)
           final result = await service.readAndParseClipboard();
 
           // Assert (Then)
           expect(result.isSuccess, isFalse);
-          expect(result.errorMessage, contains('Duplicate'));
+          expect(result.errorMessage, contains('Failed to save ticket'));
         },
       );
     });
