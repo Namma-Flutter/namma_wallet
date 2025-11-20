@@ -104,11 +104,6 @@ class ClipboardService {
     }
   }
 
-  /// Alias for [readAndParseClipboard] for backward compatibility.
-  Future<ClipboardResult> readClipboard() async {
-    return readAndParseClipboard();
-  }
-
   /// Handles update SMS by applying updates to existing ticket.
   ///
   /// Returns success if ticket was found and updated,
@@ -149,14 +144,11 @@ class ClipboardService {
   ) async {
     try {
       await _ticketDao.insertTicket(parsedTicket);
-      final updatedTicket = parsedTicket.copyWith(
-        ticketId: parsedTicket.ticketId,
-      );
 
       return ClipboardResult.success(
         ClipboardContentType.travelTicket,
         content,
-        ticket: updatedTicket,
+        ticket: parsedTicket,
       );
     } on Object catch (e, stackTrace) {
       _logger.error('Failed to save ticket to database', e, stackTrace);

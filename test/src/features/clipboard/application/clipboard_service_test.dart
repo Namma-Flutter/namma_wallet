@@ -378,23 +378,6 @@ void main() {
       );
     });
 
-    group('readClipboard Alias Method', () {
-      test(
-        'Given readClipboard called, When executed, '
-        'Then delegates to readAndParseClipboard',
-        () async {
-          // Arrange (Given)
-          mockRepository.hasContent = false;
-
-          // Act (When)
-          final result = await service.readClipboard();
-
-          // Assert (Then)
-          expect(result.isSuccess, isFalse);
-        },
-      );
-    });
-
     group('Edge Cases and Boundary Conditions', () {
       test(
         'Given text at exact max length, When reading and parsing, '

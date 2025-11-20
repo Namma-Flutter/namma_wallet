@@ -99,7 +99,7 @@ class _ScannerViewState extends State<ScannerView> {
 
     try {
       final clipboardService = getIt<ClipboardService>();
-      final result = await clipboardService.readClipboard();
+      final result = await clipboardService.readAndParseClipboard();
 
       if (!mounted) return;
 
