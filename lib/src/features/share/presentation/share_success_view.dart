@@ -29,8 +29,9 @@ class ShareSuccessView extends StatelessWidget {
     final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor:
-          isDark ? theme.scaffoldBackgroundColor : AppColor.specialColor,
+      backgroundColor: isDark
+          ? theme.scaffoldBackgroundColor
+          : AppColor.specialColor,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(24),
@@ -42,16 +43,16 @@ class ShareSuccessView extends StatelessWidget {
                 height: 120,
                 decoration: BoxDecoration(
                   color: isUpdate
-                      ? Colors.blue.shade50
-                      : Colors.green.shade50,
+                      ? theme.colorScheme.primary.withValues(alpha: 0.1)
+                      : theme.colorScheme.secondary.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
                   isUpdate ? Icons.update : Icons.check_circle,
                   size: 80,
                   color: isUpdate
-                      ? Colors.blue.shade600
-                      : Colors.green.shade600,
+                      ? theme.colorScheme.primary
+                      : theme.colorScheme.secondary,
                 ),
               ),
               const SizedBox(height: 32),
@@ -210,8 +211,9 @@ class ShareSuccessView extends StatelessWidget {
                       ),
                       child: Text(
                         'Done',
-                        style: Paragraph01(color: AppColor.primaryBlue)
-                            .semiBold,
+                        style: Paragraph01(
+                          color: AppColor.primaryBlue,
+                        ).semiBold,
                       ),
                     ),
                   ),
