@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
-import 'package:namma_wallet/src/common/database/wallet_database.dart';
+import 'package:namma_wallet/src/common/database/ticket_dao_interface.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/services/haptic_service_extension.dart';
 import 'package:namma_wallet/src/common/services/haptic_service_interface.dart';
@@ -66,9 +66,9 @@ class CalendarProvider extends ChangeNotifier {
 
   Future<void> loadTickets() async {
     try {
-      final dbHelper = getIt<WalletDatabase>();
+      final ticketDao = getIt<ITicketDAO>();
 
-      _tickets = await dbHelper.getAllTickets();
+      _tickets = await ticketDao.getAllTickets();
 
       notifyListeners();
     } on Exception catch (e, st) {

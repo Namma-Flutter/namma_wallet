@@ -179,6 +179,12 @@ class TNSTCTicketModelMapper extends ClassMapperBase<TNSTCTicketModel> {
     _$vehicleNumber,
     opt: true,
   );
+  static String? _$smsSeatNumbers(TNSTCTicketModel v) => v.smsSeatNumbers;
+  static const Field<TNSTCTicketModel, String> _f$smsSeatNumbers = Field(
+    'smsSeatNumbers',
+    _$smsSeatNumbers,
+    opt: true,
+  );
   static String _$displayPnr(TNSTCTicketModel v) => v.displayPnr;
   static const Field<TNSTCTicketModel, String> _f$displayPnr = Field(
     'displayPnr',
@@ -250,6 +256,7 @@ class TNSTCTicketModelMapper extends ClassMapperBase<TNSTCTicketModel> {
     #boardingPoint: _f$boardingPoint,
     #conductorMobileNo: _f$conductorMobileNo,
     #vehicleNumber: _f$vehicleNumber,
+    #smsSeatNumbers: _f$smsSeatNumbers,
     #displayPnr: _f$displayPnr,
     #displayFrom: _f$displayFrom,
     #displayTo: _f$displayTo,
@@ -287,6 +294,7 @@ class TNSTCTicketModelMapper extends ClassMapperBase<TNSTCTicketModel> {
       boardingPoint: data.dec(_f$boardingPoint),
       conductorMobileNo: data.dec(_f$conductorMobileNo),
       vehicleNumber: data.dec(_f$vehicleNumber),
+      smsSeatNumbers: data.dec(_f$smsSeatNumbers),
     );
   }
 
@@ -385,6 +393,7 @@ abstract class TNSTCTicketModelCopyWith<$R, $In extends TNSTCTicketModel, $Out>
     String? boardingPoint,
     String? conductorMobileNo,
     String? vehicleNumber,
+    String? smsSeatNumbers,
   });
   TNSTCTicketModelCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
     Then<$Out2, $R2> t,
@@ -438,6 +447,7 @@ class _TNSTCTicketModelCopyWithImpl<$R, $Out>
     Object? boardingPoint = $none,
     Object? conductorMobileNo = $none,
     Object? vehicleNumber = $none,
+    Object? smsSeatNumbers = $none,
   }) => $apply(
     FieldCopyWithData({
       if (corporation != $none) #corporation: corporation,
@@ -470,6 +480,7 @@ class _TNSTCTicketModelCopyWithImpl<$R, $Out>
       if (boardingPoint != $none) #boardingPoint: boardingPoint,
       if (conductorMobileNo != $none) #conductorMobileNo: conductorMobileNo,
       if (vehicleNumber != $none) #vehicleNumber: vehicleNumber,
+      if (smsSeatNumbers != $none) #smsSeatNumbers: smsSeatNumbers,
     }),
   );
   @override
@@ -527,6 +538,7 @@ class _TNSTCTicketModelCopyWithImpl<$R, $Out>
       or: $value.conductorMobileNo,
     ),
     vehicleNumber: data.get(#vehicleNumber, or: $value.vehicleNumber),
+    smsSeatNumbers: data.get(#smsSeatNumbers, or: $value.smsSeatNumbers),
   );
 
   @override

@@ -109,8 +109,9 @@ class _ScannerViewState extends State<ScannerView> {
 
     try {
       final clipboardService = getIt<ClipboardService>();
-      final result = await clipboardService.readClipboard();
+      final result = await clipboardService.readAndParseClipboard();
       final hapticService = getIt<IHapticService>();
+
       if (!mounted) return;
 
       hapticService.triggerHaptic(
