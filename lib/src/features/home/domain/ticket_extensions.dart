@@ -1,3 +1,4 @@
+import 'package:namma_wallet/src/common/helper/date_time_converter.dart';
 import 'package:namma_wallet/src/features/home/domain/extras_model.dart';
 import 'package:namma_wallet/src/features/home/domain/ticket.dart';
 
@@ -44,4 +45,15 @@ extension TicketExtrasExtension on Ticket {
 
   /// Checks if the ticket has a PNR number or booking ID.
   bool get hasPnrOrId => pnrOrId != null;
+
+  /// Gets the fare from ticket extras.
+  String? get fare => getExtraByTitle('fare') ?? getExtraByTitle('total fare');
+
+  /// Gets the date from ticket extras or formatted start time.
+  String get date {
+    final dateExtra = getExtraByTitle('date of journey');
+    if (dateExtra != null) return dateExtra;
+
+    return formatDate(startTime);
+  }
 }

@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:namma_wallet/src/common/database/wallet_database.dart';
+import 'package:namma_wallet/src/common/database/ticket_dao_interface.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/helper/check_pnr_id.dart';
 import 'package:namma_wallet/src/common/routing/app_router.dart';
@@ -11,6 +11,7 @@ import 'package:namma_wallet/src/common/services/sharing_intent_service.dart';
 import 'package:namma_wallet/src/common/theme/app_theme.dart';
 import 'package:namma_wallet/src/common/theme/theme_provider.dart';
 import 'package:namma_wallet/src/features/common/application/travel_parser_service.dart';
+import 'package:namma_wallet/src/features/home/domain/ticket_extensions.dart';
 import 'package:namma_wallet/src/features/tnstc/application/sms_service.dart';
 import 'package:provider/provider.dart';
 
@@ -62,8 +63,8 @@ class _NammaWalletAppState extends State<NammaWalletApp> {
 
           if (updateInfo != null) {
             // This is an update SMS. Attempt to apply the update.
-            final db = getIt<WalletDatabase>();
-            final count = await db.updateTravelTicketByPNR(
+            final db = getIt<ITicketDAO>();
+            final count = await db.updateTicketById(
               updateInfo.pnrNumber,
               updateInfo.updates,
             );
@@ -89,7 +90,7 @@ class _NammaWalletAppState extends State<NammaWalletApp> {
               _logger.warning(
                 'Update SMS received via sharing, but no matching ticket found',
               );
-              
+
               // Show error message
               _scaffoldMessengerKey.currentState?.showSnackBar(
                 const SnackBar(
@@ -100,7 +101,7 @@ class _NammaWalletAppState extends State<NammaWalletApp> {
                   duration: Duration(seconds: 5),
                 ),
               );
-              
+
               // Navigate back to home on error
               router.go(AppRoute.home.path);
               return;
@@ -119,11 +120,11 @@ class _NammaWalletAppState extends State<NammaWalletApp> {
           router.go(
             AppRoute.shareSuccess.path,
             extra: {
-              'pnrNumber': ticket.displayPnr,
-              'from': ticket.displayFrom,
-              'to': ticket.displayTo,
-              'fare': ticket.displayFare,
-              'date': ticket.displayDate,
+              'pnrNumber': ticket.pnrOrId ?? 'Unknown',
+              'from': ticket.fromLocation ?? 'Unknown',
+              'to': ticket.toLocation ?? 'Unknown',
+              'fare': ticket.fare ?? 'Unknown',
+              'date': ticket.date,
             },
           );
         } on Object catch (e, stackTrace) {
@@ -132,7 +133,7 @@ class _NammaWalletAppState extends State<NammaWalletApp> {
             e,
             stackTrace,
           );
-          
+
           // Show error message
           _scaffoldMessengerKey.currentState?.showSnackBar(
             SnackBar(
@@ -141,14 +142,14 @@ class _NammaWalletAppState extends State<NammaWalletApp> {
               duration: const Duration(seconds: 5),
             ),
           );
-          
+
           // Navigate back to home on error
           router.go(AppRoute.home.path);
         }
       },
       onError: (error) {
         _logger.error('Sharing intent error: $error');
-        
+
         // Show error message
         _scaffoldMessengerKey.currentState?.showSnackBar(
           SnackBar(
@@ -157,7 +158,7 @@ class _NammaWalletAppState extends State<NammaWalletApp> {
             duration: const Duration(seconds: 5),
           ),
         );
-        
+
         // Navigate back to home on error
         router.go(AppRoute.home.path);
       },
