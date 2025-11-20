@@ -53,11 +53,17 @@ class IRCTCScannerResult {
 }
 
 class IRCTCScannerService {
-  IRCTCScannerService({ILogger? logger, IRCTCQRParser? qrParser})
-    : _logger = logger ?? getIt<ILogger>(),
-      _qrParser = qrParser ?? getIt<IRCTCQRParser>();
+  IRCTCScannerService({
+    ILogger? logger,
+    IRCTCQRParser? qrParser,
+    ITicketDAO? ticketDao,
+  }) : _logger = logger ?? getIt<ILogger>(),
+       _qrParser = qrParser ?? getIt<IRCTCQRParser>(),
+       _ticketDao = ticketDao ?? getIt<ITicketDAO>();
+
   final ILogger _logger;
   final IRCTCQRParser _qrParser;
+  final ITicketDAO _ticketDao;
 
   Future<IRCTCScannerResult> parseAndSaveIRCTCTicket(String qrData) async {
     try {
@@ -77,7 +83,7 @@ class IRCTCScannerService {
 
       // Save to database
       try {
-        await getIt<ITicketDAO>().insertTicket(travelTicket);
+        await _ticketDao.insertTicket(travelTicket);
 
         return IRCTCScannerResult.success(
           IRCTCScannerContentType.irctcTicket,
