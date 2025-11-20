@@ -20,6 +20,7 @@
     "Keerthi",
     "keerthivasan",
     "KOTTIVAKKAM",
+    "Koyambedu",
     "KUMBAKONAM",
     "Magesh",
     "Maragatham",
@@ -45,7 +46,10 @@
     "unittests",
     "webiny",
     "xcodebuildmcp",
-    "yorifuji"
+    "yorifuji",
+    "தமிழ்",
+    "நாடு",
+    "பேருந்து"
   ],
   "java.configuration.updateBuildConfiguration": "interactive"
 }

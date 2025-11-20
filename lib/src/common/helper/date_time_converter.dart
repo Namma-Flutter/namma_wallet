@@ -3,11 +3,14 @@ import 'package:intl/intl.dart';
 /// Formats a DateTime as time string (e.g., "01:15 pm").
 /// Converts to local time before formatting to handle
 /// UTC datetimes from database.
-String formatTime(DateTime dt) {
+String getTime(DateTime dt) {
   final local = dt.toLocal();
   return DateFormat('hh:mm a').format(local).toLowerCase();
 }
 
+/// Formats a DateTime as date string (e.g., "18/01/2026").
+/// Converts to local time before formatting to handle
+/// UTC datetimes from database.
 String getDate(DateTime dt) {
   final local = dt.toLocal();
   return DateFormat('dd/MM/yyyy').format(local);

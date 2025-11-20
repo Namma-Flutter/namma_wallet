@@ -492,10 +492,10 @@ class _TicketViewState extends State<TicketView> {
                           title1: 'Journey Date',
                           title2: 'Time',
                           value1: getValueOrDefault(
-                            formatDate(widget.ticket.startTime),
+                            getDate(widget.ticket.startTime),
                           ),
                           value2: getValueOrDefault(
-                            formatTime(widget.ticket.startTime),
+                            getTime(widget.ticket.startTime),
                           ),
                         ),
 

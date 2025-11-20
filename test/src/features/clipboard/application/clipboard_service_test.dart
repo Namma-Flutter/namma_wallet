@@ -13,41 +13,34 @@ import '../../../common/helpers/fake_logger.dart';
 
 /// Mock implementation of IClipboardRepository for testing
 class MockClipboardRepository implements IClipboardRepository {
-  bool _hasContent = true;
-  String? _textContent;
-  bool _shouldThrow = false;
-
-  void setHasContent(bool hasContent) => _hasContent = hasContent;
-  void setTextContent(String? content) => _textContent = content;
-  void setShouldThrow(bool shouldThrow) => _shouldThrow = shouldThrow;
+  bool hasContent = true;
+  String? textContent;
+  bool shouldThrow = false;
 
   @override
   Future<bool> hasTextContent() async {
-    if (_shouldThrow) throw Exception('Mock exception');
-    return _hasContent;
+    if (shouldThrow) throw Exception('Mock exception');
+    return hasContent;
   }
 
   @override
   Future<String?> readText() async {
-    if (_shouldThrow) throw Exception('Mock exception');
-    return _textContent;
+    if (shouldThrow) throw Exception('Mock exception');
+    return textContent;
   }
 }
 
 /// Mock implementation of TravelParserService for testing
 class MockTravelParserService implements TravelParserService {
-  TicketUpdateInfo? _updateInfo;
-  Ticket? _parsedTicket;
-
-  void setUpdateInfo(TicketUpdateInfo? info) => _updateInfo = info;
-  void setParsedTicket(Ticket? ticket) => _parsedTicket = ticket;
+  TicketUpdateInfo? updateInfo;
+  Ticket? parsedTicket;
 
   @override
-  TicketUpdateInfo? parseUpdateSMS(String text) => _updateInfo;
+  TicketUpdateInfo? parseUpdateSMS(String text) => updateInfo;
 
   @override
   Ticket? parseTicketFromText(String text, {SourceType? sourceType}) =>
-      _parsedTicket;
+      parsedTicket;
 
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
@@ -57,34 +50,28 @@ class MockTravelParserService implements TravelParserService {
 class MockWalletDatabase extends WalletDatabase {
   MockWalletDatabase() : super(logger: FakeLogger());
 
-  int _updateRowCount = 0;
-  int _insertedId = 1;
-  bool _shouldThrowDuplicate = false;
-  bool _shouldThrowError = false;
-
-  void setUpdateRowCount(int count) => _updateRowCount = count;
-  void setInsertedId(int id) => _insertedId = id;
-  void setShouldThrowDuplicate(bool shouldThrow) =>
-      _shouldThrowDuplicate = shouldThrow;
-  void setShouldThrowError(bool shouldThrow) => _shouldThrowError = shouldThrow;
+  int updateRowCount = 0;
+  int insertedId = 1;
+  bool shouldThrowDuplicate = false;
+  bool shouldThrowError = false;
 
   @override
   Future<int> updateTicketById(
     String ticketId,
     Map<String, Object?> updates,
   ) async {
-    return _updateRowCount;
+    return updateRowCount;
   }
 
   @override
   Future<int> insertTicket(Ticket ticket) async {
-    if (_shouldThrowDuplicate) {
-      throw DuplicateTicketException('Duplicate ticket');
+    if (shouldThrowDuplicate) {
+      throw const DuplicateTicketException('Duplicate ticket');
     }
-    if (_shouldThrowError) {
+    if (shouldThrowError) {
       throw Exception('Database error');
     }
-    return _insertedId;
+    return insertedId;
   }
 }
 
@@ -127,10 +114,12 @@ void main() {
         () async {
           // Arrange (Given)
           const clipboardText = 'Hello from clipboard';
-          mockRepository.setHasContent(true);
-          mockRepository.setTextContent(clipboardText);
-          mockParserService.setUpdateInfo(null);
-          mockParserService.setParsedTicket(null);
+          mockRepository
+            ..hasContent = true
+            ..textContent = clipboardText;
+          mockParserService
+            ..updateInfo = null
+            ..parsedTicket = null;
 
           // Act (When)
           final result = await service.readAndParseClipboard();
@@ -157,11 +146,13 @@ void main() {
             location: 'Koyambedu',
           );
 
-          mockRepository.setHasContent(true);
-          mockRepository.setTextContent(smsText);
-          mockParserService.setUpdateInfo(null);
-          mockParserService.setParsedTicket(parsedTicket);
-          mockDatabase.setInsertedId(1);
+          mockRepository
+            ..hasContent = true
+            ..textContent = smsText;
+          mockParserService
+            ..updateInfo = null
+            ..parsedTicket = parsedTicket;
+          mockDatabase.insertedId = 1;
 
           // Act (When)
           final result = await service.readAndParseClipboard();
@@ -179,18 +170,18 @@ void main() {
         'Then updates existing ticket successfully',
         () async {
           // Arrange (Given)
-          const updateSMS =
-              'PNR: T12345678, Conductor Mobile No: 9876543210';
+          const updateSMS = 'PNR: T12345678, Conductor Mobile No: 9876543210';
           final updateInfo = TicketUpdateInfo(
             pnrNumber: 'T12345678',
             providerName: 'TNSTC',
             updates: {'conductorMobileNo': '9876543210'},
           );
 
-          mockRepository.setHasContent(true);
-          mockRepository.setTextContent(updateSMS);
-          mockParserService.setUpdateInfo(updateInfo);
-          mockDatabase.setUpdateRowCount(1);
+          mockRepository
+            ..hasContent = true
+            ..textContent = updateSMS;
+          mockParserService.updateInfo = updateInfo;
+          mockDatabase.updateRowCount = 1;
 
           // Act (When)
           final result = await service.readAndParseClipboard();
@@ -208,7 +199,7 @@ void main() {
         'Then returns error result',
         () async {
           // Arrange (Given)
-          mockRepository.setHasContent(false);
+          mockRepository.hasContent = false;
 
           // Act (When)
           final result = await service.readAndParseClipboard();
@@ -225,8 +216,9 @@ void main() {
         'Then returns error result',
         () async {
           // Arrange (Given)
-          mockRepository.setHasContent(true);
-          mockRepository.setTextContent(null);
+          mockRepository
+            ..hasContent = true
+            ..textContent = null;
 
           // Act (When)
           final result = await service.readAndParseClipboard();
@@ -242,8 +234,9 @@ void main() {
         'Then returns error result',
         () async {
           // Arrange (Given)
-          mockRepository.setHasContent(true);
-          mockRepository.setTextContent('');
+          mockRepository
+            ..hasContent = true
+            ..textContent = '';
 
           // Act (When)
           final result = await service.readAndParseClipboard();
@@ -260,8 +253,9 @@ void main() {
         () async {
           // Arrange (Given)
           final longText = 'A' * (ClipboardService.maxTextLength + 1);
-          mockRepository.setHasContent(true);
-          mockRepository.setTextContent(longText);
+          mockRepository
+            ..hasContent = true
+            ..textContent = longText;
 
           // Act (When)
           final result = await service.readAndParseClipboard();
@@ -277,18 +271,18 @@ void main() {
         'Then returns error result',
         () async {
           // Arrange (Given)
-          const updateSMS =
-              'PNR: T99999999, Conductor Mobile No: 9876543210';
+          const updateSMS = 'PNR: T99999999, Conductor Mobile No: 9876543210';
           final updateInfo = TicketUpdateInfo(
             pnrNumber: 'T99999999',
             providerName: 'TNSTC',
             updates: {'conductorMobileNo': '9876543210'},
           );
 
-          mockRepository.setHasContent(true);
-          mockRepository.setTextContent(updateSMS);
-          mockParserService.setUpdateInfo(updateInfo);
-          mockDatabase.setUpdateRowCount(0); // No rows updated
+          mockRepository
+            ..hasContent = true
+            ..textContent = updateSMS;
+          mockParserService.updateInfo = updateInfo;
+          mockDatabase.updateRowCount = 0; // No rows updated
 
           // Act (When)
           final result = await service.readAndParseClipboard();
@@ -313,11 +307,13 @@ void main() {
             location: 'Test',
           );
 
-          mockRepository.setHasContent(true);
-          mockRepository.setTextContent(smsText);
-          mockParserService.setUpdateInfo(null);
-          mockParserService.setParsedTicket(parsedTicket);
-          mockDatabase.setShouldThrowDuplicate(true);
+          mockRepository
+            ..hasContent = true
+            ..textContent = smsText;
+          mockParserService
+            ..updateInfo = null
+            ..parsedTicket = parsedTicket;
+          mockDatabase.shouldThrowDuplicate = true;
 
           // Act (When)
           final result = await service.readAndParseClipboard();
@@ -342,11 +338,13 @@ void main() {
             location: 'Test',
           );
 
-          mockRepository.setHasContent(true);
-          mockRepository.setTextContent(smsText);
-          mockParserService.setUpdateInfo(null);
-          mockParserService.setParsedTicket(parsedTicket);
-          mockDatabase.setShouldThrowError(true);
+          mockRepository
+            ..hasContent = true
+            ..textContent = smsText;
+          mockParserService
+            ..updateInfo = null
+            ..parsedTicket = parsedTicket;
+          mockDatabase.shouldThrowError = true;
 
           // Act (When)
           final result = await service.readAndParseClipboard();
@@ -362,7 +360,7 @@ void main() {
         'Then returns error result without throwing',
         () async {
           // Arrange (Given)
-          mockRepository.setShouldThrow(true);
+          mockRepository.shouldThrow = true;
 
           // Act (When)
           final result = await service.readAndParseClipboard();
@@ -380,7 +378,7 @@ void main() {
         'Then delegates to readAndParseClipboard',
         () async {
           // Arrange (Given)
-          mockRepository.setHasContent(false);
+          mockRepository.hasContent = false;
 
           // Act (When)
           final result = await service.readClipboard();
@@ -398,10 +396,12 @@ void main() {
         () async {
           // Arrange (Given)
           final exactLengthText = 'A' * ClipboardService.maxTextLength;
-          mockRepository.setHasContent(true);
-          mockRepository.setTextContent(exactLengthText);
-          mockParserService.setUpdateInfo(null);
-          mockParserService.setParsedTicket(null);
+          mockRepository
+            ..hasContent = true
+            ..textContent = exactLengthText;
+          mockParserService
+            ..updateInfo = null
+            ..parsedTicket = null;
 
           // Act (When)
           final result = await service.readAndParseClipboard();
@@ -421,10 +421,12 @@ void main() {
         () async {
           // Arrange (Given)
           const specialText = r'Test@#$%^&*()_+{}|:"<>?';
-          mockRepository.setHasContent(true);
-          mockRepository.setTextContent(specialText);
-          mockParserService.setUpdateInfo(null);
-          mockParserService.setParsedTicket(null);
+          mockRepository
+            ..hasContent = true
+            ..textContent = specialText;
+          mockParserService
+            ..updateInfo = null
+            ..parsedTicket = null;
 
           // Act (When)
           final result = await service.readAndParseClipboard();
@@ -441,10 +443,12 @@ void main() {
         () async {
           // Arrange (Given)
           const unicodeText = 'தமிழ் நாடு பேருந்து 中文 🎫';
-          mockRepository.setHasContent(true);
-          mockRepository.setTextContent(unicodeText);
-          mockParserService.setUpdateInfo(null);
-          mockParserService.setParsedTicket(null);
+          mockRepository
+            ..hasContent = true
+            ..textContent = unicodeText;
+          mockParserService
+            ..updateInfo = null
+            ..parsedTicket = null;
 
           // Act (When)
           final result = await service.readAndParseClipboard();
@@ -462,10 +466,12 @@ void main() {
         () async {
           // Arrange (Given)
           const multilineText = 'Line 1\nLine 2\nLine 3';
-          mockRepository.setHasContent(true);
-          mockRepository.setTextContent(multilineText);
-          mockParserService.setUpdateInfo(null);
-          mockParserService.setParsedTicket(null);
+          mockRepository
+            ..hasContent = true
+            ..textContent = multilineText;
+          mockParserService
+            ..updateInfo = null
+            ..parsedTicket = null;
 
           // Act (When)
           final result = await service.readAndParseClipboard();
@@ -484,8 +490,8 @@ void main() {
         'Then uses injected dependencies',
         () async {
           // Arrange (Given)
-          final customRepository = MockClipboardRepository();
-          customRepository.setHasContent(false);
+          final customRepository = MockClipboardRepository()
+            ..hasContent = false;
           final customService = ClipboardService(
             repository: customRepository,
             logger: FakeLogger(),
@@ -517,11 +523,13 @@ void main() {
             location: 'Test',
           );
 
-          mockRepository.setHasContent(true);
-          mockRepository.setTextContent(smsText);
-          mockParserService.setUpdateInfo(null);
-          mockParserService.setParsedTicket(parsedTicket);
-          mockDatabase.setShouldThrowDuplicate(true);
+          mockRepository
+            ..hasContent = true
+            ..textContent = smsText;
+          mockParserService
+            ..updateInfo = null
+            ..parsedTicket = parsedTicket;
+          mockDatabase.shouldThrowDuplicate = true;
 
           // Act (When)
           final result = await service.readAndParseClipboard();
@@ -546,11 +554,13 @@ void main() {
             location: 'Test',
           );
 
-          mockRepository.setHasContent(true);
-          mockRepository.setTextContent(smsText);
-          mockParserService.setUpdateInfo(null);
-          mockParserService.setParsedTicket(parsedTicket);
-          mockDatabase.setShouldThrowDuplicate(true);
+          mockRepository
+            ..hasContent = true
+            ..textContent = smsText;
+          mockParserService
+            ..updateInfo = null
+            ..parsedTicket = parsedTicket;
+          mockDatabase.shouldThrowDuplicate = true;
 
           // Act (When)
           final result = await service.readAndParseClipboard();

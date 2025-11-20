@@ -44,7 +44,7 @@ class TicketCardWidget extends StatelessWidget {
                       children: [
                         Text(
                           // ticket.dateTime?.toString() ?? 'xxx xxx',
-                          formatDate(ticket.startTime),
+                          getDate(ticket.startTime),
                           style: const TextStyle(color: AppColor.whiteColor),
                           overflow: TextOverflow.ellipsis,
                           maxLines: 1,
@@ -52,7 +52,7 @@ class TicketCardWidget extends StatelessWidget {
                         const Text(' - '),
                         Text(
                           // ticket.dateTime?.toString() ?? 'xxx xxx',
-                          formatTime(ticket.startTime),
+                          getTime(ticket.startTime),
                           style: const TextStyle(color: AppColor.whiteColor),
                           overflow: TextOverflow.ellipsis,
                           maxLines: 1,
@@ -158,7 +158,7 @@ class EventTicketCardWidget extends StatelessWidget {
                         children: [
                           Text(
                             // ticket.dateTime?.toString() ?? 'xxx xxx',
-                            formatDate(ticket.startTime),
+                            getDate(ticket.startTime),
                             style: TextStyle(
                               color: Theme.of(context).colorScheme.onSurface,
                             ),
@@ -168,7 +168,7 @@ class EventTicketCardWidget extends StatelessWidget {
                           const Text(' - '),
                           Text(
                             // ticket.dateTime?.toString() ?? 'xxx xxx',
-                            formatTime(ticket.startTime),
+                            getTime(ticket.startTime),
                             style: TextStyle(
                               color: Theme.of(context).colorScheme.onSurface,
                             ),
