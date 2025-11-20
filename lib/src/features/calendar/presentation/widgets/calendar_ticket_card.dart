@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:namma_wallet/src/common/theme/styles.dart';
-import 'package:namma_wallet/src/features/common/domain/travel_ticket_model.dart';
-import 'package:namma_wallet/src/features/home/domain/generic_details_model.dart';
-import 'package:namma_wallet/src/features/home/domain/tag_model.dart';
+import 'package:namma_wallet/src/features/common/enums/ticket_type.dart';
+import 'package:namma_wallet/src/features/home/domain/ticket.dart';
 
 class CalendarTicketCard extends StatelessWidget {
   const CalendarTicketCard({
@@ -11,56 +10,13 @@ class CalendarTicketCard extends StatelessWidget {
     super.key,
   });
 
-  final TravelTicketModel ticket;
+  final Ticket ticket;
 
   @override
   Widget build(BuildContext context) {
-    final genericTicket = _convertToGenericModel(ticket);
-
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: CalendarTicketCardContent(ticket: genericTicket),
-    );
-  }
-
-  GenericDetailsModel _convertToGenericModel(TravelTicketModel ticket) {
-    final entryType = ticket.ticketType;
-
-    final tags = <TagModel>[];
-    if (ticket.seatNumbers != null && ticket.seatNumbers!.isNotEmpty) {
-      tags.add(TagModel(value: ticket.seatNumbers, icon: 'event_seat'));
-    }
-    if (ticket.displayTime.isNotEmpty) {
-      tags.add(TagModel(value: ticket.displayTime, icon: 'access_time'));
-    }
-    if (ticket.amount != null) {
-      tags.add(
-        TagModel(
-          value: '₹${ticket.amount!.toStringAsFixed(0)}',
-          icon: 'currency_rupee',
-        ),
-      );
-    }
-
-    late final DateTime startTime;
-    try {
-      if (ticket.journeyDate != null && ticket.journeyDate!.isNotEmpty) {
-        startTime = DateTime.parse(ticket.journeyDate!);
-      } else {
-        startTime = DateTime.now();
-      }
-    } on FormatException {
-      startTime = DateTime.now();
-    }
-
-    return GenericDetailsModel(
-      primaryText: ticket.displayName,
-      secondaryText: ticket.providerName,
-      startTime: startTime,
-      location: ticket.providerName,
-      type: entryType,
-      tags: tags.isNotEmpty ? tags : null,
-      ticketId: ticket.id,
+      child: CalendarTicketCardContent(ticket: ticket),
     );
   }
 }
@@ -71,7 +27,7 @@ class CalendarTicketCardContent extends StatelessWidget {
     super.key,
   });
 
-  final GenericDetailsModel ticket;
+  final Ticket ticket;
 
   @override
   Widget build(BuildContext context) {
