@@ -897,8 +897,8 @@ Trip Code : TEST123
     group('Multiple Passengers', () {
       test('Given multiple passengers in table, When parsing ticket, '
           'Then extracts first passenger', () {
-        // Note: Current parser only extracts first passenger
-        // This test documents expected behavior
+        // NOTE: Current parser extracts only the first passenger
+        // TODO(enhancement): Use allMatches() for multi-passenger support
         const pdfText = '''
 Corporation : SETC
 PNR Number : T12345678

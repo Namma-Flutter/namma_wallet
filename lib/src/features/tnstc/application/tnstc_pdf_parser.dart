@@ -181,6 +181,9 @@ class TNSTCPDFParser implements ITicketParser {
 
     // Extract passenger info
     // First try the table format
+    // NOTE: Current implementation extracts only the first passenger.
+    // TODO(enhancement): Use allMatches() to extract all passengers when
+    // multiple passenger rows are detected in the table format.
     final passengerPattern = RegExp(
       r"Name\s+Age\s+Adult/Child\s+Gender\s+Seat No\.\s*\n\s*([A-Za-z](?:[A-Za-z\s\-'])*[A-Za-z])\s+(\d+)\s+(Adult|Child)\s+(M|F)\s+([A-Z0-9]+)",
       multiLine: true,
