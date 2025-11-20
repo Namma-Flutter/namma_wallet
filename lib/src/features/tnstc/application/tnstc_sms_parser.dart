@@ -2,11 +2,16 @@ import 'package:namma_wallet/src/features/home/domain/ticket.dart';
 import 'package:namma_wallet/src/features/tnstc/application/ticket_parser_interface.dart';
 import 'package:namma_wallet/src/features/tnstc/domain/tnstc_model.dart';
 
-/// Parses TNSTC SMS messages into structured ticket data.
+/// Parses TNSTC SMS messages into structured [Ticket] data.
 ///
 /// Handles both conductor SMS and booking confirmation SMS formats.
 /// Falls back to default values if parsing fails for individual fields.
-/// Never throws - returns a model with partial data on errors.
+///
+/// **Error Handling:**
+/// - Never throws exceptions
+/// - Returns a [Ticket] with partial data on parsing errors
+/// - Missing/invalid fields use fallbacks: 'Unknown', DateTime.now(), etc.
+/// - Conversion via [Ticket.fromTNSTC] is guaranteed not to throw
 class TNSTCSMSParser implements ITicketParser {
   @override
   Ticket parseTicket(String smsText) {
@@ -33,11 +38,13 @@ class TNSTCSMSParser implements ITicketParser {
       }
     }
 
-    // Common fields
+    // Extract common fields present in both SMS formats.
+    // Falls back to empty string if pattern doesn't match.
     final pnrNumber = extractMatch(
       r'(?:PNR NO\.\s*|PNR)\s*:\s*([^,\s]+)',
       smsText,
     );
+    // Falls back to DateTime.now() if date is missing or malformed.
     final journeyDate = parseDate(
       extractMatch(
         r'(?:Journey Date|DOJ)\s*:\s*(\d{2}/\d{2}/\d{4})',
@@ -45,10 +52,12 @@ class TNSTCSMSParser implements ITicketParser {
       ),
     );
 
-    // Check if it's a conductor SMS
+    // Check if it's a conductor SMS (vs booking confirmation SMS)
     final isConductorSMS = smsText.contains('Conductor Mobile No');
 
     if (isConductorSMS) {
+      // Parse conductor SMS format (typically sent during journey).
+      // Missing fields result in empty strings or null values.
       final conductorMobileNo = extractMatch(
         r'Conductor Mobile No:\s*(\d+)',
         smsText,
@@ -62,9 +71,12 @@ class TNSTCSMSParser implements ITicketParser {
         vehicleNumber: vehicleNumber,
         corporation: 'TNSTC', // Assuming TNSTC for conductor SMS
       );
+      // Convert to Ticket (guaranteed not to throw,
+      // uses fallbacks for missing data)
       return Ticket.fromTNSTC(tnstcModel, sourceType: 'SMS');
     } else {
-      // Booking confirmation SMS
+      // Parse booking confirmation SMS format (sent at time of booking).
+      // All fields use fallbacks if extraction fails.
       final corporation = extractMatch(
         r'Corporation\s*:\s*(.*?)(?=\s*,)',
         smsText,
@@ -106,6 +118,8 @@ class TNSTCSMSParser implements ITicketParser {
         numberOfSeats: numberOfSeats,
         smsSeatNumbers: seatNumbers.isNotEmpty ? seatNumbers : null,
       );
+      // Convert to Ticket (guaranteed not to throw,
+      // uses fallbacks: 'Unknown', DateTime.now(), etc. for missing data)
       return Ticket.fromTNSTC(tnstcModel, sourceType: 'SMS');
     }
   }
