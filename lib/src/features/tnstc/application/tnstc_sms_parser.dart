@@ -93,21 +93,6 @@ class TNSTCSMSParser implements ITicketParser {
           ? seatNumbers.split(',').where((s) => s.trim().isNotEmpty).length
           : 1;
 
-      // For SMS, we only have seat numbers, no passenger details
-      // Create a minimal passenger info with just seat numbers for display
-      final passengers = <PassengerInfo>[];
-      if (seatNumbers.isNotEmpty) {
-        passengers.add(
-          PassengerInfo(
-            name: '', // Empty - will be filtered out in UI
-            age: 0, // Zero - will be filtered out in UI
-            type: 'Adult',
-            gender: '', // Empty - will be filtered out in UI
-            seatNumber: seatNumbers,
-          ),
-        );
-      }
-
       final tnstcModel = TNSTCTicketModel(
         corporation: corporation,
         pnrNumber: pnrNumber,
@@ -119,7 +104,7 @@ class TNSTCSMSParser implements ITicketParser {
         classOfService: classOfService,
         passengerPickupPoint: passengerPickupPoint,
         numberOfSeats: numberOfSeats,
-        passengers: passengers,
+        smsSeatNumbers: seatNumbers.isNotEmpty ? seatNumbers : null,
       );
       return Ticket.fromTNSTC(tnstcModel, sourceType: 'SMS');
     }

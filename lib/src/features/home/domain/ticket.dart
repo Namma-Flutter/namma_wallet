@@ -99,7 +99,10 @@ class Ticket with TicketMappable {
     final firstPassenger = model.passengers.isNotEmpty
         ? model.passengers.first
         : null;
-    final seatNumber = firstPassenger?.seatNumber;
+    // Get seat numbers from either SMS field or first passenger
+    final seatNumber = model.seatNumbers.isNotEmpty
+        ? model.seatNumbers
+        : null;
     final gender = firstPassenger?.gender;
 
     var startTime = model.passengerPickupTime ?? model.journeyDate;

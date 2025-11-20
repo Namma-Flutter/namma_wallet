@@ -381,7 +381,8 @@ Seat No. : 1A,2B,3C, Journey Date : 15/12/2024
           final seatsExtra = ticket.extras
               ?.firstWhere((e) => e.title == 'Seats')
               .value;
-          // Parser counts seats by splitting on commas and filtering empty strings
+          // Parser counts seats by splitting on commas and
+          // filtering empty strings
           // "1A,2B,3C" should count as exactly 3 seats
           expect(seatsExtra, equals('3'));
         },
