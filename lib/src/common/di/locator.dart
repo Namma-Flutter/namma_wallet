@@ -6,6 +6,8 @@ import 'package:namma_wallet/src/common/services/sharing_intent_service.dart';
 import 'package:namma_wallet/src/common/theme/theme_provider.dart';
 import 'package:namma_wallet/src/features/ai/fallback-parser/application/gemma_service.dart';
 import 'package:namma_wallet/src/features/clipboard/application/clipboard_service.dart';
+import 'package:namma_wallet/src/features/clipboard/data/clipboard_repository.dart';
+import 'package:namma_wallet/src/features/clipboard/domain/i_clipboard_repository.dart';
 import 'package:namma_wallet/src/features/common/application/travel_parser_service.dart';
 import 'package:namma_wallet/src/features/irctc/application/irctc_qr_parser.dart';
 import 'package:namma_wallet/src/features/irctc/application/irctc_scanner_service.dart';
@@ -32,6 +34,8 @@ void setupLocator() {
     ..registerLazySingleton<IRCTCScannerService>(IRCTCScannerService.new)
     ..registerLazySingleton<OCRService>(OCRService.new)
     ..registerLazySingleton<PDFParserService>(PDFParserService.new)
+    // Clipboard - Repository and Service
+    ..registerLazySingleton<IClipboardRepository>(ClipboardRepository.new)
     ..registerLazySingleton<ClipboardService>(ClipboardService.new)
     ..registerLazySingleton<TravelParserService>(TravelParserService.new)
     // Parsers

@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:namma_wallet/src/features/home/domain/ticket.dart';
+import 'package:namma_wallet/src/features/tnstc/application/i_ticket_parser.dart';
 import 'package:namma_wallet/src/features/tnstc/domain/tnstc_model.dart';
 
 /// Parses TNSTC (Tamil Nadu State Transport Corporation) PDF tickets
@@ -11,11 +12,12 @@ import 'package:namma_wallet/src/features/tnstc/domain/tnstc_model.dart';
 ///
 /// Falls back to default values if parsing fails for individual fields.
 /// Never throws - returns a model with partial data on errors.
-class TNSTCPDFParser {
+class TNSTCPDFParser implements ITicketParser {
   // TODO(optimization): Move RegExp compilation to static final fields
   // to avoid recompiling patterns on each parse call, improving performance.
 
   /// Parses the given PDF text and returns a [Ticket].
+  @override
   Ticket parseTicket(String pdfText) {
     final passengers = <PassengerInfo>[];
     String extractMatch(String pattern, String input, {int groupIndex = 1}) {

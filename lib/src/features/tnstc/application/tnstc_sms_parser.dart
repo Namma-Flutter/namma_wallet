@@ -1,7 +1,14 @@
 import 'package:namma_wallet/src/features/home/domain/ticket.dart';
+import 'package:namma_wallet/src/features/tnstc/application/i_ticket_parser.dart';
 import 'package:namma_wallet/src/features/tnstc/domain/tnstc_model.dart';
 
-class TNSTCSMSParser {
+/// Parses TNSTC SMS messages into structured ticket data.
+///
+/// Handles both conductor SMS and booking confirmation SMS formats.
+/// Falls back to default values if parsing fails for individual fields.
+/// Never throws - returns a model with partial data on errors.
+class TNSTCSMSParser implements ITicketParser {
+  @override
   Ticket parseTicket(String smsText) {
     String extractMatch(String pattern, String input, {int groupIndex = 1}) {
       final regex = RegExp(pattern, multiLine: true);
