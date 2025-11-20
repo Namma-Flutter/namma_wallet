@@ -1,8 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
-import 'package:namma_wallet/src/common/database/i_ticket_dao.dart';
-import 'package:namma_wallet/src/common/database/i_wallet_database.dart';
 import 'package:namma_wallet/src/common/database/ticket_dao.dart';
+import 'package:namma_wallet/src/common/database/ticket_dao_interface.dart';
+import 'package:namma_wallet/src/common/database/wallet_database_interface.dart';
 import 'package:namma_wallet/src/common/services/logger_interface.dart';
 import 'package:namma_wallet/src/features/common/enums/ticket_type.dart';
 import 'package:namma_wallet/src/features/home/domain/extras_model.dart';
@@ -20,7 +20,7 @@ void main() {
     final getIt = GetIt.instance;
     late FakeDatabase fakeDb;
     late IWalletDatabase database;
-    late ITicketDao ticketDao;
+    late ITicketDAO ticketDao;
 
     setUp(() async {
       // Register fake logger

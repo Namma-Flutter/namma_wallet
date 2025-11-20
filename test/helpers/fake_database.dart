@@ -1,4 +1,4 @@
-import 'package:namma_wallet/src/common/database/i_wallet_database.dart';
+import 'package:namma_wallet/src/common/database/wallet_database_interface.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 class FakeDatabase implements IWalletDatabase {

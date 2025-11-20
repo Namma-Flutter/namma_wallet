@@ -1,10 +1,10 @@
 import 'package:get_it/get_it.dart';
-import 'package:namma_wallet/src/common/database/i_ticket_dao.dart';
-import 'package:namma_wallet/src/common/database/i_user_dao.dart';
-import 'package:namma_wallet/src/common/database/i_wallet_database.dart';
 import 'package:namma_wallet/src/common/database/ticket_dao.dart';
+import 'package:namma_wallet/src/common/database/ticket_dao_interface.dart';
 import 'package:namma_wallet/src/common/database/user_dao.dart';
+import 'package:namma_wallet/src/common/database/user_dao_interface.dart';
 import 'package:namma_wallet/src/common/database/wallet_database.dart';
+import 'package:namma_wallet/src/common/database/wallet_database_interface.dart';
 import 'package:namma_wallet/src/common/services/logger_interface.dart';
 import 'package:namma_wallet/src/common/services/namma_logger.dart';
 import 'package:namma_wallet/src/common/services/sharing_intent_service.dart';
@@ -12,7 +12,7 @@ import 'package:namma_wallet/src/common/theme/theme_provider.dart';
 import 'package:namma_wallet/src/features/ai/fallback-parser/application/gemma_service.dart';
 import 'package:namma_wallet/src/features/clipboard/application/clipboard_service.dart';
 import 'package:namma_wallet/src/features/clipboard/data/clipboard_repository.dart';
-import 'package:namma_wallet/src/features/clipboard/domain/i_clipboard_repository.dart';
+import 'package:namma_wallet/src/features/clipboard/domain/clipboard_repository_interface.dart';
 import 'package:namma_wallet/src/features/common/application/travel_parser_service.dart';
 import 'package:namma_wallet/src/features/irctc/application/irctc_qr_parser.dart';
 import 'package:namma_wallet/src/features/irctc/application/irctc_scanner_service.dart';
@@ -49,6 +49,6 @@ void setupLocator() {
     // Database
     ..registerSingleton<IWalletDatabase>(WalletDatabase())
     // DAOs
-    ..registerLazySingleton<ITicketDao>(TicketDao.new)
-    ..registerLazySingleton<IUserDao>(UserDao.new);
+    ..registerLazySingleton<ITicketDAO>(TicketDao.new)
+    ..registerLazySingleton<IUserDAO>(UserDao.new);
 }

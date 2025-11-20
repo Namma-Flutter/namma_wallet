@@ -1,7 +1,7 @@
 import 'package:namma_wallet/src/features/home/domain/ticket.dart';
 
 /// Abstract interface for Ticket Data Access Object
-abstract interface class ITicketDao {
+abstract interface class ITicketDAO {
   /// Insert a ticket into the database
   Future<int> insertTicket(Ticket ticket);
 

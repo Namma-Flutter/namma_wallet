@@ -1,5 +1,5 @@
-import 'package:namma_wallet/src/common/database/i_wallet_database.dart';
 import 'package:namma_wallet/src/common/database/wallet_database.dart';
+import 'package:namma_wallet/src/common/database/wallet_database_interface.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/services/logger_interface.dart';
 import 'package:sqflite/sqflite.dart';

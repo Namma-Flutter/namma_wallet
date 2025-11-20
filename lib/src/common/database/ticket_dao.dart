@@ -1,14 +1,14 @@
 import 'dart:convert';
 
-import 'package:namma_wallet/src/common/database/i_ticket_dao.dart';
-import 'package:namma_wallet/src/common/database/i_wallet_database.dart';
+import 'package:namma_wallet/src/common/database/ticket_dao_interface.dart';
+import 'package:namma_wallet/src/common/database/wallet_database_interface.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/services/logger_interface.dart';
 import 'package:namma_wallet/src/features/home/domain/ticket.dart';
 import 'package:sqflite/sqflite.dart';
 
 /// Data Access Object for Ticket operations
-class TicketDao implements ITicketDao {
+class TicketDao implements ITicketDAO {
   TicketDao({IWalletDatabase? database, ILogger? logger})
     : _database = database ?? getIt<IWalletDatabase>(),
       _logger = logger ?? getIt<ILogger>();

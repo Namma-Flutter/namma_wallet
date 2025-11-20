@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:namma_wallet/src/common/database/i_ticket_dao.dart';
+import 'package:namma_wallet/src/common/database/ticket_dao_interface.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/services/logger_interface.dart';
 import 'package:namma_wallet/src/features/home/domain/ticket.dart';
@@ -231,7 +231,7 @@ class PDFParserService {
       // Save to database
       try {
         _logger.logDatabase('Insert', 'Saving parsed PDF ticket to database');
-        final ticketId = await getIt<ITicketDao>().insertTicket(
+        final ticketId = await getIt<ITicketDAO>().insertTicket(
           parsedTicket,
         );
         final updatedTicket = parsedTicket.copyWith(

@@ -1,5 +1,5 @@
 import 'package:namma_wallet/src/features/home/domain/ticket.dart';
-import 'package:namma_wallet/src/features/tnstc/application/i_ticket_parser.dart';
+import 'package:namma_wallet/src/features/tnstc/application/ticket_parser_interface.dart';
 import 'package:namma_wallet/src/features/tnstc/domain/tnstc_model.dart';
 
 /// Parses TNSTC SMS messages into structured ticket data.

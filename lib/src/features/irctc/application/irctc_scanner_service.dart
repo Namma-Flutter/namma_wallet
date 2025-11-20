@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:namma_wallet/src/common/database/i_ticket_dao.dart';
+import 'package:namma_wallet/src/common/database/ticket_dao_interface.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/services/logger_interface.dart';
 import 'package:namma_wallet/src/features/home/domain/ticket.dart';
@@ -77,7 +77,7 @@ class IRCTCScannerService {
 
       // Save to database
       try {
-        final _ = await getIt<ITicketDao>().insertTicket(
+        final _ = await getIt<ITicketDAO>().insertTicket(
           travelTicket,
         );
         final updatedTicket = travelTicket.copyWith(

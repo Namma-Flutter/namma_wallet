@@ -1,7 +1,7 @@
 import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/services/logger_interface.dart';
 import 'package:namma_wallet/src/features/home/domain/ticket.dart';
-import 'package:namma_wallet/src/features/tnstc/application/i_ticket_parser.dart';
+import 'package:namma_wallet/src/features/tnstc/application/ticket_parser_interface.dart';
 import 'package:namma_wallet/src/features/tnstc/domain/tnstc_model.dart';
 
 /// Parses TNSTC (Tamil Nadu State Transport Corporation) PDF tickets

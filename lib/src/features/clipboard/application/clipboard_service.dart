@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:namma_wallet/src/common/database/i_ticket_dao.dart';
+import 'package:namma_wallet/src/common/database/ticket_dao_interface.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/services/logger_interface.dart';
 import 'package:namma_wallet/src/features/clipboard/domain/clipboard_content_type.dart';
+import 'package:namma_wallet/src/features/clipboard/domain/clipboard_repository_interface.dart';
 import 'package:namma_wallet/src/features/clipboard/domain/clipboard_result.dart';
-import 'package:namma_wallet/src/features/clipboard/domain/i_clipboard_repository.dart';
 import 'package:namma_wallet/src/features/common/application/travel_parser_service.dart';
 import 'package:namma_wallet/src/features/common/enums/source_type.dart';
 import 'package:namma_wallet/src/features/home/domain/ticket.dart';
@@ -29,16 +29,16 @@ class ClipboardService {
     IClipboardRepository? repository,
     ILogger? logger,
     TravelParserService? parserService,
-    ITicketDao? ticketDao,
+    ITicketDAO? ticketDao,
   }) : _repository = repository ?? getIt<IClipboardRepository>(),
        _logger = logger ?? getIt<ILogger>(),
        _parserService = parserService ?? getIt<TravelParserService>(),
-       _ticketDao = ticketDao ?? getIt<ITicketDao>();
+       _ticketDao = ticketDao ?? getIt<ITicketDAO>();
 
   final IClipboardRepository _repository;
   final ILogger _logger;
   final TravelParserService _parserService;
-  final ITicketDao _ticketDao;
+  final ITicketDAO _ticketDao;
 
   /// Maximum allowed text length to prevent spam/abuse
   static const int maxTextLength = 10000;

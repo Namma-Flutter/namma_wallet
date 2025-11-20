@@ -3,7 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:namma_wallet/src/common/services/logger_interface.dart';
 import 'package:namma_wallet/src/features/clipboard/data/clipboard_repository.dart';
-import 'package:namma_wallet/src/features/clipboard/domain/i_clipboard_repository.dart';
+import 'package:namma_wallet/src/features/clipboard/domain/clipboard_repository_interface.dart';
 
 import '../../../../helpers/fake_logger.dart';
 

@@ -1,12 +1,13 @@
-import 'package:namma_wallet/src/common/database/i_ticket_dao.dart';
+import 'package:namma_wallet/src/common/database/ticket_dao_interface.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/features/home/domain/ticket.dart';
 
 Future<void> checkAndUpdateTNSTCTicket(Ticket ticket) async {
-  final ticketDao = getIt<ITicketDao>();
+  final ticketDao = getIt<ITicketDAO>();
 
-  if (ticket.ticketId == null) {
-    // Or handle this case appropriately
+  final id = ticket.ticketId;
+  if (id == null || id.trim().isEmpty) {
+    // Skip tickets with null or empty/whitespace ticketId
     return;
   }
 

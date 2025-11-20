@@ -1,7 +1,7 @@
 import 'package:flutter/services.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/services/logger_interface.dart';
-import 'package:namma_wallet/src/features/clipboard/domain/i_clipboard_repository.dart';
+import 'package:namma_wallet/src/features/clipboard/domain/clipboard_repository_interface.dart';
 
 /// Implementation of [IClipboardRepository] using Flutter's Clipboard API.
 ///
