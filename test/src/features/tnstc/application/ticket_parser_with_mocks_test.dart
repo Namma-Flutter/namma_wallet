@@ -313,8 +313,7 @@ Conductor Mobile No: 9876543210, Vehicle No:TN01AB1234
           final extras = ticket.extras!;
           expect(
             extras.any(
-              (e) =>
-                  e.title == 'Conductor Contact' && e.value == '9876543210',
+              (e) => e.title == 'Conductor Contact' && e.value == '9876543210',
             ),
             isTrue,
           );
@@ -354,9 +353,8 @@ Conductor Mobile No: 9876543210, Vehicle No:TN01AB1234
           final ticket = parser.parseTicket(smsText);
 
           // Assert (Then)
-          // PNR extraction depends on regex pattern
           expect(ticket, isNotNull);
-          expect(ticket.ticketId, anyOf(equals('T88888888'), isEmpty));
+          expect(ticket.ticketId, equals('T88888888'));
         },
       );
 
@@ -554,7 +552,8 @@ Platform Number :
         () {
           // Arrange (Given)
           final longText = 'A' * 10000;
-          final pdfText = '''
+          final pdfText =
+              '''
 Corporation : SETC
 PNR Number : T12345678
 Trip Code : TEST123

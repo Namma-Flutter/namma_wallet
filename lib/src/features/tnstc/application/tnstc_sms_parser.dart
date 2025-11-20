@@ -35,12 +35,12 @@ class TNSTCSMSParser implements ITicketParser {
 
     // Common fields
     final pnrNumber = extractMatch(
-      r'PNR NO\.\s*:\s*([^,\s]+)|PNR:([^,\s]+)',
+      r'(?:PNR NO\.\s*|PNR)\s*:\s*([^,\s]+)',
       smsText,
     );
     final journeyDate = parseDate(
       extractMatch(
-        r'Journey Date\s*:\s*(\d{2}/\d{2}/\d{4})|DOJ:(\d{2}/\d{2}/\d{4})',
+        r'(?:Journey Date|DOJ)\s*:\s*(\d{2}/\d{2}/\d{4})',
         smsText,
       ),
     );
