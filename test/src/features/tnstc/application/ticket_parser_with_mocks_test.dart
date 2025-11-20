@@ -235,23 +235,28 @@ JohnDoe 30 Adult M 2B
           final ticket = parser.parseTicket(pdfText);
 
           // Assert (Then)
-          final passengerName = ticket.extras
-              ?.firstWhere((e) => e.title == 'Passenger Name')
-              .value;
+          final passengerNameExtras =
+              ticket.extras?.where((e) => e.title == 'Passenger Name') ?? [];
+          final passengerName = passengerNameExtras.isNotEmpty
+              ? passengerNameExtras.first.value
+              : null;
           expect(passengerName, equals('JohnDoe'));
 
-          final age = ticket.extras?.firstWhere((e) => e.title == 'Age').value;
+          final ageExtras = ticket.extras?.where((e) => e.title == 'Age') ?? [];
+          final age = ageExtras.isNotEmpty ? ageExtras.first.value : null;
           expect(age, equals('30'));
 
-          final gender = ticket.extras
-              ?.firstWhere((e) => e.title == 'Gender')
-              .value;
+          final genderExtras =
+              ticket.extras?.where((e) => e.title == 'Gender') ?? [];
+          final gender = genderExtras.isNotEmpty
+              ? genderExtras.first.value
+              : null;
           expect(gender, equals('M'));
 
-          final seat = ticket.tags
-              ?.firstWhere((t) => t.icon == 'event_seat')
-              .value;
-          expect(seat, equals('2B'));
+          final seatTags =
+              ticket.tags?.where((t) => t.icon == 'event_seat') ?? [];
+          final seat = seatTags.isNotEmpty ? seatTags.first : null;
+          expect(seat?.value, equals('2B'));
         },
       );
     });
