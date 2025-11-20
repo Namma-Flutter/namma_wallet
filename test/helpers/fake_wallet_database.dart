@@ -1,15 +1,16 @@
 import 'package:namma_wallet/src/common/database/wallet_database.dart';
 import 'package:namma_wallet/src/common/database/wallet_database_interface.dart';
-import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/services/logger_interface.dart';
 import 'package:sqflite/sqflite.dart';
 
 import 'fake_database.dart';
 
-/// Test wrapper that uses real WalletDatabase with FakeDatabase
+/// Test wrapper that uses real WalletDatabase with FakeDatabase.
+///
+/// Requires explicit logger to avoid relying on global state in tests.
 class FakeWalletDatabase implements IWalletDatabase {
-  FakeWalletDatabase({required this.fakeDb, ILogger? logger})
-    : _walletDb = _TestWalletDatabase(fakeDb, logger ?? getIt<ILogger>());
+  FakeWalletDatabase({required this.fakeDb, required ILogger logger})
+    : _walletDb = _TestWalletDatabase(fakeDb, logger);
 
   final FakeDatabase fakeDb;
   final _TestWalletDatabase _walletDb;

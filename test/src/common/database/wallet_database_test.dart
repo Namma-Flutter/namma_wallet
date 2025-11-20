@@ -21,22 +21,26 @@ void main() {
     late FakeDatabase fakeDb;
     late IWalletDatabase database;
     late ITicketDAO ticketDao;
+    late ILogger logger;
 
     setUp(() async {
-      // Register fake logger
+      // Create fake logger
+      logger = FakeLogger();
+
+      // Register fake logger in GetIt for TicketDao
       if (!getIt.isRegistered<ILogger>()) {
-        getIt.registerSingleton<ILogger>(FakeLogger());
+        getIt.registerSingleton<ILogger>(logger);
       }
 
       // Create fake database with WalletDatabase wrapper
       fakeDb = FakeDatabase();
-      database = FakeWalletDatabase(fakeDb: fakeDb);
+      database = FakeWalletDatabase(fakeDb: fakeDb, logger: logger);
 
       // Initialize database
       await database.database;
 
       // Create TicketDao with the fake database
-      ticketDao = TicketDao(database: database);
+      ticketDao = TicketDao(database: database, logger: logger);
     });
 
     tearDown(() async {
