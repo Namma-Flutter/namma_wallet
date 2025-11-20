@@ -4,10 +4,12 @@ import 'package:namma_wallet/src/common/database/ticket_dao_interface.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/helper/date_time_converter.dart';
 import 'package:namma_wallet/src/common/routing/app_routes.dart';
+import 'package:namma_wallet/src/common/services/logger_interface.dart';
 import 'package:namma_wallet/src/common/theme/styles.dart';
 import 'package:namma_wallet/src/common/widgets/snackbar_widget.dart';
 import 'package:namma_wallet/src/features/common/enums/ticket_type.dart';
 import 'package:namma_wallet/src/features/home/domain/ticket.dart';
+import 'package:namma_wallet/src/features/home/domain/ticket_extensions.dart';
 import 'package:namma_wallet/src/features/home/presentation/widgets/ticket_card_widget.dart';
 
 class AllTicketsView extends StatefulWidget {
@@ -42,9 +44,15 @@ class _AllTicketsViewState extends State<AllTicketsView> {
         _allTickets = tickets;
         _isLoading = false;
       });
-    } on Object catch (e) {
+    } on Object catch (e, stackTrace) {
+      getIt<ILogger>().error('Failed to load tickets', e, stackTrace);
+
       if (!mounted) return;
-      showSnackbar(context, 'Error loading tickets: $e', isError: true);
+      showSnackbar(
+        context,
+        'Unable to load tickets. Please try again.',
+        isError: true,
+      );
       setState(() {
         _isLoading = false;
       });
@@ -258,13 +266,16 @@ class TravelTicketListCardWidget extends StatelessWidget {
   }
 
   String _getFromLocation() {
-    // Extract from location from primaryText (format: "From → To")
-    final parts = ticket.primaryText.split('→');
-    return parts.isNotEmpty ? parts[0].trim() : ticket.primaryText;
+    // Use centralized ticket extension for consistent route parsing
+    return ticket.fromLocation ?? ticket.primaryText.split('→')[0].trim();
   }
 
   String _getToLocation() {
-    // Extract to location from primaryText (format: "From → To")
+    // Use centralized ticket extension for consistent route parsing
+    final to = ticket.toLocation;
+    if (to != null) return to;
+
+    // Fallback: parse from primaryText if extension returns null
     final parts = ticket.primaryText.split('→');
     return parts.length > 1 ? parts[1].trim() : '';
   }

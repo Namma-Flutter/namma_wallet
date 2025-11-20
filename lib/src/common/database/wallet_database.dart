@@ -6,15 +6,6 @@ import 'package:namma_wallet/src/common/services/logger_interface.dart';
 import 'package:path/path.dart' as p;
 import 'package:sqflite/sqflite.dart';
 
-class DuplicateTicketException implements Exception {
-  const DuplicateTicketException(this.message);
-
-  final String message;
-
-  @override
-  String toString() => 'DuplicateTicketException: $message';
-}
-
 class WalletDatabase implements IWalletDatabase {
   WalletDatabase({ILogger? logger}) : _logger = logger ?? getIt<ILogger>();
   final ILogger _logger;

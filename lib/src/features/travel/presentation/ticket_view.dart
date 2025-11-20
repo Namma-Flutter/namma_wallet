@@ -54,17 +54,6 @@ class _TicketViewState extends State<TicketView> {
     return ticket.extras!;
   }
 
-  String getRouteDisplay(Ticket ticket) {
-    final from = ticket.fromLocation;
-    final to = ticket.toLocation;
-
-    if (from != null && to != null) {
-      return '$from → $to';
-    }
-
-    return ticket.primaryText;
-  }
-
   ///
   // ignore: unused_element
   Future<void> _pinToHomeScreen() async {
