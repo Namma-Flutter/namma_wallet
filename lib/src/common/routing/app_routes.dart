@@ -15,6 +15,9 @@ enum AppRoute {
   // Export functionality
   export(path: '/export', name: 'export'),
 
+  // Share success
+  shareSuccess(path: '/share-success', name: 'shareSuccess'),
+
   // Settings and configuration
   settings(path: '/settings', name: 'settings'),
   license(path: '/license', name: 'license'),
