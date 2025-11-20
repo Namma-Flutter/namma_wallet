@@ -1,5 +1,4 @@
 import 'package:namma_wallet/src/common/database/i_wallet_database.dart';
-import 'package:namma_wallet/src/features/home/domain/ticket.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 class FakeDatabase implements IWalletDatabase {
@@ -12,9 +11,6 @@ class FakeDatabase implements IWalletDatabase {
     if (forceException) {
       throw Exception('Forced database exception');
     }
-
-    sqfliteFfiInit();
-    databaseFactory = databaseFactoryFfiNoIsolate;
 
     return openDatabase(
       inMemoryDatabasePath,
@@ -84,43 +80,5 @@ class FakeDatabase implements IWalletDatabase {
   /// Reset the database instance for testing isolation
   static void reset() {
     _database = null;
-  }
-
-  // Stub implementations for interface compliance
-  // These can be implemented if needed for specific test scenarios
-
-  @override
-  Future<int> deleteTicket(String id) {
-    throw UnimplementedError('Use WalletDatabase for full implementation');
-  }
-
-  @override
-  Future<List<Map<String, Object?>>> fetchAllUsers() {
-    throw UnimplementedError('Use WalletDatabase for full implementation');
-  }
-
-  @override
-  Future<List<Ticket>> getAllTickets() {
-    throw UnimplementedError('Use WalletDatabase for full implementation');
-  }
-
-  @override
-  Future<Ticket?> getTicketById(String id) {
-    throw UnimplementedError('Use WalletDatabase for full implementation');
-  }
-
-  @override
-  Future<List<Ticket>> getTicketsByType(String type) {
-    throw UnimplementedError('Use WalletDatabase for full implementation');
-  }
-
-  @override
-  Future<int> insertTicket(Ticket ticket) {
-    throw UnimplementedError('Use WalletDatabase for full implementation');
-  }
-
-  @override
-  Future<int> updateTicketById(String ticketId, Map<String, Object?> updates) {
-    throw UnimplementedError('Use WalletDatabase for full implementation');
   }
 }
