@@ -8,10 +8,7 @@ String formatTime(DateTime dt) {
   return DateFormat('hh:mm a').format(local).toLowerCase();
 }
 
-/// Formats a DateTime as date string (e.g., "18/01/2026").
-/// Converts to local time before formatting to handle
-/// UTC datetimes from database.
-String formatDate(DateTime dt) {
+String getDate(DateTime dt) {
   final local = dt.toLocal();
   return DateFormat('dd/MM/yyyy').format(local);
 }
