@@ -13,6 +13,7 @@ import 'package:namma_wallet/src/common/widgets/snackbar_widget.dart';
 import 'package:namma_wallet/src/features/common/enums/ticket_type.dart';
 import 'package:namma_wallet/src/features/home/domain/extras_model.dart';
 import 'package:namma_wallet/src/features/home/domain/ticket.dart';
+import 'package:namma_wallet/src/features/home/domain/ticket_extensions.dart';
 import 'package:namma_wallet/src/features/travel/presentation/widgets/custom_ticket_shape_line.dart';
 import 'package:namma_wallet/src/features/travel/presentation/widgets/ticket_view_widget.dart';
 import 'package:qr_flutter/qr_flutter.dart';
@@ -34,49 +35,14 @@ class _TicketViewState extends State<TicketView> {
     return (value?.isEmpty ?? true) ? '--' : value!;
   }
 
-  bool hasPnrOrId(Ticket ticket) {
-    return getPnrOrId(ticket) != null;
-  }
-
-  String? getPnrOrId(Ticket ticket) {
-    for (final extra in ticket.extras ?? <ExtrasModel>[]) {
-      if (extra.title?.toLowerCase() == 'pnr number') {
-        return extra.value;
-      }
-    }
-
-    for (final extra in ticket.extras ?? <ExtrasModel>[]) {
-      if (extra.title?.toLowerCase() == 'booking id') {
-        return extra.value;
-      }
-    }
-    return null;
-  }
-
-  String? getFromLocation(Ticket ticket) {
-    for (final extra in ticket.extras ?? <ExtrasModel>[]) {
-      if (extra.title?.toLowerCase() == 'from') {
-        return extra.value;
-      }
-    }
-    return null;
-  }
-
-  String? getToLocation(Ticket ticket) {
-    for (final extra in ticket.extras ?? <ExtrasModel>[]) {
-      if (extra.title?.toLowerCase() == 'to') {
-        return extra.value;
-      }
-    }
-    return null;
-  }
+  // Helper methods moved to TicketExtrasExtension in ticket_extensions.dart
 
   List<ExtrasModel> getFilteredExtras(Ticket ticket) {
     if (ticket.extras == null) return [];
 
     // Filter out From and To if both exist
-    final from = getFromLocation(ticket);
-    final to = getToLocation(ticket);
+    final from = ticket.fromLocation;
+    final to = ticket.toLocation;
 
     if (from != null && to != null) {
       return ticket.extras!.where((extra) {
@@ -89,8 +55,8 @@ class _TicketViewState extends State<TicketView> {
   }
 
   String getRouteDisplay(Ticket ticket) {
-    final from = getFromLocation(ticket);
-    final to = getToLocation(ticket);
+    final from = ticket.fromLocation;
+    final to = ticket.toLocation;
 
     if (from != null && to != null) {
       return '$from → $to';
@@ -340,8 +306,8 @@ class _TicketViewState extends State<TicketView> {
 
                         //* Route Display (From → To with chips)
                         ...() {
-                          final from = getFromLocation(widget.ticket);
-                          final to = getToLocation(widget.ticket);
+                          final from = widget.ticket.fromLocation;
+                          final to = widget.ticket.toLocation;
 
                           if (from != null && to != null) {
                             return <Widget>[
@@ -559,7 +525,7 @@ class _TicketViewState extends State<TicketView> {
                           ),
                     ),
                   ),
-                  if (hasPnrOrId(widget.ticket))
+                  if (widget.ticket.hasPnrOrId)
                     Container(
                       margin: const EdgeInsets.only(
                         bottom: 16,
@@ -584,7 +550,7 @@ class _TicketViewState extends State<TicketView> {
                       ),
                       child: Center(
                         child: QrImageView(
-                          data: getPnrOrId(widget.ticket) ?? 'xxx',
+                          data: widget.ticket.pnrOrId ?? 'xxx',
                           size: 200,
                           eyeStyle: QrEyeStyle(
                             eyeShape: QrEyeShape.square,

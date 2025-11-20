@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:namma_wallet/src/common/helper/date_time_converter.dart';
 import 'package:namma_wallet/src/common/theme/styles.dart';
 import 'package:namma_wallet/src/features/common/enums/ticket_type.dart';
-import 'package:namma_wallet/src/features/home/domain/extras_model.dart';
 import 'package:namma_wallet/src/features/home/domain/ticket.dart';
+import 'package:namma_wallet/src/features/home/domain/ticket_extensions.dart';
 import 'package:namma_wallet/src/features/travel/presentation/widgets/ticket_view_widget.dart';
 
 class TravelTicketCardWidget extends StatelessWidget {
@@ -16,24 +16,6 @@ class TravelTicketCardWidget extends StatelessWidget {
 
   final Ticket ticket;
   final VoidCallback? onTicketDeleted;
-
-  String? getFromLocation(Ticket ticket) {
-    for (final extra in ticket.extras ?? <ExtrasModel>[]) {
-      if (extra.title?.toLowerCase() == 'from') {
-        return extra.value;
-      }
-    }
-    return null;
-  }
-
-  String? getToLocation(Ticket ticket) {
-    for (final extra in ticket.extras ?? <ExtrasModel>[]) {
-      if (extra.title?.toLowerCase() == 'to') {
-        return extra.value;
-      }
-    }
-    return null;
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -121,8 +103,8 @@ class TravelTicketCardWidget extends StatelessWidget {
 
               //* From to To
               ...() {
-                final from = getFromLocation(ticket);
-                final to = getToLocation(ticket);
+                final from = ticket.fromLocation;
+                final to = ticket.toLocation;
 
                 if (from != null && to != null) {
                   return <Widget>[
