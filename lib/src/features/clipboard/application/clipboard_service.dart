@@ -98,9 +98,9 @@ class ClipboardService {
 
       // Step 6: If not a travel ticket, return as plain text
       return ClipboardResult.success(ClipboardContentType.text, content);
-    } on Exception catch (e) {
-      _logger.error('Unexpected exception in clipboard service: $e');
-      return ClipboardResult.error('Unexpected error occurred: $e');
+    } on Object catch (e, stackTrace) {
+      _logger.error('Unexpected exception in clipboard service', e, stackTrace);
+      return ClipboardResult.error('Unexpected error. Please try again.');
     }
   }
 
@@ -160,7 +160,7 @@ class ClipboardService {
       );
     } on Object catch (e, stackTrace) {
       _logger.error('Failed to save ticket to database', e, stackTrace);
-      return ClipboardResult.error('Failed to save ticket: $e');
+      return ClipboardResult.error('Failed to save ticket. Please try again.');
     }
   }
 
