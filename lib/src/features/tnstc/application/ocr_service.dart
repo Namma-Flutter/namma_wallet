@@ -11,14 +11,17 @@ class OCRService {
   Future<String> extractTextFromPDF(File pdfFile) async {
     final logger = getIt<ILogger>();
 
+    PdfDocument? doc;
+    TextRecognizer? textRecognizer;
+
     try {
       logger.debug('[OCRService] Starting OCR extraction from PDF');
 
       // Open the PDF document
-      final doc = await PdfDocument.openFile(pdfFile.path);
+      doc = await PdfDocument.openFile(pdfFile.path);
       logger.debug('[OCRService] PDF opened, pages: ${doc.pages.length}');
 
-      final textRecognizer = TextRecognizer();
+      textRecognizer = TextRecognizer();
       final extractedTexts = <String>[];
 
       // Get temp directory once outside the loop
@@ -98,10 +101,6 @@ class OCRService {
         }
       }
 
-      // Clean up
-      await textRecognizer.close();
-      await doc.dispose();
-
       final combinedText = extractedTexts.join('\n\n');
       logger.debug(
         '[OCRService] OCR complete: ${combinedText.length} total chars from '
@@ -112,6 +111,14 @@ class OCRService {
     } on Object catch (e, stackTrace) {
       logger.error('[OCRService] OCR extraction failed', e, stackTrace);
       rethrow;
+    } finally {
+      // Always clean up resources, even if an exception occurred
+      if (textRecognizer != null) {
+        await textRecognizer.close();
+      }
+      if (doc != null) {
+        await doc.dispose();
+      }
     }
   }
 }
