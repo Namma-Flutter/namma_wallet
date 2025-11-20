@@ -299,10 +299,11 @@ class TNSTCPDFParser implements ITicketParser {
       passengers.add(passengerInfo);
     }
 
-    // Set boarding point to passenger pickup point if not explicitly provided
+    // Set boarding point with fallback chain:
+    // passengerPickupPoint > passengerStartPlace > null
     final boardingPoint = passengerPickupPoint.isNotEmpty
         ? passengerPickupPoint
-        : null;
+        : (passengerStartPlace.isNotEmpty ? passengerStartPlace : null);
 
     final tnstcModel = TNSTCTicketModel(
       corporation: corporation,
