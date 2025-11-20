@@ -248,12 +248,14 @@ class TNSTCPDFParser implements ITicketParser {
       if (pdfText.contains('Government Issued Photo')) {
         idCardType = 'Government Issued Photo ID Card';
       } else {
-        // Try looser match
-        idCardType = extractMatch(r'ID Card Type\s*(.*)', pdfText);
+        // Try looser match - explicitly handle optional colon and whitespace
+        idCardType = extractMatch(r'ID Card Type\s*:?\s*(.*)', pdfText).trim();
         // Clean up if it grabbed too much or garbage
         if (idCardType.contains('rD Card')) {
           idCardType = idCardType.replaceAll('rD Card', '').trim();
         }
+        // Remove any leading colon or punctuation that might remain
+        idCardType = idCardType.replaceFirst(RegExp(r'^[:;\s]+'), '');
       }
     }
 
