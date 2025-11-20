@@ -587,6 +587,33 @@ Adult
         expect(gender, equals('M'));
       });
 
+      test('Given vertical headers with Seat No, When parsing, '
+          'Then extracts seat number correctly', () {
+        const pdfText = '''
+Corporation : SETC
+PNR Number : T12345678
+Trip Code : TEST123
+Passenger Information
+Name
+HarishAnbalagan
+Age
+26
+Adult/Child
+Adult
+Gender
+M
+Seat No.
+2LB
+''';
+
+        final ticket = parser.parseTicket(pdfText);
+
+        final seatTag = ticket.tags
+            ?.firstWhere((t) => t.icon == 'event_seat')
+            .value;
+        expect(seatTag, equals('2LB'));
+      });
+
       test('Given missing passenger information, When parsing ticket, '
           'Then handles gracefully without passenger fields', () {
         const pdfText = '''

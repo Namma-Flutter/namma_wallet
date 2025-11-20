@@ -234,7 +234,21 @@ class TNSTCPDFParser implements ITicketParser {
         passengerType = typeMatch.group(1) ?? '';
       }
 
-      // Try to find seat number if possible, though it's harder without context
+      final seatInlineMatch = RegExp(
+        r'Seat No\.?\s*(?:[:\-]?\s*)?(?:\n\s*)?([A-Z0-9]+(?:\s*,\s*[A-Z0-9]+)*)',
+        multiLine: true,
+      ).firstMatch(pdfText);
+      if (seatInlineMatch != null) {
+        passengerSeatNumber = (seatInlineMatch.group(1) ?? '').trim();
+      } else {
+        final genderBlockSeatMatch = RegExp(
+          r'Gender\s*\n\s*[MF]\s*\n\s*([A-Z0-9]+)',
+          multiLine: true,
+        ).firstMatch(pdfText);
+        if (genderBlockSeatMatch != null) {
+          passengerSeatNumber = (genderBlockSeatMatch.group(1) ?? '').trim();
+        }
+      }
     }
 
     var idCardType = extractMatch(
