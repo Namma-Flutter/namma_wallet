@@ -367,7 +367,8 @@ Conductor Mobile No: 9876543210, Vehicle No:TN01AB1234
       );
 
       test(
-        'Given SMS with multiple seat numbers, When parsing ticket, '
+        'Given SMS with multiple seat numbers, '
+        'When parsing ticket, '
         'Then calculates seat count correctly',
         () {
           // Arrange (Given)
@@ -380,13 +381,16 @@ Seat No. : 1A,2B,3C, Journey Date : 15/12/2024
           final ticket = parser.parseTicket(smsText);
 
           // Assert (Then)
-          final seatsExtra = ticket.extras
-              ?.firstWhere((e) => e.title == 'Seats')
-              .value;
+          final seatExtras =
+              ticket.extras?.where((e) => e.title == 'Seats') ?? [];
+          final seatsValue = seatExtras.isNotEmpty
+              ? seatExtras.first.value
+              : null;
+
           // Parser counts seats by splitting on commas and
           // filtering empty strings
           // "1A,2B,3C" should count as exactly 3 seats
-          expect(seatsExtra, equals('3'));
+          expect(seatsValue, equals('3'));
         },
       );
     });
