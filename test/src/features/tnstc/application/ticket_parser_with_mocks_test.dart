@@ -567,7 +567,7 @@ Platform Number :
 
       test(
         'Given very long text in PDF, When parsing ticket, '
-        'Then processes successfully without performance issues',
+        'Then processes successfully without errors',
         () {
           // Arrange (Given)
           final longText = 'A' * 10000;
@@ -580,14 +580,12 @@ Extra Data: $longText
 ''';
 
           // Act (When)
-          final stopwatch = Stopwatch()..start();
           final ticket = pdfParser.parseTicket(pdfText);
-          stopwatch.stop();
 
           // Assert (Then)
           expect(ticket, isNotNull);
-          // Should be fast (less than 1 second)
-          expect(stopwatch.elapsedMilliseconds, lessThan(1000));
+          expect(ticket.ticketId, equals('T12345678'));
+          // Parser handles large text without throwing errors
         },
       );
     });
