@@ -1,188 +1,177 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:namma_wallet/src/common/database/wallet_database.dart';
+import 'package:namma_wallet/src/common/database/ticket_dao_interface.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/services/logger_interface.dart';
+import 'package:namma_wallet/src/features/clipboard/domain/clipboard_content_type.dart';
+import 'package:namma_wallet/src/features/clipboard/domain/clipboard_repository_interface.dart';
+import 'package:namma_wallet/src/features/clipboard/domain/clipboard_result.dart';
 import 'package:namma_wallet/src/features/common/application/travel_parser_service.dart';
 import 'package:namma_wallet/src/features/common/enums/source_type.dart';
 import 'package:namma_wallet/src/features/home/domain/ticket.dart';
 
-enum ClipboardContentType {
-  text,
-  travelTicket,
-  invalid,
-}
-
-class ClipboardResult {
-  const ClipboardResult({
-    required this.type,
-    required this.isSuccess,
-    this.content,
-    this.ticket,
-    this.errorMessage,
-  });
-
-  factory ClipboardResult.success(
-    ClipboardContentType type,
-    String content, {
-    Ticket? ticket,
-  }) {
-    return ClipboardResult(
-      type: type,
-      content: content,
-      ticket: ticket,
-      isSuccess: true,
-    );
-  }
-
-  factory ClipboardResult.error(String errorMessage) {
-    return ClipboardResult(
-      type: ClipboardContentType.invalid,
-      errorMessage: errorMessage,
-      isSuccess: false,
-    );
-  }
-
-  final ClipboardContentType type;
-  final String? content;
-  final Ticket? ticket;
-  final String? errorMessage;
-  final bool isSuccess;
-}
-
+/// Application service for clipboard operations.
+///
+/// Orchestrates clipboard reading, content validation, parsing,
+/// and ticket storage. Acts as a use case coordinator between
+/// the clipboard repository, parser service, and database.
+///
+/// Never throws - all errors are returned as [ClipboardResult.error].
 class ClipboardService {
-  ClipboardService({ILogger? logger, TravelParserService? parserService})
-    : _logger = logger ?? getIt<ILogger>(),
-      _parserService = parserService ?? getIt<TravelParserService>();
+  /// Creates a clipboard service.
+  ///
+  /// [repository] - Repository for clipboard access
+  /// [logger] - Logger for debugging
+  /// [parserService] - Service for parsing travel tickets
+  /// [ticketDao] - DAO for ticket database operations
+  ///
+  /// Uses GetIt to resolve dependencies if not provided.
+  ClipboardService({
+    IClipboardRepository? repository,
+    ILogger? logger,
+    TravelParserService? parserService,
+    ITicketDAO? ticketDao,
+  }) : _repository = repository ?? getIt<IClipboardRepository>(),
+       _logger = logger ?? getIt<ILogger>(),
+       _parserService = parserService ?? getIt<TravelParserService>(),
+       _ticketDao = ticketDao ?? getIt<ITicketDAO>();
+
+  final IClipboardRepository _repository;
   final ILogger _logger;
   final TravelParserService _parserService;
+  final ITicketDAO _ticketDao;
 
+  /// Maximum allowed text length to prevent spam/abuse
+  static const int maxTextLength = 10000;
+
+  /// Reads clipboard content and attempts to parse it as a travel ticket.
+  ///
+  /// Workflow:
+  /// 1. Check if clipboard has text content
+  /// 2. Read and validate text content
+  /// 3. Check if it's an update SMS (conductor details, etc.)
+  /// 4. If update SMS, apply updates to existing ticket
+  /// 5. Otherwise, attempt to parse as new ticket
+  /// 6. Save new ticket to database
+  /// 7. Return result with ticket or error
+  ///
+  /// Returns [ClipboardResult] with:
+  /// - Success: Content type, raw text, and optional parsed ticket
+  /// - Error: Error message describing what went wrong
   Future<ClipboardResult> readAndParseClipboard() async {
     try {
-      // First check if clipboard has any content
-      final hasStrings = await Clipboard.hasStrings();
-      if (!hasStrings) {
+      // Step 1: Check if clipboard has content
+      final hasContent = await _repository.hasTextContent();
+      if (!hasContent) {
         return ClipboardResult.error('No content found in clipboard');
       }
 
-      // Try to get text content
-      final textData = await Clipboard.getData('text/plain');
-
-      if (textData?.text != null && textData!.text!.trim().isNotEmpty) {
-        final content = textData.text!.trim();
-
-        // Only allow plain text content
-        if (!_isValidTextContent(content)) {
-          return ClipboardResult.error(
-            'Only plain text content is allowed from clipboard.',
-          );
-        }
-
-        // First, check if this is an update SMS (e.g., conductor details)
-        final updateInfo = _parserService.parseUpdateSMS(content);
-
-        if (updateInfo != null) {
-          // This is an update SMS. Attempt to apply the update.
-          final db = getIt<WalletDatabase>();
-          final count = await db.updateTicketById(
-            updateInfo.pnrNumber,
-            updateInfo.updates,
-          );
-
-          if (count > 0) {
-            _logger.success('Ticket updated successfully via SMS');
-            return ClipboardResult.success(
-              ClipboardContentType.travelTicket,
-              content,
-            );
-          } else {
-            _logger.warning(
-              'Update SMS received, but no matching ticket found',
-            );
-            return ClipboardResult.error(
-              '''Update SMS received, but the original ticket was not found in the wallet.''',
-            );
-          }
-        }
-
-        // If it's not an update SMS, proceed with parsing as a new ticket.
-        final parsedTicket = _parserService.parseTicketFromText(
-          content,
-          sourceType: SourceType.clipboard,
-        );
-
-        if (parsedTicket != null) {
-          // Save to database
-          try {
-            final _ = await getIt<WalletDatabase>().insertTicket(
-              parsedTicket,
-            );
-            final updatedTicket = parsedTicket.copyWith(
-              ticketId: parsedTicket.ticketId,
-            );
-            return ClipboardResult.success(
-              ClipboardContentType.travelTicket,
-              content,
-              ticket: updatedTicket,
-            );
-          } on DuplicateTicketException catch (_) {
-            final maskedPnr =
-                parsedTicket.ticketId != null &&
-                    parsedTicket.ticketId.toString().length >= 4
-                ? '...${parsedTicket.ticketId.toString().substring(
-                    parsedTicket.ticketId.toString().length - 4,
-                  )}'
-                : '***';
-            _logger.warning(
-              'Duplicate ticket detected while saving clipboard import '
-              '(PNR: $maskedPnr)',
-            );
-            return ClipboardResult.error('Duplicate ticket detected');
-          } on Object catch (e) {
-            _logger.error('Failed to save ticket to database: $e');
-            return ClipboardResult.error('Failed to save ticket: $e');
-          }
-        }
-
-        // If not a travel ticket, return as plain text
-        return ClipboardResult.success(ClipboardContentType.text, content);
-      }
-
-      // If no text data found
-      return ClipboardResult.error(
-        'No text content found in clipboard. Please copy plain text.',
-      );
-    } on PlatformException catch (e) {
-      _logger.error(
-        'Platform exception in clipboard service: ${e.code} - ${e.message}',
-      );
-
-      if (e.code == 'clipboard_error' ||
-          (e.message?.contains('URI') ?? false)) {
+      // Step 2: Read text content
+      final content = await _repository.readText();
+      if (content == null || content.isEmpty) {
         return ClipboardResult.error(
-          'Unable to access clipboard content. Please copy plain text only.',
+          'No text content found in clipboard. Please copy plain text.',
         );
       }
-      return ClipboardResult.error('Error accessing clipboard: ${e.message}');
-    } on Exception catch (e) {
-      _logger.error('Unexpected exception in clipboard service: $e');
-      return ClipboardResult.error('Unexpected error occurred: $e');
+
+      // Step 3: Validate content
+      if (!_isValidTextContent(content)) {
+        return ClipboardResult.error(
+          'Only plain text content is allowed from clipboard.',
+        );
+      }
+
+      // Step 4: Check if this is an update SMS (conductor details, etc.)
+      final updateInfo = _parserService.parseUpdateSMS(content);
+      if (updateInfo != null) {
+        return await _handleUpdateSMS(updateInfo, content);
+      }
+
+      // Step 5: Attempt to parse as new ticket
+      final parsedTicket = _parserService.parseTicketFromText(
+        content,
+        sourceType: SourceType.clipboard,
+      );
+
+      if (parsedTicket != null) {
+        return await _saveNewTicket(parsedTicket, content);
+      }
+
+      // Step 6: If not a travel ticket, return as plain text
+      return ClipboardResult.success(ClipboardContentType.text, content);
+    } on Object catch (e, stackTrace) {
+      _logger.error('Unexpected exception in clipboard service', e, stackTrace);
+      return ClipboardResult.error('Unexpected error. Please try again.');
     }
   }
 
-  Future<ClipboardResult> readClipboard() async {
-    return readAndParseClipboard();
+  /// Handles update SMS by applying updates to existing ticket.
+  ///
+  /// Returns success if ticket was found and updated,
+  /// error if no matching ticket was found.
+  Future<ClipboardResult> _handleUpdateSMS(
+    TicketUpdateInfo updateInfo,
+    String content,
+  ) async {
+    final count = await _ticketDao.updateTicketById(
+      updateInfo.pnrNumber,
+      updateInfo.updates,
+    );
+
+    if (count > 0) {
+      _logger.success('Ticket updated successfully via SMS');
+      return ClipboardResult.success(
+        ClipboardContentType.travelTicket,
+        content,
+      );
+    } else {
+      _logger.warning(
+        'Update SMS received, but no matching ticket found',
+      );
+      return ClipboardResult.error(
+        'Update SMS received, but the original ticket was not found in the '
+        'wallet.',
+      );
+    }
   }
 
+  /// Saves a new ticket to the database.
+  ///
+  /// Returns success with the saved ticket,
+  /// or error if saving failed (e.g., duplicate ticket).
+  Future<ClipboardResult> _saveNewTicket(
+    Ticket parsedTicket,
+    String content,
+  ) async {
+    try {
+      await _ticketDao.insertTicket(parsedTicket);
+
+      return ClipboardResult.success(
+        ClipboardContentType.travelTicket,
+        content,
+        ticket: parsedTicket,
+      );
+    } on Object catch (e, stackTrace) {
+      _logger.error('Failed to save ticket to database', e, stackTrace);
+      return ClipboardResult.error('Failed to save ticket. Please try again.');
+    }
+  }
+
+  /// Validates text content length and format.
+  ///
+  /// Returns `true` if content is valid, `false` otherwise.
   bool _isValidTextContent(String text) {
     if (text.trim().isEmpty) return false;
 
-    // Allow reasonable text length (not too long to prevent spam)
-    if (text.length > 10000) return false;
+    // Prevent spam/abuse with unreasonably long text
+    if (text.length > maxTextLength) return false;
 
     return true;
   }
 
+  /// Shows a snackbar message based on the clipboard result.
+  ///
+  /// Displays success message in primary color or error in red.
+  /// Only shows if context is still mounted.
   void showResultMessage(BuildContext context, ClipboardResult result) {
     if (!context.mounted) return;
 

@@ -12,6 +12,10 @@
 class $AssetsDataGen {
   const $AssetsDataGen();
 
+  /// File path: assets/data/E-Ticket_T73309927_18-01-2026.pdf
+  String get eTicketT7330992718012026 =>
+      'assets/data/E-Ticket_T73309927_18-01-2026.pdf';
+
   /// File path: assets/data/cards.json
   String get cards => 'assets/data/cards.json';
 
@@ -30,6 +34,7 @@ class $AssetsDataGen {
 
   /// List of all assets
   List<String> get values => [
+    eTicketT7330992718012026,
     cards,
     eventTicketsMockedData,
     mockedTickets,

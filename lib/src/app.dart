@@ -44,12 +44,12 @@ class _NammaWalletAppState extends State<NammaWalletApp> {
           await checkAndUpdateTNSTCTicket(ticket);
 
           _logger.success(
-            'Shared SMS processed successfully for PNR: ${ticket.pnrNumber}',
+            'Shared SMS processed successfully for PNR: ${ticket.ticketId}',
           );
           _scaffoldMessengerKey.currentState?.showSnackBar(
             SnackBar(
               content: Text(
-                'Shared SMS processed for PNR: ${ticket.pnrNumber}',
+                'Shared SMS processed for PNR: ${ticket.ticketId}',
               ),
               backgroundColor: AppColor.primaryBlue,
               duration: const Duration(seconds: 3),

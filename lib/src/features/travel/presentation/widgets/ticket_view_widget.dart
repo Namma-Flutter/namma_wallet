@@ -124,6 +124,8 @@ class TicketFromToRowWidget extends StatelessWidget {
                 style: Paragraph02(
                   color: Theme.of(context).colorScheme.onSurface,
                 ).semiBold,
+                textAlign: TextAlign.end,
+                overflow: TextOverflow.clip,
               ),
             ],
           ),
