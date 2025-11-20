@@ -77,29 +77,27 @@ class IRCTCScannerService {
 
       // Save to database
       try {
-        final _ = await getIt<ITicketDAO>().insertTicket(
-          travelTicket,
-        );
-        final updatedTicket = travelTicket.copyWith(
-          ticketId: travelTicket.ticketId,
-        );
+        await getIt<ITicketDAO>().insertTicket(travelTicket);
 
         return IRCTCScannerResult.success(
           IRCTCScannerContentType.irctcTicket,
           qrData,
           irctcTicket: irctcTicket,
-          travelTicket: updatedTicket,
+          travelTicket: travelTicket,
         );
-      } on Exception catch (e, stackTrace) {
-        _logger.error('Error saving IRCTC ticket', e, stackTrace);
-        return IRCTCScannerResult.error('Failed to save ticket: $e');
       } on Object catch (e, stackTrace) {
         _logger.error('Failed to save IRCTC ticket to database', e, stackTrace);
-        return IRCTCScannerResult.error('Failed to save ticket: $e');
+        return IRCTCScannerResult.error(
+          'Failed to save ticket. Please try again.',
+        );
       }
-    } on Exception catch (e) {
-      _logger.error('Unexpected exception in IRCTC scanner service: $e');
-      return IRCTCScannerResult.error('Unexpected error occurred: $e');
+    } on Object catch (e, stackTrace) {
+      _logger.error(
+        'Unexpected exception in IRCTC scanner service',
+        e,
+        stackTrace,
+      );
+      return IRCTCScannerResult.error('Unexpected error. Please try again.');
     }
   }
 

@@ -231,29 +231,23 @@ class PDFParserService {
       // Save to database
       try {
         _logger.logDatabase('Insert', 'Saving parsed PDF ticket to database');
-        final ticketId = await getIt<ITicketDAO>().insertTicket(
-          parsedTicket,
-        );
-        final updatedTicket = parsedTicket.copyWith(
-          ticketId: parsedTicket.ticketId,
-        );
+        await getIt<ITicketDAO>().insertTicket(parsedTicket);
 
-        _logger.success('PDF ticket saved successfully with ID: $ticketId');
+        _logger.success('PDF ticket saved successfully');
         return PDFParserResult.success(
           PDFParserContentType.travelTicket,
           extractedText,
-          travelTicket: updatedTicket,
+          travelTicket: parsedTicket,
         );
-      } on Exception catch (e, stackTrace) {
-        _logger.error('Error saving PDF ticket', e, stackTrace);
-        return PDFParserResult.error(e.toString());
       } on Object catch (e, stackTrace) {
         _logger.error(
           'Failed to save PDF ticket to database',
           e,
           stackTrace,
         );
-        return PDFParserResult.error('Failed to save ticket: $e');
+        return PDFParserResult.error(
+          'Failed to save ticket. Please try again.',
+        );
       }
     } on Object catch (e, stackTrace) {
       _logger.error(
@@ -261,7 +255,7 @@ class PDFParserService {
         e,
         stackTrace,
       );
-      return PDFParserResult.error('Error processing PDF: $e');
+      return PDFParserResult.error('Error processing PDF. Please try again.');
     }
   }
 
