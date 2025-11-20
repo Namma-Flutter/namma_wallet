@@ -51,10 +51,6 @@ void main() {
       // Extract text from PDF
       final pdfText = await pdfService.extractTextFrom(pdfFile);
 
-      // Debug extracted text length
-      // ignore: avoid_print
-      print('PDF text length: ${pdfText.length} characters');
-
       // Skip if no text was extracted
       //(PDF might be empty or unreadable in test)
       if (pdfText.isEmpty) {
