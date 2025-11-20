@@ -137,9 +137,6 @@ class PDFService {
     // Remove excessive newlines but preserve structure
     cleanedText = cleanedText.replaceAll(RegExp(r'\n{3,}'), '\n\n');
 
-    // Fix common PDF extraction issues
-    // Sometimes colons get separated from labels -
-    // fix spacing but keep original text
     cleanedText = cleanedText.replaceAllMapped(
       RegExp(r'(\w+)\s+:\s*'),
       (match) => '${match.group(1)}: ',
