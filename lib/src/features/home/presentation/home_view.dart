@@ -129,7 +129,7 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const UserProfileWidget(),
+                UserProfileWidget(),
                 Padding(
                   padding: const EdgeInsets.all(16),
                   child: Row(
