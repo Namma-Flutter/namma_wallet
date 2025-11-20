@@ -47,11 +47,26 @@ class _NammaWalletAppState extends State<NammaWalletApp> {
           String ticketContent;
 
           // Check if content is a file path or text content
-          if (content.contains('/') && File(content).existsSync()) {
+          String? normalizedPath;
+          if (content.startsWith('file://')) {
+            try {
+              normalizedPath = Uri.parse(content).toFilePath();
+            } on Object catch (e, stackTrace) {
+              _logger.error(
+                'Failed to parse file URI: $content',
+                e,
+                stackTrace,
+              );
+            }
+          } else if (content.contains('/')) {
+            normalizedPath = content;
+          }
+
+          if (normalizedPath != null && File(normalizedPath).existsSync()) {
             // It's a file, read its content
-            final file = File(content);
+            final file = File(normalizedPath);
             ticketContent = await file.readAsString();
-            _logger.info('Read content from file');
+            _logger.info('Read content from file: $normalizedPath');
           } else {
             // It's text content directly (SMS, etc.)
             ticketContent = content;
