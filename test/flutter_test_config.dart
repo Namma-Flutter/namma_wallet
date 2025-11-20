@@ -3,7 +3,7 @@ import 'dart:async';
 
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
-/// A custom [main] wrapper for running tests that initializes
+/// A custom main wrapper for running tests that initializes
 /// the sqflite FFI factory.
 ///
 /// This is necessary for running tests on the host (e.g., in a
