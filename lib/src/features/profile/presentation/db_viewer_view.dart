@@ -3,9 +3,11 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:home_widget/home_widget.dart';
-import 'package:namma_wallet/src/common/database/wallet_database.dart';
+import 'package:namma_wallet/src/common/database/ticket_dao_interface.dart';
+import 'package:namma_wallet/src/common/database/user_dao_interface.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/widgets/custom_back_button.dart';
+import 'package:namma_wallet/src/features/common/domain/user.dart';
 import 'package:namma_wallet/src/features/home/domain/ticket.dart';
 
 class DbViewerView extends StatefulWidget {
@@ -18,7 +20,7 @@ class DbViewerView extends StatefulWidget {
 class _DbViewerViewState extends State<DbViewerView>
     with SingleTickerProviderStateMixin {
   late final TabController _tabController;
-  List<Map<String, Object?>> users = <Map<String, Object?>>[];
+  List<User> users = <User>[];
   List<Ticket> tickets = <Ticket>[];
 
   @override
@@ -29,9 +31,10 @@ class _DbViewerViewState extends State<DbViewerView>
   }
 
   Future<void> _load() async {
-    final db = getIt<WalletDatabase>();
-    final u = await db.fetchAllUsers();
-    final t = await db.getAllTickets();
+    final userDao = getIt<IUserDAO>();
+    final ticketDao = getIt<ITicketDAO>();
+    final u = await userDao.fetchAllUsers();
+    final t = await ticketDao.getAllTickets();
     if (!mounted) return;
     setState(() {
       users = u;
@@ -75,9 +78,9 @@ class _DbViewerViewState extends State<DbViewerView>
             return Card(
               margin: const EdgeInsets.all(8),
               child: ListTile(
-                title: Text('${user['full_name']}'),
-                subtitle: Text('${user['email']}'),
-                trailing: Text('ID: ${user['user_id']}'),
+                title: Text(user.fullName),
+                subtitle: Text(user.email),
+                trailing: Text('ID: ${user.userId}'),
               ),
             );
           },

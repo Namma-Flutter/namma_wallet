@@ -6,6 +6,7 @@ import 'package:namma_wallet/src/features/bottom_navigation/presentation/namma_n
 import 'package:namma_wallet/src/features/calendar/presentation/calendar_view.dart';
 import 'package:namma_wallet/src/features/export/presentation/export_view.dart';
 import 'package:namma_wallet/src/features/home/domain/ticket.dart';
+import 'package:namma_wallet/src/features/home/presentation/all_tickets_view.dart';
 import 'package:namma_wallet/src/features/home/presentation/home_view.dart';
 import 'package:namma_wallet/src/features/profile/presentation/contributors_view.dart';
 import 'package:namma_wallet/src/features/profile/presentation/db_viewer_view.dart';
@@ -63,6 +64,11 @@ final router = GoRouter(
         }
         return TicketView(ticket: ticket);
       },
+    ),
+    GoRoute(
+      path: AppRoute.allTickets.path,
+      name: AppRoute.allTickets.name,
+      builder: (context, state) => const AllTicketsView(),
     ),
     GoRoute(
       path: AppRoute.profile.path,

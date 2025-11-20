@@ -112,8 +112,7 @@ class _NammaWalletAppState extends State<NammaWalletApp> {
           await checkAndUpdateTNSTCTicket(ticket);
 
           _logger.success(
-            'Shared content processed successfully for PNR: '
-            '${ticket.pnrNumber}',
+            'Shared SMS processed successfully for PNR: ${ticket.ticketId}',
           );
 
           // Navigate to success screen

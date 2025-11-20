@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:namma_wallet/src/common/database/wallet_database.dart';
+import 'package:namma_wallet/src/common/database/ticket_dao_interface.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/services/logger_interface.dart';
 import 'package:namma_wallet/src/features/home/domain/ticket.dart';
@@ -125,19 +125,13 @@ class PDFParserService {
   final ILogger _logger;
   final TNSTCPDFParser _pdfParser;
 
-  /// Helper method to create a non-identifying summary of parsed ticket data
-  /// for safe logging in dev/staging environments
-  Map<String, dynamic> _createTicketSummary(TNSTCTicketModel ticket) {
-    return ticket.toNonPiiSummary();
-  }
-
   Future<PDFParserResult> parseAndSavePDFTicket(File pdfFile) async {
     try {
       _logger.logService('PDF', 'Starting PDF ticket parsing');
 
       // Extract text from PDF
       final pdfService = PDFService();
-      final extractedText = pdfService.extractTextFrom(pdfFile);
+      final extractedText = await pdfService.extractTextFrom(pdfFile);
 
       _logger.logService(
         'PDF',
@@ -146,8 +140,15 @@ class PDFParserService {
       );
 
       if (extractedText.trim().isEmpty) {
-        _logger.warning('No text content found in PDF');
-        return PDFParserResult.error('No text content found in PDF');
+        _logger.warning(
+          'No text content found in PDF - '
+          'PDF may be image-based or use unsupported fonts',
+        );
+        return PDFParserResult.error(
+          'Unable to read text from this PDF. '
+          'This ticket may be in image format. '
+          'Please try importing using the SMS/clipboard method instead.',
+        );
       }
 
       // Log text metadata only (no PII)
@@ -191,18 +192,16 @@ class PDFParserService {
           final tnstcTicket = _pdfParser.parseTicket(extractedText);
 
           // Log non-identifying summary of parsed ticket (safe for dev/staging)
-          final ticketSummary = _createTicketSummary(tnstcTicket);
           _logger
             ..debug('=== PARSED TNSTC TICKET SUMMARY (Non-PII) ===')
-            ..debug('Ticket Summary: $ticketSummary')
+            ..debug('Ticket parsed successfully')
             ..debug('=== END PARSED TNSTC TICKET SUMMARY ===');
 
-          parsedTicket = Ticket.fromTNSTC(tnstcTicket);
+          parsedTicket = tnstcTicket;
           final pnrMasked =
-              tnstcTicket.pnrNumber != null &&
-                  tnstcTicket.pnrNumber!.length >= 4
-              ? '...${tnstcTicket.pnrNumber!.substring(
-                  tnstcTicket.pnrNumber!.length - 4,
+              tnstcTicket.ticketId != null && tnstcTicket.ticketId!.length >= 4
+              ? '...${tnstcTicket.ticketId!.substring(
+                  tnstcTicket.ticketId!.length - 4,
                 )}'
               : 'N/A';
           _logger.logTicketParsing(
@@ -232,29 +231,23 @@ class PDFParserService {
       // Save to database
       try {
         _logger.logDatabase('Insert', 'Saving parsed PDF ticket to database');
-        final ticketId = await getIt<WalletDatabase>().insertTicket(
-          parsedTicket,
-        );
-        final updatedTicket = parsedTicket.copyWith(
-          ticketId: parsedTicket.ticketId,
-        );
+        await getIt<ITicketDAO>().insertTicket(parsedTicket);
 
-        _logger.success('PDF ticket saved successfully with ID: $ticketId');
+        _logger.success('PDF ticket saved successfully');
         return PDFParserResult.success(
           PDFParserContentType.travelTicket,
           extractedText,
-          travelTicket: updatedTicket,
+          travelTicket: parsedTicket,
         );
-      } on DuplicateTicketException catch (e) {
-        _logger.warning('Duplicate PDF ticket detected: ${e.message}');
-        return PDFParserResult.error(e.message);
       } on Object catch (e, stackTrace) {
         _logger.error(
           'Failed to save PDF ticket to database',
           e,
           stackTrace,
         );
-        return PDFParserResult.error('Failed to save ticket: $e');
+        return PDFParserResult.error(
+          'Failed to save ticket. Please try again.',
+        );
       }
     } on Object catch (e, stackTrace) {
       _logger.error(
@@ -262,7 +255,7 @@ class PDFParserService {
         e,
         stackTrace,
       );
-      return PDFParserResult.error('Error processing PDF: $e');
+      return PDFParserResult.error('Error processing PDF. Please try again.');
     }
   }
 
