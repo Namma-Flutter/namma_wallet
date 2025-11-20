@@ -113,6 +113,51 @@ fvm flutter build apk          # Android APK
 fvm flutter build ios          # iOS IPA
 ```
 
+### Build Commands with Makefile
+
+The project includes a `Makefile` for streamlined build processes. By default, it uses FVM (`fvm flutter` and `fvm dart`), but you can override this behavior.
+
+#### Available Targets
+
+**Utility Commands:**
+```bash
+make help       # Display all available commands
+make clean      # Clean the project
+make get        # Get dependencies
+make codegen    # Run code generation
+```
+
+**Release Builds:**
+```bash
+make release-apk        # Build Android release APK
+make release-appbundle  # Build Android release App Bundle
+make release-ipa        # Build iOS release IPA
+```
+
+All release builds automatically:
+1. Get dependencies
+2. Run code generation
+3. Remove WASM modules (via `dart run pdfrx:remove_wasm_modules`) to reduce app size
+4. Build the release version
+
+#### Using Without FVM
+
+If you're not using FVM, override the `FLUTTER` and `DART` variables:
+
+```bash
+# Build with regular Flutter/Dart
+FLUTTER=flutter DART=dart make release-apk
+
+# Or export them for the session
+export FLUTTER=flutter
+export DART=dart
+make release-apk
+```
+
+#### CI/CD Integration
+
+The release workflow in `.github/workflows/build_and_release.yml` automatically removes WASM modules before building releases for optimal app size.
+
 ---
 
 ## 🛠 Development Notes
