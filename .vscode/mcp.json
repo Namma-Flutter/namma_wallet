@@ -1,5 +1,5 @@
 {
-    "mcpServers": {
+    "servers": {
         "dart": {
             "command": "dart",
             "args": [
