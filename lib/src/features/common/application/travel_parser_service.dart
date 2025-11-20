@@ -54,7 +54,7 @@ class TNSTCBusParser implements TravelTicketParser {
       r'From\s*:\s*[A-Z]',
       r'To\s*[A-Z]',
       r'Trip\s*:\s*',
-      r'Time\s*:\s*\d{2}/\d{2}/\d{4}',
+      r'Time\s*:\s*,?\s*\d{1,2}:\d{2}',
       r'Boarding at\s*:',
     ];
 
