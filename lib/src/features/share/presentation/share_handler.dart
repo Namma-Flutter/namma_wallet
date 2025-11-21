@@ -35,6 +35,9 @@ class ShareHandler {
         );
 
       case TicketUpdatedResult(:final pnrNumber, :final updateType):
+        // Reuse share success screen with update-specific values
+        // 'to' field displays the update type (e.g., 'Seat', 'Platform')
+        // to provide user feedback about what was updated
         router.go(
           AppRoute.shareSuccess.path,
           extra: {

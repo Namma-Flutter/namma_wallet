@@ -5,8 +5,8 @@ import 'package:get_it/get_it.dart';
 import 'package:namma_wallet/src/common/services/logger_interface.dart';
 import 'package:namma_wallet/src/features/share/application/sharing_intent_service.dart';
 import 'package:namma_wallet/src/features/share/domain/sharing_intent_service_interface.dart';
-import 'package:namma_wallet/src/features/tnstc/application/ocr_service.dart';
-import 'package:namma_wallet/src/features/tnstc/application/pdf_service.dart';
+import 'package:namma_wallet/src/features/tnstc/domain/ocr_service_interface.dart';
+import 'package:namma_wallet/src/features/tnstc/domain/pdf_service_interface.dart';
 
 import '../../../helpers/fake_logger.dart';
 import '../../../helpers/mock_ocr_service.dart';
@@ -14,22 +14,19 @@ import '../../../helpers/mock_pdf_service.dart';
 
 void main() {
   group('SharingIntentService', () {
-    final getIt = GetIt.instance;
+    late GetIt getIt;
     late ISharingIntentService service;
 
     setUp(() {
-      // Arrange - Set up mocked dependencies
-      if (!getIt.isRegistered<ILogger>()) {
-        getIt.registerSingleton<ILogger>(FakeLogger());
-      }
-      if (!getIt.isRegistered<OCRService>()) {
-        getIt.registerSingleton<OCRService>(MockOCRService());
-      }
-      if (!getIt.isRegistered<PDFService>()) {
-        getIt.registerSingleton<PDFService>(MockPDFService());
-      }
+      getIt = GetIt.asNewInstance()
+        ..registerSingleton<ILogger>(FakeLogger())
+        ..registerSingleton<IOCRService>(MockOCRService())
+        ..registerSingleton<IPDFService>(MockPDFService());
 
-      service = SharingIntentService();
+      service = SharingIntentService(
+        logger: getIt<ILogger>(),
+        pdfService: getIt<IPDFService>(),
+      );
     });
 
     tearDown(() async {
@@ -44,7 +41,10 @@ void main() {
         'Then implements ISharingIntentService interface',
         () {
           // Arrange (Given)
-          final concreteService = SharingIntentService();
+          final concreteService = SharingIntentService(
+            logger: getIt<ILogger>(),
+            pdfService: getIt<IPDFService>(),
+          );
 
           // Act & Assert (When & Then)
           expect(concreteService, isA<ISharingIntentService>());
@@ -56,7 +56,10 @@ void main() {
         'Then returns registered instance',
         () {
           // Arrange (Given)
-          final testService = SharingIntentService();
+          final testService = SharingIntentService(
+            logger: getIt<ILogger>(),
+            pdfService: getIt<IPDFService>(),
+          );
           getIt.registerSingleton<ISharingIntentService>(testService);
 
           // Act (When)

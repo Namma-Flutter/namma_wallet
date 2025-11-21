@@ -6,16 +6,16 @@ import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/services/logger_interface.dart';
 import 'package:namma_wallet/src/features/share/application/shared_content_processor.dart';
 import 'package:namma_wallet/src/features/share/domain/sharing_intent_service_interface.dart';
-import 'package:namma_wallet/src/features/tnstc/application/pdf_service.dart';
+import 'package:namma_wallet/src/features/tnstc/domain/pdf_service_interface.dart';
 import 'package:path/path.dart' as path;
 
 /// Service to handle sharing intents from other apps
 class SharingIntentService implements ISharingIntentService {
-  SharingIntentService({ILogger? logger, PDFService? pdfService})
+  SharingIntentService({ILogger? logger, IPDFService? pdfService})
     : _logger = logger ?? getIt<ILogger>(),
-      _pdfService = pdfService ?? getIt<PDFService>();
+      _pdfService = pdfService ?? getIt<IPDFService>();
   final ILogger _logger;
-  final PDFService _pdfService;
+  final IPDFService _pdfService;
 
   StreamSubscription<List<SharedMediaFile>>? _intentDataStreamSubscription;
 

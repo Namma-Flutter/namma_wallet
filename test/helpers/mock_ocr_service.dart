@@ -1,8 +1,8 @@
 import 'dart:io';
 
-import 'package:namma_wallet/src/features/tnstc/application/ocr_service.dart';
+import 'package:namma_wallet/src/features/tnstc/domain/ocr_service_interface.dart';
 
-class MockOCRService extends OCRService {
+class MockOCRService implements IOCRService {
   @override
   Future<String> extractTextFromPDF(File pdfFile) async {
     return '''

@@ -1,10 +1,10 @@
 import 'dart:io';
 
-import 'package:namma_wallet/src/features/tnstc/application/pdf_service.dart';
+import 'package:namma_wallet/src/features/tnstc/domain/pdf_service_interface.dart';
 
 /// Mock PDF service for testing purposes
 /// Returns predefined text content for PDF files
-class MockPDFService extends PDFService {
+class MockPDFService implements IPDFService {
   MockPDFService({
     this.mockPdfText =
         'Mock PDF Content\nPNR: T12345678\nFrom: Chennai To: Bangalore',
