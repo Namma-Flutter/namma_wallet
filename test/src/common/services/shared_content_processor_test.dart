@@ -20,10 +20,11 @@ void main() {
 
     setUp(() {
       // Arrange - Set up mocked dependencies in a new scope
-      getIt..pushNewScope()
-      ..registerSingleton<ILogger>(FakeLogger())
-      ..registerSingleton<TNSTCSMSParser>(TNSTCSMSParser())
-      ..registerSingleton<TNSTCPDFParser>(TNSTCPDFParser());
+      getIt
+        ..pushNewScope()
+        ..registerSingleton<ILogger>(FakeLogger())
+        ..registerSingleton<TNSTCSMSParser>(TNSTCSMSParser())
+        ..registerSingleton<TNSTCPDFParser>(TNSTCPDFParser());
     });
 
     tearDown(() async {
