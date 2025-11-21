@@ -22,7 +22,7 @@ class SharingIntentService implements ISharingIntentService {
   @override
   void initialize({
     required void Function(String content, SharedContentType type)
-        onContentReceived,
+    onContentReceived,
     required void Function(String) onError,
   }) {
     _intentDataStreamSubscription = ReceiveSharingIntent.instance

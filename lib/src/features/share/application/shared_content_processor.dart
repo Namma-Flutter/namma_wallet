@@ -12,6 +12,7 @@ import 'package:namma_wallet/src/features/tnstc/application/tnstc_pdf_parser.dar
 enum SharedContentType {
   /// SMS text content
   sms,
+
   /// PDF file content (text extracted from PDF)
   pdf,
 }
@@ -96,8 +97,9 @@ class SharedContentProcessor {
           : _smsService.parseTicket(content);
       await _insertOrUpdateTicket(ticket);
 
-      final contentSource =
-          contentType == SharedContentType.pdf ? 'PDF' : 'SMS';
+      final contentSource = contentType == SharedContentType.pdf
+          ? 'PDF'
+          : 'SMS';
       _logger.success(
         'Shared $contentSource processed successfully for '
         'PNR: ${ticket.ticketId}',

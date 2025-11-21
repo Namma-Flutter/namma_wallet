@@ -25,7 +25,7 @@ abstract class ISharingIntentService {
   /// content processing fails.
   void initialize({
     required void Function(String content, SharedContentType type)
-        onContentReceived,
+    onContentReceived,
     required void Function(String) onError,
   });
 
