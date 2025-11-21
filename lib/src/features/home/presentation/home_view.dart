@@ -71,7 +71,6 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
             eventTickets.add(ticket);
         }
       }
-      final hapticService = getIt<IHapticService>();
       if (!mounted) return;
       setState(() {
         _travelTickets = travelTickets;
@@ -80,6 +79,7 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
       });
 
       if (mounted) {
+        final hapticService = getIt<IHapticService>();
         hapticService.triggerHaptic(HapticType.selection);
       }
     } on Object catch (e) {
