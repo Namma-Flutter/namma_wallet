@@ -81,6 +81,19 @@ class SharingIntentService implements ISharingIntentService {
 
           // Determine content type based on file extension
           final fileExtension = path.extension(fileObj.path).toLowerCase();
+
+          // Check if file type is supported
+          if (fileExtension != '.pdf' && !_isSupportedTextFile(fileExtension)) {
+            _logger.warning(
+              'Skipping unsupported file type: $fileExtension',
+            );
+            onError(
+              'File type $fileExtension is not supported. '
+              'Please share PDF or text files.',
+            );
+            continue;
+          }
+
           final contentType = fileExtension == '.pdf'
               ? SharedContentType.pdf
               : SharedContentType.sms;
@@ -105,6 +118,20 @@ class SharingIntentService implements ISharingIntentService {
     _logger.info('END SHARING INTENT ANALYSIS');
   }
 
+  /// Supported text file extensions (case-insensitive)
+  static const _supportedTextExtensions = {
+    '.txt',
+    '.sms',
+    '.text',
+  };
+
+  /// Check if a file extension is a supported text type
+  /// Empty extensions are treated as text files (common for SMS content)
+  bool _isSupportedTextFile(String extension) {
+    return extension.isEmpty ||
+        _supportedTextExtensions.contains(extension.toLowerCase());
+  }
+
   /// Extract content from a file based on its type
   @override
   Future<String> extractContentFromFile(File file) async {
@@ -116,12 +143,21 @@ class SharingIntentService implements ISharingIntentService {
       final content = await _pdfService.extractTextFrom(file);
       _logger.info('Successfully extracted text from PDF');
       return content;
-    } else {
+    } else if (_isSupportedTextFile(fileExtension)) {
       // Read as text file
       _logger.info('Reading text file: ${file.path}');
       final content = await file.readAsString();
       _logger.info('Successfully read text file');
       return content;
+    } else {
+      // Unsupported file type
+      _logger.warning(
+        'Unsupported file type: $fileExtension for file: ${file.path}',
+      );
+      throw UnsupportedError(
+        'File type $fileExtension is not supported. '
+        'Supported types: PDF, TXT, SMS',
+      );
     }
   }
 

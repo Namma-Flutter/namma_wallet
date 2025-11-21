@@ -9,6 +9,13 @@ sealed class SharedContentResult with SharedContentResultMappable {
 }
 
 /// Result when a new ticket is successfully processed
+///
+/// Consider stronger domain types for fields:
+/// - fare: Could be numeric type (double/int) instead of String
+/// - date: Could be DateTime instead of String
+/// This would align with domain models and reduce parsing/validation errors.
+/// Currently kept as Strings to match Ticket model's extras structure
+/// and simplify UI display.
 @MappableClass()
 class TicketCreatedResult extends SharedContentResult
     with TicketCreatedResultMappable {
@@ -28,6 +35,13 @@ class TicketCreatedResult extends SharedContentResult
 }
 
 /// Result when an existing ticket is updated
+///
+/// Consider using an enum for updateType:
+/// - Would prevent invalid update type strings
+/// - Makes valid update types discoverable at compile time
+/// - Easier to extend with new update types
+/// Currently kept as String for flexibility with dynamic update types
+/// derived from update info maps.
 @MappableClass()
 class TicketUpdatedResult extends SharedContentResult
     with TicketUpdatedResultMappable {

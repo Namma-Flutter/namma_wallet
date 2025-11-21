@@ -61,32 +61,40 @@ class SharedContentProcessor {
       _logger.info('Processing shared content');
 
       // First, check if this is an update SMS (e.g., conductor details)
-      final updateInfo = _travelParserService.parseUpdateSMS(content);
+      // Only check for updates when content type is SMS to avoid false
+      // positives with PDF text
+      if (contentType == SharedContentType.sms) {
+        final updateInfo = _travelParserService.parseUpdateSMS(content);
 
-      if (updateInfo != null) {
-        // This is an update SMS. Attempt to apply the update.
-        final count = await _ticketDao.updateTicketById(
-          updateInfo.pnrNumber,
-          updateInfo.updates,
-        );
-
-        if (count > 0) {
-          _logger.success(
-            'Ticket updated successfully via shared content',
+        if (updateInfo != null) {
+          // This is an update SMS. Attempt to apply the update.
+          final count = await _ticketDao.updateTicketById(
+            updateInfo.pnrNumber,
+            updateInfo.updates,
           );
 
-          return TicketUpdatedResult(
-            pnrNumber: updateInfo.pnrNumber,
-            updateType: 'Conductor Details',
-          );
-        } else {
-          _logger.warning(
-            'Update SMS received via sharing, but no matching ticket found',
-          );
+          if (count > 0) {
+            _logger.success(
+              'Ticket updated successfully via shared content',
+            );
 
-          return TicketNotFoundResult(
-            pnrNumber: updateInfo.pnrNumber,
-          );
+            // Derive update type from the updates map
+            // Default to 'Conductor Details' for backward compatibility
+            final updateType = _deriveUpdateType(updateInfo.updates);
+
+            return TicketUpdatedResult(
+              pnrNumber: updateInfo.pnrNumber,
+              updateType: updateType,
+            );
+          } else {
+            _logger.warning(
+              'Update SMS received via sharing, but no matching ticket found',
+            );
+
+            return TicketNotFoundResult(
+              pnrNumber: updateInfo.pnrNumber,
+            );
+          }
         }
       }
 
@@ -126,11 +134,44 @@ class SharedContentProcessor {
     }
   }
 
+  /// Derive update type from the updates map
+  ///
+  /// Attempts to determine what kind of update was made based on the
+  /// fields present in the updates map. Defaults to 'Conductor Details'
+  /// for backward compatibility.
+  String _deriveUpdateType(Map<String, dynamic> updates) {
+    if (updates.isEmpty) {
+      return 'Update';
+    }
+
+    // Check for common update patterns
+    final keys = updates.keys.toList();
+
+    // Conductor details typically include conductor name/ID
+    if (keys.any((k) => k.toLowerCase().contains('conductor'))) {
+      return 'Conductor Details';
+    }
+
+    // Seat/platform changes
+    if (keys.any((k) => k.toLowerCase().contains('seat'))) {
+      return 'Seat';
+    }
+    if (keys.any((k) => k.toLowerCase().contains('platform'))) {
+      return 'Platform';
+    }
+
+    // Generic update type based on first key
+    return keys.first;
+  }
+
   /// Insert or update a ticket in the database
   Future<void> _insertOrUpdateTicket(Ticket ticket) async {
     final id = ticket.ticketId;
     if (id == null || id.trim().isEmpty) {
-      // Skip tickets with null or empty/whitespace ticketId
+      _logger.warning(
+        'Skipping ticket persistence due to missing ticketId for '
+        'shared content',
+      );
       return;
     }
 
