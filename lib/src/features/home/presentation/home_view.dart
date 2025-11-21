@@ -79,7 +79,9 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
         _isLoading = false;
       });
 
-      hapticService.triggerHaptic(HapticType.selection);
+      if (mounted) {
+        hapticService.triggerHaptic(HapticType.selection);
+      }
     } on Object catch (e) {
       if (!mounted) return;
       showSnackbar(context, 'Error loading ticket data: $e', isError: true);
