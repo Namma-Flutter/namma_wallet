@@ -1,13 +1,17 @@
-name: flutter-analyze-commenter
+name: flutter-format-and-analyze
 
-on: pull_request # Only supports run by pull request
+on:
+  pull_request:
+    branches:
+      - main # Only PRs targeting main branch
 
 jobs:
-  flutter-analyze:
+  flutter-format-and-analyze:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      pull-requests: write # Write permission is required to add comments on a PR
+      pull-requests: write
+
     steps:
       - uses: actions/checkout@v5
 
@@ -18,14 +22,37 @@ jobs:
           flutter-version-file: pubspec.yaml
           cache: true
 
-      - run: flutter pub get
+      - name: Install dependencies
+        run: flutter pub get
 
-      # Run flutter analyze with --write option
-      - run: flutter analyze --write=flutter_analyze.log
+      - name: Check flutter format
+        id: format_check
+        run: |
+          set +e
+          flutter format --set-exit-if-changed .
+          echo "exit_code=$?" >> $GITHUB_OUTPUT
+          exit 0  # keep workflow running so we can comment
 
-      # Use flutter-analyze-commenter
-      - if: ${{ !cancelled() }} # Required to run this step even if failure
+      - name: Comment if formatting failed
+        if: ${{ steps.format_check.outputs.exit_code != 0 }}
+        uses: peter-evans/create-or-update-comment@v5
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          body: |
+            ❌ **Formatting check failed**
+            Please run:
+            ```bash
+            fvm flutter format .
+            ```
+            And push the updated files.
+
+      - name: Run flutter analyze (write log)
+        if: ${{ steps.format_check.outputs.exit_code == 0 }}
+        run: flutter analyze --write=flutter_analyze.log
+
+      - name: Comment analyze results
+        if: ${{ steps.format_check.outputs.exit_code == 0 && !cancelled() }}
         uses: yorifuji/flutter-analyze-commenter@v1
         with:
-          analyze-log: flutter_analyze.log # file path for analyze log, if multiple files, separated by commas
-          verbose: true # verbose output (optional)
+          analyze-log: flutter_analyze.log
+          verbose: true
