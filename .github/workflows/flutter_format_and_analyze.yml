@@ -25,11 +25,11 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
-      - name: Check flutter format
+      - name: Check dart format
         id: format_check
         run: |
           set +e
-          flutter format --set-exit-if-changed .
+          dart format --set-exit-if-changed .
           echo "exit_code=$?" >> $GITHUB_OUTPUT
           exit 0  # keep workflow running so we can comment
 
@@ -42,7 +42,13 @@ jobs:
             ❌ **Formatting check failed**
             Please run:
             ```bash
-            fvm flutter format .
+            fvm dart format .
+            ```
+
+            or 
+
+            ```bash
+            dart format .
             ```
             And push the updated files.
 
