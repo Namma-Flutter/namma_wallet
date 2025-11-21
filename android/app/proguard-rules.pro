@@ -22,7 +22,7 @@
 -keep class io.flutter.plugins.flutter_gemma.** { *; }
 -dontwarn io.flutter.plugins.flutter_gemma.**
 
-# Keep ML Kit text recognition classes for different languages
+# Suppress ProGuard/R8 warnings for optional ML Kit text recognition classes for different languages
 -dontwarn com.google.mlkit.vision.text.chinese.ChineseTextRecognizerOptions$Builder
 -dontwarn com.google.mlkit.vision.text.chinese.ChineseTextRecognizerOptions
 -dontwarn com.google.mlkit.vision.text.devanagari.DevanagariTextRecognizerOptions$Builder
