@@ -87,8 +87,10 @@ class PDFService implements IPDFService {
               e,
               stackTrace,
             );
-            // Return empty text if OCR also fails
-            return '';
+            // Throw exception if OCR also fails
+            throw Exception(
+              'Failed to extract text from PDF: OCR fallback failed',
+            );
           }
         } else {
           // Dispose the document if we got text from Syncfusion
