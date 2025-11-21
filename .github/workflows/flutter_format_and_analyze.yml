@@ -93,9 +93,18 @@ jobs:
             echo "Updated comment id: ${{ steps.update_format_comment.outputs.comment-id }}"
           fi
 
-      # If formatting passed -> (no-op). We do not delete comments here; comment will remain.
-      # You may prefer to delete the old comment or update it to a 'passed' message. If you want delete,
-      # I can add a safe REST API delete step (actions/github-script) — say the word.
+      # If formatting passed and there's an old comment -> delete it
+      - name: Delete format-failure comment when formatting passes
+        if: ${{ steps.format_check.outputs.exit_code == '0' && steps.find_comment.outputs.comment-id != '' }}
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.issues.deleteComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: ${{ steps.find_comment.outputs.comment-id }}
+            });
+            console.log('Deleted old formatting failure comment');
 
       - name: Run flutter analyze (write log)
         if: ${{ steps.format_check.outputs.exit_code == '0' }}
