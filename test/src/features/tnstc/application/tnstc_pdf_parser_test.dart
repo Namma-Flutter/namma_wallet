@@ -3,9 +3,9 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:namma_wallet/src/common/services/logger_interface.dart';
-import 'package:namma_wallet/src/features/tnstc/application/ocr_service.dart';
 import 'package:namma_wallet/src/features/tnstc/application/pdf_service.dart';
 import 'package:namma_wallet/src/features/tnstc/application/tnstc_pdf_parser.dart';
+import 'package:namma_wallet/src/features/tnstc/domain/ocr_service_interface.dart';
 
 import '../../../../helpers/fake_logger.dart';
 import '../../../../helpers/mock_ocr_service.dart';
@@ -17,8 +17,8 @@ void main() {
     if (!getIt.isRegistered<ILogger>()) {
       getIt.registerSingleton<ILogger>(FakeLogger());
     }
-    if (!getIt.isRegistered<OCRService>()) {
-      getIt.registerSingleton<OCRService>(MockOCRService());
+    if (!getIt.isRegistered<IOCRService>()) {
+      getIt.registerSingleton<IOCRService>(MockOCRService());
     }
   });
 

@@ -2,19 +2,22 @@ name: Upload coverage reports to Codecov
 
 on:
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   run:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
     steps:
       - uses: actions/checkout@v5
 
       - name: Setup Java
         uses: actions/setup-java@v5
         with:
-          distribution: 'temurin'
-          java-version: '17'
+          distribution: "temurin"
+          java-version: "17"
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
@@ -30,19 +33,117 @@ jobs:
         run: dart run build_runner build --delete-conflicting-outputs
 
       - name: Run tests with coverage
-        run: flutter test --coverage
+        id: test_run
+        run: |
+          set +e
+          flutter test --coverage 2>&1 | tee test_output.log
+          echo "exit_code=$?" >> $GITHUB_OUTPUT
+          exit 0
+
+      # Try to find an existing test-failure comment created by the bot
+      - name: Find previous test-failure comment
+        if: always()
+        id: find_test_comment
+        uses: peter-evans/find-comment@v3
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          comment-author: "github-actions[bot]"
+          body-includes: "Test run failed"
+
+      # If tests failed -> extract failure details and create a comment
+      - name: Extract test failures
+        if: ${{ steps.test_run.outputs.exit_code != '0' }}
+        id: extract_failures
+        run: |
+          # Extract failed test information from the log
+          if [ -f test_output.log ]; then
+            # Get the summary section which shows which tests failed
+            FAILURES=$(grep -A 50 "Some tests failed" test_output.log || grep -A 50 "FAILED" test_output.log || tail -n 30 test_output.log)
+
+            # Create a truncated version if too long (max 5000 chars for GitHub comments)
+            if [ ${#FAILURES} -gt 4500 ]; then
+              FAILURES="${FAILURES:0:4500}... (truncated)"
+            fi
+
+            # Escape for GitHub Actions output
+            echo "failures<<EOF" >> $GITHUB_OUTPUT
+            echo "$FAILURES" >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
+          else
+            echo "failures=Could not find test output log" >> $GITHUB_OUTPUT
+          fi
+
+      # If tests failed -> create a new comment (only when find_comment returned empty)
+      - name: Create test-failure comment
+        if: ${{ steps.test_run.outputs.exit_code != '0' && steps.find_test_comment.outputs.comment-id == '' }}
+        uses: peter-evans/create-or-update-comment@v5
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          body: |
+            ❌ **Test run failed**
+
+            Some tests did not pass. Please review the failures below:
+
+            ```
+            ${{ steps.extract_failures.outputs.failures }}
+            ```
+
+            Please fix the failing tests and push the updated code.
+
+      # If tests failed and a comment already exists -> update that comment
+      - name: Update existing test-failure comment
+        if: ${{ steps.test_run.outputs.exit_code != '0' && steps.find_test_comment.outputs.comment-id != '' }}
+        uses: peter-evans/create-or-update-comment@v5
+        with:
+          comment-id: ${{ steps.find_test_comment.outputs.comment-id }}
+          issue-number: ${{ github.event.pull_request.number }}
+          edit-mode: replace
+          body: |
+            ❌ **Test run failed**
+            (updated)
+
+            Some tests did not pass. Please review the failures below:
+
+            ```
+            ${{ steps.extract_failures.outputs.failures }}
+            ```
+
+            Please fix the failing tests and push the updated code.
+
+      # If tests passed and there was a previous failure comment -> delete or update it
+      - name: Delete previous test-failure comment
+        if: ${{ steps.test_run.outputs.exit_code == '0' && steps.find_test_comment.outputs.comment-id != '' }}
+        uses: peter-evans/create-or-update-comment@v5
+        with:
+          comment-id: ${{ steps.find_test_comment.outputs.comment-id }}
+          issue-number: ${{ github.event.pull_request.number }}
+          edit-mode: replace
+          body: |
+            ✅ **All tests passed!**
+
+            The previously failing tests are now fixed.
+
+      # Fail the workflow if tests failed
+      - name: Check test results
+        if: ${{ steps.test_run.outputs.exit_code != '0' }}
+        run: |
+          echo "Tests failed with exit code ${{ steps.test_run.outputs.exit_code }}"
+          exit 1
 
       - name: Install lcov
+        if: ${{ steps.test_run.outputs.exit_code == '0' }}
         run: |
           sudo apt-get update
           sudo apt-get install -y lcov
 
       - name: Convert coverage to lcov format
+        if: ${{ steps.test_run.outputs.exit_code == '0' }}
         run: |
           # Flutter generates lcov.info by default, but we may need to ensure it's in the right format
           lcov --list-coverage coverage/lcov.info || true
 
       - name: Upload coverage to Codecov
+        if: ${{ steps.test_run.outputs.exit_code == '0' }}
         uses: codecov/codecov-action@v5
         with:
           directory: ./coverage
