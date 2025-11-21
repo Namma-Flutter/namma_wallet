@@ -12,7 +12,9 @@ import 'package:namma_wallet/src/common/theme/app_theme.dart';
 import 'package:namma_wallet/src/common/theme/theme_provider.dart';
 import 'package:namma_wallet/src/features/common/application/travel_parser_service.dart';
 import 'package:namma_wallet/src/features/home/domain/ticket_extensions.dart';
+import 'package:namma_wallet/src/features/tnstc/application/pdf_service.dart';
 import 'package:namma_wallet/src/features/tnstc/application/sms_service.dart';
+import 'package:path/path.dart' as path;
 import 'package:provider/provider.dart';
 
 class NammaWalletApp extends StatefulWidget {
@@ -29,6 +31,7 @@ class _NammaWalletAppState extends State<NammaWalletApp> {
   late final SMSService _smsService = getIt<SMSService>();
   late final TravelParserService _travelParserService =
       getIt<TravelParserService>();
+  late final PDFService _pdfService = getIt<PDFService>();
   late final ILogger _logger = getIt<ILogger>();
   final GlobalKey<ScaffoldMessengerState> _scaffoldMessengerKey =
       GlobalKey<ScaffoldMessengerState>();
@@ -65,8 +68,18 @@ class _NammaWalletAppState extends State<NammaWalletApp> {
           if (normalizedPath != null && File(normalizedPath).existsSync()) {
             // It's a file, read its content
             final file = File(normalizedPath);
-            ticketContent = await file.readAsString();
-            _logger.info('Read content from file: $normalizedPath');
+            final fileExtension = path.extension(normalizedPath).toLowerCase();
+
+            if (fileExtension == '.pdf') {
+              // Extract text from PDF using PDFService
+              _logger.info('Extracting text from PDF: $normalizedPath');
+              ticketContent = await _pdfService.extractTextFrom(file);
+              _logger.info('Successfully extracted text from PDF');
+            } else {
+              // Read as text file
+              ticketContent = await file.readAsString();
+              _logger.info('Read content from text file: $normalizedPath');
+            }
           } else {
             // It's text content directly (SMS, etc.)
             ticketContent = content;
