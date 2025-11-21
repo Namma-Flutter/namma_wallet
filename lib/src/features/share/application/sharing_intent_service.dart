@@ -4,17 +4,25 @@ import 'dart:io';
 import 'package:listen_sharing_intent/listen_sharing_intent.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/services/logger_interface.dart';
+import 'package:namma_wallet/src/features/share/application/shared_content_processor.dart';
+import 'package:namma_wallet/src/features/share/domain/sharing_intent_service_interface.dart';
+import 'package:namma_wallet/src/features/tnstc/application/pdf_service.dart';
+import 'package:path/path.dart' as path;
 
 /// Service to handle sharing intents from other apps
-class SharingIntentService {
-  SharingIntentService({ILogger? logger})
-    : _logger = logger ?? getIt<ILogger>();
+class SharingIntentService implements ISharingIntentService {
+  SharingIntentService({ILogger? logger, PDFService? pdfService})
+    : _logger = logger ?? getIt<ILogger>(),
+      _pdfService = pdfService ?? getIt<PDFService>();
   final ILogger _logger;
+  final PDFService _pdfService;
 
   StreamSubscription<List<SharedMediaFile>>? _intentDataStreamSubscription;
 
+  @override
   void initialize({
-    required void Function(String) onContentReceived,
+    required void Function(String content, SharedContentType type)
+        onContentReceived,
     required void Function(String) onError,
   }) {
     _intentDataStreamSubscription = ReceiveSharingIntent.instance
@@ -43,11 +51,11 @@ class SharingIntentService {
         });
   }
 
-  void _handleSharedContent(
+  Future<void> _handleSharedContent(
     List<SharedMediaFile> files,
-    void Function(String) onContentReceived,
+    void Function(String content, SharedContentType type) onContentReceived,
     void Function(String) onError,
-  ) {
+  ) async {
     _logger.info('SHARING INTENT TRIGGERED');
 
     for (var i = 0; i < files.length; i++) {
@@ -66,15 +74,23 @@ class SharingIntentService {
         }
 
         if (fileObj.existsSync()) {
-          // It's a real file, pass the file path
+          // It's a real file, extract content based on file type
           _logger.info(
             'File received: ${fileObj.path.split(Platform.pathSeparator).last}',
           );
-          onContentReceived(fileObj.path);
+
+          // Determine content type based on file extension
+          final fileExtension = path.extension(fileObj.path).toLowerCase();
+          final contentType = fileExtension == '.pdf'
+              ? SharedContentType.pdf
+              : SharedContentType.sms;
+
+          final content = await extractContentFromFile(fileObj);
+          onContentReceived(content, contentType);
         } else {
           // It's text content (like SMS), pass the text directly
           _logger.info('Text content received');
-          onContentReceived(file.path);
+          onContentReceived(file.path, SharedContentType.sms);
         }
       } on Object catch (e, stackTrace) {
         _logger.error(
@@ -87,6 +103,26 @@ class SharingIntentService {
     }
 
     _logger.info('END SHARING INTENT ANALYSIS');
+  }
+
+  /// Extract content from a file based on its type
+  @override
+  Future<String> extractContentFromFile(File file) async {
+    final fileExtension = path.extension(file.path).toLowerCase();
+
+    if (fileExtension == '.pdf') {
+      // Extract text from PDF using PDFService
+      _logger.info('Extracting text from PDF: ${file.path}');
+      final content = await _pdfService.extractTextFrom(file);
+      _logger.info('Successfully extracted text from PDF');
+      return content;
+    } else {
+      // Read as text file
+      _logger.info('Reading text file: ${file.path}');
+      final content = await file.readAsString();
+      _logger.info('Successfully read text file');
+      return content;
+    }
   }
 
   /// Print detailed file information to console
@@ -147,6 +183,7 @@ class SharingIntentService {
   }
 
   /// Dispose resources
+  @override
   void dispose() {
     _intentDataStreamSubscription?.cancel();
     _logger.info('SharingIntentService disposed');
