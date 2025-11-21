@@ -19,29 +19,16 @@ void main() {
     final getIt = GetIt.instance;
 
     setUp(() {
-      // Arrange - Set up mocked dependencies
-      if (!getIt.isRegistered<ILogger>()) {
-        getIt.registerSingleton<ILogger>(FakeLogger());
-      }
-      if (!getIt.isRegistered<TNSTCSMSParser>()) {
-        getIt.registerSingleton<TNSTCSMSParser>(TNSTCSMSParser());
-      }
-      if (!getIt.isRegistered<TNSTCPDFParser>()) {
-        getIt.registerSingleton<TNSTCPDFParser>(TNSTCPDFParser());
-      }
+      // Arrange - Set up mocked dependencies in a new scope
+      getIt..pushNewScope()
+      ..registerSingleton<ILogger>(FakeLogger())
+      ..registerSingleton<TNSTCSMSParser>(TNSTCSMSParser())
+      ..registerSingleton<TNSTCPDFParser>(TNSTCPDFParser());
     });
 
     tearDown(() async {
-      // Cleanup - Unregister test-specific dependencies
-      if (getIt.isRegistered<TNSTCSMSParser>()) {
-        getIt.unregister<TNSTCSMSParser>();
-      }
-      if (getIt.isRegistered<TNSTCPDFParser>()) {
-        getIt.unregister<TNSTCPDFParser>();
-      }
-      if (getIt.isRegistered<ILogger>()) {
-        getIt.unregister<ILogger>();
-      }
+      // Cleanup - Pop the scope to remove test-specific dependencies
+      await getIt.popScope();
     });
 
     group('processContent - New Ticket Creation', () {
