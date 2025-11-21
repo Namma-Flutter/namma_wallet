@@ -32,8 +32,16 @@ void main() {
     });
 
     tearDown(() async {
-      // Cleanup - Reset GetIt after each test
-      await getIt.reset();
+      // Cleanup - Unregister test-specific dependencies
+      if (getIt.isRegistered<TNSTCSMSParser>()) {
+        getIt.unregister<TNSTCSMSParser>();
+      }
+      if (getIt.isRegistered<TNSTCPDFParser>()) {
+        getIt.unregister<TNSTCPDFParser>();
+      }
+      if (getIt.isRegistered<ILogger>()) {
+        getIt.unregister<ILogger>();
+      }
     });
 
     group('processContent - New Ticket Creation', () {
@@ -308,7 +316,7 @@ void main() {
       );
 
       test(
-        'Given null content, When processing content, '
+        'Given empty content, When processing content, '
         'Then handles gracefully',
         () async {
           // Arrange (Given)
