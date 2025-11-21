@@ -2,18 +2,24 @@ import 'dart:io';
 
 import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/services/logger_interface.dart';
-import 'package:namma_wallet/src/features/tnstc/application/ocr_service.dart';
+import 'package:namma_wallet/src/features/tnstc/domain/ocr_service_interface.dart';
+import 'package:namma_wallet/src/features/tnstc/domain/pdf_service_interface.dart';
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 
-class PDFService {
-  PDFService({OCRService? ocrService})
-    : _ocrService = ocrService ?? getIt<OCRService>();
+class PDFService implements IPDFService {
+  PDFService({
+    IOCRService? ocrService,
+    ILogger? logger,
+  }) : _ocrService = ocrService ?? getIt<IOCRService>(),
+       _logger = logger ?? getIt<ILogger>();
 
-  final OCRService _ocrService;
+  final IOCRService _ocrService;
+  final ILogger _logger;
 
   // Minimum expected text length threshold for successful extraction
   static const _minExpectedTextLength = 10;
 
+  @override
   Future<String> extractTextFrom(File pdf) async {
     try {
       // Load an existing PDF document.
@@ -21,7 +27,7 @@ class PDFService {
 
       // Use try-finally to ensure document is always disposed
       try {
-        getIt<ILogger>().debug(
+        _logger.debug(
           '[PDFService] PDF loaded, pages: ${document.pages.count}',
         );
 
@@ -31,7 +37,7 @@ class PDFService {
         // If extraction yields very little text, try page-by-page extraction
         if (rawText.length < _minExpectedTextLength &&
             document.pages.count > 0) {
-          getIt<ILogger>().debug(
+          _logger.debug(
             '[PDFService] Initial extraction yielded only '
             '${rawText.length} chars, trying page-by-page extraction',
           );
@@ -41,7 +47,7 @@ class PDFService {
             final pageText = PdfTextExtractor(
               document,
             ).extractText(startPageIndex: i, endPageIndex: i);
-            getIt<ILogger>().debug(
+            _logger.debug(
               '[PDFService] Page ${i + 1}: ${pageText.length} chars',
             );
             if (pageText.isNotEmpty) {
@@ -51,7 +57,7 @@ class PDFService {
 
           if (pageTexts.isNotEmpty) {
             rawText = pageTexts.join('\n');
-            getIt<ILogger>().debug(
+            _logger.debug(
               '[PDFService] Page-by-page extraction: '
               '${rawText.length} chars total',
             );
@@ -60,7 +66,7 @@ class PDFService {
 
         // Check if PDF might be image-based or use unsupported fonts
         if (rawText.trim().isEmpty) {
-          getIt<ILogger>().warning(
+          _logger.warning(
             '[PDFService] No text extracted from PDF. This PDF may be '
             'image-based or use fonts that are not supported. '
             'PDF has ${document.pages.count} pages. Trying OCR fallback...',
@@ -72,17 +78,19 @@ class PDFService {
           // Try OCR as fallback for image-based PDFs
           try {
             rawText = await _ocrService.extractTextFromPDF(pdf);
-            getIt<ILogger>().info(
+            _logger.info(
               '[PDFService] OCR fallback extracted ${rawText.length} chars',
             );
           } on Object catch (e, stackTrace) {
-            getIt<ILogger>().error(
+            _logger.error(
               '[PDFService] OCR fallback also failed',
               e,
               stackTrace,
             );
-            // Return empty text if OCR also fails
-            return '';
+            // Throw exception if OCR also fails
+            throw Exception(
+              'Failed to extract text from PDF: OCR fallback failed',
+            );
           }
         } else {
           // Dispose the document if we got text from Syncfusion
@@ -91,7 +99,7 @@ class PDFService {
 
         // Log text metadata only (no PII)
         final lineCount = rawText.split('\n').length;
-        getIt<ILogger>().debug(
+        _logger.debug(
           '[PDFService] Extracted text: ${rawText.length} chars, '
           '$lineCount lines',
         );
@@ -101,7 +109,7 @@ class PDFService {
 
         // Log metadata after cleaning (no PII)
         final cleanedLineCount = cleanedText.split('\n').length;
-        getIt<ILogger>().debug(
+        _logger.debug(
           '[PDFService] Cleaned text: ${cleanedText.length} chars, '
           '$cleanedLineCount lines',
         );
@@ -113,7 +121,7 @@ class PDFService {
         document.dispose();
       }
     } on Object catch (e, stackTrace) {
-      getIt<ILogger>().error(
+      _logger.error(
         '[PDFService] Error extracting text from PDF',
         e,
         stackTrace,

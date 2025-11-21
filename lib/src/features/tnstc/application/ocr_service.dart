@@ -4,22 +4,26 @@ import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart
 import 'package:image/image.dart' as img;
 import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/services/logger_interface.dart';
+import 'package:namma_wallet/src/features/tnstc/domain/ocr_service_interface.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pdfrx/pdfrx.dart';
 
-class OCRService {
-  Future<String> extractTextFromPDF(File pdfFile) async {
-    final logger = getIt<ILogger>();
+class OCRService implements IOCRService {
+  OCRService({ILogger? logger}) : _logger = logger ?? getIt<ILogger>();
 
+  final ILogger _logger;
+
+  @override
+  Future<String> extractTextFromPDF(File pdfFile) async {
     PdfDocument? doc;
     TextRecognizer? textRecognizer;
 
     try {
-      logger.debug('[OCRService] Starting OCR extraction from PDF');
+      _logger.debug('[OCRService] Starting OCR extraction from PDF');
 
       // Open the PDF document
       doc = await PdfDocument.openFile(pdfFile.path);
-      logger.debug('[OCRService] PDF opened, pages: ${doc.pages.length}');
+      _logger.debug('[OCRService] PDF opened, pages: ${doc.pages.length}');
 
       textRecognizer = TextRecognizer();
       final extractedTexts = <String>[];
@@ -29,7 +33,7 @@ class OCRService {
 
       // Process each page
       for (var pageNum = 0; pageNum < doc.pages.length; pageNum++) {
-        logger.debug('[OCRService] Processing page ${pageNum + 1}...');
+        _logger.debug('[OCRService] Processing page ${pageNum + 1}...');
 
         File? tempImageFile;
         try {
@@ -44,7 +48,7 @@ class OCRService {
           );
 
           if (pageImage == null) {
-            logger.warning(
+            _logger.warning(
               '[OCRService] Failed to render page ${pageNum + 1}',
             );
             continue;
@@ -66,7 +70,7 @@ class OCRService {
 
           await tempImageFile.writeAsBytes(pngBytes);
 
-          logger.debug(
+          _logger.debug(
             '[OCRService] Page ${pageNum + 1} rendered to image: '
             '${tempImageFile.path} (${pngBytes.length} bytes)',
           );
@@ -75,7 +79,7 @@ class OCRService {
           final inputImage = InputImage.fromFile(tempImageFile);
           final recognizedText = await textRecognizer.processImage(inputImage);
 
-          logger.debug(
+          _logger.debug(
             '[OCRService] Page ${pageNum + 1} OCR: '
             '${recognizedText.text.length} chars extracted',
           );
@@ -84,7 +88,7 @@ class OCRService {
             extractedTexts.add(recognizedText.text);
           }
         } on Object catch (e, stackTrace) {
-          logger.error(
+          _logger.error(
             '[OCRService] Error processing page ${pageNum + 1}',
             e,
             stackTrace,
@@ -95,21 +99,21 @@ class OCRService {
             try {
               await tempImageFile.delete();
             } on Object catch (e) {
-              logger.debug('[OCRService] Failed to delete temp file: $e');
+              _logger.debug('[OCRService] Failed to delete temp file: $e');
             }
           }
         }
       }
 
       final combinedText = extractedTexts.join('\n\n');
-      logger.debug(
+      _logger.debug(
         '[OCRService] OCR complete: ${combinedText.length} total chars from '
         '${extractedTexts.length} pages',
       );
 
       return combinedText;
     } on Object catch (e, stackTrace) {
-      logger.error('[OCRService] OCR extraction failed', e, stackTrace);
+      _logger.error('[OCRService] OCR extraction failed', e, stackTrace);
       rethrow;
     } finally {
       // Always clean up resources, even if an exception occurred
