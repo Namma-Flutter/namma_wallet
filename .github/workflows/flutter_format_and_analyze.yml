@@ -3,7 +3,7 @@ name: flutter-format-and-analyze
 on:
   pull_request:
     branches:
-      - main # Only PRs targeting main branch
+      - main
 
 jobs:
   flutter-format-and-analyze:
@@ -31,11 +31,23 @@ jobs:
           set +e
           dart format --set-exit-if-changed .
           echo "exit_code=$?" >> $GITHUB_OUTPUT
-          exit 0  # keep workflow running so we can comment
+          # keep the workflow running so we can comment
+          exit 0
 
-      - name: Comment if formatting failed
-        if: ${{ steps.format_check.outputs.exit_code != 0 }}
+      # Try to find an existing format-failure comment created by the bot (from previous runs)
+      - name: Find previous format-failure comment
+        id: find_comment
+        uses: peter-evans/find-comment@v3
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          comment-author: "github-actions[bot]"
+          body-includes: "Formatting check failed"
+
+      # If formatting failed -> create a new comment (only when find_comment returned empty)
+      - name: Create format-failure comment
+        if: ${{ steps.format_check.outputs.exit_code != '0' && steps.find_comment.outputs.comment-id == '' }}
         uses: peter-evans/create-or-update-comment@v5
+        id: create_format_comment
         with:
           issue-number: ${{ github.event.pull_request.number }}
           body: |
@@ -44,20 +56,53 @@ jobs:
             ```bash
             fvm dart format .
             ```
-
-            or 
-
+            or
             ```bash
             dart format .
             ```
-            And push the updated files.
+            Then push the updated files.
+
+      # If formatting failed and a comment already exists -> update that comment (edit-mode: replace)
+      - name: Update existing format-failure comment
+        if: ${{ steps.format_check.outputs.exit_code != '0' && steps.find_comment.outputs.comment-id != '' }}
+        uses: peter-evans/create-or-update-comment@v5
+        id: update_format_comment
+        with:
+          comment-id: ${{ steps.find_comment.outputs.comment-id }}
+          issue-number: ${{ github.event.pull_request.number }}
+          edit-mode: replace
+          body: |
+            ❌ **Formatting check failed**
+            (updated)
+            Please run:
+            ```bash
+            fvm dart format .
+            ```
+            or
+            ```bash
+            dart format .
+            ```
+            Then push the updated files.
+
+      - name: Echo created/updated comment id (debug)
+        if: ${{ steps.format_check.outputs.exit_code != '0' }}
+        run: |
+          if [ "${{ steps.create_format_comment.outputs.comment-id }}" != "" ]; then
+            echo "Created comment id: ${{ steps.create_format_comment.outputs.comment-id }}"
+          else
+            echo "Updated comment id: ${{ steps.update_format_comment.outputs.comment-id }}"
+          fi
+
+      # If formatting passed -> (no-op). We do not delete comments here; comment will remain.
+      # You may prefer to delete the old comment or update it to a 'passed' message. If you want delete,
+      # I can add a safe REST API delete step (actions/github-script) — say the word.
 
       - name: Run flutter analyze (write log)
-        if: ${{ steps.format_check.outputs.exit_code == 0 }}
+        if: ${{ steps.format_check.outputs.exit_code == '0' }}
         run: flutter analyze --write=flutter_analyze.log
 
       - name: Comment analyze results
-        if: ${{ steps.format_check.outputs.exit_code == 0 && !cancelled() }}
+        if: ${{ steps.format_check.outputs.exit_code == '0' && !cancelled() }}
         uses: yorifuji/flutter-analyze-commenter@v1
         with:
           analyze-log: flutter_analyze.log
