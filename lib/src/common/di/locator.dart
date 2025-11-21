@@ -22,10 +22,10 @@ import 'package:namma_wallet/src/features/share/domain/sharing_intent_service_in
 import 'package:namma_wallet/src/features/tnstc/application/ocr_service.dart';
 import 'package:namma_wallet/src/features/tnstc/application/pdf_service.dart';
 import 'package:namma_wallet/src/features/tnstc/application/sms_service.dart';
-import 'package:namma_wallet/src/features/tnstc/domain/ocr_service_interface.dart';
-import 'package:namma_wallet/src/features/tnstc/domain/pdf_service_interface.dart';
 import 'package:namma_wallet/src/features/tnstc/application/tnstc_pdf_parser.dart';
 import 'package:namma_wallet/src/features/tnstc/application/tnstc_sms_parser.dart';
+import 'package:namma_wallet/src/features/tnstc/domain/ocr_service_interface.dart';
+import 'package:namma_wallet/src/features/tnstc/domain/pdf_service_interface.dart';
 
 final GetIt getIt = GetIt.instance;
 

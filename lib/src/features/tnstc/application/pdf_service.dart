@@ -19,6 +19,7 @@ class PDFService implements IPDFService {
   // Minimum expected text length threshold for successful extraction
   static const _minExpectedTextLength = 10;
 
+  @override
   Future<String> extractTextFrom(File pdf) async {
     try {
       // Load an existing PDF document.

@@ -6,6 +6,8 @@ import 'dart:io';
 /// - Extracting text directly from PDF files
 /// - Falling back to OCR for image-based PDFs
 /// - Cleaning and normalizing extracted text
+// More function will be added later.
+// ignore: one_member_abstracts
 abstract interface class IPDFService {
   /// Extracts text from a PDF file.
   ///
