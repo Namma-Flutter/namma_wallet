@@ -362,6 +362,39 @@ void main() {
           expect(result, isNotNull);
         },
       );
+      test(
+        'Given parsed ticket has missing ID, When processing content, '
+        'Then returns ProcessingErrorResult',
+        () async {
+          // Arrange (Given)
+          final mockTicket = Ticket(
+            primaryText: 'Test',
+            secondaryText: 'Test',
+            startTime: DateTime.now(),
+            location: 'Test',
+          );
+
+          final processor = SharedContentProcessor(
+            logger: FakeLogger(),
+            travelParser: MockTravelParserService(),
+            smsService: MockSMSService(mockTicket: mockTicket),
+            ticketDao: MockTicketDAO(),
+          );
+
+          // Act (When)
+          final result = await processor.processContent(
+            'content',
+            SharedContentType.sms,
+          );
+
+          // Assert (Then)
+          expect(result, isA<ProcessingErrorResult>());
+          expect(
+            (result as ProcessingErrorResult).error,
+            contains('Missing ticketId'),
+          );
+        },
+      );
     });
 
     group('processContent - Result Types', () {

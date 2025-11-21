@@ -168,11 +168,7 @@ class SharedContentProcessor {
   Future<void> _insertOrUpdateTicket(Ticket ticket) async {
     final id = ticket.ticketId;
     if (id == null || id.trim().isEmpty) {
-      _logger.warning(
-        'Skipping ticket persistence due to missing ticketId for '
-        'shared content',
-      );
-      return;
+      throw ArgumentError('Missing ticketId for shared content');
     }
 
     // Delegate to DAO's upsert logic
