@@ -79,8 +79,7 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
       });
 
       if (mounted) {
-        final hapticService = getIt<IHapticService>();
-        hapticService.triggerHaptic(HapticType.selection);
+        getIt<IHapticService>().triggerHaptic(HapticType.selection);
       }
     } on Object catch (e) {
       if (!mounted) return;
