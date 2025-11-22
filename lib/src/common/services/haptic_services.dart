@@ -116,8 +116,10 @@ class HapticService implements IHapticService {
 
 /// Static convenience wrapper for [HapticService].
 ///
-/// **Important:** Call [HapticServices.loadPreference] during app initialization
-/// before using any haptic methods, otherwise the saved user preference will be ignored.
+/// **Important:** Call [HapticServices.loadPreference]
+/// during app initialization
+/// before using any haptic methods,
+/// otherwise the saved user preference will be ignored.
 ///
 /// This class provides static methods as a convenience wrapper around
 /// [HapticService]. For dependency injection, use [IHapticService] instead.
