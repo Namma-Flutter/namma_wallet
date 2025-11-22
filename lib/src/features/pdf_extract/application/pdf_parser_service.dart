@@ -5,6 +5,7 @@ import 'package:namma_wallet/src/common/database/ticket_dao_interface.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/services/logger_interface.dart';
 import 'package:namma_wallet/src/features/home/domain/ticket.dart';
+import 'package:namma_wallet/src/features/irctc/application/irctc_pdf_parser.dart';
 import 'package:namma_wallet/src/features/tnstc/application/pdf_service.dart';
 import 'package:namma_wallet/src/features/tnstc/application/tnstc_pdf_parser.dart';
 import 'package:namma_wallet/src/features/tnstc/domain/tnstc_model.dart';
@@ -119,11 +120,17 @@ class PDFParserResult {
 }
 
 class PDFParserService {
-  PDFParserService({ILogger? logger, TNSTCPDFParser? pdfParser})
-    : _logger = logger ?? getIt<ILogger>(),
-      _pdfParser = pdfParser ?? getIt<TNSTCPDFParser>();
+  PDFParserService({
+    ILogger? logger,
+    TNSTCPDFParser? tnstcPdfParser,
+    IRCTCPDFParser? irctcPdfParser,
+  }) : _logger = logger ?? getIt<ILogger>(),
+       _tnstcPdfParser = tnstcPdfParser ?? getIt<TNSTCPDFParser>(),
+       _irctcPdfParser = irctcPdfParser ?? getIt<IRCTCPDFParser>();
+
   final ILogger _logger;
-  final TNSTCPDFParser _pdfParser;
+  final TNSTCPDFParser _tnstcPdfParser;
+  final IRCTCPDFParser _irctcPdfParser;
 
   Future<PDFParserResult> parseAndSavePDFTicket(File pdfFile) async {
     try {
@@ -141,90 +148,129 @@ class PDFParserService {
 
       if (extractedText.trim().isEmpty) {
         _logger.warning(
-          'No text content found in PDF - '
-          'PDF may be image-based or use unsupported fonts',
+          'No text content found in PDF - PDF may be image-based '
+          'or unsupported',
         );
         return PDFParserResult.error(
           'Unable to read text from this PDF. '
           'This ticket may be in image format. '
-          'Please try importing using the SMS/clipboard method instead.',
+          'Try importing using SMS/clipboard.',
         );
       }
 
-      // Log text metadata only (no PII)
+      // Metadata only
       final lineCount = extractedText.split('\n').length;
       final wordCount = extractedText.split(RegExp(r'\s+')).length;
+
       _logger.debug(
         'PDF text metadata: $lineCount lines, $wordCount words, '
         '${extractedText.length} chars',
       );
 
-      // Check if any keywords are present
-      final keywords = [
-        'Corporation',
-        'PNR',
-        'Service',
-        'Journey',
+      final tnstcKeywords = [
         'TNSTC',
         'SETC',
+        'Corporation',
+        'Service Start Place',
+        'Service End Place',
+        'OB Reference',
+        'Passenger Pickup',
       ];
-      final foundKeywords = keywords
-          .where(
-            (keyword) =>
-                extractedText.toLowerCase().contains(keyword.toLowerCase()),
-          )
+
+      final foundTNSTC = tnstcKeywords
+          .where((k) => extractedText.toLowerCase().contains(k.toLowerCase()))
           .toList();
 
-      _logger.debug('Found keywords: $foundKeywords');
+      _logger.debug('Found tnstcKeywords: $foundTNSTC');
 
-      // Try to parse using TNSTC PDF parser first
+      final irctcKeywords = [
+        'Electronic Reservation Slip',
+        'IRCTC',
+        'ERS',
+        'Train No',
+        'Boarding From',
+        'Passenger Details',
+        'Acronyms',
+        'Agent Details',
+        'Departure',
+        'Arrival',
+        'Class',
+        'Quota',
+      ];
+
+      final foundIRCTC = irctcKeywords
+          .where((k) => extractedText.toLowerCase().contains(k.toLowerCase()))
+          .toList();
+
+      _logger.debug('Found irctcKeywords: $foundIRCTC');
+
       Ticket? parsedTicket;
 
-      // Check if it's a TNSTC ticket
-      if (foundKeywords.any(
-        (k) => ['TNSTC', 'Corporation', 'PNR'].contains(k),
-      )) {
+      if (foundTNSTC.isNotEmpty &&
+          foundTNSTC.any((k) => ['TNSTC', 'SETC', 'Corporation'].contains(k))) {
         try {
-          _logger.logTicketParsing(
-            'PDF',
-            'Attempting to parse as TNSTC ticket',
-          );
-          final tnstcTicket = _pdfParser.parseTicket(extractedText);
+          _logger.logTicketParsing('PDF', 'Parsing as TNSTC ticket');
 
-          // Log non-identifying summary of parsed ticket (safe for dev/staging)
-          _logger
-            ..debug('=== PARSED TNSTC TICKET SUMMARY (Non-PII) ===')
-            ..debug('Ticket parsed successfully')
-            ..debug('=== END PARSED TNSTC TICKET SUMMARY ===');
-
+          final tnstcTicket = _tnstcPdfParser.parseTicket(extractedText);
           parsedTicket = tnstcTicket;
+
           final pnrMasked =
-              tnstcTicket.ticketId != null && tnstcTicket.ticketId!.length >= 4
+              (tnstcTicket.ticketId != null &&
+                  tnstcTicket.ticketId!.length >= 4)
               ? '...${tnstcTicket.ticketId!.substring(
                   tnstcTicket.ticketId!.length - 4,
                 )}'
               : 'N/A';
+
           _logger.logTicketParsing(
             'PDF',
-            'Parsed TNSTC ticket successfully (PNR: $pnrMasked)',
+            'Parsed TNSTC PDF successfully (PNR: $pnrMasked)',
           );
-        } on Object catch (e, stackTrace) {
-          _logger.error(
-            'Failed to parse as TNSTC ticket',
-            e,
-            stackTrace,
+        } on Exception catch (e, st) {
+          _logger.error('TNSTC parsing error', e, st);
+        }
+      }
+      // IRCTC detection
+      else if (foundIRCTC.isNotEmpty &&
+          foundIRCTC.any(
+            (k) => [
+              'IRCTC',
+              'Electronic Reservation Slip',
+              'Train No',
+              'Boarding From',
+            ].contains(k),
+          )) {
+        try {
+          _logger.logTicketParsing('PDF', 'Parsing as IRCTC ticket');
+
+          final irctcTicket = _irctcPdfParser.parseTicket(extractedText);
+          parsedTicket = irctcTicket;
+
+          final pnrMasked =
+              (irctcTicket.ticketId != null &&
+                  irctcTicket.ticketId!.length >= 4)
+              ? '...${irctcTicket.ticketId!.substring(
+                  irctcTicket.ticketId!.length - 4,
+                )}'
+              : 'N/A';
+
+          _logger.logTicketParsing(
+            'PDF',
+            'Parsed IRCTC PDF successfully (PNR: $pnrMasked)',
           );
+        } on Exception catch (e, st) {
+          _logger.error('IRCTC parsing error', e, st);
         }
       }
 
       if (parsedTicket == null) {
         _logger.warning(
-          'PDF content does not match any supported ticket format. '
-          'Found keywords: $foundKeywords',
+          'PDF does not match TNSTC/IRCTC formats. '
+          'foundTNSTC=$foundTNSTC foundIRCTC=$foundIRCTC',
         );
+
         return PDFParserResult.error(
-          'PDF content does not match any supported ticket format. '
-          'Found keywords: $foundKeywords',
+          'PDF does not match TNSTC or IRCTC ticket format.',
         );
       }
 
@@ -239,22 +285,14 @@ class PDFParserService {
           extractedText,
           travelTicket: parsedTicket,
         );
-      } on Object catch (e, stackTrace) {
-        _logger.error(
-          'Failed to save PDF ticket to database',
-          e,
-          stackTrace,
-        );
+      } on Exception catch (e, st) {
+        _logger.error('Ticket DB save failed', e, st);
         return PDFParserResult.error(
           'Failed to save ticket. Please try again.',
         );
       }
-    } on Object catch (e, stackTrace) {
-      _logger.error(
-        'Unexpected exception in PDF parser service',
-        e,
-        stackTrace,
-      );
+    } on Exception catch (e, st) {
+      _logger.error('Unexpected exception in PDF parser', e, st);
       return PDFParserResult.error('Error processing PDF. Please try again.');
     }
   }

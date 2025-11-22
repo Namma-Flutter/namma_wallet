@@ -25,7 +25,10 @@ class Ticket with TicketMappable {
     this.ticketId,
   });
 
-  factory Ticket.fromIRCTC(IRCTCTicket model) {
+  factory Ticket.fromIRCTC(
+    IRCTCTicket model, {
+    String sourceType = 'PDF',
+  }) {
     return Ticket(
       ticketId: model.pnrNumber,
       primaryText: '${model.fromStation} → ${model.toStation}',
@@ -82,6 +85,7 @@ class Ticket with TicketMappable {
           value: model.irctcFee.toStringAsFixed(2),
         ),
         ExtrasModel(title: 'Transaction ID', value: model.transactionId),
+        ExtrasModel(title: 'Source Type', value: sourceType),
       ],
     );
   }
@@ -156,7 +160,8 @@ class Ticket with TicketMappable {
       secondaryText:
           '${model.corporation ?? 'TNSTC'} - '
           '${model.tripCode ?? model.routeNo ?? 'Bus'}',
-      startTime: startTime!, // Safe: we ensure startTime is non-null above
+      startTime: startTime!,
+      // Safe: we ensure startTime is non-null above
       location:
           model.passengerPickupPoint ??
           model.boardingPoint ??
