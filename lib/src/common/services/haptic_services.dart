@@ -19,6 +19,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 /// HapticServices.selection();
 /// ```
 class HapticService implements IHapticService {
+  /// Creates a new [HapticService] with haptics enabled by default.
+  /// Call [loadPreference] to load the user's saved preference.
   HapticService() {
     _initFuture = loadPreference();
   }
@@ -88,15 +90,24 @@ class HapticService implements IHapticService {
 
   @override
   Future<void> loadPreference() async {
-    final prefs = await SharedPreferences.getInstance();
-    _isEnabled = prefs.getBool(_prefKey) ?? _isEnabled;
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      _isEnabled = prefs.getBool(_prefKey) ?? _isEnabled;
+    } on Exception catch (_) {
+      // Log error or fallback to default
+      // _isEnabled remains at default value
+    }
   }
 
   @override
   Future<void> setEnabled({required bool enabled}) async {
     _isEnabled = enabled;
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(_prefKey, enabled);
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool(_prefKey, enabled);
+    } on Exception catch (_) {
+      // Log error - in-memory value is already updated
+    }
   }
 
   @override
@@ -104,6 +115,9 @@ class HapticService implements IHapticService {
 }
 
 /// Static convenience wrapper for [HapticService].
+///
+/// **Important:** Call [HapticServices.loadPreference] during app initialization
+/// before using any haptic methods, otherwise the saved user preference will be ignored.
 ///
 /// This class provides static methods as a convenience wrapper around
 /// [HapticService]. For dependency injection, use [IHapticService] instead.
