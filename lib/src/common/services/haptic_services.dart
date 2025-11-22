@@ -24,14 +24,6 @@ class HapticService implements IHapticService {
   HapticService() {
     _initFuture = loadPreference();
   }
-  // default true or choose false if desired
-  HapticService._();
-
-  static Future<HapticService> create() async {
-    final service = HapticService._();
-    await service.loadPreference();
-    return service;
-  }
 
   /// Creates a new instance of [HapticService].
   static const _prefKey = 'isHapticEnabled';
@@ -52,6 +44,7 @@ class HapticService implements IHapticService {
 
   @override
   void success() {
+    _initFuture?.ignore();
     if (!_isEnabled) return;
 
     // Use medium impact for success feedback (positive, moderate)
@@ -60,6 +53,7 @@ class HapticService implements IHapticService {
 
   @override
   void error() {
+    _initFuture?.ignore();
     if (!_isEnabled) return;
 
     // Use rigid impact for error feedback (sharp, negative)
@@ -68,6 +62,7 @@ class HapticService implements IHapticService {
 
   @override
   void warning() {
+    _initFuture?.ignore();
     if (!_isEnabled) return;
 
     // Use light impact for warning feedback (gentle alert)
@@ -76,6 +71,7 @@ class HapticService implements IHapticService {
 
   @override
   void rigid() {
+    _initFuture?.ignore();
     if (!_isEnabled) return;
 
     Gaimon.rigid();
@@ -83,6 +79,7 @@ class HapticService implements IHapticService {
 
   @override
   void soft() {
+    _initFuture?.ignore();
     if (!_isEnabled) return;
 
     Gaimon.soft();
