@@ -42,8 +42,8 @@ class _DbViewerViewState extends State<DbViewerView>
     setState(() {
       users = u;
       tickets = t;
-      hapticService.triggerHaptic(HapticType.success);
     });
+    hapticService.triggerHaptic(HapticType.success);
   }
 
   @override

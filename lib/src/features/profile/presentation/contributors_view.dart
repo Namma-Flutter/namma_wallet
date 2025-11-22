@@ -45,8 +45,6 @@ class _ContributorsViewState extends State<ContributorsView> {
   }
 
   Future<List<Contributor>> _fetchContributors() async {
-    hapticService.triggerHaptic(HapticType.rigid);
-
     final contributors = <Contributor>[];
     var page = 1;
     const perPage = 100;
@@ -91,7 +89,7 @@ class _ContributorsViewState extends State<ContributorsView> {
         );
       }
     }
-
+    hapticService.triggerHaptic(HapticType.success);
     return contributors;
   }
 
