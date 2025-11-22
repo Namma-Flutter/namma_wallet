@@ -13,12 +13,18 @@ class TagModel with TagModelMappable {
     switch (icon) {
       case 'confirmation_number':
         return Icons.confirmation_number;
+      case 'qr_code':
+        return Icons.qr_code;
       case 'train':
         return Icons.train;
       case 'access_time':
         return Icons.access_time;
       case 'event_seat':
         return Icons.event_seat;
+      case 'attach_money':
+        return Icons.attach_money;
+      case 'info':
+        return Icons.info;
       default:
         return Icons.help_outline; // fallback icon
     }

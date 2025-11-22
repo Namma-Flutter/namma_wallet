@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:home_widget/home_widget.dart';
-import 'package:namma_wallet/src/common/database/wallet_database.dart';
+import 'package:namma_wallet/src/common/database/ticket_dao_interface.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/helper/date_time_converter.dart';
 import 'package:namma_wallet/src/common/services/logger_interface.dart';
@@ -13,7 +13,7 @@ import 'package:namma_wallet/src/common/widgets/snackbar_widget.dart';
 import 'package:namma_wallet/src/features/common/enums/ticket_type.dart';
 import 'package:namma_wallet/src/features/home/domain/extras_model.dart';
 import 'package:namma_wallet/src/features/home/domain/ticket.dart';
-import 'package:namma_wallet/src/features/home/presentation/widgets/highlight_widget.dart';
+import 'package:namma_wallet/src/features/home/domain/ticket_extensions.dart';
 import 'package:namma_wallet/src/features/travel/presentation/widgets/custom_ticket_shape_line.dart';
 import 'package:namma_wallet/src/features/travel/presentation/widgets/ticket_view_widget.dart';
 import 'package:qr_flutter/qr_flutter.dart';
@@ -35,23 +35,23 @@ class _TicketViewState extends State<TicketView> {
     return (value?.isEmpty ?? true) ? '--' : value!;
   }
 
-  bool hasPnrOrId(Ticket ticket) {
-    return getPnrOrId(ticket) != null;
-  }
+  // Helper methods moved to TicketExtrasExtension in ticket_extensions.dart
 
-  String? getPnrOrId(Ticket ticket) {
-    for (final extra in ticket.extras ?? <ExtrasModel>[]) {
-      if (extra.title?.toLowerCase() == 'pnr number') {
-        return extra.value;
-      }
+  List<ExtrasModel> getFilteredExtras(Ticket ticket) {
+    if (ticket.extras == null) return [];
+
+    // Filter out From and To if both exist
+    final from = ticket.fromLocation;
+    final to = ticket.toLocation;
+
+    if (from != null && to != null) {
+      return ticket.extras!.where((extra) {
+        final title = extra.title?.toLowerCase();
+        return title != 'from' && title != 'to';
+      }).toList();
     }
 
-    for (final extra in ticket.extras ?? <ExtrasModel>[]) {
-      if (extra.title?.toLowerCase() == 'booking id') {
-        return extra.value;
-      }
-    }
-    return null;
+    return ticket.extras!;
   }
 
   ///
@@ -134,7 +134,7 @@ class _TicketViewState extends State<TicketView> {
     });
 
     try {
-      await getIt<WalletDatabase>().deleteTicket(widget.ticket.ticketId!);
+      await getIt<ITicketDAO>().deleteTicket(widget.ticket.ticketId!);
 
       getIt<ILogger>().info(
         '[TicketView] Successfully deleted ticket with '
@@ -293,15 +293,152 @@ class _TicketViewState extends State<TicketView> {
 
                         const SizedBox(height: 16),
 
-                        //* From to To (Primary text)
-                        Text(
-                          widget.ticket.primaryText,
-                          style: Paragraph01(
-                            color: Theme.of(context).colorScheme.onSurface,
-                          ).semiBold,
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 3,
-                        ),
+                        //* Route Display (From → To with chips)
+                        ...() {
+                          final from = widget.ticket.fromLocation;
+                          final to = widget.ticket.toLocation;
+
+                          if (from != null && to != null) {
+                            return <Widget>[
+                              // Origin chip
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 12,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Theme.of(context).colorScheme.surface,
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurface
+                                        .withValues(alpha: 0.1),
+                                    width: 0.5,
+                                  ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withValues(
+                                        alpha: 0.05,
+                                      ),
+                                      blurRadius: 4,
+                                      offset: const Offset(0, 2),
+                                    ),
+                                  ],
+                                ),
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Icons.trip_origin,
+                                      size: 20,
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.primary,
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: Text(
+                                        from,
+                                        style: Paragraph02(
+                                          color: Theme.of(
+                                            context,
+                                          ).colorScheme.onSurface,
+                                        ).semiBold,
+                                        overflow: TextOverflow.ellipsis,
+                                        maxLines: 2,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+
+                              // Arrow
+                              Center(
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 8,
+                                  ),
+                                  child: Icon(
+                                    Icons.arrow_downward_rounded,
+                                    size: 24,
+                                    color:
+                                        Theme.of(
+                                          context,
+                                        ).colorScheme.primary.withValues(
+                                          alpha: 0.6,
+                                        ),
+                                  ),
+                                ),
+                              ),
+
+                              // Destination chip
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 12,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Theme.of(context).colorScheme.surface,
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurface
+                                        .withValues(alpha: 0.1),
+                                    width: 0.5,
+                                  ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withValues(
+                                        alpha: 0.05,
+                                      ),
+                                      blurRadius: 4,
+                                      offset: const Offset(0, 2),
+                                    ),
+                                  ],
+                                ),
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Icons.location_on,
+                                      size: 20,
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.primary,
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: Text(
+                                        to,
+                                        style: Paragraph02(
+                                          color: Theme.of(
+                                            context,
+                                          ).colorScheme.onSurface,
+                                        ).semiBold,
+                                        overflow: TextOverflow.ellipsis,
+                                        maxLines: 2,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ];
+                          } else {
+                            // Fallback to primaryText
+                            return <Widget>[
+                              Text(
+                                widget.ticket.primaryText,
+                                style: Paragraph01(
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onSurface,
+                                ).semiBold,
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 3,
+                              ),
+                            ];
+                          }
+                        }(),
 
                         const SizedBox(height: 12),
 
@@ -310,81 +447,60 @@ class _TicketViewState extends State<TicketView> {
                           title1: 'Journey Date',
                           title2: 'Time',
                           value1: getValueOrDefault(
-                            getTime(widget.ticket.startTime),
+                            formatDate(widget.ticket.startTime),
                           ),
                           value2: getValueOrDefault(
-                            getDate(widget.ticket.startTime),
+                            formatTime(widget.ticket.startTime),
                           ),
                         ),
 
-                        if (widget.ticket.tags != null &&
-                            widget.ticket.tags!.isNotEmpty) ...[
-                          const SizedBox(height: 12),
-                          Wrap(
-                            spacing: 6,
-                            runSpacing: 6,
-                            children: [
-                              ...widget.ticket.tags!.map(
-                                (tag) => HighlightChipsWidget(
-                                  bgColor: Theme.of(
-                                    context,
-                                  ).colorScheme.primary.withValues(alpha: 0.1),
-                                  label: tag.icon ?? '',
-                                  icon: Icons.star_border_rounded,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
+                        ...() {
+                          final filteredExtras = getFilteredExtras(
+                            widget.ticket,
+                          );
+                          if (filteredExtras.isEmpty) return <Widget>[];
 
-                        if (widget.ticket.extras != null &&
-                            widget.ticket.extras!.isNotEmpty) ...[
-                          const SizedBox(height: 12),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              for (
-                                var i = 0;
-                                i < widget.ticket.extras!.length;
-                                i++
-                              ) ...[
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 4,
-                                  ),
-                                  child: Row(
-                                    spacing: 4,
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Flexible(
-                                        flex: 2,
-                                        child: Text(
-                                          widget.ticket.extras![i].title ??
-                                              '-'
-                                                  '}: ',
+                          return <Widget>[
+                            const SizedBox(height: 12),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                for (var i = 0; i < filteredExtras.length; i++)
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 4,
+                                    ),
+                                    child: Row(
+                                      spacing: 4,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Flexible(
+                                          flex: 2,
+                                          child: Text(
+                                            filteredExtras[i].title ?? '-:',
+                                          ),
                                         ),
-                                      ),
-                                      Expanded(
-                                        flex: 3,
-                                        child: Text(
-                                          widget.ticket.extras![i].value,
-                                          overflow: TextOverflow.ellipsis,
-                                          maxLines: 1,
-                                          style: Paragraph03(
-                                            color: Theme.of(
-                                              context,
-                                            ).colorScheme.onSurface,
-                                          ).semiBold,
+                                        Expanded(
+                                          flex: 3,
+                                          child: Text(
+                                            filteredExtras[i].value,
+                                            overflow: TextOverflow.ellipsis,
+                                            maxLines: 1,
+                                            style: Paragraph03(
+                                              color: Theme.of(
+                                                context,
+                                              ).colorScheme.onSurface,
+                                            ).semiBold,
+                                          ),
                                         ),
-                                      ),
-                                    ],
+                                      ],
+                                    ),
                                   ),
-                                ),
                               ],
-                            ],
-                          ),
-                        ],
+                            ),
+                          ];
+                        }(),
                       ],
                     ),
                   ),
@@ -398,7 +514,7 @@ class _TicketViewState extends State<TicketView> {
                           ),
                     ),
                   ),
-                  if (hasPnrOrId(widget.ticket))
+                  if (widget.ticket.hasPnrOrId)
                     Container(
                       margin: const EdgeInsets.only(
                         bottom: 16,
@@ -423,7 +539,7 @@ class _TicketViewState extends State<TicketView> {
                       ),
                       child: Center(
                         child: QrImageView(
-                          data: getPnrOrId(widget.ticket) ?? 'xxx',
+                          data: widget.ticket.pnrOrId ?? 'xxx',
                           size: 200,
                           eyeStyle: QrEyeStyle(
                             eyeShape: QrEyeShape.square,

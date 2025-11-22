@@ -12,6 +12,7 @@ Unlike Apple Wallet or Google Wallet, which support only specific formats, **Nam
 ## ✨ Features
 
 ### 📱 **Multi-Source Ticket Management**
+
 * **SMS Parsing** – Automatically extract tickets from TNSTC, IRCTC, and SETC SMS messages
 * **PDF Processing** – Parse TNSTC bus tickets from PDF files using Syncfusion PDF library
 * **QR Code Scanning** – Scan IRCTC train ticket QR codes with full metadata extraction
@@ -19,18 +20,21 @@ Unlike Apple Wallet or Google Wallet, which support only specific formats, **Nam
 * **Manual Entry** – Direct ticket input with form validation
 
 ### 🎫 **Supported Ticket Types**
+
 * **Bus Tickets** – TNSTC (Tamil Nadu State Transport), SETC (State Express Transport)
 * **Train Tickets** – IRCTC with complete QR code support and PNR lookup
 * **Event Tickets** – Concert, movie, and general event passes
 * **Flight/Metro** – Model support for future implementations
 
 ### 💾 **Data Management**
+
 * **SQLite Database** – Local storage with comprehensive ticket metadata
 * **Duplicate Prevention** – Smart detection based on PNR/booking references
 * **Export Functionality** – Data export capabilities for backup
 * **Share Integration** – Handle PDF files shared from other applications
 
 ### 🗂 **Organization & Navigation**
+
 * **Bottom Navigation** – Three-tab layout (Home, Scanner, Calendar)
 * **Filtering & Search** – Organize tickets by date, provider, and type
 * **State Management** – Persistent navigation and data state
@@ -50,7 +54,7 @@ Unlike Apple Wallet or Google Wallet, which support only specific formats, **Nam
 
 This app follows a **feature-based architecture** with clean separation of concerns:
 
-```
+```text
 lib/src/
 ├── app.dart                    # Main app widget with navigation
 ├── common/                     # Shared utilities and services
@@ -113,22 +117,73 @@ fvm flutter build apk          # Android APK
 fvm flutter build ios          # iOS IPA
 ```
 
+### Build Commands with Makefile
+
+The project includes a `Makefile` for streamlined build processes. By default, it uses FVM (`fvm flutter` and `fvm dart`), but you can override this behavior.
+
+#### Available Targets
+
+**Utility Commands:**
+
+```bash
+make help       # Display all available commands
+make clean      # Clean the project
+make get        # Get dependencies
+make codegen    # Run code generation
+```
+
+**Release Builds:**
+
+```bash
+make release-apk        # Build Android release APK
+make release-appbundle  # Build Android release App Bundle
+make release-ipa        # Build iOS release IPA
+```
+
+All release builds automatically:
+
+1. Get dependencies
+2. Run code generation
+3. Remove WASM modules (via `dart run pdfrx:remove_wasm_modules`) to reduce app size
+4. Build the release version
+
+#### Using Without FVM
+
+If you're not using FVM, override the `FLUTTER` and `DART` variables:
+
+```bash
+# Build with regular Flutter/Dart
+FLUTTER=flutter DART=dart make release-apk
+
+# Or export them for the session
+export FLUTTER=flutter
+export DART=dart
+make release-apk
+```
+
+#### CI/CD Integration
+
+The release workflow in `.github/workflows/build_and_release.yml` automatically removes WASM modules before building releases for optimal app size.
+
 ---
 
 ## 🛠 Development Notes
 
 ### Code Style & Conventions
+
 * Uses `flutter_lints` for consistent code formatting
 * **Views** use "view" suffix for main/page widgets (e.g., `HomeView`)
 * **Widgets** use "widget" suffix for reusable components (e.g., `TicketCardWidget`)
 * Follows standard Flutter/Dart conventions with analysis options configured
 
 ### Testing
+
 * Unit tests for parsing services and data models
 * Widget tests for UI components
 * Integration tests for full user workflows
 
 ### Database Schema
+
 * Single `travel_tickets` table supporting all ticket types
 * Generic schema with enum mapping for type safety
 * Migration support for schema updates
@@ -141,6 +196,7 @@ fvm flutter build ios          # iOS IPA
 We welcome contributions from the community! 🚀
 
 ### How to Contribute
+
 1. **Fork** this repository
 2. Create a **feature branch** (`git checkout -b feature/amazing-feature`)
 3. **Commit** your changes (`git commit -m 'Add amazing feature'`)
@@ -148,6 +204,7 @@ We welcome contributions from the community! 🚀
 5. Open a **Pull Request**
 
 ### Development Guidelines
+
 * Follow the existing code style and architecture patterns
 * Add tests for new features and bug fixes
 * Update documentation for significant changes
@@ -162,17 +219,17 @@ To maintain a clean and consistent Git history, **Namma Wallet** follows the [**
 
 Each commit message should follow this pattern:
 
-```
+```text
 <type>(<scope>): <short summary>
 ```
 
 **Examples:**
 
-```
-feat(sms_extract): add TNSTC SMS parsing support
-fix(irctc): resolve PNR extraction issue in QR scan
-chore(deps): update flutter_lints version
-docs(readme): add installation guide
+```text
+feat: add TNSTC SMS parsing support
+fix: resolve PNR extraction issue in QR scan
+chore: update flutter_lints version
+docs: add installation guide
 ```
 
 **Common Commit Types:**
@@ -198,13 +255,13 @@ docs(readme): add installation guide
 
 Branch names should follow this format:
 
-```
+```text
 <type>/<short-description>
 ```
 
 **Examples:**
 
-```
+```text
 feature/pdf-parsing
 fix/calendar-event-display
 docs/update-readme
@@ -230,6 +287,7 @@ refactor/database-schema
 ### Key Dependencies
 
 #### Core Libraries
+
 * **`syncfusion_flutter_pdf`** - PDF text extraction and processing
 * **`ai_barcode_scanner`** - QR code scanning functionality
 * **`sqflite`** - Local SQLite database storage
@@ -237,12 +295,14 @@ refactor/database-schema
 * **`dart_mappable`** - Type-safe serialization/deserialization
 
 #### UI/UX Libraries
+
 * **`card_stack_widget`** - Swipeable card stack for ticket display
 * **`table_calendar`** - Calendar view implementation
 * **`google_fonts`** - Typography and font management
 * **`flutter_svg`** - SVG asset support
 
 #### Integration Libraries
+
 * **`file_picker`** - PDF file selection
 * **`shared_preferences`** - Local settings storage
 * **`listen_sharing_intent`** - Handle shared files from other apps
@@ -257,6 +317,7 @@ refactor/database-schema
 ## 📌 Roadmap
 
 ### ✅ Completed Features
+
 * [x] SMS ticket parsing (TNSTC, IRCTC, SETC)
 * [x] PDF ticket extraction (TNSTC)
 * [x] QR code scanning (IRCTC)
@@ -269,11 +330,13 @@ refactor/database-schema
 * [x] Share intent handling for PDFs
 
 ### 🚧 In Progress
+
 * [ ] Enhanced error handling and user feedback
 * [ ] Performance optimizations for large datasets
 * [ ] Additional transport provider support
 
 ### 📅 Future Plans
+
 * [ ] Cloud backup & synchronization
 * [ ] Ticket sharing with friends and family
 * [ ] Home screen widgets for quick access

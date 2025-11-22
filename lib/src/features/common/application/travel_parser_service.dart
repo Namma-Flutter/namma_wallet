@@ -8,11 +8,13 @@ import 'package:namma_wallet/src/features/home/domain/extras_model.dart';
 import 'package:namma_wallet/src/features/home/domain/tag_model.dart';
 import 'package:namma_wallet/src/features/home/domain/ticket.dart';
 import 'package:namma_wallet/src/features/irctc/application/irctc_ticket_model.dart';
+import 'package:namma_wallet/src/features/tnstc/application/tnstc_pdf_parser.dart';
+import 'package:namma_wallet/src/features/tnstc/application/tnstc_sms_parser.dart';
 
 abstract class TravelTicketParser {
   bool canParse(String text);
 
-  Ticket? parseTicket(String text);
+  Ticket parseTicket(String text);
 
   String get providerName;
 
@@ -37,173 +39,64 @@ class TNSTCBusParser implements TravelTicketParser {
       'Trip Code',
       'Service Start Place',
       'Date of Journey',
+      'SETC',
     ];
     return patterns.any(
       (pattern) => text.toLowerCase().contains(pattern.toLowerCase()),
     );
   }
 
+  /// Detects if the text is SMS format by checking for SMS-specific patterns
+  bool _isSMSFormat(String text) {
+    // SMS contains "SETC" or has SMS-style patterns
+    // like "From :", "To ", "Trip :"
+    // PDF has "Service Start Place", "PNR Number", "Date of Journey"
+    final smsPatterns = [
+      r'From\s*:\s*[A-Z]',
+      r'To\s*[A-Z]',
+      r'Trip\s*:\s*',
+      r'Time\s*:\s*,?\s*\d{1,2}:\d{2}',
+      r'Boarding at\s*:',
+    ];
+
+    final pdfPatterns = [
+      'Service Start Place',
+      'Service End Place',
+      'Passenger Pickup Point',
+      'PNR Number',
+      'Bank Txn',
+    ];
+
+    // Check if it matches SMS patterns
+    final hasSmsPattern = smsPatterns.any(
+      (pattern) => RegExp(pattern, caseSensitive: false).hasMatch(text),
+    );
+
+    // Check if it matches PDF patterns
+    final hasPdfPattern = pdfPatterns.any(
+      (pattern) => text.toLowerCase().contains(pattern.toLowerCase()),
+    );
+
+    // If has SMS patterns and no PDF patterns, it's SMS
+    // If has SETC and no PDF patterns, it's SMS
+    // (SETC can appear in both formats)
+    return (hasSmsPattern && !hasPdfPattern) ||
+        (text.toUpperCase().contains('SETC') && !hasPdfPattern);
+  }
+
   @override
-  Ticket? parseTicket(String text) {
-    if (!canParse(text)) return null;
+  Ticket parseTicket(String text) {
+    // Detect if this is SMS or PDF format
+    final isSMS = _isSMSFormat(text);
 
-    String extractMatch(String pattern, String input, {int groupIndex = 1}) {
-      final regex = RegExp(pattern, multiLine: true, caseSensitive: false);
-      final match = regex.firstMatch(input);
-      if (match != null && groupIndex <= match.groupCount) {
-        return match.group(groupIndex)?.trim() ?? '';
-      }
-      return '';
+    // Use appropriate parser based on format
+    if (isSMS) {
+      final smsParser = TNSTCSMSParser();
+      return smsParser.parseTicket(text);
+    } else {
+      final pdfParser = TNSTCPDFParser();
+      return pdfParser.parseTicket(text);
     }
-
-    DateTime? parseDate(String date) {
-      if (date.isEmpty) return null;
-
-      // Handle both '/' and '-' separators
-      final parts = date.contains('/') ? date.split('/') : date.split('-');
-      if (parts.length != 3) return null;
-
-      try {
-        final day = int.parse(parts[0]);
-        final month = int.parse(parts[1]);
-        final year = int.parse(parts[2]);
-        return DateTime(year, month, day);
-      } on FormatException {
-        return null;
-      }
-    }
-
-    // Try multiple PNR patterns (handles "PNR:", "PNR NO.", "PNR Number")
-    var pnrNumber = extractMatch(
-      r'PNR\s*(?:NO\.?|Number)?\s*:\s*([^,\s]+)',
-      text,
-    );
-
-    // Try multiple date patterns (DOJ, Journey Date, Date of Journey)
-    final journeyDateStr = extractMatch(
-      r'(?:DOJ|Journey Date|Date of Journey)\s*:\s*(\d{2}[/-]\d{2}[/-]\d{4})',
-      text,
-    );
-    var journeyDate = parseDate(journeyDateStr);
-
-    // Try multiple patterns for route/vehicle information
-    final vehicleNo = extractMatch(r'Vehicle No\s*:\s*([^,\s]+)', text);
-    final routeNo = extractMatch(r'Route No\s*:\s*([^,.\s]+)', text);
-
-    // Try SMS patterns with various formats
-    var corporation = extractMatch(r'Corporation\s*:\s*(.*?)(?=\s*,)', text);
-    var from = extractMatch(r'From\s*:\s*(.*?)(?=\s+To)', text);
-    var to = extractMatch(r'To\s+([^,]+)', text);
-    final tripCode = extractMatch(r'Trip Code\s*:\s*(\S+)', text);
-    var departureTime = extractMatch(
-      r'Time\s*:\s*(?:\d{2}/\d{2}/\d{4},)?\s*,?\s*(\d{2}:\d{2})',
-      text,
-    );
-    var seatNumbers = extractMatch(
-      r'Seat No\.\s*:\s*([0-9A-Z,\s\-#]+)',
-      text,
-    ).replaceAll(RegExp(r'[,\s]+$'), '');
-    var classOfService = extractMatch(
-      r'Class\s*:\s*(.*?)(?=\s*[,\.]|\s*Boarding|\s*For\s+e-Ticket|$)',
-      text,
-    );
-    var boardingPoint = extractMatch(
-      r'Boarding at\s*:\s*(.*?)(?=\s*\.|$)',
-      text,
-    );
-
-    // If SMS patterns failed, try PDF patterns
-    if (corporation.isEmpty && pnrNumber.isEmpty) {
-      corporation = extractMatch(r'Corporation\s*:\s*(.*)', text);
-      pnrNumber = extractMatch(r'PNR Number\s*:\s*(\S+)', text);
-    }
-
-    if (from.isEmpty || to.isEmpty) {
-      from = from.isNotEmpty
-          ? from
-          : extractMatch(r'Service Start Place\s*:\s*(.*)', text);
-      to = to.isNotEmpty
-          ? to
-          : extractMatch(r'Service End Place\s*:\s*(.*)', text);
-    }
-
-    journeyDate ??= parseDate(
-      extractMatch(r'Date of Journey\s*:\s*(\d{2}[/-]\d{2}[/-]\d{4})', text),
-    );
-
-    if (departureTime.isEmpty) {
-      departureTime = extractMatch(
-        r'Service Start Time\s*:\s*(\d{2}:\d{2})',
-        text,
-      );
-    }
-
-    if (classOfService.isEmpty) {
-      classOfService = extractMatch(r'Class of Service\s*:\s*(.*)', text);
-    }
-
-    if (boardingPoint.isEmpty) {
-      boardingPoint = extractMatch(r'Passenger Pickup Point\s*:\s*(.*)', text);
-    }
-
-    // For PDF, try to extract seat number differently
-    if (seatNumbers.isEmpty) {
-      seatNumbers = extractMatch(r'\d+[A-Z]+', text);
-    }
-
-    // Use vehicle/route number as trip code if tripCode is empty
-    final finalTripCode = tripCode.isNotEmpty
-        ? tripCode
-        : (vehicleNo.isNotEmpty ? vehicleNo : routeNo);
-
-    // ✅ Map extracted values into Ticket
-    return Ticket(
-      ticketId: pnrNumber,
-      primaryText:
-          '${from.isNotEmpty ? from : 'Unknown'} → '
-          '${to.isNotEmpty ? to : 'Unknown'}',
-      secondaryText:
-          '${corporation.isNotEmpty ? corporation : 'TNSTC'} - '
-          '${finalTripCode.isNotEmpty ? finalTripCode : 'Bus'}',
-      startTime: journeyDate ?? DateTime.now(),
-      endTime: journeyDate?.add(const Duration(hours: 6)),
-      location: boardingPoint.isNotEmpty
-          ? boardingPoint
-          : (from.isNotEmpty ? from : 'Unknown'),
-      type: TicketType.bus,
-      tags: [
-        if (finalTripCode.isNotEmpty)
-          TagModel(value: finalTripCode, icon: 'confirmation_number'),
-        if (pnrNumber.isNotEmpty) TagModel(value: pnrNumber, icon: 'qr_code'),
-        if (departureTime.isNotEmpty)
-          TagModel(value: departureTime, icon: 'access_time'),
-        if (seatNumbers.isNotEmpty)
-          TagModel(value: seatNumbers, icon: 'event_seat'),
-        if (classOfService.isNotEmpty)
-          TagModel(value: classOfService, icon: 'workspace_premium'),
-      ],
-      extras: [
-        ExtrasModel(
-          title: 'Provider',
-          value: corporation.isNotEmpty ? corporation : 'TNSTC',
-        ),
-        if (finalTripCode.isNotEmpty)
-          ExtrasModel(title: 'Trip Code', value: finalTripCode),
-        if (from.isNotEmpty) ExtrasModel(title: 'From', value: from),
-        if (to.isNotEmpty) ExtrasModel(title: 'To', value: to),
-        if (seatNumbers.isNotEmpty)
-          ExtrasModel(title: 'Seat', value: seatNumbers),
-        if (journeyDateStr.isNotEmpty)
-          ExtrasModel(title: 'Journey Date', value: journeyDateStr),
-        if (departureTime.isNotEmpty)
-          ExtrasModel(title: 'Departure Time', value: departureTime),
-        if (classOfService.isNotEmpty)
-          ExtrasModel(title: 'Class', value: classOfService),
-        if (boardingPoint.isNotEmpty)
-          ExtrasModel(title: 'Boarding', value: boardingPoint),
-        ExtrasModel(title: 'Source Type', value: 'SMS'),
-      ],
-    );
   }
 }
 
@@ -216,6 +109,7 @@ class IRCTCTrainParser implements TravelTicketParser {
   @override
   TicketType get ticketType => TicketType.train;
 
+  @override
   bool canParse(String text) {
     final patterns = [
       r'\bIRCTC\b',
@@ -233,9 +127,12 @@ class IRCTCTrainParser implements TravelTicketParser {
   }
 
   @override
-  Ticket? parseTicket(String text) {
+  Ticket parseTicket(String text) {
     // Normalise content: Replace newlines and excessive whitespace with single spaces
-    text = text.replaceAll(RegExp(r'[\r\n]+'), ' ').replaceAll(RegExp(r'\s+'), ' ').trim();
+    text = text
+        .replaceAll(RegExp(r'[\r\n]+'), ' ')
+        .replaceAll(RegExp(r'\s+'), ' ')
+        .trim();
 
     // ---------------------- UTIL ----------------------
     String extract(String pattern, {int group = 1}) {
@@ -249,7 +146,7 @@ class IRCTCTrainParser implements TravelTicketParser {
     if (pnr.isEmpty) {
       pnr = extract(r'(?<!TRN[:\-\s]*)([0-9]{10})\b', group: 1);
     }
-    if (pnr.isEmpty) return null;
+    if (pnr.isEmpty) throw Exception('IRCTC Ticket format Exception');
 
     // ---------------------- TRAIN NUMBER ----------------------
     final trainNumber = extract(r'(?:TRN|Train|Trn)[:\-\s]*([0-9]{3,5})\b');
@@ -269,7 +166,9 @@ class IRCTCTrainParser implements TravelTicketParser {
       if (parts.length == 3) {
         final d = int.parse(parts[0]);
         final m = int.parse(parts[1]);
-        final y = parts[2].length == 2 ? 2000 + int.parse(parts[2]) : int.parse(parts[2]);
+        final y = parts[2].length == 2
+            ? 2000 + int.parse(parts[2])
+            : int.parse(parts[2]);
         doj = DateTime(y, m, d);
       }
     }
@@ -278,7 +177,17 @@ class IRCTCTrainParser implements TravelTicketParser {
     // ---------------------- CLASS (FINAL FIXED: Prioritize SL, eliminate URL match) ----------------------
     String travelClass = '';
     const knownClasses = <String>{
-      'SL', '1A', '2A', '3A', 'CC', '2S', '3E', 'FC', 'EC', '1E', '2E'
+      'SL',
+      '1A',
+      '2A',
+      '3A',
+      'CC',
+      '2S',
+      '3E',
+      'FC',
+      'EC',
+      '1E',
+      '2E',
     };
 
     // 1) Explicit label check
@@ -332,7 +241,6 @@ class IRCTCTrainParser implements TravelTicketParser {
 
     travelClass = travelClass.toUpperCase();
 
-
     // ---------------------- FROM - TO ----------------------
     String fromStation = '';
     String toStation = '';
@@ -357,7 +265,9 @@ class IRCTCTrainParser implements TravelTicketParser {
     toStation = toStation.toUpperCase();
 
     // ---------------------- DEPARTURE TIME ----------------------
-    final dep = extract(r'(?:DP|Dep|Departure)[:\-\s]*([0-9]{1,2}[:.][0-9]{2})\b');
+    final dep = extract(
+      r'(?:DP|Dep|Departure)[:\-\s]*([0-9]{1,2}[:.][0-9]{2})\b',
+    );
     DateTime scheduledDeparture = doj;
     if (dep.isNotEmpty) {
       final hm = dep.replaceAll('.', ':').split(':');
@@ -379,12 +289,17 @@ class IRCTCTrainParser implements TravelTicketParser {
     // 2) Passenger list format: NAME+N,S_XX,NAME
     if (passenger.isEmpty) {
       // HARISH ANBALAGAN+2,S4 15
-      passenger = extract(r'([A-Za-z ]+\+?[0-9]*)\b[, ]+(?:S\d+\s+\d+|WL\s*\d+|RAC|CNF|D\d+)\b');
+      passenger = extract(
+        r'([A-Za-z ]+\+?[0-9]*)\b[, ]+(?:S\d+\s+\d+|WL\s*\d+|RAC|CNF|D\d+)\b',
+      );
     }
 
     // 3) Fallback (kept safe)
     if (passenger.isEmpty) {
-      final m = RegExp(r'(?:^|,\s*|\n\s*)([A-Za-z ]{3,40})\b', caseSensitive: false).firstMatch(text);
+      final m = RegExp(
+        r'(?:^|,\s*|\n\s*)([A-Za-z ]{3,40})\b',
+        caseSensitive: false,
+      ).firstMatch(text);
       if (m != null) {
         final candidate = m.group(1)!;
         if (candidate.toUpperCase() != candidate || candidate.length > 5) {
@@ -393,10 +308,13 @@ class IRCTCTrainParser implements TravelTicketParser {
       }
     }
 
-
     // ---------------------- STATUS ----------------------
-    String status = extract(r'(Cancelled|CNF|CONFIRMED|RAC|WL\s*\d+|Waitlist)\b', group: 1);
-    if (status.isEmpty && text.toLowerCase().contains('cancel')) status = 'Cancelled';
+    String status = extract(
+      r'(Cancelled|CNF|CONFIRMED|RAC|WL\s*\d+|Waitlist)\b',
+      group: 1,
+    );
+    if (status.isEmpty && text.toLowerCase().contains('cancel'))
+      status = 'Cancelled';
     if (status.isEmpty && text.toLowerCase().contains('cnf')) status = 'CNF';
 
     // ---------------------- FARE ----------------------
@@ -415,7 +333,8 @@ class IRCTCTrainParser implements TravelTicketParser {
     }
 
     // ---------------------- IRCTC FEE ----------------------
-    final irctcFee = double.tryParse(extract(r'C Fee[:\-\s]*([0-9]+(?:\.[0-9]+)?)')) ?? 0.0;
+    final irctcFee =
+        double.tryParse(extract(r'C Fee[:\-\s]*([0-9]+(?:\.[0-9]+)?)')) ?? 0.0;
 
     // ---------------------- BUILD MODEL ----------------------
     final boardingStation = fromStation;
@@ -442,7 +361,8 @@ class IRCTCTrainParser implements TravelTicketParser {
 
     return Ticket.fromIRCTC(irctc);
   }
-///
+
+  ///
   // @override
   // Ticket? parseTicket(String text) {
   //   // Normalise content: Replace newlines and excessive whitespace with single spaces
@@ -706,7 +626,7 @@ class IRCTCTrainParser implements TravelTicketParser {
   //
   //   return Ticket.fromIRCTC(irctc);
   // }
-///
+  ///
   // @override
   // Ticket? parseTicket(String text) {
   //   if (!canParse(text)) return null;
@@ -806,9 +726,7 @@ class SETCBusParser implements TravelTicketParser {
   }
 
   @override
-  Ticket? parseTicket(String text) {
-    if (!canParse(text)) return null;
-
+  Ticket parseTicket(String text) {
     String extractMatch(String pattern, String input, {int groupIndex = 1}) {
       final regex = RegExp(pattern, multiLine: true, caseSensitive: false);
       final match = regex.firstMatch(input);
@@ -1053,24 +971,23 @@ class TravelParserService {
             );
 
           final ticket = parser.parseTicket(text);
-          if (ticket != null) {
-            // Log sanitized summary (no PII)
-            final ticketSummary = _createTicketSummary(ticket);
-            _logger
-              ..debug(
-                '[TravelParserService] Parsed ticket summary: $ticketSummary',
-              )
-              ..info(
-                '[TravelParserService] Successfully parsed ticket with '
-                '${parser.providerName}',
-              );
 
-            // TODO(keerthivasan-ai): need to clarify this with harishwarrior
-            // if (sourceType != null) {
-            //   return ticket.copyWith(sourceType: sourceType);
-            // }
-            return ticket;
-          }
+          // Log sanitized summary (no PII)
+          final ticketSummary = _createTicketSummary(ticket);
+          _logger
+            ..debug(
+              '[TravelParserService] Parsed ticket summary: $ticketSummary',
+            )
+            ..info(
+              '[TravelParserService] Successfully parsed ticket with '
+              '${parser.providerName}',
+            );
+
+          // TODO(keerthivasan-ai): need to clarify this with harishwarrior
+          // if (sourceType != null) {
+          //   return ticket.copyWith(sourceType: sourceType);
+          // }
+          return ticket;
         }
       }
 
