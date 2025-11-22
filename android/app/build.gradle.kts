@@ -51,7 +51,7 @@ android {
             isShrinkResources = true
             isMinifyEnabled = true
 
-            val keystoreFile = file("keystore.jks")
+            val keystoreFile = file("namma-wallet.keystore")
             if (keystoreFile.exists()) {
                 signingConfig = signingConfigs.create("release") {
                     storeFile = keystoreFile
