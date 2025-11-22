@@ -19,13 +19,22 @@ import 'package:shared_preferences/shared_preferences.dart';
 /// HapticServices.selection();
 /// ```
 class HapticService implements IHapticService {
+  HapticService() {
+    _initFuture = loadPreference();
+  }
   // default true or choose false if desired
-  HapticService();
+  HapticService._();
+
+  static Future<HapticService> create() async {
+    final service = HapticService._();
+    await service.loadPreference();
+    return service;
+  }
 
   /// Creates a new instance of [HapticService].
   static const _prefKey = 'isHapticEnabled';
   bool _isEnabled = true;
-
+  Future<void>? _initFuture;
   @override
   Future<bool> canSupportHaptic() async {
     return Gaimon.canSupportsHaptic;
@@ -33,6 +42,7 @@ class HapticService implements IHapticService {
 
   @override
   void selection() {
+    _initFuture?.ignore(); // Ensure init started
     if (!_isEnabled) return;
 
     Gaimon.selection();

@@ -103,8 +103,6 @@ class _TicketViewState extends State<TicketView> {
       showSnackbar(context, 'Cannot delete this ticket', isError: true);
       return;
     }
-    final hapticService = getIt<IHapticService>();
-
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -125,7 +123,7 @@ class _TicketViewState extends State<TicketView> {
     );
 
     if (mounted && (confirmed ?? false)) {
-      hapticService.triggerHaptic(
+      getIt<IHapticService>().triggerHaptic(
         HapticType.selection,
       );
       await _deleteTicket();
