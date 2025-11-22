@@ -78,11 +78,7 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
       });
     } on Object catch (e) {
       if (!mounted) return;
-      showSnackbar(
-        context,
-        'Error loading ticket data: $e',
-        isError: true,
-      );
+      showSnackbar(context, 'Error loading ticket data: $e', isError: true);
       setState(() {
         _isLoading = false;
       });
