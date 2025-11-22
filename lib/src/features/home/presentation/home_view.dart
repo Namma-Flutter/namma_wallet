@@ -1,7 +1,6 @@
 import 'package:card_stack_widget/model/card_model.dart';
-import 'package:card_stack_widget/model/card_orientation.dart';
-import 'package:card_stack_widget/widget/card_stack_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_card_swiper/flutter_card_swiper.dart';
 import 'package:go_router/go_router.dart';
 import 'package:namma_wallet/src/common/database/ticket_dao_interface.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
@@ -208,23 +207,61 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
                       : Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 16),
                           child: SizedBox(
-                            height: 500,
-                            child: CardStackWidget(
-                              cardList: cardStackList.take(3).toList(),
-                              opacityChangeOnDrag: true,
-                              swipeOrientation: CardOrientation.both,
-                              cardDismissOrientation: CardOrientation.both,
-                              positionFactor: 3,
-                              scaleFactor: 2,
-                              alignment: Alignment.center,
-                              animateCardScale: true,
-                              dismissedCardDuration: const Duration(
-                                milliseconds: 150,
-                              ),
+                            height: 330,
+                            child: CardSwiper(
+                              cardsCount: _travelTickets
+                                  .take(3)
+                                  .toList()
+                                  .length,
+                              cardBuilder:
+                                  (
+                                    context,
+                                    index,
+                                    percentThresholdX,
+                                    percentThresholdY,
+                                  ) {
+                                    final ticket = _travelTickets[index];
+                                    return InkWell(
+                                      onTap: () async {
+                                        final wasDeleted = await context
+                                            .pushNamed<bool>(
+                                              AppRoute.ticketView.name,
+                                              extra: ticket,
+                                            );
+                                        if (mounted && (wasDeleted ?? false)) {
+                                          await _loadTicketData();
+                                        }
+                                      },
+                                      child: TravelTicketCardWidget(
+                                        ticket: ticket,
+                                        onTicketDeleted: _loadTicketData,
+                                      ),
+                                    );
+                                  },
+                              allowedSwipeDirection:
+                                  const AllowedSwipeDirection.symmetric(
+                                    horizontal: true,
+                                  ),
+                              scale: 0.9,
+                              padding: const EdgeInsets.all(8),
                             ),
+                            // CardStackWidget(
+                            //   cardList: cardStackList.take(3).toList(),
+                            //   opacityChangeOnDrag: true,
+                            //   swipeOrientation: CardOrientation.both,
+                            //   cardDismissOrientation: CardOrientation.both,
+                            //   positionFactor: 3,
+                            //   scaleFactor: 2,
+                            //   alignment: Alignment.center,
+                            //   animateCardScale: true,
+                            //   dismissedCardDuration: const Duration(
+                            //     milliseconds: 150,
+                            //   ),
+                            // ),
                           ),
                         ),
 
+                const SizedBox(height: 16),
                 //* Other Cards Section
                 Padding(
                   padding: const EdgeInsets.all(16),
