@@ -6,6 +6,8 @@ import 'package:home_widget/home_widget.dart';
 import 'package:namma_wallet/src/common/database/ticket_dao_interface.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/helper/date_time_converter.dart';
+import 'package:namma_wallet/src/common/services/haptic_service_extension.dart';
+import 'package:namma_wallet/src/common/services/haptic_service_interface.dart';
 import 'package:namma_wallet/src/common/services/logger_interface.dart';
 import 'package:namma_wallet/src/common/theme/styles.dart';
 import 'package:namma_wallet/src/common/widgets/custom_back_button.dart';
@@ -101,7 +103,6 @@ class _TicketViewState extends State<TicketView> {
       showSnackbar(context, 'Cannot delete this ticket', isError: true);
       return;
     }
-
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -122,6 +123,9 @@ class _TicketViewState extends State<TicketView> {
     );
 
     if (mounted && (confirmed ?? false)) {
+      getIt<IHapticService>().triggerHaptic(
+        HapticType.selection,
+      );
       await _deleteTicket();
     }
   }
@@ -142,7 +146,12 @@ class _TicketViewState extends State<TicketView> {
       );
 
       if (mounted) {
+        final hapticService = getIt<IHapticService>();
+
         showSnackbar(context, 'Ticket deleted successfully');
+        hapticService.triggerHaptic(
+          HapticType.success,
+        );
         context.pop(true); // Return true to indicate ticket was deleted
       }
     } on Object catch (e, stackTrace) {
@@ -153,7 +162,13 @@ class _TicketViewState extends State<TicketView> {
       );
 
       if (mounted) {
+        final hapticService = getIt<IHapticService>();
+
         showSnackbar(context, 'Failed to delete ticket: $e', isError: true);
+
+        hapticService.triggerHaptic(
+          HapticType.error,
+        );
       }
     } finally {
       if (mounted) {

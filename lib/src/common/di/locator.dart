@@ -5,6 +5,8 @@ import 'package:namma_wallet/src/common/database/user_dao.dart';
 import 'package:namma_wallet/src/common/database/user_dao_interface.dart';
 import 'package:namma_wallet/src/common/database/wallet_database.dart';
 import 'package:namma_wallet/src/common/database/wallet_database_interface.dart';
+import 'package:namma_wallet/src/common/services/haptic_service_interface.dart';
+import 'package:namma_wallet/src/common/services/haptic_services.dart';
 import 'package:namma_wallet/src/common/services/logger_interface.dart';
 import 'package:namma_wallet/src/common/services/namma_logger.dart';
 import 'package:namma_wallet/src/common/theme/theme_provider.dart';
@@ -42,6 +44,7 @@ void setupLocator() {
     )
     ..registerLazySingleton<SMSService>(SMSService.new)
     ..registerLazySingleton<GemmaChatService>(GemmaChatService.new)
+    ..registerLazySingleton<IHapticService>(HapticService.new)
     // Feature services
     ..registerLazySingleton<IRCTCQRParser>(IRCTCQRParser.new)
     ..registerLazySingleton<IRCTCScannerService>(IRCTCScannerService.new)

@@ -5,6 +5,8 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:namma_wallet/src/common/database/ticket_dao_interface.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
+import 'package:namma_wallet/src/common/services/haptic_service_extension.dart';
+import 'package:namma_wallet/src/common/services/haptic_service_interface.dart';
 import 'package:namma_wallet/src/common/services/logger_interface.dart';
 import 'package:namma_wallet/src/features/calendar/domain/event_model.dart';
 import 'package:namma_wallet/src/features/calendar/presentation/widgets/calendar_toggle_buttons.dart';
@@ -32,6 +34,9 @@ class CalendarProvider extends ChangeNotifier {
   }
 
   Future<void> loadEvents() async {
+    getIt<IHapticService>().triggerHaptic(
+      HapticType.selection,
+    );
     // Load events from JSON
     final response = await rootBundle.loadString(
       'assets/data/other_cards.json',
@@ -171,6 +176,9 @@ class _CalendarContentState extends State<CalendarContent> {
                   // Handle Date Range
                 }
               });
+              getIt<IHapticService>().triggerHaptic(
+                HapticType.selection,
+              );
             },
           ),
           CalendarWidget(

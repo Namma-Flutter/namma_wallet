@@ -2,6 +2,8 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:namma_wallet/src/common/di/locator.dart';
+import 'package:namma_wallet/src/common/services/haptic_service_interface.dart';
 import 'package:namma_wallet/src/common/widgets/custom_back_button.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -33,6 +35,7 @@ class ContributorsView extends StatefulWidget {
 
 class _ContributorsViewState extends State<ContributorsView> {
   late Future<List<Contributor>> _contributorsFuture;
+  final IHapticService hapticService = getIt<IHapticService>();
 
   @override
   void initState() {
@@ -85,7 +88,6 @@ class _ContributorsViewState extends State<ContributorsView> {
         );
       }
     }
-
     return contributors;
   }
 
