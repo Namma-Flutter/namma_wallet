@@ -27,6 +27,8 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
   List<Ticket> _travelTickets = [];
   List<Ticket> _eventTickets = [];
 
+  late final IHapticService _haptic = getIt<IHapticService>();
+
   @override
   void initState() {
     super.initState();
@@ -79,7 +81,7 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
       });
 
       if (mounted) {
-        getIt<IHapticService>().triggerHaptic(HapticType.selection);
+        _haptic.triggerHaptic(HapticType.selection);
       }
     } on Object catch (e) {
       if (!mounted) return;
@@ -98,9 +100,7 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
         shadowColor: Colors.black26,
         child: InkWell(
           onTap: () async {
-            getIt<IHapticService>().triggerHaptic(
-              HapticType.selection,
-            );
+            _haptic.triggerHaptic(HapticType.selection);
             final wasDeleted = await context.pushNamed<bool>(
               AppRoute.ticketView.name,
               extra: ticket,
