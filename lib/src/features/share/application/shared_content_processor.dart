@@ -1,12 +1,11 @@
 import 'package:namma_wallet/src/common/database/ticket_dao_interface.dart';
-import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/services/logger_interface.dart';
-import 'package:namma_wallet/src/features/common/application/travel_parser_service.dart';
+import 'package:namma_wallet/src/features/common/application/travel_parser_service_interface.dart';
 import 'package:namma_wallet/src/features/home/domain/ticket.dart';
 import 'package:namma_wallet/src/features/home/domain/ticket_extensions.dart';
 import 'package:namma_wallet/src/features/share/domain/shared_content_result.dart';
-import 'package:namma_wallet/src/features/tnstc/application/sms_service.dart';
-import 'package:namma_wallet/src/features/tnstc/application/tnstc_pdf_parser.dart';
+import 'package:namma_wallet/src/features/tnstc/application/sms_service_interface.dart';
+import 'package:namma_wallet/src/features/tnstc/application/ticket_parser_interface.dart';
 
 /// Content type for shared content
 enum SharedContentType {
@@ -26,21 +25,21 @@ enum SharedContentType {
 /// - Creating new tickets in database
 class SharedContentProcessor {
   SharedContentProcessor({
-    ILogger? logger,
-    TravelParserService? travelParser,
-    SMSService? smsService,
-    TNSTCPDFParser? pdfParser,
-    ITicketDAO? ticketDao,
-  }) : _logger = logger ?? getIt<ILogger>(),
-       _travelParserService = travelParser ?? getIt<TravelParserService>(),
-       _smsService = smsService ?? getIt<SMSService>(),
-       _pdfParser = pdfParser ?? getIt<TNSTCPDFParser>(),
-       _ticketDao = ticketDao ?? getIt<ITicketDAO>();
+    required ILogger logger,
+    required ITravelParserService travelParser,
+    required ISMSService smsService,
+    required ITicketParser pdfParser,
+    required ITicketDAO ticketDao,
+  }) : _logger = logger,
+       _travelParserService = travelParser,
+       _smsService = smsService,
+       _pdfParser = pdfParser,
+       _ticketDao = ticketDao;
 
   final ILogger _logger;
-  final TravelParserService _travelParserService;
-  final SMSService _smsService;
-  final TNSTCPDFParser _pdfParser;
+  final ITravelParserService _travelParserService;
+  final ISMSService _smsService;
+  final ITicketParser _pdfParser;
   final ITicketDAO _ticketDao;
 
   /// Process shared content and return the result

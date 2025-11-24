@@ -22,7 +22,8 @@ void main() {
     late TravelParserService service;
 
     setUp(() {
-      service = TravelParserService();
+      final logger = GetIt.instance<ILogger>();
+      service = TravelParserService(logger: logger);
     });
 
     test('should detect and parse SETC SMS', () {

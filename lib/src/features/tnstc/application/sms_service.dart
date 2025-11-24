@@ -1,15 +1,16 @@
-import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/services/logger_interface.dart';
 import 'package:namma_wallet/src/features/home/domain/ticket.dart';
+import 'package:namma_wallet/src/features/tnstc/application/sms_service_interface.dart';
 import 'package:namma_wallet/src/features/tnstc/application/tnstc_sms_parser.dart';
 
-class SMSService {
-  SMSService({ILogger? logger, TNSTCSMSParser? smsParser})
-    : _logger = logger ?? getIt<ILogger>(),
-      _smsParser = smsParser ?? getIt<TNSTCSMSParser>();
+class SMSService implements ISMSService {
+  SMSService({required ILogger logger, required TNSTCSMSParser smsParser})
+    : _logger = logger,
+      _smsParser = smsParser;
   final ILogger _logger;
   final TNSTCSMSParser _smsParser;
 
+  @override
   Ticket parseTicket(String text) {
     try {
       _logger.logService('SMS', 'Parsing ticket from SMS text');

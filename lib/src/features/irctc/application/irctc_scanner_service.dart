@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:namma_wallet/src/common/database/ticket_dao_interface.dart';
-import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/services/logger_interface.dart';
 import 'package:namma_wallet/src/common/widgets/snackbar_widget.dart';
 import 'package:namma_wallet/src/features/home/domain/ticket.dart';
@@ -55,12 +54,12 @@ class IRCTCScannerResult {
 
 class IRCTCScannerService {
   IRCTCScannerService({
-    ILogger? logger,
-    IRCTCQRParser? qrParser,
-    ITicketDAO? ticketDao,
-  }) : _logger = logger ?? getIt<ILogger>(),
-       _qrParser = qrParser ?? getIt<IRCTCQRParser>(),
-       _ticketDao = ticketDao ?? getIt<ITicketDAO>();
+    required ILogger logger,
+    required IRCTCQRParser qrParser,
+    required ITicketDAO ticketDao,
+  }) : _logger = logger,
+       _qrParser = qrParser,
+       _ticketDao = ticketDao;
 
   final ILogger _logger;
   final IRCTCQRParser _qrParser;

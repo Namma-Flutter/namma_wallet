@@ -1,4 +1,3 @@
-import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/services/logger_interface.dart';
 import 'package:namma_wallet/src/features/home/domain/ticket.dart';
 import 'package:namma_wallet/src/features/tnstc/application/ticket_parser_interface.dart';
@@ -14,7 +13,7 @@ import 'package:namma_wallet/src/features/tnstc/domain/tnstc_model.dart';
 /// Falls back to default values if parsing fails for individual fields.
 /// Never throws - returns a model with partial data on errors.
 class TNSTCPDFParser implements ITicketParser {
-  TNSTCPDFParser({ILogger? logger}) : _logger = logger ?? getIt<ILogger>();
+  TNSTCPDFParser({required ILogger logger}) : _logger = logger;
   final ILogger _logger;
   // TODO(optimization): Move RegExp compilation to static final fields
   // to avoid recompiling patterns on each parse call, improving performance.

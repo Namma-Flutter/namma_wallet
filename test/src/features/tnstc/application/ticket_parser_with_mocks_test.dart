@@ -50,7 +50,8 @@ void main() {
 
       setUp(() {
         // Arrange - Create parser instance
-        parser = TNSTCPDFParser();
+        final logger = getIt<ILogger>();
+        parser = TNSTCPDFParser(logger: logger);
       });
 
       test(
@@ -406,7 +407,8 @@ Seat No. : 1A,2B,3C, Journey Date : 15/12/2024
         'Then implements ITicketParser interface',
         () {
           // Arrange (Given)
-          final parser = TNSTCPDFParser();
+          final logger = getIt<ILogger>();
+          final parser = TNSTCPDFParser(logger: logger);
 
           // Act & Assert (When & Then)
           expect(parser, isA<ITicketParser>());
@@ -452,7 +454,8 @@ Seat No. : 1A,2B,3C, Journey Date : 15/12/2024
         'Then returns registered instance',
         () async {
           // Arrange (Given)
-          final parser = TNSTCPDFParser();
+          final logger = getIt<ILogger>();
+          final parser = TNSTCPDFParser(logger: logger);
           getIt.registerSingleton<ITicketParser>(parser);
 
           // Act (When)
@@ -473,7 +476,8 @@ Seat No. : 1A,2B,3C, Journey Date : 15/12/2024
       late TNSTCSMSParser smsParser;
 
       setUp(() {
-        pdfParser = TNSTCPDFParser();
+        final logger = getIt<ILogger>();
+        pdfParser = TNSTCPDFParser(logger: logger);
         smsParser = TNSTCSMSParser();
       });
 
