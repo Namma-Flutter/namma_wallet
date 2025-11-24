@@ -63,7 +63,7 @@ class TicketsList extends StatelessWidget {
                     AppRoute.ticketView.name,
                     extra: ticket,
                   );
-                  if (result == true) {
+                  if (result ?? false) {
                     await provider.loadTickets();
                   }
                 },
