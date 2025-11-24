@@ -260,6 +260,11 @@ class _CalendarContentState extends State<CalendarContent> {
 
     if (pickedRange != null) {
       provider.setSelectedRange(pickedRange);
+    } else {
+      setState(() {
+        _selectedFilter = 1;
+        _calendarFormat = CalendarFormat.month;
+      });
     }
   }
 
