@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:namma_wallet/src/common/theme/styles.dart';
 import 'package:namma_wallet/src/common/widgets/snackbar_widget.dart';
 import 'package:namma_wallet/src/features/common/enums/ticket_type.dart';
 import 'package:namma_wallet/src/features/home/domain/ticket.dart';
@@ -40,13 +39,35 @@ class CalendarTicketCardContent extends StatelessWidget {
         borderRadius: BorderRadius.circular(30),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withAlpha(25),
-            blurRadius: 8,
-            spreadRadius: 1,
-            offset: const Offset(0, 6),
+            color: Theme.of(
+              context,
+            ).colorScheme.primary.withValues(alpha: 0.08),
+            blurRadius: 6,
+            offset: const Offset(0, 3),
+          ),
+          BoxShadow(
+            color: Theme.of(
+              context,
+            ).colorScheme.primary.withValues(alpha: 0.05),
+            blurRadius: 6,
+            offset: const Offset(0, -3),
+          ),
+          BoxShadow(
+            color: Theme.of(
+              context,
+            ).colorScheme.primary.withValues(alpha: 0.05),
+            blurRadius: 6,
+            offset: const Offset(-3, 0),
+          ),
+          BoxShadow(
+            color: Theme.of(
+              context,
+            ).colorScheme.primary.withValues(alpha: 0.05),
+            blurRadius: 6,
+            offset: const Offset(3, 0),
           ),
         ],
-        color: AppColor.periwinkleBlue,
+        color: Theme.of(context).colorScheme.surface,
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -58,13 +79,16 @@ class CalendarTicketCardContent extends StatelessWidget {
                 children: [
                   CircleAvatar(
                     radius: 20,
-                    backgroundColor: AppColor.whiteColor,
+                    backgroundColor: Theme.of(
+                      context,
+                    ).colorScheme.primary.withValues(alpha: 0.1),
                     child: Icon(
                       ticket.type == TicketType.bus
                           ? Icons.airport_shuttle_outlined
                           : ticket.type == TicketType.train
                           ? Icons.train_outlined
                           : Icons.tram_outlined,
+                      color: Theme.of(context).colorScheme.primary,
                     ),
                   ),
                   const SizedBox(width: 10),
@@ -73,10 +97,10 @@ class CalendarTicketCardContent extends StatelessWidget {
                       ticket.secondaryText.isNotEmpty
                           ? ticket.secondaryText
                           : 'xxx xxx',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
-                        color: Colors.white,
+                        color: Theme.of(context).colorScheme.onSurface,
                       ),
                       overflow: TextOverflow.ellipsis,
                       maxLines: 1,
@@ -87,10 +111,10 @@ class CalendarTicketCardContent extends StatelessWidget {
               if (ticket.primaryText.isNotEmpty)
                 Text(
                   ticket.primaryText,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 25,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                    color: Theme.of(context).colorScheme.onSurface,
                   ),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
@@ -103,19 +127,21 @@ class CalendarTicketCardContent extends StatelessWidget {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
+                        Text(
                           'Journey Date',
                           style: TextStyle(
                             fontSize: 12,
-                            color: Colors.white70,
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurface.withValues(alpha: 0.6),
                           ),
                         ),
                         Text(
                           DateFormat('MMM dd, yyyy').format(ticket.startTime),
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
-                            color: Colors.white,
+                            color: Theme.of(context).colorScheme.onSurface,
                           ),
                         ),
                       ],
@@ -123,19 +149,21 @@ class CalendarTicketCardContent extends StatelessWidget {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        const Text(
+                        Text(
                           'Time',
                           style: TextStyle(
                             fontSize: 12,
-                            color: Colors.white70,
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurface.withValues(alpha: 0.6),
                           ),
                         ),
                         Text(
                           DateFormat('HH:mm').format(ticket.startTime),
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
-                            color: Colors.white,
+                            color: Theme.of(context).colorScheme.onSurface,
                           ),
                         ),
                       ],
@@ -158,7 +186,9 @@ class CalendarTicketCardContent extends StatelessWidget {
                               vertical: 6,
                             ),
                             decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: 0.2),
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.primary.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(20),
                             ),
                             child: Row(
@@ -167,14 +197,16 @@ class CalendarTicketCardContent extends StatelessWidget {
                                 Icon(
                                   tag.iconData,
                                   size: 16,
-                                  color: Colors.white,
+                                  color: Theme.of(context).colorScheme.primary,
                                 ),
                                 const SizedBox(width: 4),
                                 Text(
                                   tag.value ?? 'xxx',
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 12,
-                                    color: Colors.white,
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onSurface,
                                     fontWeight: FontWeight.w500,
                                   ),
                                 ),
@@ -192,18 +224,18 @@ class CalendarTicketCardContent extends StatelessWidget {
               Expanded(
                 child: Row(
                   children: [
-                    const Icon(
+                    Icon(
                       Icons.location_on_outlined,
-                      color: Colors.white,
+                      color: Theme.of(context).colorScheme.primary,
                     ),
                     const SizedBox(width: 4),
                     Expanded(
                       child: Text(
                         ticket.location,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
-                          color: Colors.white,
+                          color: Theme.of(context).colorScheme.onSurface,
                         ),
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
@@ -219,9 +251,9 @@ class CalendarTicketCardContent extends StatelessWidget {
                     'Ticket details: ${ticket.primaryText}',
                   );
                 },
-                icon: const Icon(
+                icon: Icon(
                   Icons.info,
-                  color: Colors.white,
+                  color: Theme.of(context).colorScheme.primary,
                 ),
               ),
             ],
