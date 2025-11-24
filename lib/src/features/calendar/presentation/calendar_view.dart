@@ -21,13 +21,24 @@ class CalendarProvider extends ChangeNotifier {
   DateTime _selectedDay = DateTime.now();
   List<Event> _events = [];
   List<Ticket> _tickets = [];
+  DateTimeRange? _selectedRange;
 
   DateTime get selectedDay => _selectedDay;
   List<Event> get events => _events;
   List<Ticket> get tickets => _tickets;
+  DateTimeRange? get selectedRange => _selectedRange;
 
   void setSelectedDay(DateTime day) {
     _selectedDay = day;
+    _selectedRange = null; // Clear range when selecting a single day
+    notifyListeners();
+  }
+
+  void setSelectedRange(DateTimeRange? range) {
+    _selectedRange = range;
+    if (range != null) {
+      _selectedDay = range.start; // Set selected day to range start
+    }
     notifyListeners();
   }
 
@@ -117,6 +128,30 @@ class CalendarProvider extends ChangeNotifier {
   bool hasTicketsOnDay(DateTime day) {
     return getTicketsForDay(day).isNotEmpty;
   }
+
+  List<Ticket> getTicketsForRange(DateTimeRange range) {
+    return _tickets.where((ticket) {
+      try {
+        final ticketDate = ticket.startTime;
+        final rangeStart = range.start.subtract(const Duration(days: 1));
+        final rangeEnd = range.end.add(const Duration(days: 1));
+        return ticketDate.isAfter(rangeStart) && ticketDate.isBefore(rangeEnd);
+      } on Exception catch (e, st) {
+        _logger.debug(
+          'Error parsing journeyDate for range filtering: $e\n$st',
+        );
+        return false;
+      }
+    }).toList();
+  }
+
+  List<Event> getEventsForRange(DateTimeRange range) {
+    return _events.where((event) {
+      final rangeStart = range.start.subtract(const Duration(days: 1));
+      final rangeEnd = range.end.add(const Duration(days: 1));
+      return event.date.isAfter(rangeStart) && event.date.isBefore(rangeEnd);
+    }).toList();
+  }
 }
 
 class CalendarView extends StatelessWidget {
@@ -151,6 +186,56 @@ class _CalendarContentState extends State<CalendarContent> {
   CalendarFormat _calendarFormat = CalendarFormat.month;
   int _selectedFilter = 1;
 
+  Future<void> _showDateRangePicker(CalendarProvider provider) async {
+    final initialRange =
+        provider.selectedRange ??
+        DateTimeRange(
+          start: DateTime.now(),
+          end: DateTime.now().add(const Duration(days: 7)),
+        );
+
+    final pickedRange = await showDateRangePicker(
+      context: context,
+      firstDate: DateTime(2020),
+      lastDate: DateTime(2030),
+      initialDateRange: initialRange,
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: Theme.of(context).colorScheme.copyWith(
+              primary: Theme.of(context).colorScheme.primary,
+              onPrimary: Theme.of(context).colorScheme.onPrimary,
+              surface: Theme.of(context).colorScheme.surface,
+              onSurface: Theme.of(context).colorScheme.onSurface,
+              // Change the color between selected dates from green to grey
+              primaryContainer: Theme.of(
+                context,
+              ).colorScheme.surfaceContainerHigh,
+              onPrimaryContainer: Theme.of(context).colorScheme.onSurface,
+              // Override secondary colors that might be used for range
+              secondary: Theme.of(context).colorScheme.surfaceContainerHigh,
+              onSecondary: Theme.of(context).colorScheme.onSurface,
+              secondaryContainer: Theme.of(
+                context,
+              ).colorScheme.surfaceContainerHigh,
+              onSecondaryContainer: Theme.of(context).colorScheme.onSurface,
+              // Override tertiary colors as fallback
+              tertiary: Theme.of(context).colorScheme.surfaceContainerHigh,
+              tertiaryContainer: Theme.of(
+                context,
+              ).colorScheme.surfaceContainerHigh,
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (pickedRange != null) {
+      provider.setSelectedRange(pickedRange);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<CalendarProvider>(context);
@@ -160,26 +245,99 @@ class _CalendarContentState extends State<CalendarContent> {
         children: [
           CalendarToggleButtons(
             selectedFilter: _selectedFilter,
-            onFilterChanged: (index) {
+            onFilterChanged: (index) async {
               setState(() {
                 _selectedFilter = index;
                 if (index == 0) {
                   _calendarFormat = CalendarFormat.week;
+                  provider.setSelectedRange(null);
                 } else if (index == 1) {
                   _calendarFormat = CalendarFormat.month;
-                } else {
-                  // Handle Date Range
+                  provider.setSelectedRange(null);
                 }
               });
+
+              if (index == 2) {
+                // Handle Date Range
+                await _showDateRangePicker(provider);
+              }
             },
           ),
-          CalendarWidget(
-            provider: provider,
-            calendarFormat: _calendarFormat,
-            onDaySelected: (day, focusedDay) {
-              provider.setSelectedDay(day);
-            },
-          ),
+          if (provider.selectedRange != null)
+            Builder(
+              builder: (context) {
+                final range = provider.selectedRange!;
+                final formatter = DateFormat('MMM dd, yyyy');
+                final startDate = formatter.format(range.start);
+                final endDate = formatter.format(range.end);
+                return Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
+                  child: InkWell(
+                    onTap: () async {
+                      await _showDateRangePicker(provider);
+                    },
+                    borderRadius: BorderRadius.circular(12),
+                    child: Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.surfaceContainerHighest,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.date_range,
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurfaceVariant,
+                            size: 20,
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              'Selected: $startDate - $endDate',
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.onSurface,
+                                fontWeight: FontWeight.w500,
+                                fontSize: 13,
+                              ),
+                            ),
+                          ),
+                          IconButton(
+                            icon: Icon(
+                              Icons.close,
+                              size: 18,
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.onSurfaceVariant,
+                            ),
+                            onPressed: () {
+                              provider.setSelectedRange(null);
+                              setState(() {
+                                _selectedFilter = 1;
+                              });
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+          if (provider.selectedRange == null)
+            CalendarWidget(
+              provider: provider,
+              calendarFormat: _calendarFormat,
+              onDaySelected: (day, focusedDay) {
+                provider.setSelectedDay(day);
+              },
+            ),
           const SizedBox(height: 8),
           TicketsList(provider: provider),
           const SizedBox(height: 120),
