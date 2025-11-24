@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:namma_wallet/src/common/database/ticket_dao_interface.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/services/logger_interface.dart';
+import 'package:namma_wallet/src/common/widgets/snackbar_widget.dart';
 import 'package:namma_wallet/src/features/home/domain/ticket.dart';
 import 'package:namma_wallet/src/features/tnstc/application/pdf_service.dart';
 import 'package:namma_wallet/src/features/tnstc/application/tnstc_pdf_parser.dart';
@@ -262,28 +263,24 @@ class PDFParserService {
   void showResultMessage(BuildContext context, PDFParserResult result) {
     if (!context.mounted) return;
 
-    String message;
-    Color backgroundColor;
+    final message = result.isSuccess
+        ? switch (result.type) {
+            PDFParserContentType.travelTicket =>
+              'PDF ticket saved successfully!',
+            PDFParserContentType.unsupported => 'PDF format not supported',
+          }
+        : result.errorMessage ?? 'Unknown error occurred';
 
     if (result.isSuccess) {
-      message = switch (result.type) {
-        PDFParserContentType.travelTicket => 'PDF ticket saved successfully!',
-        PDFParserContentType.unsupported => 'PDF format not supported',
-      };
-      backgroundColor = Theme.of(context).colorScheme.primary;
       _logger.success('PDF parser operation succeeded: $message');
     } else {
-      message = result.errorMessage ?? 'Unknown error occurred';
-      backgroundColor = Colors.red;
       _logger.error('PDF parser operation failed: $message');
     }
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: backgroundColor,
-        duration: Duration(seconds: result.isSuccess ? 2 : 3),
-      ),
+    showSnackbar(
+      context,
+      message,
+      isError: !result.isSuccess,
     );
   }
 }
