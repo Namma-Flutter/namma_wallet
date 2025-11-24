@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/routing/app_routes.dart';
+import 'package:namma_wallet/src/common/widgets/snackbar_widget.dart';
 import 'package:namma_wallet/src/features/clipboard/application/clipboard_service.dart';
 import 'package:namma_wallet/src/features/irctc/application/irctc_qr_parser.dart';
 import 'package:namma_wallet/src/features/irctc/application/irctc_scanner_service.dart';
@@ -43,12 +44,10 @@ class _ScannerViewState extends State<ScannerView> {
       } else {
         // Handle other QR code types here if needed
         if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('QR code format not supported'),
-            backgroundColor: Colors.orange,
-            duration: Duration(seconds: 2),
-          ),
+        showSnackbar(
+          context,
+          'QR code format not supported',
+          isError: true,
         );
       }
     } finally {

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:namma_wallet/src/common/database/ticket_dao_interface.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/services/logger_interface.dart';
+import 'package:namma_wallet/src/common/widgets/snackbar_widget.dart';
 import 'package:namma_wallet/src/features/home/domain/ticket.dart';
 import 'package:namma_wallet/src/features/irctc/application/irctc_qr_parser.dart';
 import 'package:namma_wallet/src/features/irctc/application/irctc_ticket_model.dart';
@@ -110,31 +111,24 @@ class IRCTCScannerService {
   void showResultMessage(BuildContext context, IRCTCScannerResult result) {
     if (!context.mounted) return;
 
-    String message;
-    Color backgroundColor;
+    final message = result.isSuccess
+        ? switch (result.type) {
+            IRCTCScannerContentType.irctcTicket =>
+              'IRCTC ticket saved successfully!',
+            IRCTCScannerContentType.invalid => 'Invalid content',
+          }
+        : result.errorMessage ?? 'Unknown error occurred';
 
     if (result.isSuccess) {
-      message = switch (result.type) {
-        IRCTCScannerContentType.irctcTicket =>
-          'IRCTC ticket saved successfully!',
-        IRCTCScannerContentType.invalid => 'Invalid content',
-      };
-      backgroundColor = Theme.of(context).colorScheme.primary;
-
       _logger.success('IRCTC scanner operation succeeded: $message');
     } else {
-      message = result.errorMessage ?? 'Unknown error occurred';
-      backgroundColor = Colors.red;
-
       _logger.error('IRCTC scanner operation failed: $message');
     }
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: backgroundColor,
-        duration: Duration(seconds: result.isSuccess ? 2 : 3),
-      ),
+    showSnackbar(
+      context,
+      message,
+      isError: !result.isSuccess,
     );
   }
 }
