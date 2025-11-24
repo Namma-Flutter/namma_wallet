@@ -4,9 +4,9 @@ import 'package:namma_wallet/src/common/routing/app_router.dart';
 import 'package:namma_wallet/src/common/services/logger_interface.dart';
 import 'package:namma_wallet/src/common/theme/app_theme.dart';
 import 'package:namma_wallet/src/common/theme/theme_provider.dart';
-import 'package:namma_wallet/src/features/share/application/shared_content_processor.dart';
-import 'package:namma_wallet/src/features/share/domain/sharing_intent_service_interface.dart';
-import 'package:namma_wallet/src/features/share/presentation/share_handler.dart';
+import 'package:namma_wallet/src/features/receive/application/shared_content_processor.dart';
+import 'package:namma_wallet/src/features/receive/domain/sharing_intent_service_interface.dart';
+import 'package:namma_wallet/src/features/receive/presentation/share_handler.dart';
 import 'package:provider/provider.dart';
 
 class NammaWalletApp extends StatefulWidget {

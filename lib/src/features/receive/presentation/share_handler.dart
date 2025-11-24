@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:namma_wallet/src/common/routing/app_routes.dart';
-import 'package:namma_wallet/src/features/share/domain/shared_content_result.dart';
+import 'package:namma_wallet/src/features/receive/domain/shared_content_result.dart';
 
 /// Handles share result navigation and UI feedback
 class ShareHandler {

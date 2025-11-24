@@ -3,7 +3,7 @@ import 'package:namma_wallet/src/common/services/logger_interface.dart';
 import 'package:namma_wallet/src/features/common/application/travel_parser_service_interface.dart';
 import 'package:namma_wallet/src/features/home/domain/ticket.dart';
 import 'package:namma_wallet/src/features/home/domain/ticket_extensions.dart';
-import 'package:namma_wallet/src/features/share/domain/shared_content_result.dart';
+import 'package:namma_wallet/src/features/receive/domain/shared_content_result.dart';
 import 'package:namma_wallet/src/features/tnstc/application/sms_service_interface.dart';
 import 'package:namma_wallet/src/features/tnstc/application/ticket_parser_interface.dart';
 

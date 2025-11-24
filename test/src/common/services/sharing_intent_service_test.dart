@@ -4,8 +4,8 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:namma_wallet/src/common/services/logger_interface.dart';
-import 'package:namma_wallet/src/features/share/application/sharing_intent_service.dart';
-import 'package:namma_wallet/src/features/share/domain/sharing_intent_service_interface.dart';
+import 'package:namma_wallet/src/features/receive/application/sharing_intent_service.dart';
+import 'package:namma_wallet/src/features/receive/domain/sharing_intent_service_interface.dart';
 import 'package:namma_wallet/src/features/tnstc/domain/ocr_service_interface.dart';
 import 'package:namma_wallet/src/features/tnstc/domain/pdf_service_interface.dart';
 

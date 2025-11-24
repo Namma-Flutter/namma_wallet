@@ -215,13 +215,17 @@ class Ticket with TicketMappable {
         if (model.passengerPickupTime != null)
           ExtrasModel(
             title: 'Pickup Time',
-            value: formatFullDateTime(model.passengerPickupTime!),
+            value: DateTimeConverter.instance.formatFullDateTime(
+              model.passengerPickupTime!,
+            ),
           ),
         if (model.serviceStartTime != null &&
             model.serviceStartTime!.isNotEmpty)
           ExtrasModel(
             title: 'Departure Time',
-            value: formatTimeString(model.serviceStartTime!),
+            value: DateTimeConverter.instance.formatTimeString(
+              model.serviceStartTime!,
+            ),
           ),
         if (seatNumber != null && seatNumber.isNotEmpty)
           ExtrasModel(title: 'Seat', value: seatNumber),
