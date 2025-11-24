@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:namma_wallet/src/common/routing/app_routes.dart';
 import 'package:namma_wallet/src/common/theme/theme_provider.dart';
 import 'package:namma_wallet/src/common/widgets/custom_back_button.dart';
+import 'package:namma_wallet/src/common/widgets/snackbar_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -65,13 +66,10 @@ class ProfileView extends StatelessWidget {
                   try {
                     if (!await canLaunchUrl(uri)) {
                       if (context.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text(
-                              'No email app found. '
-                              'Please install a mail client.',
-                            ),
-                          ),
+                        showSnackbar(
+                          context,
+                          'No email app found. Please install a mail client.',
+                          isError: true,
                         );
                       }
                       return;
@@ -83,12 +81,10 @@ class ProfileView extends StatelessWidget {
                     );
                   } on Exception {
                     if (context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text(
-                            'Failed to open email app. Please try again.',
-                          ),
-                        ),
+                      showSnackbar(
+                        context,
+                        'Failed to open email app. Please try again.',
+                        isError: true,
                       );
                     }
                   }
