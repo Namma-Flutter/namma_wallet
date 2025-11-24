@@ -184,12 +184,13 @@ class ClipboardService {
 
     final message = result.isSuccess
         ? switch (result.type) {
-            ClipboardContentType.text => 'Text content read successfully',
             ClipboardContentType.travelTicket =>
               result.ticket != null
                   ? 'Travel ticket saved successfully!'
                   : 'Ticket updated with conductor details!',
-            ClipboardContentType.invalid => 'Invalid content',
+            ClipboardContentType.text ||
+            ClipboardContentType.invalid =>
+              'Unknown content type',
           }
         : result.errorMessage ?? 'Unknown error occurred';
 
