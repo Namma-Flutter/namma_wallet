@@ -87,7 +87,9 @@ class _NavButtonState extends State<NavButton>
               ),
               decoration: BoxDecoration(
                 color: widget.selected
-                    ? AppColor.blackColor.withValues(alpha: 0.8)
+                    ? (isDark
+                          ? AppColor.blackColor.withValues(alpha: 0.8)
+                          : AppColor.blackColor.withValues(alpha: 0.85))
                     : Colors.transparent,
                 borderRadius: BorderRadius.circular(25),
                 boxShadow: widget.selected
@@ -117,10 +119,10 @@ class _NavButtonState extends State<NavButton>
                       widget.icon,
                       size: 20,
                       color: widget.selected
-                          ? (isDark ? AppColor.whiteColor : AppColor.whiteColor)
+                          ? AppColor.whiteColor
                           : (isDark
                                 ? AppColor.whiteColor.withValues(alpha: 0.7)
-                                : AppColor.blackColor.withValues(alpha: 0.6)),
+                                : AppColor.blackColor.withValues(alpha: 0.75)),
                     ),
                   ),
 
@@ -137,10 +139,8 @@ class _NavButtonState extends State<NavButton>
                               opacity: widget.selected ? 1.0 : 0.0,
                               child: Text(
                                 widget.label,
-                                style: TextStyle(
-                                  color: isDark
-                                      ? AppColor.whiteColor
-                                      : AppColor.whiteColor,
+                                style: const TextStyle(
+                                  color: AppColor.whiteColor,
                                   fontWeight: FontWeight.w600,
                                   fontSize: 13,
                                   height: 1,
