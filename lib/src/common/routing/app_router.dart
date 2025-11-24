@@ -2,6 +2,7 @@ import 'package:ai_barcode_scanner/ai_barcode_scanner.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:namma_wallet/src/common/routing/app_routes.dart';
+import 'package:namma_wallet/src/features/add/presentation/add_view.dart';
 import 'package:namma_wallet/src/features/bottom_navigation/presentation/namma_navigation_bar.dart';
 import 'package:namma_wallet/src/features/calendar/presentation/calendar_view.dart';
 import 'package:namma_wallet/src/features/export/presentation/export_view.dart';
@@ -12,7 +13,6 @@ import 'package:namma_wallet/src/features/profile/presentation/contributors_view
 import 'package:namma_wallet/src/features/profile/presentation/db_viewer_view.dart';
 import 'package:namma_wallet/src/features/profile/presentation/license_view.dart';
 import 'package:namma_wallet/src/features/profile/presentation/profile_view.dart';
-import 'package:namma_wallet/src/features/scanner/presentation/scanner_view.dart';
 import 'package:namma_wallet/src/features/share/presentation/share_success_view.dart';
 import 'package:namma_wallet/src/features/travel/presentation/ticket_view.dart';
 
@@ -36,9 +36,9 @@ final router = GoRouter(
           builder: (context, state) => const HomeView(),
         ),
         GoRoute(
-          path: AppRoute.scanner.path,
-          name: AppRoute.scanner.name,
-          builder: (context, state) => const ScannerView(),
+          path: AppRoute.add.path,
+          name: AppRoute.add.name,
+          builder: (context, state) => const AddView(),
         ),
         GoRoute(
           path: AppRoute.calendar.path,
