@@ -132,10 +132,23 @@ class CalendarProvider extends ChangeNotifier {
   List<Ticket> getTicketsForRange(DateTimeRange range) {
     return _tickets.where((ticket) {
       try {
-        final ticketDate = ticket.startTime;
-        final rangeStart = range.start.subtract(const Duration(days: 1));
-        final rangeEnd = range.end.add(const Duration(days: 1));
-        return ticketDate.isAfter(rangeStart) && ticketDate.isBefore(rangeEnd);
+        final ticketDate = DateTime(
+          ticket.startTime.year,
+          ticket.startTime.month,
+          ticket.startTime.day,
+        );
+        final rangeStart = DateTime(
+          range.start.year,
+          range.start.month,
+          range.start.day,
+        );
+        final rangeEnd = DateTime(
+          range.end.year,
+          range.end.month,
+          range.end.day,
+        );
+        return ticketDate.compareTo(rangeStart) >= 0 &&
+            ticketDate.compareTo(rangeEnd) <= 0;
       } on Exception catch (e, st) {
         _logger.debug(
           'Error parsing journeyDate for range filtering: $e\n$st',
@@ -147,9 +160,23 @@ class CalendarProvider extends ChangeNotifier {
 
   List<Event> getEventsForRange(DateTimeRange range) {
     return _events.where((event) {
-      final rangeStart = range.start.subtract(const Duration(days: 1));
-      final rangeEnd = range.end.add(const Duration(days: 1));
-      return event.date.isAfter(rangeStart) && event.date.isBefore(rangeEnd);
+      final eventDate = DateTime(
+        event.date.year,
+        event.date.month,
+        event.date.day,
+      );
+      final rangeStart = DateTime(
+        range.start.year,
+        range.start.month,
+        range.start.day,
+      );
+      final rangeEnd = DateTime(
+        range.end.year,
+        range.end.month,
+        range.end.day,
+      );
+      return eventDate.compareTo(rangeStart) >= 0 &&
+          eventDate.compareTo(rangeEnd) <= 0;
     }).toList();
   }
 }

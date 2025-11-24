@@ -139,10 +139,8 @@ class _NavButtonState extends State<NavButton>
                               opacity: widget.selected ? 1.0 : 0.0,
                               child: Text(
                                 widget.label,
-                                style: TextStyle(
-                                  color: isDark
-                                      ? AppColor.whiteColor
-                                      : AppColor.whiteColor,
+                                style: const TextStyle(
+                                  color: AppColor.whiteColor,
                                   fontWeight: FontWeight.w600,
                                   fontSize: 13,
                                   height: 1,
