@@ -2,11 +2,24 @@ import 'package:flutter/material.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/services/logger_interface.dart';
 
-/// Custom SnackBar widget with enhanced styling, icons, and top positioning
+/// Custom SnackBar widget with enhanced styling, icons,
+/// and responsive positioning above the bottom navigation bar.
+/// This widget creates a floating snackbar that appears above
+/// the bottom navigation bar with theme-aware colors for success
+/// and error states.
 class CustomSnackBar extends SnackBar {
+  /// Creates a custom snackbar with the given message and error state
+  ///
+  /// [message] The text to display in the snackbar
+  /// [isError] Whether this is an error message (true) or success message
+  /// (false)
+  /// [context] BuildContext for accessing theme and screen dimensions
+  /// [duration] Optional custom duration, defaults to 3s for errors,
+  ///  2s for success
   CustomSnackBar({
     required String message,
     required bool isError,
+    required BuildContext context,
     super.key,
     Duration? duration,
   }) : super(
@@ -31,17 +44,18 @@ class CustomSnackBar extends SnackBar {
            ],
          ),
          backgroundColor: isError
-             ? const Color(0xffF44336) // Red for errors
-             : const Color(0xff4CAF50), // Green for success
+             ? Theme.of(context).colorScheme.error
+             : Theme.of(context).colorScheme.secondary,
          behavior: SnackBarBehavior.floating,
          shape: RoundedRectangleBorder(
            borderRadius: BorderRadius.circular(12),
          ),
-         margin: const EdgeInsets.only(
-           top: 50,
+         // Position the snackbar just above the bottom navigation bar
+         // Adds 80px for typical bottom nav bar height plus 16px spacing
+         margin: EdgeInsets.only(
+           bottom: MediaQuery.of(context).padding.bottom + 80 + 16,
            left: 16,
            right: 16,
-           bottom: 100,
          ),
          duration: duration ?? Duration(seconds: isError ? 3 : 2),
          dismissDirection: DismissDirection.up,
@@ -49,6 +63,15 @@ class CustomSnackBar extends SnackBar {
 }
 
 /// Helper function to show custom snackbar messages
+///
+/// Displays a themed snackbar above the bottom navigation bar with appropriate
+/// styling and logging based on whether it's an error or success message.
+///
+/// [context] BuildContext for accessing theme and screen dimensions
+/// [message] The text to display in the snackbar
+/// [isError] Whether this is an error message (defaults to false)
+/// [duration] Optional custom duration, defaults to 3s for errors,
+/// 2s for success
 void showSnackbar(
   BuildContext context,
   String message, {
@@ -64,11 +87,12 @@ void showSnackbar(
     logger.info(message);
   }
 
-  // Show custom snackbar at top of screen
+  // Show custom snackbar above bottom navigation bar
   ScaffoldMessenger.of(context).showSnackBar(
     CustomSnackBar(
       message: message,
       isError: isError,
+      context: context,
       duration: duration,
     ),
   );

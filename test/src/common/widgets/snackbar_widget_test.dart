@@ -11,43 +11,74 @@ void main() {
     testWidgets('creates success snackbar with correct styling', (
       tester,
     ) async {
-      const message = 'Operation successful';
-      final snackBar = CustomSnackBar(
-        message: message,
-        isError: false,
-      );
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Builder(
+              builder: (context) {
+                const message = 'Operation successful';
+                final snackBar = CustomSnackBar(
+                  message: message,
+                  isError: false,
+                  context: context,
+                );
 
-      expect(snackBar.content, isA<Row>());
-      expect(snackBar.backgroundColor, const Color(0xff4CAF50)); // Green
-      expect(snackBar.behavior, SnackBarBehavior.floating);
-      expect(snackBar.dismissDirection, DismissDirection.up);
+                expect(snackBar.content, isA<Row>());
+                expect(
+                  snackBar.backgroundColor,
+                  Theme.of(context).colorScheme.secondary,
+                );
+                expect(snackBar.behavior, SnackBarBehavior.floating);
+                expect(snackBar.dismissDirection, DismissDirection.up);
+                return Container();
+              },
+            ),
+          ),
+        ),
+      );
     });
 
     testWidgets('creates error snackbar with correct styling', (tester) async {
-      const message = 'Operation failed';
-      final snackBar = CustomSnackBar(
-        message: message,
-        isError: true,
-      );
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Builder(
+              builder: (context) {
+                const message = 'Operation failed';
+                final snackBar = CustomSnackBar(
+                  message: message,
+                  isError: true,
+                  context: context,
+                );
 
-      expect(snackBar.content, isA<Row>());
-      expect(snackBar.backgroundColor, const Color(0xffF44336)); // Red
-      expect(snackBar.behavior, SnackBarBehavior.floating);
-      expect(snackBar.dismissDirection, DismissDirection.up);
+                expect(snackBar.content, isA<Row>());
+                expect(
+                  snackBar.backgroundColor,
+                  Theme.of(context).colorScheme.error,
+                );
+                expect(snackBar.behavior, SnackBarBehavior.floating);
+                expect(snackBar.dismissDirection, DismissDirection.up);
+                return Container();
+              },
+            ),
+          ),
+        ),
+      );
     });
 
     testWidgets('uses correct icon for success message', (tester) async {
       const message = 'Success message';
-      final snackBar = CustomSnackBar(
-        message: message,
-        isError: false,
-      );
 
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
             body: Builder(
               builder: (context) {
+                final snackBar = CustomSnackBar(
+                  message: message,
+                  isError: false,
+                  context: context,
+                );
                 return ElevatedButton(
                   onPressed: () {
                     ScaffoldMessenger.of(context).showSnackBar(snackBar);
@@ -76,16 +107,17 @@ void main() {
 
     testWidgets('uses correct icon for error message', (tester) async {
       const message = 'Error message';
-      final snackBar = CustomSnackBar(
-        message: message,
-        isError: true,
-      );
 
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
             body: Builder(
               builder: (context) {
+                final snackBar = CustomSnackBar(
+                  message: message,
+                  isError: true,
+                  context: context,
+                );
                 return ElevatedButton(
                   onPressed: () {
                     ScaffoldMessenger.of(context).showSnackBar(snackBar);
@@ -113,16 +145,17 @@ void main() {
 
     testWidgets('displays message text correctly', (tester) async {
       const message = 'This is a test message';
-      final snackBar = CustomSnackBar(
-        message: message,
-        isError: false,
-      );
 
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
             body: Builder(
               builder: (context) {
+                final snackBar = CustomSnackBar(
+                  message: message,
+                  isError: false,
+                  context: context,
+                );
                 return ElevatedButton(
                   onPressed: () {
                     ScaffoldMessenger.of(context).showSnackBar(snackBar);
@@ -142,83 +175,142 @@ void main() {
     });
 
     testWidgets('uses custom duration when provided', (tester) async {
-      const customDuration = Duration(seconds: 5);
-      final snackBar = CustomSnackBar(
-        message: 'Test',
-        isError: false,
-        duration: customDuration,
-      );
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Builder(
+              builder: (context) {
+                const customDuration = Duration(seconds: 5);
+                final snackBar = CustomSnackBar(
+                  message: 'Test',
+                  isError: false,
+                  context: context,
+                  duration: customDuration,
+                );
 
-      expect(snackBar.duration, customDuration);
+                expect(snackBar.duration, customDuration);
+                return Container();
+              },
+            ),
+          ),
+        ),
+      );
     });
 
     testWidgets('uses default duration for success (2 seconds)', (
       tester,
     ) async {
-      final snackBar = CustomSnackBar(
-        message: 'Test',
-        isError: false,
-      );
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Builder(
+              builder: (context) {
+                final snackBar = CustomSnackBar(
+                  message: 'Test',
+                  isError: false,
+                  context: context,
+                );
 
-      expect(snackBar.duration, const Duration(seconds: 2));
+                expect(snackBar.duration, const Duration(seconds: 2));
+                return Container();
+              },
+            ),
+          ),
+        ),
+      );
     });
 
     testWidgets('uses default duration for error (3 seconds)', (tester) async {
-      final snackBar = CustomSnackBar(
-        message: 'Test',
-        isError: true,
-      );
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Builder(
+              builder: (context) {
+                final snackBar = CustomSnackBar(
+                  message: 'Test',
+                  isError: true,
+                  context: context,
+                );
 
-      expect(snackBar.duration, const Duration(seconds: 3));
+                expect(snackBar.duration, const Duration(seconds: 3));
+                return Container();
+              },
+            ),
+          ),
+        ),
+      );
     });
 
-    testWidgets('has correct margin for positioning above nav bar', (
+    testWidgets('has responsive margin above bottom navigation', (
       tester,
     ) async {
-      final snackBar = CustomSnackBar(
-        message: 'Test',
-        isError: false,
-      );
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Builder(
+              builder: (context) {
+                final snackBar = CustomSnackBar(
+                  message: 'Test',
+                  isError: false,
+                  context: context,
+                );
 
-      expect(
-        snackBar.margin,
-        const EdgeInsets.only(
-          top: 50,
-          left: 16,
-          right: 16,
-          bottom: 100,
+                final expectedMargin = EdgeInsets.only(
+                  bottom: MediaQuery.of(context).padding.bottom + 80 + 16,
+                  left: 16,
+                  right: 16,
+                );
+
+                expect(snackBar.margin, expectedMargin);
+                return Container();
+              },
+            ),
+          ),
         ),
       );
     });
 
     testWidgets('has rounded corners', (tester) async {
-      final snackBar = CustomSnackBar(
-        message: 'Test',
-        isError: false,
-      );
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Builder(
+              builder: (context) {
+                final snackBar = CustomSnackBar(
+                  message: 'Test',
+                  isError: false,
+                  context: context,
+                );
 
-      expect(
-        snackBar.shape,
-        isA<RoundedRectangleBorder>().having(
-          (shape) => shape.borderRadius,
-          'borderRadius',
-          BorderRadius.circular(12),
+                expect(
+                  snackBar.shape,
+                  isA<RoundedRectangleBorder>().having(
+                    (shape) => shape.borderRadius,
+                    'borderRadius',
+                    BorderRadius.circular(12),
+                  ),
+                );
+                return Container();
+              },
+            ),
+          ),
         ),
       );
     });
 
     testWidgets('icon has correct size and color', (tester) async {
       const message = 'Test message';
-      final snackBar = CustomSnackBar(
-        message: message,
-        isError: false,
-      );
 
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
             body: Builder(
               builder: (context) {
+                final snackBar = CustomSnackBar(
+                  message: message,
+                  isError: false,
+                  context: context,
+                );
                 return ElevatedButton(
                   onPressed: () {
                     ScaffoldMessenger.of(context).showSnackBar(snackBar);
@@ -247,16 +339,17 @@ void main() {
 
     testWidgets('message text has correct styling', (tester) async {
       const message = 'Test message';
-      final snackBar = CustomSnackBar(
-        message: message,
-        isError: false,
-      );
 
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
             body: Builder(
               builder: (context) {
+                final snackBar = CustomSnackBar(
+                  message: message,
+                  isError: false,
+                  context: context,
+                );
                 return ElevatedButton(
                   onPressed: () {
                     ScaffoldMessenger.of(context).showSnackBar(snackBar);
@@ -451,15 +544,14 @@ void main() {
         find.byType(SnackBar),
       );
 
-      expect(
-        snackBarWidget.margin,
-        const EdgeInsets.only(
-          top: 50,
-          left: 16,
-          right: 16,
-          bottom: 100, // Above navigation bar
-        ),
+      // Verify the margin uses responsive positioning above bottom nav
+      final context = tester.element(find.byType(Scaffold));
+      final expectedMargin = EdgeInsets.only(
+        bottom: MediaQuery.of(context).padding.bottom + 80 + 16,
+        left: 16,
+        right: 16,
       );
+      expect(snackBarWidget.margin, expectedMargin);
     });
 
     testWidgets('can dismiss snackbar by swiping up', (tester) async {
