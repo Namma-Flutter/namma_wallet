@@ -7,19 +7,20 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/routing/app_routes.dart';
+import 'package:namma_wallet/src/common/widgets/snackbar_widget.dart';
 import 'package:namma_wallet/src/features/clipboard/application/clipboard_service.dart';
 import 'package:namma_wallet/src/features/irctc/application/irctc_qr_parser.dart';
 import 'package:namma_wallet/src/features/irctc/application/irctc_scanner_service.dart';
 import 'package:namma_wallet/src/features/pdf_extract/application/pdf_parser_service.dart';
 
-class ScannerView extends StatefulWidget {
-  const ScannerView({super.key});
+class ImportView extends StatefulWidget {
+  const ImportView({super.key});
 
   @override
-  State<ScannerView> createState() => _ScannerViewState();
+  State<ImportView> createState() => _ImportViewState();
 }
 
-class _ScannerViewState extends State<ScannerView> {
+class _ImportViewState extends State<ImportView> {
   late final IRCTCQRParser _qrParser = getIt<IRCTCQRParser>();
   bool _isPasting = false;
   bool _isScanning = false;
@@ -43,12 +44,10 @@ class _ScannerViewState extends State<ScannerView> {
       } else {
         // Handle other QR code types here if needed
         if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('QR code format not supported'),
-            backgroundColor: Colors.orange,
-            duration: Duration(seconds: 2),
-          ),
+        showSnackbar(
+          context,
+          'QR code format not supported',
+          isError: true,
         );
       }
     } finally {
