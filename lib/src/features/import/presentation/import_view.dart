@@ -13,14 +13,14 @@ import 'package:namma_wallet/src/features/irctc/application/irctc_qr_parser.dart
 import 'package:namma_wallet/src/features/irctc/application/irctc_scanner_service.dart';
 import 'package:namma_wallet/src/features/pdf_extract/application/pdf_parser_service.dart';
 
-class ScannerView extends StatefulWidget {
-  const ScannerView({super.key});
+class ImportView extends StatefulWidget {
+  const ImportView({super.key});
 
   @override
-  State<ScannerView> createState() => _ScannerViewState();
+  State<ImportView> createState() => _ImportViewState();
 }
 
-class _ScannerViewState extends State<ScannerView> {
+class _ImportViewState extends State<ImportView> {
   late final IRCTCQRParser _qrParser = getIt<IRCTCQRParser>();
   bool _isPasting = false;
   bool _isScanning = false;

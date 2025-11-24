@@ -28,8 +28,8 @@ class _NammaNavigationBarState extends State<NammaNavigationBar> {
     ),
     NavItem(
       icon: Icons.add_circle,
-      label: 'Add',
-      route: AppRoute.add.path,
+      label: 'Import',
+      route: AppRoute.import.path,
     ),
     NavItem(
       icon: Icons.calendar_today,
