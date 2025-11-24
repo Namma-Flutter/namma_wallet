@@ -92,7 +92,7 @@ void main() {
       );
 
       await tester.tap(find.text('Show'));
-      await tester.pump();
+      await tester.pumpAndSettle();
 
       // Find the success icon
       expect(
@@ -131,7 +131,7 @@ void main() {
       );
 
       await tester.tap(find.text('Show'));
-      await tester.pump();
+      await tester.pumpAndSettle();
 
       // Find the error icon
       expect(
@@ -169,7 +169,7 @@ void main() {
       );
 
       await tester.tap(find.text('Show'));
-      await tester.pump();
+      await tester.pumpAndSettle();
 
       expect(find.text(message), findsOneWidget);
     });
@@ -256,7 +256,11 @@ void main() {
                 );
 
                 final expectedMargin = EdgeInsets.only(
-                  bottom: MediaQuery.of(context).padding.bottom + 80 + 16,
+                  bottom:
+                      MediaQuery.of(context).padding.bottom +
+                      MediaQuery.of(context).viewInsets.bottom +
+                      80 +
+                      16,
                   left: 16,
                   right: 16,
                 );
@@ -324,7 +328,7 @@ void main() {
       );
 
       await tester.tap(find.text('Show'));
-      await tester.pump();
+      await tester.pumpAndSettle();
 
       final iconWidget = tester.widget<Icon>(
         find.byWidgetPredicate(
@@ -363,7 +367,7 @@ void main() {
       );
 
       await tester.tap(find.text('Show'));
-      await tester.pump();
+      await tester.pumpAndSettle();
 
       final textWidget = tester.widget<Text>(find.text(message));
       expect(textWidget.style?.color, Colors.white);
@@ -407,7 +411,7 @@ void main() {
       );
 
       await tester.tap(find.text('Show'));
-      await tester.pump();
+      await tester.pumpAndSettle();
 
       expect(find.text(message), findsOneWidget);
       expect(
@@ -440,7 +444,7 @@ void main() {
       );
 
       await tester.tap(find.text('Show'));
-      await tester.pump();
+      await tester.pumpAndSettle();
 
       expect(find.text(message), findsOneWidget);
       expect(
@@ -477,7 +481,7 @@ void main() {
       );
 
       await tester.tap(find.text('Show'));
-      await tester.pump();
+      await tester.pumpAndSettle();
 
       expect(find.text(message), findsOneWidget);
     });
@@ -506,7 +510,7 @@ void main() {
       );
 
       await tester.tap(find.text('Show'));
-      await tester.pump();
+      await tester.pumpAndSettle();
 
       expect(find.text(longMessage), findsOneWidget);
     });
@@ -534,7 +538,7 @@ void main() {
       );
 
       await tester.tap(find.text('Show'));
-      await tester.pump();
+      await tester.pumpAndSettle();
 
       // Verify the snackbar is displayed
       expect(find.text(message), findsOneWidget);
@@ -547,7 +551,11 @@ void main() {
       // Verify the margin uses responsive positioning above bottom nav
       final context = tester.element(find.byType(Scaffold));
       final expectedMargin = EdgeInsets.only(
-        bottom: MediaQuery.of(context).padding.bottom + 80 + 16,
+        bottom:
+            MediaQuery.of(context).padding.bottom +
+            MediaQuery.of(context).viewInsets.bottom +
+            80 +
+            16,
         left: 16,
         right: 16,
       );
@@ -575,7 +583,7 @@ void main() {
       );
 
       await tester.tap(find.text('Show'));
-      await tester.pump();
+      await tester.pumpAndSettle();
 
       expect(find.text(message), findsOneWidget);
 
@@ -618,13 +626,13 @@ void main() {
       );
 
       await tester.tap(find.text('Show 1'));
-      await tester.pump();
+      await tester.pumpAndSettle();
 
       expect(find.text(message1), findsOneWidget);
 
       // Show second snackbar - it should work without errors
       await tester.tap(find.text('Show 2'));
-      await tester.pump();
+      await tester.pumpAndSettle();
 
       // Verify no errors occurred (both snack bars can be shown)
       expect(tester.takeException(), isNull);
@@ -666,7 +674,7 @@ void main() {
       );
 
       await tester.tap(find.text('Show'));
-      await tester.pump();
+      await tester.pumpAndSettle();
 
       // Should still display the snackbar with empty text
       expect(find.byType(SnackBar), findsOneWidget);
@@ -693,7 +701,7 @@ void main() {
       );
 
       await tester.tap(find.text('Show'));
-      await tester.pump();
+      await tester.pumpAndSettle();
 
       expect(find.text(message), findsOneWidget);
     });
@@ -719,7 +727,7 @@ void main() {
       );
 
       await tester.tap(find.text('Show'));
-      await tester.pump();
+      await tester.pumpAndSettle();
 
       expect(find.text(message), findsOneWidget);
     });
@@ -745,7 +753,7 @@ void main() {
       );
 
       await tester.tap(find.text('Show'));
-      await tester.pump();
+      await tester.pumpAndSettle();
 
       final snackBarWidget = tester.widget<SnackBar>(
         find.byType(SnackBar),
