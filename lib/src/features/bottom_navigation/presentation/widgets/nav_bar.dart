@@ -32,12 +32,12 @@ class NavBar extends StatelessWidget {
             // Transparent glassy background
             color: isDark
                 ? AppColor.whiteColor.withValues(alpha: 0.1)
-                : AppColor.whiteColor.withValues(alpha: 0.15),
+                : AppColor.blackColor.withValues(alpha: 0.08),
             borderRadius: BorderRadius.circular(35),
             border: Border.all(
               color: isDark
                   ? AppColor.whiteColor.withValues(alpha: 0.2)
-                  : AppColor.whiteColor.withValues(alpha: 0.3),
+                  : AppColor.blackColor.withValues(alpha: 0.15),
               width: 0.8,
             ),
             boxShadow: [
