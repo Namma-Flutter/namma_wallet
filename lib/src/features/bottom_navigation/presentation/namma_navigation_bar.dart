@@ -70,7 +70,7 @@ class _NammaNavigationBarState extends State<NammaNavigationBar> {
         _pendingIndex = index;
       });
 
-      HapticFeedback.selectionClick();
+      unawaited(HapticFeedback.selectionClick());
 
       // Use cancellable Timer for navigation delay
       _navigationTimer = Timer(const Duration(milliseconds: 100), () {
@@ -107,7 +107,7 @@ class _NammaNavigationBarState extends State<NammaNavigationBar> {
               return Stack(
                 children: <Widget>[
                   ...previousChildren,
-                  if (currentChild != null) currentChild,
+                  ?currentChild,
                 ],
               );
             },

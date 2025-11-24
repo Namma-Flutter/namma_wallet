@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -27,7 +28,7 @@ class _DbViewerViewState extends State<DbViewerView>
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
-    _load();
+    unawaited(_load());
   }
 
   Future<void> _load() async {
@@ -107,12 +108,12 @@ class _DbViewerViewState extends State<DbViewerView>
     ),
   );
 
-  void showTicketDetails(
+  Future<void> showTicketDetails(
     BuildContext context,
     Ticket t,
     String subtitle,
-  ) {
-    showDialog<void>(
+  ) async {
+    await showDialog<void>(
       context: context,
       builder: (context) {
         return Dialog(

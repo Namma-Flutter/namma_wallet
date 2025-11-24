@@ -1,6 +1,3 @@
-// We will add more methods in the future.
-// ignore_for_file: one_member_abstracts
-
 import 'dart:io';
 
 import 'package:namma_wallet/src/features/share/application/shared_content_processor.dart';

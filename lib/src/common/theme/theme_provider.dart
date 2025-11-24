@@ -1,10 +1,12 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// ThemeProvider manages the app's theme mode and persists user preference
 class ThemeProvider extends ChangeNotifier {
   ThemeProvider() {
-    _loadThemePreference();
+    unawaited(_loadThemePreference());
   }
   static const String _themePreferenceKey = 'theme_mode';
 

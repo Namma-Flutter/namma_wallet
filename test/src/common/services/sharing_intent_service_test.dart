@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
@@ -54,7 +55,7 @@ void main() {
       test(
         'Given service registered in GetIt, When retrieving service, '
         'Then returns registered instance',
-        () {
+        () async {
           // Arrange (Given)
           final testService = SharingIntentService(
             logger: getIt<ILogger>(),
@@ -70,7 +71,7 @@ void main() {
           expect(retrievedService, same(testService));
 
           // Cleanup
-          getIt.unregister<ISharingIntentService>();
+          await getIt.unregister<ISharingIntentService>();
         },
       );
     });
@@ -527,7 +528,8 @@ void main() {
           final testService = SharingIntentService(
             logger: FakeLogger(),
             pdfService: MockPDFService(),
-          )..dispose();
+          );
+          unawaited(testService.dispose());
 
           // Act (When) & Assert (Then)
           expect(testService.dispose, returnsNormally);

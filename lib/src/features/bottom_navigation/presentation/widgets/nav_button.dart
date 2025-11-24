@@ -49,17 +49,17 @@ class _NavButtonState extends State<NavButton>
     super.dispose();
   }
 
-  void _onTapDown(TapDownDetails details) {
-    _pressController.forward();
+  Future<void> _onTapDown(TapDownDetails details) async {
+    await _pressController.forward();
   }
 
-  void _onTapUp(TapUpDetails details) {
-    _pressController.reverse();
+  Future<void> _onTapUp(TapUpDetails details) async {
+    await _pressController.reverse();
     widget.onTap();
   }
 
-  void _onTapCancel() {
-    _pressController.reverse();
+  Future<void> _onTapCancel() async {
+    await _pressController.reverse();
   }
 
   @override

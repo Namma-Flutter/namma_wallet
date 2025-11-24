@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:namma_wallet/src/common/database/ticket_dao_interface.dart';
@@ -167,7 +169,11 @@ class CalendarView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => CalendarProvider()..loadEvents(),
+      create: (_) {
+        final provider = CalendarProvider();
+        unawaited(provider.loadEvents());
+        return provider;
+      },
       child: Scaffold(
         appBar: AppBar(
           title: const Padding(
