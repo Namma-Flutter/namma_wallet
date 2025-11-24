@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:namma_wallet/src/common/di/locator.dart';
-import 'package:namma_wallet/src/common/services/logger_interface.dart';
 
 /// Custom SnackBar widget with enhanced styling, icons,
 /// and responsive positioning above the bottom navigation bar.
@@ -52,8 +50,14 @@ class CustomSnackBar extends SnackBar {
          ),
          // Position the snackbar just above the bottom navigation bar
          // Adds 80px for typical bottom nav bar height plus 16px spacing
+         // Also accounts for keyboard height (viewInsets.bottom) to avoid
+         // hiding behind the keyboard
          margin: EdgeInsets.only(
-           bottom: MediaQuery.of(context).padding.bottom + 80 + 16,
+           bottom:
+               MediaQuery.of(context).padding.bottom +
+               MediaQuery.of(context).viewInsets.bottom +
+               80 +
+               16,
            left: 16,
            right: 16,
          ),
@@ -65,7 +69,9 @@ class CustomSnackBar extends SnackBar {
 /// Helper function to show custom snackbar messages
 ///
 /// Displays a themed snackbar above the bottom navigation bar with appropriate
-/// styling and logging based on whether it's an error or success message.
+/// styling. Does not log messages to avoid potentially logging sensitive user
+/// data (clipboard content, URLs, IDs). Callers should handle their own
+/// logging with appropriate redaction if needed.
 ///
 /// [context] BuildContext for accessing theme and screen dimensions
 /// [message] The text to display in the snackbar
@@ -78,16 +84,10 @@ void showSnackbar(
   bool isError = false,
   Duration? duration,
 }) {
-  final logger = getIt<ILogger>();
-
-  // Log to console for debugging
-  if (isError) {
-    logger.error(message);
-  } else {
-    logger.info(message);
-  }
-
   // Show custom snackbar above bottom navigation bar
+  // Note: Logging is intentionally removed to avoid logging potentially
+  // sensitive snackbar messages. Callers should handle logging separately
+  // with appropriate redaction.
   ScaffoldMessenger.of(context).showSnackBar(
     CustomSnackBar(
       message: message,
