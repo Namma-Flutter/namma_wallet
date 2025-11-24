@@ -40,13 +40,13 @@ void main() {
   late StubTicketDAO stubTicketDao;
   late CalendarProvider provider;
 
-  setUp(() {
+  setUp(() async {
     fakeLogger = FakeLogger();
     stubTicketDao = StubTicketDAO();
 
     // Setup locator
+    await getIt.reset();
     getIt
-      ..reset()
       ..registerSingleton<ILogger>(fakeLogger)
       ..registerSingleton<ITicketDAO>(stubTicketDao);
 

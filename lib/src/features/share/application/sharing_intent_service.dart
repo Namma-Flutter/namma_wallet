@@ -20,16 +20,16 @@ class SharingIntentService implements ISharingIntentService {
   StreamSubscription<List<SharedMediaFile>>? _intentDataStreamSubscription;
 
   @override
-  void initialize({
+  Future<void> initialize({
     required void Function(String content, SharedContentType type)
     onContentReceived,
     required void Function(String) onError,
-  }) {
+  }) async {
     _intentDataStreamSubscription = ReceiveSharingIntent.instance
         .getMediaStream()
         .listen(
-          (List<SharedMediaFile> files) {
-            _handleSharedContent(files, onContentReceived, onError);
+          (List<SharedMediaFile> files) async {
+            await _handleSharedContent(files, onContentReceived, onError);
           },
           onError: (Object err) {
             _logger.error('Error in sharing intent stream: $err');
@@ -37,12 +37,12 @@ class SharingIntentService implements ISharingIntentService {
           },
         );
 
-    ReceiveSharingIntent.instance
+    await ReceiveSharingIntent.instance
         .getInitialMedia()
-        .then((List<SharedMediaFile> files) {
+        .then((List<SharedMediaFile> files) async {
           if (files.isNotEmpty) {
             _logger.info('App launched with shared content: ${files.length}');
-            _handleSharedContent(files, onContentReceived, onError);
+            await _handleSharedContent(files, onContentReceived, onError);
           }
         })
         .catchError((Object error) {
@@ -220,8 +220,8 @@ class SharingIntentService implements ISharingIntentService {
 
   /// Dispose resources
   @override
-  void dispose() {
-    _intentDataStreamSubscription?.cancel();
+  Future<void> dispose() async {
+    await _intentDataStreamSubscription?.cancel();
     _logger.info('SharingIntentService disposed');
   }
 }

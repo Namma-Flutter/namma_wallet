@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:namma_wallet/src/common/database/ticket_dao_interface.dart';
@@ -27,7 +29,7 @@ class _AllTicketsViewState extends State<AllTicketsView> {
   @override
   void initState() {
     super.initState();
-    _loadTicketData();
+    unawaited(_loadTicketData());
   }
 
   Future<void> _loadTicketData() async {

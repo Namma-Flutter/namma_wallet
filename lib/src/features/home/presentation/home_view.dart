@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:card_stack_widget/model/card_model.dart';
 import 'package:card_stack_widget/model/card_orientation.dart';
 import 'package:card_stack_widget/widget/card_stack_widget.dart';
@@ -29,7 +31,7 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _loadTicketData();
+    unawaited(_loadTicketData());
   }
 
   @override
@@ -41,7 +43,7 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      _loadTicketData();
+      unawaited(_loadTicketData());
     }
   }
 
@@ -134,8 +136,8 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
                       ),
                       if (_travelTickets.isNotEmpty)
                         TextButton(
-                          onPressed: () {
-                            context.pushNamed(AppRoute.allTickets.name);
+                          onPressed: () async {
+                            await context.pushNamed(AppRoute.allTickets.name);
                           },
                           style: TextButton.styleFrom(
                             padding: const EdgeInsets.symmetric(

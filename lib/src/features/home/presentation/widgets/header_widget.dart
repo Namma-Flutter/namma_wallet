@@ -27,8 +27,8 @@ class UserProfileWidget extends StatelessWidget {
 
           //* Profile
           InkWell(
-            onTap: () {
-              context.pushNamed(AppRoute.profile.name);
+            onTap: () async {
+              await context.pushNamed(AppRoute.profile.name);
             },
             child: CircleAvatar(
               radius: 28,

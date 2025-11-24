@@ -37,8 +37,8 @@ class ProfileView extends StatelessWidget {
                 icon: Icons.people_outline,
                 title: 'Contributors',
                 subtitle: 'View project contributors',
-                onTap: () {
-                  context.pushNamed(AppRoute.contributors.name);
+                onTap: () async {
+                  await context.pushNamed(AppRoute.contributors.name);
                 },
               ),
 
@@ -47,8 +47,8 @@ class ProfileView extends StatelessWidget {
                 icon: Icons.article_outlined,
                 title: 'Licenses',
                 subtitle: 'View open source licenses',
-                onTap: () {
-                  context.pushNamed(AppRoute.license.name);
+                onTap: () async {
+                  await context.pushNamed(AppRoute.license.name);
                 },
               ),
 
@@ -95,8 +95,8 @@ class ProfileView extends StatelessWidget {
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          context.pushNamed(AppRoute.dbViewer.name);
+        onPressed: () async {
+          await context.pushNamed(AppRoute.dbViewer.name);
         },
         label: const Text('View DB'),
         icon: const Icon(Icons.storage),
@@ -149,11 +149,11 @@ class ThemeSectionWidget extends StatelessWidget {
                     : 'Light theme enabled',
               ),
               value: themeProvider.isDarkMode,
-              onChanged: (value) {
+              onChanged: (value) async {
                 if (value) {
-                  themeProvider.setDarkMode();
+                  await themeProvider.setDarkMode();
                 } else {
-                  themeProvider.setLightMode();
+                  await themeProvider.setLightMode();
                 }
               },
               secondary: Icon(
@@ -165,11 +165,11 @@ class ThemeSectionWidget extends StatelessWidget {
               title: const Text('Use System Theme'),
               trailing: Switch(
                 value: themeProvider.isSystemMode,
-                onChanged: (value) {
+                onChanged: (value) async {
                   if (value) {
-                    themeProvider.setSystemMode();
+                    await themeProvider.setSystemMode();
                   } else {
-                    themeProvider.setLightMode();
+                    await themeProvider.setLightMode();
                   }
                 },
               ),

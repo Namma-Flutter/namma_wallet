@@ -213,8 +213,8 @@ class _ImportViewState extends State<ImportView> {
                             ),
                             shape: const StadiumBorder(),
                           ),
-                          onPressed: () {
-                            context.pushNamed(
+                          onPressed: () async {
+                            await context.pushNamed(
                               AppRoute.barcodeScanner.name,
                               extra: (BarcodeCapture capture) async {
                                 // Check if barcodes list is not empty
