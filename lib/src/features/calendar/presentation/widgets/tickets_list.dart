@@ -59,10 +59,13 @@ class TicketsList extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: InkWell(
                 onTap: () async {
-                  await context.pushNamed<bool>(
+                  final result = await context.pushNamed<bool>(
                     AppRoute.ticketView.name,
                     extra: ticket,
                   );
+                  if (result == true) {
+                    await provider.loadTickets();
+                  }
                 },
                 borderRadius: BorderRadius.circular(30),
                 child: TravelTicketCardWidget(ticket: ticket),

@@ -260,6 +260,9 @@ class _CalendarContentState extends State<CalendarContent> {
 
     if (pickedRange != null) {
       provider.setSelectedRange(pickedRange);
+      setState(() {
+        _selectedFilter = 2;
+      });
     } else {
       setState(() {
         _selectedFilter = 1;
@@ -279,7 +282,9 @@ class _CalendarContentState extends State<CalendarContent> {
             selectedFilter: _selectedFilter,
             onFilterChanged: (index) async {
               setState(() {
-                _selectedFilter = index;
+                if (index != 2) {
+                  _selectedFilter = index;
+                }
                 if (index == 0) {
                   _calendarFormat = CalendarFormat.week;
                   provider.setSelectedRange(null);
