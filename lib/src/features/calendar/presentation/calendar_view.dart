@@ -1,7 +1,4 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:namma_wallet/src/common/database/ticket_dao_interface.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
@@ -43,25 +40,8 @@ class CalendarProvider extends ChangeNotifier {
   }
 
   Future<void> loadEvents() async {
-    // Load events from JSON
-    final response = await rootBundle.loadString(
-      'assets/data/other_cards.json',
-    );
-    final data = json.decode(response) as List;
-    _events = data.map((e) {
-      final item = e as Map<String, dynamic>;
-      final dateParts = (item['date'] as String).split(' ');
-      final month = DateFormat.MMM().parse(dateParts[1]).month;
-      final day = int.parse(dateParts[2]);
-      final year = DateTime.now().year; // Assuming current year
-      return Event(
-        icon: Event.getIconData(item['icon'] as String),
-        title: item['title'] as String,
-        subtitle: item['subtitle'] as String,
-        date: DateTime(year, month, day),
-        price: item['price'] as String,
-      );
-    }).toList();
+    // Initialize empty events list (no mocked data)
+    _events = [];
 
     // Load tickets from database
     await loadTickets();
