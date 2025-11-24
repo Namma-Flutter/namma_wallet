@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/services/logger_interface.dart';
 import 'package:namma_wallet/src/features/tnstc/domain/ocr_service_interface.dart';
 import 'package:namma_wallet/src/features/tnstc/domain/pdf_service_interface.dart';
@@ -8,10 +7,10 @@ import 'package:syncfusion_flutter_pdf/pdf.dart';
 
 class PDFService implements IPDFService {
   PDFService({
-    IOCRService? ocrService,
-    ILogger? logger,
-  }) : _ocrService = ocrService ?? getIt<IOCRService>(),
-       _logger = logger ?? getIt<ILogger>();
+    required IOCRService ocrService,
+    required ILogger logger,
+  }) : _ocrService = ocrService,
+       _logger = logger;
 
   final IOCRService _ocrService;
   final ILogger _logger;

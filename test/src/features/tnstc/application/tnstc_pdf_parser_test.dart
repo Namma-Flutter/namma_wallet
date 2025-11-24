@@ -31,8 +31,10 @@ void main() {
     late PDFService pdfService;
 
     setUp(() {
-      parser = TNSTCPDFParser();
-      pdfService = PDFService();
+      final logger = GetIt.instance<ILogger>();
+      final ocrService = GetIt.instance<IOCRService>();
+      parser = TNSTCPDFParser(logger: logger);
+      pdfService = PDFService(ocrService: ocrService, logger: logger);
     });
 
     test(

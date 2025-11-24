@@ -2,12 +2,11 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:namma_wallet/src/common/database/ticket_dao_interface.dart';
-import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/services/logger_interface.dart';
 import 'package:namma_wallet/src/common/widgets/snackbar_widget.dart';
 import 'package:namma_wallet/src/features/home/domain/ticket.dart';
-import 'package:namma_wallet/src/features/tnstc/application/pdf_service.dart';
-import 'package:namma_wallet/src/features/tnstc/application/tnstc_pdf_parser.dart';
+import 'package:namma_wallet/src/features/tnstc/application/ticket_parser_interface.dart';
+import 'package:namma_wallet/src/features/tnstc/domain/pdf_service_interface.dart';
 import 'package:namma_wallet/src/features/tnstc/domain/tnstc_model.dart';
 
 /// Extension to provide non-PII summary generation for TNSTCTicket
@@ -120,19 +119,26 @@ class PDFParserResult {
 }
 
 class PDFParserService {
-  PDFParserService({ILogger? logger, TNSTCPDFParser? pdfParser})
-    : _logger = logger ?? getIt<ILogger>(),
-      _pdfParser = pdfParser ?? getIt<TNSTCPDFParser>();
+  PDFParserService({
+    required ILogger logger,
+    required ITicketParser pdfParser,
+    required IPDFService pdfService,
+    required ITicketDAO ticketDao,
+  }) : _logger = logger,
+       _pdfParser = pdfParser,
+       _pdfService = pdfService,
+       _ticketDao = ticketDao;
   final ILogger _logger;
-  final TNSTCPDFParser _pdfParser;
+  final ITicketParser _pdfParser;
+  final IPDFService _pdfService;
+  final ITicketDAO _ticketDao;
 
   Future<PDFParserResult> parseAndSavePDFTicket(File pdfFile) async {
     try {
       _logger.logService('PDF', 'Starting PDF ticket parsing');
 
       // Extract text from PDF
-      final pdfService = PDFService();
-      final extractedText = await pdfService.extractTextFrom(pdfFile);
+      final extractedText = await _pdfService.extractTextFrom(pdfFile);
 
       _logger.logService(
         'PDF',
@@ -232,7 +238,7 @@ class PDFParserService {
       // Save to database
       try {
         _logger.logDatabase('Insert', 'Saving parsed PDF ticket to database');
-        await getIt<ITicketDAO>().insertTicket(parsedTicket);
+        await _ticketDao.insertTicket(parsedTicket);
 
         _logger.success('PDF ticket saved successfully');
         return PDFParserResult.success(

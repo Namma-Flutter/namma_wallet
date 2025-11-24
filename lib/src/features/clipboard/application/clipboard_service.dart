@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:namma_wallet/src/common/database/ticket_dao_interface.dart';
-import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/services/logger_interface.dart';
 import 'package:namma_wallet/src/common/widgets/snackbar_widget.dart';
+import 'package:namma_wallet/src/features/clipboard/application/clipboard_service_interface.dart';
 import 'package:namma_wallet/src/features/clipboard/domain/clipboard_content_type.dart';
 import 'package:namma_wallet/src/features/clipboard/domain/clipboard_repository_interface.dart';
 import 'package:namma_wallet/src/features/clipboard/domain/clipboard_result.dart';
 import 'package:namma_wallet/src/features/common/application/travel_parser_service.dart';
+import 'package:namma_wallet/src/features/common/application/travel_parser_service_interface.dart';
 import 'package:namma_wallet/src/features/common/enums/source_type.dart';
 import 'package:namma_wallet/src/features/home/domain/ticket.dart';
 
@@ -17,33 +18,32 @@ import 'package:namma_wallet/src/features/home/domain/ticket.dart';
 /// the clipboard repository, parser service, and database.
 ///
 /// Never throws - all errors are returned as [ClipboardResult.error].
-class ClipboardService {
+class ClipboardService implements IClipboardService {
   /// Creates a clipboard service.
   ///
   /// [repository] - Repository for clipboard access
   /// [logger] - Logger for debugging
   /// [parserService] - Service for parsing travel tickets
   /// [ticketDao] - DAO for ticket database operations
-  ///
-  /// Uses GetIt to resolve dependencies if not provided.
   ClipboardService({
-    IClipboardRepository? repository,
-    ILogger? logger,
-    TravelParserService? parserService,
-    ITicketDAO? ticketDao,
-  }) : _repository = repository ?? getIt<IClipboardRepository>(),
-       _logger = logger ?? getIt<ILogger>(),
-       _parserService = parserService ?? getIt<TravelParserService>(),
-       _ticketDao = ticketDao ?? getIt<ITicketDAO>();
+    required IClipboardRepository repository,
+    required ILogger logger,
+    required ITravelParserService parserService,
+    required ITicketDAO ticketDao,
+  }) : _repository = repository,
+       _logger = logger,
+       _parserService = parserService,
+       _ticketDao = ticketDao;
 
   final IClipboardRepository _repository;
   final ILogger _logger;
-  final TravelParserService _parserService;
+  final ITravelParserService _parserService;
   final ITicketDAO _ticketDao;
 
   /// Maximum allowed text length to prevent spam/abuse
   static const int maxTextLength = 10000;
 
+  @override
   /// Reads clipboard content and attempts to parse it as a travel ticket.
   ///
   /// Workflow:
@@ -175,6 +175,7 @@ class ClipboardService {
     return true;
   }
 
+  @override
   /// Shows a snackbar message based on the clipboard result.
   ///
   /// Displays success message or error.

@@ -20,11 +20,12 @@ void main() {
 
     setUp(() {
       // Arrange - Set up mocked dependencies in a new scope
+      final logger = FakeLogger();
       getIt
         ..pushNewScope()
-        ..registerSingleton<ILogger>(FakeLogger())
+        ..registerSingleton<ILogger>(logger)
         ..registerSingleton<TNSTCSMSParser>(TNSTCSMSParser())
-        ..registerSingleton<TNSTCPDFParser>(TNSTCPDFParser());
+        ..registerSingleton<TNSTCPDFParser>(TNSTCPDFParser(logger: logger));
     });
 
     tearDown(() async {
@@ -52,10 +53,18 @@ void main() {
             ],
           );
 
+          final logger = getIt<ILogger>();
+          final smsParser = getIt<TNSTCSMSParser>();
+          final pdfParser = getIt<TNSTCPDFParser>();
           final processor = SharedContentProcessor(
-            logger: FakeLogger(),
-            travelParser: MockTravelParserService(),
-            smsService: MockSMSService(mockTicket: mockTicket),
+            logger: logger,
+            travelParser: MockTravelParserService(logger: logger),
+            smsService: MockSMSService(
+              logger: logger,
+              smsParser: smsParser,
+              mockTicket: mockTicket,
+            ),
+            pdfParser: pdfParser,
             ticketDao: MockTicketDAO(),
           );
 
@@ -85,10 +94,14 @@ void main() {
         'Then returns TicketCreatedResult with defaults',
         () async {
           // Arrange (Given)
+          final logger = getIt<ILogger>();
+          final smsParser = getIt<TNSTCSMSParser>();
+          final pdfParser = getIt<TNSTCPDFParser>();
           final processor = SharedContentProcessor(
-            logger: FakeLogger(),
-            travelParser: MockTravelParserService(),
-            smsService: MockSMSService(),
+            logger: logger,
+            travelParser: MockTravelParserService(logger: logger),
+            smsService: MockSMSService(logger: logger, smsParser: smsParser),
+            pdfParser: pdfParser,
             ticketDao: MockTicketDAO(),
           );
 
@@ -108,10 +121,14 @@ void main() {
         'Then handles gracefully and returns result',
         () async {
           // Arrange (Given)
+          final logger = getIt<ILogger>();
+          final smsParser = getIt<TNSTCSMSParser>();
+          final pdfParser = getIt<TNSTCPDFParser>();
           final processor = SharedContentProcessor(
-            logger: FakeLogger(),
-            travelParser: MockTravelParserService(),
-            smsService: MockSMSService(),
+            logger: logger,
+            travelParser: MockTravelParserService(logger: logger),
+            smsService: MockSMSService(logger: logger, smsParser: smsParser),
+            pdfParser: pdfParser,
             ticketDao: MockTicketDAO(),
           );
 
@@ -145,12 +162,17 @@ void main() {
             },
           );
 
+          final logger = getIt<ILogger>();
+          final smsParser = getIt<TNSTCSMSParser>();
+          final pdfParser = getIt<TNSTCPDFParser>();
           final processor = SharedContentProcessor(
-            logger: FakeLogger(),
+            logger: logger,
             travelParser: MockTravelParserService(
+              logger: logger,
               mockUpdateInfo: mockUpdateInfo,
             ),
-            smsService: MockSMSService(),
+            smsService: MockSMSService(logger: logger, smsParser: smsParser),
+            pdfParser: pdfParser,
             ticketDao: MockTicketDAO(),
           );
 
@@ -185,12 +207,17 @@ void main() {
             updates: {'conductorContact': '9876543210'},
           );
 
+          final logger = getIt<ILogger>();
+          final smsParser = getIt<TNSTCSMSParser>();
+          final pdfParser = getIt<TNSTCPDFParser>();
           final processor = SharedContentProcessor(
-            logger: FakeLogger(),
+            logger: logger,
             travelParser: MockTravelParserService(
+              logger: logger,
               mockUpdateInfo: mockUpdateInfo,
             ),
-            smsService: MockSMSService(),
+            smsService: MockSMSService(logger: logger, smsParser: smsParser),
+            pdfParser: pdfParser,
             ticketDao: MockTicketDAO(updateReturnCount: 0),
           );
 
@@ -229,12 +256,17 @@ void main() {
             },
           );
 
+          final logger = getIt<ILogger>();
+          final smsParser = getIt<TNSTCSMSParser>();
+          final pdfParser = getIt<TNSTCPDFParser>();
           final processor = SharedContentProcessor(
-            logger: FakeLogger(),
+            logger: logger,
             travelParser: MockTravelParserService(
+              logger: logger,
               mockUpdateInfo: mockUpdateInfo,
             ),
-            smsService: MockSMSService(),
+            smsService: MockSMSService(logger: logger, smsParser: smsParser),
+            pdfParser: pdfParser,
             ticketDao: mockDao,
           );
 
@@ -278,12 +310,17 @@ void main() {
             updates: {'conductorContact': '9876543210'},
           );
 
+          final logger = getIt<ILogger>();
+          final smsParser = getIt<TNSTCSMSParser>();
+          final pdfParser = getIt<TNSTCPDFParser>();
           final processor = SharedContentProcessor(
-            logger: FakeLogger(),
+            logger: logger,
             travelParser: MockTravelParserService(
+              logger: logger,
               mockUpdateInfo: mockUpdateInfo,
             ),
-            smsService: MockSMSService(),
+            smsService: MockSMSService(logger: logger, smsParser: smsParser),
+            pdfParser: pdfParser,
             ticketDao: MockTicketDAO(shouldThrowOnUpdate: true),
           );
 
@@ -308,10 +345,14 @@ void main() {
         'Then handles gracefully',
         () async {
           // Arrange (Given)
+          final logger = getIt<ILogger>();
+          final smsParser = getIt<TNSTCSMSParser>();
+          final pdfParser = getIt<TNSTCPDFParser>();
           final processor = SharedContentProcessor(
-            logger: FakeLogger(),
-            travelParser: MockTravelParserService(),
-            smsService: MockSMSService(),
+            logger: logger,
+            travelParser: MockTravelParserService(logger: logger),
+            smsService: MockSMSService(logger: logger, smsParser: smsParser),
+            pdfParser: pdfParser,
             ticketDao: MockTicketDAO(),
           );
 
@@ -331,10 +372,14 @@ void main() {
         'Then processes without errors',
         () async {
           // Arrange (Given)
+          final logger = getIt<ILogger>();
+          final smsParser = getIt<TNSTCSMSParser>();
+          final pdfParser = getIt<TNSTCPDFParser>();
           final processor = SharedContentProcessor(
-            logger: FakeLogger(),
-            travelParser: MockTravelParserService(),
-            smsService: MockSMSService(),
+            logger: logger,
+            travelParser: MockTravelParserService(logger: logger),
+            smsService: MockSMSService(logger: logger, smsParser: smsParser),
+            pdfParser: pdfParser,
             ticketDao: MockTicketDAO(),
           );
 
@@ -362,10 +407,18 @@ void main() {
             location: 'Test',
           );
 
+          final logger = getIt<ILogger>();
+          final smsParser = getIt<TNSTCSMSParser>();
+          final pdfParser = getIt<TNSTCPDFParser>();
           final processor = SharedContentProcessor(
-            logger: FakeLogger(),
-            travelParser: MockTravelParserService(),
-            smsService: MockSMSService(mockTicket: mockTicket),
+            logger: logger,
+            travelParser: MockTravelParserService(logger: logger),
+            smsService: MockSMSService(
+              logger: logger,
+              smsParser: smsParser,
+              mockTicket: mockTicket,
+            ),
+            pdfParser: pdfParser,
             ticketDao: MockTicketDAO(),
           );
 
@@ -493,10 +546,14 @@ void main() {
         () async {
           // Arrange (Given)
           final mockDao = MockTicketDAO();
+          final logger = getIt<ILogger>();
+          final smsParser = getIt<TNSTCSMSParser>();
+          final pdfParser = getIt<TNSTCPDFParser>();
           final processor = SharedContentProcessor(
-            logger: FakeLogger(),
-            travelParser: MockTravelParserService(),
-            smsService: MockSMSService(),
+            logger: logger,
+            travelParser: MockTravelParserService(logger: logger),
+            smsService: MockSMSService(logger: logger, smsParser: smsParser),
+            pdfParser: pdfParser,
             ticketDao: mockDao,
           );
 
@@ -515,16 +572,21 @@ void main() {
           expect(createResult, isA<TicketCreatedResult>());
 
           // Arrange for update
+          final logger2 = getIt<ILogger>();
+          final smsParser2 = getIt<TNSTCSMSParser>();
+          final pdfParser2 = getIt<TNSTCPDFParser>();
           final updateProcessor = SharedContentProcessor(
-            logger: FakeLogger(),
+            logger: logger2,
             travelParser: MockTravelParserService(
+              logger: logger2,
               mockUpdateInfo: TicketUpdateInfo(
                 pnrNumber: 'T12345678',
                 providerName: 'TNSTC',
                 updates: {'conductorContact': '9876543210'},
               ),
             ),
-            smsService: MockSMSService(),
+            smsService: MockSMSService(logger: logger2, smsParser: smsParser2),
+            pdfParser: pdfParser2,
             ticketDao: mockDao,
           );
 
@@ -547,10 +609,15 @@ void main() {
         'Then each processor works independently',
         () async {
           // Arrange (Given)
+          final logger = getIt<ILogger>();
+          final smsParser = getIt<TNSTCSMSParser>();
+          final pdfParser = getIt<TNSTCPDFParser>();
           final processor1 = SharedContentProcessor(
-            logger: FakeLogger(),
-            travelParser: MockTravelParserService(),
+            logger: logger,
+            travelParser: MockTravelParserService(logger: logger),
             smsService: MockSMSService(
+              logger: logger,
+              smsParser: smsParser,
               mockTicket: Ticket(
                 ticketId: 'T11111111',
                 primaryText: 'Chennai → Bangalore',
@@ -564,13 +631,16 @@ void main() {
                 ],
               ),
             ),
+            pdfParser: pdfParser,
             ticketDao: MockTicketDAO(),
           );
 
           final processor2 = SharedContentProcessor(
-            logger: FakeLogger(),
-            travelParser: MockTravelParserService(),
+            logger: logger,
+            travelParser: MockTravelParserService(logger: logger),
             smsService: MockSMSService(
+              logger: logger,
+              smsParser: smsParser,
               mockTicket: Ticket(
                 ticketId: 'T22222222',
                 primaryText: 'Mumbai → Delhi',
@@ -584,6 +654,7 @@ void main() {
                 ],
               ),
             ),
+            pdfParser: pdfParser,
             ticketDao: MockTicketDAO(),
           );
 

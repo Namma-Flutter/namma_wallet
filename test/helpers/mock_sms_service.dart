@@ -4,6 +4,8 @@ import 'package:namma_wallet/src/features/tnstc/application/sms_service.dart';
 /// Mock SMSService for testing purposes
 class MockSMSService extends SMSService {
   MockSMSService({
+    required super.logger,
+    required super.smsParser,
     Ticket? mockTicket,
   }) : _mockTicket =
            mockTicket ??

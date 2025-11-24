@@ -1,7 +1,7 @@
 import 'dart:convert';
 
-import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/services/logger_interface.dart';
+import 'package:namma_wallet/src/features/common/application/travel_parser_service_interface.dart';
 import 'package:namma_wallet/src/features/common/enums/source_type.dart';
 import 'package:namma_wallet/src/features/common/enums/ticket_type.dart';
 import 'package:namma_wallet/src/features/home/domain/extras_model.dart';
@@ -21,6 +21,9 @@ abstract class TravelTicketParser {
 }
 
 class TNSTCBusParser implements TravelTicketParser {
+  TNSTCBusParser({required ILogger logger}) : _logger = logger;
+  final ILogger _logger;
+
   @override
   String get providerName => 'TNSTC';
 
@@ -93,14 +96,15 @@ class TNSTCBusParser implements TravelTicketParser {
       final smsParser = TNSTCSMSParser();
       return smsParser.parseTicket(text);
     } else {
-      final pdfParser = TNSTCPDFParser();
+      final pdfParser = TNSTCPDFParser(logger: _logger);
       return pdfParser.parseTicket(text);
     }
   }
 }
 
 class IRCTCTrainParser implements TravelTicketParser {
-  late final ILogger _logger = getIt<ILogger>();
+  IRCTCTrainParser({required ILogger logger}) : _logger = logger;
+  final ILogger _logger;
 
   @override
   String get providerName => 'IRCTC';
@@ -194,7 +198,8 @@ class IRCTCTrainParser implements TravelTicketParser {
 }
 
 class SETCBusParser implements TravelTicketParser {
-  late final ILogger _logger = getIt<ILogger>();
+  SETCBusParser({required ILogger logger}) : _logger = logger;
+  final ILogger _logger;
 
   @override
   String get providerName => 'SETC';
@@ -293,14 +298,16 @@ class TicketUpdateInfo {
   final Map<String, Object?> updates;
 }
 
-class TravelParserService {
-  TravelParserService({ILogger? logger}) : _logger = logger ?? getIt<ILogger>();
+class TravelParserService implements ITravelParserService {
+  TravelParserService({required ILogger logger})
+    : _logger = logger,
+      _parsers = [
+        TNSTCBusParser(logger: logger),
+        IRCTCTrainParser(logger: logger),
+        SETCBusParser(logger: logger),
+      ];
   final ILogger _logger;
-  final List<TravelTicketParser> _parsers = [
-    TNSTCBusParser(),
-    IRCTCTrainParser(),
-    SETCBusParser(),
-  ];
+  final List<TravelTicketParser> _parsers;
 
   /// Create a sanitized summary of ticket for safe logging (no PII)
   Map<String, dynamic> _createTicketSummary(Ticket ticket) {
@@ -373,6 +380,7 @@ class TravelParserService {
   }
 
   /// Detects if this is an update SMS (e.g., conductor details for TNSTC)
+  @override
   TicketUpdateInfo? parseUpdateSMS(String text) {
     // Match TNSTC update pattern
     if (text.toUpperCase().contains('TNSTC') &&
@@ -440,6 +448,7 @@ class TravelParserService {
     return null;
   }
 
+  @override
   Ticket? parseTicketFromText(
     String text, {
     SourceType? sourceType,

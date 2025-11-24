@@ -3,6 +3,7 @@ import 'package:namma_wallet/src/features/common/application/travel_parser_servi
 /// Mock TravelParserService for testing purposes
 class MockTravelParserService extends TravelParserService {
   MockTravelParserService({
+    required super.logger,
     this.mockUpdateInfo,
   });
 
