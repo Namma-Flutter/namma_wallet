@@ -402,9 +402,10 @@ class TravelTicketListCardWidget extends StatelessWidget {
                 const SizedBox(height: 4),
                 // Date and time
                 Text(
-                  '${formatDate(ticket.startTime)} • '
-                  '${formatTime(ticket.startTime)}'
-                  '',
+                  '${DateTimeConverter.instance.formatDate(
+                    ticket.startTime,
+                  )} • '
+                  '${DateTimeConverter.instance.formatTime(ticket.startTime)}',
                   style: TextStyle(
                     fontSize: 11,
                     color: Theme.of(
