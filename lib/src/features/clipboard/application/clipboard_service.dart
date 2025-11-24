@@ -189,8 +189,7 @@ class ClipboardService {
                   ? 'Travel ticket saved successfully!'
                   : 'Ticket updated with conductor details!',
             ClipboardContentType.text ||
-            ClipboardContentType.invalid =>
-              'Unknown content type',
+            ClipboardContentType.invalid => 'Unknown content type',
           }
         : result.errorMessage ?? 'Unknown error occurred';
 
