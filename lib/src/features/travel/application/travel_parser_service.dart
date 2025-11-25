@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:namma_wallet/src/common/services/logger_interface.dart';
-import 'package:namma_wallet/src/features/common/application/travel_parser_service_interface.dart';
 import 'package:namma_wallet/src/features/common/enums/source_type.dart';
 import 'package:namma_wallet/src/features/common/enums/ticket_type.dart';
 import 'package:namma_wallet/src/features/home/domain/extras_model.dart';
@@ -9,6 +8,7 @@ import 'package:namma_wallet/src/features/home/domain/tag_model.dart';
 import 'package:namma_wallet/src/features/home/domain/ticket.dart';
 import 'package:namma_wallet/src/features/tnstc/application/tnstc_pdf_parser.dart';
 import 'package:namma_wallet/src/features/tnstc/application/tnstc_sms_parser.dart';
+import 'package:namma_wallet/src/features/travel/application/travel_parser_interface.dart';
 
 abstract class TravelTicketParser {
   bool canParse(String text);
@@ -298,7 +298,7 @@ class TicketUpdateInfo {
   final Map<String, Object?> updates;
 }
 
-class TravelParserService implements ITravelParserService {
+class TravelParserService implements ITravelParser {
   TravelParserService({required ILogger logger})
     : _logger = logger,
       _parsers = [

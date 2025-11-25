@@ -1,11 +1,11 @@
-import 'package:namma_wallet/src/features/common/application/travel_parser_service.dart';
 import 'package:namma_wallet/src/features/common/enums/source_type.dart';
 import 'package:namma_wallet/src/features/home/domain/ticket.dart';
+import 'package:namma_wallet/src/features/travel/application/travel_parser_service.dart';
 
 /// Interface for travel ticket parsing service.
 ///
 /// Defines the contract for parsing travel tickets from various text sources.
-abstract interface class ITravelParserService {
+abstract interface class ITravelParser {
   /// Attempts to parse ticket from text using all available parsers.
   ///
   /// Returns null if no parser can handle the text.

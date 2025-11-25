@@ -1,4 +1,4 @@
-import 'package:namma_wallet/src/features/common/application/travel_parser_service.dart';
+import 'package:namma_wallet/src/features/travel/application/travel_parser_service.dart';
 
 /// Mock TravelParserService for testing purposes
 class MockTravelParserService extends TravelParserService {

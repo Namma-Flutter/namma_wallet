@@ -6,10 +6,10 @@ import 'package:namma_wallet/src/features/clipboard/application/clipboard_servic
 import 'package:namma_wallet/src/features/clipboard/domain/clipboard_content_type.dart';
 import 'package:namma_wallet/src/features/clipboard/domain/clipboard_repository_interface.dart';
 import 'package:namma_wallet/src/features/clipboard/domain/clipboard_result.dart';
-import 'package:namma_wallet/src/features/common/application/travel_parser_service.dart';
-import 'package:namma_wallet/src/features/common/application/travel_parser_service_interface.dart';
 import 'package:namma_wallet/src/features/common/enums/source_type.dart';
 import 'package:namma_wallet/src/features/home/domain/ticket.dart';
+import 'package:namma_wallet/src/features/travel/application/travel_parser_service.dart';
+import 'package:namma_wallet/src/features/travel/application/travel_parser_interface.dart';
 
 /// Application service for clipboard operations.
 ///
@@ -28,7 +28,7 @@ class ClipboardService implements IClipboardService {
   ClipboardService({
     required IClipboardRepository repository,
     required ILogger logger,
-    required ITravelParserService parserService,
+    required ITravelParser parserService,
     required ITicketDAO ticketDao,
   }) : _repository = repository,
        _logger = logger,
@@ -37,7 +37,7 @@ class ClipboardService implements IClipboardService {
 
   final IClipboardRepository _repository;
   final ILogger _logger;
-  final ITravelParserService _parserService;
+  final ITravelParser _parserService;
   final ITicketDAO _ticketDao;
 
   /// Maximum allowed text length to prevent spam/abuse

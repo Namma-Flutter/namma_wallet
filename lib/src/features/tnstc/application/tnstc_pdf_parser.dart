@@ -1,6 +1,6 @@
-import 'package:namma_wallet/src/features/common/application/travel_pdf_parser.dart';
 import 'package:namma_wallet/src/features/home/domain/ticket.dart';
 import 'package:namma_wallet/src/features/tnstc/domain/tnstc_model.dart';
+import 'package:namma_wallet/src/features/travel/application/travel_pdf_parser.dart';
 
 /// Parses TNSTC (Tamil Nadu State Transport Corporation) PDF tickets
 /// into structured ticket data.
@@ -13,8 +13,6 @@ import 'package:namma_wallet/src/features/tnstc/domain/tnstc_model.dart';
 /// Never throws - returns a model with partial data on errors.
 class TNSTCPDFParser extends TravelPDFParser {
   TNSTCPDFParser({required super.logger});
-  // TODO(optimization): Move RegExp compilation to static final fields
-  // to avoid recompiling patterns on each parse call, improving performance.
 
   /// Parses the given PDF text and returns a [Ticket].
   @override
