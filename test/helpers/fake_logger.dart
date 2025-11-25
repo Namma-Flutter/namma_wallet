@@ -1,4 +1,4 @@
-import 'package:namma_wallet/src/common/services/logger_interface.dart';
+import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
 import 'package:talker_flutter/talker_flutter.dart';
 
 /// Fake logger implementation for testing purposes

@@ -1,6 +1,6 @@
 import 'package:namma_wallet/src/common/di/locator.dart';
-import 'package:namma_wallet/src/common/services/logger_interface.dart';
-import 'package:namma_wallet/src/features/irctc/application/irctc_ticket_model.dart';
+import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
+import 'package:namma_wallet/src/features/irctc/domain/irctc_ticket_model.dart';
 
 class IRCTCQRParser {
   IRCTCQRParser({ILogger? logger}) : _logger = logger ?? getIt<ILogger>();

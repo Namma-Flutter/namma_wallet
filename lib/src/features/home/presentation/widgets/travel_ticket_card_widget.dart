@@ -1,8 +1,8 @@
 // A dedicated, reusable widget for rendering the content of a wallet card.
 import 'package:flutter/material.dart';
+import 'package:namma_wallet/src/common/enums/ticket_type.dart';
 import 'package:namma_wallet/src/common/helper/date_time_converter.dart';
 import 'package:namma_wallet/src/common/theme/styles.dart';
-import 'package:namma_wallet/src/features/common/enums/ticket_type.dart';
 import 'package:namma_wallet/src/features/home/domain/ticket.dart';
 import 'package:namma_wallet/src/features/home/domain/ticket_extensions.dart';
 import 'package:namma_wallet/src/features/travel/presentation/widgets/ticket_view_widget.dart';

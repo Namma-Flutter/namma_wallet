@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:namma_wallet/src/common/database/ticket_dao_interface.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
-import 'package:namma_wallet/src/common/services/logger_interface.dart';
+import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
 import 'package:namma_wallet/src/features/calendar/presentation/calendar_view.dart';
 import 'package:namma_wallet/src/features/home/domain/ticket.dart';
 

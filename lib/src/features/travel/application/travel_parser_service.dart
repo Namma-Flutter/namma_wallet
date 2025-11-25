@@ -1,8 +1,8 @@
 import 'dart:convert';
 
-import 'package:namma_wallet/src/common/services/logger_interface.dart';
-import 'package:namma_wallet/src/features/common/enums/source_type.dart';
-import 'package:namma_wallet/src/features/common/enums/ticket_type.dart';
+import 'package:namma_wallet/src/common/enums/source_type.dart';
+import 'package:namma_wallet/src/common/enums/ticket_type.dart';
+import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
 import 'package:namma_wallet/src/features/home/domain/extras_model.dart';
 import 'package:namma_wallet/src/features/home/domain/tag_model.dart';
 import 'package:namma_wallet/src/features/home/domain/ticket.dart';

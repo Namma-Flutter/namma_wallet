@@ -5,9 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:namma_wallet/src/app.dart';
 import 'package:namma_wallet/src/common/database/wallet_database_interface.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
-import 'package:namma_wallet/src/common/services/logger_interface.dart';
+import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
 import 'package:namma_wallet/src/common/theme/theme_provider.dart';
-import 'package:namma_wallet/src/features/ai/fallback-parser/application/gemma_service.dart';
+import 'package:namma_wallet/src/features/ai/fallback-parser/application/ai_service_interface.dart';
 import 'package:pdfrx/pdfrx.dart';
 import 'package:provider/provider.dart';
 
@@ -102,7 +102,7 @@ Future<void> main() async {
 
   try {
     logger?.info('Initializing Gemma Chat Service...');
-    await getIt<GemmaChatService>().init();
+    await getIt<IAIService>().init();
     logger?.success('Gemma Chat Service initialized');
 
     logger?.info('Initializing database...');
