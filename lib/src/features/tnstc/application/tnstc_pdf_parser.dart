@@ -1,6 +1,5 @@
-import 'package:namma_wallet/src/common/services/logger_interface.dart';
+import 'package:namma_wallet/src/features/common/application/travel_pdf_parser.dart';
 import 'package:namma_wallet/src/features/home/domain/ticket.dart';
-import 'package:namma_wallet/src/features/tnstc/application/ticket_parser_interface.dart';
 import 'package:namma_wallet/src/features/tnstc/domain/tnstc_model.dart';
 
 /// Parses TNSTC (Tamil Nadu State Transport Corporation) PDF tickets
@@ -12,9 +11,8 @@ import 'package:namma_wallet/src/features/tnstc/domain/tnstc_model.dart';
 ///
 /// Falls back to default values if parsing fails for individual fields.
 /// Never throws - returns a model with partial data on errors.
-class TNSTCPDFParser implements ITicketParser {
-  TNSTCPDFParser({required ILogger logger}) : _logger = logger;
-  final ILogger _logger;
+class TNSTCPDFParser extends TravelPDFParser {
+  TNSTCPDFParser({required super.logger});
   // TODO(optimization): Move RegExp compilation to static final fields
   // to avoid recompiling patterns on each parse call, improving performance.
 
@@ -22,81 +20,6 @@ class TNSTCPDFParser implements ITicketParser {
   @override
   Ticket parseTicket(String pdfText) {
     final passengers = <PassengerInfo>[];
-    String extractMatch(String pattern, String input, {int groupIndex = 1}) {
-      final regex = RegExp(pattern, multiLine: true);
-      final match = regex.firstMatch(input);
-
-      if (match != null && groupIndex <= match.groupCount) {
-        // Safely extract the matched group, or return empty string if null
-        return match.group(groupIndex)?.trim() ?? '';
-      }
-      // Return empty string if the match or group is invalid
-      return '';
-    }
-
-    DateTime parseDate(String date) {
-      if (date.isEmpty) return DateTime.now();
-
-      // Handle both '-' and '/' separators
-      final parts = date.contains('/') ? date.split('/') : date.split('-');
-      if (parts.length != 3) {
-        _logger.warning(
-          'Invalid date format encountered in TNSTC PDF',
-        );
-        return DateTime.now();
-      }
-
-      try {
-        final day = int.parse(parts[0]);
-        final month = int.parse(parts[1]);
-        final year = int.parse(parts[2]);
-        return DateTime(year, month, day);
-      } on FormatException catch (e) {
-        _logger.warning('Failed to parse date in TNSTC PDF: $e');
-        return DateTime.now();
-      }
-    }
-
-    DateTime parseDateTime(String dateTime) {
-      if (dateTime.isEmpty) return DateTime.now();
-
-      final parts = dateTime.split(' '); // Split into date and time
-      if (parts.length < 2) {
-        _logger.warning('Invalid datetime format encountered in TNSTC PDF');
-        return DateTime.now();
-      }
-
-      try {
-        // Handle both '-' and '/' separators for date
-        final dateParts = parts[0].contains('/')
-            ? parts[0].split('/')
-            : parts[0].split('-');
-        if (dateParts.length != 3) {
-          _logger.warning('Invalid date part in TNSTC datetime');
-          return DateTime.now();
-        }
-
-        final day = int.parse(dateParts[0]);
-        final month = int.parse(dateParts[1]);
-        final year = int.parse(dateParts[2]);
-
-        // Extract time part (might have "Hrs." suffix)
-        final timePart = parts[1].replaceAll(RegExp(r'\s*Hrs\.?'), '');
-        final timeParts = timePart.split(':'); // Split the time by ':'
-        if (timeParts.length != 2) {
-          _logger.warning('Invalid time part in TNSTC datetime');
-          return DateTime.now();
-        }
-
-        final hour = int.parse(timeParts[0]);
-        final minute = int.parse(timeParts[1]);
-
-        return DateTime(year, month, day, hour, minute);
-      } on FormatException catch (e) {
-        _logger.warning('Failed to parse datetime in TNSTC PDF: $e');
-        return DateTime.now();
-      }
-    }
 
     // Extract all fields using PDF-specific patterns
     // Use non-greedy matching and stop at newlines
