@@ -1,7 +1,7 @@
 import 'package:flutter_gemma/core/api/flutter_gemma.dart';
 import 'package:flutter_gemma/core/model.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
-import 'package:namma_wallet/src/features/ai/fallback-parser/application/ai_service_interface.dart';
+import 'package:namma_wallet/src/features/ai/fallback_parser/application/ai_service_interface.dart';
 
 /// Service class to interact with Gemma AI chat
 class GemmaService implements IAIService {

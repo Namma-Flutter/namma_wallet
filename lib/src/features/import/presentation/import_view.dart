@@ -9,6 +9,7 @@ import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/routing/app_routes.dart';
 import 'package:namma_wallet/src/common/widgets/snackbar_widget.dart';
 import 'package:namma_wallet/src/features/clipboard/application/clipboard_service_interface.dart';
+import 'package:namma_wallet/src/features/clipboard/presentation/clipboard_result_handler.dart';
 import 'package:namma_wallet/src/features/irctc/application/irctc_qr_parser.dart';
 import 'package:namma_wallet/src/features/irctc/application/irctc_scanner_service.dart';
 import 'package:namma_wallet/src/features/pdf_extract/application/pdf_parser_service.dart';
@@ -102,7 +103,7 @@ class _ImportViewState extends State<ImportView> {
 
       if (!mounted) return;
 
-      clipboardService.showResultMessage(context, result);
+      ClipboardResultHandler.showResultMessage(context, result);
     } finally {
       if (mounted) {
         setState(() {

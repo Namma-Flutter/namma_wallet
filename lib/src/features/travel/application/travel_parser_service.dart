@@ -1,11 +1,11 @@
 import 'dart:convert';
 
+import 'package:namma_wallet/src/common/domain/models/extras_model.dart';
+import 'package:namma_wallet/src/common/domain/models/tag_model.dart';
+import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 import 'package:namma_wallet/src/common/enums/source_type.dart';
 import 'package:namma_wallet/src/common/enums/ticket_type.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
-import 'package:namma_wallet/src/features/home/domain/extras_model.dart';
-import 'package:namma_wallet/src/features/home/domain/tag_model.dart';
-import 'package:namma_wallet/src/features/home/domain/ticket.dart';
 import 'package:namma_wallet/src/features/tnstc/application/tnstc_pdf_parser.dart';
 import 'package:namma_wallet/src/features/tnstc/application/tnstc_sms_parser.dart';
 import 'package:namma_wallet/src/features/travel/application/travel_parser_interface.dart';

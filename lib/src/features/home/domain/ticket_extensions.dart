@@ -1,6 +1,6 @@
+import 'package:namma_wallet/src/common/domain/models/extras_model.dart';
+import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 import 'package:namma_wallet/src/common/helper/date_time_converter.dart';
-import 'package:namma_wallet/src/features/home/domain/extras_model.dart';
-import 'package:namma_wallet/src/features/home/domain/ticket.dart';
 
 /// Extension methods for [Ticket] to simplify common operations
 /// on ticket extras data.

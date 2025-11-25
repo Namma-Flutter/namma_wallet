@@ -1,5 +1,5 @@
+import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 import 'package:namma_wallet/src/common/enums/source_type.dart';
-import 'package:namma_wallet/src/features/home/domain/ticket.dart';
 import 'package:namma_wallet/src/features/travel/application/travel_parser_service.dart';
 
 /// Interface for travel ticket parsing service.

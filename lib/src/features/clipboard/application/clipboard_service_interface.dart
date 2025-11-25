@@ -1,10 +1,11 @@
-import 'package:flutter/material.dart';
 import 'package:namma_wallet/src/features/clipboard/domain/clipboard_result.dart';
 
 /// Interface for clipboard operations service.
 ///
 /// Defines the contract for orchestrating clipboard reading,
 /// content validation, parsing, and ticket storage.
+// More methods may be added as needed.
+// ignore: one_member_abstracts
 abstract interface class IClipboardService {
   /// Reads clipboard content and attempts to parse it as a travel ticket.
   ///
@@ -23,10 +24,4 @@ abstract interface class IClipboardService {
   ///
   /// Never throws - all errors are returned as [ClipboardResult.error].
   Future<ClipboardResult> readAndParseClipboard();
-
-  /// Shows a snackbar message based on the clipboard result.
-  ///
-  /// Displays success message or error.
-  /// Only shows if context is still mounted.
-  void showResultMessage(BuildContext context, ClipboardResult result);
 }

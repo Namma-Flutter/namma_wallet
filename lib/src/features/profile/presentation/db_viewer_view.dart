@@ -7,9 +7,9 @@ import 'package:home_widget/home_widget.dart';
 import 'package:namma_wallet/src/common/database/ticket_dao_interface.dart';
 import 'package:namma_wallet/src/common/database/user_dao_interface.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
+import 'package:namma_wallet/src/common/domain/models/ticket.dart';
+import 'package:namma_wallet/src/common/domain/models/user.dart';
 import 'package:namma_wallet/src/common/widgets/rounded_back_button.dart';
-import 'package:namma_wallet/src/features/home/domain/ticket.dart';
-import 'package:namma_wallet/src/features/user/domain/user.dart';
 
 class DbViewerView extends StatefulWidget {
   const DbViewerView({super.key});

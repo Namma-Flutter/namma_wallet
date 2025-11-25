@@ -1,4 +1,4 @@
-import 'package:namma_wallet/src/features/home/domain/ticket.dart';
+import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 import 'package:namma_wallet/src/features/tnstc/domain/tnstc_model.dart';
 import 'package:namma_wallet/src/features/travel/application/travel_sms_parser.dart';
 
@@ -15,7 +15,6 @@ import 'package:namma_wallet/src/features/travel/application/travel_sms_parser.d
 class TNSTCSMSParser extends TravelSMSParser {
   @override
   Ticket parseTicket(String smsText) {
-
     // Extract common fields present in both SMS formats.
     // Falls back to empty string if pattern doesn't match.
     final pnrNumber = extractMatch(

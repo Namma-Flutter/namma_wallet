@@ -1,5 +1,5 @@
 import 'package:namma_wallet/src/common/database/ticket_dao_interface.dart';
-import 'package:namma_wallet/src/features/home/domain/ticket.dart';
+import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 
 /// Mock TicketDAO for testing purposes
 class MockTicketDAO implements ITicketDAO {
