@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:namma_wallet/src/common/domain/models/ticket.dart';
+import 'package:namma_wallet/src/common/enums/ticket_type.dart';
 import 'package:namma_wallet/src/common/helper/date_time_converter.dart';
 
 class EventTicketCardWidget extends StatelessWidget {
@@ -76,7 +77,6 @@ class EventTicketCardWidget extends StatelessWidget {
                         Row(
                           children: [
                             Text(
-                              // ticket.dateTime?.toString() ?? 'xxx xxx',
                               DateTimeConverter.instance.formatDate(
                                 ticket.startTime!,
                               ),
@@ -88,32 +88,29 @@ class EventTicketCardWidget extends StatelessWidget {
                             ),
                             const Text(' - '),
                             Text(
-                              // ticket.dateTime?.toString() ?? 'xxx xxx',
                               DateTimeConverter.instance.formatTime(
                                 ticket.startTime!,
                               ),
-                            style: TextStyle(
-                              color: Theme.of(context).colorScheme.onSurface,
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.onSurface,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
                             ),
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
-                          ),
-                        ],
-                      ),
+                          ],
+                        ),
                     ],
                   ),
                 ),
                 //* ticket icon
                 Icon(
-                  // ticket.eventIcon,
-                  Icons.star,
+                  _getTicketIcon(ticket.type),
                   color: Theme.of(context).colorScheme.primary,
                 ),
               ],
             ),
             //* Address
             Text(
-              // ticket.venue ?? 'xxx xxx',
               ticket.location,
               style: TextStyle(
                 color: Theme.of(context).colorScheme.onSurface,
@@ -125,5 +122,15 @@ class EventTicketCardWidget extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  IconData _getTicketIcon(TicketType type) {
+    return switch (type) {
+      TicketType.bus => Icons.airport_shuttle_outlined,
+      TicketType.train => Icons.tram_outlined,
+      TicketType.flight => Icons.flight_outlined,
+      TicketType.metro => Icons.subway_outlined,
+      TicketType.event => Icons.event_outlined,
+    };
   }
 }

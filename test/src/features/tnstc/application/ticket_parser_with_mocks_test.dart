@@ -453,7 +453,7 @@ Seat No. : 1A,2B,3C, Journey Date : 15/12/2024
       test(
         'Given parser registered in GetIt, When retrieving parser, '
         'Then returns registered instance',
-        () async {
+        () {
           // Arrange (Given)
           final logger = getIt<ILogger>();
           final parser = TNSTCPDFParser(logger: logger);
@@ -465,9 +465,6 @@ Seat No. : 1A,2B,3C, Journey Date : 15/12/2024
           // Assert (Then)
           expect(retrievedParser, isA<TNSTCPDFParser>());
           expect(retrievedParser, same(parser));
-
-          // Cleanup
-          await getIt.unregister<ITicketParser>();
         },
       );
     });

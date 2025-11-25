@@ -102,6 +102,16 @@ class SharedContentProcessor implements ISharedContentProcessor {
         );
       }
 
+      // Validate essential fields before insert
+      if (ticket.pnrOrId == null ||
+          ticket.fromLocation == null ||
+          ticket.toLocation == null) {
+        _logger.warning(
+          'Ticket parsed with missing fields: pnr=${ticket.pnrOrId}, '
+          'from=${ticket.fromLocation}, to=${ticket.toLocation}',
+        );
+      }
+
       await _insertOrUpdateTicket(ticket);
 
       final contentSource = contentType == SharedContentType.pdf
@@ -111,15 +121,6 @@ class SharedContentProcessor implements ISharedContentProcessor {
         'Shared $contentSource processed successfully for '
         'PNR: ${ticket.ticketId}',
       );
-
-      if (ticket.pnrOrId == null ||
-          ticket.fromLocation == null ||
-          ticket.toLocation == null) {
-        _logger.warning(
-          'Ticket parsed with missing fields: pnr=${ticket.pnrOrId}, '
-          'from=${ticket.fromLocation}, to=${ticket.toLocation}',
-        );
-      }
 
       return TicketCreatedResult(
         pnrNumber: ticket.pnrOrId ?? 'Unknown',
@@ -174,11 +175,6 @@ class SharedContentProcessor implements ISharedContentProcessor {
 
   /// Insert or update a ticket in the database
   Future<void> _insertOrUpdateTicket(Ticket ticket) async {
-    final id = ticket.ticketId;
-    if (id == null || id.trim().isEmpty) {
-      throw ArgumentError('Missing ticketId for shared content');
-    }
-
     // Delegate to DAO's upsert logic
     // insertTicket handles both insert and update based on ticketId
     await _ticketDao.insertTicket(ticket);

@@ -371,7 +371,7 @@ void main() {
     group('Edge Cases and Boundary Conditions', () {
       test(
         'Given text at exact max length, When reading and parsing, '
-        'Then returns error if not parseable as ticket',
+        'Then returns error if not parsable as ticket',
         () async {
           // Arrange (Given)
           final exactLengthText = 'A' * ClipboardService.maxTextLength;
@@ -396,7 +396,7 @@ void main() {
 
       test(
         'Given text with special characters, When reading and parsing, '
-        'Then returns error if not parseable as ticket',
+        'Then returns error if not parsable as ticket',
         () async {
           // Arrange (Given)
           const specialText = r'Test@#$%^&*()_+{}|:"<>?';
@@ -421,7 +421,7 @@ void main() {
 
       test(
         'Given text with Unicode characters, When reading and parsing, '
-        'Then returns error if not parseable as ticket',
+        'Then returns error if not parsable as ticket',
         () async {
           // Arrange (Given)
           const unicodeText = 'தமிழ் நாடு பேருந்து 中文 🎫';
@@ -446,7 +446,7 @@ void main() {
 
       test(
         'Given multiline text, When reading and parsing, '
-        'Then returns error if not parseable as ticket',
+        'Then returns error if not parsable as ticket',
         () async {
           // Arrange (Given)
           const multilineText = 'Line 1\nLine 2\nLine 3';

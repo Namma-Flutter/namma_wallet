@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/routing/app_routes.dart';
+import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
 import 'package:namma_wallet/src/common/widgets/snackbar_widget.dart';
 import 'package:namma_wallet/src/features/clipboard/application/clipboard_service_interface.dart';
 import 'package:namma_wallet/src/features/clipboard/presentation/clipboard_result_handler.dart';
@@ -22,9 +23,11 @@ class ImportView extends StatefulWidget {
 
 class _ImportViewState extends State<ImportView> {
   late final IImportService _importService = getIt<IImportService>();
+  late final ILogger _logger = getIt<ILogger>();
   bool _isPasting = false;
   bool _isScanning = false;
   bool _isProcessingPDF = false;
+  bool _isOpeningScanner = false;
 
   Future<void> _handleQRCodeScan(String qrData) async {
     if (_isScanning) return;
@@ -111,13 +114,14 @@ class _ImportViewState extends State<ImportView> {
           );
         }
       }
-    } on Exception {
+    } on Exception catch (e) {
       if (mounted) {
         PdfResultHandler.showErrorMessage(
           context,
           'Error processing PDF. Please try again.',
         );
       }
+      _logger.error('PDF import error: $e');
     } finally {
       if (mounted) {
         setState(() {
@@ -151,8 +155,7 @@ class _ImportViewState extends State<ImportView> {
             isError: true,
           );
         }
-        // Log the exception for debugging
-        debugPrint('Clipboard read error: $e');
+        _logger.error('Clipboard read error: $e');
       }
     } finally {
       if (mounted) {
@@ -264,12 +267,25 @@ class _ImportViewState extends State<ImportView> {
                             ),
                             shape: const StadiumBorder(),
                           ),
-                          onPressed: () async {
-                            await context.pushNamed(
-                              AppRoute.barcodeScanner.name,
-                              extra: _onBarcodeCaptured,
-                            );
-                          },
+                          onPressed: _isOpeningScanner
+                              ? null
+                              : () async {
+                                  setState(() {
+                                    _isOpeningScanner = true;
+                                  });
+                                  try {
+                                    await context.pushNamed(
+                                      AppRoute.barcodeScanner.name,
+                                      extra: _onBarcodeCaptured,
+                                    );
+                                  } finally {
+                                    if (mounted) {
+                                      setState(() {
+                                        _isOpeningScanner = false;
+                                      });
+                                    }
+                                  }
+                                },
                           child: const Text(
                             'Scan QR Code',
                             style: TextStyle(

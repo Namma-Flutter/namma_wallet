@@ -410,12 +410,12 @@ class TravelTicketListCardWidget extends StatelessWidget {
                       ticket.startTime!,
                     )}',
                     style: TextStyle(
-                    fontSize: 11,
-                    color: Theme.of(
-                      context,
-                    ).colorScheme.onSurface.withValues(alpha: 0.5),
+                      fontSize: 11,
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withValues(alpha: 0.5),
+                    ),
                   ),
-                ),
               ],
             ),
           ),

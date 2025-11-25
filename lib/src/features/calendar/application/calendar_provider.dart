@@ -33,11 +33,13 @@ class CalendarProvider extends ChangeNotifier {
   List<Event> _events = [];
   List<Ticket> _tickets = [];
   DateTimeRange? _selectedRange;
+  String? _errorMessage;
 
   DateTime get selectedDay => _selectedDay;
   List<Event> get events => _events;
   List<Ticket> get tickets => _tickets;
   DateTimeRange? get selectedRange => _selectedRange;
+  String? get errorMessage => _errorMessage;
 
   void setSelectedDay(DateTime day) {
     _selectedDay = day;
@@ -63,12 +65,14 @@ class CalendarProvider extends ChangeNotifier {
   }
 
   Future<void> loadTickets() async {
+    _errorMessage = null; // Clear any previous error
     try {
       _tickets = await _ticketDao.getAllTickets();
-
       notifyListeners();
     } on Exception catch (e, st) {
       _logger.error('Error loading tickets: $e\n$st');
+      _errorMessage = 'Failed to load tickets: $e';
+      notifyListeners();
     }
   }
 
