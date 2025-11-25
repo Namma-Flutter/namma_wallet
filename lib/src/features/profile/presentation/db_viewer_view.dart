@@ -7,7 +7,7 @@ import 'package:home_widget/home_widget.dart';
 import 'package:namma_wallet/src/common/database/ticket_dao_interface.dart';
 import 'package:namma_wallet/src/common/database/user_dao_interface.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
-import 'package:namma_wallet/src/common/widgets/custom_back_button.dart';
+import 'package:namma_wallet/src/common/widgets/rounded_back_button.dart';
 import 'package:namma_wallet/src/features/home/domain/ticket.dart';
 import 'package:namma_wallet/src/features/user/domain/user.dart';
 
@@ -53,7 +53,7 @@ class _DbViewerViewState extends State<DbViewerView>
   Widget build(BuildContext context) => Scaffold(
     appBar: AppBar(
       title: const Text('Database Viewer'),
-      leading: const CustomBackButton(),
+      leading: const RoundedBackButton(),
       bottom: TabBar(
         controller: _tabController,
         tabs: const <Widget>[

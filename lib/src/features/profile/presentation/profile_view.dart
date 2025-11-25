@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:namma_wallet/src/common/routing/app_routes.dart';
 import 'package:namma_wallet/src/common/theme/theme_provider.dart';
-import 'package:namma_wallet/src/common/widgets/custom_back_button.dart';
+import 'package:namma_wallet/src/common/widgets/rounded_back_button.dart';
 import 'package:namma_wallet/src/common/widgets/snackbar_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -16,7 +16,7 @@ class ProfileView extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        leading: const CustomBackButton(),
+        leading: const RoundedBackButton(),
         title: const Text('Profile'),
       ),
       body: SingleChildScrollView(

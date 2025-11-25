@@ -13,7 +13,7 @@ import 'package:namma_wallet/src/common/widgets/snackbar_widget.dart';
 import 'package:namma_wallet/src/features/home/domain/ticket.dart';
 import 'package:namma_wallet/src/features/home/presentation/widgets/header_widget.dart';
 import 'package:namma_wallet/src/features/home/presentation/widgets/ticket_card_widget.dart';
-import 'package:namma_wallet/src/features/home/presentation/widgets/travel_ticket_card_widget.dart';
+import 'package:namma_wallet/src/features/travel/presentation/widgets/travel_ticket_card_widget.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
