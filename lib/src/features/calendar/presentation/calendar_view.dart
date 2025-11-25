@@ -128,49 +128,44 @@ class _CalendarContentState extends State<CalendarContent> {
                     ).colorScheme.surfaceContainerHighest,
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Builder(
-                    builder: (context) {
-                      final formatter = DateFormat('MMM dd, yyyy');
-                      final startDate = formatter.format(range.start);
-                      final endDate = formatter.format(range.end);
-                      return Row(
-                        children: [
-                          Icon(
-                            Icons.date_range,
-                            color: Theme.of(
-                              context,
-                            ).colorScheme.onSurfaceVariant,
-                            size: 20,
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.date_range,
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onSurfaceVariant,
+                        size: 20,
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          'Selected: '
+                          '${DateFormat('MMM dd, yyyy').format(range.start)} - '
+                          '${DateFormat('MMM dd, yyyy').format(range.end)}',
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurface,
+                            fontWeight: FontWeight.w500,
+                            fontSize: 13,
                           ),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: Text(
-                              'Selected: $startDate - $endDate',
-                              style: TextStyle(
-                                color: Theme.of(context).colorScheme.onSurface,
-                                fontWeight: FontWeight.w500,
-                                fontSize: 13,
-                              ),
-                            ),
-                          ),
-                          IconButton(
-                            icon: Icon(
-                              Icons.close,
-                              size: 18,
-                              color: Theme.of(
-                                context,
-                              ).colorScheme.onSurfaceVariant,
-                            ),
-                            onPressed: () {
-                              provider.setSelectedRange(null);
-                              setState(() {
-                                _selectedFilter = 1;
-                              });
-                            },
-                          ),
-                        ],
-                      );
-                    },
+                        ),
+                      ),
+                      IconButton(
+                        icon: Icon(
+                          Icons.close,
+                          size: 18,
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onSurfaceVariant,
+                        ),
+                        onPressed: () {
+                          provider.setSelectedRange(null);
+                          setState(() {
+                            _selectedFilter = 1;
+                          });
+                        },
+                      ),
+                    ],
                   ),
                 ),
               ),

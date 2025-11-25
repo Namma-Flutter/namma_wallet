@@ -101,9 +101,9 @@ Future<void> main() async {
   };
 
   try {
-    logger?.info('Initializing Gemma Chat Service...');
+    logger?.info('Initializing AI service...');
     await getIt<IAIService>().init();
-    logger?.success('Gemma Chat Service initialized');
+    logger?.success('AI service initialized');
 
     logger?.info('Initializing database...');
     await getIt<IWalletDatabase>().database;

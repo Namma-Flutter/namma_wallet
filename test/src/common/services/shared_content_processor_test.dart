@@ -5,7 +5,7 @@ import 'package:namma_wallet/src/common/enums/ticket_type.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
 import 'package:namma_wallet/src/features/receive/application/shared_content_processor.dart';
 import 'package:namma_wallet/src/features/receive/domain/shared_content_result.dart';
-import 'package:namma_wallet/src/features/travel/application/travel_parser_service.dart';
+import 'package:namma_wallet/src/features/travel/application/travel_parser_interface.dart';
 
 import '../../../helpers/fake_logger.dart';
 import '../../../helpers/mock_ticket_dao.dart';
@@ -316,7 +316,7 @@ void main() {
           );
 
           // Assert (Then)
-          expect(result, isNotNull);
+          expect(result, isA<ProcessingErrorResult>());
         },
       );
 
@@ -512,11 +512,10 @@ void main() {
           expect(createResult, isA<TicketCreatedResult>());
 
           // Arrange for update
-          final logger2 = getIt<ILogger>();
           final updateProcessor = SharedContentProcessor(
-            logger: logger2,
+            logger: logger,
             travelParser: MockTravelParserService(
-              logger: logger2,
+              logger: logger,
               mockUpdateInfo: TicketUpdateInfo(
                 pnrNumber: 'T12345678',
                 providerName: 'TNSTC',

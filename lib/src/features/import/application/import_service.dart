@@ -29,7 +29,7 @@ class ImportService implements IImportService {
   final IIRCTCScannerService _irctcScannerService;
 
   @override
-  List<String> get supportedExtensions => ['pdf'];
+  List<String> get supportedExtensions => const ['pdf'];
 
   @override
   bool isSupportedQRCode(String qrData) {
@@ -80,7 +80,7 @@ class ImportService implements IImportService {
       _logger.info('Importing QR code data');
 
       // Check if it's an IRCTC QR code
-      if (!_qrParser.isIRCTCQRCode(qrData)) {
+      if (!isSupportedQRCode(qrData)) {
         _logger.warning('QR code format not supported');
         return null;
       }

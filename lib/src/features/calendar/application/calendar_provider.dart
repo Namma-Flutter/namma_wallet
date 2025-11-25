@@ -42,7 +42,6 @@ class CalendarProvider extends ChangeNotifier {
 
     // Load tickets from database
     await loadTickets();
-    notifyListeners();
   }
 
   Future<void> loadTickets() async {
@@ -63,40 +62,15 @@ class CalendarProvider extends ChangeNotifier {
 
   List<Ticket> getTicketsForDay(DateTime day) {
     return _tickets.where((ticket) {
-      try {
-        return isSameDay(ticket.startTime, day);
-      } on FormatException catch (e) {
-        _logger.debug(
-          'Invalid journeyDate format for ticket filtering: '
-          '${ticket.startTime} - $e',
-        );
-        return false;
-      } on Exception catch (e, st) {
-        _logger.debug(
-          'Error parsing journeyDate for ticket filtering: $e\n$st',
-        );
-        return false;
-      }
+      return isSameDay(ticket.startTime, day);
     }).toList();
   }
 
   List<DateTime> getDatesWithTickets() {
     final dates = <DateTime>[];
     for (final ticket in _tickets) {
-      try {
-        if (!dates.any((d) => isSameDay(d, ticket.startTime))) {
-          dates.add(ticket.startTime);
-        }
-      } on FormatException catch (e) {
-        _logger.debug(
-          'Invalid journeyDate format for date collection: '
-          '${ticket.startTime} - $e',
-        );
-        // Skip invalid dates
-      } on Exception catch (e, st) {
-        _logger.debug(
-          'Error parsing journeyDate for date collection: $e\n$st',
-        );
+      if (!dates.any((d) => isSameDay(d, ticket.startTime))) {
+        dates.add(ticket.startTime);
       }
     }
     return dates;
@@ -108,30 +82,23 @@ class CalendarProvider extends ChangeNotifier {
 
   List<Ticket> getTicketsForRange(DateTimeRange range) {
     return _tickets.where((ticket) {
-      try {
-        final ticketDate = DateTime(
-          ticket.startTime.year,
-          ticket.startTime.month,
-          ticket.startTime.day,
-        );
-        final rangeStart = DateTime(
-          range.start.year,
-          range.start.month,
-          range.start.day,
-        );
-        final rangeEnd = DateTime(
-          range.end.year,
-          range.end.month,
-          range.end.day,
-        );
-        return ticketDate.compareTo(rangeStart) >= 0 &&
-            ticketDate.compareTo(rangeEnd) <= 0;
-      } on Exception catch (e, st) {
-        _logger.debug(
-          'Error parsing journeyDate for range filtering: $e\n$st',
-        );
-        return false;
-      }
+      final ticketDate = DateTime(
+        ticket.startTime.year,
+        ticket.startTime.month,
+        ticket.startTime.day,
+      );
+      final rangeStart = DateTime(
+        range.start.year,
+        range.start.month,
+        range.start.day,
+      );
+      final rangeEnd = DateTime(
+        range.end.year,
+        range.end.month,
+        range.end.day,
+      );
+      return ticketDate.compareTo(rangeStart) >= 0 &&
+          ticketDate.compareTo(rangeEnd) <= 0;
     }).toList();
   }
 

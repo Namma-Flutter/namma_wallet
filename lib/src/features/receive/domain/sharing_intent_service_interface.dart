@@ -39,5 +39,5 @@ abstract class ISharingIntentService {
   /// Dispose resources and cleanup.
   ///
   /// This should cancel any subscriptions and free resources.
-  void dispose();
+  Future<void> dispose();
 }

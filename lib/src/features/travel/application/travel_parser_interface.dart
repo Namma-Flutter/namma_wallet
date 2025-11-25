@@ -1,7 +1,18 @@
 import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 import 'package:namma_wallet/src/common/enums/source_type.dart';
-import 'package:namma_wallet/src/features/travel/application/travel_parser_service.dart'
-    show TicketUpdateInfo;
+
+/// Information about a ticket update (e.g., conductor details, vehicle number).
+class TicketUpdateInfo {
+  TicketUpdateInfo({
+    required this.pnrNumber,
+    required this.providerName,
+    required this.updates,
+  });
+
+  final String pnrNumber;
+  final String providerName;
+  final Map<String, Object?> updates;
+}
 
 /// Interface for travel ticket parsing service.
 ///

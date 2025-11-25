@@ -38,18 +38,16 @@ class SharingIntentService implements ISharingIntentService {
           },
         );
 
-    await ReceiveSharingIntent.instance
-        .getInitialMedia()
-        .then((List<SharedMediaFile> files) async {
-          if (files.isNotEmpty) {
-            _logger.info('App launched with shared content: ${files.length}');
-            await _handleSharedContent(files, onContentReceived, onError);
-          }
-        })
-        .catchError((Object error) {
-          _logger.error('Error getting initial shared content: $error');
-          onError('Error getting initial shared content: $error');
-        });
+    try {
+      final files = await ReceiveSharingIntent.instance.getInitialMedia();
+      if (files.isNotEmpty) {
+        _logger.info('App launched with shared content: ${files.length}');
+        await _handleSharedContent(files, onContentReceived, onError);
+      }
+    } on Object catch (error) {
+      _logger.error('Error getting initial shared content: $error');
+      onError('Error getting initial shared content: $error');
+    }
   }
 
   Future<void> _handleSharedContent(

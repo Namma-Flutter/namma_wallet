@@ -1,7 +1,23 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:get_it/get_it.dart';
+import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
 import 'package:namma_wallet/src/features/tnstc/application/tnstc_sms_parser.dart';
 
+import '../../../../helpers/fake_logger.dart';
+
 void main() {
+  // Set up GetIt for tests
+  setUp(() {
+    final getIt = GetIt.instance;
+    if (!getIt.isRegistered<ILogger>()) {
+      getIt.registerSingleton<ILogger>(FakeLogger());
+    }
+  });
+
+  tearDown(() async {
+    await GetIt.instance.reset();
+  });
+
   group('TNSTCSMSParser Tests', () {
     late TNSTCSMSParser parser;
 

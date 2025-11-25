@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
@@ -32,7 +31,7 @@ void main() {
 
     tearDown(() async {
       // Cleanup - Reset GetIt after each test
-      service.dispose();
+      await service.dispose();
       await getIt.reset();
     });
 
@@ -523,16 +522,18 @@ void main() {
       test(
         'Given service is disposed, When dispose is called again, '
         'Then does not throw error (idempotent)',
-        () {
+        () async {
           // Arrange (Given)
           final testService = SharingIntentService(
             logger: FakeLogger(),
             pdfService: MockPDFService(),
           );
-          unawaited(testService.dispose());
 
-          // Act (When) & Assert (Then)
-          expect(testService.dispose, returnsNormally);
+          // Act (When)
+          await testService.dispose(); // first dispose
+
+          // Assert (Then) - second dispose should complete without error
+          await expectLater(testService.dispose(), completes);
         },
       );
     });

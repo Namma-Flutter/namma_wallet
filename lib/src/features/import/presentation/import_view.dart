@@ -91,7 +91,7 @@ class _ImportViewState extends State<ImportView> {
           );
         }
       }
-    } on Object {
+    } on Exception {
       if (mounted) {
         PdfResultHandler.showErrorMessage(
           context,
