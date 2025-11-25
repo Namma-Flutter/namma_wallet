@@ -234,12 +234,17 @@ class TravelTicketCardWidget extends StatelessWidget {
               }(),
 
               //* Date - Time
-              TravelRowWidget(
-                title1: 'Journey Date',
-                title2: 'Time',
-                value1: DateTimeConverter.instance.formatDate(ticket.startTime),
-                value2: DateTimeConverter.instance.formatTime(ticket.startTime),
-              ),
+              if (ticket.startTime != null)
+                TravelRowWidget(
+                  title1: 'Journey Date',
+                  title2: 'Time',
+                  value1: DateTimeConverter.instance.formatDate(
+                    ticket.startTime!,
+                  ),
+                  value2: DateTimeConverter.instance.formatTime(
+                    ticket.startTime!,
+                  ),
+                ),
             ],
           ),
 

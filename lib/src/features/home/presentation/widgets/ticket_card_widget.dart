@@ -72,25 +72,26 @@ class EventTicketCardWidget extends StatelessWidget {
                       ),
 
                       //* Date & Time
-                      Row(
-                        children: [
-                          Text(
-                            // ticket.dateTime?.toString() ?? 'xxx xxx',
-                            DateTimeConverter.instance.formatDate(
-                              ticket.startTime,
+                      if (ticket.startTime != null)
+                        Row(
+                          children: [
+                            Text(
+                              // ticket.dateTime?.toString() ?? 'xxx xxx',
+                              DateTimeConverter.instance.formatDate(
+                                ticket.startTime!,
+                              ),
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.onSurface,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
                             ),
-                            style: TextStyle(
-                              color: Theme.of(context).colorScheme.onSurface,
-                            ),
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
-                          ),
-                          const Text(' - '),
-                          Text(
-                            // ticket.dateTime?.toString() ?? 'xxx xxx',
-                            DateTimeConverter.instance.formatTime(
-                              ticket.startTime,
-                            ),
+                            const Text(' - '),
+                            Text(
+                              // ticket.dateTime?.toString() ?? 'xxx xxx',
+                              DateTimeConverter.instance.formatTime(
+                                ticket.startTime!,
+                              ),
                             style: TextStyle(
                               color: Theme.of(context).colorScheme.onSurface,
                             ),
