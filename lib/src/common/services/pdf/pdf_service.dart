@@ -1,8 +1,8 @@
 import 'dart:io';
 
 import 'package:namma_wallet/src/common/services/logger_interface.dart';
-import 'package:namma_wallet/src/features/tnstc/domain/ocr_service_interface.dart';
-import 'package:namma_wallet/src/features/tnstc/domain/pdf_service_interface.dart';
+import 'package:namma_wallet/src/common/services/ocr/ocr_service_interface.dart';
+import 'package:namma_wallet/src/common/services/pdf/pdf_service_interface.dart';
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 
 class PDFService implements IPDFService {
@@ -144,35 +144,10 @@ class PDFService implements IPDFService {
     // Remove excessive newlines but preserve structure
     cleanedText = cleanedText.replaceAll(RegExp(r'\n{3,}'), '\n\n');
 
+    // Normalize "key : value" patterns to "key: value"
     cleanedText = cleanedText.replaceAllMapped(
       RegExp(r'(\w+)\s+:\s*'),
       (match) => '${match.group(1)}: ',
-    );
-
-    // Sometimes values get split across lines - try to rejoin obvious cases
-    cleanedText = cleanedText.replaceAllMapped(
-      RegExp(r'Corporation\s*:\s*\n([A-Z\s]+)\n'),
-      (match) => 'Corporation: ${match.group(1)}\n',
-    );
-    cleanedText = cleanedText.replaceAllMapped(
-      RegExp(r'Service Start Place\s*:\s*\n([A-Z\s.-]+)\n'),
-      (match) => 'Service Start Place: ${match.group(1)}\n',
-    );
-    cleanedText = cleanedText.replaceAllMapped(
-      RegExp(r'Service End Place\s*:\s*\n([A-Z\s.-]+)\n'),
-      (match) => 'Service End Place: ${match.group(1)}\n',
-    );
-    cleanedText = cleanedText.replaceAllMapped(
-      RegExp(r'Passenger Start Place\s*:\s*\n([A-Z\s.-]+)\n'),
-      (match) => 'Passenger Start Place: ${match.group(1)}\n',
-    );
-    cleanedText = cleanedText.replaceAllMapped(
-      RegExp(r'Passenger End Place\s*:\s*\n([A-Z\s.-]+)\n'),
-      (match) => 'Passenger End Place: ${match.group(1)}\n',
-    );
-    cleanedText = cleanedText.replaceAllMapped(
-      RegExp(r'Passenger Pickup Point\s*:\s*\n([A-Z\s.\-()]+)\n'),
-      (match) => 'Passenger Pickup Point: ${match.group(1)}\n',
     );
 
     // Clean up any remaining extra whitespace
