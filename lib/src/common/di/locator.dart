@@ -25,6 +25,7 @@ import 'package:namma_wallet/src/features/irctc/application/irctc_qr_parser_inte
 import 'package:namma_wallet/src/features/irctc/application/irctc_scanner_service.dart';
 import 'package:namma_wallet/src/features/irctc/application/irctc_scanner_service_interface.dart';
 import 'package:namma_wallet/src/features/receive/application/shared_content_processor.dart';
+import 'package:namma_wallet/src/features/receive/application/shared_content_processor_interface.dart';
 import 'package:namma_wallet/src/features/receive/application/sharing_intent_service.dart';
 import 'package:namma_wallet/src/features/receive/domain/sharing_intent_service_interface.dart';
 import 'package:namma_wallet/src/features/tnstc/application/ticket_parser_interface.dart';
@@ -73,7 +74,7 @@ void setupLocator() {
         pdfService: getIt<IPDFService>(),
       ),
     )
-    ..registerLazySingleton<SharedContentProcessor>(
+    ..registerLazySingleton<ISharedContentProcessor>(
       () => SharedContentProcessor(
         logger: getIt<ILogger>(),
         travelParser: getIt<ITravelParser>(),
