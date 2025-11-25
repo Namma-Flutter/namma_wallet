@@ -10,8 +10,9 @@ import 'package:namma_wallet/src/features/travel/application/travel_sms_parser.d
 /// **Error Handling:**
 /// - Never throws exceptions
 /// - Returns a [Ticket] with partial data on parsing errors
-/// - Missing/invalid fields use fallbacks: 'Unknown', DateTime.now(), etc.
-/// - Conversion via [Ticket.fromTNSTC] is guaranteed not to throw
+/// - Missing/invalid fields use fallbacks: 'Unknown', null for dates, etc.
+/// - Conversion via [Ticket.fromTNSTC] handles null dates with
+///   DateTime.now() fallback
 class TNSTCSMSParser extends TravelSMSParser {
   @override
   Ticket parseTicket(String smsText) {
@@ -21,7 +22,7 @@ class TNSTCSMSParser extends TravelSMSParser {
       r'(?:PNR NO\.\s*|PNR)\s*:\s*([^,\s]+)',
       smsText,
     );
-    // Falls back to DateTime.now() if date is missing or malformed.
+    // Parse journey date - falls back to null if date is missing or malformed.
     final journeyDate = parseDate(
       extractMatch(
         r'(?:Journey Date|DOJ)\s*:\s*(\d{2}/\d{2}/\d{4})',

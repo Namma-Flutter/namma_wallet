@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:namma_wallet/src/common/theme/styles.dart';
 
@@ -49,17 +51,16 @@ class _NavButtonState extends State<NavButton>
     super.dispose();
   }
 
-  Future<void> _onTapDown(TapDownDetails details) async {
-    await _pressController.forward();
+  void _onTapDown(TapDownDetails details) {
+    unawaited(_pressController.forward());
   }
 
-  Future<void> _onTapUp(TapUpDetails details) async {
-    await _pressController.reverse();
-    widget.onTap();
+  void _onTapUp(TapUpDetails details) {
+    unawaited(_pressController.reverse().then((_) => widget.onTap()));
   }
 
-  Future<void> _onTapCancel() async {
-    await _pressController.reverse();
+  void _onTapCancel() {
+    unawaited(_pressController.reverse());
   }
 
   @override

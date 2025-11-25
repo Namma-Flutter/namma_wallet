@@ -28,14 +28,19 @@ class ThemeProvider extends ChangeNotifier {
 
   /// Load saved theme preference from shared preferences
   Future<void> _loadThemePreference() async {
-    final prefs = await SharedPreferences.getInstance();
-    final stored = prefs.getInt(_themePreferenceKey);
-    final idx =
-        (stored != null && stored >= 0 && stored < ThemeMode.values.length)
-        ? stored
-        : 0;
-    _themeMode = ThemeMode.values[idx];
-    notifyListeners();
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final stored = prefs.getInt(_themePreferenceKey);
+      final idx =
+          (stored != null && stored >= 0 && stored < ThemeMode.values.length)
+          ? stored
+          : 0;
+      _themeMode = ThemeMode.values[idx];
+      notifyListeners();
+    } on Exception catch (e, stackTrace) {
+      debugPrint('Failed to load theme preference: $e\n$stackTrace');
+      // Fall back to default system theme (no notifyListeners needed)
+    }
   }
 
   /// Save theme preference to shared preferences

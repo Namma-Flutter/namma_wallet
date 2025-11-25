@@ -27,10 +27,13 @@ class TravelTextParserUtils {
 
   /// Parses a date string in DD/MM/YYYY or DD-MM-YYYY format.
   ///
-  /// Returns the parsed [DateTime] or [DateTime.now()] as fallback on error.
+  /// Returns the parsed [DateTime] or null if parsing fails.
   /// Logs warnings for invalid date formats.
-  static DateTime parseDate(String date, {required ILogger logger}) {
-    if (date.isEmpty) return DateTime.now();
+  static DateTime? parseDate(String date, {required ILogger logger}) {
+    if (date.isEmpty) {
+      logger.warning('Empty date string provided');
+      return null;
+    }
 
     // Handle both '-' and '/' separators
     final parts = date.contains('/') ? date.split('/') : date.split('-');
@@ -38,7 +41,7 @@ class TravelTextParserUtils {
       logger.warning(
         'Invalid date format encountered: $date',
       );
-      return DateTime.now();
+      return null;
     }
 
     try {
@@ -48,21 +51,24 @@ class TravelTextParserUtils {
       return DateTime(year, month, day);
     } on FormatException catch (e) {
       logger.warning('Failed to parse date: $e');
-      return DateTime.now();
+      return null;
     }
   }
 
   /// Parses a datetime string in "DD/MM/YYYY HH:mm" or "DD-MM-YYYY HH:mm Hrs." format.
   ///
-  /// Returns the parsed [DateTime] or [DateTime.now()] as fallback on error.
+  /// Returns the parsed [DateTime] or null if parsing fails.
   /// Logs warnings for invalid datetime formats.
-  static DateTime parseDateTime(String dateTime, {required ILogger logger}) {
-    if (dateTime.isEmpty) return DateTime.now();
+  static DateTime? parseDateTime(String dateTime, {required ILogger logger}) {
+    if (dateTime.isEmpty) {
+      logger.warning('Empty datetime string provided');
+      return null;
+    }
 
     final parts = dateTime.split(' '); // Split into date and time
     if (parts.length < 2) {
       logger.warning('Invalid datetime format encountered: $dateTime');
-      return DateTime.now();
+      return null;
     }
 
     try {
@@ -72,7 +78,7 @@ class TravelTextParserUtils {
           : parts[0].split('-');
       if (dateParts.length != 3) {
         logger.warning('Invalid date part in datetime: $dateTime');
-        return DateTime.now();
+        return null;
       }
 
       final day = int.parse(dateParts[0]);
@@ -84,7 +90,7 @@ class TravelTextParserUtils {
       final timeParts = timePart.split(':'); // Split the time by ':'
       if (timeParts.length != 2) {
         logger.warning('Invalid time part in datetime: $dateTime');
-        return DateTime.now();
+        return null;
       }
 
       final hour = int.parse(timeParts[0]);
@@ -93,7 +99,7 @@ class TravelTextParserUtils {
       return DateTime(year, month, day, hour, minute);
     } on FormatException catch (e) {
       logger.warning('Failed to parse datetime: $e');
-      return DateTime.now();
+      return null;
     }
   }
 

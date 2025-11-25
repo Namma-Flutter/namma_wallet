@@ -1,6 +1,7 @@
 import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 import 'package:namma_wallet/src/common/enums/source_type.dart';
-import 'package:namma_wallet/src/features/travel/application/travel_parser_service.dart';
+import 'package:namma_wallet/src/features/travel/application/travel_parser_service.dart'
+    show TicketUpdateInfo;
 
 /// Interface for travel ticket parsing service.
 ///
@@ -12,7 +13,7 @@ abstract interface class ITravelParser {
   /// Logs success/failure outcomes.
   Ticket? parseTicketFromText(
     String text, {
-    SourceType sourceType,
+    SourceType? sourceType,
   });
 
   /// Checks if the text is an update SMS (conductor details, bus info, etc.).
