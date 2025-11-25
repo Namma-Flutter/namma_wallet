@@ -1,10 +1,10 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
+import 'package:namma_wallet/src/common/domain/models/ticket.dart';
+import 'package:namma_wallet/src/common/enums/ticket_type.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
 import 'package:namma_wallet/src/features/receive/application/shared_content_processor.dart';
 import 'package:namma_wallet/src/features/receive/domain/shared_content_result.dart';
-import 'package:namma_wallet/src/features/tnstc/application/tnstc_pdf_parser.dart';
-import 'package:namma_wallet/src/features/tnstc/application/tnstc_sms_parser.dart';
 import 'package:namma_wallet/src/features/travel/application/travel_parser_service.dart';
 
 import '../../../helpers/fake_logger.dart';
@@ -20,9 +20,7 @@ void main() {
       final logger = FakeLogger();
       getIt
         ..pushNewScope()
-        ..registerSingleton<ILogger>(logger)
-        ..registerSingleton<TNSTCSMSParser>(TNSTCSMSParser())
-        ..registerSingleton<TNSTCPDFParser>(TNSTCPDFParser(logger: logger));
+        ..registerSingleton<ILogger>(logger);
     });
 
     tearDown(() async {
@@ -37,13 +35,9 @@ void main() {
         () async {
           // Arrange (Given)
           final logger = getIt<ILogger>();
-          final smsParser = getIt<TNSTCSMSParser>();
-          final pdfParser = getIt<TNSTCPDFParser>();
           final processor = SharedContentProcessor(
             logger: logger,
             travelParser: MockTravelParserService(logger: logger),
-            smsParser: smsParser,
-            pdfParser: pdfParser,
             ticketDao: MockTicketDAO(),
           );
 
@@ -70,17 +64,13 @@ void main() {
 
       test(
         'Given empty content, When processing content, '
-        'Then returns TicketCreatedResult with defaults',
+        'Then returns ProcessingErrorResult',
         () async {
           // Arrange (Given)
           final logger = getIt<ILogger>();
-          final smsParser = getIt<TNSTCSMSParser>();
-          final pdfParser = getIt<TNSTCPDFParser>();
           final processor = SharedContentProcessor(
             logger: logger,
             travelParser: MockTravelParserService(logger: logger),
-            smsParser: smsParser,
-            pdfParser: pdfParser,
             ticketDao: MockTicketDAO(),
           );
 
@@ -94,7 +84,7 @@ void main() {
           expect(result, isA<ProcessingErrorResult>());
           expect(
             (result as ProcessingErrorResult).error,
-            contains('Missing ticketId'),
+            contains('No supported ticket format found'),
           );
         },
       );
@@ -105,13 +95,9 @@ void main() {
         () async {
           // Arrange (Given)
           final logger = getIt<ILogger>();
-          final smsParser = getIt<TNSTCSMSParser>();
-          final pdfParser = getIt<TNSTCPDFParser>();
           final processor = SharedContentProcessor(
             logger: logger,
             travelParser: MockTravelParserService(logger: logger),
-            smsParser: smsParser,
-            pdfParser: pdfParser,
             ticketDao: MockTicketDAO(),
           );
 
@@ -127,7 +113,7 @@ void main() {
           expect(result, isA<ProcessingErrorResult>());
           expect(
             (result as ProcessingErrorResult).error,
-            contains('Missing ticketId'),
+            contains('No supported ticket format found'),
           );
         },
       );
@@ -150,16 +136,12 @@ void main() {
           );
 
           final logger = getIt<ILogger>();
-          final smsParser = getIt<TNSTCSMSParser>();
-          final pdfParser = getIt<TNSTCPDFParser>();
           final processor = SharedContentProcessor(
             logger: logger,
             travelParser: MockTravelParserService(
               logger: logger,
               mockUpdateInfo: mockUpdateInfo,
             ),
-            smsParser: smsParser,
-            pdfParser: pdfParser,
             ticketDao: MockTicketDAO(),
           );
 
@@ -195,16 +177,12 @@ void main() {
           );
 
           final logger = getIt<ILogger>();
-          final smsParser = getIt<TNSTCSMSParser>();
-          final pdfParser = getIt<TNSTCPDFParser>();
           final processor = SharedContentProcessor(
             logger: logger,
             travelParser: MockTravelParserService(
               logger: logger,
               mockUpdateInfo: mockUpdateInfo,
             ),
-            smsParser: smsParser,
-            pdfParser: pdfParser,
             ticketDao: MockTicketDAO(updateReturnCount: 0),
           );
 
@@ -244,16 +222,12 @@ void main() {
           );
 
           final logger = getIt<ILogger>();
-          final smsParser = getIt<TNSTCSMSParser>();
-          final pdfParser = getIt<TNSTCPDFParser>();
           final processor = SharedContentProcessor(
             logger: logger,
             travelParser: MockTravelParserService(
               logger: logger,
               mockUpdateInfo: mockUpdateInfo,
             ),
-            smsParser: smsParser,
-            pdfParser: pdfParser,
             ticketDao: mockDao,
           );
 
@@ -298,16 +272,12 @@ void main() {
           );
 
           final logger = getIt<ILogger>();
-          final smsParser = getIt<TNSTCSMSParser>();
-          final pdfParser = getIt<TNSTCPDFParser>();
           final processor = SharedContentProcessor(
             logger: logger,
             travelParser: MockTravelParserService(
               logger: logger,
               mockUpdateInfo: mockUpdateInfo,
             ),
-            smsParser: smsParser,
-            pdfParser: pdfParser,
             ticketDao: MockTicketDAO(shouldThrowOnUpdate: true),
           );
 
@@ -333,13 +303,9 @@ void main() {
         () async {
           // Arrange (Given)
           final logger = getIt<ILogger>();
-          final smsParser = getIt<TNSTCSMSParser>();
-          final pdfParser = getIt<TNSTCPDFParser>();
           final processor = SharedContentProcessor(
             logger: logger,
             travelParser: MockTravelParserService(logger: logger),
-            smsParser: smsParser,
-            pdfParser: pdfParser,
             ticketDao: MockTicketDAO(),
           );
 
@@ -360,13 +326,9 @@ void main() {
         () async {
           // Arrange (Given)
           final logger = getIt<ILogger>();
-          final smsParser = getIt<TNSTCSMSParser>();
-          final pdfParser = getIt<TNSTCPDFParser>();
           final processor = SharedContentProcessor(
             logger: logger,
             travelParser: MockTravelParserService(logger: logger),
-            smsParser: smsParser,
-            pdfParser: pdfParser,
             ticketDao: MockTicketDAO(),
           );
 
@@ -388,13 +350,19 @@ void main() {
         () async {
           // Arrange (Given)
           final logger = getIt<ILogger>();
-          final smsParser = getIt<TNSTCSMSParser>();
-          final pdfParser = getIt<TNSTCPDFParser>();
           final processor = SharedContentProcessor(
             logger: logger,
-            travelParser: MockTravelParserService(logger: logger),
-            smsParser: smsParser,
-            pdfParser: pdfParser,
+            travelParser: MockTravelParserService(
+              logger: logger,
+              // Return a ticket with null ticketId
+              mockTicket: Ticket(
+                primaryText: 'Test → Test',
+                secondaryText: 'Test Bus',
+                startTime: DateTime.now(),
+                location: 'Test',
+                type: TicketType.bus,
+              ),
+            ),
             ticketDao: MockTicketDAO(),
           );
 
@@ -523,13 +491,9 @@ void main() {
           // Arrange (Given)
           final mockDao = MockTicketDAO();
           final logger = getIt<ILogger>();
-          final smsParser = getIt<TNSTCSMSParser>();
-          final pdfParser = getIt<TNSTCPDFParser>();
           final processor = SharedContentProcessor(
             logger: logger,
             travelParser: MockTravelParserService(logger: logger),
-            smsParser: smsParser,
-            pdfParser: pdfParser,
             ticketDao: mockDao,
           );
 
@@ -549,8 +513,6 @@ void main() {
 
           // Arrange for update
           final logger2 = getIt<ILogger>();
-          final smsParser2 = getIt<TNSTCSMSParser>();
-          final pdfParser2 = getIt<TNSTCPDFParser>();
           final updateProcessor = SharedContentProcessor(
             logger: logger2,
             travelParser: MockTravelParserService(
@@ -561,8 +523,6 @@ void main() {
                 updates: {'conductorContact': '9876543210'},
               ),
             ),
-            smsParser: smsParser2,
-            pdfParser: pdfParser2,
             ticketDao: mockDao,
           );
 
@@ -586,28 +546,28 @@ void main() {
         () async {
           // Arrange (Given)
           final logger = getIt<ILogger>();
-          final smsParser = getIt<TNSTCSMSParser>();
-          final pdfParser = getIt<TNSTCPDFParser>();
           final processor1 = SharedContentProcessor(
             logger: logger,
             travelParser: MockTravelParserService(logger: logger),
-            smsParser: smsParser,
-            pdfParser: pdfParser,
             ticketDao: MockTicketDAO(),
           );
 
           final processor2 = SharedContentProcessor(
             logger: logger,
             travelParser: MockTravelParserService(logger: logger),
-            smsParser: smsParser,
-            pdfParser: pdfParser,
             ticketDao: MockTicketDAO(),
           );
 
-          // Act (When) - Process concurrently
+          // Act (When) - Process concurrently with proper PNR format
           final results = await Future.wait([
-            processor1.processContent('PNR: T11111111', SharedContentType.sms),
-            processor2.processContent('PNR: T22222222', SharedContentType.sms),
+            processor1.processContent(
+              'PNR NO: T11111111, From: Chennai To Bangalore',
+              SharedContentType.sms,
+            ),
+            processor2.processContent(
+              'PNR NO: T22222222, From: Mumbai To Pune',
+              SharedContentType.sms,
+            ),
           ]);
 
           // Assert (Then)

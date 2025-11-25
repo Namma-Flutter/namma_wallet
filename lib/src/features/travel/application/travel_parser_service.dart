@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:namma_wallet/src/common/domain/models/extras_model.dart';
 import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 import 'package:namma_wallet/src/common/enums/source_type.dart';
 import 'package:namma_wallet/src/common/enums/ticket_type.dart';
@@ -179,6 +180,176 @@ class TNSTCBusParser implements TravelTicketParser {
   }
 }
 
+class IRCTCTrainParser implements TravelTicketParser {
+  IRCTCTrainParser();
+
+  @override
+  String get providerName => 'IRCTC';
+
+  @override
+  TicketType get ticketType => TicketType.train;
+
+  @override
+  bool canParse(String text) {
+    final patterns = [
+      'IRCTC',
+      'PNR No.',
+      'Train No.',
+      'Train Name',
+      'Boarding Point',
+      'Reservation Upto',
+      'Scheduled Departure',
+    ];
+    return patterns.any(
+      (pattern) => text.toLowerCase().contains(pattern.toLowerCase()),
+    );
+  }
+
+  @override
+  Ticket parseTicket(String text) {
+    // For now, create a basic IRCTC ticket
+    // TODO(keerthivasan): Implement proper IRCTC text parsing if needed
+    // Currently IRCTC tickets are primarily handled via QR codes
+
+    // Extract PNR number
+    final pnrMatch = RegExp(
+      r'PNR No\.\s*:\s*([A-Z0-9]+)',
+      caseSensitive: false,
+    ).firstMatch(text);
+
+    final pnrNumber = pnrMatch?.group(1) ?? 'Unknown';
+
+    // Extract train information
+    final trainNumberMatch = RegExp(
+      r'Train No\.\s*:\s*(\d+)',
+      caseSensitive: false,
+    ).firstMatch(text);
+
+    final trainNameMatch = RegExp(
+      r'Train Name\s*:\s*([A-Za-z\s]+)',
+      caseSensitive: false,
+    ).firstMatch(text);
+
+    // Extract passenger name
+    final passengerNameMatch = RegExp(
+      r'Passenger Name\s*:\s*([A-Za-z\s]+)',
+      caseSensitive: false,
+    ).firstMatch(text);
+
+    // Extract journey date
+    final dateMatch = RegExp(
+      r'Date of Journey\s*:\s*(\d{2}\/\d{2}\/\d{4})',
+      caseSensitive: false,
+    ).firstMatch(text);
+
+    DateTime? journeyDate;
+    if (dateMatch != null) {
+      try {
+        final dateStr = dateMatch.group(1)!;
+        journeyDate = DateTime.parse(
+          '${dateStr.substring(6, 10)}-${dateStr.substring(3, 5)}'
+          '-${dateStr.substring(0, 2)}',
+        );
+      } on FormatException {
+        journeyDate = null;
+      }
+    }
+
+    // Extract from/to stations
+    final fromMatch = RegExp(
+      r'Boarding Point\s*:\s*([A-Za-z\s]+)',
+      caseSensitive: false,
+    ).firstMatch(text);
+
+    final toMatch = RegExp(
+      r'Reservation Upto\s*:\s*([A-Za-z\s]+)',
+      caseSensitive: false,
+    ).firstMatch(text);
+
+    final primaryText =
+        trainNameMatch?.group(1)?.trim() ?? 'IRCTC Train Ticket';
+    final fromStation = fromMatch?.group(1)?.trim() ?? '';
+    final toStation = toMatch?.group(1)?.trim() ?? '';
+    final secondaryText = '$fromStation to $toStation';
+
+    final extras = <ExtrasModel>[
+      ExtrasModel(title: 'PNR Number', value: pnrNumber),
+      if (trainNumberMatch != null)
+        ExtrasModel(title: 'Train Number', value: trainNumberMatch.group(1)!),
+      if (passengerNameMatch != null)
+        ExtrasModel(
+          title: 'Passenger Name',
+          value: passengerNameMatch.group(1)!.trim(),
+        ),
+      if (journeyDate != null)
+        ExtrasModel(
+          title: 'Journey Date',
+          value: journeyDate.toString().split(' ')[0],
+        ),
+      ExtrasModel(title: 'Source Type', value: 'Text'),
+      ExtrasModel(title: 'Provider', value: 'IRCTC'),
+    ];
+
+    return Ticket(
+      ticketId: pnrNumber,
+      primaryText: primaryText,
+      secondaryText: secondaryText.trim(),
+      startTime: journeyDate ?? DateTime.now(),
+      location: fromMatch?.group(1)?.trim() ?? 'Unknown',
+      extras: extras,
+    );
+  }
+
+  @override
+  TicketUpdateInfo? parseUpdate(String text) => null;
+}
+
+class SETCBusParser implements TravelTicketParser {
+  SETCBusParser();
+
+  @override
+  String get providerName => 'SETC';
+
+  @override
+  TicketType get ticketType => TicketType.bus;
+
+  @override
+  bool canParse(String text) {
+    // SETC-specific patterns (without TNSTC)
+    final setcPatterns = [
+      'SETC',
+      'South Tamil Nadu',
+    ];
+
+    // Check if it contains SETC but not TNSTC
+    final hasSETC = setcPatterns.any(
+      (pattern) => text.toUpperCase().contains(pattern),
+    );
+    final hasTNSTC = text.toUpperCase().contains('TNSTC');
+
+    return hasSETC && !hasTNSTC;
+  }
+
+  @override
+  Ticket parseTicket(String text) {
+    // SETC tickets use the same format as TNSTC SMS
+    // Just delegate to the existing TNSTC SMS parser
+    final smsParser = TNSTCSMSParser();
+    final ticket = smsParser.parseTicket(text);
+
+    // Update the provider name to SETC
+    return ticket.copyWith(
+      extras: [
+        ...?ticket.extras,
+        ExtrasModel(title: 'Provider', value: 'SETC'),
+      ],
+    );
+  }
+
+  @override
+  TicketUpdateInfo? parseUpdate(String text) => null;
+}
+
 class TicketUpdateInfo {
   TicketUpdateInfo({
     required this.pnrNumber,
@@ -196,6 +367,8 @@ class TravelParserService implements ITravelParser {
     : _logger = logger,
       _parsers = [
         TNSTCBusParser(logger: logger),
+        SETCBusParser(),
+        IRCTCTrainParser(),
       ];
   final ILogger _logger;
   final List<TravelTicketParser> _parsers;

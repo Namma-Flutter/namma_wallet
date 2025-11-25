@@ -1,4 +1,5 @@
 import 'package:namma_wallet/src/features/tnstc/application/ticket_parser_interface.dart';
+import 'package:namma_wallet/src/features/travel/application/travel_text_parser_utils.dart';
 
 /// Base class for travel ticket SMS parsers.
 ///
@@ -9,20 +10,20 @@ abstract class TravelSMSParser implements ITicketParser {
   /// Extracts text matching a regex pattern from input.
   ///
   /// Returns the matched group (default: group 1) or empty string if no match.
-  /// This is a common utility for parsing structured text data.
+  /// Uses shared utility for consistency across all parsers.
   String extractMatch(String pattern, String input, {int groupIndex = 1}) {
-    final regex = RegExp(pattern, multiLine: true);
-    final match = regex.firstMatch(input);
-    if (match != null && groupIndex <= match.groupCount) {
-      return match.group(groupIndex)?.trim() ?? '';
-    }
-    return '';
+    return TravelTextParserUtils.extractMatch(
+      pattern,
+      input,
+      groupIndex: groupIndex,
+    );
   }
 
   /// Parses a date string in DD/MM/YYYY format.
   ///
   /// Returns the parsed [DateTime] or [DateTime.now()] as fallback on error.
   /// SMS dates are typically in DD/MM/YYYY format.
+  /// Uses shared utility for consistency across all parsers.
   DateTime parseDate(String date) {
     if (date.isEmpty) return DateTime.now();
     final parts = date.split('/');
@@ -40,16 +41,16 @@ abstract class TravelSMSParser implements ITicketParser {
   /// Safely parses an integer from a string.
   ///
   /// Returns the parsed integer or [defaultValue] if parsing fails.
+  /// Uses shared utility for consistency across all parsers.
   int parseInt(String value, {int defaultValue = 0}) {
-    if (value.isEmpty) return defaultValue;
-    return int.tryParse(value) ?? defaultValue;
+    return TravelTextParserUtils.parseInt(value, defaultValue: defaultValue);
   }
 
   /// Safely parses a double from a string.
   ///
   /// Returns the parsed double or [defaultValue] if parsing fails.
+  /// Uses shared utility for consistency across all parsers.
   double parseDouble(String value, {double defaultValue = 0.0}) {
-    if (value.isEmpty) return defaultValue;
-    return double.tryParse(value) ?? defaultValue;
+    return TravelTextParserUtils.parseDouble(value, defaultValue: defaultValue);
   }
 }

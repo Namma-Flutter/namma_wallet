@@ -1,10 +1,9 @@
 import 'package:namma_wallet/src/common/database/ticket_dao_interface.dart';
 import 'package:namma_wallet/src/common/domain/models/ticket.dart';
+import 'package:namma_wallet/src/common/enums/source_type.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
 import 'package:namma_wallet/src/features/home/domain/ticket_extensions.dart';
 import 'package:namma_wallet/src/features/receive/domain/shared_content_result.dart';
-import 'package:namma_wallet/src/features/tnstc/application/ticket_parser_interface.dart';
-import 'package:namma_wallet/src/features/tnstc/application/tnstc_sms_parser.dart';
 import 'package:namma_wallet/src/features/travel/application/travel_parser_interface.dart';
 
 /// Content type for shared content
@@ -27,19 +26,13 @@ class SharedContentProcessor {
   SharedContentProcessor({
     required ILogger logger,
     required ITravelParser travelParser,
-    required TNSTCSMSParser smsParser,
-    required ITicketParser pdfParser,
     required ITicketDAO ticketDao,
   }) : _logger = logger,
        _travelParserService = travelParser,
-       _smsParser = smsParser,
-       _pdfParser = pdfParser,
        _ticketDao = ticketDao;
 
   final ILogger _logger;
   final ITravelParser _travelParserService;
-  final TNSTCSMSParser _smsParser;
-  final ITicketParser _pdfParser;
   final ITicketDAO _ticketDao;
 
   /// Process shared content and return the result
@@ -98,10 +91,24 @@ class SharedContentProcessor {
       }
 
       // If it's not an update SMS, proceed with parsing as a new ticket.
-      // Use the appropriate parser based on content type
-      final ticket = contentType == SharedContentType.pdf
-          ? _pdfParser.parseTicket(content)
-          : _smsParser.parseTicket(content);
+      // Use the travel parser service with appropriate source type
+      final sourceType = contentType == SharedContentType.pdf
+          ? SourceType.pdf
+          : SourceType.sms;
+
+      final ticket = _travelParserService.parseTicketFromText(
+        content,
+        sourceType: sourceType,
+      );
+
+      if (ticket == null) {
+        _logger.warning('Failed to parse shared content as travel ticket');
+        return const ProcessingErrorResult(
+          message: 'Failed to parse content as travel ticket',
+          error: 'No supported ticket format found',
+        );
+      }
+
       await _insertOrUpdateTicket(ticket);
 
       final contentSource = contentType == SharedContentType.pdf
