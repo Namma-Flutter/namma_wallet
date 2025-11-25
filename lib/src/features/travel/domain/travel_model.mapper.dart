@@ -245,3 +245,4 @@ class _TravelModelCopyWithImpl<$R, $Out>
     Then<$Out2, $R2> t,
   ) => _TravelModelCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }
+

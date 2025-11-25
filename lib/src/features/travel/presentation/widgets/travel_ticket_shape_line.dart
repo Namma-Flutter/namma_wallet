@@ -2,8 +2,8 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
-class CustomTicketShapeLine extends CustomPainter {
-  CustomTicketShapeLine({
+class TravelTicketShapeLine extends CustomPainter {
+  TravelTicketShapeLine({
     required this.backgroundColor,
     this.dashedLineColor,
   });
@@ -66,7 +66,7 @@ class CustomTicketShapeLine extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant CustomTicketShapeLine oldDelegate) =>
+  bool shouldRepaint(covariant TravelTicketShapeLine oldDelegate) =>
       backgroundColor != oldDelegate.backgroundColor ||
       dashedLineColor != oldDelegate.dashedLineColor;
 }
