@@ -1,11 +1,14 @@
 import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
+import 'package:namma_wallet/src/features/irctc/application/irctc_qr_parser_interface.dart';
 import 'package:namma_wallet/src/features/irctc/domain/irctc_ticket_model.dart';
+import 'package:namma_wallet/src/features/travel/application/travel_text_parser_utils.dart';
 
-class IRCTCQRParser {
+class IRCTCQRParser implements IIRCTCQRParser {
   IRCTCQRParser({ILogger? logger}) : _logger = logger ?? getIt<ILogger>();
   final ILogger _logger;
 
+  @override
   IRCTCTicket? parseQRCode(String qrData) {
     try {
       // Create a simple non-reversible hash for
@@ -65,13 +68,14 @@ class IRCTCQRParser {
 
   int _parseInt(String value) {
     if (value.isEmpty) return 0;
-    return int.tryParse(value.replaceAll(RegExp(r'[^\d]'), '')) ?? 0;
+    final cleanValue = value.replaceAll(RegExp(r'[^\d]'), '');
+    return TravelTextParserUtils.parseInt(cleanValue);
   }
 
   double _parseAmount(String value) {
     if (value.isEmpty) return 0;
     final cleanValue = value.replaceAll(RegExp(r'[^\d.]'), '');
-    return double.tryParse(cleanValue) ?? 0.0;
+    return TravelTextParserUtils.parseDouble(cleanValue);
   }
 
   DateTime _parseDateTime(String value) {
@@ -152,6 +156,7 @@ class IRCTCQRParser {
     return classData;
   }
 
+  @override
   bool isIRCTCQRCode(String qrData) {
     return qrData.contains('PNR No.:') ||
         qrData.contains('Train No.:') ||

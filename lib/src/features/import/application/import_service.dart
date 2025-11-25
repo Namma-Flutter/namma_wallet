@@ -5,8 +5,8 @@ import 'package:namma_wallet/src/common/enums/source_type.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
 import 'package:namma_wallet/src/common/services/pdf/pdf_service_interface.dart';
 import 'package:namma_wallet/src/features/import/application/import_service_interface.dart';
-import 'package:namma_wallet/src/features/irctc/application/irctc_qr_parser.dart';
-import 'package:namma_wallet/src/features/irctc/application/irctc_scanner_service.dart';
+import 'package:namma_wallet/src/features/irctc/application/irctc_qr_parser_interface.dart';
+import 'package:namma_wallet/src/features/irctc/application/irctc_scanner_service_interface.dart';
 import 'package:namma_wallet/src/features/travel/application/travel_parser_interface.dart';
 
 class ImportService implements IImportService {
@@ -14,8 +14,8 @@ class ImportService implements IImportService {
     required ILogger logger,
     required IPDFService pdfService,
     required ITravelParser travelParser,
-    required IRCTCQRParser qrParser,
-    required IRCTCScannerService irctcScannerService,
+    required IIRCTCQRParser qrParser,
+    required IIRCTCScannerService irctcScannerService,
   }) : _logger = logger,
        _pdfService = pdfService,
        _travelParser = travelParser,
@@ -25,8 +25,8 @@ class ImportService implements IImportService {
   final ILogger _logger;
   final IPDFService _pdfService;
   final ITravelParser _travelParser;
-  final IRCTCQRParser _qrParser;
-  final IRCTCScannerService _irctcScannerService;
+  final IIRCTCQRParser _qrParser;
+  final IIRCTCScannerService _irctcScannerService;
 
   @override
   List<String> get supportedExtensions => ['pdf'];

@@ -6,9 +6,9 @@ import 'package:talker_flutter/talker_flutter.dart';
 class NammaLogger implements ILogger {
   NammaLogger()
     : _talker = Talker(
-        settings: _getTalkerSettings(),
+        settings: _createTalkerSettings(),
         logger: TalkerLogger(
-          settings: _getTalkerLoggerSettings(),
+          settings: _createTalkerLoggerSettings(),
         ),
       ) {
     const mode = kDebugMode ? 'DEBUG' : 'PRODUCTION';
@@ -18,7 +18,7 @@ class NammaLogger implements ILogger {
   final Talker _talker;
 
   /// Get environment-specific Talker settings
-  static TalkerSettings _getTalkerSettings() {
+  static TalkerSettings _createTalkerSettings() {
     if (kDebugMode) {
       // Debug mode: Enable all features for comprehensive logging
       return TalkerSettings();
@@ -31,7 +31,7 @@ class NammaLogger implements ILogger {
   }
 
   /// Get environment-specific Talker logger settings
-  static TalkerLoggerSettings _getTalkerLoggerSettings() {
+  static TalkerLoggerSettings _createTalkerLoggerSettings() {
     if (kDebugMode) {
       // Debug mode: Verbose logging with all details
       return TalkerLoggerSettings(
