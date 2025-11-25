@@ -63,8 +63,8 @@ void main() {
           expect(result, isA<TicketCreatedResult>());
           final ticketResult = result as TicketCreatedResult;
           expect(ticketResult.pnrNumber, equals('T12345678'));
-          expect(ticketResult.from, contains('Chennai'));
-          expect(ticketResult.to, contains('Bangalore'));
+          expect(ticketResult.from, contains('CHENNAI'));
+          expect(ticketResult.to, contains('BANGALORE'));
         },
       );
 
@@ -91,7 +91,11 @@ void main() {
           );
 
           // Assert (Then)
-          expect(result, isA<TicketCreatedResult>());
+          expect(result, isA<ProcessingErrorResult>());
+          expect(
+            (result as ProcessingErrorResult).error,
+            contains('Missing ticketId'),
+          );
         },
       );
 
@@ -120,7 +124,11 @@ void main() {
           );
 
           // Assert (Then)
-          expect(result, isA<TicketCreatedResult>());
+          expect(result, isA<ProcessingErrorResult>());
+          expect(
+            (result as ProcessingErrorResult).error,
+            contains('Missing ticketId'),
+          );
         },
       );
     });
@@ -598,8 +606,8 @@ void main() {
 
           // Act (When) - Process concurrently
           final results = await Future.wait([
-            processor1.processContent('SMS 1', SharedContentType.sms),
-            processor2.processContent('SMS 2', SharedContentType.sms),
+            processor1.processContent('PNR: T11111111', SharedContentType.sms),
+            processor2.processContent('PNR: T22222222', SharedContentType.sms),
           ]);
 
           // Assert (Then)
