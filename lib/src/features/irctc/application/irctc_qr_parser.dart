@@ -142,7 +142,12 @@ class IRCTCQRParser implements IIRCTCQRParser {
       'Dec': 12,
     };
 
-    return months[monthStr] ?? int.tryParse(monthStr) ?? 1;
+    final result = months[monthStr] ?? int.tryParse(monthStr);
+    if (result == null) {
+      _logger.warning('Unrecognized month string: $monthStr, defaulting to 1');
+      return 1;
+    }
+    return result;
   }
 
   String _extractClassFromString(String classData) {

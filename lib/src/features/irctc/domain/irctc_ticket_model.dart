@@ -44,7 +44,7 @@ class IRCTCTicket with IRCTCTicketMappable {
 
   String toReadableString() {
     final journeyDateStr = dateOfJourney != null
-        ? '${dateOfJourney!.day}-'
+        ? '${dateOfJourney!.day.toString().padLeft(2, '0')}-'
               '${dateOfJourney!.month.toString().padLeft(2, '0')}-'
               '${dateOfJourney!.year}'
         : 'Unknown';

@@ -83,11 +83,11 @@ void main() {
       expect(sourceType, equals('SMS'));
 
       // Verify startTime has correct date and time
-      expect(ticket.startTime.year, equals(2025));
-      expect(ticket.startTime.month, equals(2));
-      expect(ticket.startTime.day, equals(11));
-      expect(ticket.startTime.hour, equals(22));
-      expect(ticket.startTime.minute, equals(35));
+      expect(ticket.startTime?.year, equals(2025));
+      expect(ticket.startTime?.month, equals(2));
+      expect(ticket.startTime?.day, equals(11));
+      expect(ticket.startTime?.hour, equals(22));
+      expect(ticket.startTime?.minute, equals(35));
     });
 
     test('should return ticket for empty or non-matching SMS text', () {
@@ -306,6 +306,100 @@ void main() {
           ?.where((e) => e.title == 'Age')
           .firstOrNull;
       expect(ageExtra, isNull);
+    });
+    group('TNSTCSMSParser Seat Number Regex Edge Cases', () {
+      test('should handle seat numbers with special characters (#, -)', () {
+        const smsText =
+            'TNSTC Corporation:SETC , PNR NO.:T123 , '
+            'Seat No.:A-1, B#2, C-3# , Class:AC SLEEPER';
+
+        final ticket = parser.parseTicket(smsText);
+        final seatTag = ticket.tags
+            ?.firstWhere((t) => t.icon == 'event_seat')
+            .value;
+
+        expect(seatTag, equals('A-1, B#2, C-3#'));
+        expect(
+          ticket.extras?.firstWhere((e) => e.title == 'Seats').value,
+          equals('3'),
+        );
+      });
+
+      test('should stop parsing at keywords (Negative Lookahead)', () {
+        // "Class" is a keyword. The regex should stop before "Class".
+        const smsText =
+            'TNSTC Corporation:SETC , PNR NO.:T123 , '
+            'Seat No.:1A, 2B Class:AC SLEEPER';
+
+        final ticket = parser.parseTicket(smsText);
+        final seatTag = ticket.tags
+            ?.firstWhere((t) => t.icon == 'event_seat')
+            .value;
+
+        expect(seatTag, equals('1A, 2B'));
+      });
+
+      test('should stop parsing at keywords even with trailing comma', () {
+        const smsText =
+            'TNSTC Corporation:SETC , PNR NO.:T123 , '
+            'Seat No.:1A, 2B, Class:AC SLEEPER';
+
+        final ticket = parser.parseTicket(smsText);
+        final seatTag = ticket.tags
+            ?.firstWhere((t) => t.icon == 'event_seat')
+            .value;
+
+        // The parser trims trailing commas/spaces
+        expect(seatTag, equals('1A, 2B'));
+      });
+
+      test('should handle seat numbers with multiple spaces', () {
+        const smsText =
+            'TNSTC Corporation:SETC , PNR NO.:T123 , '
+            'Seat No.:1 UB LOWER, 2 LB UPPER , Class:AC SLEEPER';
+
+        final ticket = parser.parseTicket(smsText);
+        final seatTag = ticket.tags
+            ?.firstWhere((t) => t.icon == 'event_seat')
+            .value;
+
+        expect(seatTag, equals('1 UB LOWER, 2 LB UPPER'));
+      });
+
+      test('should handle empty seat number field', () {
+        const smsText =
+            'TNSTC Corporation:SETC , PNR NO.:T123 , '
+            'Seat No.: , Class:AC SLEEPER';
+
+        final ticket = parser.parseTicket(smsText);
+        final seatTag = ticket.tags
+            ?.where((t) => t.icon == 'event_seat')
+            .firstOrNull;
+
+        expect(seatTag, isNull);
+        // Should default to 1 seat if empty
+        expect(
+          ticket.extras?.firstWhere((e) => e.title == 'Seats').value,
+          equals('1'),
+        );
+      });
+
+      test('should handle seat number field missing completely', () {
+        const smsText =
+            'TNSTC Corporation:SETC , PNR NO.:T123 , '
+            'Class:AC SLEEPER';
+
+        final ticket = parser.parseTicket(smsText);
+        final seatTag = ticket.tags
+            ?.where((t) => t.icon == 'event_seat')
+            .firstOrNull;
+
+        expect(seatTag, isNull);
+        expect(
+          ticket.extras?.firstWhere((e) => e.title == 'Seats').value,
+          equals('1'),
+        );
+      });
     });
   });
 }

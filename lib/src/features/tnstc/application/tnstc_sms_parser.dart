@@ -11,8 +11,6 @@ import 'package:namma_wallet/src/features/travel/application/travel_sms_parser.d
 /// - Never throws exceptions
 /// - Returns a [Ticket] with partial data on parsing errors
 /// - Missing/invalid fields use fallbacks: 'Unknown', null for dates, etc.
-/// - Conversion via [Ticket.fromTNSTC] handles null dates with
-///   DateTime.now() fallback
 class TNSTCSMSParser extends TravelSMSParser {
   /// Creates a TNSTC SMS parser.
   TNSTCSMSParser();
@@ -70,7 +68,7 @@ class TNSTCSMSParser extends TravelSMSParser {
         smsText,
       );
       final seatNumbers = extractMatch(
-        r'Seat No\.\s*:\s*([0-9A-Z#\-]+(?: [0-9A-Z#\-]+)*(?:,\s*(?!(?:Journey|PNR|From|To|Class|Boarding|For|Time|DOJ)\s)[0-9A-Z#\-]+(?: [0-9A-Z#\-]+)*)*)',
+        r'Seat No\.\s*:\s*([0-9A-Z#\-]+(?:\s+(?!(?:Journey|PNR|From|To|Class|Boarding|For|Time|DOJ)[\s:])[0-9A-Z#\-]+)*(?:,\s*(?!(?:Journey|PNR|From|To|Class|Boarding|For|Time|DOJ)[\s:])[0-9A-Z#\-]+(?:\s+(?!(?:Journey|PNR|From|To|Class|Boarding|For|Time|DOJ)[\s:])[0-9A-Z#\-]+)*)*)',
         smsText,
       ).replaceAll(RegExp(r'[,\s]+$'), '');
       final classOfService = extractMatch(
@@ -100,7 +98,7 @@ class TNSTCSMSParser extends TravelSMSParser {
         smsSeatNumbers: seatNumbers.isNotEmpty ? seatNumbers : null,
       );
       // Convert to Ticket (guaranteed not to throw,
-      // uses fallbacks: 'Unknown', DateTime.now(), etc. for missing data)
+      // uses fallbacks: 'Unknown', null for dates, etc.)
       return Ticket.fromTNSTC(tnstcModel, sourceType: 'SMS');
     }
   }

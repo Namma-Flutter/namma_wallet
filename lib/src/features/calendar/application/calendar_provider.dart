@@ -15,13 +15,16 @@ class CalendarProvider extends ChangeNotifier {
     DateTime? initialSelectedDay,
   }) : _logger = logger ?? getIt<ILogger>(),
        _ticketDao = ticketDao ?? getIt<ITicketDAO>(),
-       _selectedDay =
-           initialSelectedDay ??
-           DateTime(
-             DateTime.timestamp().year,
-             DateTime.timestamp().month,
-             DateTime.timestamp().day,
-           );
+       _selectedDay = initialSelectedDay ?? _todayAtMidnight();
+
+  static DateTime _todayAtMidnight() {
+    final now = DateTime.now();
+    return DateTime(now.year, now.month, now.day);
+  }
+
+  DateTime _normalizeToDateOnly(DateTime dt) {
+    return DateTime(dt.year, dt.month, dt.day);
+  }
 
   final ILogger _logger;
   final ITicketDAO _ticketDao;
@@ -75,7 +78,8 @@ class CalendarProvider extends ChangeNotifier {
 
   List<Ticket> getTicketsForDay(DateTime day) {
     return _tickets.where((ticket) {
-      return isSameDay(ticket.startTime, day);
+      final startTime = ticket.startTime;
+      return startTime != null && isSameDay(startTime, day);
     }).toList();
   }
 
@@ -84,11 +88,8 @@ class CalendarProvider extends ChangeNotifier {
     final seen = <DateTime>{};
 
     for (final ticket in _tickets) {
-      final dateOnly = DateTime(
-        ticket.startTime.year,
-        ticket.startTime.month,
-        ticket.startTime.day,
-      );
+      if (ticket.startTime == null) continue;
+      final dateOnly = _normalizeToDateOnly(ticket.startTime!);
 
       if (seen.add(dateOnly)) {
         dates.add(dateOnly);
@@ -104,21 +105,10 @@ class CalendarProvider extends ChangeNotifier {
 
   List<Ticket> getTicketsForRange(DateTimeRange range) {
     return _tickets.where((ticket) {
-      final ticketDate = DateTime(
-        ticket.startTime.year,
-        ticket.startTime.month,
-        ticket.startTime.day,
-      );
-      final rangeStart = DateTime(
-        range.start.year,
-        range.start.month,
-        range.start.day,
-      );
-      final rangeEnd = DateTime(
-        range.end.year,
-        range.end.month,
-        range.end.day,
-      );
+      if (ticket.startTime == null) return false;
+      final ticketDate = _normalizeToDateOnly(ticket.startTime!);
+      final rangeStart = _normalizeToDateOnly(range.start);
+      final rangeEnd = _normalizeToDateOnly(range.end);
       return ticketDate.compareTo(rangeStart) >= 0 &&
           ticketDate.compareTo(rangeEnd) <= 0;
     }).toList();
@@ -126,21 +116,9 @@ class CalendarProvider extends ChangeNotifier {
 
   List<Event> getEventsForRange(DateTimeRange range) {
     return _events.where((event) {
-      final eventDate = DateTime(
-        event.date.year,
-        event.date.month,
-        event.date.day,
-      );
-      final rangeStart = DateTime(
-        range.start.year,
-        range.start.month,
-        range.start.day,
-      );
-      final rangeEnd = DateTime(
-        range.end.year,
-        range.end.month,
-        range.end.day,
-      );
+      final eventDate = _normalizeToDateOnly(event.date);
+      final rangeStart = _normalizeToDateOnly(range.start);
+      final rangeEnd = _normalizeToDateOnly(range.end);
       return eventDate.compareTo(rangeStart) >= 0 &&
           eventDate.compareTo(rangeEnd) <= 0;
     }).toList();
