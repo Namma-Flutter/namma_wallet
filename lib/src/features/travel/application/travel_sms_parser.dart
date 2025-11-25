@@ -21,20 +21,20 @@ abstract class TravelSMSParser implements ITicketParser {
 
   /// Parses a date string in DD/MM/YYYY format.
   ///
-  /// Returns the parsed [DateTime] or [DateTime.now()] as fallback on error.
+  /// Returns the parsed [DateTime] or null if parsing fails.
   /// SMS dates are typically in DD/MM/YYYY format.
   /// Uses shared utility for consistency across all parsers.
-  DateTime parseDate(String date) {
-    if (date.isEmpty) return DateTime.now();
+  DateTime? parseDate(String date) {
+    if (date.isEmpty) return null;
     final parts = date.split('/');
-    if (parts.length != 3) return DateTime.now();
+    if (parts.length != 3) return null;
     try {
       final day = int.parse(parts[0]);
       final month = int.parse(parts[1]);
       final year = int.parse(parts[2]);
       return DateTime(year, month, day);
     } on FormatException {
-      return DateTime.now();
+      return null;
     }
   }
 

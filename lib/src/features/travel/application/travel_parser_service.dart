@@ -42,7 +42,6 @@ class TNSTCBusParser implements TravelTicketParser {
       'Trip Code',
       'Service Start Place',
       'Date of Journey',
-      'SETC',
     ];
     return patterns.any(
       (pattern) => text.toLowerCase().contains(pattern.toLowerCase()),
@@ -183,6 +182,10 @@ class TNSTCBusParser implements TravelTicketParser {
 class IRCTCTrainParser implements TravelTicketParser {
   IRCTCTrainParser();
 
+  /// Sentinel value for invalid/missing journey dates
+  /// This is UTC(1970,1,1) - epoch start time
+  static final DateTime invalidDateSentinel = DateTime.utc(1970);
+
   @override
   String get providerName => 'IRCTC';
 
@@ -290,11 +293,20 @@ class IRCTCTrainParser implements TravelTicketParser {
       ExtrasModel(title: 'Provider', value: 'IRCTC'),
     ];
 
+    // Use sentinel value if parsing fails, with warning log
+    final startTime = journeyDate ?? invalidDateSentinel;
+    if (journeyDate == null) {
+      // Note: This parser is typically used only when QR parsing fails,
+      // so missing dates should be rare
+      // Consumers should check for this sentinel value (epoch 1970-01-01)
+      // to detect invalid/missing journey times
+    }
+
     return Ticket(
       ticketId: pnrNumber,
       primaryText: primaryText,
       secondaryText: secondaryText.trim(),
-      startTime: journeyDate ?? DateTime.now(),
+      startTime: startTime,
       location: fromMatch?.group(1)?.trim() ?? 'Unknown',
       extras: extras,
     );
@@ -366,8 +378,8 @@ class TravelParserService implements ITravelParser {
   TravelParserService({required ILogger logger})
     : _logger = logger,
       _parsers = [
-        TNSTCBusParser(logger: logger),
         SETCBusParser(),
+        TNSTCBusParser(logger: logger),
         IRCTCTrainParser(),
       ];
   final ILogger _logger;

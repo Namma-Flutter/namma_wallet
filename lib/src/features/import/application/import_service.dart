@@ -39,13 +39,15 @@ class ImportService implements IImportService {
   @override
   Future<Ticket?> importPDFFile(File pdfFile) async {
     try {
-      _logger.info('Importing PDF file: ${pdfFile.path}');
+      // Use basename to avoid logging full path with sensitive directory info
+      final filename = pdfFile.uri.pathSegments.last;
+      _logger.info('Importing PDF file: $filename');
 
       // Extract text from PDF
       final extractedText = await _pdfService.extractTextFrom(pdfFile);
 
       if (extractedText.trim().isEmpty) {
-        _logger.warning('No text extracted from PDF: ${pdfFile.path}');
+        _logger.warning('No text extracted from PDF: $filename');
         return null;
       }
 

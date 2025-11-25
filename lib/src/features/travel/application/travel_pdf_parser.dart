@@ -29,17 +29,17 @@ abstract class TravelPDFParser implements ITicketParser {
 
   /// Parses a date string in DD/MM/YYYY or DD-MM-YYYY format.
   ///
-  /// Returns the parsed [DateTime] or [DateTime.now()] as fallback on error.
+  /// Returns the parsed [DateTime] or null if parsing fails.
   /// Uses shared utility for consistency across all parsers.
-  DateTime parseDate(String date) {
+  DateTime? parseDate(String date) {
     return TravelTextParserUtils.parseDate(date, logger: logger);
   }
 
   /// Parses a datetime string in "DD/MM/YYYY HH:mm" or "DD-MM-YYYY HH:mm Hrs." format.
   ///
-  /// Returns the parsed [DateTime] or [DateTime.now()] as fallback on error.
+  /// Returns the parsed [DateTime] or null if parsing fails.
   /// Uses shared utility for consistency across all parsers.
-  DateTime parseDateTime(String dateTime) {
+  DateTime? parseDateTime(String dateTime) {
     return TravelTextParserUtils.parseDateTime(dateTime, logger: logger);
   }
 

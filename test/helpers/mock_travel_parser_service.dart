@@ -100,9 +100,14 @@ class MockTravelParserService extends TravelParserService {
 
   /// Extract location from text using patterns
   String _extractLocation(String text, String keyword, String defaultValue) {
+    // Escape keyword to avoid regex meta-characters
+    final escapedKeyword = RegExp.escape(keyword);
     final patterns = [
-      RegExp(r'$keyword\s*:\s*([A-Z\s]+)', caseSensitive: false),
-      RegExp(r'$keyword\s+([A-Z\s]+?)(?:\s+To|\s*$)', caseSensitive: false),
+      RegExp('$escapedKeyword\\s*:\\s*([A-Z\\s]+)', caseSensitive: false),
+      RegExp(
+        '$escapedKeyword\\s+([A-Z\\s]+?)(?:\\s+To|\\s*\$)',
+        caseSensitive: false,
+      ),
     ];
 
     for (final pattern in patterns) {
