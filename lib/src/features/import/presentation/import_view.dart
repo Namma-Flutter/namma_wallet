@@ -13,6 +13,7 @@ import 'package:namma_wallet/src/common/services/pdf/pdf_service_interface.dart'
 import 'package:namma_wallet/src/common/widgets/snackbar_widget.dart';
 import 'package:namma_wallet/src/features/clipboard/application/clipboard_service_interface.dart';
 import 'package:namma_wallet/src/features/clipboard/presentation/clipboard_result_handler.dart';
+import 'package:namma_wallet/src/features/import/presentation/irctc_result_handler.dart';
 import 'package:namma_wallet/src/features/import/presentation/pdf_result_handler.dart';
 import 'package:namma_wallet/src/features/irctc/application/irctc_qr_parser.dart';
 import 'package:namma_wallet/src/features/irctc/application/irctc_scanner_service.dart';
@@ -45,7 +46,7 @@ class _ImportViewState extends State<ImportView> {
         final result = await irctcService.parseAndSaveIRCTCTicket(qrData);
 
         if (!mounted) return;
-        irctcService.showResultMessage(context, result);
+        IRCTCResultHandler.showResultMessage(context, result);
       } else {
         // Handle other QR code types here if needed
         if (!mounted) return;
