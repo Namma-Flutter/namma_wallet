@@ -1,11 +1,11 @@
 import 'package:namma_wallet/src/common/database/ticket_dao_interface.dart';
 import 'package:namma_wallet/src/common/services/logger_interface.dart';
-import 'package:namma_wallet/src/features/common/application/travel_parser_service_interface.dart';
 import 'package:namma_wallet/src/features/home/domain/ticket.dart';
 import 'package:namma_wallet/src/features/home/domain/ticket_extensions.dart';
 import 'package:namma_wallet/src/features/receive/domain/shared_content_result.dart';
-import 'package:namma_wallet/src/features/tnstc/application/sms_service_interface.dart';
 import 'package:namma_wallet/src/features/tnstc/application/ticket_parser_interface.dart';
+import 'package:namma_wallet/src/features/tnstc/application/tnstc_sms_parser.dart';
+import 'package:namma_wallet/src/features/travel/application/travel_parser_interface.dart';
 
 /// Content type for shared content
 enum SharedContentType {
@@ -26,19 +26,19 @@ enum SharedContentType {
 class SharedContentProcessor {
   SharedContentProcessor({
     required ILogger logger,
-    required ITravelParserService travelParser,
-    required ISMSService smsService,
+    required ITravelParser travelParser,
+    required TNSTCSMSParser smsParser,
     required ITicketParser pdfParser,
     required ITicketDAO ticketDao,
   }) : _logger = logger,
        _travelParserService = travelParser,
-       _smsService = smsService,
+       _smsParser = smsParser,
        _pdfParser = pdfParser,
        _ticketDao = ticketDao;
 
   final ILogger _logger;
-  final ITravelParserService _travelParserService;
-  final ISMSService _smsService;
+  final ITravelParser _travelParserService;
+  final TNSTCSMSParser _smsParser;
   final ITicketParser _pdfParser;
   final ITicketDAO _ticketDao;
 
@@ -101,7 +101,7 @@ class SharedContentProcessor {
       // Use the appropriate parser based on content type
       final ticket = contentType == SharedContentType.pdf
           ? _pdfParser.parseTicket(content)
-          : _smsService.parseTicket(content);
+          : _smsParser.parseTicket(content);
       await _insertOrUpdateTicket(ticket);
 
       final contentSource = contentType == SharedContentType.pdf

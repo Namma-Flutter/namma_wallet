@@ -1,16 +1,13 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:namma_wallet/src/common/services/logger_interface.dart';
-import 'package:namma_wallet/src/features/common/application/travel_parser_service.dart';
-import 'package:namma_wallet/src/features/home/domain/extras_model.dart';
-import 'package:namma_wallet/src/features/home/domain/ticket.dart';
 import 'package:namma_wallet/src/features/receive/application/shared_content_processor.dart';
 import 'package:namma_wallet/src/features/receive/domain/shared_content_result.dart';
 import 'package:namma_wallet/src/features/tnstc/application/tnstc_pdf_parser.dart';
 import 'package:namma_wallet/src/features/tnstc/application/tnstc_sms_parser.dart';
+import 'package:namma_wallet/src/features/travel/application/travel_parser_service.dart';
 
 import '../../../helpers/fake_logger.dart';
-import '../../../helpers/mock_sms_service.dart';
 import '../../../helpers/mock_ticket_dao.dart';
 import '../../../helpers/mock_travel_parser_service.dart';
 
@@ -39,31 +36,13 @@ void main() {
         'Then returns TicketCreatedResult with ticket details',
         () async {
           // Arrange (Given)
-          final mockTicket = Ticket(
-            ticketId: 'T12345678',
-            primaryText: 'Chennai → Bangalore',
-            secondaryText: 'SETC - Trip123',
-            startTime: DateTime(2024, 12, 15, 14, 30),
-            location: 'Chennai',
-            extras: [
-              ExtrasModel(title: 'PNR Number', value: 'T12345678'),
-              ExtrasModel(title: 'From', value: 'Chennai'),
-              ExtrasModel(title: 'To', value: 'Bangalore'),
-              ExtrasModel(title: 'Fare', value: '₹500.00'),
-            ],
-          );
-
           final logger = getIt<ILogger>();
           final smsParser = getIt<TNSTCSMSParser>();
           final pdfParser = getIt<TNSTCPDFParser>();
           final processor = SharedContentProcessor(
             logger: logger,
             travelParser: MockTravelParserService(logger: logger),
-            smsService: MockSMSService(
-              logger: logger,
-              smsParser: smsParser,
-              mockTicket: mockTicket,
-            ),
+            smsParser: smsParser,
             pdfParser: pdfParser,
             ticketDao: MockTicketDAO(),
           );
@@ -100,7 +79,7 @@ void main() {
           final processor = SharedContentProcessor(
             logger: logger,
             travelParser: MockTravelParserService(logger: logger),
-            smsService: MockSMSService(logger: logger, smsParser: smsParser),
+            smsParser: smsParser,
             pdfParser: pdfParser,
             ticketDao: MockTicketDAO(),
           );
@@ -127,7 +106,7 @@ void main() {
           final processor = SharedContentProcessor(
             logger: logger,
             travelParser: MockTravelParserService(logger: logger),
-            smsService: MockSMSService(logger: logger, smsParser: smsParser),
+            smsParser: smsParser,
             pdfParser: pdfParser,
             ticketDao: MockTicketDAO(),
           );
@@ -171,7 +150,7 @@ void main() {
               logger: logger,
               mockUpdateInfo: mockUpdateInfo,
             ),
-            smsService: MockSMSService(logger: logger, smsParser: smsParser),
+            smsParser: smsParser,
             pdfParser: pdfParser,
             ticketDao: MockTicketDAO(),
           );
@@ -216,7 +195,7 @@ void main() {
               logger: logger,
               mockUpdateInfo: mockUpdateInfo,
             ),
-            smsService: MockSMSService(logger: logger, smsParser: smsParser),
+            smsParser: smsParser,
             pdfParser: pdfParser,
             ticketDao: MockTicketDAO(updateReturnCount: 0),
           );
@@ -265,7 +244,7 @@ void main() {
               logger: logger,
               mockUpdateInfo: mockUpdateInfo,
             ),
-            smsService: MockSMSService(logger: logger, smsParser: smsParser),
+            smsParser: smsParser,
             pdfParser: pdfParser,
             ticketDao: mockDao,
           );
@@ -319,7 +298,7 @@ void main() {
               logger: logger,
               mockUpdateInfo: mockUpdateInfo,
             ),
-            smsService: MockSMSService(logger: logger, smsParser: smsParser),
+            smsParser: smsParser,
             pdfParser: pdfParser,
             ticketDao: MockTicketDAO(shouldThrowOnUpdate: true),
           );
@@ -351,7 +330,7 @@ void main() {
           final processor = SharedContentProcessor(
             logger: logger,
             travelParser: MockTravelParserService(logger: logger),
-            smsService: MockSMSService(logger: logger, smsParser: smsParser),
+            smsParser: smsParser,
             pdfParser: pdfParser,
             ticketDao: MockTicketDAO(),
           );
@@ -378,7 +357,7 @@ void main() {
           final processor = SharedContentProcessor(
             logger: logger,
             travelParser: MockTravelParserService(logger: logger),
-            smsService: MockSMSService(logger: logger, smsParser: smsParser),
+            smsParser: smsParser,
             pdfParser: pdfParser,
             ticketDao: MockTicketDAO(),
           );
@@ -400,24 +379,13 @@ void main() {
         'Then returns ProcessingErrorResult',
         () async {
           // Arrange (Given)
-          final mockTicket = Ticket(
-            primaryText: 'Test',
-            secondaryText: 'Test',
-            startTime: DateTime.now(),
-            location: 'Test',
-          );
-
           final logger = getIt<ILogger>();
           final smsParser = getIt<TNSTCSMSParser>();
           final pdfParser = getIt<TNSTCPDFParser>();
           final processor = SharedContentProcessor(
             logger: logger,
             travelParser: MockTravelParserService(logger: logger),
-            smsService: MockSMSService(
-              logger: logger,
-              smsParser: smsParser,
-              mockTicket: mockTicket,
-            ),
+            smsParser: smsParser,
             pdfParser: pdfParser,
             ticketDao: MockTicketDAO(),
           );
@@ -552,7 +520,7 @@ void main() {
           final processor = SharedContentProcessor(
             logger: logger,
             travelParser: MockTravelParserService(logger: logger),
-            smsService: MockSMSService(logger: logger, smsParser: smsParser),
+            smsParser: smsParser,
             pdfParser: pdfParser,
             ticketDao: mockDao,
           );
@@ -585,7 +553,7 @@ void main() {
                 updates: {'conductorContact': '9876543210'},
               ),
             ),
-            smsService: MockSMSService(logger: logger2, smsParser: smsParser2),
+            smsParser: smsParser2,
             pdfParser: pdfParser2,
             ticketDao: mockDao,
           );
@@ -615,22 +583,7 @@ void main() {
           final processor1 = SharedContentProcessor(
             logger: logger,
             travelParser: MockTravelParserService(logger: logger),
-            smsService: MockSMSService(
-              logger: logger,
-              smsParser: smsParser,
-              mockTicket: Ticket(
-                ticketId: 'T11111111',
-                primaryText: 'Chennai → Bangalore',
-                secondaryText: 'SETC',
-                startTime: DateTime.now(),
-                location: 'Chennai',
-                extras: [
-                  ExtrasModel(title: 'PNR Number', value: 'T11111111'),
-                  ExtrasModel(title: 'From', value: 'Chennai'),
-                  ExtrasModel(title: 'To', value: 'Bangalore'),
-                ],
-              ),
-            ),
+            smsParser: smsParser,
             pdfParser: pdfParser,
             ticketDao: MockTicketDAO(),
           );
@@ -638,22 +591,7 @@ void main() {
           final processor2 = SharedContentProcessor(
             logger: logger,
             travelParser: MockTravelParserService(logger: logger),
-            smsService: MockSMSService(
-              logger: logger,
-              smsParser: smsParser,
-              mockTicket: Ticket(
-                ticketId: 'T22222222',
-                primaryText: 'Mumbai → Delhi',
-                secondaryText: 'IRCTC',
-                startTime: DateTime.now(),
-                location: 'Mumbai',
-                extras: [
-                  ExtrasModel(title: 'PNR Number', value: 'T22222222'),
-                  ExtrasModel(title: 'From', value: 'Mumbai'),
-                  ExtrasModel(title: 'To', value: 'Delhi'),
-                ],
-              ),
-            ),
+            smsParser: smsParser,
             pdfParser: pdfParser,
             ticketDao: MockTicketDAO(),
           );

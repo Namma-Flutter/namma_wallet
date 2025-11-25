@@ -1,6 +1,6 @@
-import 'package:namma_wallet/src/features/common/application/travel_sms_parser.dart';
 import 'package:namma_wallet/src/features/home/domain/ticket.dart';
 import 'package:namma_wallet/src/features/tnstc/domain/tnstc_model.dart';
+import 'package:namma_wallet/src/features/travel/application/travel_sms_parser.dart';
 
 /// Parses TNSTC SMS messages into structured [Ticket] data.
 ///
