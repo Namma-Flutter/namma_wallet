@@ -1,4 +1,4 @@
-import 'package:namma_wallet/src/common/services/logger_interface.dart';
+import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
 import 'package:namma_wallet/src/features/tnstc/application/ticket_parser_interface.dart';
 
 /// Base class for travel ticket PDF parsers.

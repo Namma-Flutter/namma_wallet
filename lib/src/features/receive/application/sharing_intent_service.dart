@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:listen_sharing_intent/listen_sharing_intent.dart';
-import 'package:namma_wallet/src/common/services/logger_interface.dart';
+import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
 import 'package:namma_wallet/src/common/services/pdf/pdf_service_interface.dart';
 import 'package:namma_wallet/src/features/receive/application/shared_content_processor.dart';
 import 'package:namma_wallet/src/features/receive/domain/sharing_intent_service_interface.dart';
