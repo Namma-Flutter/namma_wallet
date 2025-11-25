@@ -7,7 +7,6 @@ import 'package:namma_wallet/src/features/clipboard/domain/clipboard_content_typ
 import 'package:namma_wallet/src/features/clipboard/domain/clipboard_repository_interface.dart';
 import 'package:namma_wallet/src/features/clipboard/domain/clipboard_result.dart';
 import 'package:namma_wallet/src/features/travel/application/travel_parser_interface.dart';
-import 'package:namma_wallet/src/features/travel/application/travel_parser_service.dart';
 
 /// Application service for clipboard operations.
 ///
@@ -41,7 +40,6 @@ class ClipboardService implements IClipboardService {
   /// Maximum allowed text length to prevent spam/abuse
   static const int maxTextLength = 10000;
 
-  @override
   /// Reads clipboard content and attempts to parse it as a travel ticket.
   ///
   /// Workflow:
@@ -56,6 +54,7 @@ class ClipboardService implements IClipboardService {
   /// Returns [ClipboardResult] with:
   /// - Success: Content type and parsed ticket
   /// - Error: Error message if content cannot be parsed as a travel ticket
+  @override
   Future<ClipboardResult> readAndParseClipboard() async {
     try {
       // Step 1: Check if clipboard has content

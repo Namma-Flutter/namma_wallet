@@ -93,7 +93,7 @@ class TNSTCBusParser implements TravelTicketParser {
 
     // Use appropriate parser based on format
     if (isSMS) {
-      final smsParser = TNSTCSMSParser();
+      final smsParser = TNSTCSMSParser(logger: _logger);
       return smsParser.parseTicket(text);
     } else {
       final pdfParser = TNSTCPDFParser(logger: _logger);
@@ -180,7 +180,8 @@ class TNSTCBusParser implements TravelTicketParser {
 }
 
 class IRCTCTrainParser implements TravelTicketParser {
-  IRCTCTrainParser();
+  IRCTCTrainParser({required ILogger logger}) : _logger = logger;
+  final ILogger _logger;
 
   /// Sentinel value for invalid/missing journey dates
   /// This is UTC(1970,1,1) - epoch start time
@@ -229,13 +230,13 @@ class IRCTCTrainParser implements TravelTicketParser {
     ).firstMatch(text);
 
     final trainNameMatch = RegExp(
-      r'Train Name\s*:\s*([A-Za-z\s]+)',
+      r'Train Name\s*:\s*([A-Za-z0-9\s\-]+)',
       caseSensitive: false,
     ).firstMatch(text);
 
     // Extract passenger name
     final passengerNameMatch = RegExp(
-      r'Passenger Name\s*:\s*([A-Za-z\s]+)',
+      r"Passenger Name\s*:\s*([A-Za-z\s.\-']+)",
       caseSensitive: false,
     ).firstMatch(text);
 
@@ -296,10 +297,15 @@ class IRCTCTrainParser implements TravelTicketParser {
     // Use sentinel value if parsing fails, with warning log
     final startTime = journeyDate ?? invalidDateSentinel;
     if (journeyDate == null) {
-      // Note: This parser is typically used only when QR parsing fails,
-      // so missing dates should be rare
-      // Consumers should check for this sentinel value (epoch 1970-01-01)
-      // to detect invalid/missing journey times
+      // Log warning when parsing fails so consumers can detect and handle
+      // invalid/missing journey times. The sentinel value (epoch 1970-01-01)
+      // is used as a fallback. Note: This parser is typically used only when
+      // QR parsing fails, so missing dates should be rare.
+      // Consumers should check for this sentinel value to detect invalid times.
+      _logger.warning(
+        '[IRCTCTrainParser] Journey date parsing failed for PNR: $pnrNumber. '
+        'Using sentinel value ${invalidDateSentinel.toIso8601String()}',
+      );
     }
 
     return Ticket(
@@ -317,7 +323,8 @@ class IRCTCTrainParser implements TravelTicketParser {
 }
 
 class SETCBusParser implements TravelTicketParser {
-  SETCBusParser();
+  SETCBusParser({required ILogger logger}) : _logger = logger;
+  final ILogger _logger;
 
   @override
   String get providerName => 'SETC';
@@ -346,13 +353,13 @@ class SETCBusParser implements TravelTicketParser {
   Ticket parseTicket(String text) {
     // SETC tickets use the same format as TNSTC SMS
     // Just delegate to the existing TNSTC SMS parser
-    final smsParser = TNSTCSMSParser();
+    final smsParser = TNSTCSMSParser(logger: _logger);
     final ticket = smsParser.parseTicket(text);
 
     // Update the provider name to SETC
     return ticket.copyWith(
       extras: [
-        ...?ticket.extras,
+        ...?ticket.extras?.where((e) => e.title != 'Provider'),
         ExtrasModel(title: 'Provider', value: 'SETC'),
       ],
     );
@@ -362,25 +369,13 @@ class SETCBusParser implements TravelTicketParser {
   TicketUpdateInfo? parseUpdate(String text) => null;
 }
 
-class TicketUpdateInfo {
-  TicketUpdateInfo({
-    required this.pnrNumber,
-    required this.providerName,
-    required this.updates,
-  });
-
-  final String pnrNumber;
-  final String providerName;
-  final Map<String, Object?> updates;
-}
-
 class TravelParserService implements ITravelParser {
   TravelParserService({required ILogger logger})
     : _logger = logger,
       _parsers = [
-        SETCBusParser(),
+        SETCBusParser(logger: logger),
         TNSTCBusParser(logger: logger),
-        IRCTCTrainParser(),
+        IRCTCTrainParser(logger: logger),
       ];
   final ILogger _logger;
   final List<TravelTicketParser> _parsers;
@@ -437,9 +432,16 @@ class TravelParserService implements ITravelParser {
         '[TravelParserService] No parser could handle the text',
       );
       return null;
-    } on Object catch (e, stackTrace) {
+    } on FormatException catch (e, stackTrace) {
       _logger.error(
-        '[TravelParserService] Error during ticket parsing',
+        '[TravelParserService] Format error during ticket parsing',
+        e,
+        stackTrace,
+      );
+      return null;
+    } on Exception catch (e, stackTrace) {
+      _logger.error(
+        '[TravelParserService] Unexpected error during ticket parsing',
         e,
         stackTrace,
       );

@@ -45,8 +45,12 @@ class ThemeProvider extends ChangeNotifier {
 
   /// Save theme preference to shared preferences
   Future<void> _saveThemePreference() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setInt(_themePreferenceKey, _themeMode.index);
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setInt(_themePreferenceKey, _themeMode.index);
+    } on Exception catch (e, stackTrace) {
+      debugPrint('Failed to save theme preference: $e\n$stackTrace');
+    }
   }
 
   /// Set theme to light mode

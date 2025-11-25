@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/routing/app_router.dart';
@@ -59,7 +61,7 @@ class _NammaWalletAppState extends State<NammaWalletApp> {
   @override
   void dispose() {
     _logger.info('App disposing');
-    _sharingService.dispose();
+    unawaited(_sharingService.dispose());
     super.dispose();
   }
 

@@ -2,6 +2,7 @@ import 'package:namma_wallet/src/common/domain/models/extras_model.dart';
 import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 import 'package:namma_wallet/src/common/enums/source_type.dart';
 import 'package:namma_wallet/src/common/enums/ticket_type.dart';
+import 'package:namma_wallet/src/features/travel/application/travel_parser_interface.dart';
 import 'package:namma_wallet/src/features/travel/application/travel_parser_service.dart';
 
 /// Mock TravelParserService for testing purposes
@@ -10,13 +11,16 @@ class MockTravelParserService extends TravelParserService {
     required super.logger,
     this.mockUpdateInfo,
     this.mockTicket,
-  });
+    DateTime? mockStartTime,
+  }) : _mockStartTime = mockStartTime ?? DateTime(2024, 12, 15);
 
   /// Update info to return from parseUpdateSMS
   final TicketUpdateInfo? mockUpdateInfo;
 
   /// Ticket to return from parseTicketFromText
   final Ticket? mockTicket;
+
+  final DateTime _mockStartTime;
 
   @override
   TicketUpdateInfo? parseUpdateSMS(String content) {
@@ -54,7 +58,7 @@ class MockTravelParserService extends TravelParserService {
         ticketId: pnr,
         primaryText: '$fromLocation → $toLocation',
         secondaryText: 'SETC - Bus',
-        startTime: DateTime.now(),
+        startTime: _mockStartTime,
         location: fromLocation,
         type: TicketType.bus,
         extras: [
