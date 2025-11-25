@@ -93,7 +93,7 @@ class TNSTCBusParser implements TravelTicketParser {
 
     // Use appropriate parser based on format
     if (isSMS) {
-      final smsParser = TNSTCSMSParser(logger: _logger);
+      final smsParser = TNSTCSMSParser();
       return smsParser.parseTicket(text);
     } else {
       final pdfParser = TNSTCPDFParser(logger: _logger);
@@ -323,9 +323,6 @@ class IRCTCTrainParser implements TravelTicketParser {
 }
 
 class SETCBusParser implements TravelTicketParser {
-  SETCBusParser({required ILogger logger}) : _logger = logger;
-  final ILogger _logger;
-
   @override
   String get providerName => 'SETC';
 
@@ -353,7 +350,7 @@ class SETCBusParser implements TravelTicketParser {
   Ticket parseTicket(String text) {
     // SETC tickets use the same format as TNSTC SMS
     // Just delegate to the existing TNSTC SMS parser
-    final smsParser = TNSTCSMSParser(logger: _logger);
+    final smsParser = TNSTCSMSParser();
     final ticket = smsParser.parseTicket(text);
 
     // Update the provider name to SETC
@@ -373,7 +370,7 @@ class TravelParserService implements ITravelParser {
   TravelParserService({required ILogger logger})
     : _logger = logger,
       _parsers = [
-        SETCBusParser(logger: logger),
+        SETCBusParser(),
         TNSTCBusParser(logger: logger),
         IRCTCTrainParser(logger: logger),
       ];

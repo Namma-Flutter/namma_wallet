@@ -116,11 +116,24 @@ class _ImportViewState extends State<ImportView> {
 
     try {
       final clipboardService = getIt<IClipboardService>();
-      final result = await clipboardService.readAndParseClipboard();
 
-      if (!mounted) return;
+      try {
+        final result = await clipboardService.readAndParseClipboard();
 
-      ClipboardResultHandler.showResultMessage(context, result);
+        if (!mounted) return;
+
+        ClipboardResultHandler.showResultMessage(context, result);
+      } on Exception catch (e) {
+        if (mounted) {
+          showSnackbar(
+            context,
+            'Failed to read clipboard',
+            isError: true,
+          );
+        }
+        // Log the exception for debugging
+        debugPrint('Clipboard read error: $e');
+      }
     } finally {
       if (mounted) {
         setState(() {

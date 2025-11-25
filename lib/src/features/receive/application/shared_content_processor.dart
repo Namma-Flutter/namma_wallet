@@ -5,16 +5,8 @@ import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
 import 'package:namma_wallet/src/features/home/domain/ticket_extensions.dart';
 import 'package:namma_wallet/src/features/receive/application/shared_content_processor_interface.dart';
 import 'package:namma_wallet/src/features/receive/domain/shared_content_result.dart';
+import 'package:namma_wallet/src/features/receive/domain/shared_content_type.dart';
 import 'package:namma_wallet/src/features/travel/application/travel_parser_interface.dart';
-
-/// Content type for shared content
-enum SharedContentType {
-  /// SMS text content
-  sms,
-
-  /// PDF file content (text extracted from PDF)
-  pdf,
-}
 
 /// Service to process shared content (SMS, PDF text) into tickets
 ///

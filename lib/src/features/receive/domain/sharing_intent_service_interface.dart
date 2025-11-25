@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:namma_wallet/src/features/receive/application/shared_content_processor.dart';
+import 'package:namma_wallet/src/features/receive/domain/shared_content_type.dart';
 
 /// Abstract interface for sharing intent services.
 ///

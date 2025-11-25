@@ -1,5 +1,5 @@
-import 'package:namma_wallet/src/features/receive/application/shared_content_processor.dart';
 import 'package:namma_wallet/src/features/receive/domain/shared_content_result.dart';
+import 'package:namma_wallet/src/features/receive/domain/shared_content_type.dart';
 
 /// Interface for processing shared content (SMS, PDF text) into tickets.
 ///

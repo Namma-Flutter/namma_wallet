@@ -35,8 +35,11 @@ class ThemeProvider extends ChangeNotifier {
           (stored != null && stored >= 0 && stored < ThemeMode.values.length)
           ? stored
           : 0;
-      _themeMode = ThemeMode.values[idx];
-      notifyListeners();
+      final newMode = ThemeMode.values[idx];
+      if (_themeMode != newMode) {
+        _themeMode = newMode;
+        notifyListeners();
+      }
     } on Exception catch (e, stackTrace) {
       debugPrint('Failed to load theme preference: $e\n$stackTrace');
       // Fall back to default system theme (no notifyListeners needed)
