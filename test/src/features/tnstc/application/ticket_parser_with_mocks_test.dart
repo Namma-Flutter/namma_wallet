@@ -183,7 +183,8 @@ Trip Code : TEST123
 
           // Assert (Then)
           expect(ticket, isNotNull);
-          expect(ticket.startTime, isNotNull);
+          // Date parsing failed, so startTime is null
+          expect(ticket.startTime, isNull);
         },
       );
 
@@ -443,9 +444,9 @@ Seat No. : 1A,2B,3C, Journey Date : 15/12/2024
           expect(ticket.primaryText, equals('Mock Origin → Mock Destination'));
           expect(ticket.secondaryText, contains('Mock Corporation'));
           expect(ticket.location, equals('Mock Location'));
-          expect(ticket.startTime.year, equals(2024));
-          expect(ticket.startTime.month, equals(12));
-          expect(ticket.startTime.day, equals(15));
+          expect(ticket.startTime?.year, equals(2024));
+          expect(ticket.startTime?.month, equals(12));
+          expect(ticket.startTime?.day, equals(15));
         },
       );
 

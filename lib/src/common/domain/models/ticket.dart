@@ -16,7 +16,7 @@ class Ticket with TicketMappable {
   const Ticket({
     required this.primaryText,
     required this.secondaryText,
-    required this.startTime,
+    this.startTime,
     required this.location,
     this.type = TicketType.train,
     this.endTime,
@@ -34,7 +34,8 @@ class Ticket with TicketMappable {
         'scheduledDeparture=${model.scheduledDeparture}',
       );
       throw ArgumentError(
-        'Cannot create IRCTC ticket: dateOfJourney or scheduledDeparture is null',
+        'Cannot create IRCTC ticket: dateOfJourney or '
+        'scheduledDeparture is null',
       );
     }
 
@@ -117,21 +118,10 @@ class Ticket with TicketMappable {
 
     var startTime = model.passengerPickupTime ?? model.journeyDate;
 
-    // Throw error if no valid date is available instead of using DateTime.now()
-    if (startTime == null) {
-      getIt<ILogger>().error(
-        '[Ticket.fromTNSTC] Both passengerPickupTime and journeyDate are null. '
-        'Cannot create ticket without valid date.',
-      );
-      throw ArgumentError(
-        'Cannot create TNSTC ticket: both passengerPickupTime and '
-        'journeyDate are null',
-      );
-    }
-
     // If pickup time is missing, try to combine
     // journeyDate and serviceStartTime
-    if (model.passengerPickupTime == null &&
+    if (startTime != null &&
+        model.passengerPickupTime == null &&
         model.serviceStartTime != null &&
         model.serviceStartTime!.isNotEmpty) {
       try {
@@ -171,7 +161,7 @@ class Ticket with TicketMappable {
       secondaryText:
           '${model.corporation ?? 'TNSTC'} - '
           '${model.tripCode ?? model.routeNo ?? 'Bus'}',
-      startTime: startTime!, // Safe: we ensure startTime is non-null above
+      startTime: startTime,
       location:
           model.passengerPickupPoint ??
           model.boardingPoint ??
@@ -297,7 +287,7 @@ class Ticket with TicketMappable {
   @MappableField(key: 'type')
   final TicketType type;
   @MappableField(key: 'start_time')
-  final DateTime startTime;
+  final DateTime? startTime;
   @MappableField(key: 'end_time')
   final DateTime? endTime;
   @MappableField(key: 'location')

@@ -60,6 +60,26 @@ class _ImportViewState extends State<ImportView> {
     }
   }
 
+  Future<void> _onBarcodeCaptured(BarcodeCapture capture) async {
+    // Check if barcodes list is not empty
+    if (capture.barcodes.isEmpty) {
+      context.pop();
+      return;
+    }
+
+    // Handle the scanned barcode
+    final qrData = capture.barcodes.first.rawValue;
+
+    // Check if rawValue is non-null
+    if (qrData == null) {
+      context.pop();
+      return;
+    }
+
+    context.pop();
+    await _handleQRCodeScan(qrData);
+  }
+
   Future<void> _handlePDFPick() async {
     if (_isProcessingPDF) return;
 
@@ -247,25 +267,7 @@ class _ImportViewState extends State<ImportView> {
                           onPressed: () async {
                             await context.pushNamed(
                               AppRoute.barcodeScanner.name,
-                              extra: (BarcodeCapture capture) async {
-                                // Check if barcodes list is not empty
-                                if (capture.barcodes.isEmpty) {
-                                  context.pop();
-                                  return;
-                                }
-
-                                // Handle the scanned barcode
-                                final qrData = capture.barcodes.first.rawValue;
-
-                                // Check if rawValue is non-null
-                                if (qrData == null) {
-                                  context.pop();
-                                  return;
-                                }
-
-                                context.pop();
-                                await _handleQRCodeScan(qrData);
-                              },
+                              extra: _onBarcodeCaptured,
                             );
                           },
                           child: const Text(

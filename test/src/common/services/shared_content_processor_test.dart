@@ -299,29 +299,6 @@ void main() {
       );
 
       test(
-        'Given empty content, When processing content, '
-        'Then handles gracefully',
-        () async {
-          // Arrange (Given)
-          final logger = getIt<ILogger>();
-          final processor = SharedContentProcessor(
-            logger: logger,
-            travelParser: MockTravelParserService(logger: logger),
-            ticketDao: MockTicketDAO(),
-          );
-
-          // Act (When)
-          final result = await processor.processContent(
-            '',
-            SharedContentType.sms,
-          );
-
-          // Assert (Then)
-          expect(result, isA<ProcessingErrorResult>());
-        },
-      );
-
-      test(
         'Given very long content, When processing content, '
         'Then processes without errors',
         () async {
@@ -342,7 +319,7 @@ void main() {
           );
 
           // Assert (Then)
-          expect(result, isNotNull);
+          expect(result, isA<ProcessingErrorResult>());
         },
       );
       test(

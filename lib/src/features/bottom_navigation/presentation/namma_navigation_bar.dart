@@ -107,7 +107,7 @@ class _NammaNavigationBarState extends State<NammaNavigationBar> {
               return Stack(
                 children: <Widget>[
                   ...previousChildren,
-                  ?currentChild,
+                  if (currentChild != null) currentChild,
                 ],
               );
             },

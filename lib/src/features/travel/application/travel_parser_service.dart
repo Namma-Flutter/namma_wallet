@@ -80,10 +80,7 @@ class TNSTCBusParser implements TravelTicketParser {
     );
 
     // If has SMS patterns and no PDF patterns, it's SMS
-    // If has SETC and no PDF patterns, it's SMS
-    // (SETC can appear in both formats)
-    return (hasSmsPattern && !hasPdfPattern) ||
-        (text.toUpperCase().contains('SETC') && !hasPdfPattern);
+    return hasSmsPattern && !hasPdfPattern;
   }
 
   @override
@@ -253,7 +250,10 @@ class IRCTCTrainParser implements TravelTicketParser {
           '${dateStr.substring(6, 10)}-${dateStr.substring(3, 5)}'
           '-${dateStr.substring(0, 2)}',
         );
-      } on FormatException {
+      } on FormatException catch (e) {
+        _logger.debug(
+          '[IRCTCTrainParser] Date parsing failed: ${dateMatch.group(1)} - $e',
+        );
         journeyDate = null;
       }
     }
@@ -416,10 +416,14 @@ class TravelParserService implements ITravelParser {
             '${parser.providerName}',
           );
 
-          // TODO(keerthivasan-ai): need to clarify this with harishwarrior
-          // if (sourceType != null) {
-          //   return ticket.copyWith(sourceType: sourceType);
-          // }
+          if (sourceType != null) {
+            return ticket.copyWith(
+              extras: [
+                ...?ticket.extras,
+                ExtrasModel(title: 'Source Type', value: sourceType.name),
+              ],
+            );
+          }
           return ticket;
         }
       }

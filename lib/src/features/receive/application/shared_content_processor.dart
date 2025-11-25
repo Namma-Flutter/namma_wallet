@@ -103,6 +103,15 @@ class SharedContentProcessor implements ISharedContentProcessor {
         'PNR: ${ticket.ticketId}',
       );
 
+      if (ticket.pnrOrId == null ||
+          ticket.fromLocation == null ||
+          ticket.toLocation == null) {
+        _logger.warning(
+          'Ticket parsed with missing fields: pnr=${ticket.pnrOrId}, '
+          'from=${ticket.fromLocation}, to=${ticket.toLocation}',
+        );
+      }
+
       return TicketCreatedResult(
         pnrNumber: ticket.pnrOrId ?? 'Unknown',
         from: ticket.fromLocation ?? 'Unknown',
@@ -110,7 +119,18 @@ class SharedContentProcessor implements ISharedContentProcessor {
         fare: ticket.fare ?? 'Unknown',
         date: ticket.date,
       );
-    } on Object catch (e, stackTrace) {
+    } on Exception catch (e, stackTrace) {
+      _logger.error(
+        'Error processing shared content',
+        e,
+        stackTrace,
+      );
+
+      return ProcessingErrorResult(
+        message: 'Failed to process shared content',
+        error: e.toString(),
+      );
+    } on Error catch (e, stackTrace) {
       _logger.error(
         'Error processing shared content',
         e,

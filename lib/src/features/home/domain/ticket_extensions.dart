@@ -54,6 +54,7 @@ extension TicketExtrasExtension on Ticket {
     final dateExtra = getExtraByTitle('date of journey');
     if (dateExtra != null) return dateExtra;
 
-    return DateTimeConverter.instance.formatDate(startTime);
+    if (startTime == null) return 'Unknown';
+    return DateTimeConverter.instance.formatDate(startTime!);
   }
 }
