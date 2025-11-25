@@ -3,6 +3,7 @@ import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 import 'package:namma_wallet/src/common/enums/source_type.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
 import 'package:namma_wallet/src/features/home/domain/ticket_extensions.dart';
+import 'package:namma_wallet/src/features/receive/application/shared_content_processor_interface.dart';
 import 'package:namma_wallet/src/features/receive/domain/shared_content_result.dart';
 import 'package:namma_wallet/src/features/travel/application/travel_parser_interface.dart';
 
@@ -22,7 +23,7 @@ enum SharedContentType {
 /// - Checking for ticket updates (conductor details, etc.)
 /// - Updating existing tickets in database
 /// - Creating new tickets in database
-class SharedContentProcessor {
+class SharedContentProcessor implements ISharedContentProcessor {
   SharedContentProcessor({
     required ILogger logger,
     required ITravelParser travelParser,
@@ -35,16 +36,7 @@ class SharedContentProcessor {
   final ITravelParser _travelParserService;
   final ITicketDAO _ticketDao;
 
-  /// Process shared content and return the result
-  ///
-  /// Attempts to:
-  /// 1. Check if content is an update SMS (conductor details, etc.)
-  /// 2. If update: apply to existing ticket in DB
-  /// 3. If not update: parse as new ticket and save to DB
-  ///
-  /// [contentType] specifies whether the content is from SMS or PDF
-  ///
-  /// Returns a [SharedContentResult] indicating success or failure
+  @override
   Future<SharedContentResult> processContent(
     String content,
     SharedContentType contentType,
