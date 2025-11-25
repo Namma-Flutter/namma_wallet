@@ -5,19 +5,13 @@ import 'package:dotted_border/dotted_border.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:namma_wallet/src/common/database/ticket_dao_interface.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
-import 'package:namma_wallet/src/common/enums/source_type.dart';
 import 'package:namma_wallet/src/common/routing/app_routes.dart';
-import 'package:namma_wallet/src/common/services/pdf/pdf_service_interface.dart';
 import 'package:namma_wallet/src/common/widgets/snackbar_widget.dart';
 import 'package:namma_wallet/src/features/clipboard/application/clipboard_service_interface.dart';
 import 'package:namma_wallet/src/features/clipboard/presentation/clipboard_result_handler.dart';
-import 'package:namma_wallet/src/features/import/presentation/irctc_result_handler.dart';
+import 'package:namma_wallet/src/features/import/application/import_service_interface.dart';
 import 'package:namma_wallet/src/features/import/presentation/pdf_result_handler.dart';
-import 'package:namma_wallet/src/features/irctc/application/irctc_qr_parser.dart';
-import 'package:namma_wallet/src/features/irctc/application/irctc_scanner_service.dart';
-import 'package:namma_wallet/src/features/travel/application/travel_parser_interface.dart';
 
 class ImportView extends StatefulWidget {
   const ImportView({super.key});
@@ -27,7 +21,7 @@ class ImportView extends StatefulWidget {
 }
 
 class _ImportViewState extends State<ImportView> {
-  late final IRCTCQRParser _qrParser = getIt<IRCTCQRParser>();
+  late final IImportService _importService = getIt<IImportService>();
   bool _isPasting = false;
   bool _isScanning = false;
   bool _isProcessingPDF = false;
@@ -40,16 +34,17 @@ class _ImportViewState extends State<ImportView> {
     });
 
     try {
-      // Check if it's an IRCTC QR code
-      if (_qrParser.isIRCTCQRCode(qrData)) {
-        final irctcService = getIt<IRCTCScannerService>();
-        final result = await irctcService.parseAndSaveIRCTCTicket(qrData);
+      // Use import service to handle QR code
+      final ticket = await _importService.importQRCode(qrData);
 
-        if (!mounted) return;
-        IRCTCResultHandler.showResultMessage(context, result);
+      if (!mounted) return;
+
+      if (ticket != null) {
+        showSnackbar(
+          context,
+          'QR ticket imported successfully!',
+        );
       } else {
-        // Handle other QR code types here if needed
-        if (!mounted) return;
         showSnackbar(
           context,
           'QR code format not supported',
@@ -81,53 +76,27 @@ class _ImportViewState extends State<ImportView> {
       if (result != null && result.files.single.path != null) {
         final file = File(result.files.single.path!);
 
-        // Use existing services directly
-        final pdfService = getIt<IPDFService>();
-        final travelParser = getIt<ITravelParser>();
-        final ticketDao = getIt<ITicketDAO>();
+        // Use import service to handle PDF
+        final ticket = await _importService.importPDFFile(file);
 
-        try {
-          // Extract text from PDF
-          final extractedText = await pdfService.extractTextFrom(file);
+        if (!mounted) return;
 
-          if (extractedText.trim().isEmpty) {
-            if (!mounted) return;
-            PdfResultHandler.showErrorMessage(
-              context,
-              'Unable to read text from this PDF. '
-              'This ticket may be in image format. '
-              'Please try importing using the SMS/clipboard method instead.',
-            );
-            return;
-          }
-
-          // Parse the extracted text as a travel ticket
-          final parsedTicket = travelParser.parseTicketFromText(
-            extractedText,
-            sourceType: SourceType.pdf,
-          );
-
-          if (parsedTicket == null) {
-            if (!mounted) return;
-            PdfResultHandler.showErrorMessage(
-              context,
-              'PDF content does not match any supported ticket format.',
-            );
-            return;
-          }
-
-          // Save to database
-          await ticketDao.insertTicket(parsedTicket);
-
-          if (!mounted) return;
+        if (ticket != null) {
           PdfResultHandler.showSuccessMessage(context);
-        } on Object {
-          if (!mounted) return;
+        } else {
           PdfResultHandler.showErrorMessage(
             context,
-            'Error processing PDF. Please try again.',
+            'Unable to read text from this PDF or content does'
+            ' not match any supported ticket format.',
           );
         }
+      }
+    } on Object {
+      if (mounted) {
+        PdfResultHandler.showErrorMessage(
+          context,
+          'Error processing PDF. Please try again.',
+        );
       }
     } finally {
       if (mounted) {
