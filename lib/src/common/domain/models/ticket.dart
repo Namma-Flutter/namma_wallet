@@ -26,6 +26,18 @@ class Ticket with TicketMappable {
   });
 
   factory Ticket.fromIRCTC(IRCTCTicket model) {
+    // Validate that required date/time fields are not null
+    if (model.dateOfJourney == null || model.scheduledDeparture == null) {
+      getIt<ILogger>().error(
+        '[Ticket.fromIRCTC] Missing required date/time: '
+        'dateOfJourney=${model.dateOfJourney}, '
+        'scheduledDeparture=${model.scheduledDeparture}',
+      );
+      throw ArgumentError(
+        'Cannot create IRCTC ticket: dateOfJourney or scheduledDeparture is null',
+      );
+    }
+
     return Ticket(
       ticketId: model.pnrNumber,
       primaryText: '${model.fromStation} → ${model.toStation}',
@@ -33,11 +45,11 @@ class Ticket with TicketMappable {
           'Train ${model.trainNumber} • ${model.travelClass} • '
           '${model.passengerName}',
       startTime: DateTime(
-        model.dateOfJourney.year,
-        model.dateOfJourney.month,
-        model.dateOfJourney.day,
-        model.scheduledDeparture.hour,
-        model.scheduledDeparture.minute,
+        model.dateOfJourney!.year,
+        model.dateOfJourney!.month,
+        model.dateOfJourney!.day,
+        model.scheduledDeparture!.hour,
+        model.scheduledDeparture!.minute,
       ),
       location: model.boardingStation,
       tags: [
@@ -66,15 +78,15 @@ class Ticket with TicketMappable {
         ExtrasModel(
           title: 'Departure',
           value:
-              '${model.scheduledDeparture.hour.toString().padLeft(2, '0')}'
-              ':${model.scheduledDeparture.minute.toString().padLeft(2, '0')}',
+              '${model.scheduledDeparture!.hour.toString().padLeft(2, '0')}'
+              ':${model.scheduledDeparture!.minute.toString().padLeft(2, '0')}',
         ),
         ExtrasModel(
           title: 'Date of Journey',
           value:
-              '${model.dateOfJourney.year}-'
-              '${model.dateOfJourney.month.toString().padLeft(2, '0')}-'
-              '${model.dateOfJourney.day.toString().padLeft(2, '0')}',
+              '${model.dateOfJourney!.year}-'
+              '${model.dateOfJourney!.month.toString().padLeft(2, '0')}-'
+              '${model.dateOfJourney!.day.toString().padLeft(2, '0')}',
         ),
         ExtrasModel(title: 'Fare', value: model.ticketFare.toStringAsFixed(2)),
         ExtrasModel(
@@ -105,13 +117,16 @@ class Ticket with TicketMappable {
 
     var startTime = model.passengerPickupTime ?? model.journeyDate;
 
-    // Log when falling back to DateTime.now() to help debug parsing issues
+    // Throw error if no valid date is available instead of using DateTime.now()
     if (startTime == null) {
-      getIt<ILogger>().warning(
-        '[Ticket.fromTNSTC] Both passengerPickupTime and journeyDate are null, '
-        'falling back to DateTime.now()',
+      getIt<ILogger>().error(
+        '[Ticket.fromTNSTC] Both passengerPickupTime and journeyDate are null. '
+        'Cannot create ticket without valid date.',
       );
-      startTime = DateTime.now();
+      throw ArgumentError(
+        'Cannot create TNSTC ticket: both passengerPickupTime and '
+        'journeyDate are null',
+      );
     }
 
     // If pickup time is missing, try to combine

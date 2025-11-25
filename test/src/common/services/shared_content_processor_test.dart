@@ -359,7 +359,7 @@ void main() {
               mockTicket: Ticket(
                 primaryText: 'Test → Test',
                 secondaryText: 'Test Bus',
-                startTime: DateTime.now(),
+                startTime: DateTime(2024),
                 location: 'Test',
                 type: TicketType.bus,
               ),

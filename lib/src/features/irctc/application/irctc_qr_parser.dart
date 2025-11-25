@@ -78,8 +78,8 @@ class IRCTCQRParser implements IIRCTCQRParser {
     return TravelTextParserUtils.parseDouble(cleanValue);
   }
 
-  DateTime _parseDateTime(String value) {
-    if (value.isEmpty) return DateTime.now();
+  DateTime? _parseDateTime(String value) {
+    if (value.isEmpty) return null;
 
     try {
       final parts = value.split(' ');
@@ -104,11 +104,11 @@ class IRCTCQRParser implements IIRCTCQRParser {
       _logger.error('Error parsing datetime: $value, error: $e');
     }
 
-    return DateTime.now();
+    return null;
   }
 
-  DateTime _parseDate(String value) {
-    if (value.isEmpty) return DateTime.now();
+  DateTime? _parseDate(String value) {
+    if (value.isEmpty) return null;
 
     try {
       final dateComponents = value.split('-');
@@ -123,7 +123,7 @@ class IRCTCQRParser implements IIRCTCQRParser {
       _logger.error('Error parsing date: $value, error: $e');
     }
 
-    return DateTime.now();
+    return null;
   }
 
   int _parseMonth(String monthStr) {

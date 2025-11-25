@@ -54,16 +54,6 @@ class IRCTCTicketMapper extends ClassMapperBase<IRCTCTicket> {
     'trainName',
     _$trainName,
   );
-  static DateTime _$scheduledDeparture(IRCTCTicket v) => v.scheduledDeparture;
-  static const Field<IRCTCTicket, DateTime> _f$scheduledDeparture = Field(
-    'scheduledDeparture',
-    _$scheduledDeparture,
-  );
-  static DateTime _$dateOfJourney(IRCTCTicket v) => v.dateOfJourney;
-  static const Field<IRCTCTicket, DateTime> _f$dateOfJourney = Field(
-    'dateOfJourney',
-    _$dateOfJourney,
-  );
   static String _$boardingStation(IRCTCTicket v) => v.boardingStation;
   static const Field<IRCTCTicket, String> _f$boardingStation = Field(
     'boardingStation',
@@ -94,6 +84,18 @@ class IRCTCTicketMapper extends ClassMapperBase<IRCTCTicket> {
     'irctcFee',
     _$irctcFee,
   );
+  static DateTime? _$scheduledDeparture(IRCTCTicket v) => v.scheduledDeparture;
+  static const Field<IRCTCTicket, DateTime> _f$scheduledDeparture = Field(
+    'scheduledDeparture',
+    _$scheduledDeparture,
+    opt: true,
+  );
+  static DateTime? _$dateOfJourney(IRCTCTicket v) => v.dateOfJourney;
+  static const Field<IRCTCTicket, DateTime> _f$dateOfJourney = Field(
+    'dateOfJourney',
+    _$dateOfJourney,
+    opt: true,
+  );
 
   @override
   final MappableFields<IRCTCTicket> fields = const {
@@ -106,14 +108,14 @@ class IRCTCTicketMapper extends ClassMapperBase<IRCTCTicket> {
     #quota: _f$quota,
     #trainNumber: _f$trainNumber,
     #trainName: _f$trainName,
-    #scheduledDeparture: _f$scheduledDeparture,
-    #dateOfJourney: _f$dateOfJourney,
     #boardingStation: _f$boardingStation,
     #travelClass: _f$travelClass,
     #fromStation: _f$fromStation,
     #toStation: _f$toStation,
     #ticketFare: _f$ticketFare,
     #irctcFee: _f$irctcFee,
+    #scheduledDeparture: _f$scheduledDeparture,
+    #dateOfJourney: _f$dateOfJourney,
   };
 
   static IRCTCTicket _instantiate(DecodingData data) {
@@ -127,14 +129,14 @@ class IRCTCTicketMapper extends ClassMapperBase<IRCTCTicket> {
       quota: data.dec(_f$quota),
       trainNumber: data.dec(_f$trainNumber),
       trainName: data.dec(_f$trainName),
-      scheduledDeparture: data.dec(_f$scheduledDeparture),
-      dateOfJourney: data.dec(_f$dateOfJourney),
       boardingStation: data.dec(_f$boardingStation),
       travelClass: data.dec(_f$travelClass),
       fromStation: data.dec(_f$fromStation),
       toStation: data.dec(_f$toStation),
       ticketFare: data.dec(_f$ticketFare),
       irctcFee: data.dec(_f$irctcFee),
+      scheduledDeparture: data.dec(_f$scheduledDeparture),
+      dateOfJourney: data.dec(_f$dateOfJourney),
     );
   }
 
@@ -208,14 +210,14 @@ abstract class IRCTCTicketCopyWith<$R, $In extends IRCTCTicket, $Out>
     String? quota,
     String? trainNumber,
     String? trainName,
-    DateTime? scheduledDeparture,
-    DateTime? dateOfJourney,
     String? boardingStation,
     String? travelClass,
     String? fromStation,
     String? toStation,
     double? ticketFare,
     double? irctcFee,
+    DateTime? scheduledDeparture,
+    DateTime? dateOfJourney,
   });
   IRCTCTicketCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
@@ -239,14 +241,14 @@ class _IRCTCTicketCopyWithImpl<$R, $Out>
     String? quota,
     String? trainNumber,
     String? trainName,
-    DateTime? scheduledDeparture,
-    DateTime? dateOfJourney,
     String? boardingStation,
     String? travelClass,
     String? fromStation,
     String? toStation,
     double? ticketFare,
     double? irctcFee,
+    Object? scheduledDeparture = $none,
+    Object? dateOfJourney = $none,
   }) => $apply(
     FieldCopyWithData({
       if (pnrNumber != null) #pnrNumber: pnrNumber,
@@ -258,14 +260,14 @@ class _IRCTCTicketCopyWithImpl<$R, $Out>
       if (quota != null) #quota: quota,
       if (trainNumber != null) #trainNumber: trainNumber,
       if (trainName != null) #trainName: trainName,
-      if (scheduledDeparture != null) #scheduledDeparture: scheduledDeparture,
-      if (dateOfJourney != null) #dateOfJourney: dateOfJourney,
       if (boardingStation != null) #boardingStation: boardingStation,
       if (travelClass != null) #travelClass: travelClass,
       if (fromStation != null) #fromStation: fromStation,
       if (toStation != null) #toStation: toStation,
       if (ticketFare != null) #ticketFare: ticketFare,
       if (irctcFee != null) #irctcFee: irctcFee,
+      if (scheduledDeparture != $none) #scheduledDeparture: scheduledDeparture,
+      if (dateOfJourney != $none) #dateOfJourney: dateOfJourney,
     }),
   );
   @override
@@ -279,17 +281,17 @@ class _IRCTCTicketCopyWithImpl<$R, $Out>
     quota: data.get(#quota, or: $value.quota),
     trainNumber: data.get(#trainNumber, or: $value.trainNumber),
     trainName: data.get(#trainName, or: $value.trainName),
-    scheduledDeparture: data.get(
-      #scheduledDeparture,
-      or: $value.scheduledDeparture,
-    ),
-    dateOfJourney: data.get(#dateOfJourney, or: $value.dateOfJourney),
     boardingStation: data.get(#boardingStation, or: $value.boardingStation),
     travelClass: data.get(#travelClass, or: $value.travelClass),
     fromStation: data.get(#fromStation, or: $value.fromStation),
     toStation: data.get(#toStation, or: $value.toStation),
     ticketFare: data.get(#ticketFare, or: $value.ticketFare),
     irctcFee: data.get(#irctcFee, or: $value.irctcFee),
+    scheduledDeparture: data.get(
+      #scheduledDeparture,
+      or: $value.scheduledDeparture,
+    ),
+    dateOfJourney: data.get(#dateOfJourney, or: $value.dateOfJourney),
   );
 
   @override
