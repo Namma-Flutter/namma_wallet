@@ -107,9 +107,9 @@ class TNSTCBusParser implements TravelTicketParser {
     if (text.toUpperCase().contains('TNSTC') &&
         (text.toLowerCase().contains('conductor mobile no') ||
             text.toLowerCase().contains('vehicle no'))) {
-      // Extract PNR
+      // Extract PNR - handle both "PNR:" and "PNR NO." formats
       final pnrMatch = RegExp(
-        r'PNR\s*:\s*([^,\s]+)',
+        r'(?:PNR NO\.\s*|PNR)\s*:\s*([^,\s]+)',
         caseSensitive: false,
       ).firstMatch(text);
 
@@ -150,7 +150,6 @@ class TNSTCBusParser implements TravelTicketParser {
 
       // Convert extras into JSON (so updateTicketById can merge it)
       updates['extras'] = jsonEncode(extrasUpdates);
-      updates['updated_at'] = DateTime.now().toIso8601String();
 
       // Safe logging
       final sanitizedPnr = _maskPnr(pnr);

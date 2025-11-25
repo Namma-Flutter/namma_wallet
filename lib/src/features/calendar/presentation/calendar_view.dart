@@ -47,11 +47,14 @@ class _CalendarContentState extends State<CalendarContent> {
   int _selectedFilter = 1;
 
   Future<void> _showDateRangePicker(CalendarProvider provider) async {
+    final now = DateTime.timestamp();
+    final today = DateTime(now.year, now.month, now.day);
+
     final initialRange =
         provider.selectedRange ??
         DateTimeRange(
-          start: DateTime.now(),
-          end: DateTime.now().add(const Duration(days: 7)),
+          start: today,
+          end: today.add(const Duration(days: 7)),
         );
 
     final pickedRange = await showDateRangePicker(

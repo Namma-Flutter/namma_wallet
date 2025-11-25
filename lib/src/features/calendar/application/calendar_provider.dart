@@ -12,13 +12,21 @@ class CalendarProvider extends ChangeNotifier {
   CalendarProvider({
     ILogger? logger,
     ITicketDAO? ticketDao,
+    DateTime? initialSelectedDay,
   }) : _logger = logger ?? getIt<ILogger>(),
-       _ticketDao = ticketDao ?? getIt<ITicketDAO>();
+       _ticketDao = ticketDao ?? getIt<ITicketDAO>(),
+       _selectedDay =
+           initialSelectedDay ??
+           DateTime(
+             DateTime.timestamp().year,
+             DateTime.timestamp().month,
+             DateTime.timestamp().day,
+           );
 
   final ILogger _logger;
   final ITicketDAO _ticketDao;
 
-  DateTime _selectedDay = DateTime.now();
+  DateTime _selectedDay;
   List<Event> _events = [];
   List<Ticket> _tickets = [];
   DateTimeRange? _selectedRange;

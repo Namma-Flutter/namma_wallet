@@ -63,7 +63,7 @@ class GoogleMLKitOCR implements IOCRService {
           // Save temporarily for ML Kit processing
           // Use timestamp to avoid conflicts between concurrent calls
           tempImageFile = File(
-            '${tempDir.path}/ocr_${DateTime.now().microsecondsSinceEpoch}_'
+            '${tempDir.path}/ocr_${DateTime.timestamp().microsecondsSinceEpoch}_'
             'page_${pageNum + 1}.png',
           );
 
