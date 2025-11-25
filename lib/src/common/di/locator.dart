@@ -20,7 +20,6 @@ import 'package:namma_wallet/src/features/clipboard/data/clipboard_repository.da
 import 'package:namma_wallet/src/features/clipboard/domain/clipboard_repository_interface.dart';
 import 'package:namma_wallet/src/features/irctc/application/irctc_qr_parser.dart';
 import 'package:namma_wallet/src/features/irctc/application/irctc_scanner_service.dart';
-import 'package:namma_wallet/src/features/pdf_extract/application/pdf_parser_service.dart';
 import 'package:namma_wallet/src/features/receive/application/shared_content_processor.dart';
 import 'package:namma_wallet/src/features/receive/application/sharing_intent_service.dart';
 import 'package:namma_wallet/src/features/receive/domain/sharing_intent_service_interface.dart';
@@ -63,14 +62,6 @@ void setupLocator() {
     )
     ..registerLazySingleton<ITravelParser>(
       () => TravelParserService(logger: getIt<ILogger>()),
-    )
-    ..registerLazySingleton<PDFParserService>(
-      () => PDFParserService(
-        logger: getIt<ILogger>(),
-        pdfParser: getIt<ITicketParser>(),
-        pdfService: getIt<IPDFService>(),
-        ticketDao: getIt<ITicketDAO>(),
-      ),
     )
     ..registerLazySingleton<ISharingIntentService>(
       () => SharingIntentService(
