@@ -1,5 +1,4 @@
 import 'package:namma_wallet/src/common/domain/models/ticket.dart';
-import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
 import 'package:namma_wallet/src/features/tnstc/domain/tnstc_model.dart';
 import 'package:namma_wallet/src/features/travel/application/travel_sms_parser.dart';
 
@@ -16,12 +15,7 @@ import 'package:namma_wallet/src/features/travel/application/travel_sms_parser.d
 ///   DateTime.now() fallback
 class TNSTCSMSParser extends TravelSMSParser {
   /// Creates a TNSTC SMS parser.
-  ///
-  /// [logger] - Optional logger for debugging.
-  /// Currently not used as parsing is straightforward and doesn't require
-  /// logging.
-  // ignore: avoid_unused_constructor_parameters
-  TNSTCSMSParser({ILogger? logger});
+  TNSTCSMSParser();
 
   @override
   Ticket parseTicket(String smsText) {

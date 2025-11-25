@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:listen_sharing_intent/listen_sharing_intent.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
 import 'package:namma_wallet/src/common/services/pdf/pdf_service_interface.dart';
-import 'package:namma_wallet/src/features/receive/application/shared_content_processor.dart';
+import 'package:namma_wallet/src/features/receive/domain/shared_content_type.dart';
 import 'package:namma_wallet/src/features/receive/domain/sharing_intent_service_interface.dart';
 import 'package:path/path.dart' as path;
 
@@ -44,8 +44,12 @@ class SharingIntentService implements ISharingIntentService {
         _logger.info('App launched with shared content: ${files.length}');
         await _handleSharedContent(files, onContentReceived, onError);
       }
-    } on Object catch (error) {
-      _logger.error('Error getting initial shared content: $error');
+    } on Object catch (error, stackTrace) {
+      _logger.error(
+        'Error getting initial shared content: $error',
+        error,
+        stackTrace,
+      );
       onError('Error getting initial shared content: $error');
     }
   }

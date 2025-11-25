@@ -9,8 +9,14 @@ import 'package:namma_wallet/src/features/events/domain/event_model.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class CalendarProvider extends ChangeNotifier {
-  CalendarProvider({ILogger? logger}) : _logger = logger ?? getIt<ILogger>();
+  CalendarProvider({
+    ILogger? logger,
+    ITicketDAO? ticketDao,
+  }) : _logger = logger ?? getIt<ILogger>(),
+       _ticketDao = ticketDao ?? getIt<ITicketDAO>();
+
   final ILogger _logger;
+  final ITicketDAO _ticketDao;
 
   DateTime _selectedDay = DateTime.now();
   List<Event> _events = [];
@@ -36,6 +42,7 @@ class CalendarProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  // TODO(harish): Wire to IEventDAO when events feature is implemented
   Future<void> loadEvents() async {
     // Initialize empty events list (no mocked data)
     _events = [];
@@ -46,9 +53,7 @@ class CalendarProvider extends ChangeNotifier {
 
   Future<void> loadTickets() async {
     try {
-      final ticketDao = getIt<ITicketDAO>();
-
-      _tickets = await ticketDao.getAllTickets();
+      _tickets = await _ticketDao.getAllTickets();
 
       notifyListeners();
     } on Exception catch (e, st) {
@@ -68,11 +73,20 @@ class CalendarProvider extends ChangeNotifier {
 
   List<DateTime> getDatesWithTickets() {
     final dates = <DateTime>[];
+    final seen = <DateTime>{};
+
     for (final ticket in _tickets) {
-      if (!dates.any((d) => isSameDay(d, ticket.startTime))) {
-        dates.add(ticket.startTime);
+      final dateOnly = DateTime(
+        ticket.startTime.year,
+        ticket.startTime.month,
+        ticket.startTime.day,
+      );
+
+      if (seen.add(dateOnly)) {
+        dates.add(dateOnly);
       }
     }
+
     return dates;
   }
 

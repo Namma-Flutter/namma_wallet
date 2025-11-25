@@ -8,10 +8,7 @@ import '../../../../helpers/fake_logger.dart';
 void main() {
   // Set up GetIt for tests
   setUp(() {
-    final getIt = GetIt.instance;
-    if (!getIt.isRegistered<ILogger>()) {
-      getIt.registerSingleton<ILogger>(FakeLogger());
-    }
+    GetIt.instance.registerSingleton<ILogger>(FakeLogger());
   });
 
   tearDown(() async {
