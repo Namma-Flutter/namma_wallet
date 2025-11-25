@@ -4,8 +4,8 @@ import 'package:namma_wallet/src/common/theme/styles.dart';
 import 'package:namma_wallet/src/common/widgets/snackbar_widget.dart';
 import 'package:namma_wallet/src/features/events/domain/event_model.dart';
 
-class CalendarEventCard extends StatelessWidget {
-  const CalendarEventCard({
+class EventCard extends StatelessWidget {
+  const EventCard({
     required this.event,
     super.key,
   });

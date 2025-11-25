@@ -9,7 +9,7 @@ import 'package:namma_wallet/src/common/enums/ticket_type.dart';
 import 'package:namma_wallet/src/common/helper/date_time_converter.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
 import 'package:namma_wallet/src/common/theme/styles.dart';
-import 'package:namma_wallet/src/common/widgets/custom_back_button.dart';
+import 'package:namma_wallet/src/common/widgets/rounded_back_button.dart';
 import 'package:namma_wallet/src/common/widgets/snackbar_widget.dart';
 import 'package:namma_wallet/src/features/home/domain/extras_model.dart';
 import 'package:namma_wallet/src/features/home/domain/ticket.dart';
@@ -200,7 +200,7 @@ class _TicketViewState extends State<TicketView> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        leading: const CustomBackButton(),
+        leading: const RoundedBackButton(),
         title: const Text('Ticket View'),
         actions: [
           if (widget.ticket.ticketId != null)

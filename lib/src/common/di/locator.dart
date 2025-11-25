@@ -7,7 +7,7 @@ import 'package:namma_wallet/src/common/database/wallet_database.dart';
 import 'package:namma_wallet/src/common/database/wallet_database_interface.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
 import 'package:namma_wallet/src/common/services/logger/namma_logger.dart';
-import 'package:namma_wallet/src/common/services/ocr/ocr_service.dart';
+import 'package:namma_wallet/src/common/services/ocr/google_mlkit_ocr.dart';
 import 'package:namma_wallet/src/common/services/ocr/ocr_service_interface.dart';
 import 'package:namma_wallet/src/common/services/pdf/pdf_service.dart';
 import 'package:namma_wallet/src/common/services/pdf/pdf_service_interface.dart';
@@ -45,7 +45,7 @@ void setupLocator() {
     ..registerLazySingleton<IUserDAO>(UserDao.new)
     // Core services
     ..registerLazySingleton<IOCRService>(
-      () => OCRService(logger: getIt<ILogger>()),
+      () => GoogleMLKitOCR(logger: getIt<ILogger>()),
     )
     ..registerLazySingleton<IPDFService>(
       () => PDFService(
@@ -54,7 +54,7 @@ void setupLocator() {
       ),
     )
     ..registerLazySingleton<IAIService>(
-      () => GemmaChatService(logger: getIt<ILogger>()),
+      () => GemmaService(logger: getIt<ILogger>()),
     )
     // Parsers
     ..registerLazySingleton<TNSTCSMSParser>(TNSTCSMSParser.new)

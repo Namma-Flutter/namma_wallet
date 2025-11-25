@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:namma_wallet/src/common/routing/app_routes.dart';
-import 'package:namma_wallet/src/features/calendar/presentation/calendar_view.dart';
-import 'package:namma_wallet/src/features/calendar/presentation/widgets/calendar_event_card.dart';
-import 'package:namma_wallet/src/features/home/presentation/widgets/travel_ticket_card_widget.dart';
+import 'package:namma_wallet/src/features/calendar/application/calendar_provider.dart';
+import 'package:namma_wallet/src/features/events/presentation/event_card.dart';
+import 'package:namma_wallet/src/features/travel/presentation/widgets/travel_ticket_card_widget.dart';
 
-class TicketsList extends StatelessWidget {
-  const TicketsList({
+class CalendarList extends StatelessWidget {
+  const CalendarList({
     required this.provider,
     super.key,
   });
@@ -81,7 +81,7 @@ class TicketsList extends StatelessWidget {
               style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
           ),
-          ...events.map((event) => CalendarEventCard(event: event)),
+          ...events.map((event) => EventCard(event: event)),
         ],
       ],
     );

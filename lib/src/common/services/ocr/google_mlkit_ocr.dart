@@ -7,8 +7,8 @@ import 'package:namma_wallet/src/common/services/ocr/ocr_service_interface.dart'
 import 'package:path_provider/path_provider.dart';
 import 'package:pdfrx/pdfrx.dart';
 
-class OCRService implements IOCRService {
-  OCRService({required ILogger logger}) : _logger = logger;
+class GoogleMLKitOCR implements IOCRService {
+  GoogleMLKitOCR({required ILogger logger}) : _logger = logger;
 
   final ILogger _logger;
 
