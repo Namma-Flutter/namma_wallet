@@ -93,6 +93,7 @@ class IRCTCQRParser implements IIRCTCQRParser {
         if (dateComponents.length == 3 && timeComponents.length >= 2) {
           final day = int.parse(dateComponents[0]);
           final month = _parseMonth(dateComponents[1]);
+          if (month == null) return null;
           final year = int.parse(dateComponents[2]);
           final hour = int.parse(timeComponents[0]);
           final minute = int.parse(timeComponents[1]);
@@ -115,6 +116,7 @@ class IRCTCQRParser implements IIRCTCQRParser {
       if (dateComponents.length == 3) {
         final day = int.parse(dateComponents[0]);
         final month = _parseMonth(dateComponents[1]);
+        if (month == null) return null;
         final year = int.parse(dateComponents[2]);
 
         return DateTime(year, month, day);
@@ -126,7 +128,7 @@ class IRCTCQRParser implements IIRCTCQRParser {
     return null;
   }
 
-  int _parseMonth(String monthStr) {
+  int? _parseMonth(String monthStr) {
     const months = {
       'Jan': 1,
       'Feb': 2,
@@ -144,8 +146,7 @@ class IRCTCQRParser implements IIRCTCQRParser {
 
     final result = months[monthStr] ?? int.tryParse(monthStr);
     if (result == null) {
-      _logger.warning('Unrecognized month string: $monthStr, defaulting to 1');
-      return 1;
+      _logger.warning('Unrecognized month string: $monthStr');
     }
     return result;
   }

@@ -57,10 +57,6 @@ class _TravelTicketViewState extends State<TravelTicketView> {
   ///
   // ignore: unused_element
   Future<void> _pinToHomeScreen() async {
-    // setState(() {
-    //   _isPinning = true;
-    // });
-
     try {
       const iOSWidgetName = 'TicketHomeWidget';
       const androidWidgetName = 'TicketHomeWidget';
@@ -80,18 +76,12 @@ class _TravelTicketViewState extends State<TravelTicketView> {
       }
     } on Object catch (e, stackTrace) {
       getIt<ILogger>().error(
-        '[TicketView] Failed to pin ticket to home screen',
+        '[TravelTicketView] Failed to pin ticket to home screen',
         e,
         stackTrace,
       );
       if (mounted) {
         showSnackbar(context, 'Failed to pin ticket: $e', isError: true);
-      }
-    } finally {
-      if (mounted) {
-        // setState(() {
-        //   _isPinning = false;
-        // });
       }
     }
   }
@@ -137,7 +127,7 @@ class _TravelTicketViewState extends State<TravelTicketView> {
       await getIt<ITicketDAO>().deleteTicket(widget.ticket.ticketId!);
 
       getIt<ILogger>().info(
-        '[TicketView] Successfully deleted ticket with '
+        '[TravelTicketView] Successfully deleted ticket with '
         'ID: ${widget.ticket.ticketId}',
       );
 
@@ -147,7 +137,7 @@ class _TravelTicketViewState extends State<TravelTicketView> {
       }
     } on Object catch (e, stackTrace) {
       getIt<ILogger>().error(
-        '[TicketView] Failed to delete ticket',
+        '[TravelTicketView] Failed to delete ticket',
         e,
         stackTrace,
       );
@@ -163,37 +153,6 @@ class _TravelTicketViewState extends State<TravelTicketView> {
       }
     }
   }
-
-  // TODO(keerthivasan-ai): Need clarification from harishwarrior
-  // Future<void> _makePhoneCall() async {
-  //   // final mobile = widget.ticket.contactMobile;
-  //   if (mobile == null || mobile.isEmpty) return;
-  //
-  //   final uri = Uri(scheme: 'tel', path: mobile);
-  //   try {
-  //     if (await canLaunchUrl(uri)) {
-  //       await launchUrl(uri);
-  //       getIt<ILogger>().info('[TicketView] Launched phone call to $mobile');
-  //     } else {
-  //       if (mounted) {
-  //         showSnackbar(
-  //           context,
-  //           'Cannot make phone calls on this device',
-  //           isError: true,
-  //         );
-  //       }
-  //     }
-  //   } on Object catch (e, stackTrace) {
-  //     getIt<ILogger>().error(
-  //       '[TicketView] Failed to launch phone call',
-  //       e,
-  //       stackTrace,
-  //     );
-  //     if (mounted) {
-  //       showSnackbar(context, 'Failed to make call: $e', isError: true);
-  //     }
-  //   }
-  // }
 
   @override
   Widget build(BuildContext context) {
