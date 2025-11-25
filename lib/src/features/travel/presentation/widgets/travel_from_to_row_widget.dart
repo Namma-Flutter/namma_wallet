@@ -1,85 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:namma_wallet/src/common/theme/styles.dart';
 
-class TicketLabelValueWidget extends StatelessWidget {
-  const TicketLabelValueWidget({
-    required this.label,
-    required this.value,
-    super.key,
-    this.alignment = CrossAxisAlignment.start,
-  });
-
-  final String label;
-  final String value;
-  final CrossAxisAlignment alignment;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: alignment,
-      children: [
-        Text(
-          label,
-          style: Paragraph03(
-            color: Theme.of(context).colorScheme.onSurface,
-          ).regular,
-        ),
-        Text(
-          value,
-          style: Paragraph02(
-            color: Theme.of(context).colorScheme.onSurface,
-          ).semiBold,
-        ),
-      ],
-    );
-  }
-}
-
-class TicketRowWidget extends StatelessWidget {
-  const TicketRowWidget({
-    required this.title1,
-    required this.title2,
-    super.key,
-    this.value1,
-    this.value2,
-  });
-
-  final String title1;
-  final String title2;
-  final String? value1;
-  final String? value2;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Expanded(
-          child: TicketLabelValueWidget(
-            label: title1,
-            value: value1 ?? '',
-          ),
-        ),
-        Expanded(
-          child: TicketLabelValueWidget(
-            label: title2,
-            value: value2 ?? '',
-            alignment: CrossAxisAlignment.end,
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class TicketFromToRowWidget extends StatelessWidget {
-  const TicketFromToRowWidget({
+/// A widget that displays "From" and "To" locations in a row layout.
+///
+/// Used in travel ticket views to show the origin and destination
+/// with proper styling and alignment.
+class TravelFromToRowWidget extends StatelessWidget {
+  const TravelFromToRowWidget({
     required this.from,
     required this.to,
     super.key,
   });
 
+  /// The origin/departure location
   final String from;
+
+  /// The destination/arrival location
   final String to;
 
   @override

@@ -14,20 +14,20 @@ import 'package:namma_wallet/src/common/theme/styles.dart';
 import 'package:namma_wallet/src/common/widgets/rounded_back_button.dart';
 import 'package:namma_wallet/src/common/widgets/snackbar_widget.dart';
 import 'package:namma_wallet/src/features/home/domain/ticket_extensions.dart';
-import 'package:namma_wallet/src/features/travel/presentation/widgets/custom_ticket_shape_line.dart';
-import 'package:namma_wallet/src/features/travel/presentation/widgets/ticket_view_widget.dart';
+import 'package:namma_wallet/src/features/travel/presentation/widgets/travel_row_widget.dart';
+import 'package:namma_wallet/src/features/travel/presentation/widgets/travel_ticket_shape_line.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
-class TicketView extends StatefulWidget {
-  const TicketView({required this.ticket, super.key});
+class TravelTicketView extends StatefulWidget {
+  const TravelTicketView({required this.ticket, super.key});
 
   final Ticket ticket;
 
   @override
-  State<TicketView> createState() => _TicketViewState();
+  State<TravelTicketView> createState() => _TravelTicketViewState();
 }
 
-class _TicketViewState extends State<TicketView> {
+class _TravelTicketViewState extends State<TravelTicketView> {
   bool _isDeleting = false;
 
   // Helper method to handle empty values
@@ -438,7 +438,7 @@ class _TicketViewState extends State<TicketView> {
                   const SizedBox(height: 12),
 
                   //* Date - Time
-                  TicketRowWidget(
+                  TravelRowWidget(
                     title1: 'Journey Date',
                     title2: 'Time',
                     value1: getValueOrDefault(
@@ -505,7 +505,7 @@ class _TicketViewState extends State<TicketView> {
             ),
             CustomPaint(
               size: Size(MediaQuery.of(context).size.width * 0.95, 40),
-              painter: CustomTicketShapeLine(
+              painter: TravelTicketShapeLine(
                 backgroundColor: Theme.of(context).colorScheme.surface,
                 dashedLineColor: Theme.of(context).colorScheme.onSurface
                     .withValues(
