@@ -1,6 +1,6 @@
 import 'package:namma_wallet/src/common/database/ticket_dao_interface.dart';
+import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
-import 'package:namma_wallet/src/features/home/domain/ticket.dart';
 import 'package:namma_wallet/src/features/home/domain/ticket_extensions.dart';
 import 'package:namma_wallet/src/features/receive/domain/shared_content_result.dart';
 import 'package:namma_wallet/src/features/tnstc/application/ticket_parser_interface.dart';

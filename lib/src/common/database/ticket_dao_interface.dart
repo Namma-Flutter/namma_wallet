@@ -1,4 +1,4 @@
-import 'package:namma_wallet/src/features/home/domain/ticket.dart';
+import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 
 /// Abstract interface for Ticket Data Access Object
 abstract interface class ITicketDAO {

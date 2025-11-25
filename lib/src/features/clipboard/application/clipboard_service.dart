@@ -1,13 +1,11 @@
-import 'package:flutter/material.dart';
 import 'package:namma_wallet/src/common/database/ticket_dao_interface.dart';
+import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 import 'package:namma_wallet/src/common/enums/source_type.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
-import 'package:namma_wallet/src/common/widgets/snackbar_widget.dart';
 import 'package:namma_wallet/src/features/clipboard/application/clipboard_service_interface.dart';
 import 'package:namma_wallet/src/features/clipboard/domain/clipboard_content_type.dart';
 import 'package:namma_wallet/src/features/clipboard/domain/clipboard_repository_interface.dart';
 import 'package:namma_wallet/src/features/clipboard/domain/clipboard_result.dart';
-import 'package:namma_wallet/src/features/home/domain/ticket.dart';
 import 'package:namma_wallet/src/features/travel/application/travel_parser_interface.dart';
 import 'package:namma_wallet/src/features/travel/application/travel_parser_service.dart';
 
@@ -173,36 +171,5 @@ class ClipboardService implements IClipboardService {
     if (text.length > maxTextLength) return false;
 
     return true;
-  }
-
-  @override
-  /// Shows a snackbar message based on the clipboard result.
-  ///
-  /// Displays success message or error.
-  /// Only shows if context is still mounted.
-  void showResultMessage(BuildContext context, ClipboardResult result) {
-    if (!context.mounted) return;
-
-    final message = result.isSuccess
-        ? switch (result.type) {
-            ClipboardContentType.travelTicket =>
-              result.ticket != null
-                  ? 'Travel ticket saved successfully!'
-                  : 'Ticket updated with conductor details!',
-            ClipboardContentType.invalid => 'Unknown content type',
-          }
-        : result.errorMessage ?? 'Unknown error occurred';
-
-    if (result.isSuccess) {
-      _logger.success('Clipboard operation succeeded: $message');
-    } else {
-      _logger.error('Clipboard operation failed: $message');
-    }
-
-    showSnackbar(
-      context,
-      message,
-      isError: !result.isSuccess,
-    );
   }
 }

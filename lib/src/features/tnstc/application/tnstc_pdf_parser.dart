@@ -1,4 +1,4 @@
-import 'package:namma_wallet/src/features/home/domain/ticket.dart';
+import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 import 'package:namma_wallet/src/features/tnstc/domain/tnstc_model.dart';
 import 'package:namma_wallet/src/features/travel/application/travel_pdf_parser.dart';
 

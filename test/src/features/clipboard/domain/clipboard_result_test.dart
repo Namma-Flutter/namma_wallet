@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 import 'package:namma_wallet/src/features/clipboard/domain/clipboard_content_type.dart';
 import 'package:namma_wallet/src/features/clipboard/domain/clipboard_result.dart';
-import 'package:namma_wallet/src/features/home/domain/ticket.dart';
 
 void main() {
   group('ClipboardResult Domain Model Tests', () {

@@ -12,8 +12,8 @@ import 'package:namma_wallet/src/common/services/ocr/ocr_service_interface.dart'
 import 'package:namma_wallet/src/common/services/pdf/pdf_service.dart';
 import 'package:namma_wallet/src/common/services/pdf/pdf_service_interface.dart';
 import 'package:namma_wallet/src/common/theme/theme_provider.dart';
-import 'package:namma_wallet/src/features/ai/fallback-parser/application/ai_service_interface.dart';
-import 'package:namma_wallet/src/features/ai/fallback-parser/application/gemma_service.dart';
+import 'package:namma_wallet/src/features/ai/fallback_parser/application/ai_service_interface.dart';
+import 'package:namma_wallet/src/features/ai/fallback_parser/application/gemma_service.dart';
 import 'package:namma_wallet/src/features/clipboard/application/clipboard_service.dart';
 import 'package:namma_wallet/src/features/clipboard/application/clipboard_service_interface.dart';
 import 'package:namma_wallet/src/features/clipboard/data/clipboard_repository.dart';

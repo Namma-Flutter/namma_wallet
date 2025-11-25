@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 import 'package:namma_wallet/src/common/helper/date_time_converter.dart';
-import 'package:namma_wallet/src/features/home/domain/ticket.dart';
 
 class EventTicketCardWidget extends StatelessWidget {
   const EventTicketCardWidget({
