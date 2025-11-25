@@ -7,6 +7,10 @@ import 'package:namma_wallet/src/common/database/wallet_database.dart';
 import 'package:namma_wallet/src/common/database/wallet_database_interface.dart';
 import 'package:namma_wallet/src/common/services/logger_interface.dart';
 import 'package:namma_wallet/src/common/services/namma_logger.dart';
+import 'package:namma_wallet/src/common/services/ocr/ocr_service.dart';
+import 'package:namma_wallet/src/common/services/ocr/ocr_service_interface.dart';
+import 'package:namma_wallet/src/common/services/pdf/pdf_service.dart';
+import 'package:namma_wallet/src/common/services/pdf/pdf_service_interface.dart';
 import 'package:namma_wallet/src/common/theme/theme_provider.dart';
 import 'package:namma_wallet/src/features/ai/fallback-parser/application/ai_service_interface.dart';
 import 'package:namma_wallet/src/features/ai/fallback-parser/application/gemma_service.dart';
@@ -22,15 +26,11 @@ import 'package:namma_wallet/src/features/pdf_extract/application/pdf_parser_ser
 import 'package:namma_wallet/src/features/receive/application/shared_content_processor.dart';
 import 'package:namma_wallet/src/features/receive/application/sharing_intent_service.dart';
 import 'package:namma_wallet/src/features/receive/domain/sharing_intent_service_interface.dart';
-import 'package:namma_wallet/src/features/tnstc/application/ocr_service.dart';
-import 'package:namma_wallet/src/features/tnstc/application/pdf_service.dart';
 import 'package:namma_wallet/src/features/tnstc/application/sms_service.dart';
 import 'package:namma_wallet/src/features/tnstc/application/sms_service_interface.dart';
 import 'package:namma_wallet/src/features/tnstc/application/ticket_parser_interface.dart';
 import 'package:namma_wallet/src/features/tnstc/application/tnstc_pdf_parser.dart';
 import 'package:namma_wallet/src/features/tnstc/application/tnstc_sms_parser.dart';
-import 'package:namma_wallet/src/features/tnstc/domain/ocr_service_interface.dart';
-import 'package:namma_wallet/src/features/tnstc/domain/pdf_service_interface.dart';
 
 final GetIt getIt = GetIt.instance;
 

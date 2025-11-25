@@ -3,11 +3,11 @@ import 'dart:collection';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:namma_wallet/src/common/services/logger_interface.dart';
+import 'package:namma_wallet/src/common/services/ocr/ocr_service_interface.dart';
 import 'package:namma_wallet/src/features/home/domain/ticket.dart';
 import 'package:namma_wallet/src/features/tnstc/application/ticket_parser_interface.dart';
 import 'package:namma_wallet/src/features/tnstc/application/tnstc_pdf_parser.dart';
 import 'package:namma_wallet/src/features/tnstc/application/tnstc_sms_parser.dart';
-import 'package:namma_wallet/src/features/tnstc/domain/ocr_service_interface.dart';
 
 import '../../../../helpers/fake_logger.dart';
 import '../../../../helpers/mock_ocr_service.dart';
