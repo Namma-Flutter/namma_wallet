@@ -21,7 +21,9 @@ import 'package:namma_wallet/src/features/clipboard/domain/clipboard_repository_
 import 'package:namma_wallet/src/features/import/application/import_service.dart';
 import 'package:namma_wallet/src/features/import/application/import_service_interface.dart';
 import 'package:namma_wallet/src/features/irctc/application/irctc_qr_parser.dart';
+import 'package:namma_wallet/src/features/irctc/application/irctc_qr_parser_interface.dart';
 import 'package:namma_wallet/src/features/irctc/application/irctc_scanner_service.dart';
+import 'package:namma_wallet/src/features/irctc/application/irctc_scanner_service_interface.dart';
 import 'package:namma_wallet/src/features/receive/application/shared_content_processor.dart';
 import 'package:namma_wallet/src/features/receive/application/sharing_intent_service.dart';
 import 'package:namma_wallet/src/features/receive/domain/sharing_intent_service_interface.dart';
@@ -79,11 +81,11 @@ void setupLocator() {
       ),
     )
     // Feature services
-    ..registerLazySingleton<IRCTCQRParser>(IRCTCQRParser.new)
-    ..registerLazySingleton<IRCTCScannerService>(
+    ..registerLazySingleton<IIRCTCQRParser>(IRCTCQRParser.new)
+    ..registerLazySingleton<IIRCTCScannerService>(
       () => IRCTCScannerService(
         logger: getIt<ILogger>(),
-        qrParser: getIt<IRCTCQRParser>(),
+        qrParser: getIt<IIRCTCQRParser>(),
         ticketDao: getIt<ITicketDAO>(),
       ),
     )
@@ -92,8 +94,8 @@ void setupLocator() {
         logger: getIt<ILogger>(),
         pdfService: getIt<IPDFService>(),
         travelParser: getIt<ITravelParser>(),
-        qrParser: getIt<IRCTCQRParser>(),
-        irctcScannerService: getIt<IRCTCScannerService>(),
+        qrParser: getIt<IIRCTCQRParser>(),
+        irctcScannerService: getIt<IIRCTCScannerService>(),
       ),
     )
     // Clipboard - Repository and Service
