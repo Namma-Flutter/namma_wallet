@@ -93,6 +93,15 @@ class SharedContentProcessor implements ISharedContentProcessor {
         );
       }
 
+      // Validate ticket has ID before inserting
+      if (ticket.ticketId == null || ticket.ticketId!.trim().isEmpty) {
+        _logger.error('Ticket parsed without ticketId');
+        return const ProcessingErrorResult(
+          message: 'Failed to process shared content',
+          error: 'Missing ticketId for shared content',
+        );
+      }
+
       await _insertOrUpdateTicket(ticket);
 
       final contentSource = contentType == SharedContentType.pdf
@@ -120,17 +129,6 @@ class SharedContentProcessor implements ISharedContentProcessor {
         date: ticket.date,
       );
     } on Exception catch (e, stackTrace) {
-      _logger.error(
-        'Error processing shared content',
-        e,
-        stackTrace,
-      );
-
-      return ProcessingErrorResult(
-        message: 'Failed to process shared content',
-        error: e.toString(),
-      );
-    } on Error catch (e, stackTrace) {
       _logger.error(
         'Error processing shared content',
         e,

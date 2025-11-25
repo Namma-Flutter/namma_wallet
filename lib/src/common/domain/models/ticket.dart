@@ -16,8 +16,8 @@ class Ticket with TicketMappable {
   const Ticket({
     required this.primaryText,
     required this.secondaryText,
-    this.startTime,
     required this.location,
+    this.startTime,
     this.type = TicketType.train,
     this.endTime,
     this.tags,

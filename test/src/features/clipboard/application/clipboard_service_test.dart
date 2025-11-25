@@ -299,7 +299,7 @@ void main() {
             ticketId: 'T12345678',
             primaryText: 'Chennai → Bangalore',
             secondaryText: 'TNSTC',
-            startTime: DateTime(2024, 1, 1),
+            startTime: DateTime(2024),
             location: 'Test',
           );
 
@@ -330,7 +330,7 @@ void main() {
             ticketId: 'T12345678',
             primaryText: 'Test',
             secondaryText: 'Test',
-            startTime: DateTime(2024, 1, 1),
+            startTime: DateTime(2024),
             location: 'Test',
           );
 
@@ -506,7 +506,7 @@ void main() {
             ticketId: 'T123456789',
             primaryText: 'Test',
             secondaryText: 'Test',
-            startTime: DateTime(2024, 1, 1),
+            startTime: DateTime(2024),
             location: 'Test',
           );
 
@@ -537,7 +537,7 @@ void main() {
             ticketId: 'T12',
             primaryText: 'Test',
             secondaryText: 'Test',
-            startTime: DateTime(2024, 1, 1),
+            startTime: DateTime(2024),
             location: 'Test',
           );
 
