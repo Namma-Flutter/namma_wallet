@@ -1,4 +1,3 @@
-
 import 'dart:convert';
 
 import 'package:namma_wallet/src/common/domain/models/ticket.dart';
@@ -200,8 +199,6 @@ class TravelParserService implements ITravelParser {
       ];
   final ILogger _logger;
   final List<TravelTicketParser> _parsers;
-
-
 
   /// Detects if this is an update SMS (e.g., conductor details for TNSTC)
   @override
