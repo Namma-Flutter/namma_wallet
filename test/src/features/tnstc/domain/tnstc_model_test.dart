@@ -28,7 +28,8 @@ void main() {
       );
       expect(
         passenger.toString(),
-        'PassengerInfo(Name: Jane Doe, Age: 28, Type: Adult, Gender: F, Seat: 12B)',
+        'PassengerInfo(Name: Jane Doe, Age: 28, Type: Adult, '
+        'Gender: F, Seat: 12B)',
       );
     });
 

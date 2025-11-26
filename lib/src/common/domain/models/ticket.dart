@@ -239,6 +239,11 @@ class Ticket with TicketMappable {
             title: 'Seats',
             value: model.numberOfSeats.toString(),
           ),
+        if (model.idCardType != null && model.idCardType!.isNotEmpty)
+          ExtrasModel(
+            title: 'ID Card Type',
+            value: model.idCardType!,
+          ),
         if (model.idCardNumber != null && model.idCardNumber!.isNotEmpty)
           ExtrasModel(
             title: 'Verification ID',
