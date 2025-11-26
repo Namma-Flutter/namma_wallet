@@ -112,11 +112,6 @@ fvm flutter analyze
 # Run tests (when available)
 fvm flutter test
 
-# Build for release
-fvm flutter build apk          # Android APK
-fvm flutter build ios          # iOS IPA
-```
-
 ### Build Commands with Makefile
 
 The project includes a `Makefile` for streamlined build processes. By default, it uses FVM (`fvm flutter` and `fvm dart`), but you can override this behavior.

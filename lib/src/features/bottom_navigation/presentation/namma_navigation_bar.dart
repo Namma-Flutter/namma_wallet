@@ -26,9 +26,9 @@ class _NammaNavigationBarState extends State<NammaNavigationBar> {
       route: AppRoute.home.path,
     ),
     NavItem(
-      icon: Icons.qr_code_scanner,
-      label: 'Scanner',
-      route: AppRoute.scanner.path,
+      icon: Icons.add_circle,
+      label: 'Import',
+      route: AppRoute.import.path,
     ),
     NavItem(
       icon: Icons.calendar_today,

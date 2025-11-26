@@ -8,11 +8,11 @@ import 'package:namma_wallet/src/features/export/presentation/export_view.dart';
 import 'package:namma_wallet/src/features/home/domain/ticket.dart';
 import 'package:namma_wallet/src/features/home/presentation/all_tickets_view.dart';
 import 'package:namma_wallet/src/features/home/presentation/home_view.dart';
+import 'package:namma_wallet/src/features/import/presentation/import_view.dart';
 import 'package:namma_wallet/src/features/profile/presentation/contributors_view.dart';
 import 'package:namma_wallet/src/features/profile/presentation/db_viewer_view.dart';
 import 'package:namma_wallet/src/features/profile/presentation/license_view.dart';
 import 'package:namma_wallet/src/features/profile/presentation/profile_view.dart';
-import 'package:namma_wallet/src/features/scanner/presentation/scanner_view.dart';
 import 'package:namma_wallet/src/features/share/presentation/share_success_view.dart';
 import 'package:namma_wallet/src/features/travel/presentation/ticket_view.dart';
 
@@ -36,9 +36,9 @@ final router = GoRouter(
           builder: (context, state) => const HomeView(),
         ),
         GoRoute(
-          path: AppRoute.scanner.path,
-          name: AppRoute.scanner.name,
-          builder: (context, state) => const ScannerView(),
+          path: AppRoute.import.path,
+          name: AppRoute.import.name,
+          builder: (context, state) => const ImportView(),
         ),
         GoRoute(
           path: AppRoute.calendar.path,

@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/services/haptic_service_interface.dart';
 import 'package:namma_wallet/src/common/widgets/custom_back_button.dart';
+import 'package:namma_wallet/src/common/widgets/snackbar_widget.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class Contributor {
@@ -172,12 +173,10 @@ class _ContributorsViewState extends State<ContributorsView> {
                       await launchUrl(url);
                     } on Exception catch (_) {
                       if (context.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              'Could not open ${contributor.profileUrl}',
-                            ),
-                          ),
+                        showSnackbar(
+                          context,
+                          'Could not open ${contributor.profileUrl}',
+                          isError: true,
                         );
                       }
                     }
