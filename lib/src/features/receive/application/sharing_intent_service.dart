@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:listen_sharing_intent/listen_sharing_intent.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
 import 'package:namma_wallet/src/common/services/pdf/pdf_service_interface.dart';
+import 'package:namma_wallet/src/features/receive/application/sharing_intent_provider.dart';
 import 'package:namma_wallet/src/features/receive/domain/shared_content_type.dart';
 import 'package:namma_wallet/src/features/receive/domain/sharing_intent_service_interface.dart';
 import 'package:path/path.dart' as path;
@@ -13,10 +14,15 @@ class SharingIntentService implements ISharingIntentService {
   SharingIntentService({
     required ILogger logger,
     required IPDFService pdfService,
+    ISharingIntentProvider? sharingIntentProvider,
   }) : _logger = logger,
-       _pdfService = pdfService;
+       _pdfService = pdfService,
+       _sharingIntentProvider =
+           sharingIntentProvider ?? SharingIntentProvider();
+
   final ILogger _logger;
   final IPDFService _pdfService;
+  final ISharingIntentProvider _sharingIntentProvider;
 
   StreamSubscription<List<SharedMediaFile>>? _intentDataStreamSubscription;
 
@@ -26,7 +32,7 @@ class SharingIntentService implements ISharingIntentService {
     onContentReceived,
     required void Function(String) onError,
   }) async {
-    _intentDataStreamSubscription = ReceiveSharingIntent.instance
+    _intentDataStreamSubscription = _sharingIntentProvider
         .getMediaStream()
         .listen(
           (List<SharedMediaFile> files) async {
@@ -39,7 +45,7 @@ class SharingIntentService implements ISharingIntentService {
         );
 
     try {
-      final files = await ReceiveSharingIntent.instance.getInitialMedia();
+      final files = await _sharingIntentProvider.getInitialMedia();
       if (files.isNotEmpty) {
         _logger.info('App launched with shared content: ${files.length}');
         await _handleSharedContent(files, onContentReceived, onError);

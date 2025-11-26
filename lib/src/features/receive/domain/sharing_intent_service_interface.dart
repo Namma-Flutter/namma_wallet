@@ -20,7 +20,7 @@ abstract class ISharingIntentService {
   ///
   /// The [onError] callback receives error messages when
   /// content processing fails.
-  void initialize({
+  Future<void> initialize({
     required void Function(String content, SharedContentType type)
     onContentReceived,
     required void Function(String) onError,

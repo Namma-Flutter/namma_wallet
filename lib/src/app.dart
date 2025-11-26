@@ -38,23 +38,25 @@ class _NammaWalletAppState extends State<NammaWalletApp> {
     _logger.info('App initialized');
 
     // Initialize sharing intent service for file and text content
-    _sharingService.initialize(
-      onContentReceived: (content, contentType) async {
-        // Process the content using the processor service
-        final result = await _contentProcessor.processContent(
-          content,
-          contentType,
-        );
+    unawaited(
+      _sharingService.initialize(
+        onContentReceived: (content, contentType) async {
+          // Process the content using the processor service
+          final result = await _contentProcessor.processContent(
+            content,
+            contentType,
+          );
 
-        // Handle the result using the share handler
-        _shareHandler.handleResult(result);
-      },
-      onError: (error) {
-        _logger.error('Sharing intent error: $error');
+          // Handle the result using the share handler
+          _shareHandler.handleResult(result);
+        },
+        onError: (error) {
+          _logger.error('Sharing intent error: $error');
 
-        // Handle the error using the share handler
-        _shareHandler.handleError(error);
-      },
+          // Handle the error using the share handler
+          _shareHandler.handleError(error);
+        },
+      ),
     );
   }
 
