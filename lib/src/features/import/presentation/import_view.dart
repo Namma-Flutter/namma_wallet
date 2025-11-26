@@ -36,13 +36,14 @@ class _ImportViewState extends State<ImportView> {
     setState(() {
       _isScanning = true;
     });
+
+    getIt<IHapticService>().triggerHaptic(
+      HapticType.selection,
+    );
+
     try {
       // Use import service to handle QR code
       final ticket = await _importService.importQRCode(qrData);
-
-      getIt<IHapticService>().triggerHaptic(
-        HapticType.selection,
-      );
 
       if (!mounted) return;
 
@@ -106,12 +107,12 @@ class _ImportViewState extends State<ImportView> {
       if (result != null && result.files.single.path != null) {
         final file = File(result.files.single.path!);
 
-        // Use import service to handle PDF
-        final ticket = await _importService.importAndSavePDFFile(file);
-
         getIt<IHapticService>().triggerHaptic(
           HapticType.selection,
         );
+
+        // Use import service to handle PDF
+        final ticket = await _importService.importAndSavePDFFile(file);
 
         if (!mounted) return;
 
