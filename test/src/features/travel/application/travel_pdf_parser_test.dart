@@ -71,5 +71,56 @@ void main() {
         expect(result, -1.0);
       });
     });
+
+    group('TNSTCPDFParser.parseTicket - idCardType cleanup', () {
+      test(
+        'should correctly clean up "rD Card" from idCardType',
+        () {
+          // Arrange
+          const pdfText = '''
+ID Card Type: Government Issued Photo rD Card
+ID Card Number: 1234567890
+''';
+          // Act
+          final ticket = (parser as TNSTCPDFParser).parseTicket(pdfText);
+
+          // Assert
+          expect(ticket.extras, isNotNull);
+          final idCardTypeExtra = ticket.extras!.firstWhere(
+            (e) => e.title == 'ID Card Type',
+            orElse: () => throw Exception('ID Card Type extra not found'),
+          );
+          expect(
+            idCardTypeExtra.value,
+            equals('Government Issued Photo ID Card'),
+          );
+        },
+      );
+
+      test(
+        'should correctly clean up "rD Card" from idCardType'
+        ' when also contains colon',
+        () {
+          // Arrange
+          const pdfText = '''
+ID Card Type: : Government Issued Photo rD Card
+ID Card Number: 1234567890
+''';
+          // Act
+          final ticket = (parser as TNSTCPDFParser).parseTicket(pdfText);
+
+          // Assert
+          expect(ticket.extras, isNotNull);
+          final idCardTypeExtra = ticket.extras!.firstWhere(
+            (e) => e.title == 'ID Card Type',
+            orElse: () => throw Exception('ID Card Type extra not found'),
+          );
+          expect(
+            idCardTypeExtra.value,
+            equals('Government Issued Photo ID Card'),
+          );
+        },
+      );
+    });
   });
 }

@@ -176,26 +176,27 @@ class TNSTCPDFParser extends TravelPDFParser {
     }
 
     var idCardType = extractMatch(
-      r'ID Card Type\s*:\s*([A-Za-z\s]+?)(?=\s*ID Card Number)',
+      r'ID Card Type\s*:\s*(.+?)(?:\n|$)',
       pdfText,
     );
-    // Fallback for ID Card Type if the specific lookahead fails
+
+    // Fallback if precise regex fails
     if (idCardType.isEmpty) {
-      // Look for "Government Issued Photo" specifically as it
-      // appears in the raw text
       if (pdfText.contains('Government Issued Photo')) {
         idCardType = 'Government Issued Photo ID Card';
       } else {
         // Try looser match - explicitly handle optional colon and whitespace
         idCardType = extractMatch(r'ID Card Type\s*:?\s*(.*)', pdfText).trim();
-        // Clean up if it grabbed too much or garbage
-        if (idCardType.contains('rD Card')) {
-          idCardType = idCardType.replaceAll('rD Card', '').trim();
-        }
-        // Remove any leading colon or punctuation that might remain
-        idCardType = idCardType.replaceFirst(RegExp(r'^[:;\s]+'), '');
       }
     }
+
+    // Always apply cleanup if 'rD Card' is present
+    if (idCardType.contains('rD Card')) {
+      idCardType = idCardType.replaceAll('rD Card', 'ID Card');
+    }
+
+    // Remove any leading colon or punctuation that might remain
+    idCardType = idCardType.replaceFirst(RegExp(r'^[:;\s]+'), '').trim();
 
     final idCardNumber = extractMatch(
       r'ID Card Number\s*:\s*([0-9]+)',
