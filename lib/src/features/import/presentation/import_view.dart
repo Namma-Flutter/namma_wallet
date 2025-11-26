@@ -38,12 +38,13 @@ class _ImportViewState extends State<ImportView> {
       // Check if it's an IRCTC QR code
       if (_qrParser.isIRCTCQRCode(qrData)) {
         final irctcService = getIt<IRCTCScannerService>();
-        final hapticService = getIt<IHapticService>();
-        final result = await irctcService.parseAndSaveIRCTCTicket(qrData);
 
-        hapticService.triggerHaptic(
+        getIt<IHapticService>().triggerHaptic(
           HapticType.selection,
         );
+
+        final result = await irctcService.parseAndSaveIRCTCTicket(qrData);
+
         if (!mounted) return;
         irctcService.showResultMessage(context, result);
       } else {
@@ -80,13 +81,13 @@ class _ImportViewState extends State<ImportView> {
       if (result != null && result.files.single.path != null) {
         final file = File(result.files.single.path!);
         final pdfParserService = getIt<PDFParserService>();
-        final hapticService = getIt<IHapticService>();
+
+        getIt<IHapticService>().triggerHaptic(
+          HapticType.selection,
+        );
 
         final parseResult = await pdfParserService.parseAndSavePDFTicket(file);
 
-        hapticService.triggerHaptic(
-          HapticType.selection,
-        );
         if (!mounted) return;
         pdfParserService.showResultMessage(context, parseResult);
       }
@@ -106,16 +107,15 @@ class _ImportViewState extends State<ImportView> {
       _isPasting = true;
     });
 
+    getIt<IHapticService>().triggerHaptic(
+      HapticType.selection,
+    );
+
     try {
       final clipboardService = getIt<ClipboardService>();
       final result = await clipboardService.readAndParseClipboard();
-      final hapticService = getIt<IHapticService>();
 
       if (!mounted) return;
-
-      hapticService.triggerHaptic(
-        HapticType.selection,
-      );
 
       clipboardService.showResultMessage(context, result);
     } finally {

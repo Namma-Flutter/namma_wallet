@@ -45,9 +45,6 @@ class CalendarProvider extends ChangeNotifier {
   }
 
   Future<void> loadEvents() async {
-    getIt<IHapticService>().triggerHaptic(
-      HapticType.selection,
-    );
     // Load events from JSON
     final response = await rootBundle.loadString(
       'assets/data/other_cards.json',
