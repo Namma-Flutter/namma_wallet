@@ -6,7 +6,7 @@ abstract interface class IImportService {
   /// Import a PDF file and parse it as a travel ticket
   ///
   /// Returns the parsed ticket if successful, null otherwise
-  Future<Ticket?> importPDFFile(File pdfFile);
+  Future<Ticket?> importAndSavePDFFile(File pdfFile);
 
   /// Import QR code data and parse it as a travel ticket
   ///

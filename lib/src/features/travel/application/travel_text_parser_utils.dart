@@ -48,6 +48,23 @@ class TravelTextParserUtils {
       final day = int.parse(parts[0]);
       final month = int.parse(parts[1]);
       final year = int.parse(parts[2]);
+
+      // Validate that this is DD/MM/YYYY format, not YYYY-MM-DD
+      // Day should be <= 31, month should be <= 12
+      // Year should be >= 1000 (4 digits)
+      if (day > 31 || day < 1) {
+        logger.warning('Invalid day value in date: $date');
+        return null;
+      }
+      if (month > 12 || month < 1) {
+        logger.warning('Invalid month value in date: $date');
+        return null;
+      }
+      if (year < 1000 || year > 9999) {
+        logger.warning('Invalid year value in date: $date');
+        return null;
+      }
+
       return DateTime(year, month, day);
     } on FormatException catch (e) {
       logger.warning('Failed to parse date: $e');

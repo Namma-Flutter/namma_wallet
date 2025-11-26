@@ -12,7 +12,6 @@ import 'package:namma_wallet/src/common/widgets/snackbar_widget.dart';
 import 'package:namma_wallet/src/features/clipboard/application/clipboard_service_interface.dart';
 import 'package:namma_wallet/src/features/clipboard/presentation/clipboard_result_handler.dart';
 import 'package:namma_wallet/src/features/import/application/import_service_interface.dart';
-import 'package:namma_wallet/src/features/import/presentation/pdf_result_handler.dart';
 
 class ImportView extends StatefulWidget {
   const ImportView({super.key});
@@ -100,25 +99,27 @@ class _ImportViewState extends State<ImportView> {
         final file = File(result.files.single.path!);
 
         // Use import service to handle PDF
-        final ticket = await _importService.importPDFFile(file);
+        final ticket = await _importService.importAndSavePDFFile(file);
 
         if (!mounted) return;
 
         if (ticket != null) {
-          PdfResultHandler.showSuccessMessage(context);
+          showSnackbar(context, 'PDF ticket imported successfully!');
         } else {
-          PdfResultHandler.showErrorMessage(
+          showSnackbar(
             context,
             'Unable to read text from this PDF or content does'
             ' not match any supported ticket format.',
+            isError: true,
           );
         }
       }
     } on Exception catch (e) {
       if (mounted) {
-        PdfResultHandler.showErrorMessage(
+        showSnackbar(
           context,
           'Error processing PDF. Please try again.',
+          isError: true,
         );
       }
       _logger.error('PDF import error: $e');

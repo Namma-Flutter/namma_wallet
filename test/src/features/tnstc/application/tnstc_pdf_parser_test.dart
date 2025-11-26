@@ -373,7 +373,7 @@ Trip Code : TEST123
       });
 
       test('Given malformed date parts, When parsing ticket, '
-          'Then falls back to current date', () {
+          'Then returns null', () {
         const pdfText = '''
 Corporation : SETC
 PNR Number : T12345678
@@ -383,8 +383,8 @@ Trip Code : TEST123
 
         final ticket = parser.parseTicket(pdfText);
 
-        // Should fall back to current date due to invalid date values
-        expect(ticket.startTime, isNotNull);
+        // Should return null for invalid date values
+        expect(ticket.startTime, isNull);
       });
     });
 
