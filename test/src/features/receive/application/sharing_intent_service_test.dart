@@ -88,11 +88,16 @@ void main() {
 
       test('should handle stream errors', () async {
         mockProvider.initialMedia = [];
-        // We can't easily inject error into the stream controller from outside
-        // without modifying the mock, but we can verify
-        // the error callback logic
-        // if we could trigger it.
-        // For now, we trust the stream listener setup.
+        var errorReported = false;
+        await service.initialize(
+          onContentReceived: (_, _) => fail('Should not receive content'),
+          onError: (error) {
+            errorReported = true;
+          },
+        );
+        mockProvider.emitError(Exception('Test error'));
+        await Future<void>.delayed(Duration.zero);
+        expect(errorReported, isTrue);
       });
     });
 

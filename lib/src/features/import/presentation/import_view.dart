@@ -65,6 +65,7 @@ class _ImportViewState extends State<ImportView> {
   Future<void> _onBarcodeCaptured(BarcodeCapture capture) async {
     // Check if barcodes list is not empty
     if (capture.barcodes.isEmpty) {
+      if (!mounted) return;
       context.pop();
       return;
     }
@@ -74,10 +75,12 @@ class _ImportViewState extends State<ImportView> {
 
     // Check if rawValue is non-null
     if (qrData == null) {
+      if (!mounted) return;
       context.pop();
       return;
     }
 
+    if (!mounted) return;
     context.pop();
     await _handleQRCodeScan(qrData);
   }

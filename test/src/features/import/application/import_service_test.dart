@@ -134,8 +134,8 @@ void main() {
       fromStation: 'START',
       toStation: 'END',
       boardingStation: 'START',
-      dateOfJourney: DateTime.now(),
-      scheduledDeparture: DateTime.now().add(const Duration(hours: 1)),
+      dateOfJourney: DateTime(2025, 1, 15, 10, 0),
+      scheduledDeparture: DateTime(2025, 1, 15, 11, 0),
       passengerName: 'Test Passenger',
       age: 30,
       gender: 'M',
@@ -219,6 +219,7 @@ void main() {
           final result = await importService.importAndSavePDFFile(testPdfFile);
           // Assert
           expect(result, isNull);
+          expect(fakeLogger.errorLogs, isNotEmpty);
         },
       );
     });
@@ -272,6 +273,7 @@ void main() {
           final result = await importService.importQRCode(qrData);
           // Assert
           expect(result, isNull);
+          expect(fakeLogger.errorLogs, isNotEmpty);
         },
       );
     });

@@ -117,7 +117,7 @@ Key packages:
 
 ### Error Handling and Parsing Rules
 
-**CRITICAL: Never Fall Back to Default Values**
+### CRITICAL: Never Fall Back to Default Values
 
 - **Never use fallback/default values** when parsing fails
 - **Always return `null`** if parsing, extraction, or validation fails

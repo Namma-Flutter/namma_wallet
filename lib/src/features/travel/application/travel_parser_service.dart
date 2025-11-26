@@ -342,7 +342,7 @@ class SETCBusParser implements TravelTicketParser {
 
     // Check if it contains SETC but not TNSTC
     final hasSETC = setcPatterns.any(
-      (pattern) => text.toUpperCase().contains(pattern),
+      (pattern) => text.toUpperCase().contains(pattern.toUpperCase()),
     );
     final hasTNSTC = text.toUpperCase().contains('TNSTC');
 
