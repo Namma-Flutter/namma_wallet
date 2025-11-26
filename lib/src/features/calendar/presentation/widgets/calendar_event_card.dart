@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:namma_wallet/src/common/theme/styles.dart';
+import 'package:namma_wallet/src/common/widgets/snackbar_widget.dart';
 import 'package:namma_wallet/src/features/calendar/domain/event_model.dart';
 
 class CalendarEventCard extends StatelessWidget {
@@ -214,11 +215,9 @@ class CalendarEventCard extends StatelessWidget {
               ),
               IconButton(
                 onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Event details: ${event.title}'),
-                      duration: const Duration(seconds: 2),
-                    ),
+                  showSnackbar(
+                    context,
+                    'Event details: ${event.title}',
                   );
                 },
                 icon: const Icon(

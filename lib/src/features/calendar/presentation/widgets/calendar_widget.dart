@@ -63,15 +63,15 @@ class CalendarWidget extends StatelessWidget {
           }
           return Container(
             margin: const EdgeInsets.all(4),
-            decoration: const BoxDecoration(
-              color: Colors.blue,
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.primary,
               shape: BoxShape.circle,
             ),
             child: Center(
               child: Text(
                 '${day.day}',
-                style: const TextStyle(
-                  color: Colors.white,
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onPrimary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -89,15 +89,17 @@ class CalendarWidget extends StatelessWidget {
           }
           return Container(
             margin: const EdgeInsets.all(4),
-            decoration: const BoxDecoration(
-              color: Colors.blueAccent,
+            decoration: BoxDecoration(
+              color: Theme.of(
+                context,
+              ).colorScheme.primary.withValues(alpha: 0.7),
               shape: BoxShape.circle,
             ),
             child: Center(
               child: Text(
                 '${day.day}',
-                style: const TextStyle(
-                  color: Colors.white,
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onPrimary,
                   fontWeight: FontWeight.bold,
                 ),
               ),

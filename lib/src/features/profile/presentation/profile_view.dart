@@ -6,6 +6,7 @@ import 'package:namma_wallet/src/common/services/haptic_service_extension.dart';
 import 'package:namma_wallet/src/common/services/haptic_service_interface.dart';
 import 'package:namma_wallet/src/common/theme/theme_provider.dart';
 import 'package:namma_wallet/src/common/widgets/custom_back_button.dart';
+import 'package:namma_wallet/src/common/widgets/snackbar_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -100,13 +101,10 @@ class _ProfileViewState extends State<ProfileView> {
                   try {
                     if (!await canLaunchUrl(uri)) {
                       if (context.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text(
-                              'No email app found. '
-                              'Please install a mail client.',
-                            ),
-                          ),
+                        showSnackbar(
+                          context,
+                          'No email app found. Please install a mail client.',
+                          isError: true,
                         );
                       }
                       return;
@@ -118,12 +116,10 @@ class _ProfileViewState extends State<ProfileView> {
                     );
                   } on Exception {
                     if (context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text(
-                            'Failed to open email app. Please try again.',
-                          ),
-                        ),
+                      showSnackbar(
+                        context,
+                        'Failed to open email app. Please try again.',
+                        isError: true,
                       );
                     }
                   }

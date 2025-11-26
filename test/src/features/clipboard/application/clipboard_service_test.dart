@@ -116,7 +116,7 @@ void main() {
     group('readAndParseClipboard - Success Scenarios', () {
       test(
         'Given clipboard with plain text, When reading and parsing, '
-        'Then returns success result with text content',
+        'Then returns error result indicating text cannot be parsed',
         () async {
           // Arrange (Given)
           const clipboardText = 'Hello from clipboard';
@@ -131,10 +131,12 @@ void main() {
           final result = await service.readAndParseClipboard();
 
           // Assert (Then)
-          expect(result.isSuccess, isTrue);
-          expect(result.type, equals(ClipboardContentType.text));
-          expect(result.content, equals(clipboardText));
-          expect(result.ticket, isNull);
+          expect(result.isSuccess, isFalse);
+          expect(result.type, equals(ClipboardContentType.invalid));
+          expect(
+            result.errorMessage,
+            contains('Unable to process the text as a travel ticket'),
+          );
         },
       );
 
@@ -381,7 +383,7 @@ void main() {
     group('Edge Cases and Boundary Conditions', () {
       test(
         'Given text at exact max length, When reading and parsing, '
-        'Then processes successfully',
+        'Then returns error if not parseable as ticket',
         () async {
           // Arrange (Given)
           final exactLengthText = 'A' * ClipboardService.maxTextLength;
@@ -396,17 +398,17 @@ void main() {
           final result = await service.readAndParseClipboard();
 
           // Assert (Then)
-          expect(result.isSuccess, isTrue);
+          expect(result.isSuccess, isFalse);
           expect(
-            result.content?.length,
-            equals(ClipboardService.maxTextLength),
+            result.errorMessage,
+            contains('Unable to process the text as a travel ticket'),
           );
         },
       );
 
       test(
         'Given text with special characters, When reading and parsing, '
-        'Then preserves all characters',
+        'Then returns error if not parseable as ticket',
         () async {
           // Arrange (Given)
           const specialText = r'Test@#$%^&*()_+{}|:"<>?';
@@ -421,14 +423,17 @@ void main() {
           final result = await service.readAndParseClipboard();
 
           // Assert (Then)
-          expect(result.isSuccess, isTrue);
-          expect(result.content, equals(specialText));
+          expect(result.isSuccess, isFalse);
+          expect(
+            result.errorMessage,
+            contains('Unable to process the text as a travel ticket'),
+          );
         },
       );
 
       test(
         'Given text with Unicode characters, When reading and parsing, '
-        'Then preserves Unicode correctly',
+        'Then returns error if not parseable as ticket',
         () async {
           // Arrange (Given)
           const unicodeText = 'தமிழ் நாடு பேருந்து 中文 🎫';
@@ -443,15 +448,17 @@ void main() {
           final result = await service.readAndParseClipboard();
 
           // Assert (Then)
-          expect(result.isSuccess, isTrue);
-          expect(result.content, contains('தமிழ்'));
-          expect(result.content, contains('🎫'));
+          expect(result.isSuccess, isFalse);
+          expect(
+            result.errorMessage,
+            contains('Unable to process the text as a travel ticket'),
+          );
         },
       );
 
       test(
         'Given multiline text, When reading and parsing, '
-        'Then preserves line breaks',
+        'Then returns error if not parseable as ticket',
         () async {
           // Arrange (Given)
           const multilineText = 'Line 1\nLine 2\nLine 3';
@@ -466,8 +473,11 @@ void main() {
           final result = await service.readAndParseClipboard();
 
           // Assert (Then)
-          expect(result.isSuccess, isTrue);
-          expect(result.content, contains('\n'));
+          expect(result.isSuccess, isFalse);
+          expect(
+            result.errorMessage,
+            contains('Unable to process the text as a travel ticket'),
+          );
         },
       );
     });
