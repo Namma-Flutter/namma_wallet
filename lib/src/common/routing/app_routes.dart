@@ -24,10 +24,7 @@ enum AppRoute {
   contributors(path: '/contributors', name: 'contributors'),
 
   // Debug routes
-  dbViewer(path: '/db-viewer', name: 'dbViewer'),
-
-  // Haptic demo
-  hapticDemo(path: '/haptic-demo', name: 'hapticDemo');
+  dbViewer(path: '/db-viewer', name: 'dbViewer');
 
   const AppRoute({required this.path, required this.name});
 
