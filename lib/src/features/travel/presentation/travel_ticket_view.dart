@@ -9,6 +9,8 @@ import 'package:namma_wallet/src/common/domain/models/extras_model.dart';
 import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 import 'package:namma_wallet/src/common/enums/ticket_type.dart';
 import 'package:namma_wallet/src/common/helper/date_time_converter.dart';
+import 'package:namma_wallet/src/common/services/haptic/haptic_service_extension.dart';
+import 'package:namma_wallet/src/common/services/haptic/haptic_service_interface.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
 import 'package:namma_wallet/src/common/theme/styles.dart';
 import 'package:namma_wallet/src/common/widgets/rounded_back_button.dart';
@@ -91,7 +93,6 @@ class _TravelTicketViewState extends State<TravelTicketView> {
       showSnackbar(context, 'Cannot delete this ticket', isError: true);
       return;
     }
-
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -112,6 +113,9 @@ class _TravelTicketViewState extends State<TravelTicketView> {
     );
 
     if (mounted && (confirmed ?? false)) {
+      getIt<IHapticService>().triggerHaptic(
+        HapticType.selection,
+      );
       await _deleteTicket();
     }
   }
@@ -132,7 +136,12 @@ class _TravelTicketViewState extends State<TravelTicketView> {
       );
 
       if (mounted) {
+        final hapticService = getIt<IHapticService>();
+
         showSnackbar(context, 'Ticket deleted successfully');
+        hapticService.triggerHaptic(
+          HapticType.success,
+        );
         context.pop(true); // Return true to indicate ticket was deleted
       }
     } on Object catch (e, stackTrace) {
@@ -143,7 +152,13 @@ class _TravelTicketViewState extends State<TravelTicketView> {
       );
 
       if (mounted) {
+        final hapticService = getIt<IHapticService>();
+
         showSnackbar(context, 'Failed to delete ticket: $e', isError: true);
+
+        hapticService.triggerHaptic(
+          HapticType.error,
+        );
       }
     } finally {
       if (mounted) {

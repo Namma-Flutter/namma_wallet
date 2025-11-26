@@ -86,7 +86,6 @@ class _ContributorsViewState extends State<ContributorsView> {
         );
       }
     }
-
     return contributors;
   }
 

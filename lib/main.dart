@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:namma_wallet/src/app.dart';
 import 'package:namma_wallet/src/common/database/wallet_database_interface.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
+import 'package:namma_wallet/src/common/services/haptic/haptic_services.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
 import 'package:namma_wallet/src/common/theme/theme_provider.dart';
 import 'package:namma_wallet/src/features/ai/fallback_parser/application/ai_service_interface.dart';
@@ -33,7 +34,7 @@ Future<void> main() async {
     pdfInitError = e;
     pdfInitStackTrace = stackTrace;
   }
-
+  await HapticServices.loadPreference();
   // Setup dependency injection
   setupLocator();
 

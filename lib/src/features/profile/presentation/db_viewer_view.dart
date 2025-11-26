@@ -9,6 +9,8 @@ import 'package:namma_wallet/src/common/database/user_dao_interface.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 import 'package:namma_wallet/src/common/domain/models/user.dart';
+import 'package:namma_wallet/src/common/services/haptic/haptic_service_extension.dart';
+import 'package:namma_wallet/src/common/services/haptic/haptic_service_interface.dart';
 import 'package:namma_wallet/src/common/widgets/rounded_back_button.dart';
 
 class DbViewerView extends StatefulWidget {
@@ -23,6 +25,7 @@ class _DbViewerViewState extends State<DbViewerView>
   late final TabController _tabController;
   List<User> users = <User>[];
   List<Ticket> tickets = <Ticket>[];
+  final IHapticService hapticService = getIt<IHapticService>();
 
   @override
   void initState() {
@@ -41,6 +44,7 @@ class _DbViewerViewState extends State<DbViewerView>
       users = u;
       tickets = t;
     });
+    hapticService.triggerHaptic(HapticType.success);
   }
 
   @override
