@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:namma_wallet/src/features/home/domain/ticket.dart';
+import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 import 'package:namma_wallet/src/features/tnstc/domain/tnstc_model.dart';
 
 void main() {
@@ -15,10 +15,10 @@ void main() {
     final ticket = Ticket.fromTNSTC(model);
 
     // Expect startTime to be 2026-01-18 13:15:00
-    expect(ticket.startTime.year, 2026);
-    expect(ticket.startTime.month, 1);
-    expect(ticket.startTime.day, 18);
-    expect(ticket.startTime.hour, 13);
-    expect(ticket.startTime.minute, 15);
+    expect(ticket.startTime?.year, 2026);
+    expect(ticket.startTime?.month, 1);
+    expect(ticket.startTime?.day, 18);
+    expect(ticket.startTime?.hour, 13);
+    expect(ticket.startTime?.minute, 15);
   });
 }

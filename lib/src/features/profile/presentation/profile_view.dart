@@ -5,7 +5,7 @@ import 'package:namma_wallet/src/common/routing/app_routes.dart';
 import 'package:namma_wallet/src/common/services/haptic_service_extension.dart';
 import 'package:namma_wallet/src/common/services/haptic_service_interface.dart';
 import 'package:namma_wallet/src/common/theme/theme_provider.dart';
-import 'package:namma_wallet/src/common/widgets/custom_back_button.dart';
+import 'package:namma_wallet/src/common/widgets/rounded_back_button.dart';
 import 'package:namma_wallet/src/common/widgets/snackbar_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -50,7 +50,7 @@ class _ProfileViewState extends State<ProfileView> {
 
     return Scaffold(
       appBar: AppBar(
-        leading: const CustomBackButton(),
+        leading: const RoundedBackButton(),
         title: const Text('Profile'),
       ),
       body: SingleChildScrollView(
@@ -70,8 +70,8 @@ class _ProfileViewState extends State<ProfileView> {
                 title: 'Contributors',
                 subtitle: 'View project contributors',
                 trailing: const Icon(Icons.chevron_right),
-                onTap: () {
-                  context.pushNamed(AppRoute.contributors.name);
+                onTap: () async {
+                  await context.pushNamed(AppRoute.contributors.name);
                 },
               ),
 
@@ -81,8 +81,8 @@ class _ProfileViewState extends State<ProfileView> {
                 title: 'Licenses',
                 subtitle: 'View open source licenses',
                 trailing: const Icon(Icons.chevron_right),
-                onTap: () {
-                  context.pushNamed(AppRoute.license.name);
+                onTap: () async {
+                  await context.pushNamed(AppRoute.license.name);
                 },
               ),
 
@@ -167,8 +167,8 @@ class _ProfileViewState extends State<ProfileView> {
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          context.pushNamed(AppRoute.dbViewer.name);
+        onPressed: () async {
+          await context.pushNamed(AppRoute.dbViewer.name);
         },
         label: const Text('View DB'),
         icon: const Icon(Icons.storage),
@@ -221,11 +221,11 @@ class ThemeSectionWidget extends StatelessWidget {
                     : 'Light theme enabled',
               ),
               value: themeProvider.isDarkMode,
-              onChanged: (value) {
+              onChanged: (value) async {
                 if (value) {
-                  themeProvider.setDarkMode();
+                  await themeProvider.setDarkMode();
                 } else {
-                  themeProvider.setLightMode();
+                  await themeProvider.setLightMode();
                 }
               },
               secondary: Icon(
@@ -237,11 +237,11 @@ class ThemeSectionWidget extends StatelessWidget {
               title: const Text('Use System Theme'),
               trailing: Switch(
                 value: themeProvider.isSystemMode,
-                onChanged: (value) {
+                onChanged: (value) async {
                   if (value) {
-                    themeProvider.setSystemMode();
+                    await themeProvider.setSystemMode();
                   } else {
-                    themeProvider.setLightMode();
+                    await themeProvider.setLightMode();
                   }
                 },
               ),

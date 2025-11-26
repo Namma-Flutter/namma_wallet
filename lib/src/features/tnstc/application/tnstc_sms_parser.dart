@@ -1,6 +1,6 @@
-import 'package:namma_wallet/src/features/home/domain/ticket.dart';
-import 'package:namma_wallet/src/features/tnstc/application/ticket_parser_interface.dart';
+import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 import 'package:namma_wallet/src/features/tnstc/domain/tnstc_model.dart';
+import 'package:namma_wallet/src/features/travel/application/travel_sms_parser.dart';
 
 /// Parses TNSTC SMS messages into structured [Ticket] data.
 ///
@@ -10,41 +10,20 @@ import 'package:namma_wallet/src/features/tnstc/domain/tnstc_model.dart';
 /// **Error Handling:**
 /// - Never throws exceptions
 /// - Returns a [Ticket] with partial data on parsing errors
-/// - Missing/invalid fields use fallbacks: 'Unknown', DateTime.now(), etc.
-/// - Conversion via [Ticket.fromTNSTC] is guaranteed not to throw
-class TNSTCSMSParser implements ITicketParser {
+/// - Missing/invalid fields use fallbacks: 'Unknown', null for dates, etc.
+class TNSTCSMSParser extends TravelSMSParser {
+  /// Creates a TNSTC SMS parser.
+  TNSTCSMSParser();
+
   @override
   Ticket parseTicket(String smsText) {
-    String extractMatch(String pattern, String input, {int groupIndex = 1}) {
-      final regex = RegExp(pattern, multiLine: true);
-      final match = regex.firstMatch(input);
-      if (match != null && groupIndex <= match.groupCount) {
-        return match.group(groupIndex)?.trim() ?? '';
-      }
-      return '';
-    }
-
-    DateTime parseDate(String date) {
-      if (date.isEmpty) return DateTime.now();
-      final parts = date.split('/');
-      if (parts.length != 3) return DateTime.now();
-      try {
-        final day = int.parse(parts[0]);
-        final month = int.parse(parts[1]);
-        final year = int.parse(parts[2]);
-        return DateTime(year, month, day);
-      } on FormatException {
-        return DateTime.now();
-      }
-    }
-
     // Extract common fields present in both SMS formats.
     // Falls back to empty string if pattern doesn't match.
     final pnrNumber = extractMatch(
       r'(?:PNR NO\.\s*|PNR)\s*:\s*([^,\s]+)',
       smsText,
     );
-    // Falls back to DateTime.now() if date is missing or malformed.
+    // Parse journey date - falls back to null if date is missing or malformed.
     final journeyDate = parseDate(
       extractMatch(
         r'(?:Journey Date|DOJ)\s*:\s*(\d{2}/\d{2}/\d{4})',
@@ -89,7 +68,7 @@ class TNSTCSMSParser implements ITicketParser {
         smsText,
       );
       final seatNumbers = extractMatch(
-        r'Seat No\.\s*:\s*([0-9A-Z#\-]+(?: [0-9A-Z#\-]+)*(?:,\s*(?!(?:Journey|PNR|From|To|Class|Boarding|For|Time|DOJ)\s)[0-9A-Z#\-]+(?: [0-9A-Z#\-]+)*)*)',
+        r'Seat No\.\s*:\s*([0-9A-Z#\-]+(?:\s+(?!(?:Journey|PNR|From|To|Class|Boarding|For|Time|DOJ)[\s:])[0-9A-Z#\-]+)*(?:,\s*(?!(?:Journey|PNR|From|To|Class|Boarding|For|Time|DOJ)[\s:])[0-9A-Z#\-]+(?:\s+(?!(?:Journey|PNR|From|To|Class|Boarding|For|Time|DOJ)[\s:])[0-9A-Z#\-]+)*)*)',
         smsText,
       ).replaceAll(RegExp(r'[,\s]+$'), '');
       final classOfService = extractMatch(
@@ -119,7 +98,7 @@ class TNSTCSMSParser implements ITicketParser {
         smsSeatNumbers: seatNumbers.isNotEmpty ? seatNumbers : null,
       );
       // Convert to Ticket (guaranteed not to throw,
-      // uses fallbacks: 'Unknown', DateTime.now(), etc. for missing data)
+      // uses fallbacks: 'Unknown', null for dates, etc.)
       return Ticket.fromTNSTC(tnstcModel, sourceType: 'SMS');
     }
   }

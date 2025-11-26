@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:namma_wallet/src/features/tnstc/domain/ocr_service_interface.dart';
+import 'package:namma_wallet/src/common/services/ocr/ocr_service_interface.dart';
 
 class MockOCRService implements IOCRService {
   @override

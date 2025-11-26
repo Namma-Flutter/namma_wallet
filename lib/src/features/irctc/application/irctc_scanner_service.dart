@@ -1,11 +1,9 @@
-import 'package:flutter/material.dart';
 import 'package:namma_wallet/src/common/database/ticket_dao_interface.dart';
-import 'package:namma_wallet/src/common/di/locator.dart';
-import 'package:namma_wallet/src/common/services/logger_interface.dart';
-import 'package:namma_wallet/src/common/widgets/snackbar_widget.dart';
-import 'package:namma_wallet/src/features/home/domain/ticket.dart';
-import 'package:namma_wallet/src/features/irctc/application/irctc_qr_parser.dart';
-import 'package:namma_wallet/src/features/irctc/application/irctc_ticket_model.dart';
+import 'package:namma_wallet/src/common/domain/models/ticket.dart';
+import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
+import 'package:namma_wallet/src/features/irctc/application/irctc_qr_parser_interface.dart';
+import 'package:namma_wallet/src/features/irctc/application/irctc_scanner_service_interface.dart';
+import 'package:namma_wallet/src/features/irctc/domain/irctc_ticket_model.dart';
 
 enum IRCTCScannerContentType {
   irctcTicket,
@@ -53,19 +51,20 @@ class IRCTCScannerResult {
   final bool isSuccess;
 }
 
-class IRCTCScannerService {
+class IRCTCScannerService implements IIRCTCScannerService {
   IRCTCScannerService({
-    ILogger? logger,
-    IRCTCQRParser? qrParser,
-    ITicketDAO? ticketDao,
-  }) : _logger = logger ?? getIt<ILogger>(),
-       _qrParser = qrParser ?? getIt<IRCTCQRParser>(),
-       _ticketDao = ticketDao ?? getIt<ITicketDAO>();
+    required ILogger logger,
+    required IIRCTCQRParser qrParser,
+    required ITicketDAO ticketDao,
+  }) : _logger = logger,
+       _qrParser = qrParser,
+       _ticketDao = ticketDao;
 
   final ILogger _logger;
-  final IRCTCQRParser _qrParser;
+  final IIRCTCQRParser _qrParser;
   final ITicketDAO _ticketDao;
 
+  @override
   Future<IRCTCScannerResult> parseAndSaveIRCTCTicket(String qrData) async {
     try {
       // Check if this is IRCTC QR data
@@ -106,29 +105,5 @@ class IRCTCScannerService {
       );
       return IRCTCScannerResult.error('Unexpected error. Please try again.');
     }
-  }
-
-  void showResultMessage(BuildContext context, IRCTCScannerResult result) {
-    if (!context.mounted) return;
-
-    final message = result.isSuccess
-        ? switch (result.type) {
-            IRCTCScannerContentType.irctcTicket =>
-              'IRCTC ticket saved successfully!',
-            IRCTCScannerContentType.invalid => 'Invalid content',
-          }
-        : result.errorMessage ?? 'Unknown error occurred';
-
-    if (result.isSuccess) {
-      _logger.success('IRCTC scanner operation succeeded: $message');
-    } else {
-      _logger.error('IRCTC scanner operation failed: $message');
-    }
-
-    showSnackbar(
-      context,
-      message,
-      isError: !result.isSuccess,
-    );
   }
 }
