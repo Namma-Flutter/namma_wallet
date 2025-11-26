@@ -6,5 +6,12 @@
     <color name="primaryText">#212121</color>
     <color name="secondaryText">#616161</color>
 
+    <!-- App theme colors matching Flutter theme -->
+    <color name="primary">#3067FE</color>
+    <color name="primary_alpha_10">#1A3067FE</color>
+    <color name="surface_light">#FFFFFF</color>
+    <color name="on_surface_light">#000000</color>
+    <color name="secondary_text_light">#666666</color>
+
 
 </resources>
