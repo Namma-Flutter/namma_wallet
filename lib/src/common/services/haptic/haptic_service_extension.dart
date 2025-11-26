@@ -1,4 +1,4 @@
-import 'package:namma_wallet/src/common/services/haptic_service_interface.dart';
+import 'package:namma_wallet/src/common/services/haptic/haptic_service_interface.dart';
 
 /// Enum representing different types of haptic feedback.
 enum HapticType {

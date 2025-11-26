@@ -1,5 +1,5 @@
 import 'package:gaimon/gaimon.dart';
-import 'package:namma_wallet/src/common/services/haptic_service_interface.dart';
+import 'package:namma_wallet/src/common/services/haptic/haptic_service_interface.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// Implementation of [IHapticService] using the `gaimon` package.
