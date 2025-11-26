@@ -40,7 +40,6 @@ void main() {
           final result1 = TravelTextParserUtils.extractMatch(
             pattern,
             input,
-            groupIndex: 1,
           );
           final result2 = TravelTextParserUtils.extractMatch(
             pattern,
@@ -59,7 +58,7 @@ void main() {
         'Then matches regardless of case',
         () {
           // Arrange (Given)
-          const pattern = r'tnstc';
+          const pattern = 'tnstc';
           const input = 'TNSTC Bus Ticket';
 
           // Act (When)

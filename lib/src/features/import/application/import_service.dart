@@ -18,12 +18,12 @@ class ImportService implements IImportService {
     required IIRCTCQRParser qrParser,
     required IIRCTCScannerService irctcScannerService,
     required ITicketDAO ticketDao,
-  })  : _logger = logger,
-        _pdfService = pdfService,
-        _travelParser = travelParser,
-        _qrParser = qrParser,
-        _irctcScannerService = irctcScannerService,
-        _ticketDao = ticketDao;
+  }) : _logger = logger,
+       _pdfService = pdfService,
+       _travelParser = travelParser,
+       _qrParser = qrParser,
+       _irctcScannerService = irctcScannerService,
+       _ticketDao = ticketDao;
 
   final ILogger _logger;
   final IPDFService _pdfService;
