@@ -12,10 +12,10 @@ class MockPDFService implements IPDFService {
   });
 
   /// Default text to return when extracting from PDFs
-  final String mockPdfText;
+  String mockPdfText;
 
   /// Whether to throw an error when extracting
-  final bool shouldThrowError;
+  bool shouldThrowError;
 
   @override
   Future<String> extractTextFrom(File pdf) async {

@@ -422,7 +422,8 @@ class TravelParserService implements ITravelParser {
 
           if (sourceType != null) {
             // Check if Source Type already exists
-            final hasSourceType = ticket.extras?.any(
+            final hasSourceType =
+                ticket.extras?.any(
                   (e) => e.title == 'Source Type',
                 ) ??
                 false;
