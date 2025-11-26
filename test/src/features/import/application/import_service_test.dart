@@ -131,6 +131,12 @@ void main() {
       );
     });
 
+    tearDown(() {
+      // Reset exception throwing flags
+      fakeIRCTCScannerService.shouldThrow = false;
+      fakeTicketDAO.shouldThrowError = false;
+    });
+
     final testIrctcTicket = IRCTCTicket(
       pnrNumber: '1234567890',
       trainNumber: '12345',
@@ -271,13 +277,17 @@ void main() {
         () async {
           // Arrange
           fakeIRCTCQRParser.isIRCTC = true;
-          // Force an error in the scanner service
+          // Force an exception in the scanner service
           fakeIRCTCScannerService.shouldThrow = true;
           // Act
           final result = await importService.importQRCode(qrData);
           // Assert
           expect(result, isNull);
           expect(fakeLogger.errorLogs, isNotEmpty);
+          expect(
+            fakeLogger.errorLogs.first,
+            contains('Error importing QR code'),
+          );
         },
       );
     });
