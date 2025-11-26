@@ -11,22 +11,25 @@ class FakeLogger implements ILogger {
     ),
   );
 
+  final List<String> logs = [];
+  final List<String> errorLogs = [];
+
   @override
   Talker get talker => _talker;
 
   @override
   void info(String message) {
-    // Do nothing in tests
+    logs.add('INFO: $message');
   }
 
   @override
   void debug(String message) {
-    // Do nothing in tests
+    logs.add('DEBUG: $message');
   }
 
   @override
   void warning(String message) {
-    // Do nothing in tests
+    logs.add('WARNING: $message');
   }
 
   @override
@@ -35,7 +38,8 @@ class FakeLogger implements ILogger {
     Object? error,
     StackTrace? stackTrace,
   ]) {
-    // Do nothing in tests
+    errorLogs.add(message);
+    logs.add('ERROR: $message');
   }
 
   @override

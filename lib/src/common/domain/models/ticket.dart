@@ -39,6 +39,9 @@ class Ticket with TicketMappable {
       );
     }
 
+    final journeyDate = model.dateOfJourney!;
+    final departure = model.scheduledDeparture!;
+
     return Ticket(
       ticketId: model.pnrNumber,
       primaryText: '${model.fromStation} → ${model.toStation}',
@@ -46,11 +49,11 @@ class Ticket with TicketMappable {
           'Train ${model.trainNumber} • ${model.travelClass} • '
           '${model.passengerName}',
       startTime: DateTime(
-        model.dateOfJourney!.year,
-        model.dateOfJourney!.month,
-        model.dateOfJourney!.day,
-        model.scheduledDeparture!.hour,
-        model.scheduledDeparture!.minute,
+        journeyDate.year,
+        journeyDate.month,
+        journeyDate.day,
+        departure.hour,
+        departure.minute,
       ),
       location: model.boardingStation,
       tags: [
@@ -78,16 +81,11 @@ class Ticket with TicketMappable {
         ExtrasModel(title: 'Boarding', value: model.boardingStation),
         ExtrasModel(
           title: 'Departure',
-          value:
-              '${model.scheduledDeparture!.hour.toString().padLeft(2, '0')}'
-              ':${model.scheduledDeparture!.minute.toString().padLeft(2, '0')}',
+          value: DateTimeConverter.instance.formatTime(departure),
         ),
         ExtrasModel(
           title: 'Date of Journey',
-          value:
-              '${model.dateOfJourney!.year}-'
-              '${model.dateOfJourney!.month.toString().padLeft(2, '0')}-'
-              '${model.dateOfJourney!.day.toString().padLeft(2, '0')}',
+          value: DateTimeConverter.instance.formatDate(journeyDate),
         ),
         ExtrasModel(title: 'Fare', value: model.ticketFare.toStringAsFixed(2)),
         ExtrasModel(
@@ -116,12 +114,11 @@ class Ticket with TicketMappable {
     final seatNumber = model.seatNumbers.isNotEmpty ? model.seatNumbers : null;
     final gender = firstPassenger?.gender;
 
-    var startTime = model.passengerPickupTime ?? model.journeyDate;
+    var startTime = model.passengerPickupTime;
 
-    // If pickup time is missing, try to combine
-    // journeyDate and serviceStartTime
-    if (startTime != null &&
-        model.passengerPickupTime == null &&
+    // If pickup time is missing, derive from journeyDate + serviceStartTime
+    if (startTime == null &&
+        model.journeyDate != null &&
         model.serviceStartTime != null &&
         model.serviceStartTime!.isNotEmpty) {
       try {
@@ -134,9 +131,9 @@ class Ticket with TicketMappable {
           // Validate hour and minute ranges
           if (hour >= 0 && hour < 24 && minute >= 0 && minute < 60) {
             startTime = DateTime(
-              startTime.year,
-              startTime.month,
-              startTime.day,
+              model.journeyDate!.year,
+              model.journeyDate!.month,
+              model.journeyDate!.day,
               hour,
               minute,
             );
@@ -308,8 +305,7 @@ class Ticket with TicketMappable {
     return map;
   }
 
-  Ticket asExternalModel(Map<String, dynamic> json) {
-    final ticket = TicketMapper.fromMap(json);
-    return ticket;
+  static Ticket asExternalModel(Map<String, dynamic> json) {
+    return TicketMapper.fromMap(json);
   }
 }

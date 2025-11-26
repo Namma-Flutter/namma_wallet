@@ -592,7 +592,12 @@ Conductor Mobile No : 9876543210
           // Assert (Then)
           expect(updateInfo, isNotNull);
           expect(updateInfo!.pnrNumber, equals('T123456789012'));
-          // PNR should be masked in logs (internal implementation)
+          // PNR should be masked in logs
+          expect(
+            fakeLogger.logs.any((log) => log.contains('T12****9012')),
+            isTrue,
+            reason: 'PNR should be masked in logs',
+          );
         },
       );
 
@@ -611,8 +616,17 @@ Conductor Mobile No : 9876543210
           final updateInfo = service.parseUpdateSMS(updateSMS);
 
           // Assert (Then)
+          // Assert (Then)
           expect(updateInfo, isNotNull);
           expect(updateInfo!.pnrNumber, equals('T12'));
+          // Short PNRs might not be masked or masked differently, but let's check it doesn't crash
+          // and logs something relevant.
+          // Assuming implementation masks even short ones or leaves them if too short.
+          // Let's just verify it logs the update info.
+          expect(
+             fakeLogger.logs.any((log) => log.contains('Parsed update for PNR')),
+             isTrue,
+          );
         },
       );
     });

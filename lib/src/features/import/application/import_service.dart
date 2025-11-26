@@ -75,7 +75,7 @@ class ImportService implements IImportService {
         'Successfully imported and saved PDF ticket: ${parsedTicket.ticketId}',
       );
       return parsedTicket;
-    } on Object catch (e, stackTrace) {
+    } on Exception catch (e, stackTrace) {
       _logger.error('Error importing PDF file', e, stackTrace);
       return null;
     }
@@ -104,7 +104,7 @@ class ImportService implements IImportService {
         _logger.warning('Failed to import QR code: ${result.errorMessage}');
         return null;
       }
-    } on Object catch (e, stackTrace) {
+    } on Exception catch (e, stackTrace) {
       _logger.error('Error importing QR code', e, stackTrace);
       return null;
     }

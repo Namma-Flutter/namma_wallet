@@ -33,8 +33,8 @@ class MockGoRouterProvider extends StatelessWidget {
     super.key,
   });
 
-  /// The mock navigator used to mock navigation calls.
-  final FakeGoRouter goRouter;
+  /// The mock router used to mock navigation calls.
+  final GoRouter goRouter;
 
   /// The child [Widget] to render.
   final Widget child;

@@ -24,7 +24,7 @@ class SharingIntentService implements ISharingIntentService {
   final IPDFService _pdfService;
   final ISharingIntentProvider _sharingIntentProvider;
 
-  StreamSubscription<List<SharedMediaFile>>? _intentDataStreamSubscription;
+  StreamSubscription? _intentDataStreamSubscription;
 
   @override
   Future<void> initialize({
@@ -34,10 +34,11 @@ class SharingIntentService implements ISharingIntentService {
   }) async {
     _intentDataStreamSubscription = _sharingIntentProvider
         .getMediaStream()
+        .asyncMap((files) async {
+          await _handleSharedContent(files, onContentReceived, onError);
+        })
         .listen(
-          (List<SharedMediaFile> files) async {
-            await _handleSharedContent(files, onContentReceived, onError);
-          },
+          (_) {},
           onError: (Object err) {
             _logger.error('Error in sharing intent stream: $err');
             onError('Error receiving shared content: $err');

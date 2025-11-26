@@ -39,32 +39,49 @@ class _NammaWalletAppState extends State<NammaWalletApp> {
 
     // Initialize sharing intent service for file and text content
     unawaited(
-      _sharingService.initialize(
-        onContentReceived: (content, contentType) async {
-          // Process the content using the processor service
-          final result = await _contentProcessor.processContent(
-            content,
-            contentType,
-          );
+      _sharingService
+          .initialize(
+            onContentReceived: (content, contentType) async {
+              // Process the content using the processor service
+              final result = await _contentProcessor.processContent(
+                content,
+                contentType,
+              );
 
-          // Handle the result using the share handler
-          _shareHandler.handleResult(result);
-        },
-        onError: (error) {
-          _logger.error('Sharing intent error: $error');
+              // Handle the result using the share handler
+              _shareHandler.handleResult(result);
+            },
+            onError: (error) {
+              _logger.error('Sharing intent error: $error');
 
-          // Handle the error using the share handler
-          _shareHandler.handleError(error);
-        },
-      ),
+              // Handle the error using the share handler
+              _shareHandler.handleError(error);
+            },
+          )
+          .catchError((dynamic error, StackTrace stackTrace) {
+            _logger.error(
+              'Failed to initialize sharing service: $error',
+              error,
+              stackTrace,
+            );
+            // Optionally notify user of initialization failure
+          }),
     );
   }
 
   @override
   void dispose() {
     _logger.info('App disposing');
-    unawaited(_sharingService.dispose());
+    unawaited(_disposeSharingService());
     super.dispose();
+  }
+
+  Future<void> _disposeSharingService() async {
+    try {
+      await _sharingService.dispose();
+    } catch (e, st) {
+      _logger.error('Error disposing sharing service', e, st);
+    }
   }
 
   @override

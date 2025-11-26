@@ -446,7 +446,7 @@ void main() {
 
       test(
         'Given multiline text, When reading and parsing, '
-        'Then returns error if not   as ticket',
+        'Then returns error if not parsable as ticket',
         () async {
           // Arrange (Given)
           const multilineText = 'Line 1\nLine 2\nLine 3';

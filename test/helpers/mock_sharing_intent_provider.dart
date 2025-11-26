@@ -12,6 +12,10 @@ class MockSharingIntentProvider implements ISharingIntentProvider {
     _controller.add(media);
   }
 
+  void emitError(Object error) {
+    _controller.addError(error);
+  }
+
   @override
   Stream<List<SharedMediaFile>> getMediaStream() {
     return _controller.stream;
