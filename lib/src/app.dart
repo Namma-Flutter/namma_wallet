@@ -1,12 +1,14 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/routing/app_router.dart';
-import 'package:namma_wallet/src/common/services/logger_interface.dart';
+import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
 import 'package:namma_wallet/src/common/theme/app_theme.dart';
 import 'package:namma_wallet/src/common/theme/theme_provider.dart';
-import 'package:namma_wallet/src/features/share/application/shared_content_processor.dart';
-import 'package:namma_wallet/src/features/share/domain/sharing_intent_service_interface.dart';
-import 'package:namma_wallet/src/features/share/presentation/share_handler.dart';
+import 'package:namma_wallet/src/features/receive/application/shared_content_processor_interface.dart';
+import 'package:namma_wallet/src/features/receive/domain/sharing_intent_service_interface.dart';
+import 'package:namma_wallet/src/features/receive/presentation/share_handler.dart';
 import 'package:provider/provider.dart';
 
 class NammaWalletApp extends StatefulWidget {
@@ -20,8 +22,8 @@ class _NammaWalletAppState extends State<NammaWalletApp> {
   int currentPageIndex = 0;
   late final ISharingIntentService _sharingService =
       getIt<ISharingIntentService>();
-  late final SharedContentProcessor _contentProcessor =
-      getIt<SharedContentProcessor>();
+  late final ISharedContentProcessor _contentProcessor =
+      getIt<ISharedContentProcessor>();
   late final ILogger _logger = getIt<ILogger>();
   final GlobalKey<ScaffoldMessengerState> _scaffoldMessengerKey =
       GlobalKey<ScaffoldMessengerState>();
@@ -36,31 +38,50 @@ class _NammaWalletAppState extends State<NammaWalletApp> {
     _logger.info('App initialized');
 
     // Initialize sharing intent service for file and text content
-    _sharingService.initialize(
-      onContentReceived: (content, contentType) async {
-        // Process the content using the processor service
-        final result = await _contentProcessor.processContent(
-          content,
-          contentType,
-        );
+    unawaited(
+      _sharingService
+          .initialize(
+            onContentReceived: (content, contentType) async {
+              // Process the content using the processor service
+              final result = await _contentProcessor.processContent(
+                content,
+                contentType,
+              );
 
-        // Handle the result using the share handler
-        _shareHandler.handleResult(result);
-      },
-      onError: (error) {
-        _logger.error('Sharing intent error: $error');
+              // Handle the result using the share handler
+              _shareHandler.handleResult(result);
+            },
+            onError: (error) {
+              _logger.error('Sharing intent error: $error');
 
-        // Handle the error using the share handler
-        _shareHandler.handleError(error);
-      },
+              // Handle the error using the share handler
+              _shareHandler.handleError(error);
+            },
+          )
+          .catchError((dynamic error, StackTrace stackTrace) {
+            _logger.error(
+              'Failed to initialize sharing service: $error',
+              error,
+              stackTrace,
+            );
+            // Optionally notify user of initialization failure
+          }),
     );
   }
 
   @override
   void dispose() {
     _logger.info('App disposing');
-    _sharingService.dispose();
+    unawaited(_disposeSharingService());
     super.dispose();
+  }
+
+  Future<void> _disposeSharingService() async {
+    try {
+      await _sharingService.dispose();
+    } on Object catch (e, st) {
+      _logger.error('Error disposing sharing service', e, st);
+    }
   }
 
   @override

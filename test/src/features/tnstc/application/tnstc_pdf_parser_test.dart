@@ -2,10 +2,10 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
-import 'package:namma_wallet/src/common/services/logger_interface.dart';
-import 'package:namma_wallet/src/features/tnstc/application/pdf_service.dart';
+import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
+import 'package:namma_wallet/src/common/services/ocr/ocr_service_interface.dart';
+import 'package:namma_wallet/src/common/services/pdf/pdf_service.dart';
 import 'package:namma_wallet/src/features/tnstc/application/tnstc_pdf_parser.dart';
-import 'package:namma_wallet/src/features/tnstc/domain/ocr_service_interface.dart';
 
 import '../../../../helpers/fake_logger.dart';
 import '../../../../helpers/mock_ocr_service.dart';
@@ -31,8 +31,10 @@ void main() {
     late PDFService pdfService;
 
     setUp(() {
-      parser = TNSTCPDFParser();
-      pdfService = PDFService();
+      final logger = GetIt.instance<ILogger>();
+      final ocrService = GetIt.instance<IOCRService>();
+      parser = TNSTCPDFParser(logger: logger);
+      pdfService = PDFService(ocrService: ocrService, logger: logger);
     });
 
     test(
@@ -40,7 +42,7 @@ void main() {
       'Then extracts all fields correctly',
       () async {
         final pdfFile = File(
-          'assets/data/E-Ticket_T73309927_18-01-2026.pdf',
+          'test/assets/E-Ticket_T73309927_18-01-2026.pdf',
         );
 
         // Skip test if PDF file doesn't exist
@@ -117,11 +119,11 @@ void main() {
         expect(sourceType, equals('PDF'));
 
         // Verify journey date and time from startTime
-        expect(ticket.startTime.day, equals(18));
-        expect(ticket.startTime.month, equals(1));
-        expect(ticket.startTime.year, equals(2026));
-        expect(ticket.startTime.hour, equals(13)); // 01:15 PM = 13:15
-        expect(ticket.startTime.minute, equals(15));
+        expect(ticket.startTime?.day, equals(18));
+        expect(ticket.startTime?.month, equals(1));
+        expect(ticket.startTime?.year, equals(2026));
+        expect(ticket.startTime?.hour, equals(13)); // 01:15 PM = 13:15
+        expect(ticket.startTime?.minute, equals(15));
       },
     );
 
@@ -207,11 +209,11 @@ Total Fare : 500.00 Rs.
         expect(seatTag, equals('1A'));
 
         // Verify journey date from startTime
-        expect(ticket.startTime.day, equals(15));
-        expect(ticket.startTime.month, equals(12));
-        expect(ticket.startTime.year, equals(2024));
-        expect(ticket.startTime.hour, equals(14));
-        expect(ticket.startTime.minute, equals(30));
+        expect(ticket.startTime?.day, equals(15));
+        expect(ticket.startTime?.month, equals(12));
+        expect(ticket.startTime?.year, equals(2024));
+        expect(ticket.startTime?.hour, equals(14));
+        expect(ticket.startTime?.minute, equals(30));
 
         // Verify Source Type is PDF
         final sourceType = ticket.extras
@@ -315,7 +317,7 @@ Trip Code : TEST123
 
           // Verify date is parsed (if parsing fails, falls back to today)
           expect(ticket.startTime, isNotNull);
-          expect(ticket.startTime.year, greaterThanOrEqualTo(2025));
+          expect(ticket.startTime?.year, greaterThanOrEqualTo(2025));
         },
       );
 
@@ -334,7 +336,7 @@ Trip Code : TEST123
 
           // Verify date is parsed
           expect(ticket.startTime, isNotNull);
-          expect(ticket.startTime.year, greaterThanOrEqualTo(2025));
+          expect(ticket.startTime?.year, greaterThanOrEqualTo(2025));
         },
       );
 
@@ -351,8 +353,8 @@ Trip Code : TEST123
 
           final ticket = parser.parseTicket(pdfText);
 
-          // Should fall back to current date (DateTime.now())
-          expect(ticket.startTime, isNotNull);
+          // Date parsing failed, so startTime should be null
+          expect(ticket.startTime, isNull);
         },
       );
 
@@ -366,12 +368,12 @@ Trip Code : TEST123
 
         final ticket = parser.parseTicket(pdfText);
 
-        // Should fall back to current date
-        expect(ticket.startTime, isNotNull);
+        // No date provided, so startTime should be null
+        expect(ticket.startTime, isNull);
       });
 
       test('Given malformed date parts, When parsing ticket, '
-          'Then falls back to current date', () {
+          'Then returns null', () {
         const pdfText = '''
 Corporation : SETC
 PNR Number : T12345678
@@ -381,8 +383,8 @@ Trip Code : TEST123
 
         final ticket = parser.parseTicket(pdfText);
 
-        // Should fall back to current date due to invalid date values
-        expect(ticket.startTime, isNotNull);
+        // Should return null for invalid date values
+        expect(ticket.startTime, isNull);
       });
     });
 
@@ -400,11 +402,11 @@ Trip Code : TEST123
 
         final ticket = parser.parseTicket(pdfText);
 
-        expect(ticket.startTime.day, equals(25));
-        expect(ticket.startTime.month, equals(12));
-        expect(ticket.startTime.year, equals(2024));
-        expect(ticket.startTime.hour, equals(14));
-        expect(ticket.startTime.minute, equals(30));
+        expect(ticket.startTime?.day, equals(25));
+        expect(ticket.startTime?.month, equals(12));
+        expect(ticket.startTime?.year, equals(2024));
+        expect(ticket.startTime?.hour, equals(14));
+        expect(ticket.startTime?.minute, equals(30));
       });
 
       test('Given datetime with dash separator, When parsing, '
@@ -419,11 +421,11 @@ Trip Code : TEST123
 
         final ticket = parser.parseTicket(pdfText);
 
-        expect(ticket.startTime.day, equals(25));
-        expect(ticket.startTime.month, equals(12));
-        expect(ticket.startTime.year, equals(2024));
-        expect(ticket.startTime.hour, equals(9));
-        expect(ticket.startTime.minute, equals(45));
+        expect(ticket.startTime?.day, equals(25));
+        expect(ticket.startTime?.month, equals(12));
+        expect(ticket.startTime?.year, equals(2024));
+        expect(ticket.startTime?.hour, equals(9));
+        expect(ticket.startTime?.minute, equals(45));
       });
 
       test('Given invalid datetime format, When parsing ticket, '
@@ -438,8 +440,8 @@ Trip Code : TEST123
 
         final ticket = parser.parseTicket(pdfText);
 
-        // Should fall back to current datetime
-        expect(ticket.startTime, isNotNull);
+        // Invalid datetime, so startTime should be null
+        expect(ticket.startTime, isNull);
       });
 
       test('Given missing time component in datetime, When parsing, '
@@ -454,8 +456,8 @@ Trip Code : TEST123
 
         final ticket = parser.parseTicket(pdfText);
 
-        // Should fall back to current datetime
-        expect(ticket.startTime, isNotNull);
+        // Invalid datetime format, so startTime should be null
+        expect(ticket.startTime, isNull);
       });
 
       test('Given invalid time values, When parsing ticket, '
@@ -488,9 +490,9 @@ Trip Code : TEST123
 
         // Verify time components are set
         expect(ticket.startTime, isNotNull);
-        expect(ticket.startTime.hour, anyOf(equals(16), greaterThan(0)));
+        expect(ticket.startTime?.hour, anyOf(equals(16), greaterThan(0)));
         expect(
-          ticket.startTime.minute,
+          ticket.startTime?.minute,
           anyOf(equals(45), greaterThanOrEqualTo(0)),
         );
       });
@@ -1113,8 +1115,8 @@ Trip Code : TEST123
 
         // Verify time is extracted and set
         expect(ticket.startTime, isNotNull);
-        expect(ticket.startTime.hour, lessThan(24));
-        expect(ticket.startTime.minute, lessThan(60));
+        expect(ticket.startTime?.hour, lessThan(24));
+        expect(ticket.startTime?.minute, lessThan(60));
       });
 
       test('Given midnight time (00:00), When parsing ticket, '
@@ -1131,8 +1133,8 @@ Trip Code : TEST123
 
         // Verify time is valid
         expect(ticket.startTime, isNotNull);
-        expect(ticket.startTime.hour, greaterThanOrEqualTo(0));
-        expect(ticket.startTime.minute, greaterThanOrEqualTo(0));
+        expect(ticket.startTime?.hour, greaterThanOrEqualTo(0));
+        expect(ticket.startTime?.minute, greaterThanOrEqualTo(0));
       });
 
       test('Given invalid service start time, When parsing ticket, '
