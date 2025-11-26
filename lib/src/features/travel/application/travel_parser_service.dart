@@ -421,12 +421,20 @@ class TravelParserService implements ITravelParser {
           );
 
           if (sourceType != null) {
-            return ticket.copyWith(
-              extras: [
-                ...?ticket.extras,
-                ExtrasModel(title: 'Source Type', value: sourceType.name),
-              ],
-            );
+            // Check if Source Type already exists
+            final hasSourceType = ticket.extras?.any(
+                  (e) => e.title == 'Source Type',
+                ) ??
+                false;
+
+            if (!hasSourceType) {
+              return ticket.copyWith(
+                extras: [
+                  ...?ticket.extras,
+                  ExtrasModel(title: 'Source Type', value: sourceType.name),
+                ],
+              );
+            }
           }
           return ticket;
         }
