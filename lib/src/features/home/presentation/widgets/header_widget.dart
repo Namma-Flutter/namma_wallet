@@ -31,11 +31,11 @@ class UserProfileWidget extends StatelessWidget {
 
           //* Profile
           InkWell(
-            onTap: () {
+            onTap: () async {
               hapticService.triggerHaptic(
                 HapticType.selection,
               );
-              context.pushNamed(AppRoute.profile.name);
+              await context.pushNamed(AppRoute.profile.name);
             },
             child: CircleAvatar(
               radius: 28,

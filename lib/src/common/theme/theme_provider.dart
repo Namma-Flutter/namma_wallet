@@ -1,10 +1,12 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// ThemeProvider manages the app's theme mode and persists user preference
 class ThemeProvider extends ChangeNotifier {
   ThemeProvider() {
-    _loadThemePreference();
+    unawaited(_loadThemePreference());
   }
   static const String _themePreferenceKey = 'theme_mode';
 
@@ -26,20 +28,32 @@ class ThemeProvider extends ChangeNotifier {
 
   /// Load saved theme preference from shared preferences
   Future<void> _loadThemePreference() async {
-    final prefs = await SharedPreferences.getInstance();
-    final stored = prefs.getInt(_themePreferenceKey);
-    final idx =
-        (stored != null && stored >= 0 && stored < ThemeMode.values.length)
-        ? stored
-        : 0;
-    _themeMode = ThemeMode.values[idx];
-    notifyListeners();
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final stored = prefs.getInt(_themePreferenceKey);
+      final idx =
+          (stored != null && stored >= 0 && stored < ThemeMode.values.length)
+          ? stored
+          : 0;
+      final newMode = ThemeMode.values[idx];
+      if (_themeMode != newMode) {
+        _themeMode = newMode;
+        notifyListeners();
+      }
+    } on Exception catch (e, stackTrace) {
+      debugPrint('Failed to load theme preference: $e\n$stackTrace');
+      // Fall back to default system theme (no notifyListeners needed)
+    }
   }
 
   /// Save theme preference to shared preferences
   Future<void> _saveThemePreference() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setInt(_themePreferenceKey, _themeMode.index);
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setInt(_themePreferenceKey, _themeMode.index);
+    } on Exception catch (e, stackTrace) {
+      debugPrint('Failed to save theme preference: $e\n$stackTrace');
+    }
   }
 
   /// Set theme to light mode

@@ -80,30 +80,3 @@ class DateTimeConverter implements IDateTimeConverter {
     }
   }
 }
-
-// Backward compatibility: Export top-level functions
-// that delegate to the singleton instance
-
-/// Formats a DateTime as time string (e.g., "01:15 pm").
-/// Converts to local time before formatting to handle
-/// UTC datetimes from database.
-String formatTime(DateTime dt) => DateTimeConverter.instance.formatTime(dt);
-
-/// Formats a DateTime as date string (e.g., "18/01/2026").
-/// Converts to local time before formatting to handle
-/// UTC datetimes from database.
-String formatDate(DateTime dt) => DateTimeConverter.instance.formatDate(dt);
-
-/// Formats a DateTime as full date-time string
-/// (e.g., "18-01-2026 01:15 PM").
-/// Converts to local time before formatting to handle
-/// UTC datetimes from database.
-String formatFullDateTime(DateTime dt) =>
-    DateTimeConverter.instance.formatFullDateTime(dt);
-
-/// Formats a time string from 24-hour format to 12-hour format with AM/PM.
-/// Input format: "HH:mm" (e.g., "13:15")
-/// Output format: "hh:mm AM/PM" (e.g., "01:15 PM")
-/// Returns the original string if parsing fails.
-String formatTimeString(String timeStr) =>
-    DateTimeConverter.instance.formatTimeString(timeStr);
