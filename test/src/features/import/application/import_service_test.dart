@@ -54,9 +54,13 @@ class FakeIRCTCQRParser implements IIRCTCQRParser {
 
 class FakeIRCTCScannerService implements IIRCTCScannerService {
   IRCTCScannerResult? scanResult;
+  bool shouldThrow = false;
 
   @override
   Future<IRCTCScannerResult> parseAndSaveIRCTCTicket(String qrData) async {
+    if (shouldThrow) {
+      throw Exception('Scanner error');
+    }
     return scanResult ?? IRCTCScannerResult.error('Default error');
   }
 }
@@ -134,8 +138,8 @@ void main() {
       fromStation: 'START',
       toStation: 'END',
       boardingStation: 'START',
-      dateOfJourney: DateTime(2025, 1, 15, 10, 0),
-      scheduledDeparture: DateTime(2025, 1, 15, 11, 0),
+      dateOfJourney: DateTime(2025, 1, 15, 10),
+      scheduledDeparture: DateTime(2025, 1, 15, 11),
       passengerName: 'Test Passenger',
       age: 30,
       gender: 'M',
@@ -268,7 +272,7 @@ void main() {
           // Arrange
           fakeIRCTCQRParser.isIRCTC = true;
           // Force an error in the scanner service
-          fakeIRCTCScannerService.scanResult = null;
+          fakeIRCTCScannerService.shouldThrow = true;
           // Act
           final result = await importService.importQRCode(qrData);
           // Assert
