@@ -1,14 +1,4 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
-import 'package:namma_wallet/src/features/tnstc/application/ticket_parser_interface.dart';
-import 'package:namma_wallet/src/common/domain/models/ticket.dart';
-import 'package:namma_wallet/src/common/enums/ticket_type.dart';
-import 'package:namma_wallet/src/features/travel/application/travel_pdf_parser.dart';
-
-import '../../../../helpers/fake_logger.dart';
-
-
-
 import 'package:namma_wallet/src/features/tnstc/application/tnstc_pdf_parser.dart';
 import 'package:namma_wallet/src/features/travel/application/travel_pdf_parser.dart';
 
@@ -76,7 +66,7 @@ void main() {
         // Arrange
         const value = 'abc';
         // Act
-        final result = parser.parseDouble(value, defaultValue: -1.0);
+        final result = parser.parseDouble(value, defaultValue: -1);
         // Assert
         expect(result, -1.0);
       });

@@ -466,7 +466,8 @@ Train No. :
         'Then successfully extracts ticket information',
         () {
           // Arrange (Given)
-          final longText = '''
+          final longText =
+              '''
 ${'Random padding text. ' * 100}
 IRCTC
 PNR No. : 1234567890

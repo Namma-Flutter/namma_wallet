@@ -9,7 +9,7 @@ void main() {
         'Then creates model with all fields correctly',
         () {
           // Arrange & Act (Given & When)
-          final model = TravelModel(
+          const model = TravelModel(
             corporation: 'TNSTC',
             service: 'Express',
             pnrNo: 'T123456789',
@@ -43,7 +43,7 @@ void main() {
         'Then creates model with single seat in list',
         () {
           // Arrange & Act (Given & When)
-          final model = TravelModel(
+          const model = TravelModel(
             corporation: 'SETC',
             service: 'Regular',
             pnrNo: 'S987654321',
@@ -68,7 +68,7 @@ void main() {
         'Then creates model with all seats in list',
         () {
           // Arrange & Act (Given & When)
-          final model = TravelModel(
+          const model = TravelModel(
             corporation: 'TNSTC',
             service: 'Ultra Deluxe',
             pnrNo: 'T111222333',
@@ -93,7 +93,7 @@ void main() {
         'Then creates model with empty string values',
         () {
           // Arrange & Act (Given & When)
-          final model = TravelModel(
+          const model = TravelModel(
             corporation: '',
             service: '',
             pnrNo: '',
@@ -193,7 +193,7 @@ void main() {
         'Then maintains all data correctly',
         () {
           // Arrange (Given)
-          final originalModel = TravelModel(
+          const originalModel = TravelModel(
             corporation: 'TNSTC',
             service: 'Ultra Deluxe',
             pnrNo: 'T111222333',
@@ -239,7 +239,7 @@ void main() {
         'Then models are equal',
         () {
           // Arrange (Given)
-          final model1 = TravelModel(
+          const model1 = TravelModel(
             corporation: 'TNSTC',
             service: 'Express',
             pnrNo: 'T123456789',
@@ -253,7 +253,7 @@ void main() {
             boardingAt: 'Koyambedu',
           );
 
-          final model2 = TravelModel(
+          const model2 = TravelModel(
             corporation: 'TNSTC',
             service: 'Express',
             pnrNo: 'T123456789',
@@ -278,7 +278,7 @@ void main() {
         'Then models are not equal',
         () {
           // Arrange (Given)
-          final model1 = TravelModel(
+          const model1 = TravelModel(
             corporation: 'TNSTC',
             service: 'Express',
             pnrNo: 'T123456789',
@@ -292,7 +292,7 @@ void main() {
             boardingAt: 'Koyambedu',
           );
 
-          final model2 = TravelModel(
+          const model2 = TravelModel(
             corporation: 'SETC',
             service: 'Regular',
             pnrNo: 'S987654321',
@@ -316,7 +316,7 @@ void main() {
         'Then models are not equal',
         () {
           // Arrange (Given)
-          final model1 = TravelModel(
+          const model1 = TravelModel(
             corporation: 'TNSTC',
             service: 'Express',
             pnrNo: 'T123456789',
@@ -330,7 +330,7 @@ void main() {
             boardingAt: 'Koyambedu',
           );
 
-          final model2 = TravelModel(
+          const model2 = TravelModel(
             corporation: 'TNSTC',
             service: 'Express',
             pnrNo: 'T123456789',
@@ -382,8 +382,8 @@ void main() {
         'Then creates model successfully',
         () {
           // Arrange & Act (Given & When)
-          final model = TravelModel(
-            corporation: 'TNSTC@#\$%',
+          const model = TravelModel(
+            corporation: r'TNSTC@#$%',
             service: 'Express & Regular',
             pnrNo: 'T-123/456',
             from: 'Chennai (Central)',
@@ -397,7 +397,7 @@ void main() {
           );
 
           // Assert (Then)
-          expect(model.corporation, contains('@#\$%'));
+          expect(model.corporation, contains(r'@#$%'));
           expect(model.service, contains('&'));
         },
       );
@@ -407,7 +407,7 @@ void main() {
         'Then creates model successfully',
         () {
           // Arrange & Act (Given & When)
-          final model = TravelModel(
+          const model = TravelModel(
             corporation: 'தமிழ்நாடு பேருந்து',
             service: 'விரைவு சேவை',
             pnrNo: 'T123456789',
@@ -432,7 +432,7 @@ void main() {
         'Then creates model with empty list',
         () {
           // Arrange & Act (Given & When)
-          final model = TravelModel(
+          const model = TravelModel(
             corporation: 'TNSTC',
             service: 'Express',
             pnrNo: 'T123456789',
@@ -486,7 +486,7 @@ void main() {
         'Then accepts various time formats',
         () {
           // Arrange & Act (Given & When)
-          final model1 = TravelModel(
+          const model1 = TravelModel(
             corporation: 'TNSTC',
             service: 'Express',
             pnrNo: 'T1',
@@ -500,7 +500,7 @@ void main() {
             boardingAt: 'X',
           );
 
-          final model2 = TravelModel(
+          const model2 = TravelModel(
             corporation: 'TNSTC',
             service: 'Express',
             pnrNo: 'T2',
@@ -514,7 +514,7 @@ void main() {
             boardingAt: 'X',
           );
 
-          final model3 = TravelModel(
+          const model3 = TravelModel(
             corporation: 'TNSTC',
             service: 'Express',
             pnrNo: 'T3',
@@ -540,7 +540,7 @@ void main() {
         'Then accepts various date formats',
         () {
           // Arrange & Act (Given & When)
-          final model1 = TravelModel(
+          const model1 = TravelModel(
             corporation: 'TNSTC',
             service: 'Express',
             pnrNo: 'T1',
@@ -554,7 +554,7 @@ void main() {
             boardingAt: 'X',
           );
 
-          final model2 = TravelModel(
+          const model2 = TravelModel(
             corporation: 'TNSTC',
             service: 'Express',
             pnrNo: 'T2',
