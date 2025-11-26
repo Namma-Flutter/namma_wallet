@@ -36,17 +36,17 @@ class TicketMapper extends ClassMapperBase<Ticket> {
     _$secondaryText,
     key: r'secondary_text',
   );
+  static String _$location(Ticket v) => v.location;
+  static const Field<Ticket, String> _f$location = Field(
+    'location',
+    _$location,
+  );
   static DateTime? _$startTime(Ticket v) => v.startTime;
   static const Field<Ticket, DateTime> _f$startTime = Field(
     'startTime',
     _$startTime,
     key: r'start_time',
     opt: true,
-  );
-  static String _$location(Ticket v) => v.location;
-  static const Field<Ticket, String> _f$location = Field(
-    'location',
-    _$location,
   );
   static TicketType _$type(Ticket v) => v.type;
   static const Field<Ticket, TicketType> _f$type = Field(
@@ -86,8 +86,8 @@ class TicketMapper extends ClassMapperBase<Ticket> {
   final MappableFields<Ticket> fields = const {
     #primaryText: _f$primaryText,
     #secondaryText: _f$secondaryText,
-    #startTime: _f$startTime,
     #location: _f$location,
+    #startTime: _f$startTime,
     #type: _f$type,
     #endTime: _f$endTime,
     #tags: _f$tags,
@@ -99,8 +99,8 @@ class TicketMapper extends ClassMapperBase<Ticket> {
     return Ticket(
       primaryText: data.dec(_f$primaryText),
       secondaryText: data.dec(_f$secondaryText),
-      startTime: data.dec(_f$startTime),
       location: data.dec(_f$location),
+      startTime: data.dec(_f$startTime),
       type: data.dec(_f$type),
       endTime: data.dec(_f$endTime),
       tags: data.dec(_f$tags),
@@ -166,8 +166,8 @@ abstract class TicketCopyWith<$R, $In extends Ticket, $Out>
   $R call({
     String? primaryText,
     String? secondaryText,
-    DateTime? startTime,
     String? location,
+    DateTime? startTime,
     TicketType? type,
     DateTime? endTime,
     List<TagModel>? tags,
@@ -209,8 +209,8 @@ class _TicketCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Ticket, $Out>
   $R call({
     String? primaryText,
     String? secondaryText,
-    Object? startTime = $none,
     String? location,
+    Object? startTime = $none,
     TicketType? type,
     Object? endTime = $none,
     Object? tags = $none,
@@ -220,8 +220,8 @@ class _TicketCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Ticket, $Out>
     FieldCopyWithData({
       if (primaryText != null) #primaryText: primaryText,
       if (secondaryText != null) #secondaryText: secondaryText,
-      if (startTime != $none) #startTime: startTime,
       if (location != null) #location: location,
+      if (startTime != $none) #startTime: startTime,
       if (type != null) #type: type,
       if (endTime != $none) #endTime: endTime,
       if (tags != $none) #tags: tags,
@@ -233,8 +233,8 @@ class _TicketCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Ticket, $Out>
   Ticket $make(CopyWithData data) => Ticket(
     primaryText: data.get(#primaryText, or: $value.primaryText),
     secondaryText: data.get(#secondaryText, or: $value.secondaryText),
-    startTime: data.get(#startTime, or: $value.startTime),
     location: data.get(#location, or: $value.location),
+    startTime: data.get(#startTime, or: $value.startTime),
     type: data.get(#type, or: $value.type),
     endTime: data.get(#endTime, or: $value.endTime),
     tags: data.get(#tags, or: $value.tags),

@@ -278,7 +278,7 @@ class Ticket with TicketMappable {
         else if (model.passengerEndPlace != null &&
             model.passengerEndPlace!.isNotEmpty)
           ExtrasModel(title: 'To', value: model.passengerEndPlace!),
-
+        ExtrasModel(title: 'Source Type', value: sourceType),
       ],
     );
   }
