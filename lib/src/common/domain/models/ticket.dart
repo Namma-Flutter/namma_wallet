@@ -152,6 +152,9 @@ class Ticket with TicketMappable {
       }
     }
 
+    // Fallback to journeyDate if startTime is still null
+    startTime ??= model.journeyDate;
+
     return Ticket(
       ticketId: model.pnrNumber,
       primaryText: '$primarySource → $primaryDestination',

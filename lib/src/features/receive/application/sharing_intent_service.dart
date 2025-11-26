@@ -24,7 +24,7 @@ class SharingIntentService implements ISharingIntentService {
   final IPDFService _pdfService;
   final ISharingIntentProvider _sharingIntentProvider;
 
-  StreamSubscription? _intentDataStreamSubscription;
+  StreamSubscription<void>? _intentDataStreamSubscription;
 
   @override
   Future<void> initialize({

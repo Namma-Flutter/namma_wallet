@@ -79,7 +79,7 @@ class _NammaWalletAppState extends State<NammaWalletApp> {
   Future<void> _disposeSharingService() async {
     try {
       await _sharingService.dispose();
-    } catch (e, st) {
+    } on Object catch (e, st) {
       _logger.error('Error disposing sharing service', e, st);
     }
   }
