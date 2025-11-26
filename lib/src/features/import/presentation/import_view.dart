@@ -7,11 +7,11 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/routing/app_routes.dart';
+import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
 import 'package:namma_wallet/src/common/widgets/snackbar_widget.dart';
-import 'package:namma_wallet/src/features/clipboard/application/clipboard_service.dart';
-import 'package:namma_wallet/src/features/irctc/application/irctc_qr_parser.dart';
-import 'package:namma_wallet/src/features/irctc/application/irctc_scanner_service.dart';
-import 'package:namma_wallet/src/features/pdf_extract/application/pdf_parser_service.dart';
+import 'package:namma_wallet/src/features/clipboard/application/clipboard_service_interface.dart';
+import 'package:namma_wallet/src/features/clipboard/presentation/clipboard_result_handler.dart';
+import 'package:namma_wallet/src/features/import/application/import_service_interface.dart';
 
 class ImportView extends StatefulWidget {
   const ImportView({super.key});
@@ -21,10 +21,12 @@ class ImportView extends StatefulWidget {
 }
 
 class _ImportViewState extends State<ImportView> {
-  late final IRCTCQRParser _qrParser = getIt<IRCTCQRParser>();
+  late final IImportService _importService = getIt<IImportService>();
+  late final ILogger _logger = getIt<ILogger>();
   bool _isPasting = false;
   bool _isScanning = false;
   bool _isProcessingPDF = false;
+  bool _isOpeningScanner = false;
 
   Future<void> _handleQRCodeScan(String qrData) async {
     if (_isScanning) return;
@@ -34,16 +36,17 @@ class _ImportViewState extends State<ImportView> {
     });
 
     try {
-      // Check if it's an IRCTC QR code
-      if (_qrParser.isIRCTCQRCode(qrData)) {
-        final irctcService = getIt<IRCTCScannerService>();
-        final result = await irctcService.parseAndSaveIRCTCTicket(qrData);
+      // Use import service to handle QR code
+      final ticket = await _importService.importQRCode(qrData);
 
-        if (!mounted) return;
-        irctcService.showResultMessage(context, result);
+      if (!mounted) return;
+
+      if (ticket != null) {
+        showSnackbar(
+          context,
+          'QR ticket imported successfully!',
+        );
       } else {
-        // Handle other QR code types here if needed
-        if (!mounted) return;
         showSnackbar(
           context,
           'QR code format not supported',
@@ -57,6 +60,29 @@ class _ImportViewState extends State<ImportView> {
         });
       }
     }
+  }
+
+  Future<void> _onBarcodeCaptured(BarcodeCapture capture) async {
+    // Check if barcodes list is not empty
+    if (capture.barcodes.isEmpty) {
+      if (!mounted) return;
+      context.pop();
+      return;
+    }
+
+    // Handle the scanned barcode
+    final qrData = capture.barcodes.first.rawValue;
+
+    // Check if rawValue is non-null
+    if (qrData == null) {
+      if (!mounted) return;
+      context.pop();
+      return;
+    }
+
+    if (!mounted) return;
+    context.pop();
+    await _handleQRCodeScan(qrData);
   }
 
   Future<void> _handlePDFPick() async {
@@ -74,12 +100,32 @@ class _ImportViewState extends State<ImportView> {
 
       if (result != null && result.files.single.path != null) {
         final file = File(result.files.single.path!);
-        final pdfParserService = getIt<PDFParserService>();
-        final parseResult = await pdfParserService.parseAndSavePDFTicket(file);
+
+        // Use import service to handle PDF
+        final ticket = await _importService.importAndSavePDFFile(file);
 
         if (!mounted) return;
-        pdfParserService.showResultMessage(context, parseResult);
+
+        if (ticket != null) {
+          showSnackbar(context, 'PDF ticket imported successfully!');
+        } else {
+          showSnackbar(
+            context,
+            'Unable to read text from this PDF or content does'
+            ' not match any supported ticket format.',
+            isError: true,
+          );
+        }
       }
+    } on Exception catch (e) {
+      if (mounted) {
+        showSnackbar(
+          context,
+          'Error processing PDF. Please try again.',
+          isError: true,
+        );
+      }
+      _logger.error('PDF import error: $e');
     } finally {
       if (mounted) {
         setState(() {
@@ -97,12 +143,24 @@ class _ImportViewState extends State<ImportView> {
     });
 
     try {
-      final clipboardService = getIt<ClipboardService>();
-      final result = await clipboardService.readAndParseClipboard();
+      final clipboardService = getIt<IClipboardService>();
 
-      if (!mounted) return;
+      try {
+        final result = await clipboardService.readAndParseClipboard();
 
-      clipboardService.showResultMessage(context, result);
+        if (!mounted) return;
+
+        ClipboardResultHandler.showResultMessage(context, result);
+      } on Exception catch (e) {
+        if (mounted) {
+          showSnackbar(
+            context,
+            'Failed to read clipboard',
+            isError: true,
+          );
+        }
+        _logger.error('Clipboard read error: $e');
+      }
     } finally {
       if (mounted) {
         setState(() {
@@ -213,30 +271,25 @@ class _ImportViewState extends State<ImportView> {
                             ),
                             shape: const StadiumBorder(),
                           ),
-                          onPressed: () {
-                            context.pushNamed(
-                              AppRoute.barcodeScanner.name,
-                              extra: (BarcodeCapture capture) async {
-                                // Check if barcodes list is not empty
-                                if (capture.barcodes.isEmpty) {
-                                  context.pop();
-                                  return;
-                                }
-
-                                // Handle the scanned barcode
-                                final qrData = capture.barcodes.first.rawValue;
-
-                                // Check if rawValue is non-null
-                                if (qrData == null) {
-                                  context.pop();
-                                  return;
-                                }
-
-                                context.pop();
-                                await _handleQRCodeScan(qrData);
-                              },
-                            );
-                          },
+                          onPressed: _isOpeningScanner
+                              ? null
+                              : () async {
+                                  setState(() {
+                                    _isOpeningScanner = true;
+                                  });
+                                  try {
+                                    await context.pushNamed(
+                                      AppRoute.barcodeScanner.name,
+                                      extra: _onBarcodeCaptured,
+                                    );
+                                  } finally {
+                                    if (mounted) {
+                                      setState(() {
+                                        _isOpeningScanner = false;
+                                      });
+                                    }
+                                  }
+                                },
                           child: const Text(
                             'Scan QR Code',
                             style: TextStyle(

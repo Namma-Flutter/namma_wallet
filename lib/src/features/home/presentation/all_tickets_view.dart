@@ -1,14 +1,16 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:namma_wallet/src/common/database/ticket_dao_interface.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
+import 'package:namma_wallet/src/common/domain/models/ticket.dart';
+import 'package:namma_wallet/src/common/enums/ticket_type.dart';
 import 'package:namma_wallet/src/common/helper/date_time_converter.dart';
 import 'package:namma_wallet/src/common/routing/app_routes.dart';
-import 'package:namma_wallet/src/common/services/logger_interface.dart';
+import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
 import 'package:namma_wallet/src/common/theme/styles.dart';
 import 'package:namma_wallet/src/common/widgets/snackbar_widget.dart';
-import 'package:namma_wallet/src/features/common/enums/ticket_type.dart';
-import 'package:namma_wallet/src/features/home/domain/ticket.dart';
 import 'package:namma_wallet/src/features/home/domain/ticket_extensions.dart';
 import 'package:namma_wallet/src/features/home/presentation/widgets/ticket_card_widget.dart';
 
@@ -27,7 +29,7 @@ class _AllTicketsViewState extends State<AllTicketsView> {
   @override
   void initState() {
     super.initState();
-    _loadTicketData();
+    unawaited(_loadTicketData());
   }
 
   Future<void> _loadTicketData() async {
@@ -399,17 +401,21 @@ class TravelTicketListCardWidget extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 // Date and time
-                Text(
-                  '${formatDate(ticket.startTime)} • '
-                  '${formatTime(ticket.startTime)}'
-                  '',
-                  style: TextStyle(
-                    fontSize: 11,
-                    color: Theme.of(
-                      context,
-                    ).colorScheme.onSurface.withValues(alpha: 0.5),
+                if (ticket.startTime != null)
+                  Text(
+                    '${DateTimeConverter.instance.formatDate(
+                      ticket.startTime!,
+                    )} • '
+                    '${DateTimeConverter.instance.formatTime(
+                      ticket.startTime!,
+                    )}',
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withValues(alpha: 0.5),
+                    ),
                   ),
-                ),
               ],
             ),
           ),

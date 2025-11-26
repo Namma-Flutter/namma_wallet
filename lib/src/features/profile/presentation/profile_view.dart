@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:namma_wallet/src/common/routing/app_routes.dart';
 import 'package:namma_wallet/src/common/theme/theme_provider.dart';
-import 'package:namma_wallet/src/common/widgets/custom_back_button.dart';
+import 'package:namma_wallet/src/common/widgets/rounded_back_button.dart';
 import 'package:namma_wallet/src/common/widgets/snackbar_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -16,7 +16,7 @@ class ProfileView extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        leading: const CustomBackButton(),
+        leading: const RoundedBackButton(),
         title: const Text('Profile'),
       ),
       body: SingleChildScrollView(
@@ -37,8 +37,8 @@ class ProfileView extends StatelessWidget {
                 icon: Icons.people_outline,
                 title: 'Contributors',
                 subtitle: 'View project contributors',
-                onTap: () {
-                  context.pushNamed(AppRoute.contributors.name);
+                onTap: () async {
+                  await context.pushNamed(AppRoute.contributors.name);
                 },
               ),
 
@@ -47,8 +47,8 @@ class ProfileView extends StatelessWidget {
                 icon: Icons.article_outlined,
                 title: 'Licenses',
                 subtitle: 'View open source licenses',
-                onTap: () {
-                  context.pushNamed(AppRoute.license.name);
+                onTap: () async {
+                  await context.pushNamed(AppRoute.license.name);
                 },
               ),
 
@@ -95,8 +95,8 @@ class ProfileView extends StatelessWidget {
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          context.pushNamed(AppRoute.dbViewer.name);
+        onPressed: () async {
+          await context.pushNamed(AppRoute.dbViewer.name);
         },
         label: const Text('View DB'),
         icon: const Icon(Icons.storage),
@@ -149,11 +149,11 @@ class ThemeSectionWidget extends StatelessWidget {
                     : 'Light theme enabled',
               ),
               value: themeProvider.isDarkMode,
-              onChanged: (value) {
+              onChanged: (value) async {
                 if (value) {
-                  themeProvider.setDarkMode();
+                  await themeProvider.setDarkMode();
                 } else {
-                  themeProvider.setLightMode();
+                  await themeProvider.setLightMode();
                 }
               },
               secondary: Icon(
@@ -165,11 +165,11 @@ class ThemeSectionWidget extends StatelessWidget {
               title: const Text('Use System Theme'),
               trailing: Switch(
                 value: themeProvider.isSystemMode,
-                onChanged: (value) {
+                onChanged: (value) async {
                   if (value) {
-                    themeProvider.setSystemMode();
+                    await themeProvider.setSystemMode();
                   } else {
-                    themeProvider.setLightMode();
+                    await themeProvider.setLightMode();
                   }
                 },
               ),

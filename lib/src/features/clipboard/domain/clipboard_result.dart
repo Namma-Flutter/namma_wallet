@@ -1,5 +1,5 @@
+import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 import 'package:namma_wallet/src/features/clipboard/domain/clipboard_content_type.dart';
-import 'package:namma_wallet/src/features/home/domain/ticket.dart';
 
 /// Represents the result of a clipboard read operation.
 ///

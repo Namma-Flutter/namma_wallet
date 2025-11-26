@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
-import 'package:namma_wallet/src/common/services/logger_interface.dart';
-import 'package:namma_wallet/src/features/common/application/travel_parser_service.dart';
+import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
+import 'package:namma_wallet/src/features/travel/application/travel_parser_service.dart';
 
 import '../../../../helpers/fake_logger.dart';
 
@@ -22,7 +22,8 @@ void main() {
     late TravelParserService service;
 
     setUp(() {
-      service = TravelParserService();
+      final logger = GetIt.instance<ILogger>();
+      service = TravelParserService(logger: logger);
     });
 
     test('should detect and parse SETC SMS', () {

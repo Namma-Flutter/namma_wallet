@@ -1,5 +1,5 @@
 import 'package:namma_wallet/src/common/database/ticket_dao_interface.dart';
-import 'package:namma_wallet/src/features/home/domain/ticket.dart';
+import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 
 /// Mock TicketDAO for testing purposes
 class MockTicketDAO implements ITicketDAO {
@@ -54,8 +54,20 @@ class MockTicketDAO implements ITicketDAO {
     return insertedTickets.where((t) => t.type.name == type).toList();
   }
 
+  /// Whether delete should succeed
+  bool deleteSuccess = true;
+
+  /// Whether to throw an error on operations
+  bool shouldThrow = false;
+
   @override
   Future<int> deleteTicket(String ticketId) async {
+    if (shouldThrow) {
+      throw Exception('Mock delete error');
+    }
+    if (!deleteSuccess) {
+      return 0;
+    }
     final initialLength = insertedTickets.length;
     insertedTickets.removeWhere((t) => t.ticketId == ticketId);
     return initialLength - insertedTickets.length;

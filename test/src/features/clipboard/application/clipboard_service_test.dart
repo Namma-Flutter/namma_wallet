@@ -1,13 +1,11 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:get_it/get_it.dart';
 import 'package:namma_wallet/src/common/database/ticket_dao_interface.dart';
-import 'package:namma_wallet/src/common/services/logger_interface.dart';
+import 'package:namma_wallet/src/common/domain/models/ticket.dart';
+import 'package:namma_wallet/src/common/enums/source_type.dart';
 import 'package:namma_wallet/src/features/clipboard/application/clipboard_service.dart';
 import 'package:namma_wallet/src/features/clipboard/domain/clipboard_content_type.dart';
 import 'package:namma_wallet/src/features/clipboard/domain/clipboard_repository_interface.dart';
-import 'package:namma_wallet/src/features/common/application/travel_parser_service.dart';
-import 'package:namma_wallet/src/features/common/enums/source_type.dart';
-import 'package:namma_wallet/src/features/home/domain/ticket.dart';
+import 'package:namma_wallet/src/features/travel/application/travel_parser_interface.dart';
 
 import '../../../../helpers/fake_logger.dart';
 
@@ -30,8 +28,8 @@ class MockClipboardRepository implements IClipboardRepository {
   }
 }
 
-/// Mock implementation of TravelParserService for testing
-class MockTravelParserService implements TravelParserService {
+/// Mock implementation of ITravelParser for testing
+class MockTravelParserService implements ITravelParser {
   TicketUpdateInfo? updateInfo;
   Ticket? parsedTicket;
 
@@ -87,18 +85,12 @@ void main() {
     late MockClipboardRepository mockRepository;
     late MockTravelParserService mockParserService;
     late MockTicketDao mockDatabase;
-    final getIt = GetIt.instance;
 
     setUp(() {
       // Create mocks
       mockRepository = MockClipboardRepository();
       mockParserService = MockTravelParserService();
       mockDatabase = MockTicketDao();
-
-      // Register dependencies
-      if (!getIt.isRegistered<ILogger>()) {
-        getIt.registerSingleton<ILogger>(FakeLogger());
-      }
 
       // Create service with mocks
       service = ClipboardService(
@@ -107,10 +99,6 @@ void main() {
         parserService: mockParserService,
         ticketDao: mockDatabase,
       );
-    });
-
-    tearDown(() async {
-      await getIt.reset();
     });
 
     group('readAndParseClipboard - Success Scenarios', () {
@@ -311,7 +299,7 @@ void main() {
             ticketId: 'T12345678',
             primaryText: 'Chennai → Bangalore',
             secondaryText: 'TNSTC',
-            startTime: DateTime.now(),
+            startTime: DateTime(2024),
             location: 'Test',
           );
 
@@ -342,7 +330,7 @@ void main() {
             ticketId: 'T12345678',
             primaryText: 'Test',
             secondaryText: 'Test',
-            startTime: DateTime.now(),
+            startTime: DateTime(2024),
             location: 'Test',
           );
 
@@ -383,7 +371,7 @@ void main() {
     group('Edge Cases and Boundary Conditions', () {
       test(
         'Given text at exact max length, When reading and parsing, '
-        'Then returns error if not parseable as ticket',
+        'Then returns error if not parsable as ticket',
         () async {
           // Arrange (Given)
           final exactLengthText = 'A' * ClipboardService.maxTextLength;
@@ -408,7 +396,7 @@ void main() {
 
       test(
         'Given text with special characters, When reading and parsing, '
-        'Then returns error if not parseable as ticket',
+        'Then returns error if not parsable as ticket',
         () async {
           // Arrange (Given)
           const specialText = r'Test@#$%^&*()_+{}|:"<>?';
@@ -433,7 +421,7 @@ void main() {
 
       test(
         'Given text with Unicode characters, When reading and parsing, '
-        'Then returns error if not parseable as ticket',
+        'Then returns error if not parsable as ticket',
         () async {
           // Arrange (Given)
           const unicodeText = 'தமிழ் நாடு பேருந்து 中文 🎫';
@@ -458,7 +446,7 @@ void main() {
 
       test(
         'Given multiline text, When reading and parsing, '
-        'Then returns error if not parseable as ticket',
+        'Then returns error if not parsable as ticket',
         () async {
           // Arrange (Given)
           const multilineText = 'Line 1\nLine 2\nLine 3';
@@ -518,7 +506,7 @@ void main() {
             ticketId: 'T123456789',
             primaryText: 'Test',
             secondaryText: 'Test',
-            startTime: DateTime.now(),
+            startTime: DateTime(2024),
             location: 'Test',
           );
 
@@ -549,7 +537,7 @@ void main() {
             ticketId: 'T12',
             primaryText: 'Test',
             secondaryText: 'Test',
-            startTime: DateTime.now(),
+            startTime: DateTime(2024),
             location: 'Test',
           );
 
