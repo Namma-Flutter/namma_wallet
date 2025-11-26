@@ -2,6 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:namma_wallet/src/common/di/locator.dart';
+import 'package:namma_wallet/src/common/services/haptic/haptic_service_extension.dart';
+import 'package:namma_wallet/src/common/services/haptic/haptic_service_interface.dart';
 import 'package:namma_wallet/src/common/theme/app_theme.dart';
 import 'package:namma_wallet/src/features/calendar/application/calendar_provider.dart';
 import 'package:namma_wallet/src/features/calendar/presentation/widgets/calendar_list.dart';
@@ -93,6 +96,9 @@ class _CalendarContentState extends State<CalendarContent> {
           CalendarToggleButtons(
             selectedFilter: _selectedFilter,
             onFilterChanged: (index) async {
+              getIt<IHapticService>().triggerHaptic(
+                HapticType.selection,
+              );
               setState(() {
                 if (index != 2) {
                   _selectedFilter = index;

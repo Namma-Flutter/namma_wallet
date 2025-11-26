@@ -7,6 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/routing/app_routes.dart';
+import 'package:namma_wallet/src/common/services/haptic/haptic_service_extension.dart';
+import 'package:namma_wallet/src/common/services/haptic/haptic_service_interface.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
 import 'package:namma_wallet/src/common/widgets/snackbar_widget.dart';
 import 'package:namma_wallet/src/features/clipboard/application/clipboard_service_interface.dart';
@@ -34,6 +36,10 @@ class _ImportViewState extends State<ImportView> {
     setState(() {
       _isScanning = true;
     });
+
+    getIt<IHapticService>().triggerHaptic(
+      HapticType.selection,
+    );
 
     try {
       // Use import service to handle QR code
@@ -101,6 +107,10 @@ class _ImportViewState extends State<ImportView> {
       if (result != null && result.files.single.path != null) {
         final file = File(result.files.single.path!);
 
+        getIt<IHapticService>().triggerHaptic(
+          HapticType.selection,
+        );
+
         // Use import service to handle PDF
         final ticket = await _importService.importAndSavePDFFile(file);
 
@@ -141,6 +151,10 @@ class _ImportViewState extends State<ImportView> {
     setState(() {
       _isPasting = true;
     });
+
+    getIt<IHapticService>().triggerHaptic(
+      HapticType.selection,
+    );
 
     try {
       final clipboardService = getIt<IClipboardService>();
