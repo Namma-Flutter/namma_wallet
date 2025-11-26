@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:namma_wallet/src/common/database/ticket_dao_interface.dart';
 import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 import 'package:namma_wallet/src/common/enums/source_type.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
@@ -16,17 +17,20 @@ class ImportService implements IImportService {
     required ITravelParser travelParser,
     required IIRCTCQRParser qrParser,
     required IIRCTCScannerService irctcScannerService,
-  }) : _logger = logger,
-       _pdfService = pdfService,
-       _travelParser = travelParser,
-       _qrParser = qrParser,
-       _irctcScannerService = irctcScannerService;
+    required ITicketDAO ticketDao,
+  })  : _logger = logger,
+        _pdfService = pdfService,
+        _travelParser = travelParser,
+        _qrParser = qrParser,
+        _irctcScannerService = irctcScannerService,
+        _ticketDao = ticketDao;
 
   final ILogger _logger;
   final IPDFService _pdfService;
   final ITravelParser _travelParser;
   final IIRCTCQRParser _qrParser;
   final IIRCTCScannerService _irctcScannerService;
+  final ITicketDAO _ticketDao;
 
   @override
   List<String> get supportedExtensions => const ['pdf'];
@@ -37,7 +41,7 @@ class ImportService implements IImportService {
   }
 
   @override
-  Future<Ticket?> importPDFFile(File pdfFile) async {
+  Future<Ticket?> importAndSavePDFFile(File pdfFile) async {
     try {
       // Use basename to avoid logging full path with sensitive directory info
       final filename = pdfFile.uri.pathSegments.last;
@@ -64,8 +68,11 @@ class ImportService implements IImportService {
         return null;
       }
 
+      // Save the parsed ticket to the database
+      await _ticketDao.insertTicket(parsedTicket);
+
       _logger.success(
-        'Successfully imported PDF ticket: ${parsedTicket.ticketId}',
+        'Successfully imported and saved PDF ticket: ${parsedTicket.ticketId}',
       );
       return parsedTicket;
     } on Object catch (e, stackTrace) {

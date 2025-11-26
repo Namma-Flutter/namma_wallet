@@ -50,6 +50,7 @@ dev_dependencies:
   flutter_gen_runner: ^5.4.0
   flutter_test:
     sdk: flutter
+  mockito: ^5.4.4
   sqflite_common_ffi: ^2.3.0
   very_good_analysis: ^10.0.0
 

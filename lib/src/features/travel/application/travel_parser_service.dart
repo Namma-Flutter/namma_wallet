@@ -33,19 +33,23 @@ class TNSTCBusParser implements TravelTicketParser {
 
   @override
   bool canParse(String text) {
-    final patterns = [
+    // Must have at least one TNSTC-specific keyword
+    final tnstcKeywords = [
       'TNSTC',
       'Tamil Nadu',
       'Corporation',
-      'PNR NO.',
-      'PNR Number',
-      'Trip Code',
       'Service Start Place',
-      'Date of Journey',
+      'Trip Code',
     ];
-    return patterns.any(
+
+    final hasTNSTCKeyword = tnstcKeywords.any(
       (pattern) => text.toLowerCase().contains(pattern.toLowerCase()),
     );
+
+    // And should not have IRCTC keyword
+    final hasIRCTCKeyword = text.toLowerCase().contains('irctc');
+
+    return hasTNSTCKeyword && !hasIRCTCKeyword;
   }
 
   /// Detects if the text is SMS format by checking for SMS-specific patterns
@@ -191,18 +195,8 @@ class IRCTCTrainParser implements TravelTicketParser {
 
   @override
   bool canParse(String text) {
-    final patterns = [
-      'IRCTC',
-      'PNR No.',
-      'Train No.',
-      'Train Name',
-      'Boarding Point',
-      'Reservation Upto',
-      'Scheduled Departure',
-    ];
-    return patterns.any(
-      (pattern) => text.toLowerCase().contains(pattern.toLowerCase()),
-    );
+    // Must have IRCTC keyword for reliable detection
+    return text.toLowerCase().contains('irctc');
   }
 
   @override
@@ -212,12 +206,23 @@ class IRCTCTrainParser implements TravelTicketParser {
     // Currently IRCTC tickets are primarily handled via QR codes
 
     // Extract PNR number
+    // Use [ \t]* instead of \s* to avoid matching across newlines
     final pnrMatch = RegExp(
-      r'PNR No\.\s*:\s*([A-Z0-9]+)',
+      r'PNR No\.[ \t]*:[ \t]*([A-Z0-9]+)',
       caseSensitive: false,
     ).firstMatch(text);
 
-    final pnrNumber = pnrMatch?.group(1) ?? 'Unknown';
+    final pnrNumber = pnrMatch?.group(1)?.trim();
+    if (pnrNumber == null || pnrNumber.isEmpty) {
+      return Ticket(
+        ticketId: '',
+        primaryText: 'IRCTC Train Ticket',
+        secondaryText: '',
+        startTime: invalidDateSentinel,
+        location: 'Unknown',
+        extras: [ExtrasModel(title: 'Provider', value: 'IRCTC')],
+      );
+    }
 
     // Extract train information
     final trainNumberMatch = RegExp(
@@ -289,7 +294,6 @@ class IRCTCTrainParser implements TravelTicketParser {
           title: 'Journey Date',
           value: journeyDate.toString().split(' ')[0],
         ),
-      ExtrasModel(title: 'Source Type', value: 'Text'),
       ExtrasModel(title: 'Provider', value: 'IRCTC'),
     ];
 

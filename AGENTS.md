@@ -114,3 +114,26 @@ Key packages:
 - **Widgets**: Use "widget" suffix for smaller reusable components (e.g., `TicketCardWidget`, `ButtonWidget`)
   - File naming: `ticket_card_widget.dart`, `button_widget.dart`
   - Class naming: `class TicketCardWidget extends StatelessWidget`
+
+### Error Handling and Parsing Rules
+
+**CRITICAL: Never Fall Back to Default Values**
+
+- **Never use fallback/default values** when parsing fails
+- **Always return `null`** if parsing, extraction, or validation fails
+- **Never silently substitute** with current date, empty strings, or placeholder values
+- **Explicit failure is better than implicit incorrect data**
+
+Examples:
+- ❌ Bad: Date parsing fails → fallback to `DateTime.now()`
+- ✅ Good: Date parsing fails → return `null`
+- ❌ Bad: PNR extraction fails → use `"Unknown"`
+- ✅ Good: PNR extraction fails → return `null` or empty string `""`
+- ❌ Bad: Malformed data → substitute with default value
+- ✅ Good: Malformed data → return `null`
+
+**Why?**
+- Prevents silent data corruption
+- Makes errors visible and debuggable
+- Allows callers to handle missing data appropriately
+- Maintains data integrity

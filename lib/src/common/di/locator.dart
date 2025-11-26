@@ -97,6 +97,7 @@ void setupLocator() {
         travelParser: getIt<ITravelParser>(),
         qrParser: getIt<IIRCTCQRParser>(),
         irctcScannerService: getIt<IIRCTCScannerService>(),
+        ticketDao: getIt<ITicketDAO>(),
       ),
     )
     // Clipboard - Repository and Service
