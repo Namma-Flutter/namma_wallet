@@ -30,11 +30,11 @@ void main() {
       expect(ticket.secondaryText, equals('SETC - 1315KUMCHEAB'));
 
       // Test startTime (combined from journeyDate + serviceStartTime)
-      expect(ticket.startTime.year, equals(2026));
-      expect(ticket.startTime.month, equals(1));
-      expect(ticket.startTime.day, equals(18));
-      expect(ticket.startTime.hour, equals(13));
-      expect(ticket.startTime.minute, equals(15));
+      expect(ticket.startTime?.year, equals(2026));
+      expect(ticket.startTime?.month, equals(1));
+      expect(ticket.startTime?.day, equals(18));
+      expect(ticket.startTime?.hour, equals(13));
+      expect(ticket.startTime?.minute, equals(15));
 
       expect(ticket.location, equals('KUMBAKONAM'));
 
@@ -107,11 +107,11 @@ void main() {
       expect(ticket.secondaryText, equals('TNSTC KUMBAKONAM - 2145CHEKUMAB'));
 
       // Test startTime
-      expect(ticket.startTime.year, equals(2025));
-      expect(ticket.startTime.month, equals(2));
-      expect(ticket.startTime.day, equals(11));
-      expect(ticket.startTime.hour, equals(22));
-      expect(ticket.startTime.minute, equals(35));
+      expect(ticket.startTime?.year, equals(2025));
+      expect(ticket.startTime?.month, equals(2));
+      expect(ticket.startTime?.day, equals(11));
+      expect(ticket.startTime?.hour, equals(22));
+      expect(ticket.startTime?.minute, equals(35));
 
       expect(ticket.location, equals('KOTTIVAKKAM(RTO OFFICE)'));
 
@@ -138,12 +138,12 @@ void main() {
       expect(ticket.primaryText, equals('CHENNAI → MADURAI'));
 
       // startTime should use journey date with default time (00:00)
-      expect(ticket.startTime.year, equals(2025));
-      expect(ticket.startTime.month, equals(2));
-      expect(ticket.startTime.day, equals(20));
+      expect(ticket.startTime?.year, equals(2025));
+      expect(ticket.startTime?.month, equals(2));
+      expect(ticket.startTime?.day, equals(20));
       // Time should default to 00:00 when not provided
-      expect(ticket.startTime.hour, equals(0));
-      expect(ticket.startTime.minute, equals(0));
+      expect(ticket.startTime?.hour, equals(0));
+      expect(ticket.startTime?.minute, equals(0));
     });
   });
 }

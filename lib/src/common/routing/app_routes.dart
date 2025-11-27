@@ -1,7 +1,7 @@
 enum AppRoute {
   // Main navigation routes
   home(path: '/', name: 'home'),
-  scanner(path: '/scanner', name: 'scanner'),
+  import(path: '/import', name: 'import'),
   calendar(path: '/calendar', name: 'calendar'),
   profile(path: '/profile', name: 'profile'),
 

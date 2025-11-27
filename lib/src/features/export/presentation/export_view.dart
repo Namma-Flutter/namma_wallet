@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:namma_wallet/src/common/widgets/custom_back_button.dart';
+import 'package:namma_wallet/src/common/widgets/rounded_back_button.dart';
 
 class ExportView extends StatelessWidget {
   const ExportView({super.key});
@@ -8,7 +8,7 @@ class ExportView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: const CustomBackButton(),
+        leading: const RoundedBackButton(),
         title: const Text('Export'),
       ),
       body: const Center(

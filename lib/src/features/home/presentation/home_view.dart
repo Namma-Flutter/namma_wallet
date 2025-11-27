@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:card_stack_widget/model/card_model.dart';
 import 'package:card_stack_widget/model/card_orientation.dart';
 import 'package:card_stack_widget/widget/card_stack_widget.dart';
@@ -5,13 +7,15 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:namma_wallet/src/common/database/ticket_dao_interface.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
+import 'package:namma_wallet/src/common/domain/models/ticket.dart';
+import 'package:namma_wallet/src/common/enums/ticket_type.dart';
 import 'package:namma_wallet/src/common/routing/app_routes.dart';
+import 'package:namma_wallet/src/common/services/haptic/haptic_service_extension.dart';
+import 'package:namma_wallet/src/common/services/haptic/haptic_service_interface.dart';
 import 'package:namma_wallet/src/common/widgets/snackbar_widget.dart';
-import 'package:namma_wallet/src/features/common/enums/ticket_type.dart';
-import 'package:namma_wallet/src/features/home/domain/ticket.dart';
 import 'package:namma_wallet/src/features/home/presentation/widgets/header_widget.dart';
 import 'package:namma_wallet/src/features/home/presentation/widgets/ticket_card_widget.dart';
-import 'package:namma_wallet/src/features/home/presentation/widgets/travel_ticket_card_widget.dart';
+import 'package:namma_wallet/src/features/travel/presentation/widgets/travel_ticket_card_widget.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -25,11 +29,13 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
   List<Ticket> _travelTickets = [];
   List<Ticket> _eventTickets = [];
 
+  late final IHapticService _hapticService;
   @override
   void initState() {
     super.initState();
+    _hapticService = getIt<IHapticService>();
     WidgetsBinding.instance.addObserver(this);
-    _loadTicketData();
+    unawaited(_loadTicketData());
   }
 
   @override
@@ -41,7 +47,7 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      _loadTicketData();
+      unawaited(_loadTicketData());
     }
   }
 
@@ -69,13 +75,16 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
             eventTickets.add(ticket);
         }
       }
-
       if (!mounted) return;
       setState(() {
         _travelTickets = travelTickets;
         _eventTickets = eventTickets;
         _isLoading = false;
       });
+
+      if (mounted) {
+        _hapticService.triggerHaptic(HapticType.selection);
+      }
     } on Object catch (e) {
       if (!mounted) return;
       showSnackbar(context, 'Error loading ticket data: $e', isError: true);
@@ -93,6 +102,7 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
         shadowColor: Colors.black26,
         child: InkWell(
           onTap: () async {
+            _hapticService.triggerHaptic(HapticType.selection);
             final wasDeleted = await context.pushNamed<bool>(
               AppRoute.ticketView.name,
               extra: ticket,
@@ -119,7 +129,7 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const UserProfileWidget(),
+                UserProfileWidget(),
                 Padding(
                   padding: const EdgeInsets.all(16),
                   child: Row(
@@ -134,8 +144,8 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
                       ),
                       if (_travelTickets.isNotEmpty)
                         TextButton(
-                          onPressed: () {
-                            context.pushNamed(AppRoute.allTickets.name);
+                          onPressed: () async {
+                            await context.pushNamed(AppRoute.allTickets.name);
                           },
                           style: TextButton.styleFrom(
                             padding: const EdgeInsets.symmetric(

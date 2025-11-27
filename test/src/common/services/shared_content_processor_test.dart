@@ -1,16 +1,14 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
-import 'package:namma_wallet/src/common/services/logger_interface.dart';
-import 'package:namma_wallet/src/features/common/application/travel_parser_service.dart';
-import 'package:namma_wallet/src/features/home/domain/extras_model.dart';
-import 'package:namma_wallet/src/features/home/domain/ticket.dart';
-import 'package:namma_wallet/src/features/share/application/shared_content_processor.dart';
-import 'package:namma_wallet/src/features/share/domain/shared_content_result.dart';
-import 'package:namma_wallet/src/features/tnstc/application/tnstc_pdf_parser.dart';
-import 'package:namma_wallet/src/features/tnstc/application/tnstc_sms_parser.dart';
+import 'package:namma_wallet/src/common/domain/models/ticket.dart';
+import 'package:namma_wallet/src/common/enums/ticket_type.dart';
+import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
+import 'package:namma_wallet/src/features/receive/application/shared_content_processor.dart';
+import 'package:namma_wallet/src/features/receive/domain/shared_content_result.dart';
+import 'package:namma_wallet/src/features/receive/domain/shared_content_type.dart';
+import 'package:namma_wallet/src/features/travel/application/travel_parser_interface.dart';
 
 import '../../../helpers/fake_logger.dart';
-import '../../../helpers/mock_sms_service.dart';
 import '../../../helpers/mock_ticket_dao.dart';
 import '../../../helpers/mock_travel_parser_service.dart';
 
@@ -20,11 +18,10 @@ void main() {
 
     setUp(() {
       // Arrange - Set up mocked dependencies in a new scope
+      final logger = FakeLogger();
       getIt
         ..pushNewScope()
-        ..registerSingleton<ILogger>(FakeLogger())
-        ..registerSingleton<TNSTCSMSParser>(TNSTCSMSParser())
-        ..registerSingleton<TNSTCPDFParser>(TNSTCPDFParser());
+        ..registerSingleton<ILogger>(logger);
     });
 
     tearDown(() async {
@@ -38,24 +35,10 @@ void main() {
         'Then returns TicketCreatedResult with ticket details',
         () async {
           // Arrange (Given)
-          final mockTicket = Ticket(
-            ticketId: 'T12345678',
-            primaryText: 'Chennai → Bangalore',
-            secondaryText: 'SETC - Trip123',
-            startTime: DateTime(2024, 12, 15, 14, 30),
-            location: 'Chennai',
-            extras: [
-              ExtrasModel(title: 'PNR Number', value: 'T12345678'),
-              ExtrasModel(title: 'From', value: 'Chennai'),
-              ExtrasModel(title: 'To', value: 'Bangalore'),
-              ExtrasModel(title: 'Fare', value: '₹500.00'),
-            ],
-          );
-
+          final logger = getIt<ILogger>();
           final processor = SharedContentProcessor(
-            logger: FakeLogger(),
-            travelParser: MockTravelParserService(),
-            smsService: MockSMSService(mockTicket: mockTicket),
+            logger: logger,
+            travelParser: MockTravelParserService(logger: logger),
             ticketDao: MockTicketDAO(),
           );
 
@@ -75,20 +58,20 @@ void main() {
           expect(result, isA<TicketCreatedResult>());
           final ticketResult = result as TicketCreatedResult;
           expect(ticketResult.pnrNumber, equals('T12345678'));
-          expect(ticketResult.from, contains('Chennai'));
-          expect(ticketResult.to, contains('Bangalore'));
+          expect(ticketResult.from, contains('CHENNAI'));
+          expect(ticketResult.to, contains('BANGALORE'));
         },
       );
 
       test(
         'Given empty content, When processing content, '
-        'Then returns TicketCreatedResult with defaults',
+        'Then returns ProcessingErrorResult',
         () async {
           // Arrange (Given)
+          final logger = getIt<ILogger>();
           final processor = SharedContentProcessor(
-            logger: FakeLogger(),
-            travelParser: MockTravelParserService(),
-            smsService: MockSMSService(),
+            logger: logger,
+            travelParser: MockTravelParserService(logger: logger),
             ticketDao: MockTicketDAO(),
           );
 
@@ -99,7 +82,11 @@ void main() {
           );
 
           // Assert (Then)
-          expect(result, isA<TicketCreatedResult>());
+          expect(result, isA<ProcessingErrorResult>());
+          expect(
+            (result as ProcessingErrorResult).error,
+            contains('No supported ticket format found'),
+          );
         },
       );
 
@@ -108,10 +95,10 @@ void main() {
         'Then handles gracefully and returns result',
         () async {
           // Arrange (Given)
+          final logger = getIt<ILogger>();
           final processor = SharedContentProcessor(
-            logger: FakeLogger(),
-            travelParser: MockTravelParserService(),
-            smsService: MockSMSService(),
+            logger: logger,
+            travelParser: MockTravelParserService(logger: logger),
             ticketDao: MockTicketDAO(),
           );
 
@@ -124,7 +111,11 @@ void main() {
           );
 
           // Assert (Then)
-          expect(result, isA<TicketCreatedResult>());
+          expect(result, isA<ProcessingErrorResult>());
+          expect(
+            (result as ProcessingErrorResult).error,
+            contains('No supported ticket format found'),
+          );
         },
       );
     });
@@ -145,12 +136,13 @@ void main() {
             },
           );
 
+          final logger = getIt<ILogger>();
           final processor = SharedContentProcessor(
-            logger: FakeLogger(),
+            logger: logger,
             travelParser: MockTravelParserService(
+              logger: logger,
               mockUpdateInfo: mockUpdateInfo,
             ),
-            smsService: MockSMSService(),
             ticketDao: MockTicketDAO(),
           );
 
@@ -185,12 +177,13 @@ void main() {
             updates: {'conductorContact': '9876543210'},
           );
 
+          final logger = getIt<ILogger>();
           final processor = SharedContentProcessor(
-            logger: FakeLogger(),
+            logger: logger,
             travelParser: MockTravelParserService(
+              logger: logger,
               mockUpdateInfo: mockUpdateInfo,
             ),
-            smsService: MockSMSService(),
             ticketDao: MockTicketDAO(updateReturnCount: 0),
           );
 
@@ -229,12 +222,13 @@ void main() {
             },
           );
 
+          final logger = getIt<ILogger>();
           final processor = SharedContentProcessor(
-            logger: FakeLogger(),
+            logger: logger,
             travelParser: MockTravelParserService(
+              logger: logger,
               mockUpdateInfo: mockUpdateInfo,
             ),
-            smsService: MockSMSService(),
             ticketDao: mockDao,
           );
 
@@ -278,12 +272,13 @@ void main() {
             updates: {'conductorContact': '9876543210'},
           );
 
+          final logger = getIt<ILogger>();
           final processor = SharedContentProcessor(
-            logger: FakeLogger(),
+            logger: logger,
             travelParser: MockTravelParserService(
+              logger: logger,
               mockUpdateInfo: mockUpdateInfo,
             ),
-            smsService: MockSMSService(),
             ticketDao: MockTicketDAO(shouldThrowOnUpdate: true),
           );
 
@@ -304,37 +299,14 @@ void main() {
       );
 
       test(
-        'Given empty content, When processing content, '
-        'Then handles gracefully',
-        () async {
-          // Arrange (Given)
-          final processor = SharedContentProcessor(
-            logger: FakeLogger(),
-            travelParser: MockTravelParserService(),
-            smsService: MockSMSService(),
-            ticketDao: MockTicketDAO(),
-          );
-
-          // Act (When)
-          final result = await processor.processContent(
-            '',
-            SharedContentType.sms,
-          );
-
-          // Assert (Then)
-          expect(result, isNotNull);
-        },
-      );
-
-      test(
         'Given very long content, When processing content, '
         'Then processes without errors',
         () async {
           // Arrange (Given)
+          final logger = getIt<ILogger>();
           final processor = SharedContentProcessor(
-            logger: FakeLogger(),
-            travelParser: MockTravelParserService(),
-            smsService: MockSMSService(),
+            logger: logger,
+            travelParser: MockTravelParserService(logger: logger),
             ticketDao: MockTicketDAO(),
           );
 
@@ -347,7 +319,7 @@ void main() {
           );
 
           // Assert (Then)
-          expect(result, isNotNull);
+          expect(result, isA<ProcessingErrorResult>());
         },
       );
       test(
@@ -355,17 +327,20 @@ void main() {
         'Then returns ProcessingErrorResult',
         () async {
           // Arrange (Given)
-          final mockTicket = Ticket(
-            primaryText: 'Test',
-            secondaryText: 'Test',
-            startTime: DateTime.now(),
-            location: 'Test',
-          );
-
+          final logger = getIt<ILogger>();
           final processor = SharedContentProcessor(
-            logger: FakeLogger(),
-            travelParser: MockTravelParserService(),
-            smsService: MockSMSService(mockTicket: mockTicket),
+            logger: logger,
+            travelParser: MockTravelParserService(
+              logger: logger,
+              // Return a ticket with null ticketId
+              mockTicket: Ticket(
+                primaryText: 'Test → Test',
+                secondaryText: 'Test Bus',
+                startTime: DateTime(2024),
+                location: 'Test',
+                type: TicketType.bus,
+              ),
+            ),
             ticketDao: MockTicketDAO(),
           );
 
@@ -493,10 +468,10 @@ void main() {
         () async {
           // Arrange (Given)
           final mockDao = MockTicketDAO();
+          final logger = getIt<ILogger>();
           final processor = SharedContentProcessor(
-            logger: FakeLogger(),
-            travelParser: MockTravelParserService(),
-            smsService: MockSMSService(),
+            logger: logger,
+            travelParser: MockTravelParserService(logger: logger),
             ticketDao: mockDao,
           );
 
@@ -516,15 +491,15 @@ void main() {
 
           // Arrange for update
           final updateProcessor = SharedContentProcessor(
-            logger: FakeLogger(),
+            logger: logger,
             travelParser: MockTravelParserService(
+              logger: logger,
               mockUpdateInfo: TicketUpdateInfo(
                 pnrNumber: 'T12345678',
                 providerName: 'TNSTC',
                 updates: {'conductorContact': '9876543210'},
               ),
             ),
-            smsService: MockSMSService(),
             ticketDao: mockDao,
           );
 
@@ -547,50 +522,29 @@ void main() {
         'Then each processor works independently',
         () async {
           // Arrange (Given)
+          final logger = getIt<ILogger>();
           final processor1 = SharedContentProcessor(
-            logger: FakeLogger(),
-            travelParser: MockTravelParserService(),
-            smsService: MockSMSService(
-              mockTicket: Ticket(
-                ticketId: 'T11111111',
-                primaryText: 'Chennai → Bangalore',
-                secondaryText: 'SETC',
-                startTime: DateTime.now(),
-                location: 'Chennai',
-                extras: [
-                  ExtrasModel(title: 'PNR Number', value: 'T11111111'),
-                  ExtrasModel(title: 'From', value: 'Chennai'),
-                  ExtrasModel(title: 'To', value: 'Bangalore'),
-                ],
-              ),
-            ),
+            logger: logger,
+            travelParser: MockTravelParserService(logger: logger),
             ticketDao: MockTicketDAO(),
           );
 
           final processor2 = SharedContentProcessor(
-            logger: FakeLogger(),
-            travelParser: MockTravelParserService(),
-            smsService: MockSMSService(
-              mockTicket: Ticket(
-                ticketId: 'T22222222',
-                primaryText: 'Mumbai → Delhi',
-                secondaryText: 'IRCTC',
-                startTime: DateTime.now(),
-                location: 'Mumbai',
-                extras: [
-                  ExtrasModel(title: 'PNR Number', value: 'T22222222'),
-                  ExtrasModel(title: 'From', value: 'Mumbai'),
-                  ExtrasModel(title: 'To', value: 'Delhi'),
-                ],
-              ),
-            ),
+            logger: logger,
+            travelParser: MockTravelParserService(logger: logger),
             ticketDao: MockTicketDAO(),
           );
 
-          // Act (When) - Process concurrently
+          // Act (When) - Process concurrently with proper PNR format
           final results = await Future.wait([
-            processor1.processContent('SMS 1', SharedContentType.sms),
-            processor2.processContent('SMS 2', SharedContentType.sms),
+            processor1.processContent(
+              'PNR NO: T11111111, From: Chennai To Bangalore',
+              SharedContentType.sms,
+            ),
+            processor2.processContent(
+              'PNR NO: T22222222, From: Mumbai To Pune',
+              SharedContentType.sms,
+            ),
           ]);
 
           // Assert (Then)

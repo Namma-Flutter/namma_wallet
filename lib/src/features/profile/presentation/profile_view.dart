@@ -1,21 +1,58 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/routing/app_routes.dart';
+import 'package:namma_wallet/src/common/services/haptic/haptic_service_extension.dart';
+import 'package:namma_wallet/src/common/services/haptic/haptic_service_interface.dart';
 import 'package:namma_wallet/src/common/theme/theme_provider.dart';
-import 'package:namma_wallet/src/common/widgets/custom_back_button.dart';
+import 'package:namma_wallet/src/common/widgets/rounded_back_button.dart';
+import 'package:namma_wallet/src/common/widgets/snackbar_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class ProfileView extends StatelessWidget {
+class ProfileView extends StatefulWidget {
   const ProfileView({super.key});
 
+  @override
+  State<ProfileView> createState() => _ProfileViewState();
+}
+
+class _ProfileViewState extends State<ProfileView> {
+  final IHapticService hapticService = getIt<IHapticService>();
+  bool _isHapticEnabled = false;
+  @override
+  void initState() {
+    super.initState();
+    unawaited(_initHapticFlag());
+  }
+
+  Future<void> _initHapticFlag() async {
+    try {
+      await hapticService.loadPreference();
+    } on Exception catch (e) {
+      // Log error; fallback to default (false) is safe
+      debugPrint('Failed to load haptic preference: $e');
+    }
+    if (!mounted) return;
+
+    // Read current enabled state from the service and update UI.
+    setState(() {
+      _isHapticEnabled = hapticService.isEnabled;
+    });
+  }
+
+  /// Persist the flag via the service
+  Future<void> _saveFlag(bool value) =>
+      hapticService.setEnabled(enabled: value);
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
 
     return Scaffold(
       appBar: AppBar(
-        leading: const CustomBackButton(),
+        leading: const RoundedBackButton(),
         title: const Text('Profile'),
       ),
       body: SingleChildScrollView(
@@ -27,17 +64,16 @@ class ProfileView extends StatelessWidget {
               // Theme Settings Section
               ThemeSectionWidget(themeProvider: themeProvider),
 
-              const SizedBox(
-                height: 8,
-              ),
+              const SizedBox(height: 8),
 
               // Contributors Section
               ProfileTile(
                 icon: Icons.people_outline,
                 title: 'Contributors',
                 subtitle: 'View project contributors',
-                onTap: () {
-                  context.pushNamed(AppRoute.contributors.name);
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () async {
+                  await context.pushNamed(AppRoute.contributors.name);
                 },
               ),
 
@@ -46,8 +82,9 @@ class ProfileView extends StatelessWidget {
                 icon: Icons.article_outlined,
                 title: 'Licenses',
                 subtitle: 'View open source licenses',
-                onTap: () {
-                  context.pushNamed(AppRoute.license.name);
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () async {
+                  await context.pushNamed(AppRoute.license.name);
                 },
               ),
 
@@ -56,6 +93,7 @@ class ProfileView extends StatelessWidget {
                 icon: Icons.contact_mail_outlined,
                 title: 'Contact Us',
                 subtitle: 'Get support or send feedback',
+                trailing: const Icon(Icons.chevron_right),
                 onTap: () async {
                   final uri = Uri(
                     scheme: 'mailto',
@@ -65,13 +103,10 @@ class ProfileView extends StatelessWidget {
                   try {
                     if (!await canLaunchUrl(uri)) {
                       if (context.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text(
-                              'No email app found. '
-                              'Please install a mail client.',
-                            ),
-                          ),
+                        showSnackbar(
+                          context,
+                          'No email app found. Please install a mail client.',
+                          isError: true,
                         );
                       }
                       return;
@@ -83,24 +118,59 @@ class ProfileView extends StatelessWidget {
                     );
                   } on Exception {
                     if (context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text(
-                            'Failed to open email app. Please try again.',
-                          ),
-                        ),
+                      showSnackbar(
+                        context,
+                        'Failed to open email app. Please try again.',
+                        isError: true,
                       );
                     }
                   }
                 },
+              ),
+
+              // Haptics Enabled
+              ProfileTile(
+                title: 'Haptics Enabled',
+                icon: Icons.vibration_outlined,
+                trailing: Switch(
+                  value: _isHapticEnabled,
+                  onChanged: (value) async {
+                    final messenger = ScaffoldMessenger.of(context);
+                    try {
+                      // Persist via service
+                      // (updates in-memory and SharedPreferences)
+                      await _saveFlag(value);
+                    } on Exception catch (e) {
+                      if (!mounted) return;
+                      messenger.showSnackBar(
+                        SnackBar(
+                          content: Text('Failed to save haptic preference: $e'),
+                        ),
+                      );
+                      return;
+                    }
+                    if (!mounted) return;
+
+                    // Update UI
+                    setState(() {
+                      _isHapticEnabled = value;
+                    });
+
+                    // Optional: give immediate feedback only when enabling.
+                    if (value) {
+                      hapticService.triggerHaptic(HapticType.selection);
+                    }
+                  },
+                ),
+                trailingIsInteractive: true,
               ),
             ],
           ),
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          context.pushNamed(AppRoute.dbViewer.name);
+        onPressed: () async {
+          await context.pushNamed(AppRoute.dbViewer.name);
         },
         label: const Text('View DB'),
         icon: const Icon(Icons.storage),
@@ -153,11 +223,11 @@ class ThemeSectionWidget extends StatelessWidget {
                     : 'Light theme enabled',
               ),
               value: themeProvider.isDarkMode,
-              onChanged: (value) {
+              onChanged: (value) async {
                 if (value) {
-                  themeProvider.setDarkMode();
+                  await themeProvider.setDarkMode();
                 } else {
-                  themeProvider.setLightMode();
+                  await themeProvider.setLightMode();
                 }
               },
               secondary: Icon(
@@ -169,11 +239,11 @@ class ThemeSectionWidget extends StatelessWidget {
               title: const Text('Use System Theme'),
               trailing: Switch(
                 value: themeProvider.isSystemMode,
-                onChanged: (value) {
+                onChanged: (value) async {
                   if (value) {
-                    themeProvider.setSystemMode();
+                    await themeProvider.setSystemMode();
                   } else {
-                    themeProvider.setLightMode();
+                    await themeProvider.setLightMode();
                   }
                 },
               ),
@@ -189,17 +259,27 @@ class ProfileTile extends StatelessWidget {
   const ProfileTile({
     required this.icon,
     required this.title,
-    required this.subtitle,
-    required this.onTap,
+    required this.trailing,
+    this.onTap,
+    this.subtitle,
+    this.trailingIsInteractive = false,
     super.key,
   });
+
   final IconData icon;
   final String title;
-  final String subtitle;
-  final void Function() onTap;
+  final String? subtitle;
+  final Widget trailing;
+  final void Function()? onTap;
+  final bool trailingIsInteractive;
 
   @override
   Widget build(BuildContext context) {
+    // If trailing is interactive, ensure the
+    // tile itself isn't treated as a tap target
+    // even if someone accidentally passes a non-null onTap.
+    final tileOnTap = trailingIsInteractive ? null : onTap;
+    final tileEnabled = onTap != null || trailingIsInteractive;
     return Card(
       elevation: 2,
       shape: RoundedRectangleBorder(
@@ -208,9 +288,10 @@ class ProfileTile extends StatelessWidget {
       child: ListTile(
         leading: Icon(icon),
         title: Text(title),
-        subtitle: Text(subtitle),
-        trailing: const Icon(Icons.chevron_right),
-        onTap: onTap,
+        subtitle: subtitle != null ? Text(subtitle!) : null,
+        trailing: trailing,
+        onTap: tileOnTap,
+        enabled: tileEnabled,
       ),
     );
   }

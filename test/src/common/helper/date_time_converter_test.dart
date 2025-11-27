@@ -632,12 +632,10 @@ void main() {
           final dt = DateTime(2026, 1, 18, 13, 15);
 
           // Act
-          final topLevelResult = formatTime(dt);
-          final converterResult = DateTimeConverter.instance.formatTime(dt);
+          final result = DateTimeConverter.instance.formatTime(dt);
 
           // Assert
-          expect(topLevelResult, equals(converterResult));
-          expect(topLevelResult, equals('01:15 pm'));
+          expect(result, equals('01:15 pm'));
         },
       );
 
@@ -650,7 +648,7 @@ void main() {
           final dt = DateTime(2026, 1, 18);
 
           // Act
-          final result = formatTime(dt);
+          final result = DateTimeConverter.instance.formatTime(dt);
 
           // Assert
           expect(result, equals('12:00 am'));
@@ -668,12 +666,10 @@ void main() {
           final dt = DateTime(2026, 1, 18);
 
           // Act
-          final topLevelResult = formatDate(dt);
-          final converterResult = DateTimeConverter.instance.formatDate(dt);
+          final result = DateTimeConverter.instance.formatDate(dt);
 
           // Assert
-          expect(topLevelResult, equals(converterResult));
-          expect(topLevelResult, equals('18/01/2026'));
+          expect(result, equals('18/01/2026'));
         },
       );
 
@@ -686,7 +682,7 @@ void main() {
           final dt = DateTime(2026);
 
           // Act
-          final result = formatDate(dt);
+          final result = DateTimeConverter.instance.formatDate(dt);
 
           // Assert
           expect(result, equals('01/01/2026'));
@@ -704,14 +700,10 @@ void main() {
           final dt = DateTime(2026, 1, 18, 13, 15);
 
           // Act
-          final topLevelResult = formatFullDateTime(dt);
-          final converterResult = DateTimeConverter.instance.formatFullDateTime(
-            dt,
-          );
+          final result = DateTimeConverter.instance.formatFullDateTime(dt);
 
           // Assert
-          expect(topLevelResult, equals(converterResult));
-          expect(topLevelResult, equals('18-01-2026 01:15 PM'));
+          expect(result, equals('18-01-2026 01:15 PM'));
         },
       );
 
@@ -724,7 +716,7 @@ void main() {
           final dt = DateTime(2026, 1, 18, 12);
 
           // Act
-          final result = formatFullDateTime(dt);
+          final result = DateTimeConverter.instance.formatFullDateTime(dt);
 
           // Assert
           expect(result, equals('18-01-2026 12:00 PM'));
@@ -742,14 +734,10 @@ void main() {
           const timeStr = '13:15';
 
           // Act
-          final topLevelResult = formatTimeString(timeStr);
-          final converterResult = DateTimeConverter.instance.formatTimeString(
-            timeStr,
-          );
+          final result = DateTimeConverter.instance.formatTimeString(timeStr);
 
           // Assert
-          expect(topLevelResult, equals(converterResult));
-          expect(topLevelResult, equals('01:15 PM'));
+          expect(result, equals('01:15 PM'));
         },
       );
 
@@ -762,7 +750,7 @@ void main() {
           const timeStr = '';
 
           // Act
-          final result = formatTimeString(timeStr);
+          final result = DateTimeConverter.instance.formatTimeString(timeStr);
 
           // Assert
           expect(result, equals(''));
@@ -778,7 +766,7 @@ void main() {
           const timeStr = 'invalid';
 
           // Act
-          final result = formatTimeString(timeStr);
+          final result = DateTimeConverter.instance.formatTimeString(timeStr);
 
           // Assert
           expect(result, equals('invalid'));

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:namma_wallet/src/common/theme/styles.dart';
 
@@ -50,16 +52,15 @@ class _NavButtonState extends State<NavButton>
   }
 
   void _onTapDown(TapDownDetails details) {
-    _pressController.forward();
+    unawaited(_pressController.forward());
   }
 
   void _onTapUp(TapUpDetails details) {
-    _pressController.reverse();
-    widget.onTap();
+    unawaited(_pressController.reverse().then((_) => widget.onTap()));
   }
 
   void _onTapCancel() {
-    _pressController.reverse();
+    unawaited(_pressController.reverse());
   }
 
   @override
@@ -87,7 +88,9 @@ class _NavButtonState extends State<NavButton>
               ),
               decoration: BoxDecoration(
                 color: widget.selected
-                    ? AppColor.blackColor.withValues(alpha: 0.8)
+                    ? (isDark
+                          ? AppColor.blackColor.withValues(alpha: 0.8)
+                          : AppColor.blackColor.withValues(alpha: 0.85))
                     : Colors.transparent,
                 borderRadius: BorderRadius.circular(25),
                 boxShadow: widget.selected
@@ -117,10 +120,10 @@ class _NavButtonState extends State<NavButton>
                       widget.icon,
                       size: 20,
                       color: widget.selected
-                          ? (isDark ? AppColor.whiteColor : AppColor.whiteColor)
+                          ? AppColor.whiteColor
                           : (isDark
                                 ? AppColor.whiteColor.withValues(alpha: 0.7)
-                                : AppColor.blackColor.withValues(alpha: 0.6)),
+                                : AppColor.blackColor.withValues(alpha: 0.75)),
                     ),
                   ),
 
@@ -137,10 +140,8 @@ class _NavButtonState extends State<NavButton>
                               opacity: widget.selected ? 1.0 : 0.0,
                               child: Text(
                                 widget.label,
-                                style: TextStyle(
-                                  color: isDark
-                                      ? AppColor.whiteColor
-                                      : AppColor.whiteColor,
+                                style: const TextStyle(
+                                  color: AppColor.whiteColor,
                                   fontWeight: FontWeight.w600,
                                   fontSize: 13,
                                   height: 1,

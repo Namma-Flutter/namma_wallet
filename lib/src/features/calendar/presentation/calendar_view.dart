@@ -1,123 +1,17 @@
-import 'dart:convert';
+import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
-import 'package:namma_wallet/src/common/database/ticket_dao_interface.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
-import 'package:namma_wallet/src/common/services/logger_interface.dart';
-import 'package:namma_wallet/src/features/calendar/domain/event_model.dart';
+import 'package:namma_wallet/src/common/services/haptic/haptic_service_extension.dart';
+import 'package:namma_wallet/src/common/services/haptic/haptic_service_interface.dart';
+import 'package:namma_wallet/src/common/theme/app_theme.dart';
+import 'package:namma_wallet/src/features/calendar/application/calendar_provider.dart';
+import 'package:namma_wallet/src/features/calendar/presentation/widgets/calendar_list.dart';
 import 'package:namma_wallet/src/features/calendar/presentation/widgets/calendar_toggle_buttons.dart';
 import 'package:namma_wallet/src/features/calendar/presentation/widgets/calendar_widget.dart';
-import 'package:namma_wallet/src/features/calendar/presentation/widgets/tickets_list.dart';
-import 'package:namma_wallet/src/features/home/domain/ticket.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
-
-class CalendarProvider extends ChangeNotifier {
-  CalendarProvider({ILogger? logger}) : _logger = logger ?? getIt<ILogger>();
-  final ILogger _logger;
-
-  DateTime _selectedDay = DateTime.now();
-  List<Event> _events = [];
-  List<Ticket> _tickets = [];
-
-  DateTime get selectedDay => _selectedDay;
-  List<Event> get events => _events;
-  List<Ticket> get tickets => _tickets;
-
-  void setSelectedDay(DateTime day) {
-    _selectedDay = day;
-    notifyListeners();
-  }
-
-  Future<void> loadEvents() async {
-    // Load events from JSON
-    final response = await rootBundle.loadString(
-      'assets/data/other_cards.json',
-    );
-    final data = json.decode(response) as List;
-    _events = data.map((e) {
-      final item = e as Map<String, dynamic>;
-      final dateParts = (item['date'] as String).split(' ');
-      final month = DateFormat.MMM().parse(dateParts[1]).month;
-      final day = int.parse(dateParts[2]);
-      final year = DateTime.now().year; // Assuming current year
-      return Event(
-        icon: Event.getIconData(item['icon'] as String),
-        title: item['title'] as String,
-        subtitle: item['subtitle'] as String,
-        date: DateTime(year, month, day),
-        price: item['price'] as String,
-      );
-    }).toList();
-
-    // Load tickets from database
-    await loadTickets();
-    notifyListeners();
-  }
-
-  Future<void> loadTickets() async {
-    try {
-      final ticketDao = getIt<ITicketDAO>();
-
-      _tickets = await ticketDao.getAllTickets();
-
-      notifyListeners();
-    } on Exception catch (e, st) {
-      _logger.error('Error loading tickets: $e\n$st');
-    }
-  }
-
-  List<Event> getEventsForDay(DateTime day) {
-    return _events.where((event) => isSameDay(event.date, day)).toList();
-  }
-
-  List<Ticket> getTicketsForDay(DateTime day) {
-    return _tickets.where((ticket) {
-      try {
-        return isSameDay(ticket.startTime, day);
-      } on FormatException catch (e) {
-        _logger.debug(
-          'Invalid journeyDate format for ticket filtering: '
-          '${ticket.startTime} - $e',
-        );
-        return false;
-      } on Exception catch (e, st) {
-        _logger.debug(
-          'Error parsing journeyDate for ticket filtering: $e\n$st',
-        );
-        return false;
-      }
-    }).toList();
-  }
-
-  List<DateTime> getDatesWithTickets() {
-    final dates = <DateTime>[];
-    for (final ticket in _tickets) {
-      try {
-        if (!dates.any((d) => isSameDay(d, ticket.startTime))) {
-          dates.add(ticket.startTime);
-        }
-      } on FormatException catch (e) {
-        _logger.debug(
-          'Invalid journeyDate format for date collection: '
-          '${ticket.startTime} - $e',
-        );
-        // Skip invalid dates
-      } on Exception catch (e, st) {
-        _logger.debug(
-          'Error parsing journeyDate for date collection: $e\n$st',
-        );
-      }
-    }
-    return dates;
-  }
-
-  bool hasTicketsOnDay(DateTime day) {
-    return getTicketsForDay(day).isNotEmpty;
-  }
-}
 
 class CalendarView extends StatelessWidget {
   const CalendarView({super.key});
@@ -125,7 +19,11 @@ class CalendarView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => CalendarProvider()..loadEvents(),
+      create: (_) {
+        final provider = CalendarProvider();
+        unawaited(provider.loadEvents());
+        return provider;
+      },
       child: Scaffold(
         appBar: AppBar(
           title: const Padding(
@@ -151,6 +49,43 @@ class _CalendarContentState extends State<CalendarContent> {
   CalendarFormat _calendarFormat = CalendarFormat.month;
   int _selectedFilter = 1;
 
+  Future<void> _showDateRangePicker(CalendarProvider provider) async {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+
+    final initialRange =
+        provider.selectedRange ??
+        DateTimeRange(
+          start: today,
+          end: today.add(const Duration(days: 7)),
+        );
+
+    final pickedRange = await showDateRangePicker(
+      context: context,
+      firstDate: DateTime(2020),
+      lastDate: DateTime(2030),
+      initialDateRange: initialRange,
+      builder: (context, child) {
+        return Theme(
+          data: AppTheme.getDateRangePickerTheme(context),
+          child: child!,
+        );
+      },
+    );
+
+    if (pickedRange != null) {
+      provider.setSelectedRange(pickedRange);
+      setState(() {
+        _selectedFilter = 2;
+      });
+    } else {
+      setState(() {
+        _selectedFilter = 1;
+        _calendarFormat = CalendarFormat.month;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<CalendarProvider>(context);
@@ -160,28 +95,100 @@ class _CalendarContentState extends State<CalendarContent> {
         children: [
           CalendarToggleButtons(
             selectedFilter: _selectedFilter,
-            onFilterChanged: (index) {
+            onFilterChanged: (index) async {
+              getIt<IHapticService>().triggerHaptic(
+                HapticType.selection,
+              );
               setState(() {
-                _selectedFilter = index;
+                if (index != 2) {
+                  _selectedFilter = index;
+                }
                 if (index == 0) {
                   _calendarFormat = CalendarFormat.week;
+                  provider.setSelectedRange(null);
                 } else if (index == 1) {
                   _calendarFormat = CalendarFormat.month;
-                } else {
-                  // Handle Date Range
+                  provider.setSelectedRange(null);
                 }
               });
+
+              if (index == 2) {
+                // Handle Date Range
+                await _showDateRangePicker(provider);
+              }
             },
           ),
-          CalendarWidget(
-            provider: provider,
-            calendarFormat: _calendarFormat,
-            onDaySelected: (day, focusedDay) {
-              provider.setSelectedDay(day);
-            },
-          ),
+          if (provider.selectedRange case final range?)
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 8,
+              ),
+              child: InkWell(
+                onTap: () async {
+                  await _showDateRangePicker(provider);
+                },
+                borderRadius: BorderRadius.circular(12),
+                child: Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.surfaceContainerHighest,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.date_range,
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onSurfaceVariant,
+                        size: 20,
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          'Selected: '
+                          '${DateFormat('MMM dd, yyyy').format(range.start)} - '
+                          '${DateFormat('MMM dd, yyyy').format(range.end)}',
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurface,
+                            fontWeight: FontWeight.w500,
+                            fontSize: 13,
+                          ),
+                        ),
+                      ),
+                      IconButton(
+                        icon: Icon(
+                          Icons.close,
+                          size: 18,
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onSurfaceVariant,
+                        ),
+                        onPressed: () {
+                          provider.setSelectedRange(null);
+                          setState(() {
+                            _selectedFilter = 1;
+                          });
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          if (provider.selectedRange == null)
+            CalendarWidget(
+              provider: provider,
+              calendarFormat: _calendarFormat,
+              onDaySelected: (day, focusedDay) {
+                provider.setSelectedDay(day);
+              },
+            ),
           const SizedBox(height: 8),
-          TicketsList(provider: provider),
+          CalendarList(provider: provider),
           const SizedBox(height: 120),
         ],
       ),

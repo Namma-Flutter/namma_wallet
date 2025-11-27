@@ -1,7 +1,7 @@
 // We will add more methods in the future.
 // ignore_for_file: one_member_abstracts
 
-import 'package:namma_wallet/src/features/home/domain/ticket.dart';
+import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 
 /// Abstract interface for ticket parsers.
 ///

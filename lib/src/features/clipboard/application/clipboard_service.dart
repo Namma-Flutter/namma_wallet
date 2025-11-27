@@ -1,13 +1,12 @@
-import 'package:flutter/material.dart';
 import 'package:namma_wallet/src/common/database/ticket_dao_interface.dart';
-import 'package:namma_wallet/src/common/di/locator.dart';
-import 'package:namma_wallet/src/common/services/logger_interface.dart';
+import 'package:namma_wallet/src/common/domain/models/ticket.dart';
+import 'package:namma_wallet/src/common/enums/source_type.dart';
+import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
+import 'package:namma_wallet/src/features/clipboard/application/clipboard_service_interface.dart';
 import 'package:namma_wallet/src/features/clipboard/domain/clipboard_content_type.dart';
 import 'package:namma_wallet/src/features/clipboard/domain/clipboard_repository_interface.dart';
 import 'package:namma_wallet/src/features/clipboard/domain/clipboard_result.dart';
-import 'package:namma_wallet/src/features/common/application/travel_parser_service.dart';
-import 'package:namma_wallet/src/features/common/enums/source_type.dart';
-import 'package:namma_wallet/src/features/home/domain/ticket.dart';
+import 'package:namma_wallet/src/features/travel/application/travel_parser_interface.dart';
 
 /// Application service for clipboard operations.
 ///
@@ -16,28 +15,26 @@ import 'package:namma_wallet/src/features/home/domain/ticket.dart';
 /// the clipboard repository, parser service, and database.
 ///
 /// Never throws - all errors are returned as [ClipboardResult.error].
-class ClipboardService {
+class ClipboardService implements IClipboardService {
   /// Creates a clipboard service.
   ///
   /// [repository] - Repository for clipboard access
   /// [logger] - Logger for debugging
   /// [parserService] - Service for parsing travel tickets
   /// [ticketDao] - DAO for ticket database operations
-  ///
-  /// Uses GetIt to resolve dependencies if not provided.
   ClipboardService({
-    IClipboardRepository? repository,
-    ILogger? logger,
-    TravelParserService? parserService,
-    ITicketDAO? ticketDao,
-  }) : _repository = repository ?? getIt<IClipboardRepository>(),
-       _logger = logger ?? getIt<ILogger>(),
-       _parserService = parserService ?? getIt<TravelParserService>(),
-       _ticketDao = ticketDao ?? getIt<ITicketDAO>();
+    required IClipboardRepository repository,
+    required ILogger logger,
+    required ITravelParser parserService,
+    required ITicketDAO ticketDao,
+  }) : _repository = repository,
+       _logger = logger,
+       _parserService = parserService,
+       _ticketDao = ticketDao;
 
   final IClipboardRepository _repository;
   final ILogger _logger;
-  final TravelParserService _parserService;
+  final ITravelParser _parserService;
   final ITicketDAO _ticketDao;
 
   /// Maximum allowed text length to prevent spam/abuse
@@ -55,8 +52,9 @@ class ClipboardService {
   /// 7. Return result with ticket or error
   ///
   /// Returns [ClipboardResult] with:
-  /// - Success: Content type, raw text, and optional parsed ticket
-  /// - Error: Error message describing what went wrong
+  /// - Success: Content type and parsed ticket
+  /// - Error: Error message if content cannot be parsed as a travel ticket
+  @override
   Future<ClipboardResult> readAndParseClipboard() async {
     try {
       // Step 1: Check if clipboard has content
@@ -96,8 +94,14 @@ class ClipboardService {
         return await _saveNewTicket(parsedTicket, content);
       }
 
-      // Step 6: If not a travel ticket, return as plain text
-      return ClipboardResult.success(ClipboardContentType.text, content);
+      // Step 6: If not a travel ticket, return error with helpful message
+      _logger.warning(
+        'Clipboard content could not be parsed as a travel ticket',
+      );
+      return ClipboardResult.error(
+        'Unable to process the text as a travel ticket. '
+        'Please ensure you have copied valid ticket information.',
+      );
     } on Object catch (e, stackTrace) {
       _logger.error('Unexpected exception in clipboard service', e, stackTrace);
       return ClipboardResult.error('Unexpected error. Please try again.');
@@ -166,43 +170,5 @@ class ClipboardService {
     if (text.length > maxTextLength) return false;
 
     return true;
-  }
-
-  /// Shows a snackbar message based on the clipboard result.
-  ///
-  /// Displays success message in primary color or error in red.
-  /// Only shows if context is still mounted.
-  void showResultMessage(BuildContext context, ClipboardResult result) {
-    if (!context.mounted) return;
-
-    String message;
-    Color backgroundColor;
-
-    if (result.isSuccess) {
-      message = switch (result.type) {
-        ClipboardContentType.text => 'Text content read successfully',
-        ClipboardContentType.travelTicket =>
-          result.ticket != null
-              ? 'Travel ticket saved successfully!'
-              : 'Ticket updated with conductor details!',
-        ClipboardContentType.invalid => 'Invalid content',
-      };
-      backgroundColor = Theme.of(context).colorScheme.primary;
-
-      _logger.success('Clipboard operation succeeded: $message');
-    } else {
-      message = result.errorMessage ?? 'Unknown error occurred';
-      backgroundColor = Colors.red;
-
-      _logger.error('Clipboard operation failed: $message');
-    }
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: backgroundColor,
-        duration: Duration(seconds: result.isSuccess ? 2 : 3),
-      ),
-    );
   }
 }

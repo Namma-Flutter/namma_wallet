@@ -345,4 +345,30 @@ class AppTheme {
         ? const Color(0xff3067FE)
         : const Color(0xff3067FE);
   }
+
+  /// Date range picker theme with neutral range colors
+  /// Customizes the date range picker to use surfaceContainerHigh
+  /// for the range between selected dates instead of the default green
+  static ThemeData getDateRangePickerTheme(BuildContext context) {
+    final theme = Theme.of(context);
+    return theme.copyWith(
+      colorScheme: theme.colorScheme.copyWith(
+        primary: theme.colorScheme.primary,
+        onPrimary: theme.colorScheme.onPrimary,
+        surface: theme.colorScheme.surface,
+        onSurface: theme.colorScheme.onSurface,
+        // Change the color between selected dates to neutral grey
+        primaryContainer: theme.colorScheme.surfaceContainerHigh,
+        onPrimaryContainer: theme.colorScheme.onSurface,
+        // Override secondary colors that might be used for range
+        secondary: theme.colorScheme.surfaceContainerHigh,
+        onSecondary: theme.colorScheme.onSurface,
+        secondaryContainer: theme.colorScheme.surfaceContainerHigh,
+        onSecondaryContainer: theme.colorScheme.onSurface,
+        // Override tertiary colors as fallback
+        tertiary: theme.colorScheme.surfaceContainerHigh,
+        tertiaryContainer: theme.colorScheme.surfaceContainerHigh,
+      ),
+    );
+  }
 }
