@@ -9,8 +9,10 @@ import 'package:namma_wallet/src/common/database/user_dao_interface.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 import 'package:namma_wallet/src/common/domain/models/user.dart';
+import 'package:namma_wallet/src/common/helper/date_time_converter.dart';
 import 'package:namma_wallet/src/common/services/haptic/haptic_service_extension.dart';
 import 'package:namma_wallet/src/common/services/haptic/haptic_service_interface.dart';
+import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
 import 'package:namma_wallet/src/common/widgets/rounded_back_button.dart';
 
 class DbViewerView extends StatefulWidget {
@@ -27,10 +29,12 @@ class _DbViewerViewState extends State<DbViewerView>
   List<Ticket> tickets = <Ticket>[];
   final IHapticService hapticService = getIt<IHapticService>();
 
+  late ILogger _iLogger;
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    _iLogger = getIt<ILogger>();
     unawaited(_load());
   }
 
@@ -171,7 +175,30 @@ class _DbViewerViewState extends State<DbViewerView>
                   const iOSWidgetName = 'TicketHomeWidget';
                   const androidWidgetName = 'TicketHomeWidget';
                   const dataKey = 'ticket_data';
-                  await HomeWidget.saveWidgetData(dataKey, jsonEncode(t));
+                  final dateTimeCon = DateTimeConverter.instance;
+                  try {
+                    _iLogger.debug(
+                      'ticket json encoded: ${jsonEncode(t.toMap())}',
+                    );
+                    // Make a copy of the map
+                    final ticketMap = Map<String, dynamic>.from(t.toMap());
+                    // Safely format start_time and end_time if they are not null
+                    if (t.startTime != null) {
+                      ticketMap['start_time'] = dateTimeCon.formatFullDateTime(
+                        t.startTime!,
+                      );
+                    }
+                    if (t.endTime != null) {
+                      ticketMap['end_time'] = dateTimeCon.formatFullDateTime(
+                        t.endTime!,
+                      );
+                    }
+                    _iLogger.debug('ticket map : $ticketMap');
+                    // Save to widget
+                    await HomeWidget.saveWidgetData(
+                      dataKey,
+                      jsonEncode(ticketMap),
+                    );
 
                   await HomeWidget.updateWidget(
                     androidName: androidWidgetName,
@@ -179,6 +206,13 @@ class _DbViewerViewState extends State<DbViewerView>
                   );
                   if (context.mounted) {
                     context.pop();
+                    }
+                  } catch (e, stackTrace) {
+                    _iLogger.error(
+                      'Error saving ticket to widget',
+                      e,
+                      stackTrace,
+                    );
                   }
                 },
                 child: const Text('Pin to Home Screen'),

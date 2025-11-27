@@ -1,203 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/root"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@drawable/widget_background"
+    android:layout_height="wrap_content"
+    android:padding="14dp"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:background="@android:color/white">
 
-    <!-- Service Profile Row -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:paddingBottom="12dp">
-
-        <!-- Service Icon -->
-        <ImageView
-            android:id="@+id/service_icon"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:layout_marginEnd="8dp"
-            android:background="@drawable/circle_background"
-            android:src="@drawable/ic_bus"
-            android:padding="6dp"
-            android:scaleType="centerInside" />
-
-        <!-- Service Type Text -->
-        <TextView
-            android:id="@+id/service_type"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Bus Service"
-            android:textSize="12sp"
-            android:textColor="#666666"
-            android:maxLines="1"
-            android:ellipsize="end" />
-
-    </LinearLayout>
-
-    <!-- Primary Text (From - To) -->
-    <TextView
-        android:id="@+id/primary_text"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Chennai → Bangalore"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:textColor="@android:color/black"
-        android:maxLines="2"
-        android:ellipsize="end"
-        android:paddingBottom="12dp" />
-
-    <!-- Journey Details Row -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:paddingBottom="8dp">
-
-        <!-- Journey Date Column -->
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Journey Date"
-                android:textSize="10sp"
-                android:textColor="#666666" />
-
-            <TextView
-                android:id="@+id/journey_date"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Dec 25, 2024"
-                android:textSize="12sp"
-                android:textStyle="bold"
-                android:textColor="@android:color/black" />
-
-        </LinearLayout>
-
-        <!-- Journey Time Column -->
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical"
-            android:gravity="end">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Time"
-                android:textSize="10sp"
-                android:textColor="#666666" />
-
-            <TextView
-                android:id="@+id/journey_time"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="10:30 AM"
-                android:textSize="12sp"
-                android:textStyle="bold"
-                android:textColor="@android:color/black" />
-
-        </LinearLayout>
-
-    </LinearLayout>
-
-    <!-- Tags/Highlights -->
-    <LinearLayout
-        android:id="@+id/tags_container"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:paddingBottom="12dp"
-        android:visibility="gone">
-
-        <TextView
-            android:id="@+id/tag1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/tag_background"
-            android:paddingStart="8dp"
-            android:paddingEnd="8dp"
-            android:paddingTop="4dp"
-            android:paddingBottom="4dp"
-            android:layout_marginEnd="6dp"
-            android:textSize="10sp"
-            android:textColor="@android:color/black" />
-
-        <TextView
-            android:id="@+id/tag2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/tag_background"
-            android:paddingStart="8dp"
-            android:paddingEnd="8dp"
-            android:paddingTop="4dp"
-            android:paddingBottom="4dp"
-            android:textSize="10sp"
-            android:textColor="@android:color/black" />
-
-    </LinearLayout>
-
-    <!-- Spacer -->
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1" />
-
-    <!-- Bottom Row -->
+    <!-- TITLE ROW -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center_vertical">
 
-        <!-- Location -->
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
-
-            <ImageView
-                android:layout_width="16dp"
-                android:layout_height="16dp"
-                android:layout_marginEnd="4dp"
-                android:src="@drawable/ic_location"
-                android:contentDescription="Location" />
-
-            <TextView
-                android:id="@+id/location"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Chennai"
-                android:textSize="12sp"
-                android:textStyle="bold"
-                android:textColor="@android:color/black"
-                android:maxLines="1"
-                android:ellipsize="end" />
-
-        </LinearLayout>
-
-        <!-- Info Button -->
         <ImageView
-            android:id="@+id/info_button"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:src="@drawable/ic_info"
-            android:background="?android:attr/selectableItemBackgroundBorderless"
-            android:contentDescription="More Info" />
+            android:id="@+id/typeIcon"
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:src="@drawable/ic_train"
+            android:tint="#000000"
+            android:layout_marginEnd="8dp"/>
 
+        <TextView
+            android:id="@+id/primaryText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Ticket Title"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="#000000"/>
+    </LinearLayout>
+
+    <!-- LOCATION ROW -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="8dp"
+        android:gravity="center_vertical">
+
+        <ImageView
+            android:id="@+id/locationIcon"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/ic_location"
+            android:tint="#444444"
+            android:layout_marginEnd="6dp"/>
+
+        <TextView
+            android:id="@+id/locationText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Location"
+            android:textSize="14sp"
+            android:textColor="#444444"/>
+    </LinearLayout>
+
+    <!-- TIME ROW -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="6dp"
+        android:gravity="center_vertical">
+
+        <ImageView
+            android:id="@+id/timeIcon"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/ic_time"
+            android:tint="#444444"
+            android:layout_marginEnd="6dp"/>
+
+        <TextView
+            android:id="@+id/startTimeText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Start Time"
+            android:textSize="14sp"
+            android:textColor="#444444"/>
+    </LinearLayout>
+
+    <!-- PROVIDER ROW -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="6dp"
+        android:gravity="center_vertical">
+
+        <ImageView
+            android:id="@+id/providerIcon"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/ic_provider"
+            android:tint="#444444"
+            android:layout_marginEnd="6dp"/>
+
+        <TextView
+            android:id="@+id/providerText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Provider"
+            android:textSize="14sp"
+            android:textColor="#444444"/>
     </LinearLayout>
 
 </LinearLayout>

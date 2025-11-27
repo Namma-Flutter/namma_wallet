@@ -2,10 +2,14 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:namma_wallet/src/common/database/ticket_dao.dart';
+import 'package:namma_wallet/src/common/database/ticket_dao_interface.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
+import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 import 'package:namma_wallet/src/common/routing/app_routes.dart';
 import 'package:namma_wallet/src/common/services/haptic/haptic_service_extension.dart';
 import 'package:namma_wallet/src/common/services/haptic/haptic_service_interface.dart';
+import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
 import 'package:namma_wallet/src/common/theme/theme_provider.dart';
 import 'package:namma_wallet/src/common/widgets/rounded_back_button.dart';
 import 'package:namma_wallet/src/common/widgets/snackbar_widget.dart';
@@ -22,9 +26,11 @@ class ProfileView extends StatefulWidget {
 class _ProfileViewState extends State<ProfileView> {
   final IHapticService hapticService = getIt<IHapticService>();
   bool _isHapticEnabled = false;
+  late ILogger _iLogger;
   @override
   void initState() {
     super.initState();
+    _iLogger = getIt<ILogger>();
     unawaited(_initHapticFlag());
   }
 
@@ -124,6 +130,40 @@ class _ProfileViewState extends State<ProfileView> {
                         isError: true,
                       );
                     }
+                  }
+                },
+              ), // Contact Us Section
+              ProfileTile(
+                icon: Icons.south_america,
+                title: 'Add Sample Ticket Data',
+                subtitle: 'Update sample tickets for testing purposes',
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () async {
+                  try {
+                    _iLogger
+                      ..debug('Starting sample JSON data parsing')
+                      ..debug('Sample JSON: $sampleTicketList');
+                    // Parse the sample tickets
+                    final sampleTicketsParsed = sampleTicketList
+                        .map(TicketMapper.fromMap)
+                        .toList();
+                    _iLogger.debug(
+                      'Parsed ticket length: ${sampleTicketsParsed.length}',
+                    );
+                    // Insert tickets into database
+                    final ticketDao = getIt<ITicketDAO>();
+                    for (final ticket in sampleTicketsParsed) {
+                      await ticketDao.insertTicket(ticket);
+                    }
+                    _iLogger.info(
+                      'Sample tickets parsed and inserted successfully',
+                    );
+                  } on Exception catch (e, stackTrace) {
+                    _iLogger.error(
+                      'Error occurred during sample JSON parsing',
+                      e,
+                      stackTrace,
+                    );
                   }
                 },
               ),
@@ -296,3 +336,58 @@ class ProfileTile extends StatelessWidget {
     );
   }
 }
+List<Map<String, dynamic>> sampleTicketList = [
+  {
+    "ticket_id": "PNR1234567",
+    "primary_text": "New Delhi → Mumbai",
+    "secondary_text": "Train 12951 • 2A • John Doe",
+    "location": "New Delhi",
+    "start_time": "2025-02-14T06:30:00.000Z",
+    "end_time": "2025-02-14T14:45:00.000Z",
+    "type": "TRAIN",
+    "tags": [
+      {"value": "PNR1234567", "icon": "confirmation_number"},
+      {"value": "12951", "icon": "train"},
+      {"value": "2A", "icon": "event_seat"},
+    ],
+    "extras": [
+      {"title": "Passenger", "value": "John Doe"},
+      {"title": "Gender", "value": "M"},
+      {"title": "Age", "value": "29"},
+    ],
+  },
+  {
+    "ticket_id": "TNSTC99881",
+    "primary_text": "Coimbatore → Chennai",
+    "secondary_text": "TNSTC - 501A",
+    "location": "Gandhipuram",
+    "start_time": "2025-03-10T21:15:00.000Z",
+    "type": "BUS",
+    "tags": [
+      {"value": "501A", "icon": "confirmation_number"},
+      {"value": "TNSTC99881", "icon": "qr_code"},
+    ],
+    "extras": [
+      {"title": "Passenger Name", "value": "Kumar"},
+      {"title": "Age", "value": "34"},
+      {"title": "Gender", "value": "M"},
+    ],
+  },
+  {
+    "ticket_id": "FLYAI55321",
+    "primary_text": "Delhi → Dubai",
+    "secondary_text": "Air India • AI 995",
+    "location": "Indira Gandhi Airport T3",
+    "start_time": "2025-04-01T03:30:00.000Z",
+    "end_time": "2025-04-01T07:00:00.000Z",
+    "type": "FLIGHT",
+    "tags": [
+      {"value": "AI 995", "icon": "flight"},
+    ],
+    "extras": [
+      {"title": "Passenger", "value": "Ayesha Khan"},
+      {"title": "Gender", "value": "F"},
+      {"title": "Age", "value": "27"},
+    ],
+  },
+];

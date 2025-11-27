@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="12dp"
+    android:background="@android:color/white">
+
+    <!-- TYPE ICON -->
+    <ImageView
+        android:id="@+id/typeIcon"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_alignParentStart="true"
+        android:src="@drawable/ic_ticket" />
+
+    <!-- PRIMARY TEXT -->
+    <TextView
+        android:id="@+id/primaryText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@id/typeIcon"
+        android:layout_marginStart="10dp"
+        android:text="IRCTC Train Ticket"
+        android:textSize="16sp"
+        android:textColor="#222"
+        android:maxLines="1"
+        android:ellipsize="end" />
+
+    <!-- PROVIDER TEXT -->
+    <TextView
+        android:id="@+id/providerText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/primaryText"
+        android:layout_toEndOf="@id/typeIcon"
+        android:layout_marginStart="10dp"
+        android:text="IRCTC"
+        android:textColor="#777"
+        android:textSize="13sp" />
+
+    <!-- TIME -->
+    <TextView
+        android:id="@+id/timeText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/providerText"
+        android:layout_toEndOf="@id/typeIcon"
+        android:layout_marginStart="10dp"
+        android:text="10:00 AM"
+        android:textColor="#444"
+        android:textSize="13sp" />
+
+    <!-- PIN ICON -->
+    <ImageView
+        android:id="@+id/pinIcon"
+        android:layout_width="22dp"
+        android:layout_height="22dp"
+        android:layout_alignParentEnd="true"
+        android:layout_margin="6dp"
+        android:src="@drawable/ic_pin"
+        android:clickable="true"
+        android:focusable="true"
+        android:tint="#333" />
+
+</RelativeLayout>
