@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
+import 'package:namma_wallet/src/common/database/platform/platform_db.dart';
 import 'package:namma_wallet/src/common/database/wallet_database_interface.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
@@ -25,8 +27,15 @@ class WalletDatabase implements IWalletDatabase {
 
   Future<Database> _initDatabase() async {
     _logger.info('Initializing database...');
-    final dbPath = await getDatabasesPath();
-    final path = p.join(dbPath, _dbName);
+    await initDatabaseFactory();
+
+    String path;
+    if (kIsWeb) {
+      path = _dbName;
+    } else {
+      final dbPath = await getDatabasesPath();
+      path = p.join(dbPath, _dbName);
+    }
     _logger.logDatabase('Init', 'Database path: $path');
 
     return openDatabase(

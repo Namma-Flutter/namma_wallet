@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'package:cross_file/cross_file.dart';
 
 /// Interface for PDF text extraction service.
 ///
@@ -14,5 +14,5 @@ abstract interface class IPDFService {
   /// Returns the extracted and cleaned text. Falls back to OCR if the PDF
   /// is image-based or uses unsupported fonts.
   /// Throws an exception if extraction fails.
-  Future<String> extractTextFrom(File pdf);
+  Future<String> extractTextFrom(XFile pdf);
 }

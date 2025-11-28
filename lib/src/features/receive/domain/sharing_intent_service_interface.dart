@@ -1,5 +1,4 @@
-import 'dart:io';
-
+import 'package:cross_file/cross_file.dart';
 import 'package:namma_wallet/src/features/receive/domain/shared_content_type.dart';
 
 /// Abstract interface for sharing intent services.
@@ -34,7 +33,7 @@ abstract class ISharingIntentService {
   ///
   /// Returns the extracted text content.
   /// May throw exceptions for unsupported file types or extraction errors.
-  Future<String> extractContentFromFile(File file);
+  Future<String> extractContentFromFile(XFile file);
 
   /// Dispose resources and cleanup.
   ///

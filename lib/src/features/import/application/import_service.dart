@@ -1,5 +1,4 @@
-import 'dart:io';
-
+import 'package:cross_file/cross_file.dart';
 import 'package:namma_wallet/src/common/database/ticket_dao_interface.dart';
 import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 import 'package:namma_wallet/src/common/enums/source_type.dart';
@@ -41,10 +40,10 @@ class ImportService implements IImportService {
   }
 
   @override
-  Future<Ticket?> importAndSavePDFFile(File pdfFile) async {
+  Future<Ticket?> importAndSavePDFFile(XFile pdfFile) async {
     try {
       // Use basename to avoid logging full path with sensitive directory info
-      final filename = pdfFile.uri.pathSegments.last;
+      final filename = pdfFile.name;
       _logger.info('Importing PDF file: $filename');
 
       // Extract text from PDF

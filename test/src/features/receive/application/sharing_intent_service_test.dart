@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cross_file/cross_file.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:listen_sharing_intent/listen_sharing_intent.dart';
 import 'package:namma_wallet/src/features/receive/application/sharing_intent_service.dart';
@@ -219,7 +220,9 @@ void main() {
 
         mockPdfService.mockPdfText = 'PDF Content';
 
-        final content = await service.extractContentFromFile(pdfFile);
+        final content = await service.extractContentFromFile(
+          XFile(pdfFile.path),
+        );
         expect(content, equals('PDF Content'));
 
         await tempDir.delete(recursive: true);
@@ -232,7 +235,9 @@ void main() {
         final txtFile = File('${tempDir.path}/test.txt');
         await txtFile.writeAsString('Text Content');
 
-        final content = await service.extractContentFromFile(txtFile);
+        final content = await service.extractContentFromFile(
+          XFile(txtFile.path),
+        );
         expect(content, equals('Text Content'));
 
         await tempDir.delete(recursive: true);
@@ -246,7 +251,7 @@ void main() {
         await badFile.writeAsString('dummy');
 
         expect(
-          () => service.extractContentFromFile(badFile),
+          () => service.extractContentFromFile(XFile(badFile.path)),
           throwsUnsupportedError,
         );
 

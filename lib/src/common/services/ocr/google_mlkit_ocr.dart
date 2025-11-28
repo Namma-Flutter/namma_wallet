@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cross_file/cross_file.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:image/image.dart' as img;
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
@@ -13,7 +14,7 @@ class GoogleMLKitOCR implements IOCRService {
   final ILogger _logger;
 
   @override
-  Future<String> extractTextFromPDF(File pdfFile) async {
+  Future<String> extractTextFromPDF(XFile pdfFile) async {
     PdfDocument? doc;
     TextRecognizer? textRecognizer;
 
