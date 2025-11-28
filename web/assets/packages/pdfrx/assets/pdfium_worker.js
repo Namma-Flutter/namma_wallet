@@ -794,7 +794,7 @@ function loadDocumentFromData(params) {
   if (data.byteLength < sizeThreshold) {
     const buffer = Pdfium.wasmExports.malloc(data.byteLength);
     if (buffer === 0) {
-      throw new Error('Failed to allocate memory for PDF data (${data.byteLength} bytes)');
+      throw new Error(`Failed to allocate memory for PDF data (${data.byteLength} bytes)`);
     }
     new Uint8Array(Pdfium.memory.buffer, buffer, data.byteLength).set(new Uint8Array(data));
     const passwordPtr = StringUtils.allocateUTF8(password);
