@@ -115,6 +115,8 @@ class _ImportViewState extends State<ImportView> {
           );
         } else if (platformFile.path != null) {
           xFile = XFile(platformFile.path!);
+        } else {
+          _logger.warning('File picked but no bytes or path available');
         }
       }
 

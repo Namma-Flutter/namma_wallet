@@ -1,5 +1,16 @@
 globalThis.PdfiumWasmCommunicator = (function () {
-  const worker = new Worker(globalThis.pdfiumWasmWorkerUrl);
+  // Validate pdfiumWasmWorkerUrl before creating Worker
+  if (!globalThis.pdfiumWasmWorkerUrl || typeof globalThis.pdfiumWasmWorkerUrl !== 'string' || globalThis.pdfiumWasmWorkerUrl.trim() === '') {
+    throw new Error(`pdfiumWasmWorkerUrl is missing or invalid: ${globalThis.pdfiumWasmWorkerUrl}`);
+  }
+
+  let worker;
+  try {
+    worker = new Worker(globalThis.pdfiumWasmWorkerUrl);
+  } catch (error) {
+    console.error('Failed to create PDFium worker:', error);
+    throw new Error(`Failed to create PDFium worker: ${error.message}`);
+  }
   let requestId = 0;
   let callbackId = 0;
   const requestCallbacks = new Map();
@@ -11,7 +22,7 @@ globalThis.PdfiumWasmCommunicator = (function () {
       console.log('PDFium WASM worker is ready');
       return;
     }
-    
+
     // Handle callback invocations from the worker
     if (data.type === 'callback') {
       const callback = registeredCallbacks.get(data.callbackId);
@@ -24,7 +35,7 @@ globalThis.PdfiumWasmCommunicator = (function () {
       }
       return;
     }
-    
+
     // For command responses, match using the request id.
     if (data.id) {
       const callback = requestCallbacks.get(data.id);

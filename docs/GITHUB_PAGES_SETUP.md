@@ -2,6 +2,8 @@
 
 This guide explains how to complete the setup for automatic deployment to GitHub Pages.
 
+> **Note**: This guide describes CI/CD automation behavior. For local development commands, always use `fvm flutter` instead of `flutter` as documented in SETUP.md.
+
 ## What's Already Done
 
 ✅ Created `.github/workflows/deploy_github_pages.yml` workflow file

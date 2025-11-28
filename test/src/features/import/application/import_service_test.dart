@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:cross_file/cross_file.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:namma_wallet/src/common/database/ticket_dao_interface.dart';
@@ -187,14 +185,14 @@ void main() {
     });
 
     group('importAndSavePDFFile', () {
-      final testPdfFile = File('test.pdf');
+      const testPdfPath = 'test.pdf';
 
       test('should return null when no text is extracted', () async {
         // Arrange
         fakePDFService.extractedText = '';
         // Act
         final result = await importService.importAndSavePDFFile(
-          XFile(testPdfFile.path),
+          XFile(testPdfPath),
         );
         // Assert
         expect(result, isNull);
@@ -206,7 +204,7 @@ void main() {
         fakeTravelParser.parsedTicket = null;
         // Act
         final result = await importService.importAndSavePDFFile(
-          XFile(testPdfFile.path),
+          XFile(testPdfPath),
         );
         // Assert
         expect(result, isNull);
@@ -218,7 +216,7 @@ void main() {
         fakeTravelParser.parsedTicket = testTicket;
         // Act
         final result = await importService.importAndSavePDFFile(
-          XFile(testPdfFile.path),
+          XFile(testPdfPath),
         );
         // Assert
         expect(result, testTicket);
@@ -234,7 +232,7 @@ void main() {
           fakeTicketDAO.shouldThrowError = true;
           // Act
           final result = await importService.importAndSavePDFFile(
-            XFile(testPdfFile.path),
+            XFile(testPdfPath),
           );
           // Assert
           expect(result, isNull);

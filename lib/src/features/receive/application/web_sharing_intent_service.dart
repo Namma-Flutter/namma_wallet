@@ -10,6 +10,7 @@ class WebSharingIntentService implements ISharingIntentService {
     required void Function(String) onError,
   }) async {
     // Sharing intent is not supported on web (use PWA Share Target instead)
+    // This method is a no-op - native sharing intents are not available
     return;
   }
 
@@ -20,6 +21,7 @@ class WebSharingIntentService implements ISharingIntentService {
 
   @override
   Future<void> dispose() async {
+    // No-op on web - no resources to dispose as sharing intents are not supported
     return;
   }
 }
