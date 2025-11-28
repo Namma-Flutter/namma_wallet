@@ -15,7 +15,7 @@ class WebSharingIntentService implements ISharingIntentService {
 
   @override
   Future<String> extractContentFromFile(XFile file) async {
-    return '';
+    throw UnsupportedError('extractContentFromFile is not supported on web');
   }
 
   @override
