@@ -1,5 +1,4 @@
-import 'dart:io';
-
+import 'package:cross_file/cross_file.dart';
 import 'package:namma_wallet/src/common/services/pdf/pdf_service_interface.dart';
 
 /// Mock PDF service for testing purposes
@@ -18,7 +17,7 @@ class MockPDFService implements IPDFService {
   bool shouldThrowError;
 
   @override
-  Future<String> extractTextFrom(File pdf) async {
+  Future<String> extractTextFrom(XFile pdf) async {
     if (shouldThrowError) {
       throw Exception('Mock PDF extraction error');
     }

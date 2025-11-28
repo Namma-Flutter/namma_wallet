@@ -1,5 +1,4 @@
-import 'dart:io';
-
+import 'package:cross_file/cross_file.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
 import 'package:namma_wallet/src/common/services/ocr/ocr_service_interface.dart';
 import 'package:namma_wallet/src/common/services/pdf/pdf_service_interface.dart';
@@ -19,10 +18,10 @@ class PDFService implements IPDFService {
   static const _minExpectedTextLength = 10;
 
   @override
-  Future<String> extractTextFrom(File pdf) async {
+  Future<String> extractTextFrom(XFile pdf) async {
     try {
       // Load an existing PDF document.
-      final document = PdfDocument(inputBytes: pdf.readAsBytesSync());
+      final document = PdfDocument(inputBytes: await pdf.readAsBytes());
 
       // Use try-finally to ensure document is always disposed
       try {

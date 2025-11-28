@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'package:cross_file/cross_file.dart';
 
 /// Interface for OCR (Optical Character Recognition) service.
 ///
@@ -13,5 +13,5 @@ abstract interface class IOCRService {
   /// Returns the extracted text as a string, with pages separated
   ///  by double newlines.
   /// Throws an exception if OCR extraction fails.
-  Future<String> extractTextFromPDF(File pdfFile);
+  Future<String> extractTextFromPDF(XFile pdfFile);
 }

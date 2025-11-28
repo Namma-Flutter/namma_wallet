@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:cross_file/cross_file.dart';
 import 'package:listen_sharing_intent/listen_sharing_intent.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
 import 'package:namma_wallet/src/common/services/pdf/pdf_service_interface.dart';
@@ -108,7 +109,7 @@ class SharingIntentService implements ISharingIntentService {
               ? SharedContentType.pdf
               : SharedContentType.sms;
 
-          final content = await extractContentFromFile(fileObj);
+          final content = await extractContentFromFile(XFile(fileObj.path));
           onContentReceived(content, contentType);
         } else {
           // It's text content (like SMS), pass the text directly
@@ -144,7 +145,7 @@ class SharingIntentService implements ISharingIntentService {
 
   /// Extract content from a file based on its type
   @override
-  Future<String> extractContentFromFile(File file) async {
+  Future<String> extractContentFromFile(XFile file) async {
     final fileExtension = path.extension(file.path).toLowerCase();
 
     if (fileExtension == '.pdf') {
