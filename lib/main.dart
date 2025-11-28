@@ -52,16 +52,27 @@ Future<void> main() async {
   // Log PDF initialization status with full context
   if (!pdfFeaturesEnabled && logger != null && pdfInitError != null) {
     // Collect contextual information for telemetry
-    final platform = Platform.operatingSystem;
-    final osVersion = Platform.operatingSystemVersion;
+    // Platform APIs are not available on web, so we need to check
+    if (!kIsWeb) {
+      final platform = Platform.operatingSystem;
+      final osVersion = Platform.operatingSystemVersion;
 
-    logger.error(
-      'PDF initialization failed during startup. '
-      'Platform: $platform, OS: $osVersion. '
-      'PDF features disabled.',
-      pdfInitError,
-      pdfInitStackTrace,
-    );
+      logger.error(
+        'PDF initialization failed during startup. '
+        'Platform: $platform, OS: $osVersion. '
+        'PDF features disabled.',
+        pdfInitError,
+        pdfInitStackTrace,
+      );
+    } else {
+      // On web, log without platform-specific details
+      logger.error(
+        'PDF initialization failed during startup on Web. '
+        'PDF features disabled.',
+        pdfInitError,
+        pdfInitStackTrace,
+      );
+    }
   } else if (pdfFeaturesEnabled && logger != null) {
     logger.info('PDF features enabled successfully');
   }

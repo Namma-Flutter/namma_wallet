@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:get_it/get_it.dart';
 import 'package:namma_wallet/src/common/database/ticket_dao.dart';
 import 'package:namma_wallet/src/common/database/ticket_dao_interface.dart';
@@ -11,11 +12,13 @@ import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
 import 'package:namma_wallet/src/common/services/logger/namma_logger.dart';
 import 'package:namma_wallet/src/common/services/ocr/google_mlkit_ocr.dart';
 import 'package:namma_wallet/src/common/services/ocr/ocr_service_interface.dart';
+import 'package:namma_wallet/src/common/services/ocr/web_ocr_service.dart';
 import 'package:namma_wallet/src/common/services/pdf/pdf_service.dart';
 import 'package:namma_wallet/src/common/services/pdf/pdf_service_interface.dart';
 import 'package:namma_wallet/src/common/theme/theme_provider.dart';
 import 'package:namma_wallet/src/features/ai/fallback_parser/application/ai_service_interface.dart';
 import 'package:namma_wallet/src/features/ai/fallback_parser/application/gemma_service.dart';
+import 'package:namma_wallet/src/features/ai/fallback_parser/application/web_gemma_service.dart';
 import 'package:namma_wallet/src/features/clipboard/application/clipboard_service.dart';
 import 'package:namma_wallet/src/features/clipboard/application/clipboard_service_interface.dart';
 import 'package:namma_wallet/src/features/clipboard/data/clipboard_repository.dart';
@@ -29,6 +32,7 @@ import 'package:namma_wallet/src/features/irctc/application/irctc_scanner_servic
 import 'package:namma_wallet/src/features/receive/application/shared_content_processor.dart';
 import 'package:namma_wallet/src/features/receive/application/shared_content_processor_interface.dart';
 import 'package:namma_wallet/src/features/receive/application/sharing_intent_service.dart';
+import 'package:namma_wallet/src/features/receive/application/web_sharing_intent_service.dart';
 import 'package:namma_wallet/src/features/receive/domain/sharing_intent_service_interface.dart';
 import 'package:namma_wallet/src/features/tnstc/application/ticket_parser_interface.dart';
 import 'package:namma_wallet/src/features/tnstc/application/tnstc_pdf_parser.dart';
@@ -51,7 +55,7 @@ void setupLocator() {
     ..registerLazySingleton<IUserDAO>(UserDao.new)
     // Core services
     ..registerLazySingleton<IOCRService>(
-      () => GoogleMLKitOCR(logger: getIt<ILogger>()),
+      () => kIsWeb ? WebOCRService() : GoogleMLKitOCR(logger: getIt<ILogger>()),
     )
     ..registerLazySingleton<IPDFService>(
       () => PDFService(
@@ -60,7 +64,7 @@ void setupLocator() {
       ),
     )
     ..registerLazySingleton<IAIService>(
-      () => GemmaService(logger: getIt<ILogger>()),
+      () => kIsWeb ? WebGemmaService() : GemmaService(logger: getIt<ILogger>()),
     )
     // Parsers
     ..registerLazySingleton<TNSTCSMSParser>(TNSTCSMSParser.new)
@@ -71,10 +75,12 @@ void setupLocator() {
       () => TravelParserService(logger: getIt<ILogger>()),
     )
     ..registerLazySingleton<ISharingIntentService>(
-      () => SharingIntentService(
-        logger: getIt<ILogger>(),
-        pdfService: getIt<IPDFService>(),
-      ),
+      () => kIsWeb
+          ? WebSharingIntentService()
+          : SharingIntentService(
+              logger: getIt<ILogger>(),
+              pdfService: getIt<IPDFService>(),
+            ),
     )
     ..registerLazySingleton<ISharedContentProcessor>(
       () => SharedContentProcessor(
