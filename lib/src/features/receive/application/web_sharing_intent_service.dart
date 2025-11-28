@@ -21,7 +21,8 @@ class WebSharingIntentService implements ISharingIntentService {
 
   @override
   Future<void> dispose() async {
-    // No-op on web - no resources to dispose as sharing intents are not supported
+    // No-op on web - no resources to dispose as 
+    // sharing intents are not supported
     return;
   }
 }
