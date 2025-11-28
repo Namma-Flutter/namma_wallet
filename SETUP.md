@@ -166,7 +166,7 @@ Add to your `.mcp.json` configuration file:
         "--context",
         "ide-assistant",
         "--project",
-        "/Users/harish/Developer/flutter/namma_wallet"
+        "/path/to/your/namma_wallet"
     ],
     "env": {}
 }

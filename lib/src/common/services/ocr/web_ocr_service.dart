@@ -5,6 +5,8 @@ class WebOCRService implements IOCRService {
   @override
   Future<String> extractTextFromPDF(XFile pdfFile) async {
     // OCR is not yet supported on web
-    return '';
+    throw UnsupportedError(
+      'OCR text extraction from PDF is not supported on web platform.',
+    );
   }
 }

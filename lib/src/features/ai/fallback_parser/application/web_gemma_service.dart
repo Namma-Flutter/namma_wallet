@@ -4,6 +4,8 @@ class WebGemmaService implements IAIService {
   @override
   Future<void> init() async {
     // Gemma is not supported on web due to hosting headers requirements
-    return;
+    throw UnsupportedError(
+      'AI parsing with Gemma is not supported on web platform.',
+    );
   }
 }

@@ -440,7 +440,7 @@ class FileSystemEmulator {
       if (written < len) break;
     }
     const bytes_written = new Uint32Array(Pdfium.memory.buffer, ret_ptr, 1);
-    bytes_written[0] = written;
+    bytes_written[0] = total;
     return 0;
   }
 
@@ -1871,7 +1871,7 @@ function encodePdf(params) {
  */
 function createNewDocument() {
   const docHandle = Pdfium.wasmExports.FPDF_CreateNewDocument();
-  return _loadDocument(docHandle, false, () => {});
+  return _loadDocument(docHandle, false, () => { });
 }
 
 /**
@@ -1998,7 +1998,7 @@ function createDocumentFromJpegData(params) {
   Pdfium.wasmExports.FPDF_ClosePage(pageHandle);
 
   // Load and return the document
-  return _loadDocument(docHandle, false, () => {});
+  return _loadDocument(docHandle, false, () => { });
 }
 
 /**

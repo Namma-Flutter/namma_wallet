@@ -50,19 +50,29 @@ Future<void> main() async {
   }
 
   // Log PDF initialization status with full context
-  if (!pdfFeaturesEnabled && logger != null && pdfInitError != null) {
-    // Collect contextual information for telemetry
-    logger.error(
-      'PDF initialization failed during startup ${getPlatformInfo()}. '
-      'PDF features disabled.',
-      pdfInitError,
-      pdfInitStackTrace,
-    );
+  if (!pdfFeaturesEnabled && pdfInitError != null) {
+    if (logger != null) {
+      // Log with full context if logger is available
+      logger.error(
+        'PDF initialization failed during startup ${getPlatformInfo()}. '
+        'PDF features disabled.',
+        pdfInitError,
+        pdfInitStackTrace,
+      );
+    } else {
+      // Fallback: ensure error is visible even if logger is unavailable
+      logCriticalError(pdfInitError, pdfInitStackTrace ?? StackTrace.current);
+      // ignore: avoid_print
+      print(
+        'PDF INITIALIZATION FAILED on ${getPlatformInfo()}: $pdfInitError',
+      );
+    }
   } else if (pdfFeaturesEnabled && logger != null) {
     logger.info('PDF features enabled successfully');
   }
 
   // Set up global error handling
+  // ignore: no-empty-block
   FlutterError.onError = (FlutterErrorDetails details) {
     if (logger != null) {
       logger.error(
