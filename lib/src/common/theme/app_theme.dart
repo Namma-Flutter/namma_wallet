@@ -374,6 +374,10 @@ class AppTheme {
 }
 
 extension ColorSchemeExtension on ColorScheme {
-  Color get warningContainer => brightness == Brightness.light ? Colors.orange.shade100 : Colors.orange.shade900.withOpacity(0.5);
-  Color get onWarningContainer => brightness == Brightness.light ? Colors.orange.shade900 : Colors.orange.shade100;
+  Color get warningContainer => brightness == Brightness.light
+      ? Colors.orange.shade100
+      : Colors.orange.shade900.withOpacity(0.5);
+  Color get onWarningContainer => brightness == Brightness.light
+      ? Colors.orange.shade900
+      : Colors.orange.shade100;
 }
