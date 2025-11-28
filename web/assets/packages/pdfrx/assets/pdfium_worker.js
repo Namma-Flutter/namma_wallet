@@ -643,7 +643,7 @@ const emEnv = {
     const maxHeapSizeInBytes = 2 * 1024 * 1024 * 1024; // 2GB
     if (requestedSizeInBytes > maxHeapSizeInBytes) {
       console.error(
-        `emscripten_resize_heap: Cannot enlarge memory, asked for ${requestedPageCount} bytes but limit is ${maxHeapSizeInBytes}`
+        `emscripten_resize_heap: Cannot enlarge memory, asked for ${requestedSizeInBytes} bytes but limit is ${maxHeapSizeInBytes}`
       );
       return false;
     }
@@ -864,6 +864,7 @@ function _loadDocument(docHandle, useProgressiveLoading, onDispose) {
     if (!docHandle) {
       const error = Pdfium.wasmExports.FPDF_GetLastError();
       const errorStr = _errorMappings[error];
+      if (typeof onDispose === 'function') onDispose();
       return {
         errorCode: error,
         errorCodeStr: _errorMappings[error],
@@ -1511,12 +1512,13 @@ function addFontData(params) {
 
 function clearAllFontData() {
   console.log(`Clearing all font data`);
-  for (const face in fontFileNames) {
+  for (const face of Object.keys(fontFileNames)) {
     const fileName = fontFileNames[face];
     fileSystem.unregisterFile(`/usr/share/fonts/${fileName}`);
+    delete fontFileNames[face];
   }
   fileSystem.registerFile('/usr/share/fonts', { entries: [] });
-  fontFileNames = {};
+  fontFilesId = 0;
   return { message: 'All font data cleared' };
 }
 
