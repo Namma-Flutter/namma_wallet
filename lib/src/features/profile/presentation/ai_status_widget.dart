@@ -41,14 +41,17 @@ class AIStatusWidget extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
-                          color: Theme.of(context).colorScheme.onWarningContainer,
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onWarningContainer,
                         ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    status.errorMessage ?? 'Gemma AI is not supported on this platform.',
+                    status.errorMessage ??
+                        'Gemma AI is not supported on this platform.',
                     style: TextStyle(
                       color: Theme.of(context).colorScheme.onWarningContainer,
                     ),

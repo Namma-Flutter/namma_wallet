@@ -15,9 +15,9 @@ import 'package:url_launcher/url_launcher.dart';
 
 class ProfileView extends StatefulWidget {
   const ProfileView({super.key});
-  
-    @override
-    State<ProfileView> createState() => _ProfileViewState();
+
+  @override
+  State<ProfileView> createState() => _ProfileViewState();
 }
 
 class _ProfileViewState extends State<ProfileView> {
