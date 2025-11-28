@@ -336,6 +336,7 @@ class ProfileTile extends StatelessWidget {
     );
   }
 }
+
 List<Map<String, dynamic>> sampleTicketList = [
   {
     "ticket_id": "PNR1234567",
@@ -388,6 +389,95 @@ List<Map<String, dynamic>> sampleTicketList = [
       {"title": "Passenger", "value": "Ayesha Khan"},
       {"title": "Gender", "value": "F"},
       {"title": "Age", "value": "27"},
+    ],
+  },
+  {
+    "ticket_id": "PNR7654321",
+    "primary_text": "Mumbai → Jaipur",
+    "secondary_text": "Train 12955 • 3A • Rohan Mehta",
+    "location": "Mumbai Central",
+    "start_time": "2025-05-22T17:00:00.000Z",
+    "end_time": "2025-05-22T23:45:00.000Z",
+    "type": "TRAIN",
+    "tags": [
+      {"value": "PNR7654321", "icon": "confirmation_number"},
+      {"value": "12955", "icon": "train"},
+      {"value": "3A", "icon": "event_seat"},
+    ],
+    "extras": [
+      {"title": "Passenger", "value": "Rohan Mehta"},
+      {"title": "Gender", "value": "M"},
+      {"title": "Age", "value": "32"},
+    ],
+  },
+  {
+    "ticket_id": "KSRTC55221",
+    "primary_text": "Bengaluru → Mysuru",
+    "secondary_text": "KSRTC • Airavat 777",
+    "location": "Majestic Bus Stand",
+    "start_time": "2025-06-10T09:00:00.000Z",
+    "type": "BUS",
+    "tags": [
+      {"value": "777", "icon": "confirmation_number"},
+      {"value": "KSRTC55221", "icon": "qr_code"},
+    ],
+    "extras": [
+      {"title": "Passenger Name", "value": "Divya R"},
+      {"title": "Age", "value": "25"},
+      {"title": "Gender", "value": "F"},
+    ],
+  },
+  {
+    "ticket_id": "INDIGO77231",
+    "primary_text": "Bengaluru → Hyderabad",
+    "secondary_text": "IndiGo • 6E 452",
+    "location": "Kempegowda Airport T1",
+    "start_time": "2025-07-18T05:45:00.000Z",
+    "end_time": "2025-07-18T07:10:00.000Z",
+    "type": "FLIGHT",
+    "tags": [
+      {"value": "6E 452", "icon": "flight"},
+    ],
+    "extras": [
+      {"title": "Passenger", "value": "Sandeep Rao"},
+      {"title": "Gender", "value": "M"},
+      {"title": "Age", "value": "41"},
+    ],
+  },
+  {
+    "ticket_id": "MSRTC44192",
+    "primary_text": "Pune → Shirdi",
+    "secondary_text": "MSRTC • Shivneri AC",
+    "location": "Pune Station",
+    "start_time": "2025-08-05T12:30:00.000Z",
+    "type": "BUS",
+    "tags": [
+      {"value": "Shivneri", "icon": "emoji_transportation"},
+      {"value": "MSRTC44192", "icon": "qr_code"},
+    ],
+    "extras": [
+      {"title": "Passenger Name", "value": "Neha Patil"},
+      {"title": "Age", "value": "30"},
+      {"title": "Gender", "value": "F"},
+    ],
+  },
+  {
+    "ticket_id": "PNR9988776",
+    "primary_text": "Kolkata → Varanasi",
+    "secondary_text": "Train 12333 • SL • Amit Das",
+    "location": "Howrah Junction",
+    "start_time": "2025-09-11T19:20:00.000Z",
+    "end_time": "2025-09-12T05:00:00.000Z",
+    "type": "TRAIN",
+    "tags": [
+      {"value": "PNR9988776", "icon": "confirmation_number"},
+      {"value": "12333", "icon": "train"},
+      {"value": "SL", "icon": "event_seat"},
+    ],
+    "extras": [
+      {"title": "Passenger", "value": "Amit Das"},
+      {"title": "Gender", "value": "M"},
+      {"title": "Age", "value": "38"},
     ],
   },
 ];
