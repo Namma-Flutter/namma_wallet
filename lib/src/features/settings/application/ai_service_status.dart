@@ -7,7 +7,7 @@ class AIServiceStatus extends ChangeNotifier {
   String? _errorMessage;
   String? get errorMessage => _errorMessage;
 
-  void setGemmaSupport(bool supported, {String? error}) {
+  void setGemmaSupport({required bool supported, String? error}) {
     _isGemmaSupported = supported;
     _errorMessage = error;
     notifyListeners();

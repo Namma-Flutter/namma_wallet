@@ -61,6 +61,7 @@ Future<void> main() async {
     } else {
       // Fallback: ensure error is visible even if logger is unavailable
       logCriticalError(pdfInitError, pdfInitStackTrace ?? StackTrace.current);
+      // fallback print to debug console
       // ignore: avoid_print
       print(
         'PDF INITIALIZATION FAILED on ${getPlatformInfo()}: $pdfInitError',
