@@ -1,10 +1,9 @@
-import 'dart:io';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:namma_wallet/src/app.dart';
 import 'package:namma_wallet/src/common/database/wallet_database_interface.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
+import 'package:namma_wallet/src/common/platform_utils/platform_utils.dart';
 import 'package:namma_wallet/src/common/services/haptic/haptic_services.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
 import 'package:namma_wallet/src/common/theme/theme_provider.dart';
@@ -52,27 +51,12 @@ Future<void> main() async {
   // Log PDF initialization status with full context
   if (!pdfFeaturesEnabled && logger != null && pdfInitError != null) {
     // Collect contextual information for telemetry
-    // Platform APIs are not available on web, so we need to check
-    if (!kIsWeb) {
-      final platform = Platform.operatingSystem;
-      final osVersion = Platform.operatingSystemVersion;
-
-      logger.error(
-        'PDF initialization failed during startup. '
-        'Platform: $platform, OS: $osVersion. '
-        'PDF features disabled.',
-        pdfInitError,
-        pdfInitStackTrace,
-      );
-    } else {
-      // On web, log without platform-specific details
-      logger.error(
-        'PDF initialization failed during startup on Web. '
-        'PDF features disabled.',
-        pdfInitError,
-        pdfInitStackTrace,
-      );
-    }
+    logger.error(
+      'PDF initialization failed during startup ${getPlatformInfo()}. '
+      'PDF features disabled.',
+      pdfInitError,
+      pdfInitStackTrace,
+    );
   } else if (pdfFeaturesEnabled && logger != null) {
     logger.info('PDF features enabled successfully');
   }
@@ -133,14 +117,7 @@ Future<void> main() async {
     // Fallback: ensure error is always visible even if logger is null
     if (logger == null) {
       // Write to stderr for visibility in production/debug
-      stderr
-        ..writeln('=' * 80)
-        ..writeln('CRITICAL: Initialization failed and logger unavailable')
-        ..writeln('=' * 80)
-        ..writeln('Error: $e')
-        ..writeln('Stack trace:')
-        ..writeln(stackTrace)
-        ..writeln('=' * 80);
+      logCriticalError(e, stackTrace);
 
       // Also print for debug console visibility
       // Print statements are necessary here as logger is unavailable
