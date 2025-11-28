@@ -117,6 +117,14 @@ class _ImportViewState extends State<ImportView> {
           xFile = XFile(platformFile.path!);
         } else {
           _logger.warning('File picked but no bytes or path available');
+          if (mounted) {
+            showSnackbar(
+              context,
+              'Could not read the selected file. Please try again.',
+              isError: true,
+            );
+          }
+          return;
         }
       }
 
