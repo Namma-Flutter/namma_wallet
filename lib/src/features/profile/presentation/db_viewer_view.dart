@@ -172,17 +172,23 @@ class _DbViewerViewState extends State<DbViewerView>
               ),
               ElevatedButton(
                 onPressed: () async {
-                  const iOSWidgetName = 'TicketHomeWidget';
-                  const androidWidgetName = 'TicketHomeWidget';
-                  const dataKey = 'ticket_data';
+                  // Widget names MUST match actual Android & iOS widget provider classes
+                  const iOSWidgetName = 'TicketListWidgetProvider';
+                  const androidWidgetName = 'TicketListWidgetProvider';
+
+                  // KEY for the multi-ticket list
+                  const dataKey = 'ticket_list';
                   final dateTimeCon = DateTimeConverter.instance;
+
                   try {
                     _iLogger.debug(
-                      'ticket json encoded: ${jsonEncode(t.toMap())}',
+                      'NEW ticket (raw): ${jsonEncode(t.toMap())}',
                     );
-                    // Make a copy of the map
+
+                    // Convert Ticket model to map
                     final ticketMap = Map<String, dynamic>.from(t.toMap());
-                    // Safely format start_time and end_time if they are not null
+
+                    // Format dates
                     if (t.startTime != null) {
                       ticketMap['start_time'] = dateTimeCon.formatFullDateTime(
                         t.startTime!,
@@ -193,23 +199,66 @@ class _DbViewerViewState extends State<DbViewerView>
                         t.endTime!,
                       );
                     }
-                    _iLogger.debug('ticket map : $ticketMap');
-                    // Save to widget
+
+                    _iLogger.debug('Processed ticket map: $ticketMap');
+
+                    // --- LOAD EXISTING LIST ---
+                    String? existingJson =
+                        await HomeWidget.getWidgetData<String>(dataKey);
+
+                    List<dynamic> ticketList = [];
+                    if (existingJson != null && existingJson.isNotEmpty) {
+                      try {
+                        final decoded = jsonDecode(existingJson);
+
+                        if (decoded is List) {
+                          ticketList = decoded.cast<Map<String, dynamic>>();
+                        }
+                      } catch (_) {
+                        ticketList = [];
+                      }
+                    }
+
+                    // --- OPTIONAL: Prevent duplicates by ticket_id ---
+                    ticketList.removeWhere((element) {
+                      return element["ticket_id"] == ticketMap["ticket_id"];
+                    });
+
+                    // Add new ticket
+                    ticketList.add(ticketMap);
+
+                    // Save updated list
                     await HomeWidget.saveWidgetData(
                       dataKey,
-                      jsonEncode(ticketMap),
+                      jsonEncode(ticketList),
                     );
 
-                  await HomeWidget.updateWidget(
-                    androidName: androidWidgetName,
-                    iOSName: iOSWidgetName,
-                  );
-                  if (context.mounted) {
-                    context.pop();
+                    _iLogger.debug(
+                      'Saved updated ticket list: ${jsonEncode(ticketList)}',
+                    );
+
+                    // Update widget
+                    await HomeWidget.updateWidget(
+                      androidName: androidWidgetName,
+                      iOSName: iOSWidgetName,
+                    );
+
+                    _iLogger.info(
+                      'Successfully pinned ticket to widget: ${t.ticketId}',
+                    );
+
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Ticket pinned to home screen!'),
+                          duration: Duration(seconds: 2),
+                        ),
+                      );
+                      context.pop();
                     }
                   } catch (e, stackTrace) {
                     _iLogger.error(
-                      'Error saving ticket to widget',
+                      'Error saving multiple tickets to widget',
                       e,
                       stackTrace,
                     );

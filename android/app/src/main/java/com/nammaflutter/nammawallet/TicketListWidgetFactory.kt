@@ -1,68 +1,120 @@
-//package com.nammaflutter.nammawallet
-//
-//import android.app.PendingIntent
-//import android.content.Context
-//import android.content.Intent
-//import android.widget.RemoteViews
-//import android.widget.RemoteViewsService
-//import org.json.JSONArray
-//
-//class TicketListWidgetFactory(private val context: Context) :
-//    RemoteViewsService.RemoteViewsFactory {
-//
-//    private var tickets = JSONArray()
-//
-//    override fun onDataSetChanged() {
-//        val prefs = context.getSharedPreferences("HomeWidgetPreferences", Context.MODE_PRIVATE)
-//        tickets = JSONArray(prefs.getString("ticket_list", "[]"))
-//    }
-//
-//    override fun getCount(): Int = tickets.length()
-//
-//    override fun getViewAt(position: Int): RemoteViews {
-//        val obj = tickets.getJSONObject(position)
-//        val views = RemoteViews(context.packageName, R.layout.ticket_list_item)
-//
-//        // TEXTS
-//        views.setTextViewText(R.id.primaryText, obj.optString("primary_text"))
-//        views.setTextViewText(R.id.locationText, obj.optString("location"))
-//        views.setTextViewText(R.id.startTimeText, obj.optString("start_time"))
-//
-//        val extras = obj.optJSONArray("extras")
-//        if (extras != null && extras.length() > 0) {
-//            views.setTextViewText(R.id.providerText, extras.getJSONObject(0).optString("value"))
-//        }
-//
-//        // ICON
-//        when (obj.optString("type")) {
-//            "TRAIN" -> views.setImageViewResource(R.id.typeIcon, R.drawable.ic_train)
-//            "BUS" -> views.setImageViewResource(R.id.typeIcon, R.drawable.ic_bus)
-//            "FLIGHT" -> views.setImageViewResource(R.id.typeIcon, R.drawable.ic_flight)
-//            else -> views.setImageViewResource(R.id.typeIcon, R.drawable.ic_ticket)
-//        }
-//
-//        // UNPIN action
-//        val intent = Intent(context, TicketHomeWidget::class.java).apply {
-//            action = TicketHomeWidget.ACTION_UNPIN
-//            putExtra(TicketHomeWidget.EXTRA_TICKET_INDEX, position)
-//        }
-//
-//        val pending = PendingIntent.getBroadcast(
-//            context,
-//            position,
-//            intent,
-//            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-//        )
-//
-//        views.setOnClickPendingIntent(R.id.pinIcon, pending)
-//
-//        return views
-//    }
-//
-//    override fun getViewTypeCount(): Int = 1
-//    override fun hasStableIds(): Boolean = true
-//    override fun getLoadingView(): RemoteViews? = null
-//    override fun getItemId(position: Int): Long = position.toLong()
-//    override fun onCreate() {}
-//    override fun onDestroy() {}
-//}
+package com.nammaflutter.nammawallet
+
+import android.app.PendingIntent
+import android.content.Context
+import android.content.Intent
+import android.widget.RemoteViews
+import android.widget.RemoteViewsService
+import android.util.Log
+import org.json.JSONArray
+import org.json.JSONObject
+
+class TicketListWidgetFactory(private val context: Context) :
+    RemoteViewsService.RemoteViewsFactory {
+
+    private var tickets = JSONArray()
+    
+    companion object {
+        private const val TAG = "TicketListFactory"
+    }
+
+    override fun onDataSetChanged() {
+        Log.d(TAG, "onDataSetChanged called")
+        
+        val prefs = context.getSharedPreferences("HomeWidgetPreferences", Context.MODE_PRIVATE)
+        val ticketListJson = prefs.getString("ticket_list", "[]") ?: "[]"
+        
+        Log.d(TAG, "Raw ticket_list JSON: $ticketListJson")
+        
+        try {
+            tickets = JSONArray(ticketListJson)
+            Log.d(TAG, "Loaded ${tickets.length()} tickets")
+        } catch (e: Exception) {
+            Log.e(TAG, "Error parsing ticket list", e)
+            tickets = JSONArray()
+        }
+    }
+
+    override fun getCount(): Int {
+        val count = tickets.length()
+        Log.d(TAG, "getCount: $count")
+        return count
+    }
+
+    override fun getViewAt(position: Int): RemoteViews {
+        Log.d(TAG, "getViewAt position: $position")
+        
+        val views = RemoteViews(context.packageName, R.layout.ticket_list_item)
+        
+        try {
+            val ticket = tickets.getJSONObject(position)
+            Log.d(TAG, "Ticket at $position: $ticket")
+            
+            // PRIMARY TEXT - Use primary_text field (snake_case from Flutter)
+            val primaryText = ticket.optString("primary_text", "Unknown Ticket")
+            views.setTextViewText(R.id.primaryText, primaryText)
+            
+            // LOCATION - Use location field
+            val location = ticket.optString("location", "")
+            val secondaryText = ticket.optString("secondary_text", "")
+            val locationText = when {
+                location.isNotEmpty() -> location
+                secondaryText.isNotEmpty() -> secondaryText
+                else -> "Location not available"
+            }
+            views.setTextViewText(R.id.locationText, locationText)
+            
+            // START TIME - Use formatted start_time
+            val startTime = ticket.optString("start_time", "Time not available")
+            views.setTextViewText(R.id.startTimeText, startTime)
+            
+            // PROVIDER - Use secondary_text or extras
+            var providerText = ticket.optString("secondary_text", "")
+            if (providerText.isEmpty()) {
+                val extras = ticket.optJSONArray("extras")
+                if (extras != null && extras.length() > 0) {
+                    providerText = extras.getJSONObject(0).optString("value", "Provider")
+                } else {
+                    providerText = "Provider"
+                }
+            }
+            views.setTextViewText(R.id.providerText, providerText)
+            
+            // ICON - Set based on ticket type
+            val type = ticket.optString("type", "GENERAL").uppercase()
+            Log.d(TAG, "Ticket type: $type")
+            
+            when (type) {
+                "TRAIN" -> views.setImageViewResource(R.id.typeIcon, R.drawable.ic_train)
+                "BUS" -> views.setImageViewResource(R.id.typeIcon, R.drawable.ic_bus)
+                "FLIGHT" -> views.setImageViewResource(R.id.typeIcon, R.drawable.ic_flight)
+                "EVENT" -> views.setImageViewResource(R.id.typeIcon, R.drawable.ic_event)
+                else -> views.setImageViewResource(R.id.typeIcon, R.drawable.ic_ticket)
+            }
+            
+            // UNPIN ACTION - Use FillInIntent for ListView items
+            val fillInIntent = Intent().apply {
+                putExtra(TicketListWidgetProvider.EXTRA_TICKET_INDEX, position)
+            }
+            views.setOnClickFillInIntent(R.id.pinIcon, fillInIntent)
+            
+        } catch (e: Exception) {
+            Log.e(TAG, "Error creating view at position $position", e)
+            views.setTextViewText(R.id.primaryText, "Error loading ticket")
+        }
+        
+        return views
+    }
+
+    override fun getViewTypeCount(): Int = 1
+    override fun hasStableIds(): Boolean = true
+    override fun getLoadingView(): RemoteViews? = null
+    override fun getItemId(position: Int): Long = position.toLong()
+    override fun onCreate() {
+        Log.d(TAG, "onCreate")
+    }
+    override fun onDestroy() {
+        Log.d(TAG, "onDestroy")
+    }
+}
+
