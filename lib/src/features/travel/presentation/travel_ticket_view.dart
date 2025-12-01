@@ -1,17 +1,13 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:home_widget/home_widget.dart';
 import 'package:namma_wallet/src/common/database/ticket_dao_interface.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/domain/models/extras_model.dart';
 import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 import 'package:namma_wallet/src/common/enums/ticket_type.dart';
 import 'package:namma_wallet/src/common/helper/date_time_converter.dart';
-import 'package:namma_wallet/src/common/services/haptic/haptic_service_extension.dart';
-import 'package:namma_wallet/src/common/services/haptic/haptic_service_interface.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
+import 'package:namma_wallet/src/common/services/widget/widget_service_interface.dart';
 import 'package:namma_wallet/src/common/theme/styles.dart';
 import 'package:namma_wallet/src/common/widgets/rounded_back_button.dart';
 import 'package:namma_wallet/src/common/widgets/snackbar_widget.dart';
@@ -31,6 +27,7 @@ class TravelTicketView extends StatefulWidget {
 
 class _TravelTicketViewState extends State<TravelTicketView> {
   bool _isDeleting = false;
+  bool _isPinning = false;
 
   // Helper method to handle empty values
   String getValueOrDefault(String? value) {
@@ -56,22 +53,24 @@ class _TravelTicketViewState extends State<TravelTicketView> {
     return ticket.extras!;
   }
 
-  ///
-  // ignore: unused_element
+  /// Pin ticket to home screen widget
   Future<void> _pinToHomeScreen() async {
+    setState(() {
+      _isPinning = true;
+    });
+
     try {
-      const iOSWidgetName = 'TicketHomeWidget';
-      const androidWidgetName = 'TicketHomeWidget';
-      const dataKey = 'ticket_data';
+      final widgetService = getIt<IWidgetService>();
 
-      // Convert ticket to JSON format for the widget
-      final ticketData = widget.ticket.toJson();
-      await HomeWidget.saveWidgetData(dataKey, jsonEncode(ticketData));
+      // Update widget with this ticket
+      await widgetService.updateWidgetWithTicket(widget.ticket);
 
-      await HomeWidget.updateWidget(
-        androidName: androidWidgetName,
-        iOSName: iOSWidgetName,
-      );
+      // Check if pin widget is supported (Android)
+      final isPinSupported = await widgetService.isRequestPinWidgetSupported();
+      if (isPinSupported) {
+        // Request to pin widget
+        await widgetService.requestPinWidget();
+      }
 
       if (mounted) {
         showSnackbar(context, 'Ticket pinned to home screen successfully!');
@@ -85,6 +84,12 @@ class _TravelTicketViewState extends State<TravelTicketView> {
       if (mounted) {
         showSnackbar(context, 'Failed to pin ticket: $e', isError: true);
       }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isPinning = false;
+        });
+      }
     }
   }
 
@@ -93,6 +98,7 @@ class _TravelTicketViewState extends State<TravelTicketView> {
       showSnackbar(context, 'Cannot delete this ticket', isError: true);
       return;
     }
+
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -113,9 +119,6 @@ class _TravelTicketViewState extends State<TravelTicketView> {
     );
 
     if (mounted && (confirmed ?? false)) {
-      getIt<IHapticService>().triggerHaptic(
-        HapticType.selection,
-      );
       await _deleteTicket();
     }
   }
@@ -136,12 +139,7 @@ class _TravelTicketViewState extends State<TravelTicketView> {
       );
 
       if (mounted) {
-        final hapticService = getIt<IHapticService>();
-
         showSnackbar(context, 'Ticket deleted successfully');
-        hapticService.triggerHaptic(
-          HapticType.success,
-        );
         context.pop(true); // Return true to indicate ticket was deleted
       }
     } on Object catch (e, stackTrace) {
@@ -152,13 +150,7 @@ class _TravelTicketViewState extends State<TravelTicketView> {
       );
 
       if (mounted) {
-        final hapticService = getIt<IHapticService>();
-
         showSnackbar(context, 'Failed to delete ticket: $e', isError: true);
-
-        hapticService.triggerHaptic(
-          HapticType.error,
-        );
       }
     } finally {
       if (mounted) {
@@ -177,32 +169,61 @@ class _TravelTicketViewState extends State<TravelTicketView> {
         leading: const RoundedBackButton(),
         title: const Text('Ticket View'),
         actions: [
-          if (widget.ticket.ticketId != null)
-            Center(
-              child: CircleAvatar(
-                radius: 24,
-                backgroundColor: Colors.red.shade400,
-                child: _isDeleting
-                    ? const SizedBox(
-                        width: 16,
-                        height: 16,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: Colors.white,
-                        ),
-                      )
-                    : IconButton(
-                        onPressed: _isDeleting ? null : _showDeleteConfirmation,
-                        icon: const Icon(
-                          Icons.delete,
-                          size: 20,
-                          color: Colors.white,
-                        ),
-                        tooltip: 'Delete ticket',
-                      ),
+          if (_isDeleting || _isPinning)
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16),
+              child: Center(
+                child: SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                  ),
+                ),
               ),
+            )
+          else
+            PopupMenuButton<String>(
+              icon: const Icon(Icons.more_vert),
+              tooltip: 'More options',
+              onSelected: (value) async {
+                switch (value) {
+                  case 'pin':
+                    await _pinToHomeScreen();
+                  case 'delete':
+                    if (widget.ticket.ticketId != null) {
+                      await _showDeleteConfirmation();
+                    }
+                }
+              },
+              itemBuilder: (context) => [
+                const PopupMenuItem(
+                  value: 'pin',
+                  child: Row(
+                    children: [
+                      Icon(Icons.widgets_outlined),
+                      SizedBox(width: 12),
+                      Text('Pin to home screen'),
+                    ],
+                  ),
+                ),
+                if (widget.ticket.ticketId != null)
+                  const PopupMenuItem(
+                    value: 'delete',
+                    child: Row(
+                      children: [
+                        Icon(Icons.delete_outline, color: Colors.red),
+                        SizedBox(width: 12),
+                        Text(
+                          'Delete ticket',
+                          style: TextStyle(color: Colors.red),
+                        ),
+                      ],
+                    ),
+                  ),
+              ],
             ),
-          const SizedBox(width: 16),
+          const SizedBox(width: 8),
         ],
       ),
       body: SingleChildScrollView(
