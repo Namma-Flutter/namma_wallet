@@ -40,6 +40,20 @@
                 android:resource="@xml/ticket_list_widget_info" />
         </receiver>
 
+        <!-- Main Ticket Widget Provider (3x3) -->
+        <receiver
+            android:name="com.nammaflutter.nammawallet.MainTicketWidgetProvider"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.nammaflutter.nammawallet.UPDATE_TICKET_LIST" />
+                <action android:name="com.nammaflutter.nammawallet.UNPIN_MAIN_TICKET" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/main_ticket_widget_info" />
+        </receiver>
+
         <service
             android:name=".TicketListWidgetService"
             android:exported="false"
