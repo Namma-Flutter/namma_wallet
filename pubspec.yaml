@@ -53,6 +53,7 @@ dev_dependencies:
   flutter_gen_runner: ^5.4.0
   flutter_test:
     sdk: flutter
+  flutter_launcher_icons: ^0.14.4
   mockito: ^5.4.4
   sqflite_common_ffi: ^2.3.0
   very_good_analysis: ^10.0.0
@@ -63,3 +64,10 @@ flutter:
 flutter_gen:
   output: lib/src/features/common/generated/
   line_length: 80
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/icon/app-icon-android-foreground.png"
+  image_path_ios: "assets/icon/app-icon-iOS-Default.png"
+
