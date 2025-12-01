@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:namma_wallet/src/common/database/ticket_dao_interface.dart';
 import 'package:namma_wallet/src/common/domain/models/ticket.dart';
+import 'package:namma_wallet/src/common/helper/date_time_converter.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
 import 'package:namma_wallet/src/common/services/widget/widget_service_interface.dart';
 import 'package:workmanager/workmanager.dart';
@@ -20,15 +21,17 @@ class HomeWidgetService implements IWidgetService {
   final ILogger _logger;
   final ITicketDAO _ticketDAO;
 
-  static const String _androidWidgetName = 'TicketHomeWidget';
-  static const String _iOSWidgetName = 'TicketHomeWidget';
-  static const String _dataKey = 'ticket_data';
+  static const String _androidWidgetName = 'TicketListWidgetProvider';
+  static const String _iOSWidgetName = 'TicketListWidgetProvider';
+  static const String _dataKey = 'ticket_list';
+  // work manager variables
   static const String _backgroundTaskName = 'widgetBackgroundUpdate';
   static const String _backgroundTaskId = 'ticket_widget_update';
 
   // Android qualified name for the widget receiver
   static const String _androidQualifiedName =
-      'com.nammaflutter.nammawallet.TicketHomeWidget';
+      'com.nammaflutter.nammawallet.TicketListWidgetProvider';
+  static DateTimeConverter dateTimeCon = DateTimeConverter.instance;
 
   @override
   Future<void> initialize() async {
@@ -49,20 +52,65 @@ class HomeWidgetService implements IWidgetService {
   }
 
   @override
-  Future<void> updateWidgetWithTicket(Ticket ticket) async {
+  Future<void> updateWidgetWithTicket(Ticket t) async {
     try {
-      // Convert ticket to JSON format for the widget
-      final ticketData = ticket.toJson();
-      final jsonString = jsonEncode(ticketData);
-
-      _logger.info(
-        '[HomeWidgetService] Updating widget with ticket: ${ticket.ticketId}',
+      _logger.debug(
+        'NEW ticket (raw): ${jsonEncode(t.toMap())}',
       );
 
-      // Save ticket data
-      await HomeWidget.saveWidgetData<String>(_dataKey, jsonString);
+      // Convert Ticket model to map
+      final ticketMap = Map<String, dynamic>.from(t.toMap());
 
-      // Update widget on both platforms
+      // Format dates
+      if (t.startTime != null) {
+        ticketMap['start_time'] = dateTimeCon.formatFullDateTime(
+          t.startTime!,
+        );
+      }
+      if (t.endTime != null) {
+        ticketMap['end_time'] = dateTimeCon.formatFullDateTime(
+          t.endTime!,
+        );
+      }
+
+      _logger.debug('Processed ticket map: $ticketMap');
+
+      // --- LOAD EXISTING LIST ---
+      final existingJson = await HomeWidget.getWidgetData<String>(_dataKey);
+
+      var ticketList = <dynamic>[];
+      if (existingJson != null && existingJson.isNotEmpty) {
+        try {
+          final decoded = jsonDecode(existingJson);
+
+          if (decoded is List) {
+            ticketList = decoded.cast<Map<String, dynamic>>();
+          }
+        } on Object catch (_) {
+          ticketList = [];
+        }
+      }
+
+      // --- Prevent duplicates by ticket_id ---
+      ticketList.removeWhere((element) {
+        return element['ticket_id'] == ticketMap['ticket_id'];
+      });
+
+      // Add new ticket
+      ticketList.add(ticketMap);
+
+      // Save updated list
+      await HomeWidget.saveWidgetData(
+        _dataKey,
+        jsonEncode(ticketList),
+      );
+
+      // for future development
+      // var installedWidgetResult = await HomeWidget.getInstalledWidgets();
+      // var getWidgetData = HomeWidget.getWidgetData("1");
+      // _logger.debug("installedWidgetResult: $installedWidgetResult");
+      // _logger.debug("getWidgetData: $getWidgetData");
+
       await _updateWidget();
 
       _logger.info('[HomeWidgetService] Widget updated successfully');
