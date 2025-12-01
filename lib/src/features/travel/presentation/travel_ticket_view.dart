@@ -65,12 +65,12 @@ class _TravelTicketViewState extends State<TravelTicketView> {
       // Update widget with this ticket
       await widgetService.updateWidgetWithTicket(widget.ticket);
 
-      // Check if pin widget is supported (Android)
-      final isPinSupported = await widgetService.isRequestPinWidgetSupported();
-      if (isPinSupported) {
-        // Request to pin widget
-        await widgetService.requestPinWidget();
-      }
+      // // Check if pin widget is supported (Android)
+      // final isPinSupported = await widgetService.isRequestPinWidgetSupported();
+      // if (isPinSupported) {
+      //   // Request to pin widget
+      //   await widgetService.requestPinWidget();
+      // }
 
       if (mounted) {
         showSnackbar(context, 'Ticket pinned to home screen successfully!');
