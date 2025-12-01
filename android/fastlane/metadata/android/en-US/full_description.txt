@@ -1,0 +1,79 @@
+Namma Wallet is an open-source smart wallet app built by the Flutter Chennai Community. It helps you organize your digital life by automatically detecting important messages from SMS and notifications and converting them into clean, structured tickets and events — all processed locally on your device.
+
+⭐ Key Features
+📩 SMS & Notification Parsing
+
+Automatically detect and extract details for:
+
+Travel tickets
+
+Payment alerts
+
+Delivery updates
+
+Event confirmations
+
+And more…
+
+All data is processed securely on your device using an offline AI model.
+
+🤖 On-Device AI Processing
+
+Uses a locally downloaded Large Language Model (LLM)
+
+No personal data leaves your device
+
+Works fully offline after the model is downloaded
+
+Zero cloud processing or tracking
+
+📷 Camera Support
+
+Scan QR codes, ticket details, and more (based on the feature roadmap).
+
+🔒 Privacy First
+
+100% open-source
+
+No data collection
+
+No analytics
+
+No ads
+
+No tracking
+
+All your SMS, notifications, and events stay safely on your device
+
+🌐 Open Source Transparency
+
+Check out the full source code:
+https://github.com/Namma-Flutter/namma_wallet
+
+🔧 Required Permissions
+
+SMS Access – To read and extract ticket details
+
+Notification Access – To auto-create events
+
+Camera – For scanning features
+
+Internet – Only to download the AI model (once)
+
+Storage – To store the downloaded model offline
+
+🎯 Who Is This For?
+
+This app is perfect for:
+
+Travelers
+
+Shoppers
+
+Professionals who get event notifications
+
+Anyone who receives many SMS/notifications and wants auto-organized tickets
+
+💙 Built by the Community
+
+Namma Wallet is created and maintained by developers from the Flutter Chennai Community, with full transparency and community contributions.
