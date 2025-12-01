@@ -101,6 +101,14 @@ class TicketListWidgetProvider : AppWidgetProvider() {
         for (widgetId in ids) {
             updateWidget(context, manager, widgetId)
         }
+
+        // Update Main Widget as well
+        val mainIds = manager.getAppWidgetIds(
+            ComponentName(context, MainTicketWidgetProvider::class.java)
+        )
+        for (widgetId in mainIds) {
+            MainTicketWidgetProvider.updateWidget(context, manager, widgetId)
+        }
     }
 
     override fun onUpdate(

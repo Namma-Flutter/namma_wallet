@@ -29,8 +29,10 @@ class HomeWidgetService implements IWidgetService {
   static const String _backgroundTaskId = 'ticket_widget_update';
 
   // Android qualified name for the widget receiver
-  static const String _androidQualifiedName =
+  static const String _androidListWidgetName =
       'com.nammaflutter.nammawallet.TicketListWidgetProvider';
+  static const String _androidMainWidgetName =
+      'com.nammaflutter.nammawallet.MainTicketWidgetProvider';
   static DateTimeConverter dateTimeCon = DateTimeConverter.instance;
 
   @override
@@ -210,7 +212,7 @@ class HomeWidgetService implements IWidgetService {
 
     try {
       await HomeWidget.requestPinWidget(
-        qualifiedAndroidName: _androidQualifiedName,
+        qualifiedAndroidName: _androidListWidgetName,
       );
       _logger.info('[HomeWidgetService] Widget pin requested');
     } on Object catch (e, stackTrace) {
@@ -230,10 +232,14 @@ class HomeWidgetService implements IWidgetService {
         androidName: _androidWidgetName,
         iOSName: _iOSWidgetName,
       ),
-      if (Platform.isAndroid)
+      if (Platform.isAndroid) ...[
         HomeWidget.updateWidget(
-          qualifiedAndroidName: _androidQualifiedName,
+          qualifiedAndroidName: _androidListWidgetName,
         ),
+        HomeWidget.updateWidget(
+          qualifiedAndroidName: _androidMainWidgetName,
+        ),
+      ],
     ]);
   }
 
@@ -266,14 +272,19 @@ void _callbackDispatcher() {
       // Update the widget
       await Future.wait([
         HomeWidget.updateWidget(
-          androidName: 'TicketHomeWidget',
-          iOSName: 'TicketHomeWidget',
+          androidName: 'TicketListWidgetProvider',
+          iOSName: 'TicketListWidgetProvider',
         ),
-        if (Platform.isAndroid)
+        if (Platform.isAndroid) ...[
           HomeWidget.updateWidget(
             qualifiedAndroidName:
-                'com.nammaflutter.nammawallet.TicketHomeWidget',
+                'com.nammaflutter.nammawallet.TicketListWidgetProvider',
           ),
+          HomeWidget.updateWidget(
+            qualifiedAndroidName:
+                'com.nammaflutter.nammawallet.MainTicketWidgetProvider',
+          ),
+        ],
       ]);
 
       return true;
