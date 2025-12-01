@@ -1,18 +1,15 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import 'package:home_widget/home_widget.dart';
 import 'package:namma_wallet/src/common/database/ticket_dao_interface.dart';
 import 'package:namma_wallet/src/common/database/user_dao_interface.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 import 'package:namma_wallet/src/common/domain/models/user.dart';
-import 'package:namma_wallet/src/common/helper/date_time_converter.dart';
 import 'package:namma_wallet/src/common/services/haptic/haptic_service_extension.dart';
 import 'package:namma_wallet/src/common/services/haptic/haptic_service_interface.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
+import 'package:namma_wallet/src/common/services/widget/widget_service_interface.dart';
 import 'package:namma_wallet/src/common/widgets/rounded_back_button.dart';
 
 class DbViewerView extends StatefulWidget {
@@ -28,6 +25,7 @@ class _DbViewerViewState extends State<DbViewerView>
   List<User> users = <User>[];
   List<Ticket> tickets = <Ticket>[];
   final IHapticService hapticService = getIt<IHapticService>();
+  final IWidgetService iWidgetService = getIt<IWidgetService>();
 
   late ILogger _iLogger;
   @override
@@ -172,91 +170,9 @@ class _DbViewerViewState extends State<DbViewerView>
               ),
               ElevatedButton(
                 onPressed: () async {
-                  // Widget names MUST match actual Android & iOS widget provider classes
-                  const iOSWidgetName = 'TicketListWidgetProvider';
-                  const androidWidgetName = 'TicketListWidgetProvider';
-
-                  // KEY for the multi-ticket list
-                  const dataKey = 'ticket_list';
-                  final dateTimeCon = DateTimeConverter.instance;
-
                   try {
-                    _iLogger.debug(
-                      'NEW ticket (raw): ${jsonEncode(t.toMap())}',
-                    );
-
-                    // Convert Ticket model to map
-                    final ticketMap = Map<String, dynamic>.from(t.toMap());
-
-                    // Format dates
-                    if (t.startTime != null) {
-                      ticketMap['start_time'] = dateTimeCon.formatFullDateTime(
-                        t.startTime!,
-                      );
-                    }
-                    if (t.endTime != null) {
-                      ticketMap['end_time'] = dateTimeCon.formatFullDateTime(
-                        t.endTime!,
-                      );
-                    }
-
-                    _iLogger.debug('Processed ticket map: $ticketMap');
-
-                    // --- LOAD EXISTING LIST ---
-                    String? existingJson =
-                        await HomeWidget.getWidgetData<String>(dataKey);
-
-                    List<dynamic> ticketList = [];
-                    if (existingJson != null && existingJson.isNotEmpty) {
-                      try {
-                        final decoded = jsonDecode(existingJson);
-
-                        if (decoded is List) {
-                          ticketList = decoded.cast<Map<String, dynamic>>();
-                        }
-                      } catch (_) {
-                        ticketList = [];
-                      }
-                    }
-
-                    // --- OPTIONAL: Prevent duplicates by ticket_id ---
-                    ticketList.removeWhere((element) {
-                      return element["ticket_id"] == ticketMap["ticket_id"];
-                    });
-
-                    // Add new ticket
-                    ticketList.add(ticketMap);
-
-                    // Save updated list
-                    await HomeWidget.saveWidgetData(
-                      dataKey,
-                      jsonEncode(ticketList),
-                    );
-
-                    _iLogger.debug(
-                      'Saved updated ticket list: ${jsonEncode(ticketList)}',
-                    );
-
-                    // Update widget
-                    await HomeWidget.updateWidget(
-                      androidName: androidWidgetName,
-                      iOSName: iOSWidgetName,
-                    );
-
-                    _iLogger.info(
-                      'Successfully pinned ticket to widget: ${t.ticketId}',
-                    );
-
-                    if (context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Ticket pinned to home screen!'),
-                          duration: Duration(seconds: 2),
-                        ),
-                      );
-                      context.pop();
-                    }
-                  } catch (e, stackTrace) {
+                    await iWidgetService.updateWidgetWithTicket(t);
+                  } on Object catch (e, stackTrace) {
                     _iLogger.error(
                       'Error saving multiple tickets to widget',
                       e,
