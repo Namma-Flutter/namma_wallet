@@ -65,10 +65,7 @@ void setupLocator() {
       () => GemmaService(logger: getIt<ILogger>()),
     )
     ..registerLazySingleton<IWidgetService>(
-      () => HomeWidgetService(
-        logger: getIt<ILogger>(),
-        ticketDAO: getIt<ITicketDAO>(),
-      ),
+      () => HomeWidgetService(logger: getIt<ILogger>()),
     )
     // Parsers
     ..registerLazySingleton<TNSTCSMSParser>(TNSTCSMSParser.new)

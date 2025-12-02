@@ -3,7 +3,6 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:home_widget/home_widget.dart';
-import 'package:namma_wallet/src/common/database/ticket_dao_interface.dart';
 import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 import 'package:namma_wallet/src/common/helper/date_time_converter.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
@@ -14,12 +13,9 @@ import 'package:workmanager/workmanager.dart';
 class HomeWidgetService implements IWidgetService {
   HomeWidgetService({
     required ILogger logger,
-    required ITicketDAO ticketDAO,
-  }) : _logger = logger,
-       _ticketDAO = ticketDAO;
+  }) : _logger = logger;
 
   final ILogger _logger;
-  final ITicketDAO _ticketDAO;
 
   static const String _androidWidgetName = 'TicketListWidgetProvider';
   static const String _iOSWidgetName = 'TicketListWidgetProvider';
