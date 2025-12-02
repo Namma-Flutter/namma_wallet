@@ -65,9 +65,10 @@ class _TravelTicketViewState extends State<TravelTicketView> {
       // Update widget with this ticket
       await widgetService.updateWidgetWithTicket(widget.ticket);
 
-      // TODO(akash_senthil): Enable pin widget request
+      // TODO(AkashSenthil): Enable pin widget request.
       //  after testing on various Android versions.
-      // final isPinSupported = await widgetService.isRequestPinWidgetSupported();
+      // final isPinSupported =
+      // await widgetService.isRequestPinWidgetSupported();
       // if (isPinSupported) {
       //   await widgetService.requestPinWidget();
       // }
@@ -190,6 +191,7 @@ class _TravelTicketViewState extends State<TravelTicketView> {
                 switch (value) {
                   case 'pin':
                     await _pinToHomeScreen();
+
                   case 'delete':
                     if (widget.ticket.ticketId != null) {
                       await _showDeleteConfirmation();

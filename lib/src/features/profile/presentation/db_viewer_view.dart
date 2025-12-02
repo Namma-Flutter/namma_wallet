@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:namma_wallet/src/common/database/ticket_dao_interface.dart';
 import 'package:namma_wallet/src/common/database/user_dao_interface.dart';
@@ -24,15 +25,14 @@ class _DbViewerViewState extends State<DbViewerView>
   late final TabController _tabController;
   List<User> users = <User>[];
   List<Ticket> tickets = <Ticket>[];
-  final IHapticService hapticService = getIt<IHapticService>();
-  final IWidgetService iWidgetService = getIt<IWidgetService>();
+  final IHapticService _hapticService = getIt<IHapticService>();
+  final IWidgetService _iWidgetService = getIt<IWidgetService>();
+  final ILogger _iLogger = getIt<ILogger>();
 
-  late ILogger _iLogger;
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
-    _iLogger = getIt<ILogger>();
     unawaited(_load());
   }
 
@@ -46,7 +46,7 @@ class _DbViewerViewState extends State<DbViewerView>
       users = u;
       tickets = t;
     });
-    hapticService.triggerHaptic(HapticType.success);
+    _hapticService.triggerHaptic(HapticType.success);
   }
 
   @override
@@ -171,7 +171,7 @@ class _DbViewerViewState extends State<DbViewerView>
               ElevatedButton(
                 onPressed: () async {
                   try {
-                    await iWidgetService.updateWidgetWithTicket(t);
+                    await _iWidgetService.updateWidgetWithTicket(t);
                   } on Object catch (e, stackTrace) {
                     _iLogger.error(
                       'Error saving multiple tickets to widget',

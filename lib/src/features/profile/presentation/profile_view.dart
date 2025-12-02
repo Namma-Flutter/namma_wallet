@@ -24,11 +24,9 @@ class ProfileView extends StatefulWidget {
 class _ProfileViewState extends State<ProfileView> {
   final IHapticService hapticService = getIt<IHapticService>();
   bool _isHapticEnabled = false;
-  late ILogger _iLogger;
   @override
   void initState() {
     super.initState();
-    _iLogger = getIt<ILogger>();
     unawaited(_initHapticFlag());
   }
 
