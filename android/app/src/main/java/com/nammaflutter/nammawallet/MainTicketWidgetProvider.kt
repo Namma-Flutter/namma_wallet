@@ -18,6 +18,17 @@ class MainTicketWidgetProvider : AppWidgetProvider() {
         private const val TAG = "MainTicketWidget"
         const val ACTION_UNPIN_MAIN = "com.nammaflutter.nammawallet.UNPIN_MAIN_TICKET"
         
+        /**
+         * Update the main ticket app widget's RemoteViews for the given widget ID.
+         *
+         * Reads the stored "ticket_list" JSON from the "HomeWidgetPreferences" SharedPreferences,
+         * binds the most recent ticket into the widget UI when present, or shows the empty state
+         * when no tickets are available. Also configures the unpin action on the widget.
+         *
+         * @param context Context used to access resources and preferences.
+         * @param manager AppWidgetManager used to push the updated RemoteViews to the widget.
+         * @param widgetId The app widget ID to update.
+         */
         fun updateWidget(
             context: Context,
             manager: AppWidgetManager,
@@ -78,6 +89,19 @@ class MainTicketWidgetProvider : AppWidgetProvider() {
             }
         }
         
+        /**
+         * Populates widget RemoteViews with fields from a ticket JSON object.
+         *
+         * Reads `primary_text`, `secondary_text`, `location`, `start_time`, and `type` from `ticket`
+         * and updates the corresponding text and icon views in `views`.
+         *
+         * @param ticket JSONObject representing a ticket. Recognized keys:
+         *  - `primary_text` (default "Ticket")
+         *  - `secondary_text` (default "")
+         *  - `location` (default "Unknown Location")
+         *  - `start_time` (default "Time N/A")
+         *  - `type` (values: "TRAIN", "BUS", "FLIGHT", "EVENT", others → default ticket icon)
+         */
         private fun bindTicketData(context: Context, views: RemoteViews, ticket: JSONObject) {
             // Primary Text
             val primaryText = ticket.optString("primary_text", "Ticket")
@@ -107,6 +131,11 @@ class MainTicketWidgetProvider : AppWidgetProvider() {
         }
     }
 
+    /**
+     * Refreshes each widget instance specified by `appWidgetIds`.
+     *
+     * @param appWidgetIds Array of widget IDs to refresh.
+     */
     override fun onUpdate(
         context: Context,
         appWidgetManager: AppWidgetManager,
@@ -117,6 +146,15 @@ class MainTicketWidgetProvider : AppWidgetProvider() {
         }
     }
 
+    /**
+     * Receives broadcasts for the widget and dispatches handling for supported actions.
+     *
+     * Recognizes two actions:
+     * - [ACTION_UNPIN_MAIN]: removes the last pinned ticket from preferences and updates widgets.
+     * - "com.nammaflutter.nammawallet.UPDATE_TICKET_LIST": refreshes all instances of this widget.
+     *
+     * @param context Context used to access system services and update widgets.
+     * @param intent The received broadcast intent; its `action` determines the handling performed. */
     override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context, intent)
         Log.d(TAG, "onReceive: ${intent.action}")
@@ -132,6 +170,16 @@ class MainTicketWidgetProvider : AppWidgetProvider() {
         }
     }
     
+    /**
+     * Removes the most recently pinned ticket from the widget preferences and refreshes related widgets.
+     *
+     * If the stored ticket list contains at least one entry, the last entry is removed and the updated list
+     * is saved back to the "HomeWidgetPreferences" under "ticket_list". After modification, the function
+     * refreshes all instances of MainTicketWidgetProvider and TicketListWidgetProvider so they reflect the change.
+     *
+     * If the ticket list is empty, the function does nothing. Exceptions during parsing or update are caught
+     * and do not propagate.
+     */
     private fun unpinLastTicket(context: Context) {
         val prefs = context.getSharedPreferences("HomeWidgetPreferences", Context.MODE_PRIVATE)
         val json = prefs.getString("ticket_list", "[]") ?: "[]"

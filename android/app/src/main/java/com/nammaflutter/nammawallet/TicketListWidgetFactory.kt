@@ -18,6 +18,12 @@ class TicketListWidgetFactory(private val context: Context) :
         private const val TAG = "TicketListFactory"
     }
 
+    /**
+     * Refreshes the factory's internal ticket list from shared preferences.
+     *
+     * Reads the "ticket_list" JSON string from the "HomeWidgetPreferences" SharedPreferences,
+     * parses it into the `tickets` JSONArray, and resets `tickets` to an empty JSONArray if parsing fails.
+     */
     override fun onDataSetChanged() {
         Log.d(TAG, "onDataSetChanged called")
         
@@ -35,12 +41,26 @@ class TicketListWidgetFactory(private val context: Context) :
         }
     }
 
+    /**
+     * Provides the number of tickets currently loaded into the factory.
+     *
+     * @return The number of tickets available for the widget list.
+     */
     override fun getCount(): Int {
         val count = tickets.length()
         Log.d(TAG, "getCount: $count")
         return count
     }
 
+    /**
+     * Creates RemoteViews for the ticket at the given list position to display in the widget.
+     *
+     * Populates primary text, location (with fallbacks), start time, provider (from `secondary_text` or `extras`),
+     * selects an icon by ticket `type`, and attaches a fill-in intent carrying the ticket index for item actions.
+     *
+     * @param position Index of the ticket in the current ticket list.
+     * @return A RemoteViews configured to represent the ticket at `position`. If an error occurs, returns a view that shows an error message.
+     */
     override fun getViewAt(position: Int): RemoteViews {
         Log.d(TAG, "getViewAt position: $position")
         
@@ -106,15 +126,42 @@ class TicketListWidgetFactory(private val context: Context) :
         return views
     }
 
-    override fun getViewTypeCount(): Int = 1
-    override fun hasStableIds(): Boolean = true
-    override fun getLoadingView(): RemoteViews? = null
-    override fun getItemId(position: Int): Long = position.toLong()
+    /**
+ * Declares how many distinct item view types this factory provides.
+ *
+ * @return The number of distinct view types; always 1 for a single item layout.
+ */
+override fun getViewTypeCount(): Int = 1
+    /**
+ * Indicates that the factory provides stable item IDs across dataset changes.
+ *
+ * @return `true` because item IDs are stable and derived from item positions.
+ */
+override fun hasStableIds(): Boolean = true
+    /**
+ * Supplies an optional RemoteViews to display while a list item is being loaded or refreshed.
+ *
+ * @return A `RemoteViews` to use as a loading placeholder, or `null` to use the system default loading view.
+ */
+override fun getLoadingView(): RemoteViews? = null
+    /**
+ * Provides a stable item ID for the given list position.
+ *
+ * @return The item ID as a `Long` equal to the provided `position`.
+ */
+override fun getItemId(position: Int): Long = position.toLong()
+    /**
+     * Called when the factory is created to perform any initial setup.
+     */
     override fun onCreate() {
         Log.d(TAG, "onCreate")
     }
+    /**
+     * Invoked when the RemoteViewsFactory is being destroyed and should release any held resources.
+     *
+     * This method is called as part of the factory lifecycle when the widget no longer needs item views.
+     */
     override fun onDestroy() {
         Log.d(TAG, "onDestroy")
     }
 }
-
