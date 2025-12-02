@@ -17,4 +17,7 @@ flutter_launcher_icons:
   desaturate_tinted_to_grayscale_ios: true
   remove_alpha_ios: true
 
-  
+  web:
+    generate: true
+    image_path: "assets/icon/app-icon-android-foreground.png"
+    background_color: "#FFFFFF"
