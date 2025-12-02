@@ -12,6 +12,7 @@ import 'package:namma_wallet/src/common/helper/date_time_converter.dart';
 import 'package:namma_wallet/src/common/services/haptic/haptic_service_extension.dart';
 import 'package:namma_wallet/src/common/services/haptic/haptic_service_interface.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
+import 'package:namma_wallet/src/common/services/widget/widget_service_interface.dart';
 import 'package:namma_wallet/src/common/theme/styles.dart';
 import 'package:namma_wallet/src/common/widgets/rounded_back_button.dart';
 import 'package:namma_wallet/src/common/widgets/snackbar_widget.dart';
@@ -31,6 +32,7 @@ class TravelTicketView extends StatefulWidget {
 
 class _TravelTicketViewState extends State<TravelTicketView> {
   bool _isDeleting = false;
+  bool _isPinning = false;
 
   // Helper method to handle empty values
   String getValueOrDefault(String? value) {
@@ -56,22 +58,23 @@ class _TravelTicketViewState extends State<TravelTicketView> {
     return ticket.extras!;
   }
 
-  ///
-  // ignore: unused_element
+  /// Pin ticket to home screen widget
   Future<void> _pinToHomeScreen() async {
+    setState(() {
+      _isPinning = true;
+    });
     try {
-      const iOSWidgetName = 'TicketHomeWidget';
-      const androidWidgetName = 'TicketHomeWidget';
-      const dataKey = 'ticket_data';
+      final widgetService = getIt<IWidgetService>();
 
-      // Convert ticket to JSON format for the widget
-      final ticketData = widget.ticket.toJson();
-      await HomeWidget.saveWidgetData(dataKey, jsonEncode(ticketData));
+      // Update widget with this ticket
+      await widgetService.updateWidgetWithTicket(widget.ticket);
 
-      await HomeWidget.updateWidget(
-        androidName: androidWidgetName,
-        iOSName: iOSWidgetName,
-      );
+      // // Check if pin widget is supported (Android)
+      // final isPinSupported = await widgetService.isRequestPinWidgetSupported();
+      // if (isPinSupported) {
+      //   // Request to pin widget
+      //   await widgetService.requestPinWidget();
+      // }
 
       if (mounted) {
         showSnackbar(context, 'Ticket pinned to home screen successfully!');
@@ -84,6 +87,12 @@ class _TravelTicketViewState extends State<TravelTicketView> {
       );
       if (mounted) {
         showSnackbar(context, 'Failed to pin ticket: $e', isError: true);
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isPinning = false;
+        });
       }
     }
   }
