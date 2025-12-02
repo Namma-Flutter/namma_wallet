@@ -2,10 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:namma_wallet/src/common/database/ticket_dao_interface.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
-import 'package:namma_wallet/src/common/domain/data/sample_ticket_data.dart';
-import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 import 'package:namma_wallet/src/common/routing/app_routes.dart';
 import 'package:namma_wallet/src/common/services/haptic/haptic_service_extension.dart';
 import 'package:namma_wallet/src/common/services/haptic/haptic_service_interface.dart';
@@ -136,41 +133,6 @@ class _ProfileViewState extends State<ProfileView> {
                   }
                 },
               ), // Contact Us Section
-              ProfileTile(
-                icon: Icons.south_america,
-                title: 'Add Sample Ticket Data',
-                subtitle: 'Update sample tickets for testing purposes',
-                trailing: const Icon(Icons.chevron_right),
-                onTap: () async {
-                  try {
-                    _iLogger
-                      ..debug('Starting sample JSON data parsing')
-                      ..debug('Sample JSON: $sampleTicketList');
-                    // Parse the sample tickets
-                    final sampleTicketsParsed = sampleTicketList
-                        .map(TicketMapper.fromMap)
-                        .toList();
-                    _iLogger.debug(
-                      'Parsed ticket length: ${sampleTicketsParsed.length}',
-                    );
-                    // Insert tickets into database
-                    final ticketDao = getIt<ITicketDAO>();
-                    for (final ticket in sampleTicketsParsed) {
-                      await ticketDao.insertTicket(ticket);
-                    }
-                    _iLogger.info(
-                      'Sample tickets parsed and inserted successfully',
-                    );
-                  } on Exception catch (e, stackTrace) {
-                    _iLogger.error(
-                      'Error occurred during sample JSON parsing',
-                      e,
-                      stackTrace,
-                    );
-                  }
-                },
-              ),
-
               // Haptics Enabled
               ProfileTile(
                 title: 'Haptics Enabled',

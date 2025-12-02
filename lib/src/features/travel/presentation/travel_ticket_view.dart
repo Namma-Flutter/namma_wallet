@@ -65,10 +65,10 @@ class _TravelTicketViewState extends State<TravelTicketView> {
       // Update widget with this ticket
       await widgetService.updateWidgetWithTicket(widget.ticket);
 
-      // // Check if pin widget is supported (Android)
+      // TODO(akash_senthil): Enable pin widget request
+      //  after testing on various Android versions.
       // final isPinSupported = await widgetService.isRequestPinWidgetSupported();
       // if (isPinSupported) {
-      //   // Request to pin widget
       //   await widgetService.requestPinWidget();
       // }
 

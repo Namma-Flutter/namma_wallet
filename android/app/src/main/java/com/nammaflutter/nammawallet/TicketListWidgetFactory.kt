@@ -51,7 +51,7 @@ class TicketListWidgetFactory(private val context: Context) :
             Log.d(TAG, "Ticket at $position: $ticket")
             
             // PRIMARY TEXT - Use primary_text field (snake_case from Flutter)
-            val primaryText = ticket.optString("primary_text", "Unknown Ticket")
+            val primaryText = ticket.optString("primary_text", "--")
             views.setTextViewText(R.id.primaryText, primaryText)
             
             // LOCATION - Use location field
@@ -60,12 +60,12 @@ class TicketListWidgetFactory(private val context: Context) :
             val locationText = when {
                 location.isNotEmpty() -> location
                 secondaryText.isNotEmpty() -> secondaryText
-                else -> "Location not available"
+                else -> "--"
             }
             views.setTextViewText(R.id.locationText, locationText)
             
             // START TIME - Use formatted start_time
-            val startTime = ticket.optString("start_time", "Time not available")
+            val startTime = ticket.optString("start_time", "--")
             views.setTextViewText(R.id.startTimeText, startTime)
             
             // PROVIDER - Use secondary_text or extras

@@ -87,11 +87,16 @@ class TicketListWidgetProvider : AppWidgetProvider() {
         val json = prefs.getString("ticket_list", "[]") ?: "[]"
         val arr = JSONArray(json)
 
-        if (index < arr.length()) {
-            arr.remove(index)
-            prefs.edit().putString("ticket_list", arr.toString()).apply()
-            Log.d(TAG, "Ticket unpinned. Remaining tickets: ${arr.length()}")
-        }
+             try {
+                 val arr = JSONArray(json)
+                 if (index < arr.length()) {
+                     arr.remove(index)
+                     prefs.edit().putString("ticket_list", arr.toString()).apply()
+                     Log.d(TAG, "Ticket unpinned. Remaining tickets: ${arr.length()}")
+                 }
+             } catch (e: Exception) {
+                 Log.e(TAG, "Error unpinning ticket", e)
+             }
 
         // Update all widgets
         val manager = AppWidgetManager.getInstance(context)

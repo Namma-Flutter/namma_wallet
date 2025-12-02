@@ -17,7 +17,8 @@ class MainTicketWidgetProvider : AppWidgetProvider() {
     companion object {
         private const val TAG = "MainTicketWidget"
         const val ACTION_UNPIN_MAIN = "com.nammaflutter.nammawallet.UNPIN_MAIN_TICKET"
-        
+        const val ACTION_UPDATE_TICKET_LIST = "com.nammaflutter.nammawallet.UPDATE_TICKET_LIST"
+
         fun updateWidget(
             context: Context,
             manager: AppWidgetManager,
@@ -123,7 +124,7 @@ class MainTicketWidgetProvider : AppWidgetProvider() {
         
         if (intent.action == ACTION_UNPIN_MAIN) {
             unpinLastTicket(context)
-        } else if (intent.action == "com.nammaflutter.nammawallet.UPDATE_TICKET_LIST") {
+        } else if (intent.action == ACTION_UPDATE_TICKET_LIST ) {
             val manager = AppWidgetManager.getInstance(context)
             val ids = manager.getAppWidgetIds(ComponentName(context, MainTicketWidgetProvider::class.java))
             for (id in ids) {
