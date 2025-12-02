@@ -1,8 +1,5 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:home_widget/home_widget.dart';
 import 'package:namma_wallet/src/common/database/ticket_dao_interface.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/domain/models/extras_model.dart';
@@ -69,8 +66,9 @@ class _TravelTicketViewState extends State<TravelTicketView> {
       // Update widget with this ticket
       await widgetService.updateWidgetWithTicket(widget.ticket);
 
-      // // Check if pin widget is supported (Android)
-      // final isPinSupported = await widgetService.isRequestPinWidgetSupported();
+      // Check if pin widget is supported (Android)
+      // final isPinSupported =
+      // await widgetService.isRequestPinWidgetSupported();
       // if (isPinSupported) {
       //   // Request to pin widget
       //   await widgetService.requestPinWidget();
@@ -186,32 +184,61 @@ class _TravelTicketViewState extends State<TravelTicketView> {
         leading: const RoundedBackButton(),
         title: const Text('Ticket View'),
         actions: [
-          if (widget.ticket.ticketId != null)
-            Center(
-              child: CircleAvatar(
-                radius: 24,
-                backgroundColor: Colors.red.shade400,
-                child: _isDeleting
-                    ? const SizedBox(
-                        width: 16,
-                        height: 16,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: Colors.white,
-                        ),
-                      )
-                    : IconButton(
-                        onPressed: _isDeleting ? null : _showDeleteConfirmation,
-                        icon: const Icon(
-                          Icons.delete,
-                          size: 20,
-                          color: Colors.white,
-                        ),
-                        tooltip: 'Delete ticket',
-                      ),
+          if (_isDeleting || _isPinning)
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16),
+              child: Center(
+                child: SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                  ),
+                ),
               ),
+            )
+          else
+            PopupMenuButton<String>(
+              icon: const Icon(Icons.more_vert),
+              tooltip: 'More options',
+              onSelected: (value) async {
+                switch (value) {
+                  case 'pin':
+                    await _pinToHomeScreen();
+                  case 'delete':
+                    if (widget.ticket.ticketId != null) {
+                      await _showDeleteConfirmation();
+                    }
+                }
+              },
+              itemBuilder: (context) => [
+                const PopupMenuItem(
+                  value: 'pin',
+                  child: Row(
+                    children: [
+                      Icon(Icons.widgets_outlined),
+                      SizedBox(width: 12),
+                      Text('Pin to home screen'),
+                    ],
+                  ),
+                ),
+                if (widget.ticket.ticketId != null)
+                  const PopupMenuItem(
+                    value: 'delete',
+                    child: Row(
+                      children: [
+                        Icon(Icons.delete_outline, color: Colors.red),
+                        SizedBox(width: 12),
+                        Text(
+                          'Delete ticket',
+                          style: TextStyle(color: Colors.red),
+                        ),
+                      ],
+                    ),
+                  ),
+              ],
             ),
-          const SizedBox(width: 16),
+          const SizedBox(width: 8),
         ],
       ),
       body: SingleChildScrollView(
