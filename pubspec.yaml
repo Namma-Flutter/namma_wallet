@@ -19,6 +19,7 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_gemma: ^0.11.9
+  flutter_launcher_icons: ^0.14.4
   flutter_svg: ^2.2.1
   gaimon: ^1.4.1
   get_it: ^9.0.5
@@ -53,7 +54,6 @@ dev_dependencies:
   flutter_gen_runner: ^5.4.0
   flutter_test:
     sdk: flutter
-  flutter_launcher_icons: ^0.14.4
   mockito: ^5.4.4
   sqflite_common_ffi: ^2.3.0
   very_good_analysis: ^10.0.0
