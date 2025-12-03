@@ -3,16 +3,16 @@
 
     <!-- Gradient matching the lime yellow theme -->
     <gradient
-        android:startColor="#E7FC57"
+        android:angle="135"
         android:endColor="#E0FB25"
-        android:angle="135" />
+        android:startColor="#E7FC57" />
 
-    <corners android:radius="30dp"/>
+    <corners android:radius="30dp" />
 
     <!-- Shadow effect using multiple layers -->
     <stroke
         android:width="0dp"
-        android:color="@android:color/transparent"/>
+        android:color="@android:color/transparent" />
 
 </shape>
 
