@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="4dp">
+
+    <!-- Card Container -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="12dp"
+        android:background="@drawable/widget_background">
+
+        <!-- TYPE ICON -->
+        <ImageView
+            android:id="@+id/typeIcon"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_gravity="center_vertical"
+            android:src="@drawable/ic_ticket"
+            android:contentDescription="Ticket type icon" />
+
+        <!-- TICKET INFO CONTAINER -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="8dp"
+            android:orientation="vertical">
+
+            <!-- PRIMARY TEXT -->
+            <TextView
+                android:id="@+id/primaryText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="IRCTC Train Ticket"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:textColor="#222222"
+                android:maxLines="1"
+                android:ellipsize="end" />
+
+            <!-- LOCATION TEXT -->
+            <TextView
+                android:id="@+id/locationText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="Chennai → Bangalore"
+                android:textColor="#666666"
+                android:textSize="13sp"
+                android:maxLines="1"
+                android:ellipsize="end" />
+
+            <!-- START TIME -->
+            <TextView
+                android:id="@+id/startTimeText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="10:00 AM, Dec 25"
+                android:textColor="#444444"
+                android:textSize="12sp"
+                android:maxLines="1"
+                android:ellipsize="end" />
+
+            <!-- PROVIDER TEXT -->
+            <TextView
+                android:id="@+id/providerText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="IRCTC"
+                android:textColor="#666666"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:maxLines="1"
+                android:paddingStart="6dp"
+                android:paddingEnd="6dp"
+                android:paddingTop="2dp"
+                android:paddingBottom="2dp"
+                android:background="#F0F0F0" />
+
+        </LinearLayout>
+
+        <!-- PIN ICON -->
+        <ImageView
+            android:id="@+id/pinIcon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_gravity="center_vertical"
+            android:src="@drawable/ic_pin"
+            android:clickable="true"
+            android:focusable="true"
+            android:contentDescription="Unpin ticket" />
+
+    </LinearLayout>
+
+</LinearLayout>
+
+

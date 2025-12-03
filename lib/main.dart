@@ -6,6 +6,7 @@ import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/platform_utils/platform_utils.dart';
 import 'package:namma_wallet/src/common/services/haptic/haptic_services.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
+import 'package:namma_wallet/src/common/services/widget/widget_service_interface.dart';
 import 'package:namma_wallet/src/common/theme/theme_provider.dart';
 import 'package:namma_wallet/src/features/ai/fallback_parser/application/ai_service_interface.dart';
 import 'package:pdfrx/pdfrx.dart';
@@ -116,6 +117,9 @@ Future<void> main() async {
     await getIt<IWalletDatabase>().database;
     logger?.success('Database initialized');
 
+    logger?.info('Initializing widget service...');
+    await getIt<IWidgetService>().initialize();
+    logger?.success('Widget service initialized');
     logger?.success('All services initialized successfully');
   } on Object catch (e, stackTrace) {
     // Log error using logger if available

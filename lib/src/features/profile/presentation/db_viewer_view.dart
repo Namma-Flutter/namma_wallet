@@ -1,10 +1,6 @@
 import 'dart:async';
-import 'dart:convert';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import 'package:home_widget/home_widget.dart';
 import 'package:namma_wallet/src/common/database/ticket_dao_interface.dart';
 import 'package:namma_wallet/src/common/database/user_dao_interface.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
@@ -12,6 +8,8 @@ import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 import 'package:namma_wallet/src/common/domain/models/user.dart';
 import 'package:namma_wallet/src/common/services/haptic/haptic_service_extension.dart';
 import 'package:namma_wallet/src/common/services/haptic/haptic_service_interface.dart';
+import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
+import 'package:namma_wallet/src/common/services/widget/widget_service_interface.dart';
 import 'package:namma_wallet/src/common/widgets/rounded_back_button.dart';
 
 class DbViewerView extends StatefulWidget {
@@ -27,11 +25,14 @@ class _DbViewerViewState extends State<DbViewerView>
   List<User> users = <User>[];
   List<Ticket> tickets = <Ticket>[];
   final IHapticService hapticService = getIt<IHapticService>();
+  final IWidgetService iWidgetService = getIt<IWidgetService>();
 
+  late ILogger _iLogger;
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    _iLogger = getIt<ILogger>();
     unawaited(_load());
   }
 
@@ -170,17 +171,14 @@ class _DbViewerViewState extends State<DbViewerView>
               if (!kIsWeb)
                 ElevatedButton(
                   onPressed: () async {
-                    const iOSWidgetName = 'TicketHomeWidget';
-                    const androidWidgetName = 'TicketHomeWidget';
-                    const dataKey = 'ticket_data';
-                    await HomeWidget.saveWidgetData(dataKey, jsonEncode(t));
-
-                    await HomeWidget.updateWidget(
-                      androidName: androidWidgetName,
-                      iOSName: iOSWidgetName,
-                    );
-                    if (context.mounted) {
-                      context.pop();
+                    try {
+                      await iWidgetService.updateWidgetWithTicket(t);
+                    } on Object catch (e, stackTrace) {
+                      _iLogger.error(
+                        'Error saving multiple tickets to widget',
+                        e,
+                        stackTrace,
+                      );
                     }
                   },
                   child: const Text('Pin to Home Screen'),
