@@ -1,14 +1,14 @@
-import 'dart:io';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:namma_wallet/src/app.dart';
 import 'package:namma_wallet/src/common/database/wallet_database_interface.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
-import 'package:namma_wallet/src/common/services/logger_interface.dart';
+import 'package:namma_wallet/src/common/platform_utils/platform_utils.dart';
+import 'package:namma_wallet/src/common/services/haptic/haptic_services.dart';
+import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
 import 'package:namma_wallet/src/common/theme/theme_provider.dart';
-import 'package:namma_wallet/src/features/ai/fallback-parser/application/gemma_service.dart';
+import 'package:namma_wallet/src/features/ai/fallback_parser/application/ai_service_interface.dart';
 import 'package:pdfrx/pdfrx.dart';
 import 'package:provider/provider.dart';
 
@@ -35,7 +35,7 @@ Future<void> main() async {
     pdfInitError = e;
     pdfInitStackTrace = stackTrace;
   }
-
+  await HapticServices.loadPreference();
   // Setup dependency injection
   setupLocator();
 
@@ -51,23 +51,30 @@ Future<void> main() async {
   }
 
   // Log PDF initialization status with full context
-  if (!pdfFeaturesEnabled && logger != null && pdfInitError != null) {
-    // Collect contextual information for telemetry
-    final platform = Platform.operatingSystem;
-    final osVersion = Platform.operatingSystemVersion;
-
-    logger.error(
-      'PDF initialization failed during startup. '
-      'Platform: $platform, OS: $osVersion. '
-      'PDF features disabled.',
-      pdfInitError,
-      pdfInitStackTrace,
-    );
+  if (!pdfFeaturesEnabled && pdfInitError != null) {
+    if (logger != null) {
+      // Log with full context if logger is available
+      logger.error(
+        'PDF initialization failed during startup ${getPlatformInfo()}. '
+        'PDF features disabled.',
+        pdfInitError,
+        pdfInitStackTrace,
+      );
+    } else {
+      // Fallback: ensure error is visible even if logger is unavailable
+      logCriticalError(pdfInitError, pdfInitStackTrace ?? StackTrace.current);
+      // fallback print to debug console
+      // ignore: avoid_print
+      print(
+        'PDF INITIALIZATION FAILED on ${getPlatformInfo()}: $pdfInitError',
+      );
+    }
   } else if (pdfFeaturesEnabled && logger != null) {
     logger.info('PDF features enabled successfully');
   }
 
   // Set up global error handling
+  // ignore: no-empty-block
   FlutterError.onError = (FlutterErrorDetails details) {
     if (logger != null) {
       logger.error(
@@ -103,9 +110,9 @@ Future<void> main() async {
   };
 
   try {
-    logger?.info('Initializing Gemma Chat Service...');
-    await getIt<GemmaChatService>().init();
-    logger?.success('Gemma Chat Service initialized');
+    logger?.info('Initializing AI service...');
+    await getIt<IAIService>().init();
+    logger?.success('AI service initialized');
 
     logger?.info('Initializing database...');
     await getIt<IWalletDatabase>().database;
@@ -123,14 +130,7 @@ Future<void> main() async {
     // Fallback: ensure error is always visible even if logger is null
     if (logger == null) {
       // Write to stderr for visibility in production/debug
-      stderr
-        ..writeln('=' * 80)
-        ..writeln('CRITICAL: Initialization failed and logger unavailable')
-        ..writeln('=' * 80)
-        ..writeln('Error: $e')
-        ..writeln('Stack trace:')
-        ..writeln(stackTrace)
-        ..writeln('=' * 80);
+      logCriticalError(e, stackTrace);
 
       // Also print for debug console visibility
       // Print statements are necessary here as logger is unavailable

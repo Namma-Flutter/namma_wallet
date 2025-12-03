@@ -47,14 +47,33 @@ lib/
 ├── main.dart                    # App entry point
 ├── src/
     ├── app.dart                # Main app widget with bottom navigation
+    ├── common/                 # Shared code across features
+    │   ├── database/           # Database DAOs and interfaces
+    │   ├── di/                 # Dependency injection setup
+    │   ├── domain/             # Shared domain models
+    │   │   └── models/         # Core models (Ticket, User, etc.)
+    │   ├── enums/              # Shared enumerations
+    │   ├── helper/             # Utility helpers
+    │   ├── routing/            # App routing configuration
+    │   ├── services/           # Core services (PDF, OCR, Logger)
+    │   ├── theme/              # App theming
+    │   └── widgets/            # Reusable UI widgets
     └── features/               # Feature modules
+        ├── ai/                 # AI-powered parsing
+        │   └── fallback_parser/ # Fallback AI parser for unsupported formats
+        ├── bottom_navigation/  # App navigation bar
         ├── calendar/           # Calendar view for tickets
-        ├── export/             # Wallet export functionality  
+        ├── clipboard/          # Clipboard ticket import
+        ├── events/             # Event ticket support
+        ├── export/             # Wallet export functionality
         ├── home/               # Main home page
+        ├── import/             # Import tickets from various sources
+        ├── irctc/              # IRCTC train ticket support
         ├── pdf_extract/        # PDF parsing services
         ├── profile/            # User profile
-        ├── sms_extract/        # SMS ticket extraction
-        └── ticket_parser/      # Ticket parsing logic
+        ├── receive/            # Share intent handling
+        ├── tnstc/              # TNSTC bus ticket support
+        └── travel/             # Generic travel ticket parsing
 ```
 
 ### Key Features
@@ -65,8 +84,12 @@ lib/
 
 ### Architecture Patterns
 
-- Feature-based folder structure with `presentation/` and `application/` layers
-- Service-oriented architecture for core functionality (PDF, SMS, file picker services)
+- **Feature-first architecture**: Each feature is a self-contained module with its own domain, application, and presentation layers
+- **Clean Architecture**: Clear separation between domain (models, interfaces), application (services, use cases), data (repositories), and presentation (views, widgets)
+- **Shared kernel**: Common domain models (Ticket, User) live in `common/domain/models/` to avoid circular dependencies
+- **Interface-based design**: All services and repositories implement interfaces for testability and flexibility
+- **Dependency injection**: GetIt service locator pattern used throughout the app
+- **Service-oriented architecture**: Core services (PDF, OCR, Logger) are shared across features
 - Bottom navigation with three main sections: Home, Calendar, Profile
 
 ### Dependencies
@@ -91,3 +114,26 @@ Key packages:
 - **Widgets**: Use "widget" suffix for smaller reusable components (e.g., `TicketCardWidget`, `ButtonWidget`)
   - File naming: `ticket_card_widget.dart`, `button_widget.dart`
   - Class naming: `class TicketCardWidget extends StatelessWidget`
+
+### Error Handling and Parsing Rules
+
+### CRITICAL: Never Fall Back to Default Values
+
+- **Never use fallback/default values** when parsing fails
+- **Always return `null`** if parsing, extraction, or validation fails
+- **Never silently substitute** with current date, empty strings, or placeholder values
+- **Explicit failure is better than implicit incorrect data**
+
+Examples:
+- ❌ Bad: Date parsing fails → fallback to `DateTime.now()`
+- ✅ Good: Date parsing fails → return `null`
+- ❌ Bad: PNR extraction fails → use `"Unknown"`
+- ✅ Good: PNR extraction fails → return `null` or empty string `""`
+- ❌ Bad: Malformed data → substitute with default value
+- ✅ Good: Malformed data → return `null`
+
+**Why?**
+- Prevents silent data corruption
+- Makes errors visible and debuggable
+- Allows callers to handle missing data appropriately
+- Maintains data integrity

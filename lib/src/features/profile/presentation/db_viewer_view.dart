@@ -1,14 +1,18 @@
+import 'dart:async';
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:namma_wallet/src/common/database/ticket_dao_interface.dart';
 import 'package:namma_wallet/src/common/database/user_dao_interface.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
-import 'package:namma_wallet/src/common/widgets/custom_back_button.dart';
-import 'package:namma_wallet/src/features/common/domain/user.dart';
-import 'package:namma_wallet/src/features/home/domain/ticket.dart';
+import 'package:namma_wallet/src/common/domain/models/ticket.dart';
+import 'package:namma_wallet/src/common/domain/models/user.dart';
+import 'package:namma_wallet/src/common/services/haptic/haptic_service_extension.dart';
+import 'package:namma_wallet/src/common/services/haptic/haptic_service_interface.dart';
+import 'package:namma_wallet/src/common/widgets/rounded_back_button.dart';
 
 class DbViewerView extends StatefulWidget {
   const DbViewerView({super.key});
@@ -22,12 +26,13 @@ class _DbViewerViewState extends State<DbViewerView>
   late final TabController _tabController;
   List<User> users = <User>[];
   List<Ticket> tickets = <Ticket>[];
+  final IHapticService hapticService = getIt<IHapticService>();
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
-    _load();
+    unawaited(_load());
   }
 
   Future<void> _load() async {
@@ -40,6 +45,7 @@ class _DbViewerViewState extends State<DbViewerView>
       users = u;
       tickets = t;
     });
+    hapticService.triggerHaptic(HapticType.success);
   }
 
   @override
@@ -52,7 +58,7 @@ class _DbViewerViewState extends State<DbViewerView>
   Widget build(BuildContext context) => Scaffold(
     appBar: AppBar(
       title: const Text('Database Viewer'),
-      leading: const CustomBackButton(),
+      leading: const RoundedBackButton(),
       bottom: TabBar(
         controller: _tabController,
         tabs: const <Widget>[
@@ -107,12 +113,12 @@ class _DbViewerViewState extends State<DbViewerView>
     ),
   );
 
-  void showTicketDetails(
+  Future<void> showTicketDetails(
     BuildContext context,
     Ticket t,
     String subtitle,
-  ) {
-    showDialog<void>(
+  ) async {
+    await showDialog<void>(
       context: context,
       builder: (context) {
         return Dialog(
@@ -161,23 +167,24 @@ class _DbViewerViewState extends State<DbViewerView>
                   ),
                 ),
               ),
-              ElevatedButton(
-                onPressed: () async {
-                  const iOSWidgetName = 'TicketHomeWidget';
-                  const androidWidgetName = 'TicketHomeWidget';
-                  const dataKey = 'ticket_data';
-                  await HomeWidget.saveWidgetData(dataKey, jsonEncode(t));
+              if (!kIsWeb)
+                ElevatedButton(
+                  onPressed: () async {
+                    const iOSWidgetName = 'TicketHomeWidget';
+                    const androidWidgetName = 'TicketHomeWidget';
+                    const dataKey = 'ticket_data';
+                    await HomeWidget.saveWidgetData(dataKey, jsonEncode(t));
 
-                  await HomeWidget.updateWidget(
-                    androidName: androidWidgetName,
-                    iOSName: iOSWidgetName,
-                  );
-                  if (context.mounted) {
-                    context.pop();
-                  }
-                },
-                child: const Text('Pin to Home Screen'),
-              ),
+                    await HomeWidget.updateWidget(
+                      androidName: androidWidgetName,
+                      iOSName: iOSWidgetName,
+                    );
+                    if (context.mounted) {
+                      context.pop();
+                    }
+                  },
+                  child: const Text('Pin to Home Screen'),
+                ),
               const SizedBox(
                 height: 16,
               ),

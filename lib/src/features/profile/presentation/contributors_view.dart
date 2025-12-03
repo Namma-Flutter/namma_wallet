@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:namma_wallet/src/common/widgets/custom_back_button.dart';
+import 'package:namma_wallet/src/common/widgets/rounded_back_button.dart';
 import 'package:namma_wallet/src/common/widgets/snackbar_widget.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -86,7 +86,6 @@ class _ContributorsViewState extends State<ContributorsView> {
         );
       }
     }
-
     return contributors;
   }
 
@@ -94,7 +93,7 @@ class _ContributorsViewState extends State<ContributorsView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: const CustomBackButton(),
+        leading: const RoundedBackButton(),
         title: const Text('Contributors'),
       ),
       body: FutureBuilder<List<Contributor>>(
