@@ -145,6 +145,8 @@ Future<void> main() async {
     rethrow;
   }
 
+  FlutterNativeSplash.remove();
+
   runApp(
     ChangeNotifierProvider.value(
       value: getIt<ThemeProvider>(),
