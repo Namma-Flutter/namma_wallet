@@ -9,34 +9,50 @@ import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
 import 'package:namma_wallet/src/common/services/widget/widget_service_interface.dart';
 import 'package:workmanager/workmanager.dart';
 
+/// Callback for interactive widget clicks
+@pragma('vm:entry-point')
+Future<void> interactiveCallback(Uri? data) async {
+  // Handle widget interactions here
+  // For now, just log the interaction
+  if (kDebugMode) {
+    print('[HomeWidgetService] Widget interaction: $data');
+  }
+}
+
 /// Implementation of widget service using home_widget package
+// Used via dependency injection, not directly called from entry points
+// ignore: unreachable_from_main
 class HomeWidgetService implements IWidgetService {
+  // Constructor is called via GetIt dependency injection
+  // ignore: unreachable_from_main
   HomeWidgetService({
     required ILogger logger,
   }) : _logger = logger;
 
   final ILogger _logger;
 
-  static const String _androidWidgetName = 'TicketListWidgetProvider';
-  static const String _iOSWidgetName = 'TicketListWidgetProvider';
-  static const String _dataKey = 'ticket_list';
+  final String _androidWidgetName = 'TicketListWidgetProvider';
+  final String _iOSWidgetName = 'TicketListWidgetProvider';
+  final String _dataKey = 'ticket_list';
   // work manager variables
-  static const String _backgroundTaskName = 'widgetBackgroundUpdate';
-  static const String _backgroundTaskId = 'ticket_widget_update';
+  final String _backgroundTaskName = 'widgetBackgroundUpdate';
+  final String _backgroundTaskId = 'ticket_widget_update';
 
   // Android qualified name for the widget receiver
-  static const String _androidListWidgetName =
+  final String _androidListWidgetName =
       'com.nammaflutter.nammawallet.TicketListWidgetProvider';
-  static const String _androidMainWidgetName =
+  final String _androidMainWidgetName =
       'com.nammaflutter.nammawallet.MainTicketWidgetProvider';
-  static DateTimeConverter dateTimeCon = DateTimeConverter.instance;
+  // Used for date formatting in updateWidgetWithTicket method
+  // ignore: unreachable_from_main
+  final DateTimeConverter dateTimeCon = DateTimeConverter.instance;
 
   @override
   Future<void> initialize() async {
     try {
       // Register interactivity callback for handling widget clicks
       await HomeWidget.registerInteractivityCallback(
-        _interactiveCallback,
+        interactiveCallback,
       );
 
       _logger.info('[HomeWidgetService] Widget service initialized');
@@ -243,15 +259,6 @@ class HomeWidgetService implements IWidgetService {
         ),
       ],
     ]);
-  }
-
-  /// Callback for interactive widget clicks
-  static Future<void> _interactiveCallback(Uri? data) async {
-    // Handle widget interactions here
-    // For now, just log the interaction
-    if (kDebugMode) {
-      print('[HomeWidgetService] Widget interaction: $data');
-    }
   }
 }
 
