@@ -84,8 +84,14 @@ class HomeWidgetService implements IWidgetService {
           if (decoded is List) {
             ticketList = decoded.cast<Map<String, dynamic>>();
           }
-        } on Object catch (_) {
-          ticketList = [];
+        } on Object catch (e, stackTrace) {
+          _logger.error(
+            '[HomeWidgetService] Failed to parse widget JSON data. '
+            'Malformed JSON: $existingJson',
+            e,
+            stackTrace,
+          );
+          rethrow;
         }
       }
 
