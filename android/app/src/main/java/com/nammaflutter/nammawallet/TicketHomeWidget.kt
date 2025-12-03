@@ -83,7 +83,10 @@ internal fun updateAppWidget(
                         JSONObject(cleanedString)
                     }
                 } catch (e2: Exception) {
-                    android.util.Log.w("TicketHomeWidget", "Cleaned JSON parsing failed, trying regex extraction")
+                    android.util.Log.w(
+                        "TicketHomeWidget",
+                        "Cleaned JSON parsing failed, trying regex extraction"
+                    )
                     // Use regex parsing as it's working in the manual parsing method
                     parseTicketDataWithRegex(jsonString)
                 }
@@ -97,7 +100,10 @@ internal fun updateAppWidget(
             val startTime = json.optString("startTime", "")
 
             // Debug: Log extracted values
-            android.util.Log.d("TicketHomeWidget", "Primary: $primaryText, Secondary: $secondaryText, Type: $ticketType, Location: $location, StartTime: $startTime")
+            android.util.Log.d(
+                "TicketHomeWidget",
+                "Primary: $primaryText, Secondary: $secondaryText, Type: $ticketType, Location: $location, StartTime: $startTime"
+            )
 
             // Parse and format date/time
             val (journeyDate, journeyTime) = parseDateTime(startTime)
@@ -189,7 +195,8 @@ private fun parseDateTime(dateTimeString: String): Pair<String, String> {
 
     try {
         // Try to parse ISO format with milliseconds (Dart DateTime.toJson() format)
-        val isoFormatWithMillis = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
+        val isoFormatWithMillis =
+            SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
         isoFormatWithMillis.timeZone = java.util.TimeZone.getTimeZone("UTC")
         val date = isoFormatWithMillis.parse(dateTimeString)
 
@@ -291,7 +298,10 @@ private fun parseTicketDataManually(
         val location = extractValue(jsonString, "location") ?: "Unknown"
         val startTime = extractValue(jsonString, "startTime") ?: ""
 
-        android.util.Log.d("TicketHomeWidget", "Manual parsing - Primary: $primaryText, Secondary: $secondaryText, Type: $ticketType")
+        android.util.Log.d(
+            "TicketHomeWidget",
+            "Manual parsing - Primary: $primaryText, Secondary: $secondaryText, Type: $ticketType"
+        )
 
         // Parse and format date/time
         val (journeyDate, journeyTime) = parseDateTime(startTime)
@@ -350,7 +360,10 @@ private fun parseTicketDataWithRegex(jsonString: String): JSONObject {
             json.put("tags", JSONObject.NULL)
         }
 
-        android.util.Log.d("TicketHomeWidget", "Successfully created JSON object with regex parsing")
+        android.util.Log.d(
+            "TicketHomeWidget",
+            "Successfully created JSON object with regex parsing"
+        )
         return json
     } catch (e: Exception) {
         android.util.Log.e("TicketHomeWidget", "Failed to create JSON object with regex", e)
