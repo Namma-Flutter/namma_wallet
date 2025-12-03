@@ -250,7 +250,7 @@ class HomeWidgetService implements IWidgetService {
 }
 
 /// Background callback for periodic widget updates
-
+@pragma('vm:entry-point')
 void _callbackDispatcher() {
   Workmanager().executeTask((taskName, inputData) async {
     try {
