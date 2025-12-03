@@ -114,7 +114,13 @@ class TicketListWidgetFactory(private val context: Context) :
     override fun getViewTypeCount(): Int = 1
     override fun hasStableIds(): Boolean = true
     override fun getLoadingView(): RemoteViews? = null
-    override fun getItemId(position: Int): Long = position.toLong()
+    override fun getItemId(position: Int): Long {
+        return try {
+            tickets.getJSONObject(position).optLong("ticket_id", position.toLong())
+        } catch (e: Exception) {
+            position.toLong()
+        }
+    }
     override fun onCreate() {
         Log.d(TAG, "onCreate")
     }
