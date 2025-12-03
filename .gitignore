@@ -44,6 +44,9 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
+# iOS related
+ios/build/ios/XCBuildData/
+
 # FVM Version Cache
 .fvm/
 

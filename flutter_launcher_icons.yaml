@@ -1,0 +1,15 @@
+# flutter_launcher_icons configuration file
+# Run command: fvm dart run flutter_launcher_icons -f flutter_launcher_icons.yaml
+
+flutter_launcher_icons:
+  android: true
+  ios: false
+  image_path_android: "assets/icon/android.png"
+  min_sdk_android: 26
+  adaptive_icon_background: "#FFFFFF"
+  adaptive_icon_foreground: "assets/icon/android.png"
+
+  web:
+    generate: true
+    image_path: "assets/icon/android.png"
+    background_color: "#FFFFFF"

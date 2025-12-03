@@ -21,9 +21,9 @@
 
     <application
         android:name="${applicationName}"
+        android:enableOnBackInvokedCallback="true"
         android:icon="@mipmap/ic_launcher"
-        android:label="Namma Wallet"
-        android:enableOnBackInvokedCallback="true">
+        android:label="Namma Wallet">
         <!-- Multi-Ticket List Widget Provider -->
         <receiver
             android:name="com.nammaflutter.nammawallet.TicketListWidgetProvider"
@@ -92,21 +92,21 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <data android:mimeType="application/pdf" />
             </intent-filter>
-            
+
             <!-- Intent filter for sharing multiple PDF files -->
             <intent-filter>
                 <action android:name="android.intent.action.SEND_MULTIPLE" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <data android:mimeType="application/pdf" />
             </intent-filter>
-            
+
             <!-- Intent filters for sharing images (screenshots, photos) -->
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <data android:mimeType="image/*" />
             </intent-filter>
-            
+
             <!-- Intent filters for sharing text (SMS content) -->
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
