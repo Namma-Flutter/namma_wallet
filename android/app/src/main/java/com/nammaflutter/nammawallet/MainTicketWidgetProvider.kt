@@ -10,6 +10,7 @@ import android.util.Log
 import android.view.View
 import android.widget.RemoteViews
 import org.json.JSONArray
+import org.json.JSONException
 import org.json.JSONObject
 
 class MainTicketWidgetProvider : AppWidgetProvider() {
@@ -32,22 +33,30 @@ class MainTicketWidgetProvider : AppWidgetProvider() {
                 val prefs = context.getSharedPreferences("HomeWidgetPreferences", Context.MODE_PRIVATE)
                 val json = prefs.getString("ticket_list", "[]") ?: "[]"
                 
-                try {
                 // Log the raw JSON to debug
                 Log.d(TAG, "Reading JSON from prefs: $json")
 
-                val arr = JSONArray(json)
+                val arr = try {
+                    JSONArray(json)
+                } catch (e: JSONException) {
+                    Log.e(TAG, "Failed to parse ticket_list JSON. Malformed data: $json", e)
+                    // Reset stored preference to valid empty array
+                    prefs.edit().putString("ticket_list", "[]").apply()
+                    // Fall back to empty array
+                    JSONArray()
+                }
+
                 if (arr.length() > 0) {
                     // Get LAST ticket
                     val ticket = arr.getJSONObject(arr.length() - 1)
                     Log.d(TAG, "Binding ticket: $ticket")
-                    
+
                     bindTicketData(context, views, ticket)
-                    
+
                     // Show content, hide empty
                     views.setViewVisibility(R.id.contentView, View.VISIBLE)
                     views.setViewVisibility(R.id.emptyView, View.GONE)
-                    
+
                     // Setup Unpin Intent
                     val unpinIntent = Intent(context, MainTicketWidgetProvider::class.java).apply {
                         action = ACTION_UNPIN_MAIN
@@ -59,15 +68,10 @@ class MainTicketWidgetProvider : AppWidgetProvider() {
                         PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
                     )
                     views.setOnClickPendingIntent(R.id.unpinButton, pendingIntent)
-                    
+
                 } else {
                     Log.d(TAG, "Ticket list is empty")
                     // Empty state
-                    views.setViewVisibility(R.id.contentView, View.GONE)
-                    views.setViewVisibility(R.id.emptyView, View.VISIBLE)
-                }
-            } catch (e: Exception) {
-                    Log.e(TAG, "Error parsing ticket list", e)
                     views.setViewVisibility(R.id.contentView, View.GONE)
                     views.setViewVisibility(R.id.emptyView, View.VISIBLE)
                 }
@@ -135,29 +139,34 @@ class MainTicketWidgetProvider : AppWidgetProvider() {
     private fun unpinLastTicket(context: Context) {
         val prefs = context.getSharedPreferences("HomeWidgetPreferences", Context.MODE_PRIVATE)
         val json = prefs.getString("ticket_list", "[]") ?: "[]"
-        
-        try {
-            val arr = JSONArray(json)
-            if (arr.length() > 0) {
-                // Remove LAST element
-                arr.remove(arr.length() - 1)
-                prefs.edit().putString("ticket_list", arr.toString()).apply()
-                
-                // Update Main Widget
-                val manager = AppWidgetManager.getInstance(context)
-                val mainIds = manager.getAppWidgetIds(ComponentName(context, MainTicketWidgetProvider::class.java))
-                for (id in mainIds) {
-                    updateWidget(context, manager, id)
-                }
-                
-                // Update List Widget too!
-                val listIds = manager.getAppWidgetIds(ComponentName(context, TicketListWidgetProvider::class.java))
-                for (id in listIds) {
-                    TicketListWidgetProvider.updateWidget(context, manager, id)
-                }
+
+        val arr = try {
+            JSONArray(json)
+        } catch (e: JSONException) {
+            Log.e(TAG, "Failed to parse ticket_list JSON. Malformed data: $json", e)
+            // Reset stored preference to valid empty array
+            prefs.edit().putString("ticket_list", "[]").apply()
+            // Fall back to empty array so widget doesn't crash
+            JSONArray()
+        }
+
+        if (arr.length() > 0) {
+            // Remove LAST element
+            arr.remove(arr.length() - 1)
+            prefs.edit().putString("ticket_list", arr.toString()).apply()
+
+            // Update Main Widget
+            val manager = AppWidgetManager.getInstance(context)
+            val mainIds = manager.getAppWidgetIds(ComponentName(context, MainTicketWidgetProvider::class.java))
+            for (id in mainIds) {
+                updateWidget(context, manager, id)
             }
-        } catch (e: Exception) {
-            Log.e(TAG, "Error unpinning ticket", e)
+
+            // Update List Widget too!
+            val listIds = manager.getAppWidgetIds(ComponentName(context, TicketListWidgetProvider::class.java))
+            for (id in listIds) {
+                TicketListWidgetProvider.updateWidget(context, manager, id)
+            }
         }
     }
 }

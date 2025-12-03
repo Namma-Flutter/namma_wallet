@@ -7,6 +7,7 @@ import android.widget.RemoteViews
 import android.widget.RemoteViewsService
 import android.util.Log
 import org.json.JSONArray
+import org.json.JSONException
 import org.json.JSONObject
 
 class TicketListWidgetFactory(private val context: Context) :
@@ -20,18 +21,22 @@ class TicketListWidgetFactory(private val context: Context) :
 
     override fun onDataSetChanged() {
         Log.d(TAG, "onDataSetChanged called")
-        
+
         val prefs = context.getSharedPreferences("HomeWidgetPreferences", Context.MODE_PRIVATE)
         val ticketListJson = prefs.getString("ticket_list", "[]") ?: "[]"
-        
+
         Log.d(TAG, "Raw ticket_list JSON: $ticketListJson")
-        
-        try {
-            tickets = JSONArray(ticketListJson)
-            Log.d(TAG, "Loaded ${tickets.length()} tickets")
-        } catch (e: Exception) {
-            Log.e(TAG, "Error parsing ticket list", e)
-            tickets = JSONArray()
+
+        tickets = try {
+            val arr = JSONArray(ticketListJson)
+            Log.d(TAG, "Loaded ${arr.length()} tickets")
+            arr
+        } catch (e: JSONException) {
+            Log.e(TAG, "Failed to parse ticket_list JSON. Malformed data: $ticketListJson", e)
+            // Reset stored preference to valid empty array
+            prefs.edit().putString("ticket_list", "[]").apply()
+            // Fall back to empty array
+            JSONArray()
         }
     }
 

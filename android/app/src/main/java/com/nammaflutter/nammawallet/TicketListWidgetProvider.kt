@@ -9,6 +9,7 @@ import android.content.Intent
 import android.widget.RemoteViews
 import android.util.Log
 import org.json.JSONArray
+import org.json.JSONException
 
 class TicketListWidgetProvider : AppWidgetProvider() {
 
@@ -82,10 +83,19 @@ class TicketListWidgetProvider : AppWidgetProvider() {
 
     private fun unpinTicket(context: Context, index: Int) {
         Log.d(TAG, "Unpinning ticket at index: $index")
-        
+
         val prefs = context.getSharedPreferences("HomeWidgetPreferences", Context.MODE_PRIVATE)
         val json = prefs.getString("ticket_list", "[]") ?: "[]"
-        val arr = JSONArray(json)
+
+        val arr = try {
+            JSONArray(json)
+        } catch (e: JSONException) {
+            Log.e(TAG, "Failed to parse ticket_list JSON. Malformed data: $json", e)
+            // Reset stored preference to valid empty array
+            prefs.edit().putString("ticket_list", "[]").apply()
+            // Fall back to empty array so widget doesn't crash
+            JSONArray()
+        }
 
         if (index < arr.length()) {
             arr.remove(index)
