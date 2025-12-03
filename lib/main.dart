@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:namma_wallet/src/app.dart';
 import 'package:namma_wallet/src/common/database/wallet_database_interface.dart';
@@ -146,6 +147,20 @@ Future<void> main() async {
   }
 
   FlutterNativeSplash.remove();
+
+  // Restore system UI (status bar & navigation bar) after splash
+  await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+
+  // Optional: set colors for status & navigation bar
+  SystemChrome.setSystemUIOverlayStyle(
+    const SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      systemNavigationBarColor: Colors.transparent,
+      systemNavigationBarDividerColor: Colors.transparent,
+      statusBarIconBrightness: Brightness.dark,
+      systemNavigationBarIconBrightness: Brightness.dark,
+    ),
+  );
 
   runApp(
     ChangeNotifierProvider.value(
