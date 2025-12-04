@@ -24,7 +24,7 @@ class GemmaChatService {
         )
         .withProgress((progress) {
           if (_lastLoggedProgress == null ||
-              progress - _lastLoggedProgress! >= 10 ||
+              progress - _lastLoggedProgress! >= 10 || 
               progress >= 100) {
             _logger.info('Downloading: $progress%');
             _lastLoggedProgress = progress;

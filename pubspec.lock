@@ -25,6 +25,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "7.6.0"
+  android_sms_reader:
+    dependency: "direct main"
+    description:
+      name: android_sms_reader
+      sha256: "47462c76830573933d27c00742a4b15fe6e3d5dbaf438a6715ac74a31d0a4b40"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.6"
   ansicolor:
     dependency: transitive
     description:

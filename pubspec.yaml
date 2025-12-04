@@ -10,6 +10,7 @@ environment:
 
 dependencies:
   ai_barcode_scanner: ^7.0.0
+  android_sms_reader: ^0.0.6
   card_stack_widget: ^0.1.6
   cupertino_icons: ^1.0.8
   dart_mappable: ^4.6.0

@@ -22,7 +22,7 @@ Rules:
 - Output ONLY valid JSON. No explanations, no extra text, no greetings.
 - If a field is missing, leave it as an empty string.
 - Dates must be in DD-MM-YYYY format.
-- Timing should be "HH:MM AM/PM - HH:MM AM/PM".
+- Timing should be "HH:MM AM/PM - HH:MM AM/PM". 
 - Status defaults to "confirmed" unless explicitly stated otherwise.
 
 Now extract JSON for this message:
