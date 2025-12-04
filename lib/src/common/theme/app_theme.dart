@@ -372,3 +372,19 @@ class AppTheme {
     );
   }
 }
+
+extension ColorSchemeExtension on ColorScheme {
+  /// A container color for warning messages, with a semi-transparent effect
+  /// in dark mode.
+  ///
+  /// This design is intentional and is used by the AI status widget in
+  /// `lib/src/features/profile/presentation/ai_status_widget.dart` to blend
+  /// into the background. The `onWarningContainer` color is fully opaque
+  /// to ensure text contrast meets accessibility standards.
+  Color get warningContainer => brightness == Brightness.light
+      ? Colors.orange.shade100
+      : Colors.orange.shade900.withValues(alpha: 0.5);
+  Color get onWarningContainer => brightness == Brightness.light
+      ? Colors.orange.shade900
+      : Colors.orange.shade100;
+}

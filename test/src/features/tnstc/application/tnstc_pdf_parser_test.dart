@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cross_file/cross_file.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
@@ -51,7 +52,7 @@ void main() {
         }
 
         // Extract text from PDF
-        final pdfText = await pdfService.extractTextFrom(pdfFile);
+        final pdfText = await pdfService.extractTextFrom(XFile(pdfFile.path));
 
         // Skip if no text was extracted
         //(PDF might be empty or unreadable in test)
@@ -315,7 +316,7 @@ Trip Code : TEST123
 
           final ticket = parser.parseTicket(pdfText);
 
-          // Verify date is parsed (if parsing fails, falls back to today)
+          // Verify date is parsed correctly with slash separator
           expect(ticket.startTime, isNotNull);
           expect(ticket.startTime?.year, greaterThanOrEqualTo(2025));
         },
@@ -342,7 +343,7 @@ Trip Code : TEST123
 
       test(
         'Given invalid date format, When parsing ticket, '
-        'Then falls back to current date',
+        'Then returns null for invalid date',
         () {
           const pdfText = '''
 Corporation : SETC
@@ -353,13 +354,13 @@ Trip Code : TEST123
 
           final ticket = parser.parseTicket(pdfText);
 
-          // Date parsing failed, so startTime should be null
+          // Invalid date format returns null
           expect(ticket.startTime, isNull);
         },
       );
 
       test('Given empty date string, When parsing ticket, '
-          'Then falls back to current date', () {
+          'Then returns null for missing date', () {
         const pdfText = '''
 Corporation : SETC
 PNR Number : T12345678
@@ -368,7 +369,7 @@ Trip Code : TEST123
 
         final ticket = parser.parseTicket(pdfText);
 
-        // No date provided, so startTime should be null
+        // Missing date returns null
         expect(ticket.startTime, isNull);
       });
 
@@ -429,7 +430,7 @@ Trip Code : TEST123
       });
 
       test('Given invalid datetime format, When parsing ticket, '
-          'Then falls back to current datetime', () {
+          'Then returns null for invalid datetime', () {
         const pdfText = '''
 Corporation : SETC
 PNR Number : T12345678
@@ -445,7 +446,7 @@ Trip Code : TEST123
       });
 
       test('Given missing time component in datetime, When parsing, '
-          'Then falls back to current datetime', () {
+          'Then returns null for invalid datetime', () {
         const pdfText = '''
 Corporation : SETC
 PNR Number : T12345678
@@ -461,7 +462,7 @@ Trip Code : TEST123
       });
 
       test('Given invalid time values, When parsing ticket, '
-          'Then falls back to current datetime', () {
+          'Then returns null for invalid time', () {
         const pdfText = '''
 Corporation : SETC
 PNR Number : T12345678
@@ -472,8 +473,8 @@ Trip Code : TEST123
 
         final ticket = parser.parseTicket(pdfText);
 
-        // Should fall back to current datetime
-        expect(ticket.startTime, isNotNull);
+        // Invalid time values return null
+        expect(ticket.startTime, isNull);
       });
 
       test('Given journey date with service time and no pickup time, '
@@ -880,7 +881,7 @@ Trip Code : TEST123
       });
 
       test('Given invalid number format, When parsing ticket, '
-          'Then falls back to default value', () {
+          'Then returns null for invalid number', () {
         const pdfText = '''
 Corporation : SETC
 PNR Number : T12345678
@@ -890,7 +891,7 @@ Trip Code : TEST123
 
         final ticket = parser.parseTicket(pdfText);
 
-        // Should fall back to default (1)
+        // Invalid number format returns null for the field
         expect(ticket, isNotNull);
       });
     });

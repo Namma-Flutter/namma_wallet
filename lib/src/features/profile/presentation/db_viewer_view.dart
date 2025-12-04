@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:home_widget/home_widget.dart';
@@ -166,23 +167,24 @@ class _DbViewerViewState extends State<DbViewerView>
                   ),
                 ),
               ),
-              ElevatedButton(
-                onPressed: () async {
-                  const iOSWidgetName = 'TicketHomeWidget';
-                  const androidWidgetName = 'TicketHomeWidget';
-                  const dataKey = 'ticket_data';
-                  await HomeWidget.saveWidgetData(dataKey, jsonEncode(t));
+              if (!kIsWeb)
+                ElevatedButton(
+                  onPressed: () async {
+                    const iOSWidgetName = 'TicketHomeWidget';
+                    const androidWidgetName = 'TicketHomeWidget';
+                    const dataKey = 'ticket_data';
+                    await HomeWidget.saveWidgetData(dataKey, jsonEncode(t));
 
-                  await HomeWidget.updateWidget(
-                    androidName: androidWidgetName,
-                    iOSName: iOSWidgetName,
-                  );
-                  if (context.mounted) {
-                    context.pop();
-                  }
-                },
-                child: const Text('Pin to Home Screen'),
-              ),
+                    await HomeWidget.updateWidget(
+                      androidName: androidWidgetName,
+                      iOSName: iOSWidgetName,
+                    );
+                    if (context.mounted) {
+                      context.pop();
+                    }
+                  },
+                  child: const Text('Pin to Home Screen'),
+                ),
               const SizedBox(
                 height: 16,
               ),

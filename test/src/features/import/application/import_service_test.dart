@@ -1,5 +1,4 @@
-import 'dart:io';
-
+import 'package:cross_file/cross_file.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:namma_wallet/src/common/database/ticket_dao_interface.dart';
 import 'package:namma_wallet/src/common/domain/models/ticket.dart';
@@ -18,7 +17,7 @@ class FakePDFService implements IPDFService {
   String? extractedText;
 
   @override
-  Future<String> extractTextFrom(File file) async {
+  Future<String> extractTextFrom(XFile file) async {
     return extractedText ?? '';
   }
 }
@@ -186,13 +185,15 @@ void main() {
     });
 
     group('importAndSavePDFFile', () {
-      final testPdfFile = File('test.pdf');
+      const testPdfPath = 'test.pdf';
 
       test('should return null when no text is extracted', () async {
         // Arrange
         fakePDFService.extractedText = '';
         // Act
-        final result = await importService.importAndSavePDFFile(testPdfFile);
+        final result = await importService.importAndSavePDFFile(
+          XFile(testPdfPath),
+        );
         // Assert
         expect(result, isNull);
       });
@@ -202,7 +203,9 @@ void main() {
         fakePDFService.extractedText = 'some text';
         fakeTravelParser.parsedTicket = null;
         // Act
-        final result = await importService.importAndSavePDFFile(testPdfFile);
+        final result = await importService.importAndSavePDFFile(
+          XFile(testPdfPath),
+        );
         // Assert
         expect(result, isNull);
       });
@@ -212,7 +215,9 @@ void main() {
         fakePDFService.extractedText = 'some text';
         fakeTravelParser.parsedTicket = testTicket;
         // Act
-        final result = await importService.importAndSavePDFFile(testPdfFile);
+        final result = await importService.importAndSavePDFFile(
+          XFile(testPdfPath),
+        );
         // Assert
         expect(result, testTicket);
         expect(fakeTicketDAO.insertedTicket, testTicket);
@@ -226,7 +231,9 @@ void main() {
           fakeTravelParser.parsedTicket = testTicket;
           fakeTicketDAO.shouldThrowError = true;
           // Act
-          final result = await importService.importAndSavePDFFile(testPdfFile);
+          final result = await importService.importAndSavePDFFile(
+            XFile(testPdfPath),
+          );
           // Assert
           expect(result, isNull);
           expect(fakeLogger.errorLogs, isNotEmpty);

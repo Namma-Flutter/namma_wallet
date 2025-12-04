@@ -1,8 +1,8 @@
-import 'dart:io';
-
 import 'package:ai_barcode_scanner/ai_barcode_scanner.dart';
+import 'package:cross_file/cross_file.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
@@ -102,17 +102,39 @@ class _ImportViewState extends State<ImportView> {
       final result = await FilePicker.platform.pickFiles(
         type: FileType.custom,
         allowedExtensions: ['pdf'],
+        withData: kIsWeb, // Ensure bytes are loaded on web
       );
 
-      if (result != null && result.files.single.path != null) {
-        final file = File(result.files.single.path!);
+      XFile? xFile;
+      if (result != null) {
+        final platformFile = result.files.single;
+        if (kIsWeb && platformFile.bytes != null) {
+          xFile = XFile.fromData(
+            platformFile.bytes!,
+            name: platformFile.name,
+          );
+        } else if (platformFile.path != null) {
+          xFile = XFile(platformFile.path!);
+        } else {
+          _logger.warning('File picked but no bytes or path available');
+          if (mounted) {
+            showSnackbar(
+              context,
+              'Could not read the selected file. Please try again.',
+              isError: true,
+            );
+          }
+          return;
+        }
+      }
 
+      if (xFile != null) {
         getIt<IHapticService>().triggerHaptic(
           HapticType.selection,
         );
 
         // Use import service to handle PDF
-        final ticket = await _importService.importAndSavePDFFile(file);
+        final ticket = await _importService.importAndSavePDFFile(xFile);
 
         if (!mounted) return;
 
