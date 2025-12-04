@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cross_file/cross_file.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
@@ -60,7 +61,7 @@ void main() {
       'should parse Amazon Pay PDF file to Ticket model correctly',
       () async {
         /// Load Amazon Pay sample PDF.
-        final pdfFile = File('test/assets/irctc/amazonPay_ticket.pdf');
+        final pdfFile = XFile('test/assets/irctc/amazonPay_ticket.pdf');
 
         /// Extract text and parse into ticket.
         final pdfText = await pdfService.extractTextFrom(pdfFile);
@@ -145,7 +146,7 @@ void main() {
       'should parse ConfirmTkt PDF file to Ticket model correctly',
       () async {
         /// Load ConfirmTkt sample PDF.
-        final pdfFile = File('test/assets/irctc/confirmTkt_ticket.pdf');
+        final pdfFile = XFile('test/assets/irctc/confirmTkt_ticket.pdf');
 
         final pdfText = await pdfService.extractTextFrom(pdfFile);
         final ticket = parser.parseTicket(pdfText);
@@ -205,7 +206,7 @@ void main() {
       'should parse IRCTC Email PDF file to Ticket model correctly',
       () async {
         /// Load email-format PDF.
-        final pdfFile = File('test/assets/irctc/email_ticket.pdf');
+        final pdfFile = XFile('test/assets/irctc/email_ticket.pdf');
 
         final pdfText = await pdfService.extractTextFrom(pdfFile);
         final ticket = parser.parseTicket(pdfText);
