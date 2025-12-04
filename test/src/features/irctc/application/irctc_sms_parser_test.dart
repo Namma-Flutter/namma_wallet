@@ -2,54 +2,57 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:namma_wallet/src/features/irctc/application/irctc_sms_parser.dart';
 
 void main() {
+  /// Test group validating IRCTC SMS parser behavior.
   group('IRCTCParser SMS Parser', () {
+    /// Parser instance used across tests.
     late IRCTCSMSParser irctcParser;
 
+    /// Initialize parser before each test.
     setUp(() {
       irctcParser = IRCTCSMSParser();
     });
 
-    // ----------------------------------------------------------------------
-    // 1. CANCELLED TICKET
-    // ----------------------------------------------------------------------
+    /// Validates parsing of CANCELLED IRCTC ticket SMS format.
     test('should parse cancelled IRCTC ticket to Ticket model correctly', () {
+      /// Sample cancelled ticket SMS.
       const smsText =
           'PNR 4321751237 cancelled being Waitlist after chart preparation, '
           'Amount 590 will be refunded in your account within 3-4 days.-IRCTC';
 
+      /// Parse SMS text to Ticket model.
       final ticket = irctcParser.parseTicket(smsText);
 
       expect(ticket, isNotNull);
 
-      // Primary info
+      // Primary info validations
       expect(ticket.ticketId, equals('4321751237'));
-      expect(ticket.primaryText, equals(' → ')); // No route available, correct.
+      expect(ticket.primaryText, equals(' → ')); // No route available.
       expect(ticket.secondaryText, equals('Train  •  • '));
 
-      // Tags
+      // PNR Tag
       final pnrTag = ticket.tags?.firstWhere(
         (t) => t.icon == 'confirmation_number',
       );
       expect(pnrTag?.value, equals('4321751237'));
 
+      // Fare Tag
       final fareTag = ticket.tags?.firstWhere((t) => t.icon == 'attach_money');
-      expect(fareTag?.value, equals('₹590.00')); // Uses new fare extraction
+      expect(fareTag?.value, equals('₹590.00')); // New extraction logic
 
-      // Extras
+      // Extras (Fare)
       expect(
         ticket.extras?.firstWhere((e) => e.title == 'Fare').value,
         equals('590.00'),
       );
 
-      // Status
+      // Status Tag should indicate cancellation
       final statusTag = ticket.tags?.firstWhere((t) => t.icon == 'info');
       expect(statusTag?.value?.toLowerCase(), contains('cancel'));
     });
 
-    // ----------------------------------------------------------------------
-    // 2. NORMAL CONFIRMED TICKET
-    // ----------------------------------------------------------------------
+    /// Validates parsing of standard IRCTC SMS message.
     test('should parse standard IRCTC ticket to Ticket model correctly', () {
+      /// Standard IRCTC SMS with full details.
       const smsText =
           'PNR:4424909275,TRN:12291,DOJ:24-10-25,SL,YPR-MAS,DP:22:45,'
           'Boarding at YPR only,\n'
@@ -61,74 +64,69 @@ void main() {
 
       expect(ticket, isNotNull);
 
-      // Generic Ticket Fields
+      // Basic ticket metadata
       expect(ticket.ticketId, equals('4424909275'));
       expect(ticket.primaryText, equals('YPR → MAS'));
       expect(ticket.secondaryText, equals('Train 12291 • SL • MAGESH K'));
 
-      // startTime (DOJ + DP)
-      expect(ticket.startTime.year, equals(2025));
-      expect(ticket.startTime.month, equals(10));
-      expect(ticket.startTime.day, equals(24));
-      expect(ticket.startTime.hour, equals(22));
-      expect(ticket.startTime.minute, equals(45));
+      /// Validate parsed start time from DOJ + DP fields.
+      expect(ticket.startTime?.year, equals(2025));
+      expect(ticket.startTime?.month, equals(10));
+      expect(ticket.startTime?.day, equals(24));
+      expect(ticket.startTime?.hour, equals(22));
+      expect(ticket.startTime?.minute, equals(45));
 
-      // location
+      /// Boarding station
       expect(ticket.location, equals('YPR'));
 
-      // tag: PNR
+      // Tag: PNR
       final pnrTag = ticket.tags?.firstWhere(
         (t) => t.icon == 'confirmation_number',
       );
       expect(pnrTag?.value, equals('4424909275'));
 
-      // tag: Train No
+      // Tag: Train Number
       final trainTag = ticket.tags?.firstWhere((t) => t.icon == 'train');
       expect(trainTag?.value, equals('12291'));
 
-      // tag: Class
+      // Tag: Class
       final classTag = ticket.tags?.firstWhere((t) => t.icon == 'event_seat');
       expect(classTag?.value, equals('SL'));
 
-      // tag: Fare
+      // Tag: Fare
       final fareTag = ticket.tags?.firstWhere((t) => t.icon == 'attach_money');
       expect(fareTag?.value, equals('₹270.00'));
 
-      // EXTRAS — Passenger
+      // EXTRAS validations
       expect(
         ticket.extras?.firstWhere((e) => e.title == 'Passenger').value,
         equals('MAGESH K'),
       );
 
-      // EXTRAS — Boarding
       expect(
         ticket.extras?.firstWhere((e) => e.title == 'Boarding').value,
         equals('YPR'),
       );
 
-      // EXTRAS — Date of Journey
       expect(
         ticket.extras?.firstWhere((e) => e.title == 'Date of Journey').value,
-        equals('2025-10-24'),
+        equals('24/10/2025'),
       );
 
-      // EXTRAS — Fare
       expect(
         ticket.extras?.firstWhere((e) => e.title == 'Fare').value,
         equals('270.00'),
       );
 
-      // EXTRAS — IRCTC Fee
       expect(
         ticket.extras?.firstWhere((e) => e.title == 'IRCTC Fee').value,
         equals('11.80'),
       );
     });
 
-    // ----------------------------------------------------------------------
-    // 3. WAITLISTED TICKET
-    // ----------------------------------------------------------------------
+    /// Validates parsing of WAITLISTED IRCTC SMS message.
     test('should parse waitlisted IRCTC ticket to Ticket model correctly', () {
+      /// Sample waitlist SMS.
       const smsText =
           'PNR:4126774243,TRN:16021,DOJ:30-11-25,SL,TRL-SBC,DP:21:55,'
           'Boarding at TRL only,\n'
@@ -142,22 +140,20 @@ void main() {
 
       expect(ticket.primaryText, equals('TRL → SBC'));
 
-      // Status Tag
+      // Status tag includes waitlist number
       final statusTag = ticket.tags?.firstWhere((t) => t.icon == 'info');
-      // Status extraction now supports the number
       expect(statusTag?.value, contains('WL 31'));
 
-      // Fare Tag
+      // Fare tag
       final fareTag = ticket.tags?.firstWhere((t) => t.icon == 'attach_money');
       expect(fareTag?.value, equals('₹240.00'));
     });
 
-    // ----------------------------------------------------------------------
-    // 4. MULTI PASSENGER TICKET
-    // ----------------------------------------------------------------------
+    /// Validates multi-passenger SMS format.
     test(
       'should parse multi-passenger IRCTC ticket to Ticket model correctly',
       () {
+        /// Multi-passenger sample SMS.
         const smsText =
             'PNR:4621385568,TRN:12692,DOJ:23-11-24,SL,SMVB-MAS,DP:23:00,'
             'Boarding at SMVB only,\n'
@@ -169,12 +165,13 @@ void main() {
 
         expect(ticket, isNotNull);
 
-        // Passenger extraction is now safer and works
+        // Secondary text uses first passenger name correctly
         expect(
           ticket.secondaryText,
           equals('Train 12692 • SL • HARISH ANBALAGAN+2'),
         );
 
+        // Fare tag
         final fareTag = ticket.tags?.firstWhere(
           (t) => t.icon == 'attach_money',
         );
@@ -182,10 +179,9 @@ void main() {
       },
     );
 
-    // ----------------------------------------------------------------------
-    // 5. OLD-FORMAT SMS
-    // ----------------------------------------------------------------------
+    /// Validates old-style IRCTC SMS without modern formatting.
     test('should parse old-format IRCTC SMS into Ticket model correctly', () {
+      /// Old-format SMS sample.
       const smsText =
           'PNR-4930936485\n'
           'Trn:12679\n'
@@ -202,11 +198,11 @@ void main() {
       expect(ticket.primaryText, equals('MAS → SA'));
       expect(ticket.secondaryText, contains('2S'));
 
+      // Class tag should correctly detect 2S
       final classTag = ticket.tags?.firstWhere((t) => t.icon == 'event_seat');
       expect(classTag?.value, equals('2S'));
 
-      // The name extraction in this case should now be empty due to lack
-      // of a clear name pattern
+      // Old format may not contain passenger name → expect empty string
       expect(
         ticket.extras?.firstWhere((e) => e.title == 'Passenger').value,
         equals(''),
