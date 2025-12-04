@@ -5,6 +5,8 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
 }
 
+import java.util.Properties
+
 android {
     namespace = "com.nammaflutter.nammawallet"
     compileSdk = 36
@@ -55,9 +57,9 @@ android {
             if (keystoreFile.exists()) {
                 signingConfig = signingConfigs.create("release") {
                     storeFile = keystoreFile
-                    storePassword = System.getenv("KEYSTORE_PASSWORD")
-                    keyAlias = System.getenv("KEYSTORE_ENTRY_ALIAS")
-                    keyPassword = System.getenv("KEYSTORE_ENTRY_PASSWORD")
+                    storePassword = keystoreProperties["KEYSTORE_PASSWORD"] as String?
+                    keyAlias = keystoreProperties["KEYSTORE_ENTRY_ALIAS"] as String?
+                    keyPassword = keystoreProperties["KEYSTORE_ENTRY_PASSWORD"] as String?
                 }
 
                 resValue("string", "app_name", "Namma Wallet")
@@ -80,6 +82,13 @@ android {
     buildFeatures {
         viewBinding = true
     }
+}
+
+// Load keystore properties
+val keystorePropertiesFile = rootProject.file("keystore.properties")
+val keystoreProperties = Properties()
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(keystorePropertiesFile.inputStream())
 }
 
 flutter {
