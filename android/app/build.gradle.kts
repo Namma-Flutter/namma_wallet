@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("kotlin-android")
@@ -51,15 +53,26 @@ android {
             isShrinkResources = true
             isMinifyEnabled = true
 
-            val keystoreFile = file("keystore.jks")
-            if (keystoreFile.exists()) {
+            val keystoreFile = file("namma-wallet.keystore")
+            val keystorePropertiesFile = rootProject.file("keystore.properties")
+            val keystoreProperties = Properties()
+            var hasAllKeys = false
+            if (keystorePropertiesFile.exists()) {
+                keystoreProperties.load(keystorePropertiesFile.inputStream())
+                hasAllKeys = listOf(
+                    "KEYSTORE_PASSWORD",
+                    "KEYSTORE_ENTRY_ALIAS",
+                    "KEYSTORE_ENTRY_PASSWORD"
+                ).all { keystoreProperties.containsKey(it) }
+            }
+
+            if (keystoreFile.exists() && hasAllKeys) {
                 signingConfig = signingConfigs.create("release") {
                     storeFile = keystoreFile
-                    storePassword = System.getenv("KEYSTORE_PASSWORD")
-                    keyAlias = System.getenv("KEYSTORE_ENTRY_ALIAS")
-                    keyPassword = System.getenv("KEYSTORE_ENTRY_PASSWORD")
+                    storePassword = keystoreProperties["KEYSTORE_PASSWORD"]!!.toString()
+                    keyAlias = keystoreProperties["KEYSTORE_ENTRY_ALIAS"]!!.toString()
+                    keyPassword = keystoreProperties["KEYSTORE_ENTRY_PASSWORD"]!!.toString()
                 }
-
                 resValue("string", "app_name", "Namma Wallet")
             } else {
                 resValue("string", "app_name", "Namma Wallet (Development)")
