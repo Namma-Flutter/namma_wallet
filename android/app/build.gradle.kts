@@ -56,18 +56,23 @@ android {
             val keystoreFile = file("namma-wallet.keystore")
             val keystorePropertiesFile = rootProject.file("keystore.properties")
             val keystoreProperties = Properties()
+            var hasAllKeys = false
             if (keystorePropertiesFile.exists()) {
                 keystoreProperties.load(keystorePropertiesFile.inputStream())
+                hasAllKeys = listOf(
+                    "KEYSTORE_PASSWORD",
+                    "KEYSTORE_ENTRY_ALIAS",
+                    "KEYSTORE_ENTRY_PASSWORD"
+                ).all { keystoreProperties.containsKey(it) }
             }
 
-            if (keystoreFile.exists() && keystoreProperties.isNotEmpty()) {
+            if (keystoreFile.exists() && hasAllKeys) {
                 signingConfig = signingConfigs.create("release") {
                     storeFile = keystoreFile
-                    storePassword = keystoreProperties["KEYSTORE_PASSWORD"] as String?
-                    keyAlias = keystoreProperties["KEYSTORE_ENTRY_ALIAS"] as String?
-                    keyPassword = keystoreProperties["KEYSTORE_ENTRY_PASSWORD"] as String?
+                    storePassword = keystoreProperties["KEYSTORE_PASSWORD"]!!.toString()
+                    keyAlias = keystoreProperties["KEYSTORE_ENTRY_ALIAS"]!!.toString()
+                    keyPassword = keystoreProperties["KEYSTORE_ENTRY_PASSWORD"]!!.toString()
                 }
-
                 resValue("string", "app_name", "Namma Wallet")
             } else {
                 resValue("string", "app_name", "Namma Wallet (Development)")
