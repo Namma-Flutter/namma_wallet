@@ -240,13 +240,15 @@ class ThemeSectionWidget extends StatelessWidget {
             SwitchListTile(
               title: const Text('Use System Theme'),
 
-              value: themeProvider.isSystemMode, onChanged: (value) async {
-                  if (value) {
-                    await themeProvider.setSystemMode();
-                  } else {
-                    await themeProvider.setLightMode();
-                  }
-                },)
+              value: themeProvider.isSystemMode,
+              onChanged: (value) async {
+                if (value) {
+                  await themeProvider.setSystemMode();
+                } else {
+                  await themeProvider.setLightMode();
+                }
+              },
+            ),
           ],
         ),
       ),
