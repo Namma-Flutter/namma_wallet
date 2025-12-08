@@ -60,7 +60,7 @@ class Ticket with TicketMappable {
         TagModel(value: model.pnrNumber, icon: 'confirmation_number'),
         if (model.trainNumber.isNotEmpty)
           TagModel(value: model.trainNumber, icon: 'train'),
-        if (model.travelClass.isNotEmpty)
+        if (model.travelClass != null && model.travelClass!.isNotEmpty)
           TagModel(value: model.travelClass, icon: 'event_seat'),
         if (model.status.isNotEmpty)
           TagModel(value: model.status, icon: 'info'),
@@ -281,6 +281,109 @@ class Ticket with TicketMappable {
         ExtrasModel(title: 'Source Type', value: sourceType),
       ],
     );
+  }
+
+  factory Ticket.mergeTickets(Ticket existing, Ticket incoming) {
+    return Ticket(
+      // ID should match, but we keep 'this' to be safe
+      ticketId: existing.ticketId,
+
+      // 1. Strings: Only overwrite if the incoming data is NOT empty/null
+      primaryText:
+          (incoming.primaryText.isNotEmpty &&
+              incoming.primaryText.trim() != '→')
+          ? incoming.primaryText
+          : existing.primaryText,
+
+      secondaryText:
+          (incoming.secondaryText.isNotEmpty &&
+              incoming.secondaryText.trim().contains('Train • •'))
+          // Note: Added check to ignore your specific empty "Train • •"
+          // string if parser generates it
+          ? incoming.secondaryText
+          : existing.secondaryText,
+
+      location: (incoming.location.isNotEmpty)
+          ? incoming.location
+          : existing.location,
+
+      // 2. Dates: If incoming has a valid time, use it (e.g. delayed time).
+      // Otherwise keep original.
+      startTime: incoming.startTime ?? existing.startTime,
+      endTime: incoming.endTime ?? existing.endTime,
+
+      type: incoming.type,
+
+      // 3. Lists: Intelligent Merging
+      tags: _mergeTags(existing.tags, incoming.tags),
+      extras: _mergeExtras(existing.extras, incoming.extras),
+    );
+  }
+
+  /// Merges Extras (Key-Value pairs).
+  /// Strategy: Convert old list to Map. Overwrite only if new value is valid.
+  static List<ExtrasModel>? _mergeExtras(
+    List<ExtrasModel>? current,
+    List<ExtrasModel>? incoming,
+  ) {
+    if (current == null && incoming == null) return null;
+    if (incoming == null || incoming.isEmpty) return current;
+    if (current == null || current.isEmpty) return incoming;
+
+    // 1. Create a Map of the CURRENT extras key=Title
+    final mergedMap = <String, ExtrasModel>{
+      for (final item in current) ?item.title: item,
+    };
+
+    // 2. Iterate through INCOMING items
+    for (final newItem in incoming) {
+      // Logic: Only update if value is not null and not empty
+      final hasValue = newItem.value.trim().isNotEmpty;
+
+      // Special Logic for IRCTC Fee/Fare:
+      // Even if value is "0.00", we might want to update it if it's a cancellation.
+      // But generally, we skip empty strings.
+      if (hasValue) {
+        mergedMap[newItem.title ?? ''] = newItem;
+      }
+    }
+
+    return mergedMap.values.toList();
+  }
+
+  /// Merges Tags (Icons/Chips).
+  /// Strategy: Update tags with same Icon, Add new tags, Keep old unique tags.
+  static List<TagModel>? _mergeTags(
+    List<TagModel>? current,
+    List<TagModel>? incoming,
+  ) {
+    if (current == null && incoming == null) return null;
+    if (incoming == null || incoming.isEmpty) return current;
+    if (current == null || current.isEmpty) return incoming;
+
+    // We start with the existing tags
+    final result = List<TagModel>.from(current);
+
+    for (final newTag in incoming) {
+      // Find if we already have a tag with this icon (e.g. 'attach_money')
+      final existingIndex = result.indexWhere((t) => t.icon == newTag.icon);
+
+      if (existingIndex != -1) {
+        // UPDATE: logic
+        // If the new tag is 'attach_money' and value is different, replace it (Update Price)
+        // If the new tag is 'confirmation_number', it's likely the same, replace anyway.
+        result[existingIndex] = newTag;
+      } else {
+        // INSERT: logic
+        // If this is a new tag (e.g. 'info' icon for 'cancelled'), add it.
+        result.add(newTag);
+      }
+    }
+
+    // Optional: Sort logic if you want 'info' (Status) to appear first
+    // result.sort(...)
+
+    return result;
   }
 
   @MappableField(key: 'ticket_id')

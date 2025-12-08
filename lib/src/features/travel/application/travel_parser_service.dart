@@ -16,7 +16,7 @@ abstract class TravelTicketParser {
 
   Ticket parseTicket(String text);
 
-  bool _isSMSFormat(String text);
+  bool isSMSFormat(String text);
 
   TicketUpdateInfo? parseUpdate(String text) => null;
 
@@ -58,7 +58,7 @@ class TNSTCBusParser implements TravelTicketParser {
 
   /// Detects if the text is SMS format by checking for SMS-specific patterns
   @override
-  bool _isSMSFormat(String text) {
+  bool isSMSFormat(String text) {
     // SMS contains "SETC" or has SMS-style patterns
     // like "From :", "To ", "Trip :"
     // PDF has "Service Start Place", "PNR Number", "Date of Journey"
@@ -95,7 +95,7 @@ class TNSTCBusParser implements TravelTicketParser {
   @override
   Ticket parseTicket(String text) {
     // Detect if this is SMS or PDF format
-    final isSMS = _isSMSFormat(text);
+    final isSMS = isSMSFormat(text);
 
     // Use appropriate parser based on format
     if (isSMS) {
@@ -204,7 +204,7 @@ class IRCTCTrainParser implements TravelTicketParser {
   }
 
   @override
-  bool _isSMSFormat(String text) {
+  bool isSMSFormat(String text) {
     final lower = text.toLowerCase();
 
     final smsPatterns = [
@@ -245,7 +245,7 @@ class IRCTCTrainParser implements TravelTicketParser {
 
   @override
   Ticket parseTicket(String text) {
-    final isSMS = _isSMSFormat(text);
+    final isSMS = isSMSFormat(text);
 
     if (isSMS) {
       final smsParser = IRCTCSMSParser();
@@ -304,10 +304,7 @@ class SETCBusParser implements TravelTicketParser {
   TicketUpdateInfo? parseUpdate(String text) => null;
 
   @override
-  bool _isSMSFormat(String text) {
-    // TODO(KV): implement _isSMSFormat
-    throw UnimplementedError();
-  }
+  bool isSMSFormat(String text) => true;
 }
 
 class TravelParserService implements ITravelParser {

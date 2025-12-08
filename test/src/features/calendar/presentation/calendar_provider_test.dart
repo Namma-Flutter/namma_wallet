@@ -14,6 +14,9 @@ class StubTicketDAO implements ITicketDAO {
   List<Ticket> tickets = [];
 
   @override
+  Future<int> handleTicket(Ticket ticket) async => 0;
+
+  @override
   Future<int> deleteTicket(String id) async => 0;
 
   @override
@@ -31,7 +34,7 @@ class StubTicketDAO implements ITicketDAO {
   @override
   Future<int> updateTicketById(
     String ticketId,
-    Map<String, Object?> updates,
+    Ticket ticket, // Updated from Map to Ticket
   ) async => 0;
 }
 

@@ -51,9 +51,15 @@ class MockTicketDao implements ITicketDAO {
   bool shouldThrowError = false;
 
   @override
+  Future<int> handleTicket(Ticket ticket) async {
+    // For mocking purposes, we can assume success
+    return 1;
+  }
+
+  @override
   Future<int> updateTicketById(
     String ticketId,
-    Map<String, Object?> updates,
+    Ticket ticket, // Changed from Map<String, Object?> to Ticket
   ) async {
     return updateRowCount;
   }

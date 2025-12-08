@@ -69,6 +69,12 @@ class FakeTicketDAO implements ITicketDAO {
   bool shouldThrowError = false;
 
   @override
+  Future<int> handleTicket(Ticket ticket) async {
+    // Mimic success
+    return 1;
+  }
+
+  @override
   Future<int> insertTicket(Ticket ticket) async {
     if (shouldThrowError) {
       throw Exception('Database error');
@@ -98,7 +104,8 @@ class FakeTicketDAO implements ITicketDAO {
   }
 
   @override
-  Future<int> updateTicketById(String id, Map<String, Object?> data) async {
+  Future<int> updateTicketById(String id, Ticket ticket) async {
+    // Signature updated from Map -> Ticket
     return 1;
   }
 }

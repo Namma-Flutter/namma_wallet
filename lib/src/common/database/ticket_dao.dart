@@ -7,7 +7,6 @@ import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
 import 'package:sqflite/sqflite.dart';
 
-/// Data Access Object for Ticket operations
 class TicketDao implements ITicketDAO {
   TicketDao({IWalletDatabase? database, ILogger? logger})
     : _database = database ?? getIt<IWalletDatabase>(),
@@ -24,87 +23,77 @@ class TicketDao implements ITicketDAO {
     return '${'*' * maskLength}$lastThree';
   }
 
-  /// Insert a ticket into the database
+  /// --------------------------------------------------------------------------
+  /// MAIN LOGIC: HANDLE INCOMING SMS
+  /// --------------------------------------------------------------------------
+
+  @override
+  Future<int> handleTicket(Ticket ticket) async {
+    final pnr = ticket.ticketId;
+
+    // 1. Guard Clause: We cannot merge/save if there is no Unique ID (PNR)
+    if (pnr == null || pnr.isEmpty) {
+      _logger.warning(
+        '⚠️ Parse Error: Incoming ticket has no ID. Cannot save.',
+      );
+      return -1; // Return error code
+    }
+
+    try {
+      // 2. Fetch Existing: Check if we already have a ticket with this PNR
+      final existingTicket = await getTicketById(pnr);
+
+      if (existingTicket == null) {
+        // CASE A: New Ticket
+        _logger.logDatabase(
+          'Insert',
+          'New Ticket Detected: ${_maskTicketId(pnr)}',
+        );
+        return await insertTicket(ticket);
+      } else {
+        // CASE B: Update (Partial Data)
+        _logger.logDatabase(
+          'Update',
+          'Existing Ticket Detected. Merging: ${_maskTicketId(pnr)}',
+        );
+
+        // Use the Factory method to merge data safely
+        final mergedTicket = Ticket.mergeTickets(existingTicket, ticket);
+
+        // Update the database with the fully combined object
+        return await updateTicketById(pnr, mergedTicket);
+      }
+    } on Exception catch (e, stackTrace) {
+      _logger.error(
+        'Failed to handle incoming ticket: ${_maskTicketId(pnr)}',
+        e,
+        stackTrace,
+      );
+      return -1;
+    }
+  }
+
+  /// --------------------------------------------------------------------------
+  /// CRUD OPERATIONS
+  /// --------------------------------------------------------------------------
+
+  /// Insert a ticket into the database (Pure Insert)
   @override
   Future<int> insertTicket(Ticket ticket) async {
     try {
       _logger.logDatabase('Insert', 'Inserting ticket: ${ticket.primaryText}');
 
-      // Check if ticket with same ticket ID already exists
-      if (ticket.ticketId != null && ticket.ticketId!.isNotEmpty) {
-        final existing = await getTicketById(ticket.ticketId!);
-
-        if (existing != null) {
-          _logger.logDatabase(
-            'Update',
-            'Ticket with ID ${_maskTicketId(ticket.ticketId!)} already '
-                'exists, updating instead',
-          );
-
-          // Prepare updates map with new data
-          final updates = <String, Object?>{};
-
-          // Update basic fields if they have meaningful values
-          if (ticket.primaryText.isNotEmpty &&
-              ticket.primaryText != 'Unknown → Unknown') {
-            updates['primary_text'] = ticket.primaryText;
-          }
-          if (ticket.secondaryText.isNotEmpty) {
-            updates['secondary_text'] = ticket.secondaryText;
-          }
-          if (ticket.location.isNotEmpty && ticket.location != 'Unknown') {
-            updates['location'] = ticket.location;
-          }
-
-          // Merge tags
-          if (ticket.tags != null && ticket.tags!.isNotEmpty) {
-            updates['tags'] = jsonEncode(
-              ticket.tags!.map((e) => e.toMap()).toList(),
-            );
-          }
-
-          // Merge extras
-          if (ticket.extras != null && ticket.extras!.isNotEmpty) {
-            updates['extras'] = jsonEncode(
-              ticket.extras!.map((e) => e.toMap()).toList(),
-            );
-          }
-
-          // Update the existing ticket
-          await updateTicketById(ticket.ticketId!, updates);
-
-          // Return the existing ticket's database ID
-          final db = await _database.database;
-          final result = await db.query(
-            'tickets',
-            columns: ['id'],
-            where: 'ticket_id = ?',
-            whereArgs: [ticket.ticketId],
-            limit: 1,
-          );
-
-          if (result.isNotEmpty) {
-            final id = result.first['id']! as int;
-            _logger.logDatabase(
-              'Success',
-              'Updated existing ticket with database ID: $id',
-            );
-            return id;
-          }
-        }
-      }
-
-      // No existing ticket found, insert as new
       final db = await _database.database;
 
-      final map = ticket.toEntity()
-        ..remove('tags')
-        ..remove('extras');
+      // Convert to Map and handle JSON encoding
+      final map = ticket.toEntity();
+
+      // Clean up fields meant for complex objects
+      map.remove('tags');
+      map.remove('extras');
 
       if (ticket.tags != null && ticket.tags!.isNotEmpty) {
-        map['tags'] = jsonEncode(
-          ticket.tags!.map((e) => e.toMap()).toList(),
-        );
+        map['tags'] = jsonEncode(ticket.tags!.map((e) => e.toMap()).toList());
       }
 
       if (ticket.extras != null && ticket.extras!.isNotEmpty) {
@@ -125,16 +114,77 @@ class TicketDao implements ITicketDAO {
       if (id > 0) {
         _logger.logDatabase('Success', 'Inserted ticket with ID: $id');
       } else {
-        _logger.warning(
-          'Insert operation completed but no row ID returned for ticket:'
-          '${ticket.primaryText}',
-        );
+        _logger.warning('Insert operation completed but no row ID returned.');
       }
 
       return id;
     } catch (e, stackTrace) {
       _logger.error(
         'Failed to insert ticket: ${ticket.primaryText}',
+        e,
+        stackTrace,
+      );
+      rethrow;
+    }
+  }
+
+  /// Update Ticket by ID
+  @override
+  Future<int> updateTicketById(String ticketId, Ticket ticket) async {
+    try {
+      _logger.logDatabase(
+        'Update',
+        'Updating ticket with ID: ${_maskTicketId(ticketId)}',
+      );
+
+      final db = await _database.database;
+
+      // Prepare updates map from the Ticket object
+      final updates = ticket.toEntity();
+
+      // Remove fields we don't strictly want to overwrite blindly if they are null in the object
+      // (Though since we passed a 'merged' ticket, these should be correct).
+      updates.remove('id'); // Never update the primary key ID
+      updates.remove('created_at'); // Never update creation time
+
+      updates['updated_at'] = DateTime.now().toIso8601String();
+
+      // Handle JSON fields
+      updates.remove('tags');
+      updates.remove('extras');
+
+      if (ticket.tags != null) {
+        updates['tags'] = jsonEncode(
+          ticket.tags!.map((e) => e.toMap()).toList(),
+        );
+      }
+
+      if (ticket.extras != null) {
+        updates['extras'] = jsonEncode(
+          ticket.extras!.map((e) => e.toMap()).toList(),
+        );
+      }
+
+      final count = await db.update(
+        'tickets',
+        updates,
+        where: 'ticket_id = ?',
+        whereArgs: [ticketId],
+      );
+
+      if (count > 0) {
+        _logger.logDatabase(
+          'Success',
+          'Updated ticket with ID: ${_maskTicketId(ticketId)}',
+        );
+      } else {
+        _logger.warning('No ticket found with ID: ${_maskTicketId(ticketId)}');
+      }
+
+      return count;
+    } catch (e, stackTrace) {
+      _logger.error(
+        'Failed to update ticket with ID: ${_maskTicketId(ticketId)}',
         e,
         stackTrace,
       );
@@ -163,27 +213,8 @@ class TicketDao implements ITicketDAO {
         return null;
       }
 
-      _logger.logDatabase(
-        'Success',
-        'Fetched ticket with ID: ${_maskTicketId(id)}',
-      );
-
       final map = result.first;
-
-      // Decode JSON fields back to List<Map<String, dynamic>>
-      final decodedMap = {
-        ...map,
-        'tags': map['tags'] == null || (map['tags']! as String).isEmpty
-            ? null
-            : (jsonDecode(map['tags']! as String) as List)
-                  .cast<Map<String, dynamic>>(),
-        'extras': map['extras'] == null || (map['extras']! as String).isEmpty
-            ? null
-            : (jsonDecode(map['extras']! as String) as List)
-                  .cast<Map<String, dynamic>>(),
-      };
-
-      return TicketMapper.fromMap(decodedMap);
+      return _mapToTicket(map);
     } catch (e, stackTrace) {
       _logger.error(
         'Failed to fetch ticket with ID: ${_maskTicketId(id)}',
@@ -208,34 +239,9 @@ class TicketDao implements ITicketDAO {
         return [];
       }
 
-      _logger.logDatabase(
-        'Success',
-        'Fetched ${result.length} tickets from database',
-      );
-
-      final tickets = result.map((map) {
-        final decodedMap = {
-          ...map,
-          'tags': map['tags'] == null || (map['tags']! as String).isEmpty
-              ? null
-              : (jsonDecode(map['tags']! as String) as List)
-                    .cast<Map<String, dynamic>>(),
-          'extras': map['extras'] == null || (map['extras']! as String).isEmpty
-              ? null
-              : (jsonDecode(map['extras']! as String) as List)
-                    .cast<Map<String, dynamic>>(),
-        };
-
-        return TicketMapper.fromMap(decodedMap);
-      }).toList();
-
-      return tickets;
+      return result.map((map) => _mapToTicket(map)).toList();
     } catch (e, stackTrace) {
-      _logger.error(
-        'Failed to fetch all tickets from database',
-        e,
-        stackTrace,
-      );
+      _logger.error('Failed to fetch all tickets from database', e, stackTrace);
       rethrow;
     }
   }
@@ -255,150 +261,12 @@ class TicketDao implements ITicketDAO {
       );
 
       if (result.isEmpty) {
-        _logger.warning('No tickets found for type: $type');
         return [];
       }
 
-      _logger.logDatabase(
-        'Success',
-        'Fetched ${result.length} tickets of type: $type',
-      );
-
-      final tickets = result.map((map) {
-        final decodedMap = {
-          ...map,
-          'tags': map['tags'] == null || (map['tags']! as String).isEmpty
-              ? null
-              : (jsonDecode(map['tags']! as String) as List)
-                    .cast<Map<String, dynamic>>(),
-          'extras': map['extras'] == null || (map['extras']! as String).isEmpty
-              ? null
-              : (jsonDecode(map['extras']! as String) as List)
-                    .cast<Map<String, dynamic>>(),
-        };
-        return TicketMapper.fromMap(decodedMap);
-      }).toList();
-
-      return tickets;
+      return result.map((map) => _mapToTicket(map)).toList();
     } catch (e, stackTrace) {
-      _logger.error(
-        'Failed to fetch tickets of type: $type',
-        e,
-        stackTrace,
-      );
-      rethrow;
-    }
-  }
-
-  /// Update by Ticket Id
-  @override
-  Future<int> updateTicketById(
-    String ticketId,
-    Map<String, Object?> updates,
-  ) async {
-    try {
-      _logger.logDatabase(
-        'Update',
-        'Updating ticket with ID: ${_maskTicketId(ticketId)}',
-      );
-
-      final db = await _database.database;
-
-      // Step 1: If updating extras or tags, merge them with existing
-      if (updates.containsKey('extras') || updates.containsKey('tags')) {
-        final existingResult = await db.query(
-          'tickets',
-          where: 'ticket_id = ?',
-          whereArgs: [ticketId],
-          limit: 1,
-        );
-
-        if (existingResult.isNotEmpty) {
-          final existing = existingResult.first;
-
-          // --- Merge extras ---
-          if (updates.containsKey('extras')) {
-            final existingExtras =
-                existing['extras'] != null &&
-                    (existing['extras']! as String).isNotEmpty
-                ? (jsonDecode(existing['extras']! as String) as List)
-                      .cast<Map<String, dynamic>>()
-                : <Map<String, dynamic>>[];
-
-            final newExtras = (jsonDecode(updates['extras']! as String) as List)
-                .cast<Map<String, dynamic>>();
-
-            // Merge based on unique "title" keys (replace if same title)
-            final mergedExtras = {
-              ...{
-                for (final e in existingExtras) e['title']: e,
-              },
-            };
-
-            for (final newE in newExtras) {
-              mergedExtras[newE['title']] = newE;
-            }
-
-            updates['extras'] = jsonEncode(mergedExtras.values.toList());
-          }
-
-          // --- Merge tags (if needed) ---
-          if (updates.containsKey('tags')) {
-            final existingTags =
-                existing['tags'] != null &&
-                    (existing['tags']! as String).isNotEmpty
-                ? (jsonDecode(existing['tags']! as String) as List)
-                      .cast<Map<String, dynamic>>()
-                : <Map<String, dynamic>>[];
-
-            final newTags = (jsonDecode(updates['tags']! as String) as List)
-                .cast<Map<String, dynamic>>();
-
-            final mergedTags = {
-              ...{
-                for (final t in existingTags) t['value']: t,
-              },
-            };
-
-            for (final newT in newTags) {
-              mergedTags[newT['value']] = newT;
-            }
-
-            updates['tags'] = jsonEncode(mergedTags.values.toList());
-          }
-        }
-      }
-
-      // Step 2: Update timestamp
-      updates['updated_at'] = DateTime.now().toIso8601String();
-
-      // Step 3: Run update
-      final count = await db.update(
-        'tickets',
-        updates,
-        where: 'ticket_id = ?',
-        whereArgs: [ticketId],
-      );
-
-      if (count > 0) {
-        _logger.logDatabase(
-          'Success',
-          'Updated ticket with ID: ${_maskTicketId(ticketId)}',
-        );
-      } else {
-        _logger.warning(
-          'No ticket found with ID: ${_maskTicketId(ticketId)}',
-        );
-      }
-
-      return count;
-    } catch (e, stackTrace) {
-      _logger.error(
-        'Failed to update ticket with ID: '
-        '${_maskTicketId(ticketId)}',
-        e,
-        stackTrace,
-      );
+      _logger.error('Failed to fetch tickets of type: $type', e, stackTrace);
       rethrow;
     }
   }
@@ -425,12 +293,7 @@ class TicketDao implements ITicketDAO {
           'Success',
           'Deleted ticket with ID: ${_maskTicketId(id)}',
         );
-      } else {
-        _logger.warning(
-          'No ticket found to delete with ID: ${_maskTicketId(id)}',
-        );
       }
-
       return count;
     } catch (e, stackTrace) {
       _logger.error(
@@ -440,5 +303,22 @@ class TicketDao implements ITicketDAO {
       );
       rethrow;
     }
+  }
+
+  /// Helper to convert DB Map to Ticket Object
+  Ticket _mapToTicket(Map<String, Object?> map) {
+    final decodedMap = {
+      ...map,
+      'tags': map['tags'] == null || (map['tags'] as String).isEmpty
+          ? null
+          : (jsonDecode(map['tags'] as String) as List)
+                .cast<Map<String, dynamic>>(),
+      'extras': map['extras'] == null || (map['extras'] as String).isEmpty
+          ? null
+          : (jsonDecode(map['extras'] as String) as List)
+                .cast<Map<String, dynamic>>(),
+    };
+
+    return TicketMapper.fromMap(decodedMap);
   }
 }
