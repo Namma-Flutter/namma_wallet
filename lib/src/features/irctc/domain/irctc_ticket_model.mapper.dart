@@ -59,11 +59,6 @@ class IRCTCTicketMapper extends ClassMapperBase<IRCTCTicket> {
     'boardingStation',
     _$boardingStation,
   );
-  static String _$travelClass(IRCTCTicket v) => v.travelClass;
-  static const Field<IRCTCTicket, String> _f$travelClass = Field(
-    'travelClass',
-    _$travelClass,
-  );
   static String _$fromStation(IRCTCTicket v) => v.fromStation;
   static const Field<IRCTCTicket, String> _f$fromStation = Field(
     'fromStation',
@@ -83,6 +78,12 @@ class IRCTCTicketMapper extends ClassMapperBase<IRCTCTicket> {
   static const Field<IRCTCTicket, double> _f$irctcFee = Field(
     'irctcFee',
     _$irctcFee,
+  );
+  static String? _$travelClass(IRCTCTicket v) => v.travelClass;
+  static const Field<IRCTCTicket, String> _f$travelClass = Field(
+    'travelClass',
+    _$travelClass,
+    opt: true,
   );
   static DateTime? _$scheduledDeparture(IRCTCTicket v) => v.scheduledDeparture;
   static const Field<IRCTCTicket, DateTime> _f$scheduledDeparture = Field(
@@ -109,11 +110,11 @@ class IRCTCTicketMapper extends ClassMapperBase<IRCTCTicket> {
     #trainNumber: _f$trainNumber,
     #trainName: _f$trainName,
     #boardingStation: _f$boardingStation,
-    #travelClass: _f$travelClass,
     #fromStation: _f$fromStation,
     #toStation: _f$toStation,
     #ticketFare: _f$ticketFare,
     #irctcFee: _f$irctcFee,
+    #travelClass: _f$travelClass,
     #scheduledDeparture: _f$scheduledDeparture,
     #dateOfJourney: _f$dateOfJourney,
   };
@@ -130,11 +131,11 @@ class IRCTCTicketMapper extends ClassMapperBase<IRCTCTicket> {
       trainNumber: data.dec(_f$trainNumber),
       trainName: data.dec(_f$trainName),
       boardingStation: data.dec(_f$boardingStation),
-      travelClass: data.dec(_f$travelClass),
       fromStation: data.dec(_f$fromStation),
       toStation: data.dec(_f$toStation),
       ticketFare: data.dec(_f$ticketFare),
       irctcFee: data.dec(_f$irctcFee),
+      travelClass: data.dec(_f$travelClass),
       scheduledDeparture: data.dec(_f$scheduledDeparture),
       dateOfJourney: data.dec(_f$dateOfJourney),
     );
@@ -211,11 +212,11 @@ abstract class IRCTCTicketCopyWith<$R, $In extends IRCTCTicket, $Out>
     String? trainNumber,
     String? trainName,
     String? boardingStation,
-    String? travelClass,
     String? fromStation,
     String? toStation,
     double? ticketFare,
     double? irctcFee,
+    String? travelClass,
     DateTime? scheduledDeparture,
     DateTime? dateOfJourney,
   });
@@ -242,11 +243,11 @@ class _IRCTCTicketCopyWithImpl<$R, $Out>
     String? trainNumber,
     String? trainName,
     String? boardingStation,
-    String? travelClass,
     String? fromStation,
     String? toStation,
     double? ticketFare,
     double? irctcFee,
+    Object? travelClass = $none,
     Object? scheduledDeparture = $none,
     Object? dateOfJourney = $none,
   }) => $apply(
@@ -261,11 +262,11 @@ class _IRCTCTicketCopyWithImpl<$R, $Out>
       if (trainNumber != null) #trainNumber: trainNumber,
       if (trainName != null) #trainName: trainName,
       if (boardingStation != null) #boardingStation: boardingStation,
-      if (travelClass != null) #travelClass: travelClass,
       if (fromStation != null) #fromStation: fromStation,
       if (toStation != null) #toStation: toStation,
       if (ticketFare != null) #ticketFare: ticketFare,
       if (irctcFee != null) #irctcFee: irctcFee,
+      if (travelClass != $none) #travelClass: travelClass,
       if (scheduledDeparture != $none) #scheduledDeparture: scheduledDeparture,
       if (dateOfJourney != $none) #dateOfJourney: dateOfJourney,
     }),
@@ -282,11 +283,11 @@ class _IRCTCTicketCopyWithImpl<$R, $Out>
     trainNumber: data.get(#trainNumber, or: $value.trainNumber),
     trainName: data.get(#trainName, or: $value.trainName),
     boardingStation: data.get(#boardingStation, or: $value.boardingStation),
-    travelClass: data.get(#travelClass, or: $value.travelClass),
     fromStation: data.get(#fromStation, or: $value.fromStation),
     toStation: data.get(#toStation, or: $value.toStation),
     ticketFare: data.get(#ticketFare, or: $value.ticketFare),
     irctcFee: data.get(#irctcFee, or: $value.irctcFee),
+    travelClass: data.get(#travelClass, or: $value.travelClass),
     scheduledDeparture: data.get(
       #scheduledDeparture,
       or: $value.scheduledDeparture,

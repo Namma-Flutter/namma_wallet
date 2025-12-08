@@ -54,7 +54,7 @@ void main() {
     test('should parse standard IRCTC ticket to Ticket model correctly', () {
       /// Standard IRCTC SMS with full details.
       const smsText =
-          'PNR:4424909275,TRN:12291,DOJ:24-10-25,SL,YPR-MAS,DP:22:45,'
+          'PNR:4321751237,TRN:12291,DOJ:24-10-25,SL,YPR-MAS,DP:22:45,'
           'Boarding at YPR only,\n'
           'MAGESH K,S2 24,\n'
           'Fare:270,C Fee:11.8+PG.This rail travel is insured.\n'
@@ -65,7 +65,7 @@ void main() {
       expect(ticket, isNotNull);
 
       // Basic ticket metadata
-      expect(ticket.ticketId, equals('4424909275'));
+      expect(ticket.ticketId, equals('4321751237'));
       expect(ticket.primaryText, equals('YPR → MAS'));
       expect(ticket.secondaryText, equals('Train 12291 • SL • MAGESH K'));
 
@@ -83,7 +83,7 @@ void main() {
       final pnrTag = ticket.tags?.firstWhere(
         (t) => t.icon == 'confirmation_number',
       );
-      expect(pnrTag?.value, equals('4424909275'));
+      expect(pnrTag?.value, equals('4321751237'));
 
       // Tag: Train Number
       final trainTag = ticket.tags?.firstWhere((t) => t.icon == 'train');

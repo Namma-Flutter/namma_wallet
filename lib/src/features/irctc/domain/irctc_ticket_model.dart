@@ -15,11 +15,11 @@ class IRCTCTicket with IRCTCTicketMappable {
     required this.trainNumber,
     required this.trainName,
     required this.boardingStation,
-    required this.travelClass,
     required this.fromStation,
     required this.toStation,
     required this.ticketFare,
     required this.irctcFee,
+    this.travelClass,
     this.scheduledDeparture,
     this.dateOfJourney,
   });
@@ -36,7 +36,7 @@ class IRCTCTicket with IRCTCTicketMappable {
   final DateTime? scheduledDeparture;
   final DateTime? dateOfJourney;
   final String boardingStation;
-  final String travelClass;
+  final String? travelClass;
   final String fromStation;
   final String toStation;
   final double ticketFare;

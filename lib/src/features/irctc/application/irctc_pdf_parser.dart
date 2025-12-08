@@ -13,19 +13,58 @@ class IRCTCPDFParser implements ITicketParser {
   Ticket parseTicket(String rawText) {
     /// Allowed IRCTC travel class codes.
     const allowedClasses = {
-      'SL', '1A', '2A', '3A', 'CC', '2S', '3E', 'FC', 'EC', '1E', '2E'
+      'SL',
+      '1A',
+      '2A',
+      '3A',
+      'CC',
+      '2S',
+      '3E',
+      'FC',
+      'EC',
+      '1E',
+      '2E',
     };
 
     /// Codes to be ignored when detecting station names from the text.
     const ignoredCodes = {
-      'ERS', 'NCH', 'VRM', 'GST', 'TDR', 'RFD', 'CNF', 'RAC', 'WL', 'GN',
-      'PQWL', 'RLWL', 'RSWL', 'LB', 'UB', 'MB', 'SL', 'SU', 'PDF', 'APP',
-      'UPI', 'OTP', 'CVV', 'PIN', 'IRCTC', 'GGM', 'IT', 'SURE', 'MSG',
-      'SMS', 'IN', 'NA', 'SF'
+      'ERS',
+      'NCH',
+      'VRM',
+      'GST',
+      'TDR',
+      'RFD',
+      'CNF',
+      'RAC',
+      'WL',
+      'GN',
+      'PQWL',
+      'RLWL',
+      'RSWL',
+      'LB',
+      'UB',
+      'MB',
+      'SL',
+      'SU',
+      'PDF',
+      'APP',
+      'UPI',
+      'OTP',
+      'CVV',
+      'PIN',
+      'IRCTC',
+      'GGM',
+      'IT',
+      'SURE',
+      'MSG',
+      'SMS',
+      'IN',
+      'NA',
+      'SF',
     };
 
     /// Normalizes raw class text to a valid IRCTC class code.
-    String normalizeClass(String raw) {
+    String? normalizeClass(String raw) {
       if (raw.isEmpty) return 'SL';
       final upper = raw.toUpperCase().trim();
       final parenMatch = RegExp(r'\(([A-Z0-9]{2})\)').firstMatch(upper);
@@ -39,11 +78,11 @@ class IRCTCPDFParser implements ITicketParser {
       if (upper.contains('CHAIR')) return 'CC';
       if (upper.contains('SLEEPER') || upper.contains('SL')) return 'SL';
       if (allowedClasses.contains(upper)) return upper;
-      return 'SL';
+      return null;
     }
 
     /// Converts month abbreviation to integer representation.
-    int monthToInt(String month) {
+    int? monthToInt(String month) {
       const months = {
         'Jan': 1,
         'Feb': 2,
@@ -58,10 +97,10 @@ class IRCTCPDFParser implements ITicketParser {
         'Nov': 11,
         'Dec': 12,
       };
-      if (month.isEmpty) return 1;
+      if (month.isEmpty) return null;
       final key = month.substring(0, 3);
       final normalized = key[0].toUpperCase() + key.substring(1).toLowerCase();
-      return months[normalized] ?? 1;
+      return months[normalized];
     }
 
     /// Returns the first matching regex group for the given list of patterns.
@@ -217,13 +256,18 @@ class IRCTCPDFParser implements ITicketParser {
         if (timeMatch != null && dateMatch != null) {
           final timeParts = timeMatch.group(1)!.split(':');
           final dateParts = dateMatch.group(1)!.split('-');
-          return DateTime(
-            int.parse(dateParts[2]),
-            monthToInt(dateParts[1]),
-            int.parse(dateParts[0]),
-            int.parse(timeParts[0]),
-            int.parse(timeParts[1]),
-          );
+          final month = monthToInt(dateParts[1]);
+          if (month == null) {
+            return null;
+          } else {
+            return DateTime(
+              int.parse(dateParts[2]),
+              month,
+              int.parse(dateParts[0]),
+              int.parse(timeParts[0]),
+              int.parse(timeParts[1]),
+            );
+          }
         }
       } on Exception catch (_) {}
       return null;
@@ -334,320 +378,3 @@ class IRCTCPDFParser implements ITicketParser {
     return Ticket.fromIRCTC(model);
   }
 }
-
-// @override
-
-// Ticket parseTicket(String rawText) {
-//   // 1. Constants & Blocklists (Kept same as your code)
-//   const allowedClasses = {
-//     'SL',
-//     '1A',
-//     '2A',
-//     '3A',
-//     'CC',
-//     '2S',
-//     '3E',
-//     'FC',
-//     'EC',
-//     '1E',
-//     '2E',
-//   };
-//   const ignoredCodes = {
-//     'ERS',
-//     'NCH',
-//     'VRM',
-//     'GST',
-//     'TDR',
-//     'RFD',
-//     'CNF',
-//     'RAC',
-//     'WL',
-//     'GN',
-//     'PQWL',
-//     'RLWL',
-//     'RSWL',
-//     'LB',
-//     'UB',
-//     'MB',
-//     'SL',
-//     'SU',
-//     'PDF',
-//     'APP',
-//     'UPI',
-//     'OTP',
-//     'CVV',
-//     'PIN',
-//     'IRCTC',
-//     'GGM',
-//     'IT',
-//     'SURE',
-//     'MSG',
-//     'SMS',
-//     'IN',
-//     'NA',
-//     'SF',
-//   };
-//
-//   // -----------------------------
-//   // 2. Helper Functions
-//   // -----------------------------
-//   String _normalizeClass(String raw) {
-//     if (raw.isEmpty) return 'SL';
-//     final upper = raw.toUpperCase().trim();
-//     final parenMatch = RegExp(r'\(([A-Z0-9]{2})\)').firstMatch(upper);
-//     if (parenMatch != null) {
-//       final code = parenMatch.group(1)!;
-//       if (allowedClasses.contains(code)) return code;
-//     }
-//     if (upper.contains('AC 3')) return '3A';
-//     if (upper.contains('AC 2')) return '2A';
-//     if (upper.contains('AC 1') || upper.contains('FIRST AC')) return '1A';
-//     if (upper.contains('CHAIR')) return 'CC';
-//     if (upper.contains('SLEEPER')) return 'SL';
-//     if (allowedClasses.contains(upper)) return upper;
-//     return 'SL';
-//   }
-//
-//   int _monthToInt(String month) {
-//     const months = {
-//       'Jan': 1,
-//       'Feb': 2,
-//       'Mar': 3,
-//       'Apr': 4,
-//       'May': 5,
-//       'Jun': 6,
-//       'Jul': 7,
-//       'Aug': 8,
-//       'Sep': 9,
-//       'Oct': 10,
-//       'Nov': 11,
-//       'Dec': 12,
-//     };
-//     if (month.isEmpty) return 1;
-//     final key = month.substring(0, 3);
-//     final normalized = key[0].toUpperCase() + key.substring(1).toLowerCase();
-//     return months[normalized] ?? 1;
-//   }
-//
-//   String pick(List<String> patterns, {int group = 1}) {
-//     for (final pattern in patterns) {
-//       final m = RegExp(
-//         pattern,
-//         caseSensitive: false,
-//         multiLine: true,
-//       ).firstMatch(rawText);
-//       if (m != null && m.group(group) != null) {
-//         return m.group(group)!.trim().replaceAll('"', '');
-//       }
-//     }
-//     return '';
-//   }
-//
-//   double pickDouble(List<String> patterns) {
-//     // Updated to remove commas before parsing (e.g., "1,080.00" -> "1080.00")
-//     final v = pick(
-//       patterns,
-//     ).replaceAll(',', '').replaceAll(RegExp(r'[^\d.]'), '');
-//     return double.tryParse(v) ?? 0.0;
-//   }
-//
-//   // -----------------------------
-//   // 3. Extraction Logic (FIXED)
-//   // -----------------------------
-//
-//   final pnr = pick([
-//     r'PNR(?:[\s\S]{0,100}?)(\d{10})',
-//     r'PNR\s*[:.-]?\s*(\d{10})',
-//   ]);
-//
-//   // STATION PARSING
-//   var fromStn = '';
-//   var toStn = '';
-//   var boardingStn = '';
-//
-//   final stationRegex = RegExp(
-//     r'([A-Za-z &.]{2,})\s*\n?\s*\(([A-Z]{3,4})\)',
-//     multiLine: true,
-//   );
-//   final stationMatches = stationRegex.allMatches(rawText);
-//   final List<String> foundStations = [];
-//
-//   for (final m in stationMatches) {
-//     final name = m.group(1)!.trim().replaceAll('\n', ' ');
-//     final code = m.group(2)!;
-//     if (ignoredCodes.contains(code)) continue;
-//     if (name.toLowerCase().contains('case of')) continue;
-//     foundStations.add('$name ($code)');
-//   }
-//
-//   if (foundStations.isNotEmpty) {
-//     fromStn = foundStations.first;
-//     boardingStn = foundStations.first;
-//     toStn = foundStations.lastWhere((s) => s != fromStn, orElse: () => '');
-//   }
-//
-//   if (fromStn.isEmpty || toStn.isEmpty) {
-//     final fallbackBoarding = pick([r'Boarding At\s*[:]?\s*([A-Z]{3,4})']);
-//     if (fallbackBoarding.isNotEmpty && boardingStn.isEmpty)
-//       boardingStn = fallbackBoarding;
-//     final fallbackFrom = pick([r'From\s*[:]?\s*([A-Z ]+\([A-Z]+\))']);
-//     if (fallbackFrom.isNotEmpty && fromStn.isEmpty) fromStn = fallbackFrom;
-//     final fallbackTo = pick([r'To\s*[:]?\s*([A-Z ]+\([A-Z]+\))']);
-//     if (fallbackTo.isNotEmpty && toStn.isEmpty) toStn = fallbackTo;
-//   }
-//
-//   // --- FIX 1: Train Details ---
-//   // Problem: The previous regex enforced "Train No./ Name".
-//   // Fix: We look for "Train" followed closely by a 5-digit number.
-//   final trainNumber = pick([
-//     r'Train No\./\s*Name\s+(?:[:.-])?\s*(\d{5})',
-//     // Strict
-//     r'Train\s*(?:No|Number|Name)?\s*[:.-]?\s*(\d{5})',
-//     // Flexible header
-//     r'(?:^|\s)(\d{5})(?=\s+[A-Z])',
-//     // 5 digits followed by text (e.g. "12558 SAPTHAGIRI")
-//   ]);
-//
-//   final trainName = pick([
-//     r'Train No\./\s*Name\s+(?:[:.-])?\s*\d{5}\s*/\s*(.*)',
-//     r'Train\s*[:.-]?\s*\d{5}\s*/\s*(.*)', // Flexible slash separator
-//     r'Train Name\s*[:.-]?\s*(.*)',
-//   ]);
-//
-//   final rawClass = pick([
-//     r'Class(?:[\s\S]{0,20}?)([A-Za-z0-9 ]+\([A-Z0-9]+\))',
-//   ]);
-//   final travelClass = _normalizeClass(rawClass);
-//   final quota = pick([r'Quota(?:[\s\S]{0,20}?)([A-Za-z ]+\([A-Z]+\))']);
-//
-//   // -----------------------------
-//   // 4. Date Parsing
-//   // -----------------------------
-//   final dateTimeRaw = pick([
-//     r'(?:Departure|Scheduled Departure|Arrival)[^0-9]*?(\d{1,2}:\d{2}[\s\S]{0,25}?\d{4})',
-//     r'(?:Departure|Scheduled Departure|Arrival)[^0-9]*?(\d{2}-[A-Za-z]{3}-\d{4}[\s\S]{0,25}?\d{1,2}:\d{2})',
-//   ]);
-//
-//   DateTime parseFlexibleDate(String raw) {
-//     if (raw.isEmpty) return DateTime.now();
-//     try {
-//       raw = raw.replaceAll(RegExp(r'[*"\n]'), ' ').trim();
-//       final timeMatch = RegExp(r'(\d{1,2}:\d{2})').firstMatch(raw);
-//       final dateMatch = RegExp(
-//         r'(\d{2}-[A-Za-z]{3}-\d{4})',
-//         caseSensitive: false,
-//       ).firstMatch(raw);
-//
-//       if (timeMatch != null && dateMatch != null) {
-//         final timeParts = timeMatch.group(1)!.split(':');
-//         final dateParts = dateMatch.group(1)!.split('-');
-//         return DateTime(
-//           int.parse(dateParts[2]),
-//           _monthToInt(dateParts[1]),
-//           int.parse(dateParts[0]),
-//           int.parse(timeParts[0]),
-//           int.parse(timeParts[1]),
-//         );
-//       }
-//     } catch (e) {
-//       /* log error */
-//     }
-//     return DateTime.now();
-//   }
-//
-//   final scheduledDeparture = parseFlexibleDate(dateTimeRaw);
-//
-//   // -----------------------------
-//   // 5. Passenger Parsing
-//   // -----------------------------
-//   var pName = '';
-//   var pAge = 0;
-//   var pGender = '';
-//   var pStatus = '';
-//
-//   final verticalPassengerRegex = RegExp(
-//     r'(?:^|\n)\s*1\s*\n\s*([A-Za-z .]+)\s*\n\s*(\d{1,3})\s*\n\s*(MALE|FEMALE|M|F)',
-//     caseSensitive: false,
-//     multiLine: true,
-//   );
-//   final horizontalPassengerRegex = RegExp(
-//     r'(?:^|\n)\s*1\.?\s+([A-Za-z .]+)\s+(\d{1,3})\s+(Male|Female|M|F)',
-//     caseSensitive: false,
-//     multiLine: true,
-//   );
-//
-//   var pMatch = verticalPassengerRegex.firstMatch(rawText);
-//   pMatch ??= horizontalPassengerRegex.firstMatch(rawText);
-//
-//   if (pMatch != null) {
-//     pName = pMatch.group(1)!.trim();
-//     pAge = int.tryParse(pMatch.group(2) ?? '0') ?? 0;
-//     pGender = pMatch.group(3)!.trim();
-//     final lookAhead = rawText.substring(
-//       pMatch.end,
-//       (pMatch.end + 150).clamp(0, rawText.length),
-//     );
-//     final statusMatch = RegExp(
-//       r'((?:CNF|WL|RAC|RLWL|PQWL|RSWL)[A-Z0-9/ ]*)',
-//     ).firstMatch(lookAhead);
-//     if (statusMatch != null) {
-//       pStatus = statusMatch.group(1)?.trim() ?? 'CNF';
-//     } else if (lookAhead.contains("CNF")) {
-//       pStatus = "CNF";
-//     }
-//   }
-//
-//   // -----------------------------
-//   // 6. Financials (FIXED)
-//   // -----------------------------
-//
-//   // TICKET FARE
-//   // Strategy: Finds "Ticket Fare" and grabs the first number found (1080.00).
-//   // The buffer (0-100 chars) allows it to skip the "Convenience Fee" label if it appears in between.
-//   final ticketFare = pickDouble([
-//     r'Ticket [Ff]are(?:[\s\S]{0,100}?)Rs\.?\s*([\d,]+\.\d{2})',
-//     r'Ticket [Ff]are(?:[\s\S]{0,100}?)([\d,]+\.\d{2})',
-//     r'Total [Ff]are(?:[\s\S]{0,50}?)([\d,]+\.\d{2})',
-//   ]);
-//
-//   // IRCTC / CONVENIENCE FEE
-//   // Strategy:
-//   // 1. Stacked Layout (Priority): Looks for "Convenience Fee", sees a number (Ticket Fare), skips it, and grabs the SECOND number.
-//   // 2. Standard Layout (Fallback): Looks for "Convenience Fee" and grabs the immediate next number.
-//   final irctcFee = pickDouble([
-//     // PRIORITY 1: Handle Columnar/Stacked Data (The fix for your specific error)
-//     // Matches: Convenience Fee ... [Skip 1080.00] ... [Capture 17.70]
-//     r'Convenience Fee(?:[\s\S]{0,100}?)Rs\.?\s*[\d,]+\.\d{2}(?:[\s\S]{0,50}?)Rs\.?\s*([\d,]+\.\d{2})',
-//
-//     // PRIORITY 2: Standard Layout
-//     r'Convenience Fee(?:[\s\S]{0,30}?)Rs\.?\s*([\d,]+\.\d{2})',
-//     r'Convenience Fee(?:[\s\S]{0,30}?)([\d,]+\.\d{2})',
-//     r'IRCTC Fee(?:[\s\S]{0,30}?)([\d,]+\.\d{2})',
-//   ]);
-//
-//   final model = IRCTCTicket(
-//     pnrNumber: pnr,
-//     transactionId: pick([r'Transaction (?:ID|Id)[-:]?\s*\(?(\d+)']),
-//     passengerName: pName,
-//     gender: pGender,
-//     age: pAge,
-//     status: pStatus,
-//     quota: quota,
-//     trainNumber: trainNumber,
-//     trainName: trainName,
-//     scheduledDeparture: scheduledDeparture,
-//     dateOfJourney: DateTime(
-//       scheduledDeparture.year,
-//       scheduledDeparture.month,
-//       scheduledDeparture.day,
-//     ),
-//     boardingStation: boardingStn,
-//     travelClass: travelClass,
-//     fromStation: fromStn,
-//     toStation: toStn,
-//     ticketFare: ticketFare,
-//     irctcFee: irctcFee,
-//   );
-//
-//   return Ticket.fromIRCTC(model);
-// }
