@@ -233,7 +233,8 @@ class _ImportViewState extends State<ImportView> {
                             ? 120
                             : 40,
                       ),
-                      GestureDetector(
+                      InkWell(
+                        splashColor: Colors.transparent,
                         onTap: _isProcessingPDF ? null : _handlePDFPick,
                         child: SizedBox(
                           height: pickFileContainerWidth,
