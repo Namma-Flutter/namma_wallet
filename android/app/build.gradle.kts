@@ -52,21 +52,21 @@ android {
         release {
             isShrinkResources = true
             isMinifyEnabled = true
-
+            // Keystore file at android/app/namma-wallet.keystore
             val keystoreFile = file("namma-wallet.keystore")
+            // Properties file at android/keystore.properties
             val keystorePropertiesFile = rootProject.file("keystore.properties")
             val keystoreProperties = Properties()
             var hasAllKeys = false
             if (keystorePropertiesFile.exists()) {
                 keystoreProperties.load(keystorePropertiesFile.inputStream())
-                hasAllKeys = listOf(
-                    "KEYSTORE_PASSWORD",
-                    "KEYSTORE_ENTRY_ALIAS",
-                    "KEYSTORE_ENTRY_PASSWORD"
-                ).all { keystoreProperties.containsKey(it) }
             }
-
-            if (keystoreFile.exists() && hasAllKeys) {
+            val requiredKeys = mapOf(
+                "KEYSTORE_PASSWORD" to keystoreProperties["KEYSTORE_PASSWORD"]?.toString(),
+                "KEYSTORE_ENTRY_ALIAS" to keystoreProperties["KEYSTORE_ENTRY_ALIAS"]?.toString(),
+                "KEYSTORE_ENTRY_PASSWORD" to keystoreProperties["KEYSTORE_ENTRY_PASSWORD"]?.toString()
+            )
+            if (keystoreFile.exists() &&  requiredKeys.values.all { !it.isNullOrEmpty() }) {
                 signingConfig = signingConfigs.create("release") {
                     storeFile = keystoreFile
                     storePassword = keystoreProperties["KEYSTORE_PASSWORD"]!!.toString()
