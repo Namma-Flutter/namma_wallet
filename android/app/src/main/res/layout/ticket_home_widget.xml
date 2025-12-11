@@ -9,8 +9,8 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
         android:gravity="center_vertical"
+        android:orientation="horizontal"
         android:paddingBottom="12dp">
 
         <!-- Service Icon -->
@@ -20,9 +20,9 @@
             android:layout_height="32dp"
             android:layout_marginEnd="8dp"
             android:background="@drawable/circle_background"
-            android:src="@drawable/ic_bus"
             android:padding="6dp"
-            android:scaleType="centerInside" />
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_bus" />
 
         <!-- Service Type Text -->
         <TextView
@@ -30,11 +30,11 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Bus Service"
-            android:textSize="12sp"
-            android:textColor="#666666"
+            android:ellipsize="end"
             android:maxLines="1"
-            android:ellipsize="end" />
+            android:text="Bus Service"
+            android:textColor="#666666"
+            android:textSize="12sp" />
 
     </LinearLayout>
 
@@ -43,13 +43,13 @@
         android:id="@+id/primary_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Chennai → Bangalore"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:textColor="@android:color/black"
-        android:maxLines="2"
         android:ellipsize="end"
-        android:paddingBottom="12dp" />
+        android:maxLines="2"
+        android:paddingBottom="12dp"
+        android:text="Chennai → Bangalore"
+        android:textColor="@android:color/black"
+        android:textSize="18sp"
+        android:textStyle="bold" />
 
     <!-- Journey Details Row -->
     <LinearLayout
@@ -69,17 +69,17 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Journey Date"
-                android:textSize="10sp"
-                android:textColor="#666666" />
+                android:textColor="#666666"
+                android:textSize="10sp" />
 
             <TextView
                 android:id="@+id/journey_date"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Dec 25, 2024"
+                android:textColor="@android:color/black"
                 android:textSize="12sp"
-                android:textStyle="bold"
-                android:textColor="@android:color/black" />
+                android:textStyle="bold" />
 
         </LinearLayout>
 
@@ -88,24 +88,24 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:orientation="vertical"
-            android:gravity="end">
+            android:gravity="end"
+            android:orientation="vertical">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Time"
-                android:textSize="10sp"
-                android:textColor="#666666" />
+                android:textColor="#666666"
+                android:textSize="10sp" />
 
             <TextView
                 android:id="@+id/journey_time"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="10:30 AM"
+                android:textColor="@android:color/black"
                 android:textSize="12sp"
-                android:textStyle="bold"
-                android:textColor="@android:color/black" />
+                android:textStyle="bold" />
 
         </LinearLayout>
 
@@ -124,14 +124,14 @@
             android:id="@+id/tag1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginEnd="6dp"
             android:background="@drawable/tag_background"
             android:paddingStart="8dp"
-            android:paddingEnd="8dp"
             android:paddingTop="4dp"
+            android:paddingEnd="8dp"
             android:paddingBottom="4dp"
-            android:layout_marginEnd="6dp"
-            android:textSize="10sp"
-            android:textColor="@android:color/black" />
+            android:textColor="@android:color/black"
+            android:textSize="10sp" />
 
         <TextView
             android:id="@+id/tag2"
@@ -139,11 +139,11 @@
             android:layout_height="wrap_content"
             android:background="@drawable/tag_background"
             android:paddingStart="8dp"
-            android:paddingEnd="8dp"
             android:paddingTop="4dp"
+            android:paddingEnd="8dp"
             android:paddingBottom="4dp"
-            android:textSize="10sp"
-            android:textColor="@android:color/black" />
+            android:textColor="@android:color/black"
+            android:textSize="10sp" />
 
     </LinearLayout>
 
@@ -157,35 +157,35 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical">
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
 
         <!-- Location -->
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
             <ImageView
                 android:layout_width="16dp"
                 android:layout_height="16dp"
                 android:layout_marginEnd="4dp"
-                android:src="@drawable/ic_location"
-                android:contentDescription="Location" />
+                android:contentDescription="Location"
+                android:src="@drawable/ic_location" />
 
             <TextView
                 android:id="@+id/location"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Chennai"
-                android:textSize="12sp"
-                android:textStyle="bold"
-                android:textColor="@android:color/black"
+                android:ellipsize="end"
                 android:maxLines="1"
-                android:ellipsize="end" />
+                android:text="Chennai"
+                android:textColor="@android:color/black"
+                android:textSize="12sp"
+                android:textStyle="bold" />
 
         </LinearLayout>
 
@@ -194,9 +194,9 @@
             android:id="@+id/info_button"
             android:layout_width="24dp"
             android:layout_height="24dp"
-            android:src="@drawable/ic_info"
             android:background="?android:attr/selectableItemBackgroundBorderless"
-            android:contentDescription="More Info" />
+            android:contentDescription="More Info"
+            android:src="@drawable/ic_info" />
 
     </LinearLayout>
 

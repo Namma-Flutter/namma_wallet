@@ -1,11 +1,14 @@
 import 'package:namma_wallet/src/common/di/locator.dart';
-import 'package:namma_wallet/src/common/services/logger_interface.dart';
-import 'package:namma_wallet/src/features/irctc/application/irctc_ticket_model.dart';
+import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
+import 'package:namma_wallet/src/features/irctc/application/irctc_qr_parser_interface.dart';
+import 'package:namma_wallet/src/features/irctc/domain/irctc_ticket_model.dart';
+import 'package:namma_wallet/src/features/travel/application/travel_text_parser_utils.dart';
 
-class IRCTCQRParser {
+class IRCTCQRParser implements IIRCTCQRParser {
   IRCTCQRParser({ILogger? logger}) : _logger = logger ?? getIt<ILogger>();
   final ILogger _logger;
 
+  @override
   IRCTCTicket? parseQRCode(String qrData) {
     try {
       // Create a simple non-reversible hash for
@@ -65,17 +68,18 @@ class IRCTCQRParser {
 
   int _parseInt(String value) {
     if (value.isEmpty) return 0;
-    return int.tryParse(value.replaceAll(RegExp(r'[^\d]'), '')) ?? 0;
+    final cleanValue = value.replaceAll(RegExp(r'[^\d]'), '');
+    return TravelTextParserUtils.parseInt(cleanValue);
   }
 
   double _parseAmount(String value) {
     if (value.isEmpty) return 0;
     final cleanValue = value.replaceAll(RegExp(r'[^\d.]'), '');
-    return double.tryParse(cleanValue) ?? 0.0;
+    return TravelTextParserUtils.parseDouble(cleanValue);
   }
 
-  DateTime _parseDateTime(String value) {
-    if (value.isEmpty) return DateTime.now();
+  DateTime? _parseDateTime(String value) {
+    if (value.isEmpty) return null;
 
     try {
       final parts = value.split(' ');
@@ -89,6 +93,7 @@ class IRCTCQRParser {
         if (dateComponents.length == 3 && timeComponents.length >= 2) {
           final day = int.parse(dateComponents[0]);
           final month = _parseMonth(dateComponents[1]);
+          if (month == null) return null;
           final year = int.parse(dateComponents[2]);
           final hour = int.parse(timeComponents[0]);
           final minute = int.parse(timeComponents[1]);
@@ -100,17 +105,18 @@ class IRCTCQRParser {
       _logger.error('Error parsing datetime: $value, error: $e');
     }
 
-    return DateTime.now();
+    return null;
   }
 
-  DateTime _parseDate(String value) {
-    if (value.isEmpty) return DateTime.now();
+  DateTime? _parseDate(String value) {
+    if (value.isEmpty) return null;
 
     try {
       final dateComponents = value.split('-');
       if (dateComponents.length == 3) {
         final day = int.parse(dateComponents[0]);
         final month = _parseMonth(dateComponents[1]);
+        if (month == null) return null;
         final year = int.parse(dateComponents[2]);
 
         return DateTime(year, month, day);
@@ -119,10 +125,10 @@ class IRCTCQRParser {
       _logger.error('Error parsing date: $value, error: $e');
     }
 
-    return DateTime.now();
+    return null;
   }
 
-  int _parseMonth(String monthStr) {
+  int? _parseMonth(String monthStr) {
     const months = {
       'Jan': 1,
       'Feb': 2,
@@ -138,7 +144,11 @@ class IRCTCQRParser {
       'Dec': 12,
     };
 
-    return months[monthStr] ?? int.tryParse(monthStr) ?? 1;
+    final result = months[monthStr] ?? int.tryParse(monthStr);
+    if (result == null) {
+      _logger.warning('Unrecognized month string: $monthStr');
+    }
+    return result;
   }
 
   String _extractClassFromString(String classData) {
@@ -152,6 +162,7 @@ class IRCTCQRParser {
     return classData;
   }
 
+  @override
   bool isIRCTCQRCode(String qrData) {
     return qrData.contains('PNR No.:') ||
         qrData.contains('Train No.:') ||

@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/routing/app_routes.dart';
+import 'package:namma_wallet/src/common/services/haptic/haptic_service_extension.dart';
+import 'package:namma_wallet/src/common/services/haptic/haptic_service_interface.dart';
 
 class UserProfileWidget extends StatelessWidget {
-  const UserProfileWidget({
+  UserProfileWidget({
     super.key,
   });
+  final IHapticService hapticService = getIt<IHapticService>();
 
   @override
   Widget build(BuildContext context) {
@@ -27,8 +31,11 @@ class UserProfileWidget extends StatelessWidget {
 
           //* Profile
           InkWell(
-            onTap: () {
-              context.pushNamed(AppRoute.profile.name);
+            onTap: () async {
+              hapticService.triggerHaptic(
+                HapticType.selection,
+              );
+              await context.pushNamed(AppRoute.profile.name);
             },
             child: CircleAvatar(
               radius: 28,

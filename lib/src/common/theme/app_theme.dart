@@ -345,4 +345,46 @@ class AppTheme {
         ? const Color(0xff3067FE)
         : const Color(0xff3067FE);
   }
+
+  /// Date range picker theme with neutral range colors
+  /// Customizes the date range picker to use surfaceContainerHigh
+  /// for the range between selected dates instead of the default green
+  static ThemeData getDateRangePickerTheme(BuildContext context) {
+    final theme = Theme.of(context);
+    return theme.copyWith(
+      colorScheme: theme.colorScheme.copyWith(
+        primary: theme.colorScheme.primary,
+        onPrimary: theme.colorScheme.onPrimary,
+        surface: theme.colorScheme.surface,
+        onSurface: theme.colorScheme.onSurface,
+        // Change the color between selected dates to neutral grey
+        primaryContainer: theme.colorScheme.surfaceContainerHigh,
+        onPrimaryContainer: theme.colorScheme.onSurface,
+        // Override secondary colors that might be used for range
+        secondary: theme.colorScheme.surfaceContainerHigh,
+        onSecondary: theme.colorScheme.onSurface,
+        secondaryContainer: theme.colorScheme.surfaceContainerHigh,
+        onSecondaryContainer: theme.colorScheme.onSurface,
+        // Override tertiary colors as fallback
+        tertiary: theme.colorScheme.surfaceContainerHigh,
+        tertiaryContainer: theme.colorScheme.surfaceContainerHigh,
+      ),
+    );
+  }
+}
+
+extension ColorSchemeExtension on ColorScheme {
+  /// A container color for warning messages, with a semi-transparent effect
+  /// in dark mode.
+  ///
+  /// This design is intentional and is used by the AI status widget in
+  /// `lib/src/features/profile/presentation/ai_status_widget.dart` to blend
+  /// into the background. The `onWarningContainer` color is fully opaque
+  /// to ensure text contrast meets accessibility standards.
+  Color get warningContainer => brightness == Brightness.light
+      ? Colors.orange.shade100
+      : Colors.orange.shade900.withValues(alpha: 0.5);
+  Color get onWarningContainer => brightness == Brightness.light
+      ? Colors.orange.shade900
+      : Colors.orange.shade100;
 }

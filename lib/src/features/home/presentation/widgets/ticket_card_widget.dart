@@ -1,88 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:namma_wallet/src/common/domain/models/ticket.dart';
+import 'package:namma_wallet/src/common/enums/ticket_type.dart';
 import 'package:namma_wallet/src/common/helper/date_time_converter.dart';
-import 'package:namma_wallet/src/common/theme/styles.dart';
-import 'package:namma_wallet/src/features/home/domain/ticket.dart';
-
-class TicketCardWidget extends StatelessWidget {
-  const TicketCardWidget({
-    required this.ticket,
-    super.key,
-  });
-
-  final Ticket ticket;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
-          color: AppColor.secondaryColor,
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          spacing: 12,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    //* ticket title
-                    Text(
-                      ticket.primaryText,
-                      style: const TextStyle(color: AppColor.whiteColor),
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 1,
-                    ),
-
-                    //* Date & Time
-                    Row(
-                      children: [
-                        Text(
-                          // ticket.dateTime?.toString() ?? 'xxx xxx',
-                          formatDate(ticket.startTime),
-                          style: const TextStyle(color: AppColor.whiteColor),
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 1,
-                        ),
-                        const Text(' - '),
-                        Text(
-                          // ticket.dateTime?.toString() ?? 'xxx xxx',
-                          formatTime(ticket.startTime),
-                          style: const TextStyle(color: AppColor.whiteColor),
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 1,
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-                //* ticket icon
-                const Icon(
-                  // ticket.eventIcon,
-                  Icons.star,
-                  color: AppColor.whiteColor,
-                ),
-              ],
-            ),
-            //* Address
-            Text(
-              // ticket.venue ?? 'xxx xxx',
-              ticket.location,
-              style: const TextStyle(color: AppColor.whiteColor),
-              overflow: TextOverflow.ellipsis,
-              maxLines: 1,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
 
 class EventTicketCardWidget extends StatelessWidget {
   const EventTicketCardWidget({
@@ -154,43 +73,44 @@ class EventTicketCardWidget extends StatelessWidget {
                       ),
 
                       //* Date & Time
-                      Row(
-                        children: [
-                          Text(
-                            // ticket.dateTime?.toString() ?? 'xxx xxx',
-                            formatDate(ticket.startTime),
-                            style: TextStyle(
-                              color: Theme.of(context).colorScheme.onSurface,
+                      if (ticket.startTime != null)
+                        Row(
+                          children: [
+                            Text(
+                              DateTimeConverter.instance.formatDate(
+                                ticket.startTime!,
+                              ),
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.onSurface,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
                             ),
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
-                          ),
-                          const Text(' - '),
-                          Text(
-                            // ticket.dateTime?.toString() ?? 'xxx xxx',
-                            formatTime(ticket.startTime),
-                            style: TextStyle(
-                              color: Theme.of(context).colorScheme.onSurface,
+                            const Text(' - '),
+                            Text(
+                              DateTimeConverter.instance.formatTime(
+                                ticket.startTime!,
+                              ),
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.onSurface,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
                             ),
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
-                          ),
-                        ],
-                      ),
+                          ],
+                        ),
                     ],
                   ),
                 ),
                 //* ticket icon
                 Icon(
-                  // ticket.eventIcon,
-                  Icons.star,
+                  _getTicketIcon(ticket.type),
                   color: Theme.of(context).colorScheme.primary,
                 ),
               ],
             ),
             //* Address
             Text(
-              // ticket.venue ?? 'xxx xxx',
               ticket.location,
               style: TextStyle(
                 color: Theme.of(context).colorScheme.onSurface,
@@ -202,5 +122,15 @@ class EventTicketCardWidget extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  IconData _getTicketIcon(TicketType type) {
+    return switch (type) {
+      TicketType.bus => Icons.airport_shuttle_outlined,
+      TicketType.train => Icons.tram_outlined,
+      TicketType.flight => Icons.flight_outlined,
+      TicketType.metro => Icons.subway_outlined,
+      TicketType.event => Icons.event_outlined,
+    };
   }
 }

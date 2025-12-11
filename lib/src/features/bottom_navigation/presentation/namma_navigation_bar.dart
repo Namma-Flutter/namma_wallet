@@ -27,9 +27,9 @@ class _NammaNavigationBarState extends State<NammaNavigationBar> {
       route: AppRoute.home.path,
     ),
     NavItem(
-      icon: Icons.qr_code_scanner,
-      label: 'Scanner',
-      route: AppRoute.scanner.path,
+      icon: Icons.add_circle,
+      label: 'Import',
+      route: AppRoute.import.path,
     ),
     NavItem(
       icon: Icons.calendar_today,
@@ -70,7 +70,7 @@ class _NammaNavigationBarState extends State<NammaNavigationBar> {
         _pendingIndex = index;
       });
 
-      HapticFeedback.selectionClick();
+      unawaited(HapticFeedback.selectionClick());
 
       // Use cancellable Timer for navigation delay
       _navigationTimer = Timer(const Duration(milliseconds: 100), () {
@@ -107,7 +107,7 @@ class _NammaNavigationBarState extends State<NammaNavigationBar> {
               return Stack(
                 children: <Widget>[
                   ...previousChildren,
-                  if (currentChild != null) currentChild,
+                  ?currentChild,
                 ],
               );
             },

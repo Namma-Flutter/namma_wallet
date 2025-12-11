@@ -1,0 +1,314 @@
+import 'package:dart_mappable/dart_mappable.dart';
+import 'package:namma_wallet/src/common/di/locator.dart';
+import 'package:namma_wallet/src/common/domain/models/extras_model.dart';
+import 'package:namma_wallet/src/common/domain/models/tag_model.dart';
+import 'package:namma_wallet/src/common/enums/ticket_type.dart';
+import 'package:namma_wallet/src/common/helper/date_time_converter.dart';
+import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
+import 'package:namma_wallet/src/features/irctc/domain/irctc_ticket_model.dart';
+import 'package:namma_wallet/src/features/tnstc/domain/tnstc_model.dart';
+
+part 'ticket.mapper.dart';
+
+@MappableClass()
+class Ticket with TicketMappable {
+  ///
+  const Ticket({
+    required this.primaryText,
+    required this.secondaryText,
+    required this.location,
+    this.startTime,
+    this.type = TicketType.train,
+    this.endTime,
+    this.tags,
+    this.extras,
+    this.ticketId,
+  });
+
+  factory Ticket.fromIRCTC(IRCTCTicket model) {
+    // Validate that required date/time fields are not null
+    if (model.dateOfJourney == null || model.scheduledDeparture == null) {
+      getIt<ILogger>().error(
+        '[Ticket.fromIRCTC] Missing required date/time: '
+        'dateOfJourney=${model.dateOfJourney}, '
+        'scheduledDeparture=${model.scheduledDeparture}',
+      );
+      throw ArgumentError(
+        'Cannot create IRCTC ticket: dateOfJourney or '
+        'scheduledDeparture is null',
+      );
+    }
+
+    final journeyDate = model.dateOfJourney!;
+    final departure = model.scheduledDeparture!;
+
+    return Ticket(
+      ticketId: model.pnrNumber,
+      primaryText: '${model.fromStation} → ${model.toStation}',
+      secondaryText:
+          'Train ${model.trainNumber} • ${model.travelClass} • '
+          '${model.passengerName}',
+      startTime: DateTime(
+        journeyDate.year,
+        journeyDate.month,
+        journeyDate.day,
+        departure.hour,
+        departure.minute,
+      ),
+      location: model.boardingStation,
+      tags: [
+        TagModel(value: model.pnrNumber, icon: 'confirmation_number'),
+        if (model.trainNumber.isNotEmpty)
+          TagModel(value: model.trainNumber, icon: 'train'),
+        if (model.travelClass.isNotEmpty)
+          TagModel(value: model.travelClass, icon: 'event_seat'),
+        if (model.status.isNotEmpty)
+          TagModel(value: model.status, icon: 'info'),
+        if (model.ticketFare > 0)
+          TagModel(
+            value: '₹${model.ticketFare.toStringAsFixed(2)}',
+            icon: 'attach_money',
+          ),
+      ],
+      extras: [
+        ExtrasModel(title: 'Passenger', value: model.passengerName),
+        ExtrasModel(title: 'Gender', value: model.gender),
+        ExtrasModel(title: 'Age', value: model.age.toString()),
+        ExtrasModel(title: 'Train Name', value: model.trainName),
+        ExtrasModel(title: 'Quota', value: model.quota),
+        ExtrasModel(title: 'From', value: model.fromStation),
+        ExtrasModel(title: 'To', value: model.toStation),
+        ExtrasModel(title: 'Boarding', value: model.boardingStation),
+        ExtrasModel(
+          title: 'Departure',
+          value: DateTimeConverter.instance.formatTime(departure),
+        ),
+        ExtrasModel(
+          title: 'Date of Journey',
+          value: DateTimeConverter.instance.formatDate(journeyDate),
+        ),
+        ExtrasModel(title: 'Fare', value: model.ticketFare.toStringAsFixed(2)),
+        ExtrasModel(
+          title: 'IRCTC Fee',
+          value: model.irctcFee.toStringAsFixed(2),
+        ),
+        ExtrasModel(title: 'Transaction ID', value: model.transactionId),
+      ],
+    );
+  }
+
+  factory Ticket.fromTNSTC(
+    TNSTCTicketModel model, {
+    String sourceType = 'PDF',
+  }) {
+    final primarySource =
+        model.serviceStartPlace ?? model.passengerStartPlace ?? 'Unknown';
+    final primaryDestination =
+        model.serviceEndPlace ?? model.passengerEndPlace ?? 'Unknown';
+
+    // Use first passenger for display if available
+    final firstPassenger = model.passengers.isNotEmpty
+        ? model.passengers.first
+        : null;
+    // Get seat numbers from either SMS field or first passenger
+    final seatNumber = model.seatNumbers.isNotEmpty ? model.seatNumbers : null;
+    final gender = firstPassenger?.gender;
+
+    var startTime = model.passengerPickupTime;
+
+    // If pickup time is missing, derive from journeyDate + serviceStartTime
+    if (startTime == null &&
+        model.journeyDate != null &&
+        model.serviceStartTime != null &&
+        model.serviceStartTime!.isNotEmpty) {
+      try {
+        // serviceStartTime format is usually "HH:mm"
+        final timeParts = model.serviceStartTime!.split(':');
+        if (timeParts.length == 2) {
+          final hour = int.parse(timeParts[0]);
+          final minute = int.parse(timeParts[1]);
+
+          // Validate hour and minute ranges
+          if (hour >= 0 && hour < 24 && minute >= 0 && minute < 60) {
+            startTime = DateTime(
+              model.journeyDate!.year,
+              model.journeyDate!.month,
+              model.journeyDate!.day,
+              hour,
+              minute,
+            );
+          }
+        }
+      } on FormatException catch (e) {
+        // Log parse failure for debugging (no PII)
+        getIt<ILogger>().warning(
+          '[Ticket.fromTNSTC] Failed to parse serviceStartTime: $e',
+        );
+      } on Exception catch (e) {
+        // Log any other parsing errors (no PII)
+        getIt<ILogger>().warning(
+          '[Ticket.fromTNSTC] Error parsing serviceStartTime: $e',
+        );
+      }
+    }
+
+    // Fallback to journeyDate if startTime is still null
+    startTime ??= model.journeyDate;
+
+    return Ticket(
+      ticketId: model.pnrNumber,
+      primaryText: '$primarySource → $primaryDestination',
+      secondaryText:
+          '${model.corporation ?? 'TNSTC'} - '
+          '${model.tripCode ?? model.routeNo ?? 'Bus'}',
+      startTime: startTime,
+      location:
+          model.passengerPickupPoint ??
+          model.boardingPoint ??
+          model.serviceStartPlace ??
+          'Unknown',
+      type: TicketType.bus,
+
+      tags: [
+        if (model.tripCode != null)
+          TagModel(value: model.tripCode, icon: 'confirmation_number'),
+        if (model.pnrNumber?.isNotEmpty ?? false)
+          TagModel(value: model.pnrNumber, icon: 'qr_code'),
+        if (model.serviceStartTime != null)
+          TagModel(value: model.serviceStartTime, icon: 'access_time'),
+        if (seatNumber != null && seatNumber.isNotEmpty)
+          TagModel(value: seatNumber, icon: 'event_seat'),
+        if (model.totalFare != null)
+          TagModel(
+            value: '₹${model.totalFare!.toStringAsFixed(2)}',
+            icon: 'attach_money',
+          ),
+      ],
+
+      extras: [
+        if (model.pnrNumber?.isNotEmpty ?? false)
+          ExtrasModel(title: 'PNR Number', value: model.pnrNumber!),
+        if (firstPassenger != null && firstPassenger.name.isNotEmpty)
+          ExtrasModel(title: 'Passenger Name', value: firstPassenger.name),
+        if (firstPassenger?.age != null && firstPassenger!.age > 0)
+          ExtrasModel(title: 'Age', value: firstPassenger.age.toString()),
+        if (gender != null && gender.isNotEmpty)
+          ExtrasModel(title: 'Gender', value: gender),
+        if (model.busIdNumber != null && model.busIdNumber!.trim().isNotEmpty)
+          ExtrasModel(title: 'Bus ID', value: model.busIdNumber!.trim()),
+        if (model.vehicleNumber != null &&
+            model.vehicleNumber!.trim().isNotEmpty)
+          ExtrasModel(
+            title: 'Bus Number',
+            value: model.vehicleNumber!.trim(),
+          ),
+        if (model.obReferenceNumber != null &&
+            model.obReferenceNumber!.trim().isNotEmpty)
+          ExtrasModel(
+            title: 'Booking Ref',
+            value: model.obReferenceNumber!.trim(),
+          ),
+        if (model.classOfService != null &&
+            model.classOfService!.trim().isNotEmpty)
+          ExtrasModel(
+            title: 'Service Class',
+            value: model.classOfService!.trim(),
+          ),
+        if (model.platformNumber != null &&
+            model.platformNumber!.trim().isNotEmpty)
+          ExtrasModel(title: 'Platform', value: model.platformNumber!.trim()),
+        if (model.passengerPickupTime != null)
+          ExtrasModel(
+            title: 'Pickup Time',
+            value: DateTimeConverter.instance.formatFullDateTime(
+              model.passengerPickupTime!,
+            ),
+          ),
+        if (model.serviceStartTime != null &&
+            model.serviceStartTime!.isNotEmpty)
+          ExtrasModel(
+            title: 'Departure Time',
+            value: DateTimeConverter.instance.formatTimeString(
+              model.serviceStartTime!,
+            ),
+          ),
+        if (seatNumber != null && seatNumber.isNotEmpty)
+          ExtrasModel(title: 'Seat', value: seatNumber),
+        if (model.numberOfSeats != null)
+          ExtrasModel(
+            title: 'Seats',
+            value: model.numberOfSeats.toString(),
+          ),
+        if (model.idCardType != null && model.idCardType!.isNotEmpty)
+          ExtrasModel(
+            title: 'ID Card Type',
+            value: model.idCardType!,
+          ),
+        if (model.idCardNumber != null && model.idCardNumber!.isNotEmpty)
+          ExtrasModel(
+            title: 'Verification ID',
+            value: model.idCardNumber!,
+          ),
+        if (model.conductorMobileNo != null &&
+            model.conductorMobileNo!.isNotEmpty)
+          ExtrasModel(
+            title: 'Conductor Contact',
+            value: model.conductorMobileNo!,
+          ),
+        if (model.totalFare != null)
+          ExtrasModel(
+            title: 'Fare',
+            value: '₹${model.totalFare!.toStringAsFixed(2)}',
+          ),
+        if (model.corporation != null && model.corporation!.isNotEmpty)
+          ExtrasModel(
+            title: 'Provider',
+            value: model.corporation!,
+          ),
+        if (model.tripCode != null && model.tripCode!.isNotEmpty)
+          ExtrasModel(title: 'Trip Code', value: model.tripCode!),
+        if (model.serviceStartPlace != null &&
+            model.serviceStartPlace!.isNotEmpty)
+          ExtrasModel(title: 'From', value: model.serviceStartPlace!)
+        else if (model.passengerStartPlace != null &&
+            model.passengerStartPlace!.isNotEmpty)
+          ExtrasModel(title: 'From', value: model.passengerStartPlace!),
+        if (model.serviceEndPlace != null && model.serviceEndPlace!.isNotEmpty)
+          ExtrasModel(title: 'To', value: model.serviceEndPlace!)
+        else if (model.passengerEndPlace != null &&
+            model.passengerEndPlace!.isNotEmpty)
+          ExtrasModel(title: 'To', value: model.passengerEndPlace!),
+        ExtrasModel(title: 'Source Type', value: sourceType),
+      ],
+    );
+  }
+
+  @MappableField(key: 'ticket_id')
+  final String? ticketId;
+  @MappableField(key: 'primary_text')
+  final String primaryText;
+  @MappableField(key: 'secondary_text')
+  final String secondaryText;
+  @MappableField(key: 'type')
+  final TicketType type;
+  @MappableField(key: 'start_time')
+  final DateTime? startTime;
+  @MappableField(key: 'end_time')
+  final DateTime? endTime;
+  @MappableField(key: 'location')
+  final String location;
+  @MappableField(key: 'tags')
+  final List<TagModel>? tags;
+  @MappableField(key: 'extras')
+  final List<ExtrasModel>? extras;
+
+  Map<String, Object?> toEntity() {
+    final map = toMap()..removeWhere((key, value) => value == null);
+    if (ticketId == null) map.remove('id');
+    return map;
+  }
+
+  static Ticket asExternalModel(Map<String, dynamic> json) {
+    return TicketMapper.fromMap(json);
+  }
+}
