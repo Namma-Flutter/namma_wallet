@@ -237,19 +237,16 @@ class ThemeSectionWidget extends StatelessWidget {
                 themeProvider.isDarkMode ? Icons.dark_mode : Icons.light_mode,
               ),
             ),
-            ListTile(
-              leading: const Icon(Icons.brightness_auto),
+            SwitchListTile(
               title: const Text('Use System Theme'),
-              trailing: Switch(
-                value: themeProvider.isSystemMode,
-                onChanged: (value) async {
-                  if (value) {
-                    await themeProvider.setSystemMode();
-                  } else {
-                    await themeProvider.setLightMode();
-                  }
-                },
-              ),
+              value: themeProvider.isSystemMode,
+              onChanged: (value) async {
+                if (value) {
+                  await themeProvider.setSystemMode();
+                } else {
+                  await themeProvider.setLightMode();
+                }
+              },
             ),
           ],
         ),
