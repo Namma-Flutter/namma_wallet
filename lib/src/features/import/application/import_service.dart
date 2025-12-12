@@ -68,7 +68,7 @@ class ImportService implements IImportService {
       }
 
       // Save the parsed ticket to the database
-      await _ticketDao.insertTicket(parsedTicket);
+      await _ticketDao.handleTicket(parsedTicket);
 
       _logger.success(
         'Successfully imported and saved PDF ticket: ${parsedTicket.ticketId}',

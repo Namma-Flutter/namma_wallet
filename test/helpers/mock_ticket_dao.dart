@@ -18,7 +18,7 @@ class MockTicketDAO implements ITicketDAO {
   final List<Ticket> insertedTickets = [];
 
   /// Store update calls for verification
-  /// Changed from Map<String, dynamic> to Ticket to match new interface
+  /// Changed from `Map<String, dynamic>` to `Ticket` to match new interface
   final List<MapEntry<String, Ticket>> updateCalls = [];
 
   /// Whether delete should succeed
@@ -41,7 +41,7 @@ class MockTicketDAO implements ITicketDAO {
       return insertTicket(ticket);
     } else {
       // mimic Update/Merge
-      // We use the real Factory here to ensure tests verify the merge logic works
+      // Use real Factory to ensure tests verify merge logic
       final merged = Ticket.mergeTickets(existing, ticket);
       return updateTicketById(pnr, merged);
     }
@@ -50,7 +50,7 @@ class MockTicketDAO implements ITicketDAO {
   @override
   Future<int> insertTicket(Ticket ticket) async {
     if (shouldThrow) throw Exception('Mock insert error');
-
+    // Compare enum name to filter by type
     insertedTickets.add(ticket);
     return 1;
   }
@@ -88,7 +88,8 @@ class MockTicketDAO implements ITicketDAO {
   @override
   Future<List<Ticket>> getTicketsByType(String type) async {
     if (shouldThrow) throw Exception('Mock get error');
-    // Assuming TicketType is an enum, we compare names or convert string to enum
+    // Assuming TicketType is an enum,
+    // we compare names or convert string to enum
     return insertedTickets.where((t) => t.type.name == type).toList();
   }
 

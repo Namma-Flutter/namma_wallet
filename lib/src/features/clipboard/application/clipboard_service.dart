@@ -45,11 +45,11 @@ class ClipboardService implements IClipboardService {
   /// Workflow:
   /// 1. Check if clipboard has text content
   /// 2. Read and validate text content
-  /// 3. Check if it's an update SMS (conductor details, etc.)
-  /// 4. If update SMS, apply updates to existing ticket
-  /// 5. Otherwise, attempt to parse as new ticket
-  /// 6. Save new ticket to database
-  /// 7. Return result with ticket or error
+  /// 3. Attempt to parse as new ticket
+  /// 4. Pass it to the [_saveNewTicket] method
+  /// 5. It has `_ticketDao.handleTicket` method will do save the ticket
+  /// to database either update or insert
+  /// 6. Return result with ticket or error
   ///
   /// Returns [ClipboardResult] with:
   /// - Success: Content type and parsed ticket
@@ -107,36 +107,6 @@ class ClipboardService implements IClipboardService {
       return ClipboardResult.error('Unexpected error. Please try again.');
     }
   }
-
-  /// Handles update SMS by applying updates to existing ticket.
-  ///
-  /// Returns success if ticket was found and updated,
-  /// error if no matching ticket was found.
-  // Future<ClipboardResult> _handleUpdateSMS(
-  //   TicketUpdateInfo updateInfo,
-  //   String content,
-  // ) async {
-  //   final count = await _ticketDao.updateTicketById(
-  //     updateInfo.pnrNumber,
-  //     updateInfo.updates,
-  //   );
-  //
-  //   if (count > 0) {
-  //     _logger.success('Ticket updated successfully via SMS');
-  //     return ClipboardResult.success(
-  //       ClipboardContentType.travelTicket,
-  //       content,
-  //     );
-  //   } else {
-  //     _logger.warning(
-  //       'Update SMS received, but no matching ticket found',
-  //     );
-  //     return ClipboardResult.error(
-  //       'Update SMS received, but the original ticket was not found in the '
-  //       'wallet.',
-  //     );
-  //   }
-  // }
 
   /// Saves a new ticket to the database.
   ///

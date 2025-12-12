@@ -30,6 +30,7 @@ class MockClipboardRepository implements IClipboardRepository {
 
 /// Mock implementation of ITravelParser for testing
 class MockTravelParserService implements ITravelParser {
+  // TicketUpdateInfo is now largely ignored if update-SMS flow is disabled
   TicketUpdateInfo? updateInfo;
   Ticket? parsedTicket;
 
@@ -44,26 +45,42 @@ class MockTravelParserService implements ITravelParser {
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
-/// Mock implementation of ITicketDAO for testing
+/// Mock implementation of ITicketDAO for testing - RECONCILED
 class MockTicketDao implements ITicketDAO {
-  int updateRowCount = 0;
+  // Use insertedId for successful insert/handle return value
   int insertedId = 1;
+
+  // Use shouldThrowError to simulate database failure
+  // (e.g., duplicate key, connection error)
   bool shouldThrowError = false;
+
+  // Track the number of successful updates/inserts for assertions
+  int handleTicketCallCount = 0;
+
+  // Kept for interface compliance, but ignored by new ClipboardService tests
+  int updateRowCount = 0;
 
   @override
   Future<int> handleTicket(Ticket ticket) async {
-    // For mocking purposes, we can assume success
-    return 1;
+    handleTicketCallCount++;
+    if (shouldThrowError) {
+      // Simulate database error for insert/update attempts
+      throw Exception('Database error');
+    }
+    // A successful 'handle' operation typically returns the ID or 1 for success
+    return insertedId;
   }
 
+  // Legacy method: Kept for interface compliance
   @override
   Future<int> updateTicketById(
     String ticketId,
-    Ticket ticket, // Changed from Map<String, Object?> to Ticket
+    Ticket ticket,
   ) async {
     return updateRowCount;
   }
 
+  // Legacy method: Kept for interface compliance
   @override
   Future<int> insertTicket(Ticket ticket) async {
     if (shouldThrowError) {
@@ -154,6 +171,9 @@ void main() {
           mockParserService
             ..updateInfo = null
             ..parsedTicket = parsedTicket;
+
+          // The updated MockTicketDao handles success when
+          // shouldThrowError is false
           mockDatabase.insertedId = 1;
 
           // Act (When)
@@ -167,32 +187,7 @@ void main() {
         },
       );
 
-      test(
-        'Given clipboard with update SMS, When reading and parsing, '
-        'Then updates existing ticket successfully',
-        () async {
-          // Arrange (Given)
-          const updateSMS = 'PNR: T12345678, Conductor Mobile No: 9876543210';
-          final updateInfo = TicketUpdateInfo(
-            pnrNumber: 'T12345678',
-            providerName: 'TNSTC',
-            updates: {'conductorMobileNo': '9876543210'},
-          );
-
-          mockRepository
-            ..hasContent = true
-            ..textContent = updateSMS;
-          mockParserService.updateInfo = updateInfo;
-          mockDatabase.updateRowCount = 1;
-
-          // Act (When)
-          final result = await service.readAndParseClipboard();
-
-          // Assert (Then)
-          expect(result.isSuccess, isTrue);
-          expect(result.type, equals(ClipboardContentType.travelTicket));
-        },
-      );
+      // REMOVED: Test case for successful update-SMS flow (Lines 207-228)
     });
 
     group('readAndParseClipboard - Error Scenarios', () {
@@ -268,32 +263,8 @@ void main() {
         },
       );
 
-      test(
-        'Given update SMS for non-existent ticket, When reading and parsing, '
-        'Then returns error result',
-        () async {
-          // Arrange (Given)
-          const updateSMS = 'PNR: T99999999, Conductor Mobile No: 9876543210';
-          final updateInfo = TicketUpdateInfo(
-            pnrNumber: 'T99999999',
-            providerName: 'TNSTC',
-            updates: {'conductorMobileNo': '9876543210'},
-          );
-
-          mockRepository
-            ..hasContent = true
-            ..textContent = updateSMS;
-          mockParserService.updateInfo = updateInfo;
-          mockDatabase.updateRowCount = 0; // No rows updated
-
-          // Act (When)
-          final result = await service.readAndParseClipboard();
-
-          // Assert (Then)
-          expect(result.isSuccess, isFalse);
-          expect(result.errorMessage, contains('not found'));
-        },
-      );
+      // REMOVED: Test case for update SMS for
+      // non-existent ticket (Lines 272-295)
 
       test(
         'Given duplicate ticket, When saving to database, '

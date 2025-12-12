@@ -59,7 +59,7 @@ class TNSTCBusParser implements TravelTicketParser {
   /// Detects if the text is SMS format by checking for SMS-specific patterns
   @override
   bool isSMSFormat(String text) {
-    // SMS contains "SETC" or has SMS-style patterns
+    // SMS contains TNSTC SMS-style patterns
     // like "From :", "To ", "Trip :"
     // PDF has "Service Start Place", "PNR Number", "Date of Journey"
     final smsPatterns = [
@@ -251,7 +251,7 @@ class IRCTCTrainParser implements TravelTicketParser {
       final smsParser = IRCTCSMSParser();
       return smsParser.parseTicket(text);
     } else {
-      final pdfParser = IRCTCPDFParser();
+      final pdfParser = IRCTCPDFParser(logger: _logger);
       return pdfParser.parseTicket(text);
     }
   }

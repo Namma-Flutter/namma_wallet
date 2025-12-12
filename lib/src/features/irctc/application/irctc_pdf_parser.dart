@@ -63,21 +63,63 @@ class IRCTCPDFParser implements ITicketParser {
       'SF',
     };
 
-    /// Normalizes raw class text to a valid IRCTC class code.
-    String? normalizeClass(String raw) {
-      if (raw.isEmpty) return 'SL';
-      final upper = raw.toUpperCase().trim();
-      final parenMatch = RegExp(r'\(([A-Z0-9]{2})\)').firstMatch(upper);
+    String? normalizeClass(String? raw) {
+      if (raw == null || raw.isEmpty) return null;
+
+      final upper = raw.toUpperCase().replaceAll(RegExp(r'["\n]'), '').trim();
+
+      final parenMatch = RegExp(r'\(([A-Z0-9]{2,3})\)').firstMatch(upper);
       if (parenMatch != null) {
-        final code = parenMatch.group(1)!;
+        return parenMatch.group(1);
+      }
+
+      // 2. Keyword Matching (Specific to Generic)
+      if (upper.contains('AC 3') ||
+          upper.contains('3RD AC') ||
+          upper.contains('3A')) {
+        return '3A';
+      }
+      if (upper.contains('AC 2') ||
+          upper.contains('2ND AC') ||
+          upper.contains('2A')) {
+        return '2A';
+      }
+      if (upper.contains('AC 1') ||
+          upper.contains('1ST AC') ||
+          upper.contains('FIRST AC') ||
+          upper.contains('1A')) {
+        return '1A';
+      }
+      if (upper.contains('CHAIR') || upper.contains('CC')) return 'CC';
+      if (upper.contains('SLEEPER') || upper.contains('SL')) return 'SL';
+      if (upper.contains('2S') || upper.contains('SECOND')) return '2S';
+      if (upper.contains('EXECUTIVE')) return 'EC';
+
+      if (upper.length <= 3) return upper;
+
+      return null;
+    }
+
+    /// Normalizes raw class text to a valid IRCTC class code.
+    String? extractClass(String text) {
+      final m1 = RegExp(
+        r'Class\s*[:\-]\s*([A-Za-z0-9 ()/]+)',
+        caseSensitive: false,
+      ).firstMatch(text);
+      if (m1 != null) return normalizeClass(m1.group(1));
+
+      final m2 = RegExp(
+        r'Class\s*\n[^\n]*\n.*?\s([A-Za-z ]*\([A-Z0-9]{2,3}\))',
+        caseSensitive: false,
+      ).firstMatch(text);
+      if (m2 != null) return normalizeClass(m2.group(1));
+
+      final fallback = RegExp(r'\(([A-Z0-9]{2,3})\)').allMatches(text);
+      for (final match in fallback) {
+        final code = match.group(1)!;
         if (allowedClasses.contains(code)) return code;
       }
-      if (upper.contains('AC 3')) return '3A';
-      if (upper.contains('AC 2')) return '2A';
-      if (upper.contains('AC 1') || upper.contains('FIRST AC')) return '1A';
-      if (upper.contains('CHAIR')) return 'CC';
-      if (upper.contains('SLEEPER') || upper.contains('SL')) return 'SL';
-      if (allowedClasses.contains(upper)) return upper;
+
       return null;
     }
 
@@ -130,17 +172,12 @@ class IRCTCPDFParser implements ITicketParser {
       return double.tryParse(v) ?? 0.0;
     }
 
-    // -------------------------------------------------------------------------
-    // Extraction Logic
-    // -------------------------------------------------------------------------
-
     /// Extracts PNR number using multiple regex variations.
     final pnr = pick([
       r'PNR(?:[\s\S]{0,50}?)(\d{10})',
       r'PNR\s*[:.-]?\s*(\d{10})',
     ]);
 
-    // STATIONS
     /// Extracted origin station name.
     var fromStn = '';
 
@@ -208,7 +245,6 @@ class IRCTCPDFParser implements ITicketParser {
       if (fullBoarding.isNotEmpty) boardingStn = fullBoarding;
     }
 
-    // TRAIN
     /// Extracts train number.
     final trainNumber = pick([
       r'Train No\./\s*Name\s+(?:[:.-])?\s*(\d{5})(?!\d)',
@@ -223,18 +259,11 @@ class IRCTCPDFParser implements ITicketParser {
     ]);
 
     /// Raw travel class as printed on ticket.
-    final rawClass = pick([
-      r'Class(?:[\s\S]{0,20}?)([A-Za-z0-9 ]+\([A-Z0-9]+\))',
-      r'Class\s*[:]\s*([A-Z ]+)',
-    ]);
-
-    /// Normalized class (SL, 3A, etc.)
-    final travelClass = normalizeClass(rawClass);
+    final travelClass = extractClass(rawText);
 
     /// Quota extracted from ticket text.
     final quota = pick([r'Quota(?:[\s\S]{0,20}?)([A-Za-z ]+\([A-Z]+\))']);
 
-    // DATE
     /// Raw date-time text extracted from ticket text.
     final dateTimeRaw = pick([
       r'Scheduled Departure[\s\S]{0,10}?[:"]+\s*(\d{2}-[A-Za-z]{3}-\d{4}\s+\d{2}:\d{2})',
@@ -269,7 +298,13 @@ class IRCTCPDFParser implements ITicketParser {
             );
           }
         }
-      } on Exception catch (_) {}
+      } on Exception catch (e, stackTree) {
+        _logger.error(
+          '[IRCTCPDFParser] Failed to parse date: $e',
+          e,
+          stackTree,
+        );
+      }
       return null;
     }
 
@@ -331,7 +366,7 @@ class IRCTCPDFParser implements ITicketParser {
       ).firstMatch(lookAhead);
 
       if (statusMatch != null) {
-        pStatus = statusMatch.group(1)?.trim() ?? 'CNF';
+        pStatus = statusMatch.group(1)?.trim() ?? '';
       } else if (lookAhead.contains('CNF')) {
         pStatus = 'CNF';
       }

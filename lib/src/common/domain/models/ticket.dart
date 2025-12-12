@@ -7,6 +7,7 @@ import 'package:namma_wallet/src/common/helper/date_time_converter.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
 import 'package:namma_wallet/src/features/irctc/domain/irctc_ticket_model.dart';
 import 'package:namma_wallet/src/features/tnstc/domain/tnstc_model.dart';
+import 'package:namma_wallet/src/features/travel/application/travel_parser_service.dart';
 
 part 'ticket.mapper.dart';
 
@@ -285,10 +286,8 @@ class Ticket with TicketMappable {
 
   factory Ticket.mergeTickets(Ticket existing, Ticket incoming) {
     return Ticket(
-      // ID should match, but we keep 'this' to be safe
       ticketId: existing.ticketId,
 
-      // 1. Strings: Only overwrite if the incoming data is NOT empty/null
       primaryText:
           (incoming.primaryText.isNotEmpty &&
               incoming.primaryText.trim() != '→')
@@ -297,9 +296,7 @@ class Ticket with TicketMappable {
 
       secondaryText:
           (incoming.secondaryText.isNotEmpty &&
-              incoming.secondaryText.trim().contains('Train • •'))
-          // Note: Added check to ignore your specific empty "Train • •"
-          // string if parser generates it
+              !incoming.secondaryText.trim().contains('Train • •'))
           ? incoming.secondaryText
           : existing.secondaryText,
 
@@ -307,14 +304,20 @@ class Ticket with TicketMappable {
           ? incoming.location
           : existing.location,
 
-      // 2. Dates: If incoming has a valid time, use it (e.g. delayed time).
-      // Otherwise keep original.
-      startTime: incoming.startTime ?? existing.startTime,
-      endTime: incoming.endTime ?? existing.endTime,
+      startTime:
+          (incoming.startTime.toString().isEmpty ||
+              incoming.startTime == IRCTCTrainParser.invalidDateSentinel)
+          ? existing.startTime
+          : incoming.startTime,
+
+      endTime:
+          (incoming.endTime.toString().isEmpty ||
+              incoming.endTime == IRCTCTrainParser.invalidDateSentinel)
+          ? existing.endTime
+          : incoming.endTime,
 
       type: incoming.type,
 
-      // 3. Lists: Intelligent Merging
       tags: _mergeTags(existing.tags, incoming.tags),
       extras: _mergeExtras(existing.extras, incoming.extras),
     );
@@ -330,19 +333,17 @@ class Ticket with TicketMappable {
     if (incoming == null || incoming.isEmpty) return current;
     if (current == null || current.isEmpty) return incoming;
 
-    // 1. Create a Map of the CURRENT extras key=Title
     final mergedMap = <String, ExtrasModel>{
       for (final item in current) ?item.title: item,
     };
 
-    // 2. Iterate through INCOMING items
     for (final newItem in incoming) {
       // Logic: Only update if value is not null and not empty
-      final hasValue = newItem.value.trim().isNotEmpty;
+      final hasValue =
+          newItem.value.trim().isNotEmpty &&
+          (newItem.value.trim() !=
+              IRCTCTrainParser.invalidDateSentinel.toString());
 
-      // Special Logic for IRCTC Fee/Fare:
-      // Even if value is "0.00", we might want to update it if it's a cancellation.
-      // But generally, we skip empty strings.
       if (hasValue) {
         mergedMap[newItem.title ?? ''] = newItem;
       }
@@ -361,27 +362,17 @@ class Ticket with TicketMappable {
     if (incoming == null || incoming.isEmpty) return current;
     if (current == null || current.isEmpty) return incoming;
 
-    // We start with the existing tags
     final result = List<TagModel>.from(current);
 
     for (final newTag in incoming) {
-      // Find if we already have a tag with this icon (e.g. 'attach_money')
       final existingIndex = result.indexWhere((t) => t.icon == newTag.icon);
 
       if (existingIndex != -1) {
-        // UPDATE: logic
-        // If the new tag is 'attach_money' and value is different, replace it (Update Price)
-        // If the new tag is 'confirmation_number', it's likely the same, replace anyway.
         result[existingIndex] = newTag;
       } else {
-        // INSERT: logic
-        // If this is a new tag (e.g. 'info' icon for 'cancelled'), add it.
         result.add(newTag);
       }
     }
-
-    // Optional: Sort logic if you want 'info' (Status) to appear first
-    // result.sort(...)
 
     return result;
   }

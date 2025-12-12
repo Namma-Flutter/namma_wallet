@@ -86,11 +86,10 @@ class TicketDao implements ITicketDAO {
       final db = await _database.database;
 
       // Convert to Map and handle JSON encoding
-      final map = ticket.toEntity();
-
-      // Clean up fields meant for complex objects
-      map.remove('tags');
-      map.remove('extras');
+      final map = ticket.toEntity()
+        // Clean up fields meant for complex objects
+        ..remove('tags')
+        ..remove('extras');
 
       if (ticket.tags != null && ticket.tags!.isNotEmpty) {
         map['tags'] = jsonEncode(ticket.tags!.map((e) => e.toMap()).toList());
@@ -140,18 +139,17 @@ class TicketDao implements ITicketDAO {
       final db = await _database.database;
 
       // Prepare updates map from the Ticket object
-      final updates = ticket.toEntity();
-
-      // Remove fields we don't strictly want to overwrite blindly if they are null in the object
-      // (Though since we passed a 'merged' ticket, these should be correct).
-      updates.remove('id'); // Never update the primary key ID
-      updates.remove('created_at'); // Never update creation time
-
+      final updates = ticket.toEntity()
+        // Remove fields we don't strictly want to overwrite blindly
+        // if they are null in the object
+        // (Though since we passed a 'merged' ticket, these should be correct).
+        ..remove('id') // Never update the primary key ID
+        ..remove('created_at') // Never update creation time
+        ..remove('tags')
+        ..remove('extras');
       updates['updated_at'] = DateTime.now().toIso8601String();
 
       // Handle JSON fields
-      updates.remove('tags');
-      updates.remove('extras');
 
       if (ticket.tags != null) {
         updates['tags'] = jsonEncode(
@@ -239,7 +237,7 @@ class TicketDao implements ITicketDAO {
         return [];
       }
 
-      return result.map((map) => _mapToTicket(map)).toList();
+      return result.map(_mapToTicket).toList();
     } catch (e, stackTrace) {
       _logger.error('Failed to fetch all tickets from database', e, stackTrace);
       rethrow;
@@ -264,7 +262,7 @@ class TicketDao implements ITicketDAO {
         return [];
       }
 
-      return result.map((map) => _mapToTicket(map)).toList();
+      return result.map(_mapToTicket).toList();
     } catch (e, stackTrace) {
       _logger.error('Failed to fetch tickets of type: $type', e, stackTrace);
       rethrow;
@@ -307,16 +305,17 @@ class TicketDao implements ITicketDAO {
 
   /// Helper to convert DB Map to Ticket Object
   Ticket _mapToTicket(Map<String, Object?> map) {
+    final tagsRaw = map['tags'];
+    final extrasRaw = map['extras'];
+
     final decodedMap = {
       ...map,
-      'tags': map['tags'] == null || (map['tags'] as String).isEmpty
-          ? null
-          : (jsonDecode(map['tags'] as String) as List)
-                .cast<Map<String, dynamic>>(),
-      'extras': map['extras'] == null || (map['extras'] as String).isEmpty
-          ? null
-          : (jsonDecode(map['extras'] as String) as List)
-                .cast<Map<String, dynamic>>(),
+      'tags': tagsRaw is String && tagsRaw.isNotEmpty
+          ? (jsonDecode(tagsRaw) as List).cast<Map<String, dynamic>>()
+          : null,
+      'extras': extrasRaw is String && extrasRaw.isNotEmpty
+          ? (jsonDecode(extrasRaw) as List).cast<Map<String, dynamic>>()
+          : null,
     };
 
     return TicketMapper.fromMap(decodedMap);

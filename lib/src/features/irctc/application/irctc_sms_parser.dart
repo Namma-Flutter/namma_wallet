@@ -6,7 +6,6 @@ import 'package:namma_wallet/src/features/travel/application/travel_parser_servi
 class IRCTCSMSParser implements ITicketParser {
   @override
   Ticket parseTicket(String smsText) {
-    // Normalize text for easier pattern matching.
     final rawText = smsText
         .replaceAll(RegExp(r'[\r\n]+'), ' ')
         .replaceAll(RegExp(r'\s+'), ' ')
@@ -19,11 +18,11 @@ class IRCTCSMSParser implements ITicketParser {
     }
 
     // Safe date parser – falls back to today if malformed/missing.
-    DateTime? parseDate(String value) {
-      if (value.isEmpty) return DateTime.now();
+    DateTime parseDate(String value) {
+      if (value.isEmpty) return IRCTCTrainParser.invalidDateSentinel;
 
       final parts = value.split(RegExp('[-/]'));
-      if (parts.length != 3) return DateTime.now();
+      if (parts.length != 3) return IRCTCTrainParser.invalidDateSentinel;
 
       try {
         final d = int.parse(parts[0]);
@@ -33,7 +32,7 @@ class IRCTCSMSParser implements ITicketParser {
             : int.parse(parts[2]);
         return DateTime(y, m, d);
       } on Exception catch (_) {
-        return null;
+        return IRCTCTrainParser.invalidDateSentinel;
       }
     }
 
@@ -45,18 +44,18 @@ class IRCTCSMSParser implements ITicketParser {
     }
     if (pnr.isEmpty) pnr = '';
 
-    // ---------------------- TRAIN NUMBER ----------------------
     final trainNumber = extract(r'(?:TRN|Train|Trn)[:\-\s]*([0-9]{3,5})');
 
-    // ---------------------- DATE OF JOURNEY ----------------------
     final dojRaw = extract(
-      r'(?:DOJ|Journey Date|Date|Date of Journey)'
-      r'[:\-\s]*([0-9]{1,2}[-/][0-9]{1,2}[-/][0-9]{2,4})',
+      /// this ignore is added here because, changing the regex making the
+      /// parser fails.
+      // ignore: missing_whitespace_between_adjacent_strings
+      r'(?:DOJ|Journey Date|Date|Date of Journey)[:\-\s]*'
+      '([0-9]{1,2}[-/][0-9]{1,2}[-/][0-9]{2,4})',
     );
 
     final doj = parseDate(dojRaw);
 
-    // ---------------------- CLASS ----------------------
     var travelClass = extract(r'(?:Class|Cls)[:\-\s]*([A-Za-z0-9\/]{2,3})');
 
     const allowedClasses = {
@@ -73,7 +72,6 @@ class IRCTCSMSParser implements ITicketParser {
       '2E',
     };
 
-    // Derive class from coach like S2 / B3 / A1
     if (travelClass.isEmpty) {
       final coach = extract(r'([SABHEC][0-9])\s*[0-9]{1,2}');
       if (coach.isNotEmpty) {
@@ -93,7 +91,6 @@ class IRCTCSMSParser implements ITicketParser {
     travelClass = travelClass.toUpperCase();
     if (!allowedClasses.contains(travelClass)) travelClass = '';
 
-    // ---------------------- STATIONS ----------------------
     var fromStation = '';
     var toStation = '';
 
@@ -117,7 +114,6 @@ class IRCTCSMSParser implements ITicketParser {
     fromStation = fromStation.toUpperCase();
     toStation = toStation.toUpperCase();
 
-    // ---------------------- DEPARTURE TIME ----------------------
     final depRaw = extract(
       r'(?:DP|Dep|Departure)[:\-\s]*([0-9]{1,2}[:.][0-9]{2})',
     );
@@ -127,18 +123,17 @@ class IRCTCSMSParser implements ITicketParser {
       final hm = depRaw.replaceAll('.', ':').split(':');
       try {
         scheduledDeparture = DateTime(
-          doj!.year,
+          doj.year,
           doj.month,
           doj.day,
           int.parse(hm[0]),
           int.parse(hm[1]),
         );
       } on Exception catch (_) {
-        scheduledDeparture = null;
+        scheduledDeparture = IRCTCTrainParser.invalidDateSentinel;
       }
     }
 
-    // ---------------------- PASSENGER NAME ----------------------
     var passenger = extract(r'Passenger[:\-\s]*([A-Za-z \+]+)');
 
     if (passenger.isEmpty) {
@@ -147,17 +142,6 @@ class IRCTCSMSParser implements ITicketParser {
       );
     }
 
-    // if (passenger.isEmpty) {
-    //   final m = RegExp(
-    //     r'(?:^|[, ])([A-Za-z][A-Za-z ]{2,40})\b',
-    //   ).firstMatch(rawText);
-    //   if (m != null) {
-    //     final candidate = m.group(1)!.trim();
-    //     if (candidate.contains(' ')) passenger = candidate;
-    //   }
-    // }
-
-    // ---------------------- STATUS (Booking / Cancelled / Coach Allocated) ----------------------
     var status = extract(
       r'(Cancelled|CNF|CONFIRMED|RAC|WL\s*[0-9]+|Waitlist)',
     );
@@ -172,7 +156,6 @@ class IRCTCSMSParser implements ITicketParser {
       status = 'CNF';
     }
 
-    // ---------------------- Fare ----------------------
     var fare = 0.0;
 
     for (final pattern in [
@@ -193,7 +176,6 @@ class IRCTCSMSParser implements ITicketParser {
         ) ??
         0.0;
 
-    // ---------------------- Build Model ----------------------
     final irctcModel = IRCTCTicket(
       pnrNumber: pnr,
       transactionId: '',
@@ -214,7 +196,6 @@ class IRCTCSMSParser implements ITicketParser {
       irctcFee: irctcFee,
     );
 
-    // Convert to generic ticket with safe fallbacks.
     return Ticket.fromIRCTC(irctcModel);
   }
 }

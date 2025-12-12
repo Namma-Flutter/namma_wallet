@@ -43,7 +43,7 @@ void main() {
       'Then extracts all fields correctly',
       () async {
         final pdfFile = File(
-          'test/assets/E-Ticket_T73309927_18-01-2026.pdf',
+          'test/assets/tnstc/E-Ticket_T73309927_18-01-2026.pdf',
         );
 
         // Skip test if PDF file doesn't exist
