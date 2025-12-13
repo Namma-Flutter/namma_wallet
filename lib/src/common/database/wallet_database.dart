@@ -69,6 +69,7 @@ class WalletDatabase implements IWalletDatabase {
   ''');
 
     await _createTicketTable(db);
+    await _createTrainStationTable(db);
   }
 
   /// function [_createTicketTable] will helps to create
@@ -102,6 +103,21 @@ class WalletDatabase implements IWalletDatabase {
     await db.execute(
       'CREATE INDEX IF NOT EXISTS idx_tickets_start_time ON tickets '
       '(start_time);',
+    );
+  }
+
+  Future<void> _createTrainStationTable(Database db) async {
+    const query = '''
+    CREATE TABLE stations (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      station_name TEXT NOT NULL,
+      station_code TEXT NOT NULL UNIQUE
+    );
+    ''';
+
+    await db.execute(query);
+    await db.execute(
+      'CREATE INDEX IF NOT EXISTS idx_station_code ON stations (station_code);',
     );
   }
 

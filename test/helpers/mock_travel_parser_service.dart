@@ -9,6 +9,7 @@ import 'package:namma_wallet/src/features/travel/application/travel_parser_servi
 class MockTravelParserService extends TravelParserService {
   MockTravelParserService({
     required super.logger,
+    required super.stationPdfParser,
     this.mockUpdateInfo,
     this.mockTicket,
     DateTime? mockStartTime,

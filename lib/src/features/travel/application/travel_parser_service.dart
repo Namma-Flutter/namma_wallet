@@ -5,6 +5,7 @@ import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 import 'package:namma_wallet/src/common/enums/source_type.dart';
 import 'package:namma_wallet/src/common/enums/ticket_type.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
+import 'package:namma_wallet/src/common/services/pdf/station_pdf_parser.dart';
 import 'package:namma_wallet/src/features/irctc/application/irctc_pdf_parser.dart';
 import 'package:namma_wallet/src/features/irctc/application/irctc_sms_parser.dart';
 import 'package:namma_wallet/src/features/tnstc/application/tnstc_pdf_parser.dart';
@@ -185,8 +186,14 @@ class TNSTCBusParser implements TravelTicketParser {
 }
 
 class IRCTCTrainParser implements TravelTicketParser {
-  IRCTCTrainParser({required ILogger logger}) : _logger = logger;
+  IRCTCTrainParser({
+    required ILogger logger,
+    required StationPdfParser stationPdfParser,
+  }) : _logger = logger,
+       _stationPdfParser = stationPdfParser;
+
   final ILogger _logger;
+  final StationPdfParser _stationPdfParser;
 
   /// Sentinel value for invalid/missing journey dates
   /// This is UTC(1970,1,1) - epoch start time
@@ -248,7 +255,7 @@ class IRCTCTrainParser implements TravelTicketParser {
     final isSMS = isSMSFormat(text);
 
     if (isSMS) {
-      final smsParser = IRCTCSMSParser();
+      final smsParser = IRCTCSMSParser(stationPdfParser: _stationPdfParser);
       return smsParser.parseTicket(text);
     } else {
       final pdfParser = IRCTCPDFParser(logger: _logger);
@@ -308,13 +315,18 @@ class SETCBusParser implements TravelTicketParser {
 }
 
 class TravelParserService implements ITravelParser {
-  TravelParserService({required ILogger logger})
-    : _logger = logger,
-      _parsers = [
-        SETCBusParser(),
-        TNSTCBusParser(logger: logger),
-        IRCTCTrainParser(logger: logger),
-      ];
+  TravelParserService({
+    required ILogger logger,
+    required StationPdfParser stationPdfParser,
+  }) : _logger = logger,
+       _parsers = [
+         SETCBusParser(),
+         TNSTCBusParser(logger: logger),
+         IRCTCTrainParser(
+           logger: logger,
+           stationPdfParser: stationPdfParser,
+         ),
+       ];
   final ILogger _logger;
   final List<TravelTicketParser> _parsers;
 
