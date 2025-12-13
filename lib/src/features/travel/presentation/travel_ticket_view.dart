@@ -457,7 +457,7 @@ class _TravelTicketViewState extends State<TravelTicketView> {
                                   Expanded(
                                     flex: 3,
                                     child: Text(
-                                      filteredExtras[i].value,
+                                      filteredExtras[i].value ?? '-',
                                       overflow: TextOverflow.ellipsis,
                                       maxLines: 1,
                                       style: Paragraph03(

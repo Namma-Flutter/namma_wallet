@@ -1,5 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:get_it/get_it.dart' show GetIt;
 import 'package:namma_wallet/src/common/enums/source_type.dart';
+import 'package:namma_wallet/src/common/services/pdf/station_pdf_parser.dart';
 import 'package:namma_wallet/src/features/travel/application/travel_parser_service.dart';
 
 import '../../../../fixtures/tnstc_sms_fixtures.dart';
@@ -12,7 +14,11 @@ void main() {
 
     setUp(() {
       fakeLogger = FakeLogger();
-      service = TravelParserService(logger: fakeLogger);
+      final stationPdfParser = GetIt.I<StationPdfParser>();
+      service = TravelParserService(
+        logger: fakeLogger,
+        stationPdfParser: stationPdfParser,
+      );
     });
 
     group('TNSTC Parser - SMS Format', () {

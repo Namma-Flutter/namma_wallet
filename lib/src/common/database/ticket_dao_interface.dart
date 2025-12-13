@@ -14,11 +14,10 @@ abstract interface class ITicketDAO {
   /// Get ticket by type
   Future<List<Ticket>> getTicketsByType(String type);
 
+  Future<int> handleTicket(Ticket ticket);
+
   /// Update by Ticket Id
-  Future<int> updateTicketById(
-    String ticketId,
-    Map<String, Object?> updates,
-  );
+  Future<int> updateTicketById(String ticketId, Ticket ticket);
 
   /// Delete a ticket
   Future<int> deleteTicket(String id);
