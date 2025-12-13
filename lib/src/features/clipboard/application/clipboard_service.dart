@@ -47,8 +47,7 @@ class ClipboardService implements IClipboardService {
   /// 2. Read and validate text content
   /// 3. Attempt to parse as new ticket
   /// 4. Pass it to the [_saveNewTicket] method
-  /// 5. It has `_ticketDao.handleTicket` method will do save the ticket
-  /// to database either update or insert
+  /// 5. Persist via _ticketDao.handleTicket (DAO decides insert vs merge/update).
   /// 6. Return result with ticket or error
   ///
   /// Returns [ClipboardResult] with:
@@ -78,13 +77,7 @@ class ClipboardService implements IClipboardService {
         );
       }
 
-      // Step 4: Check if this is an update SMS (conductor details, etc.)
-      // final updateInfo = _parserService.parseUpdateSMS(content);
-      // if (updateInfo != null) {
-      //   return await _handleUpdateSMS(updateInfo, content);
-      // }
-
-      // Step 5: Attempt to parse as new ticket
+      // Step 4 and 5: Attempt to parse as new ticket
       final parsedTicket = _parserService.parseTicketFromText(
         content,
         sourceType: SourceType.clipboard,

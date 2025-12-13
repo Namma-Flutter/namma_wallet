@@ -144,6 +144,7 @@ class TicketDao implements ITicketDAO {
         // if they are null in the object
         // (Though since we passed a 'merged' ticket, these should be correct).
         ..remove('id') // Never update the primary key ID
+        ..remove('ticket_id') // Never update the business/unique ticket ID
         ..remove('created_at') // Never update creation time
         ..remove('tags')
         ..remove('extras');

@@ -7,7 +7,6 @@ import 'package:namma_wallet/src/common/helper/date_time_converter.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
 import 'package:namma_wallet/src/features/irctc/domain/irctc_ticket_model.dart';
 import 'package:namma_wallet/src/features/tnstc/domain/tnstc_model.dart';
-import 'package:namma_wallet/src/features/travel/application/travel_parser_service.dart';
 
 part 'ticket.mapper.dart';
 
@@ -26,9 +25,12 @@ class Ticket with TicketMappable {
     this.ticketId,
   });
 
-  factory Ticket.fromIRCTC(IRCTCTicket model) {
-    // Validate that required date/time fields are not null
-    if (model.dateOfJourney == null || model.scheduledDeparture == null) {
+  factory Ticket.fromIRCTC(
+    IRCTCTicket model, {
+    bool isUpdate = false,
+  }) {
+    if ((model.dateOfJourney == null || model.scheduledDeparture == null) &&
+        !isUpdate) {
       getIt<ILogger>().error(
         '[Ticket.fromIRCTC] Missing required date/time: '
         'dateOfJourney=${model.dateOfJourney}, '
@@ -40,8 +42,8 @@ class Ticket with TicketMappable {
       );
     }
 
-    final journeyDate = model.dateOfJourney!;
-    final departure = model.scheduledDeparture!;
+    final journeyDate = !isUpdate ? model.dateOfJourney : null;
+    final departure = !isUpdate ? model.scheduledDeparture : null;
 
     return Ticket(
       ticketId: model.pnrNumber,
@@ -49,13 +51,15 @@ class Ticket with TicketMappable {
       secondaryText:
           'Train ${model.trainNumber} • ${model.travelClass} • '
           '${model.passengerName}',
-      startTime: DateTime(
-        journeyDate.year,
-        journeyDate.month,
-        journeyDate.day,
-        departure.hour,
-        departure.minute,
-      ),
+      startTime: !isUpdate
+          ? DateTime(
+              journeyDate!.year,
+              journeyDate.month,
+              journeyDate.day,
+              departure!.hour,
+              departure.minute,
+            )
+          : null,
       location: model.boardingStation,
       tags: [
         TagModel(value: model.pnrNumber, icon: 'confirmation_number'),
@@ -72,28 +76,33 @@ class Ticket with TicketMappable {
           ),
       ],
       extras: [
+        ExtrasModel(title: 'PNR Number', value: model.pnrNumber),
         ExtrasModel(title: 'Passenger', value: model.passengerName),
-        ExtrasModel(title: 'Gender', value: model.gender),
+        ExtrasModel(title: 'Gender', value: model.gender ?? ''),
         ExtrasModel(title: 'Age', value: model.age.toString()),
         ExtrasModel(title: 'Train Name', value: model.trainName),
-        ExtrasModel(title: 'Quota', value: model.quota),
+        ExtrasModel(title: 'Quota', value: model.quota ?? ''),
         ExtrasModel(title: 'From', value: model.fromStation),
         ExtrasModel(title: 'To', value: model.toStation),
         ExtrasModel(title: 'Boarding', value: model.boardingStation),
         ExtrasModel(
           title: 'Departure',
-          value: DateTimeConverter.instance.formatTime(departure),
+          value: !isUpdate
+              ? DateTimeConverter.instance.formatTime(departure!)
+              : null,
         ),
         ExtrasModel(
           title: 'Date of Journey',
-          value: DateTimeConverter.instance.formatDate(journeyDate),
+          value: !isUpdate
+              ? DateTimeConverter.instance.formatDate(journeyDate!)
+              : null,
         ),
         ExtrasModel(title: 'Fare', value: model.ticketFare.toStringAsFixed(2)),
         ExtrasModel(
           title: 'IRCTC Fee',
           value: model.irctcFee.toStringAsFixed(2),
         ),
-        ExtrasModel(title: 'Transaction ID', value: model.transactionId),
+        ExtrasModel(title: 'Transaction ID', value: model.transactionId ?? ''),
       ],
     );
   }
@@ -188,7 +197,7 @@ class Ticket with TicketMappable {
 
       extras: [
         if (model.pnrNumber?.isNotEmpty ?? false)
-          ExtrasModel(title: 'PNR Number', value: model.pnrNumber!),
+          ExtrasModel(title: 'PNR Number', value: model.pnrNumber),
         if (firstPassenger != null && firstPassenger.name.isNotEmpty)
           ExtrasModel(title: 'Passenger Name', value: firstPassenger.name),
         if (firstPassenger?.age != null && firstPassenger!.age > 0)
@@ -243,18 +252,18 @@ class Ticket with TicketMappable {
         if (model.idCardType != null && model.idCardType!.isNotEmpty)
           ExtrasModel(
             title: 'ID Card Type',
-            value: model.idCardType!,
+            value: model.idCardType,
           ),
         if (model.idCardNumber != null && model.idCardNumber!.isNotEmpty)
           ExtrasModel(
             title: 'Verification ID',
-            value: model.idCardNumber!,
+            value: model.idCardNumber,
           ),
         if (model.conductorMobileNo != null &&
             model.conductorMobileNo!.isNotEmpty)
           ExtrasModel(
             title: 'Conductor Contact',
-            value: model.conductorMobileNo!,
+            value: model.conductorMobileNo,
           ),
         if (model.totalFare != null)
           ExtrasModel(
@@ -264,21 +273,21 @@ class Ticket with TicketMappable {
         if (model.corporation != null && model.corporation!.isNotEmpty)
           ExtrasModel(
             title: 'Provider',
-            value: model.corporation!,
+            value: model.corporation,
           ),
         if (model.tripCode != null && model.tripCode!.isNotEmpty)
-          ExtrasModel(title: 'Trip Code', value: model.tripCode!),
+          ExtrasModel(title: 'Trip Code', value: model.tripCode),
         if (model.serviceStartPlace != null &&
             model.serviceStartPlace!.isNotEmpty)
-          ExtrasModel(title: 'From', value: model.serviceStartPlace!)
+          ExtrasModel(title: 'From', value: model.serviceStartPlace)
         else if (model.passengerStartPlace != null &&
             model.passengerStartPlace!.isNotEmpty)
-          ExtrasModel(title: 'From', value: model.passengerStartPlace!),
+          ExtrasModel(title: 'From', value: model.passengerStartPlace),
         if (model.serviceEndPlace != null && model.serviceEndPlace!.isNotEmpty)
-          ExtrasModel(title: 'To', value: model.serviceEndPlace!)
+          ExtrasModel(title: 'To', value: model.serviceEndPlace)
         else if (model.passengerEndPlace != null &&
             model.passengerEndPlace!.isNotEmpty)
-          ExtrasModel(title: 'To', value: model.passengerEndPlace!),
+          ExtrasModel(title: 'To', value: model.passengerEndPlace),
         ExtrasModel(title: 'Source Type', value: sourceType),
       ],
     );
@@ -289,32 +298,26 @@ class Ticket with TicketMappable {
       ticketId: existing.ticketId,
 
       primaryText:
-          (incoming.primaryText.isNotEmpty &&
+          (incoming.primaryText.trim().isNotEmpty &&
               incoming.primaryText.trim() != '→')
           ? incoming.primaryText
           : existing.primaryText,
 
       secondaryText:
-          (incoming.secondaryText.isNotEmpty &&
-              !incoming.secondaryText.trim().contains('Train • •'))
+          (incoming.secondaryText.trim().isNotEmpty &&
+              !incoming.secondaryText.trim().contains('Train  •  •'))
           ? incoming.secondaryText
           : existing.secondaryText,
 
-      location: (incoming.location.isNotEmpty)
+      location: (incoming.location.trim().isNotEmpty)
           ? incoming.location
           : existing.location,
 
-      startTime:
-          (incoming.startTime.toString().isEmpty ||
-              incoming.startTime == IRCTCTrainParser.invalidDateSentinel)
+      startTime: (incoming.startTime == null)
           ? existing.startTime
           : incoming.startTime,
 
-      endTime:
-          (incoming.endTime.toString().isEmpty ||
-              incoming.endTime == IRCTCTrainParser.invalidDateSentinel)
-          ? existing.endTime
-          : incoming.endTime,
+      endTime: (incoming.endTime == null) ? existing.endTime : incoming.endTime,
 
       type: incoming.type,
 
@@ -334,18 +337,19 @@ class Ticket with TicketMappable {
     if (current == null || current.isEmpty) return incoming;
 
     final mergedMap = <String, ExtrasModel>{
-      for (final item in current) ?item.title: item,
+      for (final item in current)
+        if ((item.title ?? '').trim().isNotEmpty) item.title!.trim(): item,
     };
 
     for (final newItem in incoming) {
-      // Logic: Only update if value is not null and not empty
-      final hasValue =
-          newItem.value.trim().isNotEmpty &&
-          (newItem.value.trim() !=
-              IRCTCTrainParser.invalidDateSentinel.toString());
+      final title = (newItem.title ?? '').trim();
+      if (title.isEmpty) continue;
+
+      final value = newItem.value?.trim();
+      final hasValue = value != null && value.isNotEmpty;
 
       if (hasValue) {
-        mergedMap[newItem.title ?? ''] = newItem;
+        mergedMap[title] = newItem;
       }
     }
 

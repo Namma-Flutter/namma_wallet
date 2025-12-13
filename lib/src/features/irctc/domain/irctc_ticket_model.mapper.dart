@@ -26,24 +26,33 @@ class IRCTCTicketMapper extends ClassMapperBase<IRCTCTicket> {
     'pnrNumber',
     _$pnrNumber,
   );
-  static String _$transactionId(IRCTCTicket v) => v.transactionId;
+  static String? _$transactionId(IRCTCTicket v) => v.transactionId;
   static const Field<IRCTCTicket, String> _f$transactionId = Field(
     'transactionId',
     _$transactionId,
+    opt: true,
   );
   static String _$passengerName(IRCTCTicket v) => v.passengerName;
   static const Field<IRCTCTicket, String> _f$passengerName = Field(
     'passengerName',
     _$passengerName,
   );
-  static String _$gender(IRCTCTicket v) => v.gender;
-  static const Field<IRCTCTicket, String> _f$gender = Field('gender', _$gender);
+  static String? _$gender(IRCTCTicket v) => v.gender;
+  static const Field<IRCTCTicket, String> _f$gender = Field(
+    'gender',
+    _$gender,
+    opt: true,
+  );
   static int _$age(IRCTCTicket v) => v.age;
   static const Field<IRCTCTicket, int> _f$age = Field('age', _$age);
   static String _$status(IRCTCTicket v) => v.status;
   static const Field<IRCTCTicket, String> _f$status = Field('status', _$status);
-  static String _$quota(IRCTCTicket v) => v.quota;
-  static const Field<IRCTCTicket, String> _f$quota = Field('quota', _$quota);
+  static String? _$quota(IRCTCTicket v) => v.quota;
+  static const Field<IRCTCTicket, String> _f$quota = Field(
+    'quota',
+    _$quota,
+    opt: true,
+  );
   static String _$trainNumber(IRCTCTicket v) => v.trainNumber;
   static const Field<IRCTCTicket, String> _f$trainNumber = Field(
     'trainNumber',
@@ -234,12 +243,12 @@ class _IRCTCTicketCopyWithImpl<$R, $Out>
   @override
   $R call({
     String? pnrNumber,
-    String? transactionId,
+    Object? transactionId = $none,
     String? passengerName,
-    String? gender,
+    Object? gender = $none,
     int? age,
     String? status,
-    String? quota,
+    Object? quota = $none,
     String? trainNumber,
     String? trainName,
     String? boardingStation,
@@ -253,12 +262,12 @@ class _IRCTCTicketCopyWithImpl<$R, $Out>
   }) => $apply(
     FieldCopyWithData({
       if (pnrNumber != null) #pnrNumber: pnrNumber,
-      if (transactionId != null) #transactionId: transactionId,
+      if (transactionId != $none) #transactionId: transactionId,
       if (passengerName != null) #passengerName: passengerName,
-      if (gender != null) #gender: gender,
+      if (gender != $none) #gender: gender,
       if (age != null) #age: age,
       if (status != null) #status: status,
-      if (quota != null) #quota: quota,
+      if (quota != $none) #quota: quota,
       if (trainNumber != null) #trainNumber: trainNumber,
       if (trainName != null) #trainName: trainName,
       if (boardingStation != null) #boardingStation: boardingStation,

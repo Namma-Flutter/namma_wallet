@@ -1,9 +1,15 @@
 import 'package:namma_wallet/src/common/domain/models/ticket.dart';
+import 'package:namma_wallet/src/common/services/pdf/station_pdf_parser.dart';
 import 'package:namma_wallet/src/features/irctc/domain/irctc_ticket_model.dart';
 import 'package:namma_wallet/src/features/tnstc/application/ticket_parser_interface.dart';
-import 'package:namma_wallet/src/features/travel/application/travel_parser_service.dart';
 
 class IRCTCSMSParser implements ITicketParser {
+  IRCTCSMSParser({
+    required StationPdfParser stationPdfParser,
+  }) : _stationPdfParser = stationPdfParser;
+
+  final StationPdfParser _stationPdfParser;
+
   @override
   Ticket parseTicket(String smsText) {
     final rawText = smsText
@@ -18,11 +24,11 @@ class IRCTCSMSParser implements ITicketParser {
     }
 
     // Safe date parser – falls back to today if malformed/missing.
-    DateTime parseDate(String value) {
-      if (value.isEmpty) return IRCTCTrainParser.invalidDateSentinel;
+    DateTime? parseDate(String value) {
+      if (value.isEmpty) return null;
 
       final parts = value.split(RegExp('[-/]'));
-      if (parts.length != 3) return IRCTCTrainParser.invalidDateSentinel;
+      if (parts.length != 3) return null;
 
       try {
         final d = int.parse(parts[0]);
@@ -32,17 +38,79 @@ class IRCTCSMSParser implements ITicketParser {
             : int.parse(parts[2]);
         return DateTime(y, m, d);
       } on Exception catch (_) {
-        return IRCTCTrainParser.invalidDateSentinel;
+        return null;
       }
     }
 
-    // ---------------------- PNR ----------------------
-    var pnr = extract(r'PNR[:\-\s]*([0-9]{6,10})');
-    if (pnr.isEmpty) {
-      // fallback: 10 digits not preceded by TRN
-      pnr = extract(r'(?<!TRN[:\-\s]*)([0-9]{10})');
+    /// List of keywords that indicate the SMS is an update/notification
+    /// (e.g., cancellation, delay, reschedule, chart prepared).
+    const updateKeywords = <String>[
+      'cancelled',
+      'cancelled',
+      'cancel',
+      'refund',
+      'running late',
+      'reschedule',
+      'chart prepared',
+      'chart preparation',
+      'wl after chart',
+      'cancellation',
+    ];
+
+    /// Detects if the SMS is an update message (e.g., cancellation, delay).
+    ///
+    /// This is often indicated by specific keywords and the absence of
+    /// full PNR/Train/DOJ key-value pairs typical of a booking SMS.
+    bool isUpdateMessage(String smsText) {
+      final lowerCaseText = smsText.toLowerCase();
+
+      // 1. Check for update-specific keywords.
+      final containsUpdateKeyword = updateKeywords.any(
+        lowerCaseText.contains,
+      );
+
+      // 2. Check for the structure of a standard booking SMS.
+      // A standard booking SMS usually contains 'PNR:' or 'TRN:' and 'DOJ:'.
+      // If it lacks this structure but has an update keyword,
+      // it's likely an update.
+      final isStandardBooking =
+          lowerCaseText.contains('pnr:') ||
+          lowerCaseText.contains('trn:') ||
+          lowerCaseText.contains('doj:');
+
+      // If an update keyword is present, but it does NOT contain the
+      // full key-value format of a standard booking, it's an update message.
+      // Exception: Even if it's a standard booking,
+      // if it *explicitly* mentions "cancellation"
+      // it should be treated as an update for the status.
+      return containsUpdateKeyword && !isStandardBooking;
     }
-    if (pnr.isEmpty) pnr = '';
+
+    final isUpdate = isUpdateMessage(smsText);
+
+    String? pnr = extract(r'PNR[:\-\s]*([0-9]{6,10})');
+    if (pnr.isEmpty) {
+      for (final m in RegExp(r'\b([0-9]{10})\b').allMatches(rawText)) {
+        final start = m.start;
+        final prefixStart = start - 16;
+        final prefix = rawText.substring(
+          prefixStart < 0 ? 0 : prefixStart,
+          start,
+        );
+        final isTrainNumber = RegExp(
+          r'(?:TRN|Train)[:\-\s]*$',
+          caseSensitive: false,
+        ).hasMatch(prefix);
+        if (!isTrainNumber) {
+          pnr = m.group(1) ?? '';
+          break;
+        }
+      }
+    }
+
+    if (pnr == null || pnr.isEmpty) {
+      throw const FormatException('IRCTC PDF parse failed: PNR not found');
+    }
 
     final trainNumber = extract(r'(?:TRN|Train|Trn)[:\-\s]*([0-9]{3,5})');
 
@@ -50,7 +118,7 @@ class IRCTCSMSParser implements ITicketParser {
       /// this ignore is added here because, changing the regex making the
       /// parser fails.
       // ignore: missing_whitespace_between_adjacent_strings
-      r'(?:DOJ|Journey Date|Date|Date of Journey)[:\-\s]*'
+      r'(?:DOJ|Journey Date|Date|Date of Journey|Dt)[:\-\s]*'
       '([0-9]{1,2}[-/][0-9]{1,2}[-/][0-9]{2,4})',
     );
 
@@ -111,8 +179,13 @@ class IRCTCSMSParser implements ITicketParser {
       }
     }
 
-    fromStation = fromStation.toUpperCase();
-    toStation = toStation.toUpperCase();
+    Future.wait([
+      _stationPdfParser.getStationName(fromStation.toUpperCase()),
+      _stationPdfParser.getStationName(toStation.toUpperCase()),
+    ]).then((values) {
+      fromStation = values[0] ?? fromStation;
+      toStation = values[1] ?? toStation;
+    });
 
     final depRaw = extract(
       r'(?:DP|Dep|Departure)[:\-\s]*([0-9]{1,2}[:.][0-9]{2})',
@@ -123,14 +196,14 @@ class IRCTCSMSParser implements ITicketParser {
       final hm = depRaw.replaceAll('.', ':').split(':');
       try {
         scheduledDeparture = DateTime(
-          doj.year,
+          doj!.year,
           doj.month,
           doj.day,
           int.parse(hm[0]),
           int.parse(hm[1]),
         );
       } on Exception catch (_) {
-        scheduledDeparture = IRCTCTrainParser.invalidDateSentinel;
+        scheduledDeparture = null;
       }
     }
 
@@ -196,6 +269,6 @@ class IRCTCSMSParser implements ITicketParser {
       irctcFee: irctcFee,
     );
 
-    return Ticket.fromIRCTC(irctcModel);
+    return Ticket.fromIRCTC(irctcModel, isUpdate: isUpdate);
   }
 }
