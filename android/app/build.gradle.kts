@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("kotlin-android")
@@ -50,16 +52,27 @@ android {
         release {
             isShrinkResources = true
             isMinifyEnabled = true
-
-            val keystoreFile = file("keystore.jks")
-            if (keystoreFile.exists()) {
+            // Keystore file at android/app/namma-wallet.keystore
+            val keystoreFile = file("namma-wallet.keystore")
+            // Properties file at android/keystore.properties
+            val keystorePropertiesFile = rootProject.file("keystore.properties")
+            val keystoreProperties = Properties()
+            var hasAllKeys = false
+            if (keystorePropertiesFile.exists()) {
+                keystoreProperties.load(keystorePropertiesFile.inputStream())
+            }
+            val requiredKeys = mapOf(
+                "KEYSTORE_PASSWORD" to keystoreProperties["KEYSTORE_PASSWORD"]?.toString(),
+                "KEYSTORE_ENTRY_ALIAS" to keystoreProperties["KEYSTORE_ENTRY_ALIAS"]?.toString(),
+                "KEYSTORE_ENTRY_PASSWORD" to keystoreProperties["KEYSTORE_ENTRY_PASSWORD"]?.toString()
+            )
+            if (keystoreFile.exists() &&  requiredKeys.values.all { !it.isNullOrEmpty() }) {
                 signingConfig = signingConfigs.create("release") {
                     storeFile = keystoreFile
-                    storePassword = System.getenv("KEYSTORE_PASSWORD")
-                    keyAlias = System.getenv("KEYSTORE_ENTRY_ALIAS")
-                    keyPassword = System.getenv("KEYSTORE_ENTRY_PASSWORD")
+                    storePassword = keystoreProperties["KEYSTORE_PASSWORD"]!!.toString()
+                    keyAlias = keystoreProperties["KEYSTORE_ENTRY_ALIAS"]!!.toString()
+                    keyPassword = keystoreProperties["KEYSTORE_ENTRY_PASSWORD"]!!.toString()
                 }
-
                 resValue("string", "app_name", "Namma Wallet")
             } else {
                 resValue("string", "app_name", "Namma Wallet (Development)")
