@@ -57,7 +57,5 @@ config.json
 .claude/settings.json
 .claude/settings.local.json
 
-# Temporary testing files
-rough/
 
 
