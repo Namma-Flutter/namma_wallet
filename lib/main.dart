@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gemma/core/api/flutter_gemma.dart';
 import 'package:namma_wallet/src/app.dart';
 import 'package:namma_wallet/src/common/database/wallet_database_interface.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
@@ -13,6 +14,9 @@ import 'package:provider/provider.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  /// This is required by the new mediapipe requirement made by flutter gemma
+  await FlutterGemma.initialize();
 
   // Initialize pdfrx (required when using PDF engine APIs before widgets)
   // with error handling to prevent app crashes
