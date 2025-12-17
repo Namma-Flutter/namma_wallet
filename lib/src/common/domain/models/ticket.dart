@@ -400,7 +400,7 @@ class Ticket with TicketMappable {
     final result = List<TagModel>.from(current);
 
     for (final newTag in incoming) {
-      if (newTag.value!.trim().isEmpty) continue;
+      if (newTag.value == null || newTag.value!.trim().isEmpty) continue;
       final existingIndex = result.indexWhere((t) => t.icon == newTag.icon);
 
       if (existingIndex != -1) {
