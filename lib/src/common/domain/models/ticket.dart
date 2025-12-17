@@ -328,8 +328,8 @@ class Ticket with TicketMappable {
       secondaryText:
           (incoming.secondaryText.isNotNullOrEmpty &&
               incoming.secondaryText == secondaryTextConstant)
-          ? incoming.secondaryText
-          : existing.secondaryText,
+          ? existing.secondaryText
+          : incoming.secondaryText,
 
       location: (incoming.location.trim().isNotNullOrEmpty)
           ? incoming.location

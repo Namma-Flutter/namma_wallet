@@ -6,6 +6,7 @@ import 'package:home_widget/home_widget.dart';
 import 'package:namma_wallet/src/common/database/ticket_dao_interface.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/domain/models/extras_model.dart';
+import 'package:namma_wallet/src/common/domain/models/tag_model.dart';
 import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 import 'package:namma_wallet/src/common/enums/ticket_type.dart';
 import 'package:namma_wallet/src/common/helper/date_time_converter.dart';
@@ -54,6 +55,11 @@ class _TravelTicketViewState extends State<TravelTicketView> {
     }
 
     return ticket.extras!;
+  }
+
+  List<TagModel> getFilteredTags(Ticket ticket) {
+    if (ticket.tags == null) return [];
+    return ticket.tags!;
   }
 
   ///
@@ -426,6 +432,57 @@ class _TravelTicketViewState extends State<TravelTicketView> {
                           )
                         : 'Unknown',
                   ),
+
+                  const SizedBox(height: 16),
+
+                  ...() {
+                    final filteredTags = getFilteredTags(widget.ticket);
+                    if (filteredTags.isEmpty) return <Widget>[];
+
+                    return <Widget>[
+                      LayoutBuilder(
+                        builder: (context, constraints) {
+                          final itemWidth = (constraints.maxWidth) / 3;
+
+                          return Wrap(
+                            spacing: 16, // Horizontal space between items
+                            runSpacing: 12, // Vertical space between rows
+                            children: filteredTags.map((tag) {
+                              return SizedBox(
+                                width: itemWidth,
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(
+                                      tag.iconData,
+                                      size: 16,
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.primary,
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Expanded(
+                                      child: Text(
+                                        tag.value ?? '-',
+                                        style: Paragraph03(
+                                          color: Theme.of(
+                                            context,
+                                          ).colorScheme.onSurface,
+                                        ).semiBold,
+                                        overflow: TextOverflow.ellipsis,
+                                        maxLines: 1,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            }).toList(),
+                          );
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                    ];
+                  }(),
 
                   ...() {
                     final filteredExtras = getFilteredExtras(
