@@ -3,7 +3,6 @@ import 'package:get_it/get_it.dart';
 import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 import 'package:namma_wallet/src/common/enums/ticket_type.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
-import 'package:namma_wallet/src/common/services/pdf/station_pdf_parser.dart';
 import 'package:namma_wallet/src/features/receive/application/shared_content_processor.dart';
 import 'package:namma_wallet/src/features/receive/domain/shared_content_result.dart';
 import 'package:namma_wallet/src/features/receive/domain/shared_content_type.dart';
@@ -37,13 +36,9 @@ void main() {
         () async {
           // Arrange (Given)
           final logger = getIt<ILogger>();
-          final stationPdfParser = GetIt.I<StationPdfParser>();
           final processor = SharedContentProcessor(
             logger: logger,
-            travelParser: MockTravelParserService(
-              logger: logger,
-              stationPdfParser: stationPdfParser,
-            ),
+            travelParser: MockTravelParserService(logger: logger),
             ticketDao: MockTicketDAO(),
           );
 
@@ -74,13 +69,9 @@ void main() {
         () async {
           // Arrange (Given)
           final logger = getIt<ILogger>();
-          final stationPdfParser = GetIt.I<StationPdfParser>();
           final processor = SharedContentProcessor(
             logger: logger,
-            travelParser: MockTravelParserService(
-              logger: logger,
-              stationPdfParser: stationPdfParser,
-            ),
+            travelParser: MockTravelParserService(logger: logger),
             ticketDao: MockTicketDAO(),
           );
 
@@ -105,13 +96,9 @@ void main() {
         () async {
           // Arrange (Given)
           final logger = getIt<ILogger>();
-          final stationPdfParser = GetIt.I<StationPdfParser>();
           final processor = SharedContentProcessor(
             logger: logger,
-            travelParser: MockTravelParserService(
-              logger: logger,
-              stationPdfParser: stationPdfParser,
-            ),
+            travelParser: MockTravelParserService(logger: logger),
             ticketDao: MockTicketDAO(),
           );
 
@@ -150,12 +137,10 @@ void main() {
           );
 
           final logger = getIt<ILogger>();
-          final stationPdfParser = GetIt.I<StationPdfParser>();
           final processor = SharedContentProcessor(
             logger: logger,
             travelParser: MockTravelParserService(
               logger: logger,
-              stationPdfParser: stationPdfParser,
               mockUpdateInfo: mockUpdateInfo,
             ),
             ticketDao: MockTicketDAO(),
@@ -193,12 +178,10 @@ void main() {
           );
 
           final logger = getIt<ILogger>();
-          final stationPdfParser = GetIt.I<StationPdfParser>();
           final processor = SharedContentProcessor(
             logger: logger,
             travelParser: MockTravelParserService(
               logger: logger,
-              stationPdfParser: stationPdfParser,
               mockUpdateInfo: mockUpdateInfo,
             ),
             ticketDao: MockTicketDAO(updateReturnCount: 0),
@@ -240,12 +223,10 @@ void main() {
           );
 
           final logger = getIt<ILogger>();
-          final stationPdfParser = GetIt.I<StationPdfParser>();
           final processor = SharedContentProcessor(
             logger: logger,
             travelParser: MockTravelParserService(
               logger: logger,
-              stationPdfParser: stationPdfParser,
               mockUpdateInfo: mockUpdateInfo,
             ),
             ticketDao: mockDao,
@@ -292,12 +273,10 @@ void main() {
           );
 
           final logger = getIt<ILogger>();
-          final stationPdfParser = GetIt.I<StationPdfParser>();
           final processor = SharedContentProcessor(
             logger: logger,
             travelParser: MockTravelParserService(
               logger: logger,
-              stationPdfParser: stationPdfParser,
               mockUpdateInfo: mockUpdateInfo,
             ),
             ticketDao: MockTicketDAO(shouldThrowOnUpdate: true),
@@ -325,13 +304,9 @@ void main() {
         () async {
           // Arrange (Given)
           final logger = getIt<ILogger>();
-          final stationPdfParser = GetIt.I<StationPdfParser>();
           final processor = SharedContentProcessor(
             logger: logger,
-            travelParser: MockTravelParserService(
-              logger: logger,
-              stationPdfParser: stationPdfParser,
-            ),
+            travelParser: MockTravelParserService(logger: logger),
             ticketDao: MockTicketDAO(),
           );
 
@@ -353,12 +328,10 @@ void main() {
         () async {
           // Arrange (Given)
           final logger = getIt<ILogger>();
-          final stationPdfParser = GetIt.I<StationPdfParser>();
           final processor = SharedContentProcessor(
             logger: logger,
             travelParser: MockTravelParserService(
               logger: logger,
-              stationPdfParser: stationPdfParser,
               // Return a ticket with null ticketId
               mockTicket: Ticket(
                 primaryText: 'Test → Test',
@@ -496,14 +469,10 @@ void main() {
           // Arrange (Given)
           final mockDao = MockTicketDAO();
           final logger = getIt<ILogger>();
-          final stationPdfParser = GetIt.I<StationPdfParser>();
           final processor = SharedContentProcessor(
             logger: logger,
-            travelParser: MockTravelParserService(
-              logger: logger,
-              stationPdfParser: stationPdfParser,
-            ),
-            ticketDao: MockTicketDAO(),
+            travelParser: MockTravelParserService(logger: logger),
+            ticketDao: mockDao,
           );
 
           const createSms = '''
@@ -525,7 +494,6 @@ void main() {
             logger: logger,
             travelParser: MockTravelParserService(
               logger: logger,
-              stationPdfParser: stationPdfParser,
               mockUpdateInfo: TicketUpdateInfo(
                 pnrNumber: 'T12345678',
                 providerName: 'TNSTC',
@@ -555,22 +523,15 @@ void main() {
         () async {
           // Arrange (Given)
           final logger = getIt<ILogger>();
-          final stationPdfParser = GetIt.I<StationPdfParser>();
           final processor1 = SharedContentProcessor(
             logger: logger,
-            travelParser: MockTravelParserService(
-              logger: logger,
-              stationPdfParser: stationPdfParser,
-            ),
+            travelParser: MockTravelParserService(logger: logger),
             ticketDao: MockTicketDAO(),
           );
 
           final processor2 = SharedContentProcessor(
             logger: logger,
-            travelParser: MockTravelParserService(
-              logger: logger,
-              stationPdfParser: stationPdfParser,
-            ),
+            travelParser: MockTravelParserService(logger: logger),
             ticketDao: MockTicketDAO(),
           );
 

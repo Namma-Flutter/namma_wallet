@@ -15,7 +15,6 @@ import 'package:namma_wallet/src/common/services/ocr/ocr_service_interface.dart'
 import 'package:namma_wallet/src/common/services/ocr/web_ocr_service.dart';
 import 'package:namma_wallet/src/common/services/pdf/pdf_service.dart';
 import 'package:namma_wallet/src/common/services/pdf/pdf_service_interface.dart';
-import 'package:namma_wallet/src/common/services/pdf/station_pdf_parser.dart';
 import 'package:namma_wallet/src/common/theme/theme_provider.dart';
 import 'package:namma_wallet/src/features/ai/fallback_parser/application/ai_service_interface.dart';
 import 'package:namma_wallet/src/features/ai/fallback_parser/application/gemma_service.dart';
@@ -75,10 +74,7 @@ void setupLocator() {
       () => TNSTCPDFParser(logger: getIt<ILogger>()),
     )
     ..registerLazySingleton<ITravelParser>(
-      () => TravelParserService(
-        logger: getIt<ILogger>(),
-        stationPdfParser: getIt<StationPdfParser>(),
-      ),
+      () => TravelParserService(logger: getIt<ILogger>()),
     )
     ..registerLazySingleton<ISharingIntentService>(
       () => kIsWeb
@@ -124,6 +120,5 @@ void setupLocator() {
         parserService: getIt<ITravelParser>(),
         ticketDao: getIt<ITicketDAO>(),
       ),
-    )
-    ..registerSingleton(StationPdfParser());
+    );
 }

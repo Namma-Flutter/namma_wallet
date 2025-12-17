@@ -61,9 +61,6 @@ dev_dependencies:
 flutter:
   uses-material-design: true
 
-  assets:
-    - assets/pdf/station_codes.pdf
-
 flutter_gen:
   output: lib/src/features/common/generated/
   line_length: 80
