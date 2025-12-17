@@ -40,7 +40,6 @@ class IRCTCSMSParser implements ITicketParser {
     /// (e.g., cancellation, delay, reschedule, chart prepared).
     const updateKeywords = <String>[
       'cancelled',
-      'cancelled',
       'cancel',
       'refund',
       'running late',
@@ -58,25 +57,14 @@ class IRCTCSMSParser implements ITicketParser {
     bool isUpdateMessage(String smsText) {
       final lowerCaseText = smsText.toLowerCase();
 
-      // 1. Check for update-specific keywords.
       final containsUpdateKeyword = updateKeywords.any(
         lowerCaseText.contains,
       );
-
-      // 2. Check for the structure of a standard booking SMS.
-      // A standard booking SMS usually contains 'PNR:' or 'TRN:' and 'DOJ:'.
-      // If it lacks this structure but has an update keyword,
-      // it's likely an update.
       final isStandardBooking =
           lowerCaseText.contains('pnr:') ||
           lowerCaseText.contains('trn:') ||
           lowerCaseText.contains('doj:');
 
-      // If an update keyword is present, but it does NOT contain the
-      // full key-value format of a standard booking, it's an update message.
-      // Exception: Even if it's a standard booking,
-      // if it *explicitly* mentions "cancellation"
-      // it should be treated as an update for the status.
       return containsUpdateKeyword && !isStandardBooking;
     }
 
@@ -103,7 +91,7 @@ class IRCTCSMSParser implements ITicketParser {
     }
 
     if (pnr == null || pnr.isEmpty) {
-      throw const FormatException('IRCTC PDF parse failed: PNR not found');
+      throw const FormatException('IRCTC SMS parse failed: PNR not found');
     }
 
     final trainNumber = extract(r'(?:TRN|Train|Trn)[:\-\s]*([0-9]{3,5})');
