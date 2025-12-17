@@ -57,9 +57,7 @@ config.json
 .claude/settings.json
 .claude/settings.local.json
 
-# Temporary testig files
+# Temporary testing files
 rough/
 
-# key store files
-android/key.properties
-android/namma-wallet.keystore
+
