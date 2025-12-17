@@ -1,15 +1,9 @@
+import 'package:namma_wallet/src/common/constants/station_code.dart';
 import 'package:namma_wallet/src/common/domain/models/ticket.dart';
-import 'package:namma_wallet/src/common/services/pdf/station_pdf_parser.dart';
 import 'package:namma_wallet/src/features/irctc/domain/irctc_ticket_model.dart';
 import 'package:namma_wallet/src/features/tnstc/application/ticket_parser_interface.dart';
 
 class IRCTCSMSParser implements ITicketParser {
-  IRCTCSMSParser({
-    required StationPdfParser stationPdfParser,
-  }) : _stationPdfParser = stationPdfParser;
-
-  final StationPdfParser _stationPdfParser;
-
   @override
   Ticket parseTicket(String smsText) {
     final rawText = smsText
@@ -98,7 +92,7 @@ class IRCTCSMSParser implements ITicketParser {
           start,
         );
         final isTrainNumber = RegExp(
-          r'(?:TRN|Train)[:\-\s]*$',
+          r'(?:TRN|Train|Trn)[:\-\s]*$',
           caseSensitive: false,
         ).hasMatch(prefix);
         if (!isTrainNumber) {
@@ -179,13 +173,8 @@ class IRCTCSMSParser implements ITicketParser {
       }
     }
 
-    Future.wait([
-      _stationPdfParser.getStationName(fromStation.toUpperCase()),
-      _stationPdfParser.getStationName(toStation.toUpperCase()),
-    ]).then((values) {
-      fromStation = values[0] ?? fromStation;
-      toStation = values[1] ?? toStation;
-    });
+    fromStation = StationRegistry.getName(fromStation);
+    toStation = StationRegistry.getName(toStation);
 
     final depRaw = extract(
       r'(?:DP|Dep|Departure)[:\-\s]*([0-9]{1,2}[:.][0-9]{2})',

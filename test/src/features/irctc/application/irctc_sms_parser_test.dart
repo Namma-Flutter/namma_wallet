@@ -1,6 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:get_it/get_it.dart';
-import 'package:namma_wallet/src/common/services/pdf/station_pdf_parser.dart';
+import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 import 'package:namma_wallet/src/features/irctc/application/irctc_sms_parser.dart';
 
 void main() {
@@ -11,8 +10,7 @@ void main() {
 
     /// Initialize parser before each test.
     setUp(() {
-      final stationPdfParser = GetIt.I<StationPdfParser>();
-      irctcParser = IRCTCSMSParser(stationPdfParser: stationPdfParser);
+      irctcParser = IRCTCSMSParser();
     });
 
     /// Validates parsing of CANCELLED IRCTC ticket SMS format.
@@ -29,8 +27,14 @@ void main() {
 
       // Primary info validations
       expect(ticket.ticketId, equals('4321751237'));
-      expect(ticket.primaryText, equals(' → ')); // No route available.
-      expect(ticket.secondaryText, equals('Train  •  • '));
+      expect(
+        ticket.primaryText,
+        equals(Ticket.primaryTextConstant),
+      ); // No route available.
+      expect(
+        ticket.secondaryText,
+        equals(Ticket.secondaryTextConstant),
+      );
 
       // PNR Tag
       final pnrTag = ticket.tags?.firstWhere(
@@ -69,7 +73,7 @@ void main() {
 
       // Basic ticket metadata
       expect(ticket.ticketId, equals('4321751237'));
-      expect(ticket.primaryText, equals('YPR → MAS'));
+      expect(ticket.primaryText, equals('Yesvantpur → Chennai Central'));
       expect(ticket.secondaryText, equals('Train 12291 • SL • MAGESH K'));
 
       /// Validate parsed start time from DOJ + DP fields.
@@ -80,7 +84,7 @@ void main() {
       expect(ticket.startTime?.minute, equals(45));
 
       /// Boarding station
-      expect(ticket.location, equals('YPR'));
+      expect(ticket.location, equals('Yesvantpur'));
 
       // Tag: PNR
       final pnrTag = ticket.tags?.firstWhere(
@@ -108,7 +112,7 @@ void main() {
 
       expect(
         ticket.extras?.firstWhere((e) => e.title == 'Boarding').value,
-        equals('YPR'),
+        equals('Yesvantpur'),
       );
 
       expect(
@@ -141,7 +145,7 @@ void main() {
 
       expect(ticket, isNotNull);
 
-      expect(ticket.primaryText, equals('TRL → SBC'));
+      expect(ticket.primaryText, equals('Tiruvallur → Bangalore City'));
 
       // Status tag includes waitlist number
       final statusTag = ticket.tags?.firstWhere((t) => t.icon == 'info');
@@ -198,8 +202,8 @@ void main() {
 
       expect(ticket, isNotNull);
 
-      expect(ticket.primaryText, equals('MAS → SA'));
-      expect(ticket.secondaryText, contains('2S'));
+      expect(ticket.primaryText, equals('Chennai Central → Salem Junction'));
+      expect(ticket.secondaryText, contains('Train 12679 • 2S'));
 
       // Class tag should correctly detect 2S
       final classTag = ticket.tags?.firstWhere((t) => t.icon == 'event_seat');
