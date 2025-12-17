@@ -91,10 +91,10 @@ class Ticket with TicketMappable {
       extras: [
         ExtrasModel(title: 'PNR Number', value: model.pnrNumber),
         ExtrasModel(title: 'Passenger', value: model.passengerName),
-        ExtrasModel(title: 'Gender', value: model.gender ?? ''),
+        ExtrasModel(title: 'Gender', value: model.gender),
         ExtrasModel(title: 'Age', value: model.age.toString()),
         ExtrasModel(title: 'Train Name', value: model.trainName),
-        ExtrasModel(title: 'Quota', value: model.quota ?? ''),
+        ExtrasModel(title: 'Quota', value: model.quota),
         ExtrasModel(title: 'From', value: model.fromStation),
         ExtrasModel(title: 'To', value: model.toStation),
         ExtrasModel(title: 'Boarding', value: model.boardingStation),
@@ -115,7 +115,7 @@ class Ticket with TicketMappable {
           title: 'IRCTC Fee',
           value: model.irctcFee.toStringAsFixed(2),
         ),
-        ExtrasModel(title: 'Transaction ID', value: model.transactionId ?? ''),
+        ExtrasModel(title: 'Transaction ID', value: model.transactionId),
       ],
     );
   }
@@ -221,11 +221,9 @@ class Ticket with TicketMappable {
           ExtrasModel(title: 'Age', value: firstPassenger.age.toString()),
         if (gender != null && gender.isNotNullOrEmpty)
           ExtrasModel(title: 'Gender', value: gender),
-        if (model.busIdNumber != null &&
-            model.busIdNumber!.trim().isNotNullOrEmpty)
+        if (model.busIdNumber?.trim().isNotNullOrEmpty ?? false)
           ExtrasModel(title: 'Bus ID', value: model.busIdNumber!.trim()),
-        if (model.vehicleNumber != null &&
-            model.vehicleNumber!.trim().isNotNullOrEmpty)
+        if (model.vehicleNumber?.trim().isNotNullOrEmpty ?? false)
           ExtrasModel(
             title: 'Bus Number',
             value: model.vehicleNumber!.trim(),
@@ -395,6 +393,7 @@ class Ticket with TicketMappable {
     final result = List<TagModel>.from(current);
 
     for (final newTag in incoming) {
+      if (newTag.value!.trim().isEmpty) continue;
       final existingIndex = result.indexWhere((t) => t.icon == newTag.icon);
 
       if (existingIndex != -1) {
