@@ -1,10 +1,16 @@
 import java.util.Properties
+import java.io.FileInputStream
 
 plugins {
     id("com.android.application")
     id("kotlin-android")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
+}
+val keystoreProperties = Properties()
+val keystorePropertiesFile = rootProject.file("key.properties")
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(FileInputStream(keystorePropertiesFile))
 }
 
 android {
@@ -23,6 +29,8 @@ android {
         }
     }
 
+
+
     defaultConfig {
         applicationId = "com.nammaflutter.nammawallet"
         minSdk = 26
@@ -33,60 +41,21 @@ android {
         resValue("string", "app_name", "Namma Wallet")
     }
 
-    applicationVariants.all {
-        outputs.all {
-            this as com.android.build.gradle.internal.api.ApkVariantOutputImpl
-
-            outputFileName = "namma-wallet-$versionName.apk"
+    signingConfigs {
+        create("release") {
+            keyAlias = keystoreProperties.getProperty("keyAlias")
+            keyPassword = keystoreProperties.getProperty("keyPassword")
+            storeFile = keystoreProperties.getProperty("storeFile")?.let { rootProject.file(it) }
+            storePassword = keystoreProperties.getProperty("storePassword")
         }
     }
 
     buildTypes {
-        configureEach {
-            isShrinkResources = false
-            isMinifyEnabled = false
-
-            signingConfig = signingConfigs["debug"]
-        }
-
         release {
-            isShrinkResources = true
             isMinifyEnabled = true
-            // Keystore file at android/app/namma-wallet.keystore
-            val keystoreFile = file("namma-wallet.keystore")
-            // Properties file at android/keystore.properties
-            val keystorePropertiesFile = rootProject.file("keystore.properties")
-            val keystoreProperties = Properties()
-            var hasAllKeys = false
-            if (keystorePropertiesFile.exists()) {
-                keystoreProperties.load(keystorePropertiesFile.inputStream())
-            }
-            val requiredKeys = mapOf(
-                "KEYSTORE_PASSWORD" to keystoreProperties["KEYSTORE_PASSWORD"]?.toString(),
-                "KEYSTORE_ENTRY_ALIAS" to keystoreProperties["KEYSTORE_ENTRY_ALIAS"]?.toString(),
-                "KEYSTORE_ENTRY_PASSWORD" to keystoreProperties["KEYSTORE_ENTRY_PASSWORD"]?.toString()
-            )
-            if (keystoreFile.exists() &&  requiredKeys.values.all { !it.isNullOrEmpty() }) {
-                signingConfig = signingConfigs.create("release") {
-                    storeFile = keystoreFile
-                    storePassword = keystoreProperties["KEYSTORE_PASSWORD"]!!.toString()
-                    keyAlias = keystoreProperties["KEYSTORE_ENTRY_ALIAS"]!!.toString()
-                    keyPassword = keystoreProperties["KEYSTORE_ENTRY_PASSWORD"]!!.toString()
-                }
-                resValue("string", "app_name", "Namma Wallet")
-            } else {
-                resValue("string", "app_name", "Namma Wallet (Development)")
-                signingConfig = signingConfigs["debug"]
-            }
-        }
-
-        debug {
-            resValue("string", "app_name", "Namma Wallet (Debug)")
-        }
-
-        named("profile") {
-            initWith(getByName("debug"))
-            resValue("string", "app_name", "Namma Wallet (Profile)")
+            isShrinkResources = true
+            // Using release signing config from key.properties.
+            signingConfig = signingConfigs.getByName("release")
         }
     }
 
