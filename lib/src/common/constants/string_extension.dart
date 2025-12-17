@@ -8,9 +8,4 @@ extension StringExtensions on String? {
   bool get isNotNullOrEmpty {
     return this != null && this!.trim().isNotEmpty;
   }
-
-  /// Returns the string if valid, otherwise returns a fallback value
-  String orDefault(String fallback) {
-    return isNotNullOrEmpty ? this! : fallback;
-  }
 }
