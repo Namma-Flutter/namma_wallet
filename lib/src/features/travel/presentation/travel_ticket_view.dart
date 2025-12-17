@@ -442,7 +442,7 @@ class _TravelTicketViewState extends State<TravelTicketView> {
                     return <Widget>[
                       LayoutBuilder(
                         builder: (context, constraints) {
-                          final itemWidth = (constraints.maxWidth) / 3;
+                          final itemWidth = (constraints.maxWidth - 32) / 3;
 
                           return Wrap(
                             spacing: 16, // Horizontal space between items
