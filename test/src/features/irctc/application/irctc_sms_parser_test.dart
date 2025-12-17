@@ -29,11 +29,11 @@ void main() {
       expect(ticket.ticketId, equals('4321751237'));
       expect(
         ticket.primaryText,
-        equals(Ticket.primaryTextConstant),
+        equals('Unknown → Unknown'),
       ); // No route available.
       expect(
         ticket.secondaryText,
-        equals(Ticket.secondaryTextConstant),
+        equals('N/A'),
       );
 
       // PNR Tag

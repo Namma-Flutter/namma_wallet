@@ -51,13 +51,13 @@ class Ticket with TicketMappable {
       primaryText:
           model.fromStation.isNotNullOrEmpty && model.toStation.isNotNullOrEmpty
           ? '${model.fromStation} → ${model.toStation}'
-          : primaryTextConstant,
+          : _primaryTextConstant,
       secondaryText:
           [
             if (model.trainNumber.isNotNullOrEmpty) model.trainNumber,
             if (model.travelClass.isNotNullOrEmpty) model.travelClass,
           ].isEmpty
-          ? secondaryTextConstant
+          ? _secondaryTextConstant
           : [
               if (model.trainNumber.isNotNullOrEmpty)
                 'Train ${model.trainNumber}',
@@ -183,11 +183,11 @@ class Ticket with TicketMappable {
       primaryText:
           primarySource.isNotNullOrEmpty && primaryDestination.isNotNullOrEmpty
           ? '$primarySource → $primaryDestination'
-          : primaryTextConstant,
+          : _primaryTextConstant,
       secondaryText: model.tripCode.isNotNullOrEmpty
           ? '${model.corporation ?? 'TNSTC'} - '
                 '${model.tripCode ?? model.routeNo ?? 'Bus'}'
-          : secondaryTextConstant,
+          : _secondaryTextConstant,
       startTime: startTime,
       location:
           model.passengerPickupPoint ??
@@ -318,13 +318,13 @@ class Ticket with TicketMappable {
 
       primaryText:
           (incoming.primaryText.isNotNullOrEmpty &&
-              incoming.primaryText == primaryTextConstant)
+              incoming.primaryText == _primaryTextConstant)
           ? existing.primaryText
           : incoming.primaryText,
 
       secondaryText:
           (incoming.secondaryText.isNotNullOrEmpty &&
-              incoming.secondaryText == secondaryTextConstant)
+              incoming.secondaryText == _secondaryTextConstant)
           ? existing.secondaryText
           : incoming.secondaryText,
 
@@ -345,8 +345,11 @@ class Ticket with TicketMappable {
     );
   }
 
-  static const primaryTextConstant = 'Unknown → Unknown';
-  static const secondaryTextConstant = 'N/A';
+  /// Sentinel value for merge logic only. Never use as a parsing fallback.
+  static const _primaryTextConstant = 'Unknown → Unknown';
+
+  /// Sentinel value for merge logic only. Never use as a parsing fallback.
+  static const _secondaryTextConstant = 'N/A';
 
   /// Merges Extras (Key-Value pairs).
   /// Strategy: Convert old list to Map. Overwrite only if new value is valid.
