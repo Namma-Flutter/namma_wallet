@@ -46,6 +46,10 @@ class Ticket with TicketMappable {
     final journeyDate = !isUpdate ? model.dateOfJourney : null;
     final departure = !isUpdate ? model.scheduledDeparture : null;
 
+    /// the constants [_primaryTextConstant] used for primaryText
+    /// and [__secondaryTextConstant] used for secondary
+    /// are used here only for merging logic, it won't affect the user data.
+
     return Ticket(
       ticketId: model.pnrNumber,
       primaryText:
@@ -175,8 +179,11 @@ class Ticket with TicketMappable {
       }
     }
 
-    // Fallback to journeyDate if startTime is still null
     startTime ??= model.journeyDate;
+
+    /// the constants [_primaryTextConstant] used for primaryText
+    /// and [__secondaryTextConstant] used for secondary
+    /// are used here only for merging logic, it won't affect the user data.
 
     return Ticket(
       ticketId: model.pnrNumber,
