@@ -624,10 +624,15 @@ class StationRegistry {
     'ZBD': 'Zafarabad',
   };
 
+  /// method [getName] will return the station name if it is
+  /// available in the map [_stations] else, it is good to use the
+  /// station code which is passed to this method.
   static String getName(String stationCode) {
     return _stations[stationCode.toUpperCase().trim()] ?? stationCode;
   }
 
+  /// method [exists] is un-used for now, later it will be used
+  /// so ignore for review
   static bool exists(String? stationCode) {
     if (stationCode == null) return false;
     return _stations.containsKey(stationCode.toUpperCase().trim());
