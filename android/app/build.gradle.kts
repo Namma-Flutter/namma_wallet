@@ -1,8 +1,16 @@
+import java.util.Properties
+import java.io.FileInputStream
+
 plugins {
     id("com.android.application")
     id("kotlin-android")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
+}
+val keystoreProperties = Properties()
+val keystorePropertiesFile = rootProject.file("key.properties")
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(FileInputStream(keystorePropertiesFile))
 }
 
 android {
@@ -21,6 +29,8 @@ android {
         }
     }
 
+
+
     defaultConfig {
         applicationId = "com.nammaflutter.nammawallet"
         minSdk = 26
@@ -31,49 +41,21 @@ android {
         resValue("string", "app_name", "Namma Wallet")
     }
 
-    applicationVariants.all {
-        outputs.all {
-            this as com.android.build.gradle.internal.api.ApkVariantOutputImpl
-
-            outputFileName = "namma-wallet-$versionName.apk"
+    signingConfigs {
+        create("release") {
+            keyAlias = keystoreProperties.getProperty("keyAlias")
+            keyPassword = keystoreProperties.getProperty("keyPassword")
+            storeFile = keystoreProperties.getProperty("storeFile")?.let { rootProject.file(it) }
+            storePassword = keystoreProperties.getProperty("storePassword")
         }
     }
 
     buildTypes {
-        configureEach {
-            isShrinkResources = false
-            isMinifyEnabled = false
-
-            signingConfig = signingConfigs["debug"]
-        }
-
         release {
-            isShrinkResources = true
             isMinifyEnabled = true
-
-            val keystoreFile = file("keystore.jks")
-            if (keystoreFile.exists()) {
-                signingConfig = signingConfigs.create("release") {
-                    storeFile = keystoreFile
-                    storePassword = System.getenv("KEYSTORE_PASSWORD")
-                    keyAlias = System.getenv("KEYSTORE_ENTRY_ALIAS")
-                    keyPassword = System.getenv("KEYSTORE_ENTRY_PASSWORD")
-                }
-
-                resValue("string", "app_name", "Namma Wallet")
-            } else {
-                resValue("string", "app_name", "Namma Wallet (Development)")
-                signingConfig = signingConfigs["debug"]
-            }
-        }
-
-        debug {
-            resValue("string", "app_name", "Namma Wallet (Debug)")
-        }
-
-        named("profile") {
-            initWith(getByName("debug"))
-            resValue("string", "app_name", "Namma Wallet (Profile)")
+            isShrinkResources = true
+            // Using release signing config from key.properties.
+            signingConfig = signingConfigs.getByName("release")
         }
     }
 
