@@ -317,13 +317,13 @@ class Ticket with TicketMappable {
       ticketId: existing.ticketId,
 
       primaryText:
-          (incoming.primaryText.isNotNullOrEmpty &&
+          (!incoming.primaryText.isNotNullOrEmpty ||
               incoming.primaryText == _primaryTextConstant)
           ? existing.primaryText
           : incoming.primaryText,
 
       secondaryText:
-          (incoming.secondaryText.isNotNullOrEmpty &&
+          (!incoming.secondaryText.isNotNullOrEmpty ||
               incoming.secondaryText == _secondaryTextConstant)
           ? existing.secondaryText
           : incoming.secondaryText,
