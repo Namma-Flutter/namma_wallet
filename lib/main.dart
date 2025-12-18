@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gemma/core/api/flutter_gemma.dart';
 import 'package:namma_wallet/src/app.dart';
 import 'package:namma_wallet/src/common/database/wallet_database_interface.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
@@ -13,6 +14,18 @@ import 'package:provider/provider.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  /// This is required by the new mediapipe requirement made by flutter gemma
+  try {
+    await FlutterGemma.initialize();
+  } on Exception catch (e, stackTrace) {
+    // Log initialization error - AI features may be unavailable
+    // Continue app startup to allow non-AI features to work
+    debugPrint('FlutterGemma initialization failed: $e\n$stackTrace');
+  } on Object catch (e, stackTrace) {
+    // Catch any other throwables
+    debugPrint('FlutterGemma initialization failed: $e\n$stackTrace');
+  }
 
   // Initialize pdfrx (required when using PDF engine APIs before widgets)
   // with error handling to prevent app crashes
@@ -33,7 +46,6 @@ Future<void> main() async {
     pdfInitError = e;
     pdfInitStackTrace = stackTrace;
   }
-  await HapticServices.loadPreference();
   // Setup dependency injection
   setupLocator();
 
@@ -108,13 +120,17 @@ Future<void> main() async {
   };
 
   try {
-    logger?.info('Initializing AI service...');
-    await getIt<IAIService>().init();
-    logger?.success('AI service initialized');
-
     logger?.info('Initializing database...');
     await getIt<IWalletDatabase>().database;
     logger?.success('Database initialized');
+
+    logger?.info('Initializing Haptic service...');
+    await getIt<HapticService>().loadPreference();
+    logger?.success('Haptic service initialized');
+
+    logger?.info('Initializing AI service...');
+    await getIt<IAIService>().init();
+    logger?.success('AI service initialized');
 
     logger?.success('All services initialized successfully');
   } on Object catch (e, stackTrace) {
