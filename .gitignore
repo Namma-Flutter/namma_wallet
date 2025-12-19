@@ -57,5 +57,6 @@ config.json
 .claude/settings.json
 .claude/settings.local.json
 
-
-
+**/key.properties
+**/*.keystore
+**/*.jks
