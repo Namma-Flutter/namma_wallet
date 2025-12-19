@@ -86,7 +86,7 @@ class Ticket with TicketMappable {
           TagModel(value: model.travelClass, icon: 'event_seat'),
         if (model.status.isNotNullOrEmpty)
           TagModel(value: model.status, icon: 'info'),
-        if (model.ticketFare! > 0)
+        if ((model.ticketFare ?? 0) > 0)
           TagModel(
             value: '₹${model.ticketFare?.toStringAsFixed(2)}',
             icon: 'attach_money',
