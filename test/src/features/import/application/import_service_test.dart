@@ -158,15 +158,15 @@ void main() {
       boardingStation: 'START',
       dateOfJourney: DateTime(2025, 1, 15, 10),
       scheduledDeparture: DateTime(2025, 1, 15, 11),
-      passengerName: 'Test Passenger',
-      age: 30,
-      gender: 'M',
+      // passengerName: 'Test Passenger',
+      // age: 30,
+      // gender: 'M',
       travelClass: 'AC',
       quota: 'GN',
       status: 'CNF',
       ticketFare: 1000,
       irctcFee: 50,
-      transactionId: 'txn123',
+      transactionId: 'txn123', passengers: [],
     );
 
     final testTicket = Ticket.fromIRCTC(testIrctcTicket);

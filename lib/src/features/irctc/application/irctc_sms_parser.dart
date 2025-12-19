@@ -229,9 +229,9 @@ class IRCTCSMSParser implements ITicketParser {
     final irctcModel = IRCTCTicket(
       pnrNumber: pnr,
       transactionId: '',
-      passengerName: passenger,
-      gender: '',
-      age: 0,
+      // passengerName: passenger,
+      // gender: '',
+      // age: 0,
       status: status,
       quota: '',
       trainNumber: trainNumber,
@@ -243,7 +243,7 @@ class IRCTCSMSParser implements ITicketParser {
       fromStation: fromStation,
       toStation: toStation,
       ticketFare: fare,
-      irctcFee: irctcFee,
+      irctcFee: irctcFee, passengers: [],
     );
 
     return Ticket.fromIRCTC(irctcModel, isUpdate: isUpdate);

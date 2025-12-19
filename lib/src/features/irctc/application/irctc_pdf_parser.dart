@@ -3,6 +3,7 @@ import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
 import 'package:namma_wallet/src/features/irctc/domain/irctc_ticket_model.dart';
 import 'package:namma_wallet/src/features/tnstc/application/ticket_parser_interface.dart';
+import 'package:namma_wallet/src/features/tnstc/domain/tnstc_model.dart';
 
 class IRCTCPDFParser implements ITicketParser {
   IRCTCPDFParser({ILogger? logger}) : _logger = logger ?? getIt<ILogger>();
@@ -70,6 +71,139 @@ class IRCTCPDFParser implements ITicketParser {
       'PT',
       'CC',
     };
+
+    List<PassengerInfo> extractAllPassengers(String text) {
+      final passengers = <PassengerInfo>[];
+
+      // This regex looks for rows starting with a number followed by name,
+      // age, and gender
+      // It accounts for both single-line and multi-line (Confirmtkt/IRCTC) formats
+      final passengerRegex = RegExp(
+        r'(\d+)\.?\s+([A-Za-z\s\.]{3,})\s+(\d{1,3})\s+([MF]|MALE|FEMALE)',
+        caseSensitive: false,
+        multiLine: true,
+      );
+
+      final matches = passengerRegex.allMatches(text).toList();
+
+      for (var i = 0; i < matches.length; i++) {
+        final name = matches[i].group(2)!.trim().replaceAll('\n', ' ');
+        final age = int.tryParse(matches[i].group(3)!) ?? 0;
+        final genderRaw = matches[i].group(4)!.toUpperCase();
+        final gender = genderRaw.startsWith('M') ? 'M' : 'F';
+        final type = age > 12 ? 'Adult' : 'Child';
+
+        // Capture Seat/Status info by looking at the text block after the passenger row
+        // but before the next passenger row starts.
+        var seatNumber = 'N/A';
+        final startSearch = matches[i].end;
+        final endSearch = (i + 1 < matches.length)
+            ? matches[i + 1].start
+            : (startSearch + 200).clamp(0, text.length);
+
+        final statusBlock = text.substring(startSearch, endSearch);
+
+        // Look for confirmed seat patterns (e.g., S8/56)
+        // or Waitlist codes (e.g., RLWL18)
+        final statusMatch = RegExp(
+          r'([A-Z0-9]{1,3}/\d{1,3}(?:/[A-Z\s]+)?)|((?:RLWL|PQWL|RSWL|WL)\s*\d+/?\d*)',
+          caseSensitive: false,
+        ).firstMatch(statusBlock);
+
+        if (statusMatch != null) {
+          seatNumber = statusMatch.group(0)!.trim().replaceAll('\n', ' ');
+        } else if (statusBlock.contains('CAN')) {
+          seatNumber = 'Cancelled'; // Specific to the second PDF
+        }
+
+        passengers.add(
+          PassengerInfo(
+            name: name,
+            age: age,
+            type: type,
+            gender: gender,
+            seatNumber: seatNumber,
+          ),
+        );
+      }
+      return passengers;
+    }
+
+    /// Commented for future reference
+    // List<PassengerInfo> extractAllPassengers(String text) {
+    //   final passengers = <PassengerInfo>[];
+    //
+    //   // 🔒 FIX: Use Passenger Details section if present
+    //   final detailsIndex = text.toLowerCase().indexOf('passenger details');
+    //   if (detailsIndex != -1) {
+    //     text = text.substring(detailsIndex);
+    //   }
+    //
+    //   final normalized = text
+    //       .replaceAll('\r', '')
+    //       .replaceAll(RegExp(r'[ \t]+'), ' ')
+    //       .replaceAll(RegExp(r'\n{2,}'), '\n');
+    //
+    //   final passengerHeaderRegex = RegExp(
+    //     r'^\s*(\d{1,2})\.\s+([A-Z][A-Z\s\.]{2,})\s*$',
+    //     caseSensitive: false,
+    //     multiLine: true,
+    //   );
+    //
+    //   final matches = passengerHeaderRegex.allMatches(normalized).toList();
+    //
+    //   for (var i = 0; i < matches.length; i++) {
+    //     final name = matches[i].group(2)!.trim();
+    //     if (name.length < 3 || RegExp(r'\d').hasMatch(name)) continue;
+    //
+    //     final start = matches[i].end;
+    //     final end = (i + 1 < matches.length)
+    //         ? matches[i + 1].start
+    //         : (start + 400).clamp(0, normalized.length);
+    //
+    //     final block = normalized.substring(start, end);
+    //
+    //     final ageMatch = RegExp(
+    //       r'Age[:\s]*(\d{1,3})|\b(\d{1,3})\s*(?:Years)?',
+    //       caseSensitive: false,
+    //     ).firstMatch(block);
+    //
+    //     final age =
+    //         int.tryParse(ageMatch?.group(1) ??
+    //         ageMatch?.group(2) ?? '') ?? 0;
+    //
+    //     final genderMatch = RegExp(
+    //       r'\b(MALE|FEMALE|M|F)\b',
+    //       caseSensitive: false,
+    //     ).firstMatch(block);
+    //
+    //     final genderRaw = genderMatch?.group(1)?.toUpperCase() ?? 'M';
+    //     final gender = genderRaw.startsWith('M') ? 'M' : 'F';
+    //
+    //     final seatMatch = RegExp(
+    //       r'(?:Current Status[:\s]*)?'
+    //       r'((?:RLWL|WL|PQWL|RSWL|RAC)\s*/?\s*\d+|\b[A-Z]\d+/\d+(?:/[A-Z ]+)?)',
+    //       caseSensitive: false,
+    //     ).firstMatch(block);
+    //
+    //     final seat =
+    //         seatMatch?.group(1)?.replaceAll(RegExp(r'\s+'), '').toUpperCase() ??
+    //         'N/A';
+    //
+    //     passengers.add(
+    //       PassengerInfo(
+    //         name: name,
+    //         age: age,
+    //         type: age > 12 ? 'Adult' : 'Child',
+    //         gender: gender,
+    //         seatNumber: seat,
+    //       ),
+    //     );
+    //   }
+    //   return passengers;
+    // }
+
+    final allPassengers = extractAllPassengers(rawText);
 
     String? normalizeClass(String? raw) {
       if (raw == null || raw.isEmpty) return null;
@@ -341,15 +475,6 @@ class IRCTCPDFParser implements ITicketParser {
           )
         : null;
 
-    /// Passenger name.
-    var pName = '';
-
-    /// Passenger age.
-    var pAge = 0;
-
-    /// Passenger gender.
-    var pGender = '';
-
     /// Passenger booking status (CNF, RAC, WL).
     var pStatus = '';
 
@@ -372,9 +497,9 @@ class IRCTCPDFParser implements ITicketParser {
     pMatch ??= emailPassengerRegex.firstMatch(rawText);
 
     if (pMatch != null) {
-      pName = pMatch.group(1)!.trim();
-      pAge = int.tryParse(pMatch.group(2) ?? '0') ?? 0;
-      pGender = pMatch.group(3)!.trim();
+      // pName = pMatch.group(1)!.trim();
+      // pAge = int.tryParse(pMatch.group(2) ?? '0') ?? 0;
+      // pGender = pMatch.group(3)!.trim();
 
       /// Look ahead for passenger status code.
       final lookAhead = rawText.substring(
@@ -444,9 +569,9 @@ class IRCTCPDFParser implements ITicketParser {
     final model = IRCTCTicket(
       pnrNumber: pnr,
       transactionId: pick([r'Transaction (?:ID|Id)[-:]?\s*\(?(\d+)']),
-      passengerName: pName,
-      gender: pGender,
-      age: pAge,
+      passengers: allPassengers,
+      // gender: pGender,
+      // age: pAge,
       status: pStatus,
       quota: quota,
       trainNumber: trainNumber,

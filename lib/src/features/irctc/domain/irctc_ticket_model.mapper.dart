@@ -14,6 +14,7 @@ class IRCTCTicketMapper extends ClassMapperBase<IRCTCTicket> {
   static IRCTCTicketMapper ensureInitialized() {
     if (_instance == null) {
       MapperContainer.globals.use(_instance = IRCTCTicketMapper._());
+      PassengerInfoMapper.ensureInitialized();
     }
     return _instance!;
   }
@@ -26,13 +27,11 @@ class IRCTCTicketMapper extends ClassMapperBase<IRCTCTicket> {
     'pnrNumber',
     _$pnrNumber,
   );
-  static String _$passengerName(IRCTCTicket v) => v.passengerName;
-  static const Field<IRCTCTicket, String> _f$passengerName = Field(
-    'passengerName',
-    _$passengerName,
+  static List<PassengerInfo> _$passengers(IRCTCTicket v) => v.passengers;
+  static const Field<IRCTCTicket, List<PassengerInfo>> _f$passengers = Field(
+    'passengers',
+    _$passengers,
   );
-  static int _$age(IRCTCTicket v) => v.age;
-  static const Field<IRCTCTicket, int> _f$age = Field('age', _$age);
   static String _$status(IRCTCTicket v) => v.status;
   static const Field<IRCTCTicket, String> _f$status = Field('status', _$status);
   static String _$trainNumber(IRCTCTicket v) => v.trainNumber;
@@ -64,22 +63,18 @@ class IRCTCTicketMapper extends ClassMapperBase<IRCTCTicket> {
   static const Field<IRCTCTicket, double> _f$ticketFare = Field(
     'ticketFare',
     _$ticketFare,
+    opt: true,
   );
   static double? _$irctcFee(IRCTCTicket v) => v.irctcFee;
   static const Field<IRCTCTicket, double> _f$irctcFee = Field(
     'irctcFee',
     _$irctcFee,
+    opt: true,
   );
   static String? _$transactionId(IRCTCTicket v) => v.transactionId;
   static const Field<IRCTCTicket, String> _f$transactionId = Field(
     'transactionId',
     _$transactionId,
-    opt: true,
-  );
-  static String? _$gender(IRCTCTicket v) => v.gender;
-  static const Field<IRCTCTicket, String> _f$gender = Field(
-    'gender',
-    _$gender,
     opt: true,
   );
   static String? _$quota(IRCTCTicket v) => v.quota;
@@ -110,8 +105,7 @@ class IRCTCTicketMapper extends ClassMapperBase<IRCTCTicket> {
   @override
   final MappableFields<IRCTCTicket> fields = const {
     #pnrNumber: _f$pnrNumber,
-    #passengerName: _f$passengerName,
-    #age: _f$age,
+    #passengers: _f$passengers,
     #status: _f$status,
     #trainNumber: _f$trainNumber,
     #trainName: _f$trainName,
@@ -121,7 +115,6 @@ class IRCTCTicketMapper extends ClassMapperBase<IRCTCTicket> {
     #ticketFare: _f$ticketFare,
     #irctcFee: _f$irctcFee,
     #transactionId: _f$transactionId,
-    #gender: _f$gender,
     #quota: _f$quota,
     #travelClass: _f$travelClass,
     #scheduledDeparture: _f$scheduledDeparture,
@@ -131,8 +124,7 @@ class IRCTCTicketMapper extends ClassMapperBase<IRCTCTicket> {
   static IRCTCTicket _instantiate(DecodingData data) {
     return IRCTCTicket(
       pnrNumber: data.dec(_f$pnrNumber),
-      passengerName: data.dec(_f$passengerName),
-      age: data.dec(_f$age),
+      passengers: data.dec(_f$passengers),
       status: data.dec(_f$status),
       trainNumber: data.dec(_f$trainNumber),
       trainName: data.dec(_f$trainName),
@@ -142,7 +134,6 @@ class IRCTCTicketMapper extends ClassMapperBase<IRCTCTicket> {
       ticketFare: data.dec(_f$ticketFare),
       irctcFee: data.dec(_f$irctcFee),
       transactionId: data.dec(_f$transactionId),
-      gender: data.dec(_f$gender),
       quota: data.dec(_f$quota),
       travelClass: data.dec(_f$travelClass),
       scheduledDeparture: data.dec(_f$scheduledDeparture),
@@ -210,10 +201,15 @@ extension IRCTCTicketValueCopy<$R, $Out>
 
 abstract class IRCTCTicketCopyWith<$R, $In extends IRCTCTicket, $Out>
     implements ClassCopyWith<$R, $In, $Out> {
+  ListCopyWith<
+    $R,
+    PassengerInfo,
+    PassengerInfoCopyWith<$R, PassengerInfo, PassengerInfo>
+  >
+  get passengers;
   $R call({
     String? pnrNumber,
-    String? passengerName,
-    int? age,
+    List<PassengerInfo>? passengers,
     String? status,
     String? trainNumber,
     String? trainName,
@@ -223,7 +219,6 @@ abstract class IRCTCTicketCopyWith<$R, $In extends IRCTCTicket, $Out>
     double? ticketFare,
     double? irctcFee,
     String? transactionId,
-    String? gender,
     String? quota,
     String? travelClass,
     DateTime? scheduledDeparture,
@@ -241,10 +236,20 @@ class _IRCTCTicketCopyWithImpl<$R, $Out>
   late final ClassMapperBase<IRCTCTicket> $mapper =
       IRCTCTicketMapper.ensureInitialized();
   @override
+  ListCopyWith<
+    $R,
+    PassengerInfo,
+    PassengerInfoCopyWith<$R, PassengerInfo, PassengerInfo>
+  >
+  get passengers => ListCopyWith(
+    $value.passengers,
+    (v, t) => v.copyWith.$chain(t),
+    (v) => call(passengers: v),
+  );
+  @override
   $R call({
     String? pnrNumber,
-    String? passengerName,
-    int? age,
+    List<PassengerInfo>? passengers,
     String? status,
     String? trainNumber,
     String? trainName,
@@ -254,7 +259,6 @@ class _IRCTCTicketCopyWithImpl<$R, $Out>
     Object? ticketFare = $none,
     Object? irctcFee = $none,
     Object? transactionId = $none,
-    Object? gender = $none,
     Object? quota = $none,
     Object? travelClass = $none,
     Object? scheduledDeparture = $none,
@@ -262,8 +266,7 @@ class _IRCTCTicketCopyWithImpl<$R, $Out>
   }) => $apply(
     FieldCopyWithData({
       if (pnrNumber != null) #pnrNumber: pnrNumber,
-      if (passengerName != null) #passengerName: passengerName,
-      if (age != null) #age: age,
+      if (passengers != null) #passengers: passengers,
       if (status != null) #status: status,
       if (trainNumber != null) #trainNumber: trainNumber,
       if (trainName != null) #trainName: trainName,
@@ -273,7 +276,6 @@ class _IRCTCTicketCopyWithImpl<$R, $Out>
       if (ticketFare != $none) #ticketFare: ticketFare,
       if (irctcFee != $none) #irctcFee: irctcFee,
       if (transactionId != $none) #transactionId: transactionId,
-      if (gender != $none) #gender: gender,
       if (quota != $none) #quota: quota,
       if (travelClass != $none) #travelClass: travelClass,
       if (scheduledDeparture != $none) #scheduledDeparture: scheduledDeparture,
@@ -283,8 +285,7 @@ class _IRCTCTicketCopyWithImpl<$R, $Out>
   @override
   IRCTCTicket $make(CopyWithData data) => IRCTCTicket(
     pnrNumber: data.get(#pnrNumber, or: $value.pnrNumber),
-    passengerName: data.get(#passengerName, or: $value.passengerName),
-    age: data.get(#age, or: $value.age),
+    passengers: data.get(#passengers, or: $value.passengers),
     status: data.get(#status, or: $value.status),
     trainNumber: data.get(#trainNumber, or: $value.trainNumber),
     trainName: data.get(#trainName, or: $value.trainName),
@@ -294,7 +295,6 @@ class _IRCTCTicketCopyWithImpl<$R, $Out>
     ticketFare: data.get(#ticketFare, or: $value.ticketFare),
     irctcFee: data.get(#irctcFee, or: $value.irctcFee),
     transactionId: data.get(#transactionId, or: $value.transactionId),
-    gender: data.get(#gender, or: $value.gender),
     quota: data.get(#quota, or: $value.quota),
     travelClass: data.get(#travelClass, or: $value.travelClass),
     scheduledDeparture: data.get(

@@ -58,15 +58,19 @@ class Ticket with TicketMappable {
           : _primaryTextConstant,
       secondaryText:
           [
-            if (model.trainNumber.isNotNullOrEmpty) model.trainNumber,
+            if (model.trainNumber.isNotNullOrEmpty)
+              'Train ${model.trainNumber}',
             if (model.travelClass.isNotNullOrEmpty) model.travelClass,
+            if (model.passengers.isNotEmpty)
+              '${model.passengers.length} Passenger(s)',
           ].isEmpty
           ? _secondaryTextConstant
           : [
               if (model.trainNumber.isNotNullOrEmpty)
                 'Train ${model.trainNumber}',
               if (model.travelClass.isNotNullOrEmpty) model.travelClass,
-              if (model.passengerName.isNotNullOrEmpty) model.passengerName,
+              if (model.passengers.isNotEmpty)
+                '${model.passengers.length} Passenger(s)',
             ].join(' • '),
       startTime: !isUpdate
           ? DateTime(
@@ -94,32 +98,40 @@ class Ticket with TicketMappable {
       ],
       extras: [
         ExtrasModel(title: 'PNR Number', value: model.pnrNumber),
-        ExtrasModel(title: 'Passenger', value: model.passengerName),
-        ExtrasModel(title: 'Gender', value: model.gender),
-        ExtrasModel(title: 'Age', value: model.age.toString()),
         ExtrasModel(title: 'Train Name', value: model.trainName),
         ExtrasModel(title: 'Quota', value: model.quota),
         ExtrasModel(title: 'From', value: model.fromStation),
         ExtrasModel(title: 'To', value: model.toStation),
         ExtrasModel(title: 'Boarding', value: model.boardingStation),
+
         ExtrasModel(
           title: 'Departure',
           value: !isUpdate
               ? DateTimeConverter.instance.formatTime(departure!)
               : null,
         ),
+
         ExtrasModel(
           title: 'Date of Journey',
           value: !isUpdate
               ? DateTimeConverter.instance.formatDate(journeyDate!)
               : null,
         ),
-        ExtrasModel(title: 'Fare', value: model.ticketFare?.toStringAsFixed(2)),
+
+        ExtrasModel(
+          title: 'Fare',
+          value: model.ticketFare?.toStringAsFixed(2),
+        ),
+
         ExtrasModel(
           title: 'IRCTC Fee',
           value: model.irctcFee?.toStringAsFixed(2),
         ),
+
         ExtrasModel(title: 'Transaction ID', value: model.transactionId),
+
+        // 👇 MULTI-PASSENGER SUPPORT
+        ..._buildPassengerExtras(model.passengers),
       ],
     );
   }
@@ -411,6 +423,36 @@ class Ticket with TicketMappable {
     }
 
     return result;
+  }
+
+  static List<ExtrasModel> _buildPassengerExtras(
+    List<PassengerInfo> passengers,
+  ) {
+    if (passengers.isEmpty) return [];
+
+    final extras = <ExtrasModel>[
+      ExtrasModel(
+        title: 'Passengers',
+        value: passengers.length.toString(),
+      ),
+    ];
+
+    for (var i = 0; i < passengers.length; i++) {
+      final p = passengers[i];
+
+      extras.addAll([
+        // Section header (value = null → UI separator)
+        ExtrasModel(title: 'Passenger ${i + 1}', value: null),
+
+        ExtrasModel(title: 'Name', value: p.name),
+        ExtrasModel(title: 'Age', value: p.age.toString()),
+        ExtrasModel(title: 'Type', value: p.type),
+        ExtrasModel(title: 'Gender', value: p.gender),
+        ExtrasModel(title: 'Seat', value: p.seatNumber),
+      ]);
+    }
+
+    return extras;
   }
 
   @MappableField(key: 'ticket_id')

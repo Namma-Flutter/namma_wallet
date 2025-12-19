@@ -38,9 +38,9 @@ class IRCTCQRParser implements IIRCTCQRParser {
       return IRCTCTicket(
         pnrNumber: _extractValue(data, 'PNR No.'),
         transactionId: _extractValue(data, 'TXN ID'),
-        passengerName: _extractValue(data, 'Passenger Name'),
-        gender: _extractValue(data, 'Gender'),
-        age: _parseInt(_extractValue(data, 'Age')),
+        // passengerName: _extractValue(data, 'Passenger Name'),
+        // gender: _extractValue(data, 'Gender'),
+        // age: _parseInt(_extractValue(data, 'Age')),
         status: _extractValue(data, 'Status'),
         quota: _extractValue(data, 'Quota'),
         trainNumber: _extractValue(data, 'Train No.'),
@@ -54,7 +54,7 @@ class IRCTCQRParser implements IIRCTCQRParser {
         fromStation: _extractValue(data, 'From'),
         toStation: _extractValue(data, 'To'),
         ticketFare: _parseAmount(_extractValue(data, 'Ticket Fare')),
-        irctcFee: _parseAmount(_extractValue(data, 'IRCTC C Fee')),
+        irctcFee: _parseAmount(_extractValue(data, 'IRCTC C Fee')), passengers: [],
       );
     } on Object catch (e, stackTrace) {
       _logger.error('Error parsing IRCTC QR code: $e', e, stackTrace);

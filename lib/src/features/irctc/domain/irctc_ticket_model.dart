@@ -1,4 +1,5 @@
 import 'package:dart_mappable/dart_mappable.dart';
+import 'package:namma_wallet/src/features/tnstc/domain/tnstc_model.dart';
 
 part 'irctc_ticket_model.mapper.dart';
 
@@ -6,8 +7,7 @@ part 'irctc_ticket_model.mapper.dart';
 class IRCTCTicket with IRCTCTicketMappable {
   const IRCTCTicket({
     required this.pnrNumber,
-    required this.passengerName,
-    required this.age,
+    required this.passengers,
     required this.status,
     required this.trainNumber,
     required this.trainName,
@@ -17,7 +17,6 @@ class IRCTCTicket with IRCTCTicketMappable {
     this.ticketFare,
     this.irctcFee,
     this.transactionId,
-    this.gender,
     this.quota,
     this.travelClass,
     this.scheduledDeparture,
@@ -26,9 +25,7 @@ class IRCTCTicket with IRCTCTicketMappable {
 
   final String pnrNumber;
   final String? transactionId;
-  final String passengerName;
-  final String? gender;
-  final int age;
+  final List<PassengerInfo> passengers;
   final String status;
   final String? quota;
   final String trainNumber;
@@ -51,7 +48,7 @@ class IRCTCTicket with IRCTCTicketMappable {
 
     return 'IRCTCTicket{\n'
         '  PNR: $pnrNumber\n'
-        '  Passenger: $passengerName ($gender, $age)\n'
+        '  Passenger: ""'
         '  Train: $trainNumber - $trainName\n'
         '  Journey: $fromStation → $toStation\n'
         '  Date: $journeyDateStr\n'
