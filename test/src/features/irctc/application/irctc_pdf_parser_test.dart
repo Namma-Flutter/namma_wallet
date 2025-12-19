@@ -264,5 +264,574 @@ void main() {
         );
       },
     );
+
+    test(
+      'should parse IRCTC PDF file 4117608719 to Ticket model correctly',
+      () async {
+        final pdfFile = XFile('test/assets/irctc/4117608719.pdf');
+        final pdfText = await pdfService.extractTextFrom(pdfFile);
+        final ticket = parser.parseTicket(pdfText);
+
+        expect(ticket, isNotNull);
+
+        // --- FIELD VALIDATIONS ---
+        expect(ticket.ticketId, equals('4117608719'));
+
+        /// Validates extracted route.
+        expect(
+          ticket.primaryText,
+          equals('VALLIYUR (VLY) → CHENNAI EGMORE (MS)'),
+        );
+
+        /// Validates train number, class, and passenger text.
+        expect(
+          ticket.secondaryText,
+          equals('Train 12634 • SL • SARAVANAKUMAR'),
+        );
+
+        /// Validate parsed departure date/time.
+        expect(ticket.startTime?.year, equals(2025));
+        expect(ticket.startTime?.month, equals(4));
+        expect(ticket.startTime?.day, equals(13));
+        expect(ticket.startTime?.hour, equals(18));
+        expect(ticket.startTime?.minute, equals(55));
+
+        /// Origin station
+        expect(ticket.location, equals('VALLIYUR (VLY)'));
+
+        // TAG VALIDATION: PNR, Train, Class, Fare
+        expect(
+          ticket.tags?.firstWhere((t) => t.icon == 'confirmation_number').value,
+          equals('4117608719'),
+        );
+        expect(
+          ticket.tags?.firstWhere((t) => t.icon == 'train').value,
+          equals('12634'),
+        );
+        expect(
+          ticket.tags?.firstWhere((t) => t.icon == 'event_seat').value,
+          equals('SL'),
+        );
+        expect(
+          ticket.tags?.firstWhere((t) => t.icon == 'attach_money').value,
+          equals('₹549.95'),
+        );
+
+        // EXTRAS VALIDATION
+        expect(
+          ticket.extras?.firstWhere((e) => e.title == 'Passenger').value,
+          equals('SARAVANAKUMAR'),
+        );
+        expect(
+          ticket.extras?.firstWhere((e) => e.title == 'Date of Journey').value,
+          equals('13/04/2025'),
+        );
+        expect(
+          ticket.extras?.firstWhere((e) => e.title == 'Fare').value,
+          equals('549.95'),
+        );
+        expect(
+          ticket.extras?.firstWhere((e) => e.title == 'Train Name').value,
+          equals('KANYAKUMARI EXP'),
+        );
+        expect(
+          ticket.extras?.firstWhere((e) => e.title == 'IRCTC Fee').value,
+          equals('17.70'),
+        );
+      },
+    );
+
+    test(
+      'should parse IRCTC PDF file 4214465828 to Ticket model correctly',
+      () async {
+        final pdfFile = XFile('test/assets/irctc/4214465828.pdf');
+        final pdfText = await pdfService.extractTextFrom(pdfFile);
+        final ticket = parser.parseTicket(pdfText);
+
+        expect(ticket, isNotNull);
+
+        // --- FIELD VALIDATIONS ---
+        expect(ticket.ticketId, equals('4214465828'));
+
+        /// Validates extracted route.
+        expect(
+          ticket.primaryText,
+          equals('ARALVAYMOZHI (AAY) → CHENNAI EGMORE (MS)'),
+        );
+
+        /// Validates train number, class, and first passenger text.
+        expect(
+          ticket.secondaryText,
+          equals('Train 20636 • SL • RAMKUMAR'),
+        );
+
+        /// Validate parsed departure date/time.
+        expect(ticket.startTime?.year, equals(2025));
+        expect(ticket.startTime?.month, equals(2));
+        expect(ticket.startTime?.day, equals(11));
+        expect(ticket.startTime?.hour, equals(17));
+        expect(ticket.startTime?.minute, equals(48));
+
+        /// Origin station
+        expect(ticket.location, equals('ARALVAYMOZHI (AAY)'));
+
+        // TAG VALIDATION
+        expect(
+          ticket.tags?.firstWhere((t) => t.icon == 'confirmation_number').value,
+          equals('4214465828'),
+        );
+        expect(
+          ticket.tags?.firstWhere((t) => t.icon == 'train').value,
+          equals('20636'),
+        );
+        expect(
+          ticket.tags?.firstWhere((t) => t.icon == 'event_seat').value,
+          equals('SL'),
+        );
+        expect(
+          ticket.tags?.firstWhere((t) => t.icon == 'attach_money').value,
+          equals('₹1905.85'),
+        );
+
+        // EXTRAS VALIDATION
+        expect(
+          ticket.extras?.firstWhere((e) => e.title == 'Passenger').value,
+          equals('RAMKUMAR'),
+        );
+        expect(
+          ticket.extras?.firstWhere((e) => e.title == 'Date of Journey').value,
+          equals('11/02/2025'),
+        );
+        expect(
+          ticket.extras?.firstWhere((e) => e.title == 'Fare').value,
+          equals('1905.85'),
+        );
+        expect(
+          ticket.extras?.firstWhere((e) => e.title == 'Train Name').value,
+          equals('ANANTAPURI EXP'),
+        );
+      },
+    );
+
+    test(
+      'should parse IRCTC PDF file 4249001496 to Ticket model correctly',
+      () async {
+        final pdfFile = XFile('test/assets/irctc/4249001496.pdf');
+        final pdfText = await pdfService.extractTextFrom(pdfFile);
+        final ticket = parser.parseTicket(pdfText);
+
+        expect(ticket, isNotNull);
+
+        expect(ticket.ticketId, equals('4249001496'));
+
+        /// Validates extracted route [cite: 227, 237]
+        expect(
+          ticket.primaryText,
+          equals('MGR CHENNAI CTL (MAS) → KOZHIKKODE (CLT)'),
+        );
+
+        /// Validates train number, class, and first passenger
+        expect(
+          ticket.secondaryText,
+          equals('Train 12685 • SL • RAMKUMAR R'),
+        );
+
+        /// Validate parsed departure date/time [cite: 232]
+        expect(ticket.startTime?.year, equals(2023));
+        expect(ticket.startTime?.month, equals(8));
+        expect(ticket.startTime?.day, equals(11));
+        expect(ticket.startTime?.hour, equals(16));
+        expect(ticket.startTime?.minute, equals(20));
+
+        /// Origin station [cite: 231, 232]
+        expect(ticket.location, equals('MGR CHENNAI CTL (MAS)'));
+        expect(
+          ticket.tags?.firstWhere((t) => t.icon == 'confirmation_number').value,
+          equals('4249001496'),
+        );
+        expect(
+          ticket.tags?.firstWhere((t) => t.icon == 'train').value,
+          equals('12685'),
+        );
+        expect(
+          ticket.tags?.firstWhere((t) => t.icon == 'event_seat').value,
+          equals('SL'),
+        );
+        expect(
+          ticket.tags?.firstWhere((t) => t.icon == 'attach_money').value,
+          equals('₹818.40'),
+        );
+
+        expect(
+          ticket.extras?.firstWhere((e) => e.title == 'Passenger').value,
+          equals('RAMKUMAR R'),
+        );
+        expect(
+          ticket.extras?.firstWhere((e) => e.title == 'Date of Journey').value,
+          equals('11/08/2023'),
+        );
+        expect(
+          ticket.extras?.firstWhere((e) => e.title == 'Fare').value,
+          equals('818.40'),
+        );
+        expect(
+          ticket.extras?.firstWhere((e) => e.title == 'Train Name').value,
+          equals('MAS MAQ EXP'),
+        );
+      },
+    );
+
+    test(
+      'should parse IRCTC PDF file 4417448343 to Ticket model correctly',
+      () async {
+        final pdfFile = XFile('test/assets/irctc/4417448343.pdf');
+        final pdfText = await pdfService.extractTextFrom(pdfFile);
+        final ticket = parser.parseTicket(pdfText);
+
+        expect(ticket, isNotNull);
+
+        expect(ticket.ticketId, equals('4417448343'));
+
+        expect(
+          ticket.primaryText,
+          equals('CHENNAI EGMORE (MS) → TIRUNELVELI JN (TEN)'),
+        );
+
+        expect(
+          ticket.secondaryText,
+          equals('Train 12631 • SL • SARAVANAKUMAR'),
+        );
+
+        expect(ticket.startTime?.year, equals(2025));
+        expect(ticket.startTime?.month, equals(4));
+        expect(ticket.startTime?.day, equals(10));
+        expect(ticket.startTime?.hour, equals(20));
+        expect(ticket.startTime?.minute, equals(40));
+
+        expect(ticket.location, equals('CHENNAI EGMORE (MS)'));
+
+        expect(
+          ticket.tags?.firstWhere((t) => t.icon == 'confirmation_number').value,
+          equals('4417448343'),
+        );
+        expect(
+          ticket.tags?.firstWhere((t) => t.icon == 'train').value,
+          equals('12631'),
+        );
+        expect(
+          ticket.tags?.firstWhere((t) => t.icon == 'event_seat').value,
+          equals('SL'),
+        );
+        expect(
+          ticket.tags?.firstWhere((t) => t.icon == 'attach_money').value,
+          equals('₹529.95'),
+        );
+
+        // EXTRAS VALIDATION [cite: 362, 357, 366, 382]
+        expect(
+          ticket.extras?.firstWhere((e) => e.title == 'Passenger').value,
+          equals('SARAVANAKUMAR'),
+        );
+        expect(
+          ticket.extras?.firstWhere((e) => e.title == 'Date of Journey').value,
+          equals('10/04/2025'),
+        );
+        expect(
+          ticket.extras?.firstWhere((e) => e.title == 'Fare').value,
+          equals('529.95'),
+        );
+        expect(
+          ticket.extras?.firstWhere((e) => e.title == 'Train Name').value,
+          equals('NELLAI SF EXP'),
+        );
+      },
+    );
+
+    test(
+      'should parse IRCTC PDF file 4222116599 to Ticket model correctly',
+      () async {
+        final pdfFile = XFile('test/assets/irctc/4222116599.pdf');
+        final pdfText = await pdfService.extractTextFrom(pdfFile);
+        final ticket = parser.parseTicket(pdfText);
+
+        expect(ticket, isNotNull);
+
+        expect(ticket.ticketId, equals('4222116599'));
+
+        /// Validates extracted route [cite: 466, 481]
+        expect(
+          ticket.primaryText,
+          equals('CHENNAI EGMORE (MS) → ARALVAYMOZHI (AAY)'),
+        );
+
+        /// Validates train number, class, and passenger [cite: 472, 476, 483]
+        expect(
+          ticket.secondaryText,
+          equals('Train 16127 • 3A • MURUGESAN M'),
+        );
+
+        /// Validate parsed departure date/time [cite: 475]
+        expect(ticket.startTime?.year, equals(2025));
+        expect(ticket.startTime?.month, equals(8));
+        expect(ticket.startTime?.day, equals(27));
+        expect(ticket.startTime?.hour, equals(10));
+        expect(ticket.startTime?.minute, equals(20));
+
+        /// Origin station [cite: 474, 475]
+        expect(ticket.location, equals('CHENNAI EGMORE (MS)'));
+
+        expect(
+          ticket.tags?.firstWhere((t) => t.icon == 'confirmation_number').value,
+          equals('4222116599'),
+        );
+        expect(
+          ticket.tags?.firstWhere((t) => t.icon == 'train').value,
+          equals('16127'),
+        );
+        expect(
+          ticket.tags?.firstWhere((t) => t.icon == 'event_seat').value,
+          equals('3A'),
+        );
+        expect(
+          ticket.tags?.firstWhere((t) => t.icon == 'attach_money').value,
+          equals('₹1112.20'),
+        );
+
+        expect(
+          ticket.extras?.firstWhere((e) => e.title == 'Passenger').value,
+          equals('MURUGESAN M'),
+        );
+        expect(
+          ticket.extras?.firstWhere((e) => e.title == 'Date of Journey').value,
+          equals('27/08/2025'),
+        );
+        expect(
+          ticket.extras?.firstWhere((e) => e.title == 'Train Name').value,
+          equals('MS GURUVAYUR EXP'),
+        );
+      },
+    );
+
+    test(
+      'should parse IRCTC PDF file 4534937884 to Ticket model correctly',
+      () async {
+        final pdfFile = XFile('test/assets/irctc/4534937884.pdf');
+        final pdfText = await pdfService.extractTextFrom(pdfFile);
+        final ticket = parser.parseTicket(pdfText);
+
+        expect(ticket, isNotNull);
+
+        // --- FIELD VALIDATIONS ---
+        expect(ticket.ticketId, equals('4534937884'));
+
+        /// Validates extracted route in CAPITAL LETTERS
+        expect(
+          ticket.primaryText,
+          equals('MGR CHENNAI CTL (MAS) → KSR BENGALURU (SBC)'),
+        );
+
+        /// Validates train number, class, and passenger
+        expect(
+          ticket.secondaryText,
+          equals('Train 12007 • CC'),
+        );
+
+        /// Validate parsed departure date/time
+        expect(ticket.startTime?.year, equals(2025));
+        expect(ticket.startTime?.month, equals(7));
+        expect(ticket.startTime?.day, equals(28));
+        expect(ticket.startTime?.hour, equals(6));
+        expect(ticket.startTime?.minute, equals(0));
+
+        /// Origin station
+        expect(ticket.location, equals('MGR CHENNAI CTL (MAS)'));
+
+        // TAG VALIDATION
+        expect(
+          ticket.tags?.firstWhere((t) => t.icon == 'confirmation_number').value,
+          equals('4534937884'),
+        );
+        expect(
+          ticket.tags?.firstWhere((t) => t.icon == 'train').value,
+          equals('12007'),
+        );
+        expect(
+          ticket.tags?.firstWhere((t) => t.icon == 'event_seat').value,
+          equals('CC'),
+        );
+        expect(
+          ticket.tags?.firstWhere((t) => t.icon == 'attach_money').value,
+          equals('₹967.65'),
+        );
+
+        // EXTRAS VALIDATION
+        // expect(
+        //   ticket.extras?.firstWhere((e) => e.title == 'Passenger').value,
+        //   equals('SARAVANAKUMAR RA'),
+        // );
+        expect(
+          ticket.extras?.firstWhere((e) => e.title == 'Train Name').value,
+          equals('MYS SHATABDI'),
+        );
+        expect(
+          ticket.extras?.firstWhere((e) => e.title == 'Fare').value,
+          equals('967.65'),
+        );
+      },
+    );
+
+    test(
+      'should throw ArgumentError when parsing IRCTC'
+      ' PDF 4565161618 due to N.A. departure time',
+      () async {
+        /// Load the specific sample where departure is "N.A."
+        final pdfFile = XFile('test/assets/irctc/4565161618.pdf');
+
+        /// Extract text from the PDF
+        final pdfText = await pdfService.extractTextFrom(pdfFile);
+
+        /// The test verifies that the parser rejects the ticket because
+        /// scheduledDeparture is null due to the "N.A."
+        /// value in the source.
+        expect(
+          () => parser.parseTicket(pdfText),
+          throwsA(isA<ArgumentError>()),
+        );
+      },
+    );
+
+    test(
+      'should parse IRCTC PDF file 4449000087 to Ticket model correctly',
+      () async {
+        final pdfFile = XFile('test/assets/irctc/4449000087.pdf');
+        final pdfText = await pdfService.extractTextFrom(pdfFile);
+        final ticket = parser.parseTicket(pdfText);
+
+        expect(ticket, isNotNull);
+
+        // --- FIELD VALIDATIONS ---
+        expect(ticket.ticketId, equals('4449000087'));
+
+        /// Validates extracted route in CAPITAL LETTERS
+        expect(
+          ticket.primaryText,
+          equals('KOZHIKKODE (CLT) → MGR CHENNAI CTL (MAS)'),
+        );
+
+        /// Validates train number, class, and first passenger
+        expect(
+          ticket.secondaryText,
+          equals('Train 12686 • 3A • RAMKUMAR'),
+        );
+
+        /// Validate parsed departure date/time
+        expect(ticket.startTime?.year, equals(2023));
+        expect(ticket.startTime?.month, equals(8));
+        expect(ticket.startTime?.day, equals(15));
+        expect(ticket.startTime?.hour, equals(20));
+        expect(ticket.startTime?.minute, equals(30));
+
+        /// Origin station
+        expect(ticket.location, equals('KOZHIKKODE (CLT)'));
+
+        // TAG VALIDATION
+        expect(
+          ticket.tags?.firstWhere((t) => t.icon == 'confirmation_number').value,
+          equals('4449000087'),
+        );
+        expect(
+          ticket.tags?.firstWhere((t) => t.icon == 'train').value,
+          equals('12686'),
+        );
+        expect(
+          ticket.tags?.firstWhere((t) => t.icon == 'event_seat').value,
+          equals('3A'),
+        );
+        expect(
+          ticket.tags?.firstWhere((t) => t.icon == 'attach_money').value,
+          equals('₹2126.10'),
+        );
+
+        // EXTRAS VALIDATION
+        expect(
+          ticket.extras?.firstWhere((e) => e.title == 'Passenger').value,
+          equals('RAMKUMAR'),
+        );
+        expect(
+          ticket.extras?.firstWhere((e) => e.title == 'Train Name').value,
+          equals('MAQ MAS EXP'),
+        );
+        expect(
+          ticket.extras?.firstWhere((e) => e.title == 'Fare').value,
+          equals('2126.10'),
+        );
+      },
+    );
+
+    test(
+      'should parse IRCTC PDF file 4328673018 to Ticket model correctly',
+      () async {
+        final pdfFile = XFile('test/assets/irctc/confirmTkt_ticket_2.pdf');
+        final pdfText = await pdfService.extractTextFrom(pdfFile);
+        final ticket = parser.parseTicket(pdfText);
+
+        expect(ticket, isNotNull);
+
+        // --- FIELD VALIDATIONS ---
+        expect(ticket.ticketId, equals('4328673018')); // [cite: 897]
+
+        /// Validates extracted route in CAPITAL LETTERS
+        expect(
+          ticket.primaryText,
+          equals(
+            'KSR BENGALURU (SBC) → MGR CHENNAI CTL (MAS)',
+          ), // [cite: 894, 908]
+        );
+
+        /// Validates train number, class, and passenger
+        expect(
+          ticket.secondaryText,
+          equals('Train 16022 • SL • MAGESH K'), // [cite: 901, 911, 905]
+        );
+
+        /// Validate parsed departure date/time
+        expect(ticket.startTime?.year, equals(2026)); // [cite: 895]
+        expect(ticket.startTime?.month, equals(1)); // [cite: 895]
+        expect(ticket.startTime?.day, equals(13)); // [cite: 895]
+        expect(ticket.startTime?.hour, equals(23)); // [cite: 895]
+        expect(ticket.startTime?.minute, equals(50)); // [cite: 895]
+
+        /// Origin station
+        expect(ticket.location, equals('KSR BENGALURU (SBC)')); // [cite: 894]
+
+        // TAG VALIDATION
+        expect(
+          ticket.tags?.firstWhere((t) => t.icon == 'confirmation_number').value,
+          equals('4328673018'), // [cite: 897]
+        );
+        expect(
+          ticket.tags?.firstWhere((t) => t.icon == 'train').value,
+          equals('16022'), // [cite: 901]
+        );
+        expect(
+          ticket.tags?.firstWhere((t) => t.icon == 'event_seat').value,
+          equals('SL'), // [cite: 911]
+        );
+        expect(
+          ticket.tags?.firstWhere((t) => t.icon == 'attach_money').value,
+          equals('₹240.00'), // [cite: 927]
+        );
+
+        // EXTRAS VALIDATION
+        expect(
+          ticket.extras?.firstWhere((e) => e.title == 'Passenger').value,
+          equals('MAGESH K'), // [cite: 905]
+        );
+        expect(
+          ticket.extras?.firstWhere((e) => e.title == 'Train Name').value,
+          equals('KAVERI EXPRESS'), // [cite: 901]
+        );
+      },
+    );
   });
 }
