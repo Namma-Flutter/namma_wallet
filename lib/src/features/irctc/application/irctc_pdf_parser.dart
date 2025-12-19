@@ -401,16 +401,16 @@ class IRCTCPDFParser implements ITicketParser {
       // r'Total [Ff]are(?:[\s\S]{0,50}?)([\d,]+\.\d{2})',
     ]);
 
-    double extractTotalFareFallback(String text) {
+    double? extractTotalFareFallback(String text) {
       final matches = RegExp(
         r'₹\s*([\d,]+\.\d{2})',
         multiLine: true,
       ).allMatches(text);
 
-      if (matches.isEmpty) return 0;
+      if (matches.isEmpty) return null;
 
       final last = matches.last.group(1)!;
-      return double.tryParse(last.replaceAll(',', '')) ?? 0.0;
+      return double.tryParse(last.replaceAll(',', ''));
     }
 
     final resolvedTicketFare = ticketFare > 0
@@ -425,15 +425,15 @@ class IRCTCPDFParser implements ITicketParser {
       r'IRCTC Fee(?:[\s\S]{0,30}?)([\d,]+\.?\d{0,2})',
     ]);
 
-    double extractIrctcFeeFallback(String text) {
+    double? extractIrctcFeeFallback(String text) {
       final matches = RegExp(
         r'₹\s*([\d,]+\.\d{2})',
       ).allMatches(text).toList();
 
-      if (matches.length < 2) return 0;
+      if (matches.length < 2) return null;
 
       final value = matches[1].group(1)!;
-      return double.tryParse(value.replaceAll(',', '')) ?? 0.0;
+      return double.tryParse(value.replaceAll(',', ''));
     }
 
     final resolvedIrctcFee = irctcFee > 0

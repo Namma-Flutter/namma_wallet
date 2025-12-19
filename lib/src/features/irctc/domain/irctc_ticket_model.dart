@@ -14,8 +14,8 @@ class IRCTCTicket with IRCTCTicketMappable {
     required this.boardingStation,
     required this.fromStation,
     required this.toStation,
-    required this.ticketFare,
-    required this.irctcFee,
+    this.ticketFare,
+    this.irctcFee,
     this.transactionId,
     this.gender,
     this.quota,
@@ -39,8 +39,8 @@ class IRCTCTicket with IRCTCTicketMappable {
   final String? travelClass;
   final String fromStation;
   final String toStation;
-  final double ticketFare;
-  final double irctcFee;
+  final double? ticketFare;
+  final double? irctcFee;
 
   String toReadableString() {
     final journeyDateStr = dateOfJourney != null

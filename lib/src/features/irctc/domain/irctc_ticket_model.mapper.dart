@@ -60,12 +60,12 @@ class IRCTCTicketMapper extends ClassMapperBase<IRCTCTicket> {
     'toStation',
     _$toStation,
   );
-  static double _$ticketFare(IRCTCTicket v) => v.ticketFare;
+  static double? _$ticketFare(IRCTCTicket v) => v.ticketFare;
   static const Field<IRCTCTicket, double> _f$ticketFare = Field(
     'ticketFare',
     _$ticketFare,
   );
-  static double _$irctcFee(IRCTCTicket v) => v.irctcFee;
+  static double? _$irctcFee(IRCTCTicket v) => v.irctcFee;
   static const Field<IRCTCTicket, double> _f$irctcFee = Field(
     'irctcFee',
     _$irctcFee,
@@ -251,8 +251,8 @@ class _IRCTCTicketCopyWithImpl<$R, $Out>
     String? boardingStation,
     String? fromStation,
     String? toStation,
-    double? ticketFare,
-    double? irctcFee,
+    Object? ticketFare = $none,
+    Object? irctcFee = $none,
     Object? transactionId = $none,
     Object? gender = $none,
     Object? quota = $none,
@@ -270,8 +270,8 @@ class _IRCTCTicketCopyWithImpl<$R, $Out>
       if (boardingStation != null) #boardingStation: boardingStation,
       if (fromStation != null) #fromStation: fromStation,
       if (toStation != null) #toStation: toStation,
-      if (ticketFare != null) #ticketFare: ticketFare,
-      if (irctcFee != null) #irctcFee: irctcFee,
+      if (ticketFare != $none) #ticketFare: ticketFare,
+      if (irctcFee != $none) #irctcFee: irctcFee,
       if (transactionId != $none) #transactionId: transactionId,
       if (gender != $none) #gender: gender,
       if (quota != $none) #quota: quota,

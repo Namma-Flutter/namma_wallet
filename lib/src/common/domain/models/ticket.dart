@@ -86,9 +86,9 @@ class Ticket with TicketMappable {
           TagModel(value: model.travelClass, icon: 'event_seat'),
         if (model.status.isNotNullOrEmpty)
           TagModel(value: model.status, icon: 'info'),
-        if (model.ticketFare > 0)
+        if (model.ticketFare! > 0)
           TagModel(
-            value: '₹${model.ticketFare.toStringAsFixed(2)}',
+            value: '₹${model.ticketFare?.toStringAsFixed(2)}',
             icon: 'attach_money',
           ),
       ],
@@ -114,10 +114,10 @@ class Ticket with TicketMappable {
               ? DateTimeConverter.instance.formatDate(journeyDate!)
               : null,
         ),
-        ExtrasModel(title: 'Fare', value: model.ticketFare.toStringAsFixed(2)),
+        ExtrasModel(title: 'Fare', value: model.ticketFare?.toStringAsFixed(2)),
         ExtrasModel(
           title: 'IRCTC Fee',
-          value: model.irctcFee.toStringAsFixed(2),
+          value: model.irctcFee?.toStringAsFixed(2),
         ),
         ExtrasModel(title: 'Transaction ID', value: model.transactionId),
       ],
