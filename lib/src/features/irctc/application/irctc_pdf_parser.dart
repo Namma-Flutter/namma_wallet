@@ -59,8 +59,16 @@ class IRCTCPDFParser implements ITicketParser {
       'MSG',
       'SMS',
       'IN',
+      'AC',
       'NA',
       'SF',
+      'SIDE',
+      'ROAD',
+      'PREMIUM',
+      'TATKAL',
+      'TQ',
+      'PT',
+      'CC',
     };
 
     String? normalizeClass(String? raw) {
@@ -189,7 +197,7 @@ class IRCTCPDFParser implements ITicketParser {
 
     /// Regex to capture station name and code pairs.
     final stationRegex = RegExp(
-      r'([A-Za-z &.]{2,})\s*\n?\s*\(([A-Z]{3,4})\)',
+      r'([A-Za-z &.]{2,})\s*(?:\(\s*([A-Z]{2,4})\s*\)|-\s*([A-Z]{2,4}))',
       multiLine: true,
     );
 
@@ -199,21 +207,34 @@ class IRCTCPDFParser implements ITicketParser {
 
     /// Iterates through detected stations, filtering invalid or noisy entries.
     for (final m in stationMatches) {
-      final name = m.group(1)!.trim().replaceAll('\n', ' ');
-      final code = m.group(2)!;
+      final rawName = m.group(1)!;
+      final code = m.group(2) ?? m.group(3);
 
+      if (code == null) continue;
       if (ignoredCodes.contains(code)) continue;
-      if (name.toLowerCase().contains('international year')) continue;
-      if (name.toLowerCase().contains('case of')) continue;
 
+      final name = rawName.replaceAll('\n', ' ').trim();
+
+      if (name.length <= 4 || name.toUpperCase() == code) continue;
       foundStations.add('$name ($code)');
     }
 
     /// Assigns from, to, and boarding stations based on parsed list.
+    /// Assigns from, boarding, and to stations safely
     if (foundStations.isNotEmpty) {
-      fromStn = foundStations.first;
-      boardingStn = foundStations.first;
-      toStn = foundStations.lastWhere((s) => s != fromStn, orElse: () => '');
+      if (foundStations.length == 1) {
+        fromStn = foundStations.first;
+        boardingStn = foundStations.first;
+        toStn = '';
+      } else if (foundStations.length == 2) {
+        fromStn = foundStations[0];
+        boardingStn = foundStations[0];
+        toStn = foundStations[1];
+      } else {
+        fromStn = foundStations.first;
+        boardingStn = foundStations[1]; // IMPORTANT
+        toStn = foundStations.last;
+      }
     }
 
     /// Fallback regex for "From"
@@ -377,8 +398,24 @@ class IRCTCPDFParser implements ITicketParser {
       r'Ticket Fare\s*[:]\s*([\d,]+(?:\.\d+)?)',
       r'Ticket [Ff]are(?:[\s\S]{0,50}?)Rs\.?\s*([\d,]+\.\d{2})',
       r'Ticket [Ff]are(?:[\s\S]{0,50}?)([\d,]+\.\d{2})',
-      r'Total [Ff]are(?:[\s\S]{0,50}?)([\d,]+\.\d{2})',
+      // r'Total [Ff]are(?:[\s\S]{0,50}?)([\d,]+\.\d{2})',
     ]);
+
+    double? extractTotalFareFallback(String text) {
+      final matches = RegExp(
+        r'₹\s*([\d,]+\.\d{2})',
+        multiLine: true,
+      ).allMatches(text);
+
+      if (matches.isEmpty) return null;
+
+      final last = matches.last.group(1)!;
+      return double.tryParse(last.replaceAll(',', ''));
+    }
+
+    final resolvedTicketFare = ticketFare > 0
+        ? ticketFare
+        : extractTotalFareFallback(rawText);
 
     /// Extracts IRCTC service fee or convenience fee.
     final irctcFee = pickDouble([
@@ -387,6 +424,21 @@ class IRCTCPDFParser implements ITicketParser {
       r'Convenience Fee(?:[\s\S]{0,30}?)([\d,]+\.?\d{0,2})',
       r'IRCTC Fee(?:[\s\S]{0,30}?)([\d,]+\.?\d{0,2})',
     ]);
+
+    double? extractIrctcFeeFallback(String text) {
+      final matches = RegExp(
+        r'₹\s*([\d,]+\.\d{2})',
+      ).allMatches(text).toList();
+
+      if (matches.length < 2) return null;
+
+      final value = matches[1].group(1)!;
+      return double.tryParse(value.replaceAll(',', ''));
+    }
+
+    final resolvedIrctcFee = irctcFee > 0
+        ? irctcFee
+        : extractIrctcFeeFallback(rawText);
 
     /// Creates IRCTCTicket model using extracted values.
     final model = IRCTCTicket(
@@ -405,8 +457,8 @@ class IRCTCPDFParser implements ITicketParser {
       travelClass: travelClass,
       fromStation: fromStn,
       toStation: toStn,
-      ticketFare: ticketFare,
-      irctcFee: irctcFee,
+      ticketFare: resolvedTicketFare,
+      irctcFee: resolvedIrctcFee,
     );
 
     /// Converts IRCTCTicket model to Ticket entity.

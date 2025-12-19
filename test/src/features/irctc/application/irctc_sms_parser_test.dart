@@ -72,7 +72,10 @@ void main() {
 
       // Basic ticket metadata
       expect(ticket.ticketId, equals('4321751237'));
-      expect(ticket.primaryText, equals('Yesvantpur → Chennai Central'));
+      expect(
+        ticket.primaryText,
+        equals('YESVANTPUR (YPR) → CHENNAI CENTRAL (MAS)'),
+      );
       expect(ticket.secondaryText, equals('Train 12291 • SL • MAGESH K'));
 
       /// Validate parsed start time from DOJ + DP fields.
@@ -83,7 +86,7 @@ void main() {
       expect(ticket.startTime?.minute, equals(45));
 
       /// Boarding station
-      expect(ticket.location, equals('Yesvantpur'));
+      expect(ticket.location, equals('YESVANTPUR (YPR)'));
 
       // Tag: PNR
       final pnrTag = ticket.tags?.firstWhere(
@@ -111,7 +114,7 @@ void main() {
 
       expect(
         ticket.extras?.firstWhere((e) => e.title == 'Boarding').value,
-        equals('Yesvantpur'),
+        equals('YESVANTPUR (YPR)'),
       );
 
       expect(
@@ -144,7 +147,10 @@ void main() {
 
       expect(ticket, isNotNull);
 
-      expect(ticket.primaryText, equals('Tiruvallur → Bangalore City'));
+      expect(
+        ticket.primaryText,
+        equals('TIRUVALLUR (TRL) → BANGALORE CITY (SBC)'),
+      );
 
       // Status tag includes waitlist number
       final statusTag = ticket.tags?.firstWhere((t) => t.icon == 'info');
@@ -201,7 +207,10 @@ void main() {
 
       expect(ticket, isNotNull);
 
-      expect(ticket.primaryText, equals('Chennai Central → Salem Junction'));
+      expect(
+        ticket.primaryText,
+        equals('CHENNAI CENTRAL (MAS) → SALEM JUNCTION (SA)'),
+      );
       expect(ticket.secondaryText, contains('Train 12679 • 2S'));
 
       // Class tag should correctly detect 2S

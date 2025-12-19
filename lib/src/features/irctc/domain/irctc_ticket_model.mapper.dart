@@ -26,33 +26,15 @@ class IRCTCTicketMapper extends ClassMapperBase<IRCTCTicket> {
     'pnrNumber',
     _$pnrNumber,
   );
-  static String? _$transactionId(IRCTCTicket v) => v.transactionId;
-  static const Field<IRCTCTicket, String> _f$transactionId = Field(
-    'transactionId',
-    _$transactionId,
-    opt: true,
-  );
   static String _$passengerName(IRCTCTicket v) => v.passengerName;
   static const Field<IRCTCTicket, String> _f$passengerName = Field(
     'passengerName',
     _$passengerName,
   );
-  static String? _$gender(IRCTCTicket v) => v.gender;
-  static const Field<IRCTCTicket, String> _f$gender = Field(
-    'gender',
-    _$gender,
-    opt: true,
-  );
   static int _$age(IRCTCTicket v) => v.age;
   static const Field<IRCTCTicket, int> _f$age = Field('age', _$age);
   static String _$status(IRCTCTicket v) => v.status;
   static const Field<IRCTCTicket, String> _f$status = Field('status', _$status);
-  static String? _$quota(IRCTCTicket v) => v.quota;
-  static const Field<IRCTCTicket, String> _f$quota = Field(
-    'quota',
-    _$quota,
-    opt: true,
-  );
   static String _$trainNumber(IRCTCTicket v) => v.trainNumber;
   static const Field<IRCTCTicket, String> _f$trainNumber = Field(
     'trainNumber',
@@ -78,15 +60,33 @@ class IRCTCTicketMapper extends ClassMapperBase<IRCTCTicket> {
     'toStation',
     _$toStation,
   );
-  static double _$ticketFare(IRCTCTicket v) => v.ticketFare;
+  static double? _$ticketFare(IRCTCTicket v) => v.ticketFare;
   static const Field<IRCTCTicket, double> _f$ticketFare = Field(
     'ticketFare',
     _$ticketFare,
   );
-  static double _$irctcFee(IRCTCTicket v) => v.irctcFee;
+  static double? _$irctcFee(IRCTCTicket v) => v.irctcFee;
   static const Field<IRCTCTicket, double> _f$irctcFee = Field(
     'irctcFee',
     _$irctcFee,
+  );
+  static String? _$transactionId(IRCTCTicket v) => v.transactionId;
+  static const Field<IRCTCTicket, String> _f$transactionId = Field(
+    'transactionId',
+    _$transactionId,
+    opt: true,
+  );
+  static String? _$gender(IRCTCTicket v) => v.gender;
+  static const Field<IRCTCTicket, String> _f$gender = Field(
+    'gender',
+    _$gender,
+    opt: true,
+  );
+  static String? _$quota(IRCTCTicket v) => v.quota;
+  static const Field<IRCTCTicket, String> _f$quota = Field(
+    'quota',
+    _$quota,
+    opt: true,
   );
   static String? _$travelClass(IRCTCTicket v) => v.travelClass;
   static const Field<IRCTCTicket, String> _f$travelClass = Field(
@@ -110,12 +110,9 @@ class IRCTCTicketMapper extends ClassMapperBase<IRCTCTicket> {
   @override
   final MappableFields<IRCTCTicket> fields = const {
     #pnrNumber: _f$pnrNumber,
-    #transactionId: _f$transactionId,
     #passengerName: _f$passengerName,
-    #gender: _f$gender,
     #age: _f$age,
     #status: _f$status,
-    #quota: _f$quota,
     #trainNumber: _f$trainNumber,
     #trainName: _f$trainName,
     #boardingStation: _f$boardingStation,
@@ -123,6 +120,9 @@ class IRCTCTicketMapper extends ClassMapperBase<IRCTCTicket> {
     #toStation: _f$toStation,
     #ticketFare: _f$ticketFare,
     #irctcFee: _f$irctcFee,
+    #transactionId: _f$transactionId,
+    #gender: _f$gender,
+    #quota: _f$quota,
     #travelClass: _f$travelClass,
     #scheduledDeparture: _f$scheduledDeparture,
     #dateOfJourney: _f$dateOfJourney,
@@ -131,12 +131,9 @@ class IRCTCTicketMapper extends ClassMapperBase<IRCTCTicket> {
   static IRCTCTicket _instantiate(DecodingData data) {
     return IRCTCTicket(
       pnrNumber: data.dec(_f$pnrNumber),
-      transactionId: data.dec(_f$transactionId),
       passengerName: data.dec(_f$passengerName),
-      gender: data.dec(_f$gender),
       age: data.dec(_f$age),
       status: data.dec(_f$status),
-      quota: data.dec(_f$quota),
       trainNumber: data.dec(_f$trainNumber),
       trainName: data.dec(_f$trainName),
       boardingStation: data.dec(_f$boardingStation),
@@ -144,6 +141,9 @@ class IRCTCTicketMapper extends ClassMapperBase<IRCTCTicket> {
       toStation: data.dec(_f$toStation),
       ticketFare: data.dec(_f$ticketFare),
       irctcFee: data.dec(_f$irctcFee),
+      transactionId: data.dec(_f$transactionId),
+      gender: data.dec(_f$gender),
+      quota: data.dec(_f$quota),
       travelClass: data.dec(_f$travelClass),
       scheduledDeparture: data.dec(_f$scheduledDeparture),
       dateOfJourney: data.dec(_f$dateOfJourney),
@@ -212,12 +212,9 @@ abstract class IRCTCTicketCopyWith<$R, $In extends IRCTCTicket, $Out>
     implements ClassCopyWith<$R, $In, $Out> {
   $R call({
     String? pnrNumber,
-    String? transactionId,
     String? passengerName,
-    String? gender,
     int? age,
     String? status,
-    String? quota,
     String? trainNumber,
     String? trainName,
     String? boardingStation,
@@ -225,6 +222,9 @@ abstract class IRCTCTicketCopyWith<$R, $In extends IRCTCTicket, $Out>
     String? toStation,
     double? ticketFare,
     double? irctcFee,
+    String? transactionId,
+    String? gender,
+    String? quota,
     String? travelClass,
     DateTime? scheduledDeparture,
     DateTime? dateOfJourney,
@@ -243,38 +243,38 @@ class _IRCTCTicketCopyWithImpl<$R, $Out>
   @override
   $R call({
     String? pnrNumber,
-    Object? transactionId = $none,
     String? passengerName,
-    Object? gender = $none,
     int? age,
     String? status,
-    Object? quota = $none,
     String? trainNumber,
     String? trainName,
     String? boardingStation,
     String? fromStation,
     String? toStation,
-    double? ticketFare,
-    double? irctcFee,
+    Object? ticketFare = $none,
+    Object? irctcFee = $none,
+    Object? transactionId = $none,
+    Object? gender = $none,
+    Object? quota = $none,
     Object? travelClass = $none,
     Object? scheduledDeparture = $none,
     Object? dateOfJourney = $none,
   }) => $apply(
     FieldCopyWithData({
       if (pnrNumber != null) #pnrNumber: pnrNumber,
-      if (transactionId != $none) #transactionId: transactionId,
       if (passengerName != null) #passengerName: passengerName,
-      if (gender != $none) #gender: gender,
       if (age != null) #age: age,
       if (status != null) #status: status,
-      if (quota != $none) #quota: quota,
       if (trainNumber != null) #trainNumber: trainNumber,
       if (trainName != null) #trainName: trainName,
       if (boardingStation != null) #boardingStation: boardingStation,
       if (fromStation != null) #fromStation: fromStation,
       if (toStation != null) #toStation: toStation,
-      if (ticketFare != null) #ticketFare: ticketFare,
-      if (irctcFee != null) #irctcFee: irctcFee,
+      if (ticketFare != $none) #ticketFare: ticketFare,
+      if (irctcFee != $none) #irctcFee: irctcFee,
+      if (transactionId != $none) #transactionId: transactionId,
+      if (gender != $none) #gender: gender,
+      if (quota != $none) #quota: quota,
       if (travelClass != $none) #travelClass: travelClass,
       if (scheduledDeparture != $none) #scheduledDeparture: scheduledDeparture,
       if (dateOfJourney != $none) #dateOfJourney: dateOfJourney,
@@ -283,12 +283,9 @@ class _IRCTCTicketCopyWithImpl<$R, $Out>
   @override
   IRCTCTicket $make(CopyWithData data) => IRCTCTicket(
     pnrNumber: data.get(#pnrNumber, or: $value.pnrNumber),
-    transactionId: data.get(#transactionId, or: $value.transactionId),
     passengerName: data.get(#passengerName, or: $value.passengerName),
-    gender: data.get(#gender, or: $value.gender),
     age: data.get(#age, or: $value.age),
     status: data.get(#status, or: $value.status),
-    quota: data.get(#quota, or: $value.quota),
     trainNumber: data.get(#trainNumber, or: $value.trainNumber),
     trainName: data.get(#trainName, or: $value.trainName),
     boardingStation: data.get(#boardingStation, or: $value.boardingStation),
@@ -296,6 +293,9 @@ class _IRCTCTicketCopyWithImpl<$R, $Out>
     toStation: data.get(#toStation, or: $value.toStation),
     ticketFare: data.get(#ticketFare, or: $value.ticketFare),
     irctcFee: data.get(#irctcFee, or: $value.irctcFee),
+    transactionId: data.get(#transactionId, or: $value.transactionId),
+    gender: data.get(#gender, or: $value.gender),
+    quota: data.get(#quota, or: $value.quota),
     travelClass: data.get(#travelClass, or: $value.travelClass),
     scheduledDeparture: data.get(
       #scheduledDeparture,

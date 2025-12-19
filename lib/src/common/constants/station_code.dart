@@ -1,3 +1,5 @@
+import 'package:namma_wallet/src/common/constants/string_extension.dart';
+
 class StationRegistry {
   StationRegistry._();
 
@@ -628,7 +630,12 @@ class StationRegistry {
   /// available in the map [_stations] else, it is good to use the
   /// station code which is passed to this method.
   static String getName(String stationCode) {
-    return _stations[stationCode.toUpperCase().trim()] ?? stationCode;
+    final station = _stations[stationCode.toUpperCase().trim()];
+    if (station.isNotNullOrEmpty) {
+      return '${station?.toUpperCase()} (${stationCode.toUpperCase()})';
+    } else {
+      return stationCode.toUpperCase();
+    }
   }
 
   /// method [exists] is un-used for now, later it will be used
