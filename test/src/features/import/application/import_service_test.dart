@@ -65,42 +65,55 @@ class FakeIRCTCScannerService implements IIRCTCScannerService {
 }
 
 class FakeTicketDAO implements ITicketDAO {
-  Ticket? insertedTicket;
+  // State for assertions
+  Ticket? handledTicket;
   bool shouldThrowError = false;
 
   @override
-  Future<int> insertTicket(Ticket ticket) async {
+  Future<int> handleTicket(Ticket ticket) async {
+    // 1. Simulate Error
     if (shouldThrowError) {
       throw Exception('Database error');
     }
-    insertedTicket = ticket;
+
+    // 2. Capture State (Test Spy behavior)
+    // We rename this from 'insertedTicket' to 'handledTicket'
+    // to match the method name, though 'insertedTicket' is fine too.
+    handledTicket = ticket;
+
+    // 3. Return Success
     return 1;
   }
 
   @override
-  Future<List<Ticket>> getAllTickets() async {
-    return [];
+  Future<int> insertTicket(Ticket ticket) async {
+    // If legacy tests still rely on this, keep the logic,
+    // otherwise, you can now delegate to handleTicket
+    // or keep it as a simple backing store.
+    return handleTicket(ticket);
   }
 
   @override
-  Future<Ticket?> getTicketById(String id) async {
-    return null;
-  }
-
-  @override
-  Future<int> deleteTicket(String id) async {
+  Future<int> updateTicketById(String id, Ticket ticket) async {
+    // If your logic distinguishes between insert/update,
+    // you might want to capture this separately.
+    handledTicket = ticket;
     return 1;
   }
 
-  @override
-  Future<List<Ticket>> getTicketsByType(String type) async {
-    return [];
-  }
+  // --- Boilerplate stubs ---
 
   @override
-  Future<int> updateTicketById(String id, Map<String, Object?> data) async {
-    return 1;
-  }
+  Future<List<Ticket>> getAllTickets() async => [];
+
+  @override
+  Future<Ticket?> getTicketById(String id) async => null;
+
+  @override
+  Future<int> deleteTicket(String id) async => 1;
+
+  @override
+  Future<List<Ticket>> getTicketsByType(String type) async => [];
 }
 
 void main() {
@@ -220,7 +233,7 @@ void main() {
         );
         // Assert
         expect(result, testTicket);
-        expect(fakeTicketDAO.insertedTicket, testTicket);
+        expect(fakeTicketDAO.handledTicket, testTicket);
       });
 
       test(
