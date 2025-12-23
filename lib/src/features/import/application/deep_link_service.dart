@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:cross_file/cross_file.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
@@ -54,6 +55,11 @@ class DeepLinkService implements IDeepLinkService {
 
       final path = attachment.path;
       _logger.info('DeepLinkService: Attachment path: $path');
+
+      if (!File(path).existsSync()) {
+        _logger.warning('DeepLinkService: File not found at $path');
+        continue;
+      }
 
       if (path.toLowerCase().endsWith('.pkpass')) {
         _logger.info('DeepLinkService: Detected .pkpass file, importing...');
