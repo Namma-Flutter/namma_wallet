@@ -114,18 +114,18 @@ final router = GoRouter(
       path: AppRoute.shareSuccess.path,
       name: AppRoute.shareSuccess.name,
       builder: (context, state) {
-        final extra = state.extra as Map<String, String>?;
+        final extra = state.extra as Map<String, dynamic>?;
         if (extra == null) {
           return const Scaffold(
             body: Center(child: Text('Invalid share data')),
           );
         }
         return ShareSuccessView(
-          pnrNumber: extra['pnrNumber'] ?? 'Unknown',
-          from: extra['from'] ?? 'Unknown',
-          to: extra['to'] ?? 'Unknown',
-          fare: extra['fare'] ?? '₹0.00',
-          date: extra['date'] ?? 'Unknown',
+          pnrNumber: extra['pnrNumber'] as String?,
+          from: extra['from'] as String?,
+          to: extra['to'] as String?,
+          fare: extra['fare'] as String?,
+          date: extra['date'] as String?,
         );
       },
     ),

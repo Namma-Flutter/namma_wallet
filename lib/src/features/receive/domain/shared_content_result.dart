@@ -27,11 +27,11 @@ class TicketCreatedResult extends SharedContentResult
     required this.date,
   });
 
-  final String pnrNumber;
-  final String from;
-  final String to;
-  final String fare;
-  final String date;
+  final String? pnrNumber;
+  final String? from;
+  final String? to;
+  final String? fare;
+  final String? date;
 }
 
 /// Result when an existing ticket is updated

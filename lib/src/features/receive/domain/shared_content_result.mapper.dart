@@ -82,24 +82,24 @@ class TicketCreatedResultMapper extends ClassMapperBase<TicketCreatedResult> {
   @override
   final String id = 'TicketCreatedResult';
 
-  static String _$pnrNumber(TicketCreatedResult v) => v.pnrNumber;
+  static String? _$pnrNumber(TicketCreatedResult v) => v.pnrNumber;
   static const Field<TicketCreatedResult, String> _f$pnrNumber = Field(
     'pnrNumber',
     _$pnrNumber,
   );
-  static String _$from(TicketCreatedResult v) => v.from;
+  static String? _$from(TicketCreatedResult v) => v.from;
   static const Field<TicketCreatedResult, String> _f$from = Field(
     'from',
     _$from,
   );
-  static String _$to(TicketCreatedResult v) => v.to;
+  static String? _$to(TicketCreatedResult v) => v.to;
   static const Field<TicketCreatedResult, String> _f$to = Field('to', _$to);
-  static String _$fare(TicketCreatedResult v) => v.fare;
+  static String? _$fare(TicketCreatedResult v) => v.fare;
   static const Field<TicketCreatedResult, String> _f$fare = Field(
     'fare',
     _$fare,
   );
-  static String _$date(TicketCreatedResult v) => v.date;
+  static String? _$date(TicketCreatedResult v) => v.date;
   static const Field<TicketCreatedResult, String> _f$date = Field(
     'date',
     _$date,
@@ -217,18 +217,18 @@ class _TicketCreatedResultCopyWithImpl<$R, $Out>
       TicketCreatedResultMapper.ensureInitialized();
   @override
   $R call({
-    String? pnrNumber,
-    String? from,
-    String? to,
-    String? fare,
-    String? date,
+    Object? pnrNumber = $none,
+    Object? from = $none,
+    Object? to = $none,
+    Object? fare = $none,
+    Object? date = $none,
   }) => $apply(
     FieldCopyWithData({
-      if (pnrNumber != null) #pnrNumber: pnrNumber,
-      if (from != null) #from: from,
-      if (to != null) #to: to,
-      if (fare != null) #fare: fare,
-      if (date != null) #date: date,
+      if (pnrNumber != $none) #pnrNumber: pnrNumber,
+      if (from != $none) #from: from,
+      if (to != $none) #to: to,
+      if (fare != $none) #fare: fare,
+      if (date != $none) #date: date,
     }),
   );
   @override

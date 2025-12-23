@@ -54,10 +54,10 @@ class SharedContentProcessor implements ISharedContentProcessor {
           );
         }
         return TicketCreatedResult(
-          pnrNumber: ticket.pnrOrId ?? 'Unknown',
-          from: ticket.fromLocation ?? 'Unknown',
-          to: ticket.toLocation ?? 'Unknown',
-          fare: ticket.fare ?? 'Unknown',
+          pnrNumber: ticket.pnrOrId,
+          from: ticket.fromLocation,
+          to: ticket.toLocation,
+          fare: ticket.fare,
           date: ticket.date,
         );
       }
@@ -155,10 +155,10 @@ class SharedContentProcessor implements ISharedContentProcessor {
       );
 
       return TicketCreatedResult(
-        pnrNumber: ticket.pnrOrId ?? 'Unknown',
-        from: ticket.fromLocation ?? 'Unknown',
-        to: ticket.toLocation ?? 'Unknown',
-        fare: ticket.fare ?? 'Unknown',
+        pnrNumber: ticket.pnrOrId,
+        from: ticket.fromLocation,
+        to: ticket.toLocation,
+        fare: ticket.fare,
         date: ticket.date,
       );
     } on Exception catch (e, stackTrace) {
