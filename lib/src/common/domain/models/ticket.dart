@@ -180,8 +180,6 @@ class Ticket with TicketMappable {
       }
     }
 
-    startTime ??= model.journeyDate;
-
     final secondaryParts = [
       if (model.corporation.isNotNullOrEmpty) model.corporation,
       if (model.tripCode.isNotNullOrEmpty)

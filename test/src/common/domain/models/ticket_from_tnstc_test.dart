@@ -31,8 +31,8 @@ void main() {
         // Should not throw, but log warning and handle gracefully
         final ticket = Ticket.fromTNSTC(model);
 
-        // Verify fallback to journeyDate (midnight)
-        expect(ticket.startTime, DateTime(2023, 10, 25));
+        // Verify null on failure
+        expect(ticket.startTime, isNull);
       },
     );
 
@@ -49,8 +49,8 @@ void main() {
         // Should not throw
         final ticket = Ticket.fromTNSTC(model);
 
-        // Verify fallback
-        expect(ticket.startTime, DateTime(2023, 10, 25));
+        // Verify null on failure
+        expect(ticket.startTime, isNull);
       },
     );
 
@@ -67,8 +67,8 @@ void main() {
 
         final ticket = Ticket.fromTNSTC(model);
 
-        // Verify fallback to journeyDate
-        expect(ticket.startTime, DateTime(2023, 10, 25));
+        // Verify null on failure
+        expect(ticket.startTime, isNull);
       },
     );
   });
