@@ -63,14 +63,15 @@ class EventTicketCardWidget extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       //* ticket title
-                      Text(
-                        ticket.primaryText ?? '',
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.onSurface,
+                      if (ticket.primaryText?.isNotEmpty ?? false)
+                        Text(
+                          ticket.primaryText!,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurface,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 2,
                         ),
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 2,
-                      ),
 
                       //* Date & Time
                       if (ticket.startTime != null)
