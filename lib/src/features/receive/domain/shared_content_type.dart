@@ -5,4 +5,7 @@ enum SharedContentType {
 
   /// PDF file content (text extracted from PDF)
   pdf,
+
+  /// PKPass file content
+  pkpass,
 }

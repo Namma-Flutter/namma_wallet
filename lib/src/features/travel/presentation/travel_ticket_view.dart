@@ -1,9 +1,11 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:namma_wallet/src/common/database/ticket_dao_interface.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/domain/models/extras_model.dart';
 import 'package:namma_wallet/src/common/domain/models/tag_model.dart';
@@ -235,6 +237,42 @@ class _TravelTicketViewState extends State<TravelTicketView> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  //* Image (if exists)
+                  if (widget.ticket.imagePath != null) ...[
+                    Builder(
+                      builder: (context) {
+                        final file = File(widget.ticket.imagePath!);
+                        if (file.existsSync()) {
+                          return Column(
+                            children: [
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(12),
+                                child: Image.file(
+                                  file,
+                                  width: double.infinity,
+                                  height: 150,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    getIt<ILogger>().error(
+                                      '[TravelTicketView] Failed to load '
+                                      'ticket image from path: '
+                                      '${widget.ticket.imagePath}',
+                                      error,
+                                      stackTrace,
+                                    );
+                                    return const SizedBox.shrink();
+                                  },
+                                ),
+                              ),
+                              const SizedBox(height: 16),
+                            ],
+                          );
+                        }
+                        return const SizedBox.shrink();
+                      },
+                    ),
+                  ],
+
                   //* Icon & Service
                   Row(
                     children: [
@@ -255,7 +293,7 @@ class _TravelTicketViewState extends State<TravelTicketView> {
                       //* Description (Secondary text)
                       Expanded(
                         child: Text(
-                          widget.ticket.secondaryText,
+                          widget.ticket.secondaryText ?? '',
                           style: Paragraph03(
                             color: Theme.of(
                               context,
@@ -402,7 +440,7 @@ class _TravelTicketViewState extends State<TravelTicketView> {
                       // Fallback to primaryText
                       return <Widget>[
                         Text(
-                          widget.ticket.primaryText,
+                          widget.ticket.primaryText ?? '',
                           style: Paragraph01(
                             color: Theme.of(
                               context,
@@ -434,6 +472,40 @@ class _TravelTicketViewState extends State<TravelTicketView> {
                   ),
 
                   const SizedBox(height: 16),
+
+                  if (widget.ticket.directionsUrl != null) ...[
+                    SizedBox(
+                      width: double.infinity,
+                      child: OutlinedButton.icon(
+                        onPressed: () async {
+                          final uri = Uri.parse(widget.ticket.directionsUrl!);
+                          if (await canLaunchUrl(uri)) {
+                            await launchUrl(uri);
+                          } else {
+                            if (context.mounted) {
+                              showSnackbar(
+                                context,
+                                'Could not open map URL',
+                                isError: true,
+                              );
+                            }
+                          }
+                        },
+                        icon: const Icon(Icons.map_outlined),
+                        label: const Text('Get Directions'),
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          side: BorderSide(
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                  ],
 
                   ...() {
                     final filteredTags = getFilteredTags(widget.ticket);

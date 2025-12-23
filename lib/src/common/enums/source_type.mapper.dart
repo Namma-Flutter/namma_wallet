@@ -36,6 +36,8 @@ class SourceTypeMapper extends EnumMapper<SourceType> {
         return SourceType.clipboard;
       case 'QR':
         return SourceType.qr;
+      case 'PKPASS':
+        return SourceType.pkpass;
       default:
         throw MapperException.unknownEnumValue(value);
     }
@@ -54,6 +56,8 @@ class SourceTypeMapper extends EnumMapper<SourceType> {
         return 'CLIPBOARD';
       case SourceType.qr:
         return 'QR';
+      case SourceType.pkpass:
+        return 'PKPASS';
     }
   }
 }
