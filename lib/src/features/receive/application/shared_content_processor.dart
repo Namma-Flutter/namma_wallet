@@ -75,7 +75,7 @@ class SharedContentProcessor implements ISharedContentProcessor {
             location: '',
             extras: updateInfo.updates.entries
                 .map<ExtrasModel>(
-                  (e) => ExtrasModel(title: e.key, value: e.value as String?),
+                  (e) => ExtrasModel(title: e.key, value: e.value?.toString()),
                 )
                 .toList(),
           );
