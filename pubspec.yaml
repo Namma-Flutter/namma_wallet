@@ -34,8 +34,10 @@ dependencies:
       url: https://github.com/Zverik/receive_sharing_intent
   path: ^1.9.1
   path_provider: ^2.1.5
+  path_provider_platform_interface: ^2.1.2
   pdfrx: ^2.2.16
   pkpass: ^2.2.0
+  plugin_platform_interface: ^2.1.8
   provider: ^6.1.2
   qr_flutter: ^4.1.0
   share_handler: ^0.0.1+12

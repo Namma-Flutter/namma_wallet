@@ -71,9 +71,6 @@ class FakePKPassParser implements IPKPassParser {
 
   @override
   Future<Ticket?> parsePKPass(Uint8List data) async {
-    print(
-      'DEBUG: FakePKPassParser.parsePKPass called with ${data.length} bytes',
-    );
     return parsedTicket;
   }
 }

@@ -62,7 +62,7 @@ class PKPassParser implements IPKPassParser {
 
       final appDocDir = await getApplicationDocumentsDirectory();
       final imagesDir = Directory(p.join(appDocDir.path, 'ticket_images'));
-      if (!await imagesDir.exists()) {
+      if (!imagesDir.existsSync()) {
         await imagesDir.create(recursive: true);
       }
 
@@ -72,7 +72,7 @@ class PKPassParser implements IPKPassParser {
       await file.writeAsBytes(imageBytes);
 
       return filePath;
-    } catch (e, stackTrace) {
+    } on Object catch (e, stackTrace) {
       _logger.error('Failed to save pkpass image', e, stackTrace);
       return null;
     }
@@ -213,7 +213,8 @@ class PKPassParser implements IPKPassParser {
       final label = field.label;
       final dynamic val = field.value;
       if (label != null && val != null) {
-        // DictionaryValue in pkpass package wraps actual values in specific properties
+        // DictionaryValue in pkpass package wraps actual
+        // values in specific properties
         final dynamic value = _getDictionaryValue(val);
 
         String displayValue;
@@ -295,11 +296,11 @@ class PKPassParser implements IPKPassParser {
 
       // Fallback for any other types or if types are not exactly matched
       return (val as dynamic).value;
-    } catch (_) {
+    } on Object catch (_) {
       try {
         // Ultimate fallback
         return val.toString();
-      } catch (_) {
+      } on Object catch (_) {
         return null;
       }
     }

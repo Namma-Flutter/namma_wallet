@@ -67,8 +67,8 @@ class DeepLinkService implements IDeepLinkService {
   }
 
   @override
-  void dispose() {
-    _subscription?.cancel();
+  Future<void> dispose() async {
+    await _subscription?.cancel();
     _logger.info('DeepLinkService disposed');
   }
 }

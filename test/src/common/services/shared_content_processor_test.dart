@@ -8,8 +8,8 @@ import 'package:namma_wallet/src/features/receive/domain/shared_content_result.d
 import 'package:namma_wallet/src/features/receive/domain/shared_content_type.dart';
 import 'package:namma_wallet/src/features/travel/application/travel_parser_interface.dart';
 
-import '../../../helpers/mock_import_service.dart';
 import '../../../helpers/fake_logger.dart';
+import '../../../helpers/mock_import_service.dart';
 import '../../../helpers/mock_ticket_dao.dart';
 import '../../../helpers/mock_travel_parser_service.dart';
 
