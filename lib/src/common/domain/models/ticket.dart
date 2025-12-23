@@ -182,6 +182,17 @@ class Ticket with TicketMappable {
 
     startTime ??= model.journeyDate;
 
+    final secondaryParts = [
+      if (model.corporation.isNotNullOrEmpty) model.corporation,
+      if (model.tripCode.isNotNullOrEmpty)
+        model.tripCode
+      else if (model.routeNo.isNotNullOrEmpty)
+        model.routeNo,
+    ];
+    final secondaryText = secondaryParts.isNotEmpty
+        ? secondaryParts.join(' - ')
+        : null;
+
     /// the constants [_primaryTextConstant] used for primaryText
     /// and [__secondaryTextConstant] used for secondary
     /// are used here only for merging logic, it won't affect the user data.
@@ -192,11 +203,7 @@ class Ticket with TicketMappable {
           primarySource.isNotNullOrEmpty && primaryDestination.isNotNullOrEmpty
           ? '$primarySource → $primaryDestination'
           : _primaryTextConstant,
-      secondaryText:
-          model.tripCode.isNotNullOrEmpty || model.routeNo.isNotNullOrEmpty
-          ? '${model.corporation ?? 'TNSTC'} - '
-                '${model.tripCode ?? model.routeNo ?? 'Bus'}'
-          : _secondaryTextConstant,
+      secondaryText: secondaryText,
       startTime: startTime,
       location:
           model.passengerPickupPoint ??

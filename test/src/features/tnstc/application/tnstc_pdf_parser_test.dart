@@ -1032,7 +1032,7 @@ Trip Code : TEST123
         // in the Ticket.fromTNSTC factory
         expect(
           ticket.secondaryText,
-          anyOf(contains('TNSTC'), equals(' - TEST123')),
+          equals('TEST123'),
         );
       });
     });
