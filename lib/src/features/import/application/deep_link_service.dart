@@ -18,9 +18,11 @@ class DeepLinkService implements IDeepLinkService {
   final ILogger _logger;
 
   StreamSubscription<sh.SharedMedia?>? _subscription;
+  void Function(Object error)? _onError;
 
   @override
-  Future<void> initialize() async {
+  Future<void> initialize({void Function(Object error)? onError}) async {
+    _onError = onError;
     try {
       final handler = sh.ShareHandler.instance;
 
@@ -28,22 +30,29 @@ class DeepLinkService implements IDeepLinkService {
       final initialMedia = await handler.getInitialSharedMedia();
       if (initialMedia != null) {
         _logger.info('DeepLinkService: Handling initial shared media');
-        _handleMedia(initialMedia);
+        await _handleMedia(initialMedia);
       }
 
       // Handle Warm/Hot Start (App resume from file)
-      _subscription = handler.sharedMediaStream.listen((media) {
-        _logger.info('DeepLinkService: Handling shared media stream event');
-        _handleMedia(media);
-      });
+      _subscription = handler.sharedMediaStream.listen(
+        (media) async {
+          _logger.info('DeepLinkService: Handling shared media stream event');
+          await _handleMedia(media);
+        },
+        onError: (Object error) {
+          _logger.error('Deep link error: $error');
+          _onError?.call(error);
+        },
+      );
 
       _logger.info('DeepLinkService initialized');
     } on Object catch (e, stackTrace) {
       _logger.error('Failed to initialize DeepLinkService', e, stackTrace);
+      _onError?.call(e);
     }
   }
 
-  void _handleMedia(sh.SharedMedia media) {
+  Future<void> _handleMedia(sh.SharedMedia media) async {
     final attachments = media.attachments;
     if (attachments == null || attachments.isEmpty) {
       _logger.info('DeepLinkService: No attachments found in shared media');
@@ -63,7 +72,12 @@ class DeepLinkService implements IDeepLinkService {
 
       if (path.toLowerCase().endsWith('.pkpass')) {
         _logger.info('DeepLinkService: Detected .pkpass file, importing...');
-        unawaited(_importService.importAndSavePKPassFile(XFile(path)));
+        try {
+          await _importService.importAndSavePKPassFile(XFile(path));
+        } on Object catch (e, st) {
+          _logger.error('DeepLinkService: Error importing PKPass file', e, st);
+          _onError?.call(e);
+        }
       } else {
         _logger.warning(
           'DeepLinkService: Received unsupported file via deep link: $path',
