@@ -162,7 +162,7 @@ class SharingIntentService implements ISharingIntentService {
       // Read as text file
       _logger.info('Reading text file: ${file.path}');
       final content = await file.readAsString();
-      _logger.info('Successfully successfully read text file');
+      _logger.info('Successfully read text file');
       return content;
     } else if (fileExtension == '.pkpass') {
       // For pkpass, we pass the file path as the content
