@@ -73,6 +73,14 @@ class FakePKPassParser implements IPKPassParser {
   Future<Ticket?> parsePKPass(Uint8List data) async {
     return parsedTicket;
   }
+
+  @override
+  Future<Uint8List?> fetchLatestPass(
+    Uint8List currentPassData, {
+    DateTime? modifiedSince,
+  }) async {
+    return null;
+  }
 }
 
 class FakeTicketDAO implements ITicketDAO {

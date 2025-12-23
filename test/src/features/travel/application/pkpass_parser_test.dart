@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:namma_wallet/src/common/enums/ticket_type.dart';
 import 'package:namma_wallet/src/features/travel/application/pkpass_parser.dart';
 import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
@@ -53,10 +54,24 @@ void main() {
 
       expect(ticket, isNotNull);
       // Based on the file name, it's likely a generic or event ticket
-      expect(ticket!.primaryText, contains('Devcon'));
-      // Since it's not a boarding pass, type should be null
-      //(logic change verification)
-      expect(ticket.type, isNull);
+      expect(ticket, isNotNull);
+      // Based on the file name, it's likely a generic or event ticket
+      expect(ticket!.primaryText, contains('Flutter Devcon'));
+
+      // Should be identifed as event
+      expect(ticket.type, equals(TicketType.event));
+
+      // Should have location
+      expect(ticket.location, contains('PayPal India'));
+
+      // Should fall back to serial number since no PNR field
+      // Actually, since barcode is present, it takes precedence.
+      expect(
+        ticket.ticketId,
+        equals(
+          'https://luma.com/check-in/evt-UbFJYLx0uKfphCt?pk=g-5OaenLTfc4WNbgl',
+        ),
+      );
 
       // Check for extras to verify data refinement
       expect(ticket.extras, isNotEmpty);
@@ -66,19 +81,21 @@ void main() {
 
       expect(ticket.imagePath, isNotNull);
       expect(File(ticket.imagePath!).existsSync(), isTrue);
+
+      // Verify URL extraction
+      expect(ticket.directionsUrl, contains('google.com/maps'));
     });
 
     test(
-      'should return null for missing fields instead '
-      'of "Unknown" (Using real file)',
+      'should extract improved fields like location from real file',
       () async {
         final file = File('test/assets/pkpass/Flutter Devcon.pkpass');
         final bytes = await file.readAsBytes();
         final ticket = await parser.parsePKPass(bytes);
 
         expect(ticket, isNotNull);
-        // 'location' is empty in this sample pkpass
-        expect(ticket!.location, isNull);
+        // 'location' is now found due to improved parsing
+        expect(ticket!.location, equals('PayPal India Development Center'));
       },
     );
 
@@ -98,5 +115,21 @@ void main() {
     // NOTE: Further tests for specific TicketType (train/bus) mapping logic
     // require valid .pkpass samples with valid signatures/manifests, or
     // a way to mock the 3rd party PassFile class which is currently not exported/mockable.
+
+    test(
+      'fetchLatestPass should return null given invalid pkpass data (not a zip)',
+      () async {
+        final invalidBytes = Uint8List.fromList([1, 2, 3, 4, 5]);
+        final result = await parser.fetchLatestPass(invalidBytes);
+        expect(result, isNull);
+        // ZipDecoder might throw or just fail to find files.
+        // If it throws, we log error. If it returns invalid archive, we log warning.
+        // We just ensure we handled it.
+        expect(
+          fakeLogger.logs.join('\n'),
+          contains(RegExp('(Failed to fetch|pass.json not found)')),
+        );
+      },
+    );
   });
 }

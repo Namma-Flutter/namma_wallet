@@ -1,6 +1,9 @@
+import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:archive/archive.dart';
+import 'package:http/http.dart' as http;
 import 'package:namma_wallet/src/common/domain/models/extras_model.dart';
 import 'package:namma_wallet/src/common/domain/models/tag_model.dart';
 import 'package:namma_wallet/src/common/domain/models/ticket.dart';
@@ -36,6 +39,12 @@ class PKPassParser implements IPKPassParser {
       final extras = _extractExtras(passFile);
 
       final imagePath = await _savePassImage(passFile);
+      final directionsUrl = _extractDirectionsUrl(passFile);
+      if (directionsUrl != null) {
+        _logger.info('PKPassParser: Found directionsUrl: $directionsUrl');
+      } else {
+        _logger.info('PKPassParser: No directionsUrl found in pass fields.');
+      }
 
       return Ticket(
         ticketId: pnrNumber,
@@ -47,9 +56,78 @@ class PKPassParser implements IPKPassParser {
         tags: tags,
         extras: extras,
         imagePath: imagePath,
+        directionsUrl: directionsUrl,
       );
     } on Object catch (e, stackTrace) {
       _logger.error('Failed to parse pkpass file', e, stackTrace);
+      return null;
+    }
+  }
+
+  @override
+  Future<Uint8List?> fetchLatestPass(
+    Uint8List currentPassData, {
+    DateTime? modifiedSince,
+  }) async {
+    try {
+      // Decode the PKPass (ZIP file) manually to access top-level fields
+      // that might not be exposed by the pkpass package.
+      final archive = ZipDecoder().decodeBytes(currentPassData);
+      final passJsonFile = archive.findFile('pass.json');
+
+      if (passJsonFile == null) {
+        _logger.warning('pass.json not found in pkpass archive');
+        return null;
+      }
+
+      final passJsonContent = utf8.decode(passJsonFile.content as List<int>);
+      final passJson = jsonDecode(passJsonContent) as Map<String, dynamic>;
+
+      final webServiceUrl = passJson['webServiceURL'] as String?;
+      final authenticationToken = passJson['authenticationToken'] as String?;
+      final serialNumber = passJson['serialNumber'] as String?;
+      final passTypeIdentifier = passJson['passTypeIdentifier'] as String?;
+
+      if (webServiceUrl == null ||
+          authenticationToken == null ||
+          serialNumber == null ||
+          passTypeIdentifier == null) {
+        return null;
+      }
+
+      // Construct URL: {webServiceURL}/v1/passes/{passTypeIdentifier}/{serialNumber}
+      final uri = Uri.parse(webServiceUrl).replace(
+        pathSegments: [
+          ...Uri.parse(webServiceUrl).pathSegments,
+          'v1',
+          'passes',
+          passTypeIdentifier,
+          serialNumber,
+        ],
+      );
+
+      final headers = {
+        'Authorization': 'ApplePass $authenticationToken',
+      };
+
+      if (modifiedSince != null) {
+        headers['If-Modified-Since'] = HttpDate.format(modifiedSince);
+      }
+
+      final response = await http.get(uri, headers: headers);
+
+      if (response.statusCode == 200) {
+        return response.bodyBytes;
+      } else if (response.statusCode == 304) {
+        return null; // Not modified
+      } else {
+        _logger.warning(
+          'Failed to fetch latest pass: ${response.statusCode} ${response.reasonPhrase}',
+        );
+        return null;
+      }
+    } on Object catch (e, stackTrace) {
+      _logger.error('Failed to fetch latest pass version', e, stackTrace);
       return null;
     }
   }
@@ -88,12 +166,21 @@ class PKPassParser implements IPKPassParser {
     }
 
     // Fallback to fields
-    return _findFieldValue(passFile, [
+    final fromFields = _findFieldValue(passFile, [
       'pnr',
       'confirmation_number',
       'booking_id',
       'ticket_number',
     ]);
+
+    if (fromFields != null) return fromFields;
+
+    // Fallback to serial number if nothing else found
+    if (metadata.serialNumber.isNotEmpty) {
+      return metadata.serialNumber;
+    }
+
+    return null;
   }
 
   String? _getPrimaryText(PassFile passFile) {
@@ -112,9 +199,13 @@ class PKPassParser implements IPKPassParser {
       'to_station',
     ]);
 
+    final eventName = _findFieldValue(passFile, ['event_name', 'event']);
+
     if (origin != null && destination != null) {
       return '$origin → $destination';
     }
+
+    if (eventName != null) return eventName;
 
     final logoText = metadata.logoText;
     if (logoText != null && logoText.isNotEmpty) return logoText;
@@ -163,6 +254,18 @@ class PKPassParser implements IPKPassParser {
       'gate',
       'platform',
       'boarding_gate',
+      'event_address',
+      'venue_name',
+      'address',
+    ]);
+  }
+
+  String? _extractDirectionsUrl(PassFile passFile) {
+    return _findFieldValue(passFile, [
+      'google_maps_url',
+      'directions',
+      'map_url',
+      'venue_maps_url',
     ]);
   }
 
@@ -179,6 +282,9 @@ class PKPassParser implements IPKPassParser {
       if (transitType == TransitType.air) {
         return TicketType.flight;
       }
+    }
+    if (metadata.eventTicket != null) {
+      return TicketType.event;
     }
     return null;
   }
@@ -200,24 +306,14 @@ class PKPassParser implements IPKPassParser {
   }
 
   List<ExtrasModel> _extractExtras(PassFile passFile) {
-    final metadata = passFile.metadata;
     final extras = <ExtrasModel>[];
 
     // Collect all fields from various sections
-    final allFields = [
-      ...?metadata.boardingPass?.primaryFields,
-      ...?metadata.boardingPass?.secondaryFields,
-      ...?metadata.boardingPass?.auxiliaryFields,
-      ...?metadata.boardingPass?.headerFields,
-      ...?metadata.boardingPass?.backFields,
-      ...?metadata.eventTicket?.primaryFields,
-      ...?metadata.eventTicket?.secondaryFields,
-      ...?metadata.coupon?.primaryFields,
-      ...?metadata.storeCard?.primaryFields,
-      ...?metadata.generic?.primaryFields,
-    ];
+    final allFields = _getAllFields(passFile.metadata);
 
     for (final field in allFields) {
+      if (field is! DictionaryField) continue;
+
       final label = field.label;
       final dynamic val = field.value;
       if (label != null && val != null) {
@@ -254,7 +350,7 @@ class PKPassParser implements IPKPassParser {
       }
     }
 
-    final orgName = metadata.organizationName;
+    final orgName = passFile.metadata.organizationName;
     if (orgName.isNotEmpty) {
       extras.add(ExtrasModel(title: 'Provider', value: orgName));
     }
@@ -263,15 +359,7 @@ class PKPassParser implements IPKPassParser {
   }
 
   String? _findFieldValue(PassFile passFile, List<String> keys) {
-    final metadata = passFile.metadata;
-    final allFields = [
-      ...?metadata.boardingPass?.primaryFields,
-      ...?metadata.boardingPass?.secondaryFields,
-      ...?metadata.boardingPass?.auxiliaryFields,
-      ...?metadata.boardingPass?.headerFields,
-      ...?metadata.eventTicket?.primaryFields,
-      ...?metadata.generic?.primaryFields,
-    ];
+    final allFields = _getAllFields(passFile.metadata);
 
     for (final key in keys) {
       final field = allFields
@@ -293,6 +381,39 @@ class PKPassParser implements IPKPassParser {
       }
     }
     return null;
+  }
+
+  /// Helper to get all fields from all pass structures and sections
+  List<dynamic> _getAllFields(PassMetadata metadata) {
+    final allFields = <dynamic>[];
+
+    void addFields(dynamic structure) {
+      if (structure == null) return;
+      // We use dynamic access because different structure classes share these properties
+      // but might not share a common interface in the library.
+      try {
+        if (structure.headerFields != null)
+          allFields.addAll(structure.headerFields as List);
+        if (structure.primaryFields != null)
+          allFields.addAll(structure.primaryFields as List);
+        if (structure.secondaryFields != null)
+          allFields.addAll(structure.secondaryFields as List);
+        if (structure.auxiliaryFields != null)
+          allFields.addAll(structure.auxiliaryFields as List);
+        if (structure.backFields != null)
+          allFields.addAll(structure.backFields as List);
+      } catch (e) {
+        // Ignore if a field list access fails (unlikely if package structure is consistent)
+      }
+    }
+
+    addFields(metadata.boardingPass);
+    addFields(metadata.eventTicket);
+    addFields(metadata.coupon);
+    addFields(metadata.storeCard);
+    addFields(metadata.generic);
+
+    return allFields;
   }
 
   /// Helper to extract raw value from DictionaryValue subclasses

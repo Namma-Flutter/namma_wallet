@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:namma_wallet/src/common/database/ticket_dao_interface.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/domain/models/extras_model.dart';
 import 'package:namma_wallet/src/common/domain/models/tag_model.dart';
@@ -471,6 +472,40 @@ class _TravelTicketViewState extends State<TravelTicketView> {
                   ),
 
                   const SizedBox(height: 16),
+
+                  if (widget.ticket.directionsUrl != null) ...[
+                    SizedBox(
+                      width: double.infinity,
+                      child: OutlinedButton.icon(
+                        onPressed: () async {
+                          final uri = Uri.parse(widget.ticket.directionsUrl!);
+                          if (await canLaunchUrl(uri)) {
+                            await launchUrl(uri);
+                          } else {
+                            if (context.mounted) {
+                              showSnackbar(
+                                context,
+                                'Could not open map URL',
+                                isError: true,
+                              );
+                            }
+                          }
+                        },
+                        icon: const Icon(Icons.map_outlined),
+                        label: const Text('Get Directions'),
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          side: BorderSide(
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                  ],
 
                   ...() {
                     final filteredTags = getFilteredTags(widget.ticket);
