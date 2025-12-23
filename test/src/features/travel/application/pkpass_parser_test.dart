@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
 
@@ -77,6 +78,18 @@ void main() {
         expect(ticket, isNotNull);
         // 'location' is empty in this sample pkpass
         expect(ticket!.location, isNull);
+      },
+    );
+
+    test(
+      'should return null when parsing invalid/malformed pkpass data',
+      () async {
+        // Create some random bytes that are not a valid zip file
+        final invalidBytes = Uint8List.fromList([1, 2, 3, 4, 5]);
+
+        final ticket = await parser.parsePKPass(invalidBytes);
+
+        expect(ticket, isNull);
       },
     );
   });
