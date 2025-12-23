@@ -19,7 +19,8 @@ void main() {
     tearDown(getIt.reset);
 
     test(
-      'should catch FormatException when serviceStartTime contains non-numeric characters',
+      'should catch FormatException when serviceStartTime'
+      ' contains non-numeric characters',
       () {
         final model = TNSTCTicketModel(
           pnrNumber: 'PNR123',
@@ -36,7 +37,8 @@ void main() {
     );
 
     test(
-      'should catch FormatException when serviceStartTime is completely invalid format',
+      'should catch FormatException when serviceStartTime'
+      ' is completely invalid format',
       () {
         final model = TNSTCTicketModel(
           pnrNumber: 'PNR123',
@@ -53,7 +55,8 @@ void main() {
     );
 
     test(
-      'should handle case where serviceStartTime has valid format but logic fails silently (e.g. out of range)',
+      'should handle case where serviceStartTime has valid format but logic '
+      'fails silently (e.g. out of range)',
       () {
         // This path doesn't throw exception but is an error path in logic
         final model = TNSTCTicketModel(
