@@ -238,19 +238,38 @@ class _TravelTicketViewState extends State<TravelTicketView> {
                 children: [
                   //* Image (if exists)
                   if (widget.ticket.imagePath != null) ...[
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(12),
-                      child: Image.file(
-                        File(widget.ticket.imagePath!),
-                        width: double.infinity,
-                        height: 150,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          return const SizedBox.shrink();
-                        },
-                      ),
+                    Builder(
+                      builder: (context) {
+                        final file = File(widget.ticket.imagePath!);
+                        if (file.existsSync()) {
+                          return Column(
+                            children: [
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(12),
+                                child: Image.file(
+                                  file,
+                                  width: double.infinity,
+                                  height: 150,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    getIt<ILogger>().error(
+                                      '[TravelTicketView] Failed to load '
+                                      'ticket image from path: '
+                                      '${widget.ticket.imagePath}',
+                                      error,
+                                      stackTrace,
+                                    );
+                                    return const SizedBox.shrink();
+                                  },
+                                ),
+                              ),
+                              const SizedBox(height: 16),
+                            ],
+                          );
+                        }
+                        return const SizedBox.shrink();
+                      },
                     ),
-                    const SizedBox(height: 16),
                   ],
 
                   //* Icon & Service
