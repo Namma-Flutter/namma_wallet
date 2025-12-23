@@ -225,7 +225,7 @@ class PKPassParser implements IPKPassParser {
         // values in specific properties
         final dynamic value = _getDictionaryValue(val);
 
-        String displayValue;
+        String? displayValue;
         if (value is String) {
           displayValue = value;
         } else if (value is Map) {
@@ -234,15 +234,16 @@ class PKPassParser implements IPKPassParser {
               value['full_address']?.toString() ??
               value['address']?.toString() ??
               value['name']?.toString() ??
-              value.values.firstOrNull?.toString() ??
-              value.toString();
+              (value.values.firstOrNull)?.toString();
         } else if (value is Iterable) {
-          displayValue = value.join(', ');
+          if (value.isNotEmpty) {
+            displayValue = value.join(', ');
+          }
         } else {
-          displayValue = value?.toString() ?? '';
+          displayValue = value?.toString();
         }
 
-        if (displayValue.isNotEmpty) {
+        if (displayValue != null && displayValue.isNotEmpty) {
           extras.add(
             ExtrasModel(
               title: label,
