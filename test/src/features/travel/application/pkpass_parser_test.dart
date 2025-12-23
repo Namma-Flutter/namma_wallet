@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:namma_wallet/src/common/enums/ticket_type.dart';
+
 import 'package:namma_wallet/src/features/travel/application/pkpass_parser.dart';
 import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
@@ -54,10 +54,8 @@ void main() {
       expect(ticket, isNotNull);
       // Based on the file name, it's likely a generic or event ticket
       expect(ticket!.primaryText, contains('Devcon'));
-      expect(
-        ticket.type,
-        TicketType.event,
-      );
+      // Since it's not a boarding pass, type should be null
+      expect(ticket.type, isNull);
 
       // Check for extras to verify data refinement
       expect(ticket.extras, isNotEmpty);

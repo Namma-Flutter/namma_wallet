@@ -175,18 +175,6 @@ class PKPassParser implements IPKPassParser {
         return TicketType.bus;
       }
     }
-    if (metadata.eventTicket != null) {
-      return TicketType.event;
-    }
-    if (metadata.coupon != null) {
-      return TicketType.event; // Placeholder for now
-    }
-    if (metadata.storeCard != null) {
-      return TicketType.event; // Placeholder for now
-    }
-    if (metadata.generic != null) {
-      return TicketType.event; // Placeholder for now
-    }
     return null;
   }
 
