@@ -70,9 +70,6 @@ class SharedContentProcessor implements ISharedContentProcessor {
           // Create a partial ticket with the updates for merging
           final updateTicket = Ticket(
             ticketId: updateInfo.pnrNumber,
-            primaryText: '', // Empty values ignored by merge
-            secondaryText: '',
-            location: '',
             extras: updateInfo.updates.entries
                 .map<ExtrasModel>(
                   (e) => ExtrasModel(title: e.key, value: e.value?.toString()),
