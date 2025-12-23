@@ -192,7 +192,8 @@ class Ticket with TicketMappable {
           primarySource.isNotNullOrEmpty && primaryDestination.isNotNullOrEmpty
           ? '$primarySource → $primaryDestination'
           : _primaryTextConstant,
-      secondaryText: model.tripCode.isNotNullOrEmpty
+      secondaryText:
+          model.tripCode.isNotNullOrEmpty || model.routeNo.isNotNullOrEmpty
           ? '${model.corporation ?? 'TNSTC'} - '
                 '${model.tripCode ?? model.routeNo ?? 'Bus'}'
           : _secondaryTextConstant,
