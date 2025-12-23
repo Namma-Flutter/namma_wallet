@@ -165,14 +165,30 @@ class PKPassParser implements IPKPassParser {
         'Unknown';
   }
 
-  TicketType _getTicketType(PassFile passFile) {
+  TicketType? _getTicketType(PassFile passFile) {
     final metadata = passFile.metadata;
     if (metadata.boardingPass != null) {
       final transitType = metadata.boardingPass!.transitType;
-      if (transitType == TransitType.train) return TicketType.train;
-      if (transitType == TransitType.bus) return TicketType.bus;
+      if (transitType == TransitType.train) {
+        return TicketType.train;
+      }
+      if (transitType == TransitType.bus) {
+        return TicketType.bus;
+      }
     }
-    return TicketType.train; // Default
+    if (metadata.eventTicket != null) {
+      return TicketType.event;
+    }
+    if (metadata.coupon != null) {
+      return TicketType.event; // Placeholder for now
+    }
+    if (metadata.storeCard != null) {
+      return TicketType.event; // Placeholder for now
+    }
+    if (metadata.generic != null) {
+      return TicketType.event; // Placeholder for now
+    }
+    return null;
   }
 
   List<TagModel> _extractTags(PassFile passFile) {

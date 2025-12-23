@@ -259,6 +259,7 @@ class TravelTicketListCardWidget extends StatelessWidget {
       TicketType.flight => Icons.flight_rounded,
       TicketType.metro => Icons.subway_rounded,
       TicketType.event => Icons.event_rounded,
+      null => Icons.confirmation_number_outlined,
     };
   }
 

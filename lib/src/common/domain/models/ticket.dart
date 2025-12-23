@@ -19,7 +19,7 @@ class Ticket with TicketMappable {
     required this.secondaryText,
     required this.location,
     this.startTime,
-    this.type = TicketType.train,
+    this.type,
     this.endTime,
     this.tags,
     this.extras,
@@ -422,7 +422,7 @@ class Ticket with TicketMappable {
   @MappableField(key: 'secondary_text')
   final String secondaryText;
   @MappableField(key: 'type')
-  final TicketType type;
+  final TicketType? type;
   @MappableField(key: 'start_time')
   final DateTime? startTime;
   @MappableField(key: 'end_time')

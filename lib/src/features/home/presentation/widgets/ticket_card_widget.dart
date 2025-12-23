@@ -124,13 +124,14 @@ class EventTicketCardWidget extends StatelessWidget {
     );
   }
 
-  IconData _getTicketIcon(TicketType type) {
+  IconData _getTicketIcon(TicketType? type) {
     return switch (type) {
       TicketType.bus => Icons.airport_shuttle_outlined,
       TicketType.train => Icons.tram_outlined,
       TicketType.flight => Icons.flight_outlined,
       TicketType.metro => Icons.subway_outlined,
       TicketType.event => Icons.event_outlined,
+      null => Icons.confirmation_number_outlined,
     };
   }
 }

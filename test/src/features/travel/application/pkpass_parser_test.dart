@@ -56,8 +56,8 @@ void main() {
       expect(ticket!.primaryText, contains('Devcon'));
       expect(
         ticket.type,
-        TicketType.train,
-      ); // Default is train if not boardingPass
+        TicketType.event,
+      );
 
       // Check for extras to verify data refinement
       expect(ticket.extras, isNotEmpty);

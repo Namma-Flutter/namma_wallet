@@ -75,11 +75,14 @@ class TravelTicketCardWidget extends StatelessWidget {
                       context,
                     ).colorScheme.primary.withValues(alpha: 0.1),
                     child: Icon(
-                      ticket.type == TicketType.bus
-                          ? ticket.type == TicketType.bus
-                                ? Icons.airport_shuttle_outlined
-                                : Icons.badge_outlined
-                          : Icons.tram_outlined,
+                      switch (ticket.type) {
+                        TicketType.bus => Icons.airport_shuttle_outlined,
+                        TicketType.train => Icons.tram_outlined,
+                        TicketType.flight => Icons.flight_outlined,
+                        TicketType.metro => Icons.subway_outlined,
+                        TicketType.event => Icons.event_outlined,
+                        null => Icons.confirmation_number_outlined,
+                      },
                       size: 18,
                       color: Theme.of(context).colorScheme.primary,
                     ),

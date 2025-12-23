@@ -72,6 +72,7 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
           case TicketType.metro:
             travelTickets.add(ticket);
           case TicketType.event:
+          case null:
             eventTickets.add(ticket);
         }
       }

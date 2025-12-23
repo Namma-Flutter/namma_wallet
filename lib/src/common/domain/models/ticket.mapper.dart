@@ -48,12 +48,11 @@ class TicketMapper extends ClassMapperBase<Ticket> {
     key: r'start_time',
     opt: true,
   );
-  static TicketType _$type(Ticket v) => v.type;
+  static TicketType? _$type(Ticket v) => v.type;
   static const Field<Ticket, TicketType> _f$type = Field(
     'type',
     _$type,
     opt: true,
-    def: TicketType.train,
   );
   static DateTime? _$endTime(Ticket v) => v.endTime;
   static const Field<Ticket, DateTime> _f$endTime = Field(
@@ -221,7 +220,7 @@ class _TicketCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Ticket, $Out>
     String? secondaryText,
     String? location,
     Object? startTime = $none,
-    TicketType? type,
+    Object? type = $none,
     Object? endTime = $none,
     Object? tags = $none,
     Object? extras = $none,
@@ -233,7 +232,7 @@ class _TicketCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Ticket, $Out>
       if (secondaryText != null) #secondaryText: secondaryText,
       if (location != null) #location: location,
       if (startTime != $none) #startTime: startTime,
-      if (type != null) #type: type,
+      if (type != $none) #type: type,
       if (endTime != $none) #endTime: endTime,
       if (tags != $none) #tags: tags,
       if (extras != $none) #extras: extras,
