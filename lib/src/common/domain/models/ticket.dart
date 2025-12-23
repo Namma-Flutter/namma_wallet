@@ -15,9 +15,9 @@ part 'ticket.mapper.dart';
 class Ticket with TicketMappable {
   ///
   const Ticket({
-    required this.primaryText,
-    required this.secondaryText,
-    required this.location,
+    this.primaryText,
+    this.secondaryText,
+    this.location,
     this.startTime,
     this.type,
     this.endTime,
@@ -323,18 +323,20 @@ class Ticket with TicketMappable {
       ticketId: existing.ticketId,
 
       primaryText:
-          (!incoming.primaryText.isNotNullOrEmpty ||
+          (incoming.primaryText == null ||
+              incoming.primaryText!.isEmpty ||
               incoming.primaryText == _primaryTextConstant)
           ? existing.primaryText
           : incoming.primaryText,
 
       secondaryText:
-          (!incoming.secondaryText.isNotNullOrEmpty ||
+          (incoming.secondaryText == null ||
+              incoming.secondaryText!.isEmpty ||
               incoming.secondaryText == _secondaryTextConstant)
           ? existing.secondaryText
           : incoming.secondaryText,
 
-      location: (incoming.location.trim().isNotNullOrEmpty)
+      location: (incoming.location?.trim().isNotEmpty ?? false)
           ? incoming.location
           : existing.location,
 
@@ -418,9 +420,9 @@ class Ticket with TicketMappable {
   @MappableField(key: 'ticket_id')
   final String? ticketId;
   @MappableField(key: 'primary_text')
-  final String primaryText;
+  final String? primaryText;
   @MappableField(key: 'secondary_text')
-  final String secondaryText;
+  final String? secondaryText;
   @MappableField(key: 'type')
   final TicketType? type;
   @MappableField(key: 'start_time')
@@ -428,7 +430,7 @@ class Ticket with TicketMappable {
   @MappableField(key: 'end_time')
   final DateTime? endTime;
   @MappableField(key: 'location')
-  final String location;
+  final String? location;
   @MappableField(key: 'tags')
   final List<TagModel>? tags;
   @MappableField(key: 'extras')

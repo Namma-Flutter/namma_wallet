@@ -24,22 +24,25 @@ class TicketMapper extends ClassMapperBase<Ticket> {
   @override
   final String id = 'Ticket';
 
-  static String _$primaryText(Ticket v) => v.primaryText;
+  static String? _$primaryText(Ticket v) => v.primaryText;
   static const Field<Ticket, String> _f$primaryText = Field(
     'primaryText',
     _$primaryText,
     key: r'primary_text',
+    opt: true,
   );
-  static String _$secondaryText(Ticket v) => v.secondaryText;
+  static String? _$secondaryText(Ticket v) => v.secondaryText;
   static const Field<Ticket, String> _f$secondaryText = Field(
     'secondaryText',
     _$secondaryText,
     key: r'secondary_text',
+    opt: true,
   );
-  static String _$location(Ticket v) => v.location;
+  static String? _$location(Ticket v) => v.location;
   static const Field<Ticket, String> _f$location = Field(
     'location',
     _$location,
+    opt: true,
   );
   static DateTime? _$startTime(Ticket v) => v.startTime;
   static const Field<Ticket, DateTime> _f$startTime = Field(
@@ -216,9 +219,9 @@ class _TicketCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Ticket, $Out>
       : null;
   @override
   $R call({
-    String? primaryText,
-    String? secondaryText,
-    String? location,
+    Object? primaryText = $none,
+    Object? secondaryText = $none,
+    Object? location = $none,
     Object? startTime = $none,
     Object? type = $none,
     Object? endTime = $none,
@@ -228,9 +231,9 @@ class _TicketCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Ticket, $Out>
     Object? imagePath = $none,
   }) => $apply(
     FieldCopyWithData({
-      if (primaryText != null) #primaryText: primaryText,
-      if (secondaryText != null) #secondaryText: secondaryText,
-      if (location != null) #location: location,
+      if (primaryText != $none) #primaryText: primaryText,
+      if (secondaryText != $none) #secondaryText: secondaryText,
+      if (location != $none) #location: location,
       if (startTime != $none) #startTime: startTime,
       if (type != $none) #type: type,
       if (endTime != $none) #endTime: endTime,

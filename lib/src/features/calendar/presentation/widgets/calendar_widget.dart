@@ -36,8 +36,8 @@ class CalendarWidget extends StatelessWidget {
           ...tickets.map(
             (t) => Event(
               iconName: 'confirmation_number',
-              title: t.primaryText,
-              subtitle: t.secondaryText,
+              title: t.primaryText ?? 'Unknown',
+              subtitle: t.secondaryText ?? 'No description',
               date: day,
               price: '',
             ),

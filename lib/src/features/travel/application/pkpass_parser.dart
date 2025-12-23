@@ -94,7 +94,7 @@ class PKPassParser implements IPKPassParser {
     ]);
   }
 
-  String _getPrimaryText(PassFile passFile) {
+  String? _getPrimaryText(PassFile passFile) {
     final metadata = passFile.metadata;
     // For boarding passes, often {origin} -> {destination}
     final origin = _findFieldValue(passFile, [
@@ -120,10 +120,10 @@ class PKPassParser implements IPKPassParser {
     final orgName = metadata.organizationName;
     if (orgName.isNotEmpty) return orgName;
 
-    return 'Unknown Ticket';
+    return null;
   }
 
-  String _getSecondaryText(PassFile passFile) {
+  String? _getSecondaryText(PassFile passFile) {
     final metadata = passFile.metadata;
     final service = _findFieldValue(passFile, [
       'flight_number',
@@ -144,7 +144,7 @@ class PKPassParser implements IPKPassParser {
 
     if (parts.isEmpty) {
       final description = metadata.description;
-      return (description.isNotEmpty) ? description : 'Ticket Details';
+      return (description.isNotEmpty) ? description : null;
     }
 
     return parts.join(' • ');
@@ -155,14 +155,13 @@ class PKPassParser implements IPKPassParser {
     return metadata.relevantDate;
   }
 
-  String _getLocation(PassFile passFile) {
+  String? _getLocation(PassFile passFile) {
     return _findFieldValue(passFile, [
-          'boarding_point',
-          'gate',
-          'platform',
-          'boarding_gate',
-        ]) ??
-        'Unknown';
+      'boarding_point',
+      'gate',
+      'platform',
+      'boarding_gate',
+    ]);
   }
 
   TicketType? _getTicketType(PassFile passFile) {

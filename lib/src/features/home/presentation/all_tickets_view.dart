@@ -270,7 +270,9 @@ class TravelTicketListCardWidget extends StatelessWidget {
 
   String _getFromLocation() {
     // Use centralized ticket extension for consistent route parsing
-    return ticket.fromLocation ?? ticket.primaryText.split('→')[0].trim();
+    return ticket.fromLocation ??
+        ticket.primaryText?.split('→')[0].trim() ??
+        '';
   }
 
   String _getToLocation() {
@@ -279,7 +281,7 @@ class TravelTicketListCardWidget extends StatelessWidget {
     if (to != null) return to;
 
     // Fallback: parse from primaryText if extension returns null
-    final parts = ticket.primaryText.split('→');
+    final parts = ticket.primaryText?.split('→') ?? [];
     return parts.length > 1 ? parts[1].trim() : '';
   }
 
@@ -390,7 +392,7 @@ class TravelTicketListCardWidget extends StatelessWidget {
                 const SizedBox(height: 8),
                 // Secondary info (train/bus number, etc.)
                 Text(
-                  ticket.secondaryText,
+                  ticket.secondaryText ?? '',
                   style: TextStyle(
                     fontSize: 12,
                     color: Theme.of(

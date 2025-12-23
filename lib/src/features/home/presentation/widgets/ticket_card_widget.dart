@@ -64,7 +64,7 @@ class EventTicketCardWidget extends StatelessWidget {
                     children: [
                       //* ticket title
                       Text(
-                        ticket.primaryText,
+                        ticket.primaryText ?? '',
                         style: TextStyle(
                           color: Theme.of(context).colorScheme.onSurface,
                         ),
@@ -110,14 +110,15 @@ class EventTicketCardWidget extends StatelessWidget {
               ],
             ),
             //* Address
-            Text(
-              ticket.location,
-              style: TextStyle(
-                color: Theme.of(context).colorScheme.onSurface,
+            if (ticket.location != null)
+              Text(
+                ticket.location!,
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
               ),
-              overflow: TextOverflow.ellipsis,
-              maxLines: 1,
-            ),
           ],
         ),
       ),

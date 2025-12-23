@@ -292,7 +292,7 @@ class _TravelTicketViewState extends State<TravelTicketView> {
                       //* Description (Secondary text)
                       Expanded(
                         child: Text(
-                          widget.ticket.secondaryText,
+                          widget.ticket.secondaryText ?? '',
                           style: Paragraph03(
                             color: Theme.of(
                               context,
@@ -439,7 +439,7 @@ class _TravelTicketViewState extends State<TravelTicketView> {
                       // Fallback to primaryText
                       return <Widget>[
                         Text(
-                          widget.ticket.primaryText,
+                          widget.ticket.primaryText ?? '',
                           style: Paragraph01(
                             color: Theme.of(
                               context,

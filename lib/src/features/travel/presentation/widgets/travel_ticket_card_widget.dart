@@ -91,8 +91,8 @@ class TravelTicketCardWidget extends StatelessWidget {
                   //* Secondary text
                   Flexible(
                     child: Text(
-                      ticket.secondaryText.isNotEmpty
-                          ? ticket.secondaryText
+                      (ticket.secondaryText?.isNotEmpty ?? false)
+                          ? ticket.secondaryText!
                           : 'xxx xxx',
                       style: Paragraph02(
                         color: Theme.of(context).colorScheme.onSurface,
@@ -219,10 +219,10 @@ class TravelTicketCardWidget extends StatelessWidget {
                       ),
                     ),
                   ];
-                } else if (ticket.primaryText.isNotEmpty) {
+                } else if (ticket.primaryText?.isNotEmpty ?? false) {
                   return <Widget>[
                     Text(
-                      ticket.primaryText,
+                      ticket.primaryText!,
                       style: TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
@@ -252,14 +252,14 @@ class TravelTicketCardWidget extends StatelessWidget {
           ),
 
           //* Boarding Point
-          if (ticket.location.isNotEmpty)
+          if (ticket.location?.isNotEmpty ?? false)
             Row(
               spacing: 8,
               children: [
                 const Icon(Icons.flag_outlined),
                 Expanded(
                   child: Text(
-                    ticket.location,
+                    ticket.location!,
                     style: TextStyle(
                       fontWeight: FontWeight.w500,
                       fontSize: 14,
