@@ -64,6 +64,9 @@ void main() {
       for (final extra in ticket.extras!) {
         expect(extra.value, isNot(contains('Instance of')));
       }
+
+      expect(ticket.imagePath, isNotNull);
+      expect(File(ticket.imagePath!).existsSync(), isTrue);
     });
   });
 }
