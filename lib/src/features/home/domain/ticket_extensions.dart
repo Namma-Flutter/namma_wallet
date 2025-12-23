@@ -40,7 +40,9 @@ extension TicketExtrasExtension on Ticket {
   ///
   /// This checks for 'pnr number' first, then falls back to 'booking id'.
   String? get pnrOrId {
-    return getExtraByTitle('pnr number') ?? getExtraByTitle('booking id');
+    return (ticketId != null && ticketId!.trim().isNotEmpty)
+        ? ticketId
+        : getExtraByTitle('pnr number') ?? getExtraByTitle('booking id');
   }
 
   /// Checks if the ticket has a PNR number or booking ID.

@@ -7,6 +7,11 @@ abstract interface class IImportService {
   /// Returns the parsed ticket if successful, null otherwise
   Future<Ticket?> importAndSavePDFFile(XFile pdfFile);
 
+  /// Import a pkpass file and parse it as a travel ticket
+  ///
+  /// Returns the parsed ticket if successful, null otherwise
+  Future<Ticket?> importAndSavePKPassFile(XFile pkpassFile);
+
   /// Import QR code data and parse it as a travel ticket
   ///
   /// Returns the parsed ticket if successful, null otherwise

@@ -81,6 +81,13 @@ class TicketMapper extends ClassMapperBase<Ticket> {
     key: r'ticket_id',
     opt: true,
   );
+  static String? _$imagePath(Ticket v) => v.imagePath;
+  static const Field<Ticket, String> _f$imagePath = Field(
+    'imagePath',
+    _$imagePath,
+    key: r'image_path',
+    opt: true,
+  );
 
   @override
   final MappableFields<Ticket> fields = const {
@@ -93,6 +100,7 @@ class TicketMapper extends ClassMapperBase<Ticket> {
     #tags: _f$tags,
     #extras: _f$extras,
     #ticketId: _f$ticketId,
+    #imagePath: _f$imagePath,
   };
 
   static Ticket _instantiate(DecodingData data) {
@@ -106,6 +114,7 @@ class TicketMapper extends ClassMapperBase<Ticket> {
       tags: data.dec(_f$tags),
       extras: data.dec(_f$extras),
       ticketId: data.dec(_f$ticketId),
+      imagePath: data.dec(_f$imagePath),
     );
   }
 
@@ -173,6 +182,7 @@ abstract class TicketCopyWith<$R, $In extends Ticket, $Out>
     List<TagModel>? tags,
     List<ExtrasModel>? extras,
     String? ticketId,
+    String? imagePath,
   });
   TicketCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
@@ -216,6 +226,7 @@ class _TicketCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Ticket, $Out>
     Object? tags = $none,
     Object? extras = $none,
     Object? ticketId = $none,
+    Object? imagePath = $none,
   }) => $apply(
     FieldCopyWithData({
       if (primaryText != null) #primaryText: primaryText,
@@ -227,6 +238,7 @@ class _TicketCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Ticket, $Out>
       if (tags != $none) #tags: tags,
       if (extras != $none) #extras: extras,
       if (ticketId != $none) #ticketId: ticketId,
+      if (imagePath != $none) #imagePath: imagePath,
     }),
   );
   @override
@@ -240,6 +252,7 @@ class _TicketCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Ticket, $Out>
     tags: data.get(#tags, or: $value.tags),
     extras: data.get(#extras, or: $value.extras),
     ticketId: data.get(#ticketId, or: $value.ticketId),
+    imagePath: data.get(#imagePath, or: $value.imagePath),
   );
 
   @override

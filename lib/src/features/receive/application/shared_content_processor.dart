@@ -1,12 +1,15 @@
 import 'package:namma_wallet/src/common/database/ticket_dao_interface.dart';
+import 'package:namma_wallet/src/common/domain/models/extras_model.dart';
 import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 import 'package:namma_wallet/src/common/enums/source_type.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
 import 'package:namma_wallet/src/features/home/domain/ticket_extensions.dart';
+import 'package:namma_wallet/src/features/import/application/import_service_interface.dart';
 import 'package:namma_wallet/src/features/receive/application/shared_content_processor_interface.dart';
 import 'package:namma_wallet/src/features/receive/domain/shared_content_result.dart';
 import 'package:namma_wallet/src/features/receive/domain/shared_content_type.dart';
 import 'package:namma_wallet/src/features/travel/application/travel_parser_interface.dart';
+import 'package:cross_file/cross_file.dart';
 
 /// Service to process shared content (SMS, PDF text) into tickets
 ///
@@ -20,13 +23,16 @@ class SharedContentProcessor implements ISharedContentProcessor {
     required ILogger logger,
     required ITravelParser travelParser,
     required ITicketDAO ticketDao,
+    required IImportService importService,
   }) : _logger = logger,
        _travelParserService = travelParser,
-       _ticketDao = ticketDao;
+       _ticketDao = ticketDao,
+       _importService = importService;
 
   final ILogger _logger;
   final ITravelParser _travelParserService;
   final ITicketDAO _ticketDao;
+  final IImportService _importService;
 
   @override
   Future<SharedContentResult> processContent(
@@ -35,6 +41,72 @@ class SharedContentProcessor implements ISharedContentProcessor {
   ) async {
     try {
       _logger.info('Processing shared content');
+
+      if (contentType == SharedContentType.pkpass) {
+        _logger.info('Processing PKPass file via SharedContentProcessor');
+        final ticket = await _importService.importAndSavePKPassFile(
+          XFile(content),
+        );
+        if (ticket == null) {
+          return const ProcessingErrorResult(
+            message: 'Failed to process PKPass file',
+            error: 'Parser returned null',
+          );
+        }
+        return TicketCreatedResult(
+          pnrNumber: ticket.pnrOrId ?? 'Unknown',
+          from: ticket.fromLocation ?? 'Unknown',
+          to: ticket.toLocation ?? 'Unknown',
+          fare: ticket.fare ?? 'Unknown',
+          date: ticket.date,
+        );
+      }
+
+      if (contentType == SharedContentType.sms) {
+        final updateInfo = _travelParserService.parseUpdateSMS(content);
+        if (updateInfo != null) {
+          _logger.info('Update found for PNR: ${updateInfo.pnrNumber}');
+
+          // Create a partial ticket with the updates for merging
+          final updateTicket = Ticket(
+            ticketId: updateInfo.pnrNumber,
+            primaryText: '', // Empty values ignored by merge
+            secondaryText: '',
+            location: '',
+            extras: updateInfo.updates.entries
+                .map<ExtrasModel>(
+                  (e) => ExtrasModel(title: e.key, value: e.value as String?),
+                )
+                .toList(),
+          );
+
+          // Check if ticket exists before updating
+          final existing = await _ticketDao.getTicketById(updateInfo.pnrNumber);
+          if (existing == null) {
+            _logger.warning(
+              'Ticket not found for update: ${updateInfo.pnrNumber}',
+            );
+            return TicketNotFoundResult(pnrNumber: updateInfo.pnrNumber);
+          }
+
+          final result = await _ticketDao.handleTicket(updateTicket);
+
+          if (result > 0) {
+            _logger.success('Ticket updated successfully');
+            return TicketUpdatedResult(
+              pnrNumber: updateInfo.pnrNumber,
+              updateType: updateInfo.updates.keys.contains('conductorContact')
+                  ? 'Conductor Details'
+                  : 'Ticket Update',
+            );
+          } else {
+            _logger.warning(
+              'Ticket not found for update: ${updateInfo.pnrNumber}',
+            );
+            return TicketNotFoundResult(pnrNumber: updateInfo.pnrNumber);
+          }
+        }
+      }
 
       final sourceType = contentType == SharedContentType.pdf
           ? SourceType.pdf

@@ -24,6 +24,7 @@ class Ticket with TicketMappable {
     this.tags,
     this.extras,
     this.ticketId,
+    this.imagePath,
   });
 
   factory Ticket.fromIRCTC(
@@ -347,6 +348,7 @@ class Ticket with TicketMappable {
 
       tags: _mergeTags(existing.tags, incoming.tags),
       extras: _mergeExtras(existing.extras, incoming.extras),
+      imagePath: incoming.imagePath ?? existing.imagePath,
     );
   }
 
@@ -431,6 +433,8 @@ class Ticket with TicketMappable {
   final List<TagModel>? tags;
   @MappableField(key: 'extras')
   final List<ExtrasModel>? extras;
+  @MappableField(key: 'image_path')
+  final String? imagePath;
 
   Map<String, Object?> toEntity() {
     final map = toMap()..removeWhere((key, value) => value == null);

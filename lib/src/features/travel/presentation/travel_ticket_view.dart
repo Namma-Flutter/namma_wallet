@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -235,6 +236,23 @@ class _TravelTicketViewState extends State<TravelTicketView> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  //* Image (if exists)
+                  if (widget.ticket.imagePath != null) ...[
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: Image.file(
+                        File(widget.ticket.imagePath!),
+                        width: double.infinity,
+                        height: 150,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return const SizedBox.shrink();
+                        },
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                  ],
+
                   //* Icon & Service
                   Row(
                     children: [

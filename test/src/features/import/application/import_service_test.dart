@@ -1,3 +1,4 @@
+import 'dart:typed_data';
 import 'package:cross_file/cross_file.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:namma_wallet/src/common/database/ticket_dao_interface.dart';
@@ -9,6 +10,7 @@ import 'package:namma_wallet/src/features/irctc/application/irctc_qr_parser_inte
 import 'package:namma_wallet/src/features/irctc/application/irctc_scanner_service.dart';
 import 'package:namma_wallet/src/features/irctc/application/irctc_scanner_service_interface.dart';
 import 'package:namma_wallet/src/features/irctc/domain/irctc_ticket_model.dart';
+import 'package:namma_wallet/src/features/travel/application/pkpass_parser_interface.dart';
 import 'package:namma_wallet/src/features/travel/application/travel_parser_interface.dart';
 
 import '../../../../helpers/fake_logger.dart';
@@ -61,6 +63,18 @@ class FakeIRCTCScannerService implements IIRCTCScannerService {
       throw Exception('Scanner error');
     }
     return scanResult ?? IRCTCScannerResult.error('Default error');
+  }
+}
+
+class FakePKPassParser implements IPKPassParser {
+  Ticket? parsedTicket;
+
+  @override
+  Future<Ticket?> parsePKPass(Uint8List data) async {
+    print(
+      'DEBUG: FakePKPassParser.parsePKPass called with ${data.length} bytes',
+    );
+    return parsedTicket;
   }
 }
 
@@ -124,6 +138,7 @@ void main() {
     late FakeTravelParser fakeTravelParser;
     late FakeIRCTCQRParser fakeIRCTCQRParser;
     late FakeIRCTCScannerService fakeIRCTCScannerService;
+    late FakePKPassParser fakePKPassParser;
     late FakeTicketDAO fakeTicketDAO;
 
     setUp(() {
@@ -132,6 +147,7 @@ void main() {
       fakeTravelParser = FakeTravelParser();
       fakeIRCTCQRParser = FakeIRCTCQRParser();
       fakeIRCTCScannerService = FakeIRCTCScannerService();
+      fakePKPassParser = FakePKPassParser();
       fakeTicketDAO = FakeTicketDAO();
       importService = ImportService(
         logger: fakeLogger,
@@ -139,6 +155,7 @@ void main() {
         travelParser: fakeTravelParser,
         qrParser: fakeIRCTCQRParser,
         irctcScannerService: fakeIRCTCScannerService,
+        pkpassParser: fakePKPassParser,
         ticketDao: fakeTicketDAO,
       );
     });
@@ -172,9 +189,53 @@ void main() {
     final testTicket = Ticket.fromIRCTC(testIrctcTicket);
 
     group('supportedExtensions', () {
-      test('should return a list containing only "pdf"', () {
-        expect(importService.supportedExtensions, ['pdf']);
+      test('should return a list containing "pdf" and "pkpass"', () {
+        expect(importService.supportedExtensions, contains('pdf'));
+        expect(importService.supportedExtensions, contains('pkpass'));
       });
+    });
+
+    group('importAndSavePKPassFile', () {
+      const testPKPassPath = 'test/assets/pkpass/Flutter Devcon.pkpass';
+
+      test('should return null when ticket cannot be parsed', () async {
+        // Arrange
+        fakePKPassParser.parsedTicket = null;
+        // Act
+        final result = await importService.importAndSavePKPassFile(
+          XFile(testPKPassPath),
+        );
+        // Assert
+        expect(result, isNull);
+      });
+
+      test('should save and return ticket on successful import', () async {
+        // Arrange
+        fakePKPassParser.parsedTicket = testTicket;
+        // Act
+        final result = await importService.importAndSavePKPassFile(
+          XFile(testPKPassPath),
+        );
+        // Assert
+        expect(result, testTicket);
+        expect(fakeTicketDAO.handledTicket, testTicket);
+      });
+
+      test(
+        'should return null and log error when an exception occurs',
+        () async {
+          // Arrange
+          fakePKPassParser.parsedTicket = testTicket;
+          fakeTicketDAO.shouldThrowError = true;
+          // Act
+          final result = await importService.importAndSavePKPassFile(
+            XFile(testPKPassPath),
+          );
+          // Assert
+          expect(result, isNull);
+          expect(fakeLogger.errorLogs, isNotEmpty);
+        },
+      );
     });
 
     group('isSupportedQRCode', () {
