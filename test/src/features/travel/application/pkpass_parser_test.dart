@@ -68,5 +68,18 @@ void main() {
       expect(ticket.imagePath, isNotNull);
       expect(File(ticket.imagePath!).existsSync(), isTrue);
     });
+
+    test(
+      'should return null for missing fields instead of "Unknown"',
+      () async {
+        final file = File('test/assets/pkpass/Flutter Devcon.pkpass');
+        final bytes = await file.readAsBytes();
+        final ticket = await parser.parsePKPass(bytes);
+
+        expect(ticket, isNotNull);
+        // 'location' is empty in this sample pkpass
+        expect(ticket!.location, isNull);
+      },
+    );
   });
 }
