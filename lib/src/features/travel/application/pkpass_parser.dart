@@ -176,6 +176,9 @@ class PKPassParser implements IPKPassParser {
       if (transitType == TransitType.bus) {
         return TicketType.bus;
       }
+      if (transitType == TransitType.air) {
+        return TicketType.flight;
+      }
     }
     return null;
   }
