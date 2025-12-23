@@ -2,7 +2,6 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
-
 import 'package:namma_wallet/src/features/travel/application/pkpass_parser.dart';
 import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
@@ -55,7 +54,7 @@ void main() {
       expect(ticket, isNotNull);
       // Based on the file name, it's likely a generic or event ticket
       expect(ticket!.primaryText, contains('Devcon'));
-      // Since it's not a boarding pass, type should be null
+      // Since it's not a boarding pass, type should be null (logic change verification)
       expect(ticket.type, isNull);
 
       // Check for extras to verify data refinement
@@ -69,7 +68,7 @@ void main() {
     });
 
     test(
-      'should return null for missing fields instead of "Unknown"',
+      'should return null for missing fields instead of "Unknown" (Using real file)',
       () async {
         final file = File('test/assets/pkpass/Flutter Devcon.pkpass');
         final bytes = await file.readAsBytes();
@@ -90,7 +89,12 @@ void main() {
         final ticket = await parser.parsePKPass(invalidBytes);
 
         expect(ticket, isNull);
+        expect(fakeLogger.logs.last, contains('Failed to parse pkpass file'));
       },
     );
+
+    // NOTE: Further tests for specific TicketType (train/bus) mapping logic
+    // require valid .pkpass samples with valid signatures/manifests, or
+    // a way to mock the 3rd party PassFile class which is currently not exported/mockable.
   });
 }
