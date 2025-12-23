@@ -93,7 +93,7 @@ class TravelTicketCardWidget extends StatelessWidget {
                     child: Text(
                       (ticket.secondaryText?.isNotEmpty ?? false)
                           ? ticket.secondaryText!
-                          : 'xxx xxx',
+                          : 'No details',
                       style: Paragraph02(
                         color: Theme.of(context).colorScheme.onSurface,
                       ).regular,

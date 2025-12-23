@@ -54,7 +54,8 @@ void main() {
       expect(ticket, isNotNull);
       // Based on the file name, it's likely a generic or event ticket
       expect(ticket!.primaryText, contains('Devcon'));
-      // Since it's not a boarding pass, type should be null (logic change verification)
+      // Since it's not a boarding pass, type should be null
+      //(logic change verification)
       expect(ticket.type, isNull);
 
       // Check for extras to verify data refinement
@@ -68,7 +69,8 @@ void main() {
     });
 
     test(
-      'should return null for missing fields instead of "Unknown" (Using real file)',
+      'should return null for missing fields instead '
+      'of "Unknown" (Using real file)',
       () async {
         final file = File('test/assets/pkpass/Flutter Devcon.pkpass');
         final bytes = await file.readAsBytes();
