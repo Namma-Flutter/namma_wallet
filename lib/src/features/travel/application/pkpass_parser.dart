@@ -234,7 +234,7 @@ class PKPassParser implements IPKPassParser {
               value['full_address']?.toString() ??
               value['address']?.toString() ??
               value['name']?.toString() ??
-              (value.values.firstOrNull)?.toString();
+              value.values.firstOrNull?.toString();
         } else if (value is Iterable) {
           if (value.isNotEmpty) {
             displayValue = value.join(', ');
