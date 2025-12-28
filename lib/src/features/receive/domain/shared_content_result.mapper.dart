@@ -104,6 +104,12 @@ class TicketCreatedResultMapper extends ClassMapperBase<TicketCreatedResult> {
     'date',
     _$date,
   );
+  static String? _$warning(TicketCreatedResult v) => v.warning;
+  static const Field<TicketCreatedResult, String> _f$warning = Field(
+    'warning',
+    _$warning,
+    opt: true,
+  );
 
   @override
   final MappableFields<TicketCreatedResult> fields = const {
@@ -112,6 +118,7 @@ class TicketCreatedResultMapper extends ClassMapperBase<TicketCreatedResult> {
     #to: _f$to,
     #fare: _f$fare,
     #date: _f$date,
+    #warning: _f$warning,
   };
 
   static TicketCreatedResult _instantiate(DecodingData data) {
@@ -121,6 +128,7 @@ class TicketCreatedResultMapper extends ClassMapperBase<TicketCreatedResult> {
       to: data.dec(_f$to),
       fare: data.dec(_f$fare),
       date: data.dec(_f$date),
+      warning: data.dec(_f$warning),
     );
   }
 
@@ -201,6 +209,7 @@ abstract class TicketCreatedResultCopyWith<
     String? to,
     String? fare,
     String? date,
+    String? warning,
   });
   TicketCreatedResultCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
     Then<$Out2, $R2> t,
@@ -222,6 +231,7 @@ class _TicketCreatedResultCopyWithImpl<$R, $Out>
     Object? to = $none,
     Object? fare = $none,
     Object? date = $none,
+    Object? warning = $none,
   }) => $apply(
     FieldCopyWithData({
       if (pnrNumber != $none) #pnrNumber: pnrNumber,
@@ -229,6 +239,7 @@ class _TicketCreatedResultCopyWithImpl<$R, $Out>
       if (to != $none) #to: to,
       if (fare != $none) #fare: fare,
       if (date != $none) #date: date,
+      if (warning != $none) #warning: warning,
     }),
   );
   @override
@@ -238,6 +249,7 @@ class _TicketCreatedResultCopyWithImpl<$R, $Out>
     to: data.get(#to, or: $value.to),
     fare: data.get(#fare, or: $value.fare),
     date: data.get(#date, or: $value.date),
+    warning: data.get(#warning, or: $value.warning),
   );
 
   @override

@@ -77,6 +77,10 @@ class _NammaWalletAppState extends State<NammaWalletApp> {
           _logger.error('Deep link error: $error');
           _shareHandler.handleError(error.toString());
         },
+        onWarning: (String message) {
+          _logger.warning('Deep link warning: $message');
+          _shareHandler.handleWarning(message);
+        },
       ),
     );
   }

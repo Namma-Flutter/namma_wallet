@@ -44,9 +44,10 @@ class SharedContentProcessor implements ISharedContentProcessor {
 
       if (contentType == SharedContentType.pkpass) {
         _logger.info('Processing PKPass file via SharedContentProcessor');
-        final ticket = await _importService.importAndSavePKPassFile(
+        final result = await _importService.importAndSavePKPassFile(
           XFile(content),
         );
+        final ticket = result.ticket;
         if (ticket == null) {
           return const ProcessingErrorResult(
             message: 'Failed to process PKPass file',
@@ -59,6 +60,7 @@ class SharedContentProcessor implements ISharedContentProcessor {
           to: ticket.toLocation,
           fare: ticket.fare,
           date: ticket.date,
+          warning: result.warning,
         );
       }
 

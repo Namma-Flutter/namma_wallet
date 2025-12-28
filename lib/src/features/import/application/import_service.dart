@@ -7,6 +7,7 @@ import 'package:namma_wallet/src/common/services/pdf/pdf_service_interface.dart'
 import 'package:namma_wallet/src/features/import/application/import_service_interface.dart';
 import 'package:namma_wallet/src/features/irctc/application/irctc_qr_parser_interface.dart';
 import 'package:namma_wallet/src/features/irctc/application/irctc_scanner_service_interface.dart';
+import 'package:namma_wallet/src/common/domain/models/extras_model.dart';
 import 'package:namma_wallet/src/features/travel/application/pkpass_parser_interface.dart';
 import 'package:namma_wallet/src/features/travel/application/travel_parser_interface.dart';
 
@@ -85,7 +86,7 @@ class ImportService implements IImportService {
   }
 
   @override
-  Future<Ticket?> importAndSavePKPassFile(XFile pkpassFile) async {
+  Future<TicketImportResult> importAndSavePKPassFile(XFile pkpassFile) async {
     try {
       final filename = pkpassFile.name;
       _logger.info('Importing pkpass file: $filename');
@@ -95,7 +96,7 @@ class ImportService implements IImportService {
 
       if (parsedTicket == null) {
         _logger.warning('Failed to parse pkpass: $filename');
-        return null;
+        return const TicketImportResult();
       }
 
       await _ticketDao.handleTicket(parsedTicket);
@@ -104,10 +105,22 @@ class ImportService implements IImportService {
         'Successfully imported and saved PKPass ticket: '
         '${parsedTicket.ticketId}',
       );
-      return parsedTicket;
+
+      // Check provider for warning
+      String? warning;
+      final provider = parsedTicket.extras?.firstWhere(
+        (e) => e.title?.toLowerCase() == 'provider',
+        orElse: () => ExtrasModel(title: '', value: ''),
+      );
+
+      if (provider?.value?.toLowerCase().contains('luma') != true) {
+        warning = 'Imported pass is not from Luma';
+      }
+
+      return TicketImportResult(ticket: parsedTicket, warning: warning);
     } on Exception catch (e, stackTrace) {
       _logger.error('Error importing pkpass file', e, stackTrace);
-      return null;
+      return const TicketImportResult();
     }
   }
 

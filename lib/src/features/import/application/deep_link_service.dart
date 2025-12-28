@@ -19,10 +19,15 @@ class DeepLinkService implements IDeepLinkService {
 
   StreamSubscription<sh.SharedMedia?>? _subscription;
   void Function(Object error)? _onError;
+  void Function(String warning)? _onWarning;
 
   @override
-  Future<void> initialize({void Function(Object error)? onError}) async {
+  Future<void> initialize({
+    void Function(Object error)? onError,
+    void Function(String message)? onWarning,
+  }) async {
     _onError = onError;
+    _onWarning = onWarning;
     try {
       final handler = sh.ShareHandler.instance;
 
@@ -73,7 +78,12 @@ class DeepLinkService implements IDeepLinkService {
       if (path.toLowerCase().endsWith('.pkpass')) {
         _logger.info('DeepLinkService: Detected .pkpass file, importing...');
         try {
-          await _importService.importAndSavePKPassFile(XFile(path));
+          final result = await _importService.importAndSavePKPassFile(
+            XFile(path),
+          );
+          if (result.warning != null) {
+            _onWarning?.call(result.warning!);
+          }
         } on Object catch (e, st) {
           _logger.error('DeepLinkService: Error importing PKPass file', e, st);
           _onError?.call(e);

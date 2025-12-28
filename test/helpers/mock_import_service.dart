@@ -14,9 +14,9 @@ class MockImportService implements IImportService {
   }
 
   @override
-  Future<Ticket?> importAndSavePKPassFile(XFile pkpassFile) async {
+  Future<TicketImportResult> importAndSavePKPassFile(XFile pkpassFile) async {
     importedFiles.add(pkpassFile);
-    return mockTicket;
+    return TicketImportResult(ticket: mockTicket);
   }
 
   @override
