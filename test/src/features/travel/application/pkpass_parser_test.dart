@@ -117,13 +117,15 @@ void main() {
     // a way to mock the 3rd party PassFile class which is currently not exported/mockable.
 
     test(
-      'fetchLatestPass should return null given invalid pkpass data (not a zip)',
+      'fetchLatestPass should return null '
+      'given invalid pkpass data (not a zip)',
       () async {
         final invalidBytes = Uint8List.fromList([1, 2, 3, 4, 5]);
         final result = await parser.fetchLatestPass(invalidBytes);
         expect(result, isNull);
         // ZipDecoder might throw or just fail to find files.
-        // If it throws, we log error. If it returns invalid archive, we log warning.
+        // If it throws, we log error. If it returns invalid archive,
+        // we log warning.
         // We just ensure we handled it.
         expect(
           fakeLogger.logs.join('\n'),

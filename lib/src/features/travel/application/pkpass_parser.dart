@@ -122,7 +122,8 @@ class PKPassParser implements IPKPassParser {
         return null; // Not modified
       } else {
         _logger.warning(
-          'Failed to fetch latest pass: ${response.statusCode} ${response.reasonPhrase}',
+          'Failed to fetch latest '
+          'pass: ${response.statusCode} ${response.reasonPhrase}',
         );
         return null;
       }
@@ -387,24 +388,15 @@ class PKPassParser implements IPKPassParser {
   List<dynamic> _getAllFields(PassMetadata metadata) {
     final allFields = <dynamic>[];
 
-    void addFields(dynamic structure) {
+    void addFields(PassStructureDictionary? structure) {
       if (structure == null) return;
-      // We use dynamic access because different structure classes share these properties
-      // but might not share a common interface in the library.
-      try {
-        if (structure.headerFields != null)
-          allFields.addAll(structure.headerFields as List);
-        if (structure.primaryFields != null)
-          allFields.addAll(structure.primaryFields as List);
-        if (structure.secondaryFields != null)
-          allFields.addAll(structure.secondaryFields as List);
-        if (structure.auxiliaryFields != null)
-          allFields.addAll(structure.auxiliaryFields as List);
-        if (structure.backFields != null)
-          allFields.addAll(structure.backFields as List);
-      } catch (e) {
-        // Ignore if a field list access fails (unlikely if package structure is consistent)
-      }
+
+      allFields
+        ..addAll(structure.headerFields)
+        ..addAll(structure.primaryFields)
+        ..addAll(structure.secondaryFields)
+        ..addAll(structure.auxiliaryFields)
+        ..addAll(structure.backFields);
     }
 
     addFields(metadata.boardingPass);
