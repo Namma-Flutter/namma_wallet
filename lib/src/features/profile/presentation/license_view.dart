@@ -21,7 +21,8 @@ class LicenseView extends StatelessWidget {
           applicationVersion = 'loading...';
         } else if (snapshot.hasData) {
           final packageInfo = snapshot.data!;
-          applicationVersion = '${packageInfo.version}+${packageInfo.buildNumber}';
+          applicationVersion =
+              '${packageInfo.version}+${packageInfo.buildNumber}';
         } else {
           applicationVersion = '';
         }
