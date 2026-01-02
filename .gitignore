@@ -60,3 +60,15 @@ config.json
 **/key.properties
 **/*.keystore
 **/*.jks
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+ios/fastlane/report.xml
+android/app/google-services.json
+ios/fastlane/*.p8
+android/fastlane/*.json
+ios/Runner.app.dSYM.zip
+ios/Runner.ipa
+android/fastlane/report.xml
