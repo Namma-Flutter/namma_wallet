@@ -12,11 +12,11 @@ skip_binary_upload true
 
 # Metadata settings
 skip_metadata false
-metadata_path "./fastlane/metadata"
+metadata_path "./metadata"
 
 # Screenshots settings
 skip_screenshots false
-screenshots_path "./fastlane/screenshots"
+screenshots_path "./screenshots"
 
 # Overwrite existing screenshots
 overwrite_screenshots true
