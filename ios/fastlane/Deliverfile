@@ -35,7 +35,7 @@ submission_information({
 # Phased release for automatic updates
 phased_release false
 
-# Don't automatically release after approval
+# Automatically release after approval
 automatic_release true
 
 # Submit for review after metadata upload
