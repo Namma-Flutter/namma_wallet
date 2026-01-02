@@ -14,13 +14,21 @@ class LicenseView extends StatelessWidget {
     return FutureBuilder<PackageInfo>(
       future: PackageInfo.fromPlatform(),
       builder: (context, snapshot) {
-        final version = snapshot.hasData
-            ? '${snapshot.data!.version}+${snapshot.data!.buildNumber}'
-            : '';
+        final String applicationVersion;
+        if (snapshot.hasError) {
+          applicationVersion = 'Error: ${snapshot.error}';
+        } else if (snapshot.connectionState == ConnectionState.waiting) {
+          applicationVersion = 'loading...';
+        } else if (snapshot.hasData) {
+          final packageInfo = snapshot.data!;
+          applicationVersion = '${packageInfo.version}+${packageInfo.buildNumber}';
+        } else {
+          applicationVersion = '';
+        }
 
         return LicensePage(
           applicationName: 'Namma Wallet',
-          applicationVersion: version,
+          applicationVersion: applicationVersion,
           applicationLegalese: '© 2026 Namma Flutter',
         );
       },
