@@ -75,7 +75,7 @@ platform :ios do
 
     # 5. Upload to TestFlight
     # Safely handle missing changelog files
-    changelog_path = "./fastlane/metadata/en-US/release_notes.txt"
+    changelog_path = "./metadata/en-US/release_notes.txt"
     changelog = File.exist?(changelog_path) ? File.read(changelog_path) : "Beta build v#{version} (#{build_number})"
 
     testflight(
