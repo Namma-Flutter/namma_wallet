@@ -35,6 +35,12 @@ class EventMapper extends ClassMapperBase<Event> {
   static const Field<Event, DateTime> _f$date = Field('date', _$date);
   static String _$price(Event v) => v.price;
   static const Field<Event, String> _f$price = Field('price', _$price);
+  static IconData _$icon(Event v) => v.icon;
+  static const Field<Event, IconData> _f$icon = Field(
+    'icon',
+    _$icon,
+    mode: FieldMode.member,
+  );
 
   @override
   final MappableFields<Event> fields = const {
@@ -43,6 +49,7 @@ class EventMapper extends ClassMapperBase<Event> {
     #subtitle: _f$subtitle,
     #date: _f$date,
     #price: _f$price,
+    #icon: _f$icon,
   };
 
   static Event _instantiate(DecodingData data) {

@@ -15,7 +15,6 @@ import 'package:namma_wallet/src/common/services/ocr/ocr_service_interface.dart'
 import 'package:namma_wallet/src/common/services/ocr/web_ocr_service.dart';
 import 'package:namma_wallet/src/common/services/pdf/pdf_service.dart';
 import 'package:namma_wallet/src/common/services/pdf/pdf_service_interface.dart';
-import 'package:namma_wallet/src/common/theme/theme_provider.dart';
 import 'package:namma_wallet/src/features/ai/fallback_parser/application/ai_service_interface.dart';
 import 'package:namma_wallet/src/features/ai/fallback_parser/application/gemma_service.dart';
 import 'package:namma_wallet/src/features/ai/fallback_parser/application/web_gemma_service.dart';
@@ -34,7 +33,6 @@ import 'package:namma_wallet/src/features/receive/application/shared_content_pro
 import 'package:namma_wallet/src/features/receive/application/sharing_intent_service.dart';
 import 'package:namma_wallet/src/features/receive/application/web_sharing_intent_service.dart';
 import 'package:namma_wallet/src/features/receive/domain/sharing_intent_service_interface.dart';
-import 'package:namma_wallet/src/features/settings/application/ai_service_status.dart';
 import 'package:namma_wallet/src/features/tnstc/application/ticket_parser_interface.dart';
 import 'package:namma_wallet/src/features/tnstc/application/tnstc_pdf_parser.dart';
 import 'package:namma_wallet/src/features/tnstc/application/tnstc_sms_parser.dart';
@@ -47,9 +45,6 @@ void setupLocator() {
   getIt
     // Logger - Initialize first
     ..registerSingleton<ILogger>(NammaLogger())
-    // Providers
-    ..registerSingleton<ThemeProvider>(ThemeProvider())
-    ..registerSingleton<AIServiceStatus>(AIServiceStatus())
     // Database - Initialize before DAOs
     ..registerSingleton<IWalletDatabase>(WalletDatabase())
     // DAOs

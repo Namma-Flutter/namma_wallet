@@ -4,11 +4,12 @@ import 'package:card_stack_widget/model/card_model.dart';
 import 'package:card_stack_widget/model/card_orientation.dart';
 import 'package:card_stack_widget/widget/card_stack_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:namma_wallet/src/common/database/ticket_dao_interface.dart';
-import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 import 'package:namma_wallet/src/common/enums/ticket_type.dart';
+import 'package:namma_wallet/src/common/database/ticket_dao_interface.dart';
+import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/routing/app_routes.dart';
 import 'package:namma_wallet/src/common/services/haptic/haptic_service_extension.dart';
 import 'package:namma_wallet/src/common/services/haptic/haptic_service_interface.dart';
@@ -17,23 +18,22 @@ import 'package:namma_wallet/src/features/home/presentation/widgets/header_widge
 import 'package:namma_wallet/src/features/home/presentation/widgets/ticket_card_widget.dart';
 import 'package:namma_wallet/src/features/travel/presentation/widgets/travel_ticket_card_widget.dart';
 
-class HomeView extends StatefulWidget {
+class HomeView extends ConsumerStatefulWidget {
   const HomeView({super.key});
 
   @override
-  State<HomeView> createState() => _HomeViewState();
+  ConsumerState<HomeView> createState() => _HomeViewState();
 }
 
-class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
+class _HomeViewState extends ConsumerState<HomeView>
+    with WidgetsBindingObserver {
   bool _isLoading = true;
   List<Ticket> _travelTickets = [];
   List<Ticket> _eventTickets = [];
 
-  late final IHapticService _hapticService;
   @override
   void initState() {
     super.initState();
-    _hapticService = getIt<IHapticService>();
     WidgetsBinding.instance.addObserver(this);
     unawaited(_loadTicketData());
   }
@@ -57,7 +57,8 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
         _isLoading = true;
       });
 
-      final tickets = await getIt<ITicketDAO>().getAllTickets();
+      final ticketDao = getIt<ITicketDAO>();
+      final tickets = await ticketDao.getAllTickets();
 
       if (!mounted) return;
 
@@ -83,7 +84,8 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
       });
 
       if (mounted) {
-        _hapticService.triggerHaptic(HapticType.selection);
+        final hapticService = getIt<IHapticService>();
+        hapticService.triggerHaptic(HapticType.selection);
       }
     } on Object catch (e) {
       if (!mounted) return;
@@ -96,13 +98,15 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
+    final hapticService = getIt<IHapticService>();
+
     final cardStackList = _travelTickets.map((ticket) {
       return CardModel(
         radius: const Radius.circular(30),
         shadowColor: Colors.black26,
         child: InkWell(
           onTap: () async {
-            _hapticService.triggerHaptic(HapticType.selection);
+            hapticService.triggerHaptic(HapticType.selection);
             final wasDeleted = await context.pushNamed<bool>(
               AppRoute.ticketView.name,
               extra: ticket,

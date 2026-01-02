@@ -1,26 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:namma_wallet/src/common/theme/styles.dart';
-import 'package:namma_wallet/src/features/calendar/application/calendar_provider.dart';
+import 'package:namma_wallet/src/features/calendar/application/calendar_notifier.dart';
 import 'package:namma_wallet/src/features/calendar/presentation/widgets/calendar_utils.dart';
 
 class ThemedDayCell extends StatelessWidget {
   const ThemedDayCell({
     required this.day,
-    required this.provider,
+    required this.calendarNotifier,
     super.key,
     this.isSelected = false,
     this.isToday = false,
   });
 
   final DateTime day;
-  final CalendarProvider provider;
+  final Calendar calendarNotifier;
   final bool isSelected;
   final bool isToday;
 
   @override
   Widget build(BuildContext context) {
-    final tickets = provider.getTicketsForDay(day);
-    final events = provider.getEventsForDay(day);
+    final tickets = calendarNotifier.getTicketsForDay(day);
+    final events = calendarNotifier.getEventsForDay(day);
 
     var primaryIcon = Icons.directions_bus;
     if (tickets.isNotEmpty) {

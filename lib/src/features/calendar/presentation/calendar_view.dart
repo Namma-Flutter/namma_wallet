@@ -1,60 +1,69 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/services/haptic/haptic_service_extension.dart';
 import 'package:namma_wallet/src/common/services/haptic/haptic_service_interface.dart';
 import 'package:namma_wallet/src/common/theme/app_theme.dart';
-import 'package:namma_wallet/src/features/calendar/application/calendar_provider.dart';
+import 'package:namma_wallet/src/features/calendar/application/calendar_notifier.dart';
 import 'package:namma_wallet/src/features/calendar/presentation/widgets/calendar_list.dart';
 import 'package:namma_wallet/src/features/calendar/presentation/widgets/calendar_toggle_buttons.dart';
 import 'package:namma_wallet/src/features/calendar/presentation/widgets/calendar_widget.dart';
-import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 
-class CalendarView extends StatelessWidget {
+class CalendarView extends ConsumerStatefulWidget {
   const CalendarView({super.key});
 
   @override
+  ConsumerState<CalendarView> createState() => _CalendarViewState();
+}
+
+class _CalendarViewState extends ConsumerState<CalendarView> {
+  @override
+  void initState() {
+    super.initState();
+    // Load events when the view is first created
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      unawaited(ref.read(calendarProvider.notifier).loadEvents());
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) {
-        final provider = CalendarProvider();
-        unawaited(provider.loadEvents());
-        return provider;
-      },
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Padding(
-            padding: EdgeInsets.only(left: 8),
-            child: Text('Calendar'),
-          ),
-          centerTitle: false,
+    return Scaffold(
+      appBar: AppBar(
+        title: const Padding(
+          padding: EdgeInsets.only(left: 8),
+          child: Text('Calendar'),
         ),
-        body: const CalendarContent(),
+        centerTitle: false,
       ),
+      body: const CalendarContent(),
     );
   }
 }
 
-class CalendarContent extends StatefulWidget {
+class CalendarContent extends ConsumerStatefulWidget {
   const CalendarContent({super.key});
 
   @override
-  State<CalendarContent> createState() => _CalendarContentState();
+  ConsumerState<CalendarContent> createState() => _CalendarContentState();
 }
 
-class _CalendarContentState extends State<CalendarContent> {
+class _CalendarContentState extends ConsumerState<CalendarContent> {
   CalendarFormat _calendarFormat = CalendarFormat.month;
   int _selectedFilter = 1;
 
-  Future<void> _showDateRangePicker(CalendarProvider provider) async {
+  Future<void> _showDateRangePicker() async {
+    final calendarState = ref.read(calendarProvider);
+    final notifier = ref.read(calendarProvider.notifier);
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
 
     final initialRange =
-        provider.selectedRange ??
+        calendarState.selectedRange ??
         DateTimeRange(
           start: today,
           end: today.add(const Duration(days: 7)),
@@ -74,7 +83,7 @@ class _CalendarContentState extends State<CalendarContent> {
     );
 
     if (pickedRange != null) {
-      provider.setSelectedRange(pickedRange);
+      notifier.setSelectedRange(pickedRange);
       setState(() {
         _selectedFilter = 2;
       });
@@ -88,7 +97,9 @@ class _CalendarContentState extends State<CalendarContent> {
 
   @override
   Widget build(BuildContext context) {
-    final provider = Provider.of<CalendarProvider>(context);
+    final calendarState = ref.watch(calendarProvider);
+    final notifier = ref.read(calendarProvider.notifier);
+    final hapticService = getIt<IHapticService>();
 
     return SingleChildScrollView(
       child: Column(
@@ -96,38 +107,34 @@ class _CalendarContentState extends State<CalendarContent> {
           CalendarToggleButtons(
             selectedFilter: _selectedFilter,
             onFilterChanged: (index) async {
-              getIt<IHapticService>().triggerHaptic(
-                HapticType.selection,
-              );
+              hapticService.triggerHaptic(HapticType.selection);
               setState(() {
                 if (index != 2) {
                   _selectedFilter = index;
                 }
                 if (index == 0) {
                   _calendarFormat = CalendarFormat.week;
-                  provider.setSelectedRange(null);
+                  notifier.setSelectedRange(null);
                 } else if (index == 1) {
                   _calendarFormat = CalendarFormat.month;
-                  provider.setSelectedRange(null);
+                  notifier.setSelectedRange(null);
                 }
               });
 
               if (index == 2) {
                 // Handle Date Range
-                await _showDateRangePicker(provider);
+                await _showDateRangePicker();
               }
             },
           ),
-          if (provider.selectedRange case final range?)
+          if (calendarState.selectedRange case final range?)
             Padding(
               padding: const EdgeInsets.symmetric(
                 horizontal: 16,
                 vertical: 8,
               ),
               child: InkWell(
-                onTap: () async {
-                  await _showDateRangePicker(provider);
-                },
+                onTap: _showDateRangePicker,
                 borderRadius: BorderRadius.circular(12),
                 child: Container(
                   padding: const EdgeInsets.all(12),
@@ -168,7 +175,7 @@ class _CalendarContentState extends State<CalendarContent> {
                           ).colorScheme.onSurfaceVariant,
                         ),
                         onPressed: () {
-                          provider.setSelectedRange(null);
+                          notifier.setSelectedRange(null);
                           setState(() {
                             _selectedFilter = 1;
                           });
@@ -179,16 +186,20 @@ class _CalendarContentState extends State<CalendarContent> {
                 ),
               ),
             ),
-          if (provider.selectedRange == null)
+          if (calendarState.selectedRange == null)
             CalendarWidget(
-              provider: provider,
+              calendarState: calendarState,
+              calendarNotifier: notifier,
               calendarFormat: _calendarFormat,
               onDaySelected: (day, focusedDay) {
-                provider.setSelectedDay(day);
+                notifier.setSelectedDay(day);
               },
             ),
           const SizedBox(height: 8),
-          CalendarList(provider: provider),
+          CalendarList(
+            calendarState: calendarState,
+            calendarNotifier: notifier,
+          ),
           const SizedBox(height: 120),
         ],
       ),

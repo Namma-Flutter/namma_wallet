@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:namma_wallet/src/common/database/ticket_dao_interface.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
-import 'package:namma_wallet/src/features/calendar/application/calendar_provider.dart';
+import 'package:namma_wallet/src/features/calendar/application/calendar_notifier.dart';
 
 import '../../../../helpers/fake_logger.dart';
 
@@ -34,31 +35,35 @@ class StubTicketDAO implements ITicketDAO {
   @override
   Future<int> updateTicketById(
     String ticketId,
-    Ticket ticket, // Updated from Map to Ticket
+    Ticket ticket,
   ) async => 0;
 }
 
 void main() {
   late FakeLogger fakeLogger;
   late StubTicketDAO stubTicketDao;
-  late CalendarProvider provider;
+  late ProviderContainer container;
 
   setUp(() async {
     fakeLogger = FakeLogger();
     stubTicketDao = StubTicketDAO();
 
-    // Setup locator
+    // Setup GetIt locator with test dependencies
     await getIt.reset();
     getIt
       ..registerSingleton<ILogger>(fakeLogger)
       ..registerSingleton<ITicketDAO>(stubTicketDao);
 
-    provider = CalendarProvider(logger: fakeLogger);
+    // Create Riverpod container for testing
+    container = ProviderContainer();
   });
 
-  tearDown(getIt.reset);
+  tearDown(() async {
+    container.dispose();
+    await getIt.reset();
+  });
 
-  group('CalendarProvider Range Filtering', () {
+  group('Calendar Range Filtering', () {
     test(
       'getTicketsForRange filters correctly with inclusive bounds',
       () async {
@@ -119,8 +124,11 @@ void main() {
           ticketAfter,
         ];
 
-        await provider.loadTickets();
-        final filteredTickets = provider.getTicketsForRange(range);
+        // Use ProviderContainer to get the notifier (required for Riverpod v3)
+        final notifier = container.read(calendarProvider.notifier);
+        await notifier.loadTickets();
+
+        final filteredTickets = notifier.getTicketsForRange(range);
 
         expect(
           filteredTickets.map((t) => t.ticketId),

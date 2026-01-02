@@ -1,24 +1,24 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/routing/app_router.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
 import 'package:namma_wallet/src/common/theme/app_theme.dart';
-import 'package:namma_wallet/src/common/theme/theme_provider.dart';
+import 'package:namma_wallet/src/common/theme/theme_notifier.dart';
 import 'package:namma_wallet/src/features/receive/application/shared_content_processor_interface.dart';
 import 'package:namma_wallet/src/features/receive/domain/sharing_intent_service_interface.dart';
 import 'package:namma_wallet/src/features/receive/presentation/share_handler.dart';
-import 'package:provider/provider.dart';
 
-class NammaWalletApp extends StatefulWidget {
+class NammaWalletApp extends ConsumerStatefulWidget {
   const NammaWalletApp({super.key});
 
   @override
-  State<NammaWalletApp> createState() => _NammaWalletAppState();
+  ConsumerState<NammaWalletApp> createState() => _NammaWalletAppState();
 }
 
-class _NammaWalletAppState extends State<NammaWalletApp> {
+class _NammaWalletAppState extends ConsumerState<NammaWalletApp> {
   int currentPageIndex = 0;
   late final ISharingIntentService _sharingService =
       getIt<ISharingIntentService>();
@@ -86,13 +86,13 @@ class _NammaWalletAppState extends State<NammaWalletApp> {
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
+    final themeState = ref.watch(themeModeProvider);
 
     return MaterialApp.router(
       title: 'NammaWallet',
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
-      themeMode: themeProvider.themeMode,
+      themeMode: themeState.themeMode,
       debugShowCheckedModeBanner: false,
       routerConfig: router,
       scaffoldMessengerKey: _scaffoldMessengerKey,

@@ -1,28 +1,28 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/routing/app_routes.dart';
 import 'package:namma_wallet/src/common/services/haptic/haptic_service_extension.dart';
 import 'package:namma_wallet/src/common/services/haptic/haptic_service_interface.dart';
-import 'package:namma_wallet/src/common/theme/theme_provider.dart';
+import 'package:namma_wallet/src/common/theme/theme_notifier.dart';
 import 'package:namma_wallet/src/common/widgets/rounded_back_button.dart';
 import 'package:namma_wallet/src/common/widgets/snackbar_widget.dart';
 import 'package:namma_wallet/src/features/profile/presentation/ai_status_widget.dart';
-import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class ProfileView extends StatefulWidget {
+class ProfileView extends ConsumerStatefulWidget {
   const ProfileView({super.key});
 
   @override
-  State<ProfileView> createState() => _ProfileViewState();
+  ConsumerState<ProfileView> createState() => _ProfileViewState();
 }
 
-class _ProfileViewState extends State<ProfileView> {
-  final IHapticService hapticService = getIt<IHapticService>();
+class _ProfileViewState extends ConsumerState<ProfileView> {
   bool _isHapticEnabled = false;
+
   @override
   void initState() {
     super.initState();
@@ -30,26 +30,29 @@ class _ProfileViewState extends State<ProfileView> {
   }
 
   Future<void> _initHapticFlag() async {
+    final hapticService = getIt<IHapticService>();
     try {
       await hapticService.loadPreference();
     } on Exception catch (e) {
-      // Log error; fallback to default (false) is safe
       debugPrint('Failed to load haptic preference: $e');
     }
     if (!mounted) return;
 
-    // Read current enabled state from the service and update UI.
     setState(() {
       _isHapticEnabled = hapticService.isEnabled;
     });
   }
 
-  /// Persist the flag via the service
-  Future<void> _saveFlag(bool value) =>
-      hapticService.setEnabled(enabled: value);
+  Future<void> _saveFlag(bool value) async {
+    final hapticService = getIt<IHapticService>();
+    await hapticService.setEnabled(enabled: value);
+  }
+
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
+    final themeState = ref.watch(themeModeProvider);
+    final themeNotifier = ref.read(themeModeProvider.notifier);
+    final hapticService = getIt<IHapticService>();
 
     return Scaffold(
       appBar: AppBar(
@@ -65,7 +68,10 @@ class _ProfileViewState extends State<ProfileView> {
               const AIStatusWidget(),
               const SizedBox(height: 8),
               // Theme Settings Section
-              ThemeSectionWidget(themeProvider: themeProvider),
+              ThemeSectionWidget(
+                themeState: themeState,
+                themeNotifier: themeNotifier,
+              ),
 
               const SizedBox(height: 8),
 
@@ -140,8 +146,6 @@ class _ProfileViewState extends State<ProfileView> {
                   onChanged: (value) async {
                     final messenger = ScaffoldMessenger.of(context);
                     try {
-                      // Persist via service
-                      // (updates in-memory and SharedPreferences)
                       await _saveFlag(value);
                     } on Exception catch (e) {
                       if (!mounted) return;
@@ -154,12 +158,10 @@ class _ProfileViewState extends State<ProfileView> {
                     }
                     if (!mounted) return;
 
-                    // Update UI
                     setState(() {
                       _isHapticEnabled = value;
                     });
 
-                    // Optional: give immediate feedback only when enabling.
                     if (value) {
                       hapticService.triggerHaptic(HapticType.selection);
                     }
@@ -184,11 +186,13 @@ class _ProfileViewState extends State<ProfileView> {
 
 class ThemeSectionWidget extends StatelessWidget {
   const ThemeSectionWidget({
-    required this.themeProvider,
+    required this.themeState,
+    required this.themeNotifier,
     super.key,
   });
 
-  final ThemeProvider themeProvider;
+  final ThemeState themeState;
+  final ThemeModeNotifier themeNotifier;
 
   @override
   Widget build(BuildContext context) {
@@ -219,32 +223,32 @@ class ThemeSectionWidget extends StatelessWidget {
             SwitchListTile(
               title: const Text('Dark Mode'),
               subtitle: Text(
-                themeProvider.isSystemMode
+                themeState.isSystemMode
                     ? 'Following system settings'
-                    : themeProvider.isDarkMode
+                    : themeState.isDarkMode
                     ? 'Dark theme enabled'
                     : 'Light theme enabled',
               ),
-              value: themeProvider.isDarkMode,
+              value: themeState.isDarkMode,
               onChanged: (value) async {
                 if (value) {
-                  await themeProvider.setDarkMode();
+                  await themeNotifier.setDarkMode();
                 } else {
-                  await themeProvider.setLightMode();
+                  await themeNotifier.setLightMode();
                 }
               },
               secondary: Icon(
-                themeProvider.isDarkMode ? Icons.dark_mode : Icons.light_mode,
+                themeState.isDarkMode ? Icons.dark_mode : Icons.light_mode,
               ),
             ),
             SwitchListTile(
               title: const Text('Use System Theme'),
-              value: themeProvider.isSystemMode,
+              value: themeState.isSystemMode,
               onChanged: (value) async {
                 if (value) {
-                  await themeProvider.setSystemMode();
+                  await themeNotifier.setSystemMode();
                 } else {
-                  await themeProvider.setLightMode();
+                  await themeNotifier.setLightMode();
                 }
               },
             ),
@@ -275,9 +279,6 @@ class ProfileTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // If trailing is interactive, ensure the
-    // tile itself isn't treated as a tap target
-    // even if someone accidentally passes a non-null onTap.
     final tileOnTap = trailingIsInteractive ? null : onTap;
     final tileEnabled = onTap != null || trailingIsInteractive;
     return Card(

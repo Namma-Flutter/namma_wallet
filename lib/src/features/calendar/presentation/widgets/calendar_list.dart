@@ -1,30 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:namma_wallet/src/common/routing/app_routes.dart';
-import 'package:namma_wallet/src/features/calendar/application/calendar_provider.dart';
+import 'package:namma_wallet/src/features/calendar/application/calendar_notifier.dart';
 import 'package:namma_wallet/src/features/events/presentation/event_card.dart';
 import 'package:namma_wallet/src/features/travel/presentation/widgets/travel_ticket_card_widget.dart';
 
 class CalendarList extends StatelessWidget {
   const CalendarList({
-    required this.provider,
+    required this.calendarState,
+    required this.calendarNotifier,
     super.key,
   });
 
-  final CalendarProvider provider;
+  final CalendarState calendarState;
+  final Calendar calendarNotifier;
 
   @override
   Widget build(BuildContext context) {
-    final selectedRange = provider.selectedRange;
-    final selectedDay = provider.selectedDay;
+    final selectedRange = calendarState.selectedRange;
+    final selectedDay = calendarState.selectedDay;
 
     final events = selectedRange != null
-        ? provider.getEventsForRange(selectedRange)
-        : provider.getEventsForDay(selectedDay);
+        ? calendarNotifier.getEventsForRange(selectedRange)
+        : calendarNotifier.getEventsForDay(selectedDay);
 
     final tickets = selectedRange != null
-        ? provider.getTicketsForRange(selectedRange)
-        : provider.getTicketsForDay(selectedDay);
+        ? calendarNotifier.getTicketsForRange(selectedRange)
+        : calendarNotifier.getTicketsForDay(selectedDay);
 
     if (events.isEmpty && tickets.isEmpty) {
       return Center(
@@ -64,7 +66,7 @@ class CalendarList extends StatelessWidget {
                     extra: ticket,
                   );
                   if (result ?? false) {
-                    await provider.loadTickets();
+                    await calendarNotifier.loadTickets();
                   }
                 },
                 borderRadius: BorderRadius.circular(30),

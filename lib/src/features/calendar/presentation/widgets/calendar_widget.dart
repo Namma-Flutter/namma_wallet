@@ -1,24 +1,26 @@
 import 'package:flutter/material.dart';
-import 'package:namma_wallet/src/features/calendar/application/calendar_provider.dart';
+import 'package:namma_wallet/src/features/calendar/application/calendar_notifier.dart';
 import 'package:namma_wallet/src/features/calendar/presentation/widgets/themed_day_cell.dart';
 import 'package:namma_wallet/src/features/events/domain/event_model.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class CalendarWidget extends StatelessWidget {
   const CalendarWidget({
-    required this.provider,
+    required this.calendarState,
+    required this.calendarNotifier,
     required this.calendarFormat,
     required this.onDaySelected,
     super.key,
   });
 
-  final CalendarProvider provider;
+  final CalendarState calendarState;
+  final Calendar calendarNotifier;
   final CalendarFormat calendarFormat;
   final void Function(DateTime, DateTime) onDaySelected;
 
   @override
   Widget build(BuildContext context) {
-    final selectedDay = provider.selectedDay;
+    final selectedDay = calendarState.selectedDay;
 
     return TableCalendar<Event>(
       firstDay: DateTime.utc(2020),
@@ -28,9 +30,8 @@ class CalendarWidget extends StatelessWidget {
       selectedDayPredicate: (day) => isSameDay(selectedDay, day),
       onDaySelected: onDaySelected,
       eventLoader: (day) {
-        final events = provider.getEventsForDay(day);
-        final tickets = provider.getTicketsForDay(day);
-        // TODO(keerthivasan-ai): need to get clarification from harishwarrior
+        final events = calendarNotifier.getEventsForDay(day);
+        final tickets = calendarNotifier.getTicketsForDay(day);
         return [
           ...events,
           ...tickets.map(
@@ -46,18 +47,21 @@ class CalendarWidget extends StatelessWidget {
       },
       calendarBuilders: CalendarBuilders(
         markerBuilder: (context, day, events) {
-          if (provider.hasTicketsOnDay(day) ||
-              provider.getEventsForDay(day).isNotEmpty) {
-            return ThemedDayCell(day: day, provider: provider);
+          if (calendarNotifier.hasTicketsOnDay(day) ||
+              calendarNotifier.getEventsForDay(day).isNotEmpty) {
+            return ThemedDayCell(
+              day: day,
+              calendarNotifier: calendarNotifier,
+            );
           }
           return null;
         },
         selectedBuilder: (context, day, focusedDay) {
-          if (provider.hasTicketsOnDay(day) ||
-              provider.getEventsForDay(day).isNotEmpty) {
+          if (calendarNotifier.hasTicketsOnDay(day) ||
+              calendarNotifier.getEventsForDay(day).isNotEmpty) {
             return ThemedDayCell(
               day: day,
-              provider: provider,
+              calendarNotifier: calendarNotifier,
               isSelected: true,
             );
           }
@@ -79,11 +83,11 @@ class CalendarWidget extends StatelessWidget {
           );
         },
         todayBuilder: (context, day, focusedDay) {
-          if (provider.hasTicketsOnDay(day) ||
-              provider.getEventsForDay(day).isNotEmpty) {
+          if (calendarNotifier.hasTicketsOnDay(day) ||
+              calendarNotifier.getEventsForDay(day).isNotEmpty) {
             return ThemedDayCell(
               day: day,
-              provider: provider,
+              calendarNotifier: calendarNotifier,
               isToday: true,
             );
           }
