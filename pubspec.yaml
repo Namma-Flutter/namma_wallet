@@ -32,6 +32,7 @@ dependencies:
   listen_sharing_intent:
     git:
       url: https://github.com/Zverik/receive_sharing_intent
+  package_info_plus: ^9.0.0
   path: ^1.9.1
   path_provider: ^2.1.5
   pdfrx: ^2.2.16

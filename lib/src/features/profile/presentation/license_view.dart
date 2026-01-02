@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 /// A view that displays the licenses for all packages used in the application.
 ///
@@ -10,10 +11,28 @@ class LicenseView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const LicensePage(
-      applicationName: 'Namma Wallet',
-      applicationVersion: '1.0.0',
-      applicationLegalese: '© 2024 Namma Flutter',
+    return FutureBuilder<PackageInfo>(
+      future: PackageInfo.fromPlatform(),
+      builder: (context, snapshot) {
+        final String applicationVersion;
+        if (snapshot.hasError) {
+          applicationVersion = 'Error: ${snapshot.error}';
+        } else if (snapshot.connectionState == ConnectionState.waiting) {
+          applicationVersion = 'loading...';
+        } else if (snapshot.hasData) {
+          final packageInfo = snapshot.data!;
+          applicationVersion =
+              '${packageInfo.version}+${packageInfo.buildNumber}';
+        } else {
+          applicationVersion = '';
+        }
+
+        return LicensePage(
+          applicationName: 'Namma Wallet',
+          applicationVersion: applicationVersion,
+          applicationLegalese: '© 2026 Namma Flutter',
+        );
+      },
     );
   }
 }

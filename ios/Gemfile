@@ -1,0 +1,8 @@
+source "https://rubygems.org"
+
+# ruby - using 3.4.7 for better fastlane compatibility
+ruby "~> 3.4.7"
+# Core automation tool
+gem "fastlane", "~> 2.230.0"
+
+gem "abbrev"
