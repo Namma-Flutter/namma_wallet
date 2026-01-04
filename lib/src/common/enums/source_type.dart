@@ -14,4 +14,6 @@ enum SourceType {
   clipboard,
   @MappableValue('QR')
   qr,
+  @MappableValue('PKPASS')
+  pkpass,
 }

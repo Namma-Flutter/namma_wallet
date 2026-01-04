@@ -10,6 +10,7 @@ environment:
 
 dependencies:
   ai_barcode_scanner: ^7.0.0
+  archive: ^4.0.7
   card_stack_widget: ^0.1.6
   cross_file: ^0.3.5+1
   cupertino_icons: ^1.0.8
@@ -35,9 +36,13 @@ dependencies:
   package_info_plus: ^9.0.0
   path: ^1.9.1
   path_provider: ^2.1.5
+  path_provider_platform_interface: ^2.1.2
   pdfrx: ^2.2.16
+  pkpass: ^2.2.0
+  plugin_platform_interface: ^2.1.8
   provider: ^6.1.2
   qr_flutter: ^4.1.0
+  share_handler: ^0.0.1+12
   shared_preferences: ^2.5.3
   sqflite: ^2.4.2
   sqflite_common_ffi_web: ^1.0.2

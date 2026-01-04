@@ -466,8 +466,8 @@ Trip Code : TEST123
         const pdfText = '''
 Corporation : SETC
 PNR Number : T12345678
-Passenger Pickup Time : 25/12/2024 99:99
-Service Start Time : 14:30
+Passenger Pickup Time : 25/12/2024 xx:xx
+Service Start Time : invalid-time
 Trip Code : TEST123
 ''';
 
@@ -1032,7 +1032,7 @@ Trip Code : TEST123
         // in the Ticket.fromTNSTC factory
         expect(
           ticket.secondaryText,
-          anyOf(contains('TNSTC'), equals(' - TEST123')),
+          equals('TEST123'),
         );
       });
     });
