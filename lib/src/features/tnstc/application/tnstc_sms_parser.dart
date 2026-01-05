@@ -1,61 +1,61 @@
+import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 import 'package:namma_wallet/src/features/tnstc/domain/tnstc_model.dart';
+import 'package:namma_wallet/src/features/travel/application/travel_sms_parser.dart';
 
-class TNSTCSMSParser {
-  TNSTCTicketModel parseTicket(String smsText) {
-    String extractMatch(String pattern, String input, {int groupIndex = 1}) {
-      final regex = RegExp(pattern, multiLine: true);
-      final match = regex.firstMatch(input);
-      if (match != null && groupIndex <= match.groupCount) {
-        return match.group(groupIndex)?.trim() ?? '';
-      }
-      return '';
-    }
+/// Parses TNSTC SMS messages into structured [Ticket] data.
+///
+/// Handles both conductor SMS and booking confirmation SMS formats.
+/// Falls back to default values if parsing fails for individual fields.
+///
+/// **Error Handling:**
+/// - Never throws exceptions
+/// - Returns a [Ticket] with partial data on parsing errors
+/// - Missing/invalid fields use fallbacks: 'Unknown', null for dates, etc.
+class TNSTCSMSParser extends TravelSMSParser {
+  /// Creates a TNSTC SMS parser.
+  TNSTCSMSParser();
 
-    DateTime parseDate(String date) {
-      if (date.isEmpty) return DateTime.now();
-      final parts = date.split('/');
-      if (parts.length != 3) return DateTime.now();
-      try {
-        final day = int.parse(parts[0]);
-        final month = int.parse(parts[1]);
-        final year = int.parse(parts[2]);
-        return DateTime(year, month, day);
-      } on FormatException {
-        return DateTime.now();
-      }
-    }
-
-    // Common fields
+  @override
+  Ticket parseTicket(String smsText) {
+    // Extract common fields present in both SMS formats.
+    // Falls back to empty string if pattern doesn't match.
     final pnrNumber = extractMatch(
-      r'PNR NO\.\s*:\s*([^,\s]+)|PNR:([^,\s]+)',
+      r'(?:PNR NO\.\s*|PNR)\s*:\s*([^,\s]+)',
       smsText,
     );
+    // Parse journey date - falls back to null if date is missing or malformed.
     final journeyDate = parseDate(
       extractMatch(
-        r'Journey Date\s*:\s*(\d{2}/\d{2}/\d{4})|DOJ:(\d{2}/\d{2}/\d{4})',
+        r'(?:Journey Date|DOJ)\s*:\s*(\d{2}/\d{2}/\d{4})',
         smsText,
       ),
     );
 
-    // Check if it's a conductor SMS
+    // Check if it's a conductor SMS (vs booking confirmation SMS)
     final isConductorSMS = smsText.contains('Conductor Mobile No');
 
     if (isConductorSMS) {
+      // Parse conductor SMS format (typically sent during journey).
+      // Missing fields result in empty strings or null values.
       final conductorMobileNo = extractMatch(
         r'Conductor Mobile No:\s*(\d+)',
         smsText,
       );
       final vehicleNumber = extractMatch('Vehicle No:([A-Z0-9]+)', smsText);
 
-      return TNSTCTicketModel(
+      final tnstcModel = TNSTCTicketModel(
         pnrNumber: pnrNumber,
         journeyDate: journeyDate,
         conductorMobileNo: conductorMobileNo,
         vehicleNumber: vehicleNumber,
         corporation: 'TNSTC', // Assuming TNSTC for conductor SMS
       );
+      // Convert to Ticket (guaranteed not to throw,
+      // uses fallbacks for missing data)
+      return Ticket.fromTNSTC(tnstcModel, sourceType: 'SMS');
     } else {
-      // Booking confirmation SMS
+      // Parse booking confirmation SMS format (sent at time of booking).
+      // All fields use fallbacks if extraction fails.
       final corporation = extractMatch(
         r'Corporation\s*:\s*(.*?)(?=\s*,)',
         smsText,
@@ -68,7 +68,7 @@ class TNSTCSMSParser {
         smsText,
       );
       final seatNumbers = extractMatch(
-        r'Seat No\.\s*:\s*([0-9A-Z,\s\-#]+)',
+        r'Seat No\.\s*:\s*([0-9A-Z#\-]+(?:\s+(?!(?:Journey|PNR|From|To|Class|Boarding|For|Time|DOJ)[\s:])[0-9A-Z#\-]+)*(?:,\s*(?!(?:Journey|PNR|From|To|Class|Boarding|For|Time|DOJ)[\s:])[0-9A-Z#\-]+(?:\s+(?!(?:Journey|PNR|From|To|Class|Boarding|For|Time|DOJ)[\s:])[0-9A-Z#\-]+)*)*)',
         smsText,
       ).replaceAll(RegExp(r'[,\s]+$'), '');
       final classOfService = extractMatch(
@@ -84,20 +84,7 @@ class TNSTCSMSParser {
           ? seatNumbers.split(',').where((s) => s.trim().isNotEmpty).length
           : 1;
 
-      final passengers = <PassengerInfo>[];
-      if (seatNumbers.isNotEmpty) {
-        passengers.add(
-          PassengerInfo(
-            name: '',
-            age: 0,
-            type: 'Adult',
-            gender: '',
-            seatNumber: seatNumbers,
-          ),
-        );
-      }
-
-      return TNSTCTicketModel(
+      final tnstcModel = TNSTCTicketModel(
         corporation: corporation,
         pnrNumber: pnrNumber,
         serviceStartPlace: from,
@@ -108,8 +95,11 @@ class TNSTCSMSParser {
         classOfService: classOfService,
         passengerPickupPoint: passengerPickupPoint,
         numberOfSeats: numberOfSeats,
-        passengers: passengers,
+        smsSeatNumbers: seatNumbers.isNotEmpty ? seatNumbers : null,
       );
+      // Convert to Ticket (guaranteed not to throw,
+      // uses fallbacks: 'Unknown', null for dates, etc.)
+      return Ticket.fromTNSTC(tnstcModel, sourceType: 'SMS');
     }
   }
 }

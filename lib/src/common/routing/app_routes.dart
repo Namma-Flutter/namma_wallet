@@ -1,18 +1,22 @@
 enum AppRoute {
   // Main navigation routes
   home(path: '/', name: 'home'),
-  scanner(path: '/scanner', name: 'scanner'),
+  import(path: '/import', name: 'import'),
   calendar(path: '/calendar', name: 'calendar'),
   profile(path: '/profile', name: 'profile'),
 
   // Ticket related routes
   ticketView(path: '/ticket', name: 'ticketView'),
+  allTickets(path: '/all-tickets', name: 'allTickets'),
 
   // Scanner related routes
   barcodeScanner(path: '/barcode-scanner', name: 'barcodeScanner'),
 
   // Export functionality
   export(path: '/export', name: 'export'),
+
+  // Share success
+  shareSuccess(path: '/share-success', name: 'shareSuccess'),
 
   // Settings and configuration
   settings(path: '/settings', name: 'settings'),

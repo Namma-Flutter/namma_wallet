@@ -1,11 +1,18 @@
+import 'dart:async';
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:home_widget/home_widget.dart';
-import 'package:namma_wallet/src/common/database/wallet_database.dart';
+import 'package:namma_wallet/src/common/database/ticket_dao_interface.dart';
+import 'package:namma_wallet/src/common/database/user_dao_interface.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
-import 'package:namma_wallet/src/common/widgets/custom_back_button.dart';
+import 'package:namma_wallet/src/common/domain/models/ticket.dart';
+import 'package:namma_wallet/src/common/domain/models/user.dart';
+import 'package:namma_wallet/src/common/services/haptic/haptic_service_extension.dart';
+import 'package:namma_wallet/src/common/services/haptic/haptic_service_interface.dart';
+import 'package:namma_wallet/src/common/widgets/rounded_back_button.dart';
 
 class DbViewerView extends StatefulWidget {
   const DbViewerView({super.key});
@@ -17,25 +24,28 @@ class DbViewerView extends StatefulWidget {
 class _DbViewerViewState extends State<DbViewerView>
     with SingleTickerProviderStateMixin {
   late final TabController _tabController;
-  List<Map<String, Object?>> users = <Map<String, Object?>>[];
-  List<Map<String, Object?>> tickets = <Map<String, Object?>>[];
+  List<User> users = <User>[];
+  List<Ticket> tickets = <Ticket>[];
+  final IHapticService hapticService = getIt<IHapticService>();
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
-    _load();
+    unawaited(_load());
   }
 
   Future<void> _load() async {
-    final db = getIt<WalletDatabase>();
-    final u = await db.fetchAllUsers();
-    final t = await db.fetchTravelTicketsWithUser();
+    final userDao = getIt<IUserDAO>();
+    final ticketDao = getIt<ITicketDAO>();
+    final u = await userDao.fetchAllUsers();
+    final t = await ticketDao.getAllTickets();
     if (!mounted) return;
     setState(() {
       users = u;
       tickets = t;
     });
+    hapticService.triggerHaptic(HapticType.success);
   }
 
   @override
@@ -48,7 +58,7 @@ class _DbViewerViewState extends State<DbViewerView>
   Widget build(BuildContext context) => Scaffold(
     appBar: AppBar(
       title: const Text('Database Viewer'),
-      leading: const CustomBackButton(),
+      leading: const RoundedBackButton(),
       bottom: TabBar(
         controller: _tabController,
         tabs: const <Widget>[
@@ -74,9 +84,9 @@ class _DbViewerViewState extends State<DbViewerView>
             return Card(
               margin: const EdgeInsets.all(8),
               child: ListTile(
-                title: Text('${user['full_name']}'),
-                subtitle: Text('${user['email']}'),
-                trailing: Text('ID: ${user['user_id']}'),
+                title: Text(user.fullName),
+                subtitle: Text(user.email),
+                trailing: Text('ID: ${user.userId}'),
               ),
             );
           },
@@ -85,16 +95,15 @@ class _DbViewerViewState extends State<DbViewerView>
           itemCount: tickets.length,
           itemBuilder: (context, index) {
             final t = tickets[index];
-            final subtitle =
-                '''${t['provider_name']} - ${t['source_location']} → ${t['destination_location']}''';
+            final subtitle = t.secondaryText;
             return Card(
               margin: const EdgeInsets.all(8),
               child: ListTile(
                 title: Text(
-                  '${t['pnr_number'] ?? t['booking_reference'] ?? 'N/A'}',
+                  t.ticketId.toString(),
                 ),
                 subtitle: Text(subtitle),
-                trailing: Text('${t['amount'] ?? 'N/A'}'),
+                // trailing: Text('${t['amount'] ?? 'N/A'}'),
                 onTap: () => showTicketDetails(context, t, subtitle),
               ),
             );
@@ -104,12 +113,12 @@ class _DbViewerViewState extends State<DbViewerView>
     ),
   );
 
-  void showTicketDetails(
+  Future<void> showTicketDetails(
     BuildContext context,
-    Map<String, Object?> t,
+    Ticket t,
     String subtitle,
-  ) {
-    showDialog<void>(
+  ) async {
+    await showDialog<void>(
       context: context,
       builder: (context) {
         return Dialog(
@@ -132,7 +141,7 @@ class _DbViewerViewState extends State<DbViewerView>
                   padding: const EdgeInsets.all(16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: t.entries
+                    children: (t.extras ?? [])
                         .map(
                           (entry) => Padding(
                             padding: const EdgeInsets.symmetric(vertical: 4),
@@ -141,13 +150,13 @@ class _DbViewerViewState extends State<DbViewerView>
                                 style: DefaultTextStyle.of(context).style,
                                 children: [
                                   TextSpan(
-                                    text: '${entry.key}: ',
+                                    text: '${entry.title}: ',
                                     style: const TextStyle(
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
                                   TextSpan(
-                                    text: '${entry.value}',
+                                    text: entry.value,
                                   ),
                                 ],
                               ),
@@ -158,23 +167,24 @@ class _DbViewerViewState extends State<DbViewerView>
                   ),
                 ),
               ),
-              ElevatedButton(
-                onPressed: () async {
-                  const iOSWidgetName = 'TicketHomeWidget';
-                  const androidWidgetName = 'TicketHomeWidget';
-                  const dataKey = 'ticket_data';
-                  await HomeWidget.saveWidgetData(dataKey, jsonEncode(t));
+              if (!kIsWeb)
+                ElevatedButton(
+                  onPressed: () async {
+                    const iOSWidgetName = 'TicketHomeWidget';
+                    const androidWidgetName = 'TicketHomeWidget';
+                    const dataKey = 'ticket_data';
+                    await HomeWidget.saveWidgetData(dataKey, jsonEncode(t));
 
-                  await HomeWidget.updateWidget(
-                    androidName: androidWidgetName,
-                    iOSName: iOSWidgetName,
-                  );
-                  if (context.mounted) {
-                    context.pop();
-                  }
-                },
-                child: const Text('Pin to Home Screen'),
-              ),
+                    await HomeWidget.updateWidget(
+                      androidName: androidWidgetName,
+                      iOSName: iOSWidgetName,
+                    );
+                    if (context.mounted) {
+                      context.pop();
+                    }
+                  },
+                  child: const Text('Pin to Home Screen'),
+                ),
               const SizedBox(
                 height: 16,
               ),

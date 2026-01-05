@@ -1,12 +1,12 @@
-    {
-        "mcpServers": {
-            "context7": {
-                "type": "stdio",
-                "command": "npx",
-                "args": [
-                    "-y",
-                    "@upstash/context7-mcp@latest"
-                ]
-            }
+{
+    "mcpServers": {
+        "dart": {
+            "command": "dart",
+            "args": [
+                "mcp-server",
+                "--flutter-sdk",
+                ".fvm/flutter_sdk"
+            ]
         }
     }
+}

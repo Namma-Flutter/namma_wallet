@@ -1,18 +1,20 @@
 import 'package:ai_barcode_scanner/ai_barcode_scanner.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 import 'package:namma_wallet/src/common/routing/app_routes.dart';
 import 'package:namma_wallet/src/features/bottom_navigation/presentation/namma_navigation_bar.dart';
 import 'package:namma_wallet/src/features/calendar/presentation/calendar_view.dart';
 import 'package:namma_wallet/src/features/export/presentation/export_view.dart';
-import 'package:namma_wallet/src/features/home/domain/generic_details_model.dart';
+import 'package:namma_wallet/src/features/home/presentation/all_tickets_view.dart';
 import 'package:namma_wallet/src/features/home/presentation/home_view.dart';
+import 'package:namma_wallet/src/features/import/presentation/import_view.dart';
 import 'package:namma_wallet/src/features/profile/presentation/contributors_view.dart';
 import 'package:namma_wallet/src/features/profile/presentation/db_viewer_view.dart';
 import 'package:namma_wallet/src/features/profile/presentation/license_view.dart';
 import 'package:namma_wallet/src/features/profile/presentation/profile_view.dart';
-import 'package:namma_wallet/src/features/scanner/presentation/scanner_view.dart';
-import 'package:namma_wallet/src/features/travel/presentation/ticket_view.dart';
+import 'package:namma_wallet/src/features/receive/presentation/share_success_view.dart';
+import 'package:namma_wallet/src/features/travel/presentation/travel_ticket_view.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>(
   debugLabel: 'root',
@@ -34,9 +36,9 @@ final router = GoRouter(
           builder: (context, state) => const HomeView(),
         ),
         GoRoute(
-          path: AppRoute.scanner.path,
-          name: AppRoute.scanner.name,
-          builder: (context, state) => const ScannerView(),
+          path: AppRoute.import.path,
+          name: AppRoute.import.name,
+          builder: (context, state) => const ImportView(),
         ),
         GoRoute(
           path: AppRoute.calendar.path,
@@ -54,14 +56,19 @@ final router = GoRouter(
       path: AppRoute.ticketView.path,
       name: AppRoute.ticketView.name,
       builder: (context, state) {
-        final ticket = state.extra as GenericDetailsModel?;
+        final ticket = state.extra as Ticket?;
         if (ticket == null) {
           return const Scaffold(
             body: Center(child: Text('Ticket not found')),
           );
         }
-        return TicketView(ticket: ticket);
+        return TravelTicketView(ticket: ticket);
       },
+    ),
+    GoRoute(
+      path: AppRoute.allTickets.path,
+      name: AppRoute.allTickets.name,
+      builder: (context, state) => const AllTicketsView(),
     ),
     GoRoute(
       path: AppRoute.profile.path,
@@ -102,6 +109,25 @@ final router = GoRouter(
       path: AppRoute.contributors.path,
       name: AppRoute.contributors.name,
       builder: (context, state) => const ContributorsView(),
+    ),
+    GoRoute(
+      path: AppRoute.shareSuccess.path,
+      name: AppRoute.shareSuccess.name,
+      builder: (context, state) {
+        final extra = state.extra as Map<String, String>?;
+        if (extra == null) {
+          return const Scaffold(
+            body: Center(child: Text('Invalid share data')),
+          );
+        }
+        return ShareSuccessView(
+          pnrNumber: extra['pnrNumber'] ?? 'Unknown',
+          from: extra['from'] ?? 'Unknown',
+          to: extra['to'] ?? 'Unknown',
+          fare: extra['fare'] ?? '₹0.00',
+          date: extra['date'] ?? 'Unknown',
+        );
+      },
     ),
   ],
 );

@@ -1,10 +1,9 @@
-import 'package:flutter/material.dart';
-import 'package:namma_wallet/src/common/database/wallet_database.dart';
-import 'package:namma_wallet/src/common/di/locator.dart';
-import 'package:namma_wallet/src/common/services/logger_interface.dart';
-import 'package:namma_wallet/src/features/common/domain/travel_ticket_model.dart';
-import 'package:namma_wallet/src/features/irctc/application/irctc_qr_parser.dart';
-import 'package:namma_wallet/src/features/irctc/application/irctc_ticket_model.dart';
+import 'package:namma_wallet/src/common/database/ticket_dao_interface.dart';
+import 'package:namma_wallet/src/common/domain/models/ticket.dart';
+import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
+import 'package:namma_wallet/src/features/irctc/application/irctc_qr_parser_interface.dart';
+import 'package:namma_wallet/src/features/irctc/application/irctc_scanner_service_interface.dart';
+import 'package:namma_wallet/src/features/irctc/domain/irctc_ticket_model.dart';
 
 enum IRCTCScannerContentType {
   irctcTicket,
@@ -25,7 +24,7 @@ class IRCTCScannerResult {
     IRCTCScannerContentType type,
     String content, {
     IRCTCTicket? irctcTicket,
-    TravelTicketModel? travelTicket,
+    Ticket? travelTicket,
   }) {
     return IRCTCScannerResult(
       type: type,
@@ -47,18 +46,25 @@ class IRCTCScannerResult {
   final IRCTCScannerContentType type;
   final String? content;
   final IRCTCTicket? irctcTicket;
-  final TravelTicketModel? travelTicket;
+  final Ticket? travelTicket;
   final String? errorMessage;
   final bool isSuccess;
 }
 
-class IRCTCScannerService {
-  IRCTCScannerService({ILogger? logger, IRCTCQRParser? qrParser})
-    : _logger = logger ?? getIt<ILogger>(),
-      _qrParser = qrParser ?? getIt<IRCTCQRParser>();
-  final ILogger _logger;
-  final IRCTCQRParser _qrParser;
+class IRCTCScannerService implements IIRCTCScannerService {
+  IRCTCScannerService({
+    required ILogger logger,
+    required IIRCTCQRParser qrParser,
+    required ITicketDAO ticketDao,
+  }) : _logger = logger,
+       _qrParser = qrParser,
+       _ticketDao = ticketDao;
 
+  final ILogger _logger;
+  final IIRCTCQRParser _qrParser;
+  final ITicketDAO _ticketDao;
+
+  @override
   Future<IRCTCScannerResult> parseAndSaveIRCTCTicket(String qrData) async {
     try {
       // Check if this is IRCTC QR data
@@ -73,102 +79,31 @@ class IRCTCScannerService {
       }
 
       // Convert to travel ticket model for database storage
-      final travelTicket = _convertIRCTCToTravelTicket(irctcTicket);
+      final travelTicket = Ticket.fromIRCTC(irctcTicket);
 
       // Save to database
       try {
-        final ticketId = await getIt<WalletDatabase>().insertTravelTicket(
-          travelTicket.toDatabase(),
-        );
-        final updatedTicket = travelTicket.copyWith(id: ticketId);
+        await _ticketDao.insertTicket(travelTicket);
 
         return IRCTCScannerResult.success(
           IRCTCScannerContentType.irctcTicket,
           qrData,
           irctcTicket: irctcTicket,
-          travelTicket: updatedTicket,
+          travelTicket: travelTicket,
         );
-      } on DuplicateTicketException catch (e) {
-        _logger.warning('Duplicate IRCTC ticket detected: ${e.message}');
-        return IRCTCScannerResult.error(e.message);
-      } on Object catch (e) {
-        _logger.error('Failed to save IRCTC ticket to database: $e');
-        return IRCTCScannerResult.error('Failed to save ticket: $e');
+      } on Object catch (e, stackTrace) {
+        _logger.error('Failed to save IRCTC ticket to database', e, stackTrace);
+        return IRCTCScannerResult.error(
+          'Failed to save ticket. Please try again.',
+        );
       }
-    } on Exception catch (e) {
-      _logger.error('Unexpected exception in IRCTC scanner service: $e');
-      return IRCTCScannerResult.error('Unexpected error occurred: $e');
+    } on Object catch (e, stackTrace) {
+      _logger.error(
+        'Unexpected exception in IRCTC scanner service',
+        e,
+        stackTrace,
+      );
+      return IRCTCScannerResult.error('Unexpected error. Please try again.');
     }
-  }
-
-  TravelTicketModel _convertIRCTCToTravelTicket(IRCTCTicket irctcTicket) {
-    // Format dates as strings
-    final journeyDateStr =
-        '${irctcTicket.dateOfJourney.year}-'
-        '${irctcTicket.dateOfJourney.month.toString().padLeft(2, '0')}-'
-        '${irctcTicket.dateOfJourney.day.toString().padLeft(2, '0')}';
-
-    final departureTimeStr =
-        '${irctcTicket.scheduledDeparture.hour.toString().padLeft(2, '0')}:'
-        '${irctcTicket.scheduledDeparture.minute.toString().padLeft(2, '0')}';
-
-    // Convert status string to TicketStatus enum
-    final ticketStatus = irctcTicket.status.toLowerCase().contains('cancelled')
-        ? TicketStatus.cancelled
-        : irctcTicket.status.toLowerCase().contains('pending')
-        ? TicketStatus.pending
-        : TicketStatus.confirmed;
-
-    return TravelTicketModel(
-      ticketType: TicketType.train,
-      providerName: 'IRCTC',
-      pnrNumber: irctcTicket.pnrNumber,
-      passengerName: irctcTicket.passengerName,
-      sourceLocation: irctcTicket.fromStation,
-      destinationLocation: irctcTicket.toStation,
-      boardingPoint: irctcTicket.boardingStation,
-      departureTime: departureTimeStr,
-      journeyDate: journeyDateStr,
-      tripCode: irctcTicket.trainNumber,
-      amount: irctcTicket.ticketFare + irctcTicket.irctcFee,
-      sourceType: SourceType.scanner,
-      rawData: irctcTicket.toReadableString(),
-      classOfService: irctcTicket.travelClass,
-      passengerAge: irctcTicket.age,
-      passengerGender: irctcTicket.gender,
-      status: ticketStatus,
-      bookingReference: irctcTicket.transactionId,
-    );
-  }
-
-  void showResultMessage(BuildContext context, IRCTCScannerResult result) {
-    if (!context.mounted) return;
-
-    String message;
-    Color backgroundColor;
-
-    if (result.isSuccess) {
-      message = switch (result.type) {
-        IRCTCScannerContentType.irctcTicket =>
-          'IRCTC ticket saved successfully!',
-        IRCTCScannerContentType.invalid => 'Invalid content',
-      };
-      backgroundColor = Theme.of(context).colorScheme.primary;
-
-      _logger.success('IRCTC scanner operation succeeded: $message');
-    } else {
-      message = result.errorMessage ?? 'Unknown error occurred';
-      backgroundColor = Colors.red;
-
-      _logger.error('IRCTC scanner operation failed: $message');
-    }
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: backgroundColor,
-        duration: Duration(seconds: result.isSuccess ? 2 : 3),
-      ),
-    );
   }
 }

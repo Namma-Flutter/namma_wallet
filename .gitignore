@@ -44,6 +44,9 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
+# iOS related
+ios/build/ios/XCBuildData/
+
 # FVM Version Cache
 .fvm/
 
@@ -53,3 +56,19 @@ config.json
 # Claude config
 .claude/settings.json
 .claude/settings.local.json
+
+**/key.properties
+**/*.keystore
+**/*.jks
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+ios/fastlane/report.xml
+android/app/google-services.json
+ios/fastlane/*.p8
+android/fastlane/*.json
+ios/Runner.app.dSYM.zip
+ios/Runner.ipa
+android/fastlane/report.xml
