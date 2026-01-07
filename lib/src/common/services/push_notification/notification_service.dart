@@ -1,12 +1,13 @@
 import 'dart:convert';
 
+import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
-/// Service for managing push notifications, including scheduling 
+/// Service for managing push notifications, including scheduling
 /// and displaying notifications.
 
 class NotificationService {
@@ -70,6 +71,27 @@ class NotificationService {
     );
   }
 
+  String _formatTime12(DateTime dt) {
+    final hour = dt.hour % 12 == 0 ? 12 : dt.hour % 12;
+    final minute = dt.minute.toString().padLeft(2, '0');
+    final period = dt.hour >= 12 ? 'PM' : 'AM';
+    return '$hour:$minute $period';
+  }
+
+  String _formatDateTimeForNotification(DateTime? dt) {
+    if (dt == null) return '';
+    final now = DateTime.now();
+    final nowDate = DateTime(now.year, now.month, now.day);
+    final dtDate = DateTime(dt.year, dt.month, dt.day);
+    final diffDays = dtDate.difference(nowDate).inDays;
+    final time = _formatTime12(dt);
+
+    if (diffDays == 0) return time;
+    if (diffDays == 1) return 'Tomorrow $time';
+
+    return '${dt.day}/${dt.month}/${dt.year} $time';
+  }
+
   /// Schedules a ticket reminder notification.
 
   Future<void> scheduleTicketReminder({
@@ -81,53 +103,77 @@ class NotificationService {
   }) async {
     final details = await notificatioDetails();
 
-    await _plugin.zonedSchedule(
-      id,
-      title,
-      body,
-      tz.TZDateTime.from(dateTime, tz.local),
-      details,
-      payload: payload,
-      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-      matchDateTimeComponents: DateTimeComponents.dateAndTime,
-    );
+    try {
+      await _plugin.zonedSchedule(
+        id,
+        title,
+        body,
+        tz.TZDateTime.from(dateTime, tz.local),
+        details,
+        payload: payload,
+        androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+        matchDateTimeComponents: DateTimeComponents.dateAndTime,
+      );
+    } on Exception catch (e, stackTrace) {
+      debugPrint(
+        'Error scheduling ticket reminders: $e\n$stackTrace',
+      );
+    }
   }
 
   Future<void> cancelTicketReminder(int id) async {
     await _plugin.cancel(id);
   }
 
-
   /// Schedules multiple reminders for a ticket at predefined intervals.
 
   Future<void> scheduleTicketReminderFor(Ticket ticket) async {
-    final journeyTime = ticket.startTime ?? ticket.endTime ?? DateTime.now();
-    final now = DateTime.now();
+    try {
+      final journeyTime = ticket.startTime ?? ticket.endTime ?? DateTime.now();
+      final now = DateTime.now();
 
-    final reminders = [
-      const Duration(hours: 24),
-      const Duration(hours: 4),
-      const Duration(hours: 2),
-    ];
+      final reminders = [
+        const Duration(hours: 24),
+        const Duration(hours: 4),
+        const Duration(hours: 2),
+      ];
 
-    for (var i = 0; i < reminders.length; i++) {
-      final reminderTime = journeyTime.subtract(reminders[i]);
+      for (var i = 0; i < reminders.length; i++) {
+        final reminderTime = journeyTime.subtract(reminders[i]);
 
-      // Skip if already passed
-      if (reminderTime.isBefore(now)) continue;
+        // Skip if already passed
+        if (reminderTime.isBefore(now)) continue;
 
-      // Unique ID for each reminder (ticketId + reminder index)
-      final notificationId =
-          (ticket.ticketId?.hashCode ?? ticket.primaryText.hashCode) * 100 + i;
+        // Unique ID for each reminder (ticketId + reminder index)
+        // Ensure the ID fits in signed 32-bit integer range required by
+        // FlutterLocalNotifications ([-2^31, 2^31 - 1]).
+        final baseHash =
+            ticket.ticketId?.hashCode ?? ticket.primaryText.hashCode;
+        const maxInt32 = 0x7FFFFFFF; // 2147483647
+        // Reserve space for multiplying by 100 (reminder index multiplier)
+        const maxBase = maxInt32 ~/ 100; // 21474836
+        final safeBase = baseHash.abs() % maxBase;
+        final notificationId = safeBase * 100 + i;
 
-      final payload = jsonEncode(ticket.toJson());
+        final payload = jsonEncode(ticket.toJson());
 
-      await NotificationService().scheduleTicketReminder(
-        id: notificationId,
-        dateTime: reminderTime,
-        title: ticket.primaryText,
-        body: '${ticket.secondaryText} • ${ticket.location}',
-        payload: payload,
+        final formattedDateTime = _formatDateTimeForNotification(journeyTime);
+        final bodyText = formattedDateTime.isNotEmpty
+            ? '${ticket.location} • $formattedDateTime'
+            : ticket.location;
+
+        await NotificationService().scheduleTicketReminder(
+          id: notificationId,
+          dateTime: reminderTime,
+          title: ticket.primaryText,
+          body: bodyText,
+          payload: payload,
+        );
+      }
+    } on Exception catch (e, stackTrace) {
+      // Log error scheduling reminders
+      debugPrint(
+        'Error scheduling ticket reminders: $e\n$stackTrace',
       );
     }
   }
