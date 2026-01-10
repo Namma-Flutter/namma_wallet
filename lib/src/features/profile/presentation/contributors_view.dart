@@ -96,93 +96,95 @@ class _ContributorsViewState extends State<ContributorsView> {
         leading: const RoundedBackButton(),
         title: const Text('Contributors'),
       ),
-      body: FutureBuilder<List<Contributor>>(
-        future: _contributorsFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(
-                      Icons.error_outline,
-                      size: 48,
-                      color: Colors.red,
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      'Error loading contributors',
-                      style: Theme.of(context).textTheme.titleLarge,
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      '${snapshot.error}',
-                      textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.bodyMedium,
-                    ),
-                  ],
-                ),
-              ),
-            );
-          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(
-              child: Padding(
-                padding: EdgeInsets.all(16),
-                child: Text('No contributors found.'),
-              ),
-            );
-          }
-
-          final contributors = snapshot.data!;
-          return ListView.builder(
-            padding: const EdgeInsets.all(16),
-            itemCount: contributors.length,
-            itemBuilder: (context, index) {
-              final contributor = contributors[index];
-              return Card(
-                margin: const EdgeInsets.only(bottom: 8),
-                elevation: 1,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: ListTile(
-                  leading: CircleAvatar(
-                    backgroundImage: NetworkImage(contributor.avatarUrl),
-                    radius: 24,
+      body: SafeArea(
+        child: FutureBuilder<List<Contributor>>(
+          future: _contributorsFuture,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (snapshot.hasError) {
+              return Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(
+                        Icons.error_outline,
+                        size: 48,
+                        color: Colors.red,
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'Error loading contributors',
+                        style: Theme.of(context).textTheme.titleLarge,
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        '${snapshot.error}',
+                        textAlign: TextAlign.center,
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
+                    ],
                   ),
-                  title: Text(
-                    contributor.name,
-                    style: const TextStyle(fontWeight: FontWeight.w600),
-                  ),
-                  subtitle: Text(
-                    contributor.profileUrl,
-                    style: const TextStyle(fontSize: 12),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  trailing: const Icon(Icons.open_in_new, size: 20),
-                  onTap: () async {
-                    final url = Uri.parse(contributor.profileUrl);
-                    try {
-                      await launchUrl(url);
-                    } on Exception catch (_) {
-                      if (context.mounted) {
-                        showSnackbar(
-                          context,
-                          'Could not open ${contributor.profileUrl}',
-                          isError: true,
-                        );
-                      }
-                    }
-                  },
                 ),
               );
-            },
-          );
-        },
+            } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+              return const Center(
+                child: Padding(
+                  padding: EdgeInsets.all(16),
+                  child: Text('No contributors found.'),
+                ),
+              );
+            }
+        
+            final contributors = snapshot.data!;
+            return ListView.builder(
+              padding: const EdgeInsets.all(16),
+              itemCount: contributors.length,
+              itemBuilder: (context, index) {
+                final contributor = contributors[index];
+                return Card(
+                  margin: const EdgeInsets.only(bottom: 8),
+                  elevation: 1,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: ListTile(
+                    leading: CircleAvatar(
+                      backgroundImage: NetworkImage(contributor.avatarUrl),
+                      radius: 24,
+                    ),
+                    title: Text(
+                      contributor.name,
+                      style: const TextStyle(fontWeight: FontWeight.w600),
+                    ),
+                    subtitle: Text(
+                      contributor.profileUrl,
+                      style: const TextStyle(fontSize: 12),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    trailing: const Icon(Icons.open_in_new, size: 20),
+                    onTap: () async {
+                      final url = Uri.parse(contributor.profileUrl);
+                      try {
+                        await launchUrl(url);
+                      } on Exception catch (_) {
+                        if (context.mounted) {
+                          showSnackbar(
+                            context,
+                            'Could not open ${contributor.profileUrl}',
+                            isError: true,
+                          );
+                        }
+                      }
+                    },
+                  ),
+                );
+              },
+            );
+          },
+        ),
       ),
     );
   }

@@ -1,5 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:get_it/get_it.dart';
+import 'package:namma_wallet/src/common/database/ticket_backup_dao.dart';
+import 'package:namma_wallet/src/common/database/ticket_backup_interface.dart';
 import 'package:namma_wallet/src/common/database/ticket_dao.dart';
 import 'package:namma_wallet/src/common/database/ticket_dao_interface.dart';
 import 'package:namma_wallet/src/common/database/user_dao.dart';
@@ -120,5 +122,8 @@ void setupLocator() {
         parserService: getIt<ITravelParser>(),
         ticketDao: getIt<ITicketDAO>(),
       ),
+    )
+    ..registerLazySingleton<ITicketBackup>(
+      TicketBackupDao.new,
     );
 }
