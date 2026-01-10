@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -41,6 +42,15 @@ class NotificationService {
     const androidSettings = AndroidInitializationSettings(
       '@drawable/ic_notification_small',
     );
+    if (Platform.isAndroid) {
+      final androidImpl = _plugin
+          .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin
+          >();
+      final granted =
+          await androidImpl?.requestNotificationsPermission() ?? false;
+      debugPrint('Notification permission granted: $granted');
+    }
     const iosSettings = DarwinInitializationSettings();
     const initSettings = InitializationSettings(
       android: androidSettings,
@@ -159,7 +169,7 @@ class NotificationService {
 
         final formattedDateTime = _formatDateTimeForNotification(journeyTime);
         final bodyText = formattedDateTime.isNotEmpty
-            ? '${ticket.location} • $formattedDateTime'
+            ? '${ticket.location} • Starts - $formattedDateTime'
             : ticket.location;
 
         await NotificationService().scheduleTicketReminder(
