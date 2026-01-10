@@ -75,11 +75,14 @@ class TravelTicketCardWidget extends StatelessWidget {
                       context,
                     ).colorScheme.primary.withValues(alpha: 0.1),
                     child: Icon(
-                      ticket.type == TicketType.bus
-                          ? ticket.type == TicketType.bus
-                                ? Icons.airport_shuttle_outlined
-                                : Icons.badge_outlined
-                          : Icons.tram_outlined,
+                      switch (ticket.type) {
+                        TicketType.bus => Icons.airport_shuttle_outlined,
+                        TicketType.train => Icons.tram_outlined,
+                        TicketType.flight => Icons.flight_outlined,
+                        TicketType.metro => Icons.subway_outlined,
+                        TicketType.event => Icons.event_outlined,
+                        null => Icons.confirmation_number_outlined,
+                      },
                       size: 18,
                       color: Theme.of(context).colorScheme.primary,
                     ),
@@ -88,9 +91,9 @@ class TravelTicketCardWidget extends StatelessWidget {
                   //* Secondary text
                   Flexible(
                     child: Text(
-                      ticket.secondaryText.isNotEmpty
-                          ? ticket.secondaryText
-                          : 'xxx xxx',
+                      (ticket.secondaryText?.isNotEmpty ?? false)
+                          ? ticket.secondaryText!
+                          : 'No details',
                       style: Paragraph02(
                         color: Theme.of(context).colorScheme.onSurface,
                       ).regular,
@@ -216,10 +219,10 @@ class TravelTicketCardWidget extends StatelessWidget {
                       ),
                     ),
                   ];
-                } else if (ticket.primaryText.isNotEmpty) {
+                } else if (ticket.primaryText?.isNotEmpty ?? false) {
                   return <Widget>[
                     Text(
-                      ticket.primaryText,
+                      ticket.primaryText!,
                       style: TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
@@ -249,14 +252,14 @@ class TravelTicketCardWidget extends StatelessWidget {
           ),
 
           //* Boarding Point
-          if (ticket.location.isNotEmpty)
+          if (ticket.location?.isNotEmpty ?? false)
             Row(
               spacing: 8,
               children: [
                 const Icon(Icons.flag_outlined),
                 Expanded(
                   child: Text(
-                    ticket.location,
+                    ticket.location!,
                     style: TextStyle(
                       fontWeight: FontWeight.w500,
                       fontSize: 14,

@@ -14,11 +14,11 @@ class ShareSuccessView extends StatelessWidget {
     super.key,
   });
 
-  final String pnrNumber;
-  final String from;
-  final String to;
-  final String fare;
-  final String date;
+  final String? pnrNumber;
+  final String? from;
+  final String? to;
+  final String? fare;
+  final String? date;
 
   /// Determine if this is an update operation
   bool get isUpdate => from == 'Updated' || to == 'Conductor Details';
@@ -104,7 +104,7 @@ class ShareSuccessView extends StatelessWidget {
 
                       _DetailRow(
                         label: 'Route',
-                        value: '$from → $to',
+                        value: '${from ?? 'Unknown'} → ${to ?? 'Unknown'}',
                         theme: theme,
                       ),
                       const SizedBox(height: 16),
@@ -236,7 +236,7 @@ class _DetailRow extends StatelessWidget {
   });
 
   final String label;
-  final String value;
+  final String? value;
   final ThemeData theme;
   final bool isHighlighted;
 
@@ -254,7 +254,7 @@ class _DetailRow extends StatelessWidget {
         const SizedBox(width: 12),
         Expanded(
           child: Text(
-            value,
+            value ?? 'Unknown',
             style: isHighlighted
                 ? Paragraph02(color: AppColor.primaryBlue).semiBold
                 : Paragraph02(color: theme.colorScheme.onSurface).semiBold,

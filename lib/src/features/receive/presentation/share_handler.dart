@@ -22,7 +22,11 @@ class ShareHandler {
         :final to,
         :final fare,
         :final date,
+        :final warning,
       ):
+        if (warning != null) {
+          handleWarning(warning);
+        }
         router.go(
           AppRoute.shareSuccess.path,
           extra: {
@@ -86,5 +90,15 @@ class ShareHandler {
 
     // Navigate back to home on error
     router.go(AppRoute.home.path);
+  }
+
+  /// Handle warning messages
+  void handleWarning(String message) {
+    scaffoldMessengerKey.currentState?.showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.orange,
+      ),
+    );
   }
 }

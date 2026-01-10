@@ -90,7 +90,7 @@ class MockTicketDAO implements ITicketDAO {
     if (shouldThrow) throw Exception('Mock get error');
     // Assuming TicketType is an enum,
     // we compare names or convert string to enum
-    return insertedTickets.where((t) => t.type.name == type).toList();
+    return insertedTickets.where((t) => (t.type?.name ?? '') == type).toList();
   }
 
   @override
