@@ -25,10 +25,14 @@ class TNSTCPDFParser extends TravelPDFParser {
       r'Corporation\s*:\s*([A-Za-z\s-]+?)(?:\n|$)',
       pdfText,
     );
-    final pnrNumber = extractMatch(
-      r'PNR Number\s*:\s*([A-Z0-9]+)',
+    // PNR may have invisible characters/whitespace from PDF extraction
+    // First extract raw PNR (stop at newline), then clean it
+    final pnrRaw = extractMatch(
+      r'PNR Number\s*:\s*([A-Z0-9](?:[A-Z0-9\s]*[A-Z0-9])?)(?:\n|$)',
       pdfText,
     );
+    // Remove any whitespace that may have been inserted during PDF extraction
+    final pnrNumber = pnrRaw.replaceAll(RegExp(r'\s'), '');
     final journeyDate = parseDate(
       extractMatch(r'Date of Journey\s*:\s*(\d{2}[/-]\d{2}[/-]\d{4})', pdfText),
     );
