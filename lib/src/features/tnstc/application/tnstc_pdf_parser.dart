@@ -107,13 +107,13 @@ class TNSTCPDFParser extends TravelPDFParser {
     );
     final serviceStartPlace = nullIfEmpty(
       extractMatch(
-        r'Service Start Place\s*:\s*([A-Za-z0-9\s.,()-]+?)(?:\n|$)',
+        r'Service Start Place\s*:\s*([A-Za-z0-9\s.,()@#&/-]+?)(?:\n|$)',
         pdfText,
       ),
     );
     final serviceEndPlace = nullIfEmpty(
       extractMatch(
-        r'Service End Place\s*:\s*([A-Za-z0-9\s.,()-]+?)(?:\n|$)',
+        r'Service End Place\s*:\s*([A-Za-z0-9\s.,()@#&/-]+?)(?:\n|$)',
         pdfText,
       ),
     );
@@ -125,13 +125,13 @@ class TNSTCPDFParser extends TravelPDFParser {
     );
     final passengerStartPlace = nullIfEmpty(
       extractMatch(
-        r'Passenger Start Place\s*:\s*([A-Za-z0-9\s.,()-]+?)(?:\n|$)',
+        r'Passenger Start Place\s*:\s*([A-Za-z0-9\s.,()@#&/-]+?)(?:\n|$)',
         pdfText,
       ),
     );
     final passengerEndPlace = nullIfEmpty(
       extractMatch(
-        r'Passenger End Place\s*:\s*([A-Za-z0-9\s.,()-]+?)(?:\n|$)',
+        r'Passenger End Place\s*:\s*([A-Za-z0-9\s.,()@#&/-]+?)(?:\n|$)',
         pdfText,
       ),
     );
@@ -205,18 +205,38 @@ class TNSTCPDFParser extends TravelPDFParser {
       ),
     );
     // Trip code may be on a different line due to OCR column ordering
-    // First try direct extraction, then look for pattern like
-    // 2100KUMCHELB or 2200CHEKUMLB or 2110BANTIDVVO1L
-    // Must start with digits to avoid capturing labels like "No."
-    var tripCodeRaw = extractMatch(r'Trip Code\s*:\s*(\d+[A-Z0-9]+)', pdfText);
-    if (tripCodeRaw.isEmpty) {
-      // Look for trip code pattern anywhere in the text (4 digits followed
-      // by alphanumeric)
-      final tripCodeMatch = RegExp(
-        r'\b(\d{4}[A-Z0-9]{4,})\b',
+    // First try direct extraction with any printable characters
+    // allowing special chars like @#& that may appear in place names
+    var tripCodeRaw = extractMatch(
+      r'Trip Code\s*:\s*([A-Z0-9@#&-]+)',
+      pdfText,
+    );
+
+    // Validate that the captured value looks like a trip code
+    // Standard trip codes: 8+ chars starting with 4 digits (e.g., 2100KUMCHELB)
+    // But also accept non-standard formats if explicitly labeled
+    final standardTripCodePattern = RegExp(r'^\d{4}[A-Z0-9]{4,}$');
+
+    if (tripCodeRaw.isEmpty ||
+        (!standardTripCodePattern.hasMatch(tripCodeRaw) &&
+            tripCodeRaw.length < 4)) {
+      // Look for standard trip code pattern near "Trip Code:" label
+      // Try to find it within the next few lines after "Trip Code:"
+      final tripCodeSection = RegExp(
+        r'Trip Code\s*:[\s\S]{0,100}?(\d{4}[A-Z]{4,}[A-Z0-9]*)',
+        multiLine: true,
       ).firstMatch(pdfText);
-      if (tripCodeMatch != null) {
-        tripCodeRaw = tripCodeMatch.group(1) ?? '';
+
+      if (tripCodeSection != null) {
+        tripCodeRaw = tripCodeSection.group(1) ?? '';
+      } else {
+        // Fallback: Look for standard trip code pattern anywhere in text
+        final tripCodeMatch = RegExp(
+          r'\b(\d{4}[A-Z]{4,}[A-Z0-9]*)\b',
+        ).firstMatch(pdfText);
+        if (tripCodeMatch != null) {
+          tripCodeRaw = tripCodeMatch.group(1) ?? '';
+        }
       }
     }
     final tripCode = nullIfEmpty(tripCodeRaw);
