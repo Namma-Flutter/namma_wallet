@@ -10,6 +10,6 @@ class ExtrasModel with ExtrasModelMappable {
     this.title,
   });
   final String? title;
-  final String value;
+  final String? value;
   final List<ExtrasModel>? child;
 }

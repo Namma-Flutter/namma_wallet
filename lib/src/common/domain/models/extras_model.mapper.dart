@@ -22,7 +22,7 @@ class ExtrasModelMapper extends ClassMapperBase<ExtrasModel> {
   @override
   final String id = 'ExtrasModel';
 
-  static String _$value(ExtrasModel v) => v.value;
+  static String? _$value(ExtrasModel v) => v.value;
   static const Field<ExtrasModel, String> _f$value = Field('value', _$value);
   static List<ExtrasModel>? _$child(ExtrasModel v) => v.child;
   static const Field<ExtrasModel, List<ExtrasModel>> _f$child = Field(
@@ -144,14 +144,17 @@ class _ExtrasModelCopyWithImpl<$R, $Out>
         )
       : null;
   @override
-  $R call({String? value, Object? child = $none, Object? title = $none}) =>
-      $apply(
-        FieldCopyWithData({
-          if (value != null) #value: value,
-          if (child != $none) #child: child,
-          if (title != $none) #title: title,
-        }),
-      );
+  $R call({
+    Object? value = $none,
+    Object? child = $none,
+    Object? title = $none,
+  }) => $apply(
+    FieldCopyWithData({
+      if (value != $none) #value: value,
+      if (child != $none) #child: child,
+      if (title != $none) #title: title,
+    }),
+  );
   @override
   ExtrasModel $make(CopyWithData data) => ExtrasModel(
     value: data.get(#value, or: $value.value),

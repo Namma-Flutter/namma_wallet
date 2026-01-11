@@ -171,13 +171,6 @@ class _ProfileViewState extends State<ProfileView> {
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () async {
-          await context.pushNamed(AppRoute.dbViewer.name);
-        },
-        label: const Text('View DB'),
-        icon: const Icon(Icons.storage),
-      ),
     );
   }
 }
