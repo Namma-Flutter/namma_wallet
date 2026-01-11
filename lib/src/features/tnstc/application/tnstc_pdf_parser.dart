@@ -83,18 +83,27 @@ class TNSTCPDFParser extends TravelPDFParser {
     // OCR may read columns out of order, causing pickup point to be split:
     // "Passenger Pickup Point : OFFICE)" followed by
     // "KOTTIVAKKAM(RTO" on next line
-    // Use dotAll flag to capture across newlines, and manually extract
+    // Use line-based matching instead of dotAll to avoid consuming subsequent fields
     final pickupRegex = RegExp(
-      r'Passenger Pickup Point\s*:\s*(.*?)'
-      r'(?:\n(.+?))?'
-      r'(?=\nPlatform Number|\nPassenger Pickup Time|\nTrip Code|$)',
-      dotAll: true,
+      r'Passenger Pickup Point\s*:\s*([^\n]*)(?:\n([^\n]*))?',
     );
     final pickupMatch = pickupRegex.firstMatch(pdfText);
     String? passengerPickupPoint;
     if (pickupMatch != null) {
-      final part1 = pickupMatch.group(1)?.trim() ?? '';
-      final part2 = pickupMatch.group(2)?.trim() ?? '';
+      var part1 = pickupMatch.group(1)?.trim() ?? '';
+      var part2 = pickupMatch.group(2)?.trim() ?? '';
+
+      // Helper to check if a string looks like a field label
+      bool isFieldLabel(String s) {
+        return s.startsWith('Platform Number') ||
+            s.startsWith('Passenger Pickup Time') ||
+            s.startsWith('Trip Code') ||
+            s.startsWith('Passenger End Place') ||
+            s.startsWith('Service Start Time');
+      }
+
+      if (isFieldLabel(part1)) part1 = '';
+      if (isFieldLabel(part2)) part2 = '';
 
       logger.debug(
         '[TNSTCPDFParser] Pickup point parts: '
