@@ -19,6 +19,7 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_gemma: ^0.11.13
+  flutter_native_splash: ^2.4.7
   flutter_svg: ^2.2.1
   gaimon: ^1.4.1
   get_it: ^9.0.5
@@ -71,3 +72,20 @@ flutter_launcher_icons:
   ios: true
   image_path: "assets/icon/app-icon-android-foreground.png"
   image_path_ios: "assets/icon/app-icon-iOS-Default.png"
+
+flutter_native_splash:
+  # Light theme configuration
+  color: "#FFFFFF"
+  image: assets/icon/splash_icon.png
+
+  # Dark theme configuration
+  color_dark: "#000000"
+  image_dark: assets/icon/splash_icon.png
+
+  android_12:
+    image: assets/icon/splash_icon.png
+    color: "#FFFFFF"
+    image_dark: assets/icon/splash_icon.png
+    color_dark: "#000000"
+
+  fullscreen: true
