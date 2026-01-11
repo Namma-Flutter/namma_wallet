@@ -156,14 +156,23 @@ class TNSTCPDFParser extends TravelPDFParser {
       passengerSeatNumber = passengerMatch.group(5) ?? '';
     } else {
       // Fallback: Extract fields individually if table format is broken
-      // Name is usually after "Passenger Information"
-      // Support multi-word names with spaces, hyphens, and apostrophes
-      final nameMatch = RegExp(
-        r'Passenger Information\s*\n\s*([^\n]+)',
+      // OCR often puts "Name" on one line and actual name on next line
+      // Try to get the line after "Name" header (not after "Passenger Information")
+      var nameMatch = RegExp(
+        r'^Name\s*$\n\s*([A-Za-z][^\n]+)',
         multiLine: true,
       ).firstMatch(pdfText);
       if (nameMatch != null) {
-        passengerName = nameMatch.group(1) ?? '';
+        passengerName = nameMatch.group(1)?.trim() ?? '';
+      } else {
+        // Secondary fallback: line after Passenger Information
+        nameMatch = RegExp(
+          r'Passenger Information\s*\n\s*Name\s*\n\s*([^\n]+)',
+          multiLine: true,
+        ).firstMatch(pdfText);
+        if (nameMatch != null) {
+          passengerName = nameMatch.group(1)?.trim() ?? '';
+        }
       }
 
       final ageMatch = RegExp(r'Age\s*\n\s*(\d+)', multiLine: true).firstMatch(
