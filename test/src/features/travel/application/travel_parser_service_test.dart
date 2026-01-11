@@ -1,18 +1,30 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/enums/source_type.dart';
+import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
 import 'package:namma_wallet/src/features/travel/application/travel_parser_service.dart';
 
 import '../../../../fixtures/tnstc_sms_fixtures.dart';
 import '../../../../helpers/fake_logger.dart';
 
 void main() {
+  setUpAll(() async {
+    final fakeLogger = FakeLogger();
+    getIt.registerLazySingleton<ILogger>(() => fakeLogger);
+  });
+
   group('TravelParserService Tests', () {
     late TravelParserService service;
     late FakeLogger fakeLogger;
 
-    setUp(() {
-      fakeLogger = FakeLogger();
+    setUp(() async {
+      fakeLogger = getIt<ILogger>() as FakeLogger;
       service = TravelParserService(logger: fakeLogger);
+      getIt.pushNewScope();
+    });
+
+    tearDown(() async {
+      await getIt.popScope();
     });
 
     group('TNSTC Parser - SMS Format', () {
