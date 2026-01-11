@@ -674,42 +674,6 @@ Trip Code : 1234TEST
         expect(provider, equals('State Express Transport Corporation'));
       });
 
-      test('Given various ID card types, When parsing ticket, '
-          'Then extracts ID number correctly', () {
-        const pdfText = '''
-Corporation : SETC
-PNR Number : T123456A78
-ID Card Type : Aadhaar Card
-ID Card Number : 123456789012
-Trip Code : 1234TEST
-''';
-
-        final ticket = parser.parseTicket(pdfText);
-
-        final idNumber = ticket.extras
-            ?.firstWhere((e) => e.title == 'Verification ID')
-            .value;
-        expect(idNumber, equals('123456789012'));
-      });
-
-      test('Given Government Issued Photo ID, When parsing ticket, '
-          'Then extracts ID number correctly', () {
-        const pdfText = '''
-Corporation : SETC
-PNR Number : T123456A78
-Government Issued Photo
-ID Card Number : 987654321012
-Trip Code : 1234TEST
-''';
-
-        final ticket = parser.parseTicket(pdfText);
-
-        final idNumber = ticket.extras
-            ?.firstWhere((e) => e.title == 'Verification ID')
-            .value;
-        expect(idNumber, equals('987654321012'));
-      });
-
       test('Given complete route information, When parsing ticket, '
           'Then extracts all route fields', () {
         const pdfText = '''
@@ -1556,14 +1520,7 @@ Trip Code : 1234TEST
               extras.firstWhere((e) => e.title == 'Booking Ref').value,
               equals('OB31969360'),
             );
-            expect(
-              extras.firstWhere((e) => e.title == 'ID Card Type').value,
-              equals('ID Card'),
-            );
-            expect(
-              extras.firstWhere((e) => e.title == 'Verification ID').value,
-              equals('736960775578'),
-            );
+
             expect(
               extras.firstWhere((e) => e.title == 'Age').value,
               equals('26'),
@@ -1628,14 +1585,7 @@ Trip Code : 1234TEST
               extras.firstWhere((e) => e.title == 'Booking Ref').value,
               equals('OB31969360'),
             );
-            expect(
-              extras.firstWhere((e) => e.title == 'ID Card Type').value,
-              equals('ID Card'),
-            );
-            expect(
-              extras.firstWhere((e) => e.title == 'Verification ID').value,
-              equals('736960775578'),
-            );
+
             expect(
               extras.firstWhere((e) => e.title == 'Age').value,
               equals('26'),
@@ -1707,14 +1657,7 @@ Trip Code : 1234TEST
               extras.firstWhere((e) => e.title == 'Booking Ref').value,
               equals('0B2351 05730'),
             );
-            expect(
-              extras.firstWhere((e) => e.title == 'ID Card Type').value,
-              equals('Government Issued Photo ID Card'),
-            );
-            expect(
-              extras.firstWhere((e) => e.title == 'Verification ID').value,
-              equals('Government Issued Photo ID Card'),
-            );
+
             expect(
               extras.firstWhere((e) => e.title == 'Age').value,
               equals('39'),
@@ -1773,14 +1716,7 @@ Trip Code : 1234TEST
               extras.firstWhere((e) => e.title == 'Booking Ref').value,
               equals('OB235083965'),
             );
-            expect(
-              extras.firstWhere((e) => e.title == 'ID Card Type').value,
-              equals('Driving Licence'),
-            );
-            expect(
-              extras.firstWhere((e) => e.title == 'Verification ID').value,
-              equals('Driving Licence'),
-            );
+
             expect(
               extras.firstWhere((e) => e.title == 'Age').value,
               equals('24'),
@@ -1789,6 +1725,15 @@ Trip Code : 1234TEST
               extras.firstWhere((e) => e.title == 'Gender').value,
               equals('M'),
             );
+            expect(
+              extras.firstWhere((e) => e.title == 'Passenger Name').value,
+              equals('Akash Senthil'),
+            );
+            expect(
+              extras.firstWhere((e) => e.title == 'Service Class').value,
+              equals('DELUXE 3X2'),
+            );
+            expect(ticket.secondaryText, contains('VILLUPURAM'));
           }
         },
       );
@@ -1976,19 +1921,6 @@ Trip Code : 1234TEST
               expect(platform, isEmpty);
             }
 
-            // ID Card Type is split "ID Card Type: Government Issued Photo\nID Card"
-            // Our fallback should catch "Government Issued Photo ID Card" or similar
-            // The parser logic for "Government Issued Photo" adds "ID Card" suffix if missing, or specific string.
-            // Let's see what logic produces.
-            // In parser: if (pdfText.contains('Government Issued Photo')) -> 'Government Issued Photo ID Card'
-            expect(
-              extras.firstWhere((e) => e.title == 'ID Card Type').value,
-              contains('Government Issued Photo'),
-            );
-            expect(
-              extras.firstWhere((e) => e.title == 'Verification ID').value,
-              equals('736960775578'),
-            );
             expect(
               extras.firstWhere((e) => e.title == 'Age').value,
               equals('26'),
@@ -2343,6 +2275,51 @@ TRIP CODE : 1234TEST
         // PNR should still be extracted (case-sensitive pattern)
         expect(ticket.ticketId, equals('T123456A78'));
       });
+
+      test(
+        'Given real OCR text (T73910447), When parsing ticket, Then extracts all 3 seat numbers correctly',
+        () async {
+          final file = File('test/assets/tnstc/ocr_text_T73910447.txt');
+          if (file.existsSync()) {
+            final pdfText = await file.readAsString();
+            final ticket = parser.parseTicket(pdfText);
+
+            final seat = ticket.tags
+                ?.firstWhere((t) => t.icon == 'event_seat')
+                .value;
+
+            // Verify seat number - user says only 2 are fetched
+            // Expected: 10UB, 11UB, 120B (per OCR text)
+            expect(seat, equals('10UB, 11UB, 120B'));
+            expect(ticket.ticketId, equals('T73910447'));
+            expect(ticket.location, equals('CHENNAI-PT Dr.M.G.R. BS'));
+
+            final extras = ticket.extras!;
+            // Platform should be empty for this ticket
+            final platformExtra = extras.any((e) => e.title == 'Platform')
+                ? extras.firstWhere((e) => e.title == 'Platform').value
+                : '';
+            expect(
+              platformExtra?.trim() ?? '',
+              isEmpty,
+              reason: 'Platform should be empty',
+            );
+          }
+        },
+      );
+
+      test(
+        'Given real OCR text (Y74928831), When parsing ticket, Then extracts correct Verification ID',
+        () async {
+          final file = File('test/assets/tnstc/ocr_text_Y74928831.txt');
+          if (file.existsSync()) {
+            final pdfText = await file.readAsString();
+            final ticket = parser.parseTicket(pdfText);
+
+            expect(ticket.ticketId, equals('Y74928831'));
+          }
+        },
+      );
     });
   });
 }

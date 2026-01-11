@@ -25,8 +25,6 @@ class TNSTCTicketModel with TNSTCTicketModelMappable {
     this.busIdNumber,
     this.passengerCategory,
     this.passengers = const [],
-    this.idCardType,
-    this.idCardNumber,
     this.totalFare,
     this.boardingPoint,
     this.conductorMobileNo,
@@ -53,8 +51,6 @@ class TNSTCTicketModel with TNSTCTicketModelMappable {
   final String? busIdNumber;
   final String? passengerCategory;
   final List<PassengerInfo> passengers;
-  final String? idCardType;
-  final String? idCardNumber;
   final double? totalFare;
   final String? boardingPoint;
   final String? conductorMobileNo;
@@ -84,8 +80,6 @@ Number of Seats: $numberOfSeats,
 Bus ID No: $busIdNumber,
 Passenger Category: $passengerCategory,
 Passengers: ${passengers.map((p) => p.toString()).join(', ')},
-ID Card Type: $idCardType,
-ID Card Number: $idCardNumber,
 Total Fare: ₹$totalFare,
 Boarding Point: $boardingPoint
 )''';
