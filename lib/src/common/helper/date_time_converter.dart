@@ -4,7 +4,7 @@ import 'package:intl/intl.dart';
 /// Provides methods to format DateTime objects and time strings
 /// into user-friendly representations.
 abstract class IDateTimeConverter {
-  /// Formats a DateTime as time string (e.g., "01:15 pm").
+  /// Formats a DateTime as time string (e.g., "01:15 AM").
   /// Converts to local time before formatting to handle
   /// UTC datetimes from database.
   String formatTime(DateTime dt);
@@ -41,7 +41,7 @@ class DateTimeConverter implements IDateTimeConverter {
   @override
   String formatTime(DateTime dt) {
     final local = dt.toLocal();
-    return DateFormat('hh:mm a').format(local).toLowerCase();
+    return DateFormat('hh:mm a').format(local);
   }
 
   @override

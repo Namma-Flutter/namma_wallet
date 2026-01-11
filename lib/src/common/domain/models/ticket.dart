@@ -191,9 +191,15 @@ class Ticket with TicketMappable {
           primarySource.isNotNullOrEmpty && primaryDestination.isNotNullOrEmpty
           ? '$primarySource → $primaryDestination'
           : _primaryTextConstant,
-      secondaryText: model.tripCode.isNotNullOrEmpty
-          ? '${model.corporation ?? 'TNSTC'} - '
-                '${model.tripCode ?? model.routeNo ?? 'Bus'}'
+      secondaryText:
+          model.tripCode.isNotNullOrEmpty || model.routeNo.isNotNullOrEmpty
+          ? [
+              if (model.corporation.isNotNullOrEmpty) model.corporation,
+              if (model.tripCode.isNotNullOrEmpty)
+                model.tripCode
+              else
+                model.routeNo ?? 'Bus',
+            ].where((s) => s != null && s.isNotEmpty).join(' - ')
           : _secondaryTextConstant,
       startTime: startTime,
       location:
@@ -253,7 +259,7 @@ class Ticket with TicketMappable {
         if (model.passengerPickupTime != null)
           ExtrasModel(
             title: 'Pickup Time',
-            value: DateTimeConverter.instance.formatFullDateTime(
+            value: DateTimeConverter.instance.formatTime(
               model.passengerPickupTime!,
             ),
           ),
@@ -300,6 +306,8 @@ class Ticket with TicketMappable {
           ),
         if (model.tripCode != null && model.tripCode!.isNotNullOrEmpty)
           ExtrasModel(title: 'Trip Code', value: model.tripCode),
+        if (model.routeNo != null && model.routeNo!.trim().isNotNullOrEmpty)
+          ExtrasModel(title: 'Route No', value: model.routeNo!.trim()),
         if (model.serviceStartPlace != null &&
             model.serviceStartPlace!.isNotNullOrEmpty)
           ExtrasModel(title: 'From', value: model.serviceStartPlace)
