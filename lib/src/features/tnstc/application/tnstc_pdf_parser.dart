@@ -103,7 +103,16 @@ class TNSTCPDFParser extends TravelPDFParser {
       r'Class of Service\s*:\s*([A-Za-z0-9\s]+?)(?:\n|$)',
       pdfText,
     );
-    final tripCode = extractMatch(r'Trip Code\s*:\s*(\S+)', pdfText);
+    // Trip code may be on a different line due to OCR column ordering
+    // First try direct extraction, then look for pattern like 2100KUMCHELB or 2200CHEKUMLB
+    var tripCode = extractMatch(r'Trip Code\s*:\s*([0-9]+[A-Z]+)', pdfText);
+    if (tripCode.isEmpty) {
+      // Look for trip code pattern anywhere in the text (4 digits followed by uppercased letters)
+      final tripCodeMatch = RegExp(r'\b(\d{4}[A-Z]{4,})\b').firstMatch(pdfText);
+      if (tripCodeMatch != null) {
+        tripCode = tripCodeMatch.group(1) ?? '';
+      }
+    }
     final obReferenceNumber = extractMatch(
       r'OB Reference No\.\s*:\s*([A-Z0-9]+)',
       pdfText,
