@@ -436,55 +436,6 @@ class _TravelTicketViewState extends State<TravelTicketView> {
                   const SizedBox(height: 16),
 
                   ...() {
-                    final filteredTags = getFilteredTags(widget.ticket);
-                    if (filteredTags.isEmpty) return <Widget>[];
-
-                    return <Widget>[
-                      LayoutBuilder(
-                        builder: (context, constraints) {
-                          final itemWidth = (constraints.maxWidth - 32) / 3;
-
-                          return Wrap(
-                            spacing: 16, // Horizontal space between items
-                            runSpacing: 12, // Vertical space between rows
-                            children: filteredTags.map((tag) {
-                              return SizedBox(
-                                width: itemWidth,
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Icon(
-                                      tag.iconData,
-                                      size: 16,
-                                      color: Theme.of(
-                                        context,
-                                      ).colorScheme.primary,
-                                    ),
-                                    const SizedBox(width: 8),
-                                    Expanded(
-                                      child: Text(
-                                        tag.value ?? '-',
-                                        style: Paragraph03(
-                                          color: Theme.of(
-                                            context,
-                                          ).colorScheme.onSurface,
-                                        ).semiBold,
-                                        overflow: TextOverflow.ellipsis,
-                                        maxLines: 1,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            }).toList(),
-                          );
-                        },
-                      ),
-                      const SizedBox(height: 16),
-                    ];
-                  }(),
-
-                  ...() {
                     final filteredExtras = getFilteredExtras(
                       widget.ticket,
                     );
@@ -492,43 +443,81 @@ class _TravelTicketViewState extends State<TravelTicketView> {
 
                     return <Widget>[
                       const SizedBox(height: 12),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          for (var i = 0; i < filteredExtras.length; i++)
-                            Padding(
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 4,
-                              ),
-                              child: Row(
-                                spacing: 4,
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Flexible(
-                                    flex: 2,
-                                    child: Text(
-                                      filteredExtras[i].title ?? '-:',
+                      // 2-column grid layout
+                      for (var i = 0; i < filteredExtras.length; i += 2)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Left item
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      filteredExtras[i].title ?? '-',
+                                      style: Paragraph03(
+                                        color:
+                                            Theme.of(
+                                              context,
+                                            ).colorScheme.onSurface.withValues(
+                                              alpha: 0.7,
+                                            ),
+                                      ).regular,
                                     ),
-                                  ),
-                                  Expanded(
-                                    flex: 3,
-                                    child: Text(
+                                    const SizedBox(height: 4),
+                                    Text(
                                       filteredExtras[i].value ?? '-',
                                       overflow: TextOverflow.ellipsis,
-                                      maxLines: 1,
+                                      maxLines: 2,
                                       style: Paragraph03(
                                         color: Theme.of(
                                           context,
                                         ).colorScheme.onSurface,
                                       ).semiBold,
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
-                            ),
-                        ],
-                      ),
+                              // Right item (if exists)
+                              if (i + 1 < filteredExtras.length)
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    children: [
+                                      Text(
+                                        filteredExtras[i + 1].title ?? '-',
+                                        style: Paragraph03(
+                                          color:
+                                              Theme.of(
+                                                    context,
+                                                  ).colorScheme.onSurface
+                                                  .withValues(
+                                                    alpha: 0.7,
+                                                  ),
+                                        ).regular,
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        filteredExtras[i + 1].value ?? '-',
+                                        overflow: TextOverflow.ellipsis,
+                                        maxLines: 2,
+                                        textAlign: TextAlign.end,
+                                        style: Paragraph03(
+                                          color: Theme.of(
+                                            context,
+                                          ).colorScheme.onSurface,
+                                        ).semiBold,
+                                      ),
+                                    ],
+                                  ),
+                                )
+                              else
+                                const Expanded(child: SizedBox()),
+                            ],
+                          ),
+                        ),
                     ];
                   }(),
                 ],

@@ -191,9 +191,14 @@ class Ticket with TicketMappable {
           primarySource.isNotNullOrEmpty && primaryDestination.isNotNullOrEmpty
           ? '$primarySource → $primaryDestination'
           : _primaryTextConstant,
-      secondaryText: model.tripCode.isNotNullOrEmpty
-          ? '${model.corporation ?? 'TNSTC'} - '
-                '${model.tripCode ?? model.routeNo ?? 'Bus'}'
+      secondaryText:
+          model.tripCode.isNotNullOrEmpty || model.routeNo.isNotNullOrEmpty
+          ? [
+              if (model.corporation.isNotNullOrEmpty) model.corporation,
+              model.tripCode.isNotNullOrEmpty
+                  ? model.tripCode
+                  : model.routeNo ?? 'Bus',
+            ].where((s) => s != null && s.isNotEmpty).join(' - ')
           : _secondaryTextConstant,
       startTime: startTime,
       location:
@@ -253,7 +258,7 @@ class Ticket with TicketMappable {
         if (model.passengerPickupTime != null)
           ExtrasModel(
             title: 'Pickup Time',
-            value: DateTimeConverter.instance.formatFullDateTime(
+            value: DateTimeConverter.instance.formatTime(
               model.passengerPickupTime!,
             ),
           ),

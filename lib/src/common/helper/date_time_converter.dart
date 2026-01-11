@@ -41,7 +41,7 @@ class DateTimeConverter implements IDateTimeConverter {
   @override
   String formatTime(DateTime dt) {
     final local = dt.toLocal();
-    return DateFormat('hh:mm a').format(local).toLowerCase();
+    return DateFormat('hh:mm a').format(local);
   }
 
   @override

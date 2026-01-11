@@ -1028,11 +1028,11 @@ Trip Code : TEST123
 
         final ticket = parser.parseTicket(pdfText);
 
-        // When corporation is empty, secondaryText uses 'TNSTC' as default
-        // in the Ticket.fromTNSTC factory
+        // When corporation is missing, secondaryText shows just trip code
+        // (no leading dash or default corporation)
         expect(
           ticket.secondaryText,
-          anyOf(contains('TNSTC'), equals(' - TEST123')),
+          equals('TEST123'),
         );
       });
     });
