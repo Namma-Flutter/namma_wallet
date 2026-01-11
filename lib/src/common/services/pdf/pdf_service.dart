@@ -32,6 +32,8 @@ class PDFService implements IPDFService {
         // Try extracting text from all pages at once first
         var rawText = PdfTextExtractor(document).extractText();
 
+        print(rawText);
+
         // If extraction yields very little text, try page-by-page extraction
         if (rawText.length < _minExpectedTextLength &&
             document.pages.count > 0) {

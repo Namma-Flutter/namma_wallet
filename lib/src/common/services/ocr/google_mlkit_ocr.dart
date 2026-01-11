@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:cross_file/cross_file.dart';
+import 'package:flutter/foundation.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:image/image.dart' as img;
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
@@ -106,6 +107,8 @@ class GoogleMLKitOCR implements IOCRService {
       }
 
       final combinedText = extractedTexts.join('\n\n');
+
+      debugPrint(combinedText);
       _logger.debug(
         '[OCRService] OCR complete: ${combinedText.length} total chars from '
         '${extractedTexts.length} pages',
