@@ -1796,7 +1796,8 @@ Trip Code : 1234TEST
 
       test(
         'Given real OCR text (T73309927), When parsing ticket, '
-        'Then extracts all fields including "Seat :No." and clean names correctly',
+        'Then extracts all fields including "Seat :No." and '
+        'clean names correctly',
         () async {
           final file = File('test/assets/tnstc/ocr_text_T73309927.txt');
           if (file.existsSync()) {
@@ -1912,7 +1913,8 @@ Trip Code : 1234TEST
             );
 
             // Verify Platform is NOT erroneously capturing 'Class of Service'
-            // Since it is empty in the file, it should either be absent or empty string.
+            // Since it is empty in the file, it should either be absent
+            // or empty string.
             if (extras.any((e) => e.title == 'Platform')) {
               final platform = extras
                   .firstWhere((e) => e.title == 'Platform')
@@ -2277,7 +2279,8 @@ TRIP CODE : 1234TEST
       });
 
       test(
-        'Given real OCR text (T73910447), When parsing ticket, Then extracts all 3 seat numbers correctly',
+        'Given real OCR text (T73910447), When parsing ticket, Then extracts '
+        'all 3 seat numbers correctly',
         () async {
           final file = File('test/assets/tnstc/ocr_text_T73910447.txt');
           if (file.existsSync()) {
@@ -2309,7 +2312,8 @@ TRIP CODE : 1234TEST
       );
 
       test(
-        'Given real OCR text (Y74928831), When parsing ticket, Then extracts correct Verification ID',
+        'Given real OCR text (Y74928831), When parsing ticket, '
+        'Then extracts correct Verification ID',
         () async {
           final file = File('test/assets/tnstc/ocr_text_Y74928831.txt');
           if (file.existsSync()) {

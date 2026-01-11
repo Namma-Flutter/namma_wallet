@@ -22,7 +22,8 @@ class TNSTCPDFParser extends TravelPDFParser {
     // Helper to convert empty strings to null for nullable model fields
     String? nullIfEmpty(String value) => value.isNotEmpty ? value : null;
 
-    // Helper to parse fields that might be on same line or next line, skipping punctuation
+    // Helper to parse fields that might be on same line or next line, 
+    //skipping punctuation
     String parseField(
       String labelPattern, {
       String? valuePattern,
@@ -137,7 +138,8 @@ class TNSTCPDFParser extends TravelPDFParser {
     // OCR may read columns out of order, causing pickup point to be split:
     // "Passenger Pickup Point : OFFICE)" followed by
     // "KOTTIVAKKAM(RTO" on next line
-    // Use line-based matching instead of dotAll to avoid consuming subsequent fields
+    // Use line-based matching instead of dotAll to avoid consuming 
+    //subsequent fields
     final pickupRegex = RegExp(
       r'Passenger Pickup Point\s*:\s*([^\n\r]*?)(?=\s*(?:Platform Number|Passenger Pickup Time|Trip Code|Passenger End Place|Service Start Time)|\n|$)(?:\s*\n([^\n]*))?',
     );
@@ -319,9 +321,11 @@ class TNSTCPDFParser extends TravelPDFParser {
           return true;
         }).toList();
 
-        // Temporarily store joined names if we are in single-passenger fallback mode
+        // Temporarily store joined names if we are in single-passenger 
+        //fallback mode
         // But ideally we should create multiple PassengerInfo objects if valid
-        // For now, let's just join them so at least they appear in the Ticket model
+        // For now, let's just join them so at least they appear in the 
+        //Ticket model
         passengerName = names.join(', ');
       }
 
@@ -352,7 +356,8 @@ class TNSTCPDFParser extends TravelPDFParser {
 
       final seatInlineMatch = RegExp(
         // Match seat numbers separated by comma OR newline
-        // Ensure subsequent lines don't start with keywords like Age, Gender, Important, etc.
+        // Ensure subsequent lines don't start with keywords like Age, Gender,
+        // Important, etc.
         r'^Seat\s*[:\.]?\s*No\.?\s*(?:[:\-]?\s*)?(?:\n\s*)?([A-Z0-9]+(?:(?:\s*,\s*|\s*\n\s*(?!Age|Gender|Total|Government|ID|Class|Important|Name)(?=[A-Z0-9]))[A-Z0-9]+)*)',
         multiLine: true,
         caseSensitive: false,
