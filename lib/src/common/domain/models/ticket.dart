@@ -195,9 +195,10 @@ class Ticket with TicketMappable {
           model.tripCode.isNotNullOrEmpty || model.routeNo.isNotNullOrEmpty
           ? [
               if (model.corporation.isNotNullOrEmpty) model.corporation,
-              model.tripCode.isNotNullOrEmpty
-                  ? model.tripCode
-                  : model.routeNo ?? 'Bus',
+              if (model.tripCode.isNotNullOrEmpty)
+                model.tripCode
+              else
+                model.routeNo ?? 'Bus',
             ].where((s) => s != null && s.isNotEmpty).join(' - ')
           : _secondaryTextConstant,
       startTime: startTime,
@@ -305,6 +306,8 @@ class Ticket with TicketMappable {
           ),
         if (model.tripCode != null && model.tripCode!.isNotNullOrEmpty)
           ExtrasModel(title: 'Trip Code', value: model.tripCode),
+        if (model.routeNo != null && model.routeNo!.trim().isNotNullOrEmpty)
+          ExtrasModel(title: 'Route No', value: model.routeNo!.trim()),
         if (model.serviceStartPlace != null &&
             model.serviceStartPlace!.isNotNullOrEmpty)
           ExtrasModel(title: 'From', value: model.serviceStartPlace)
