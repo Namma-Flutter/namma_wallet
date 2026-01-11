@@ -106,7 +106,7 @@ class TNSTCPDFParser extends TravelPDFParser {
       pdfText,
     );
     // Trip code may be on a different line due to OCR column ordering
-    // First try direct extraction, then look for pattern like 
+    // First try direct extraction, then look for pattern like
     // 2100KUMCHELB or 2200CHEKUMLB
     var tripCode = extractMatch(r'Trip Code\s*:\s*([0-9]+[A-Z]+)', pdfText);
     if (tripCode.isEmpty) {
@@ -170,7 +170,7 @@ class TNSTCPDFParser extends TravelPDFParser {
     } else {
       // Fallback: Extract fields individually if table format is broken
       // OCR often puts "Name" on one line and actual name on next line
-      // Try to get the line after "Name" header 
+      // Try to get the line after "Name" header
       //(not after "Passenger Information")
       var nameMatch = RegExp(
         r'^Name\s*$\n\s*([A-Za-z][^\n]+)',
