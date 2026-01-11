@@ -109,8 +109,6 @@ class GoogleMLKitOCR implements IOCRService {
 
       final combinedText = extractedTexts.join('\n\n');
 
-      debugPrint(combinedText);
-
       _logger.debug(
         '[OCRService] OCR complete: ${combinedText.length} total chars from '
         '${extractedTexts.length} pages',

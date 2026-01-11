@@ -106,8 +106,6 @@ class PDFService implements IPDFService {
         // Clean and normalize the extracted text
         final cleanedText = _cleanExtractedText(rawText);
 
-        debugPrint(cleanedText);
-
         // Log metadata after cleaning (no PII)
         final cleanedLineCount = cleanedText.split('\n').length;
         _logger.debug(
