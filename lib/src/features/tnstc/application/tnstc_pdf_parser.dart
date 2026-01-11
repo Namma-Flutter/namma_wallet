@@ -232,7 +232,7 @@ class TNSTCPDFParser extends TravelPDFParser {
       } else {
         // Secondary fallback: line after Passenger Information
         nameMatch = RegExp(
-          r'Passenger Information\s*\n\s*Name\s*\n\s*([^\n]+)',
+          r'Passenger Information\s*\n\s*(?:Name\s*\n\s*)?([^\n]+)',
           multiLine: true,
         ).firstMatch(pdfText);
         if (nameMatch != null) {
@@ -265,8 +265,10 @@ class TNSTCPDFParser extends TravelPDFParser {
       }
 
       final seatInlineMatch = RegExp(
-        r'Seat No\.?\s*(?:[:\-]?\s*)?(?:\n\s*)?([A-Z0-9]+(?:\s*,\s*[A-Z0-9]+)*)',
+        // Match seat numbers separated by comma OR newline
+        r'^Seat No\.?\s*(?:[:\-]?\s*)?(?:\n\s*)?([A-Z0-9]+(?:(?:\s*,\s*|\s*\n\s*)[A-Z0-9]+)*)',
         multiLine: true,
+        caseSensitive: false,
       ).firstMatch(pdfText);
       if (seatInlineMatch != null) {
         passengerSeatNumber = (seatInlineMatch.group(1) ?? '').trim();

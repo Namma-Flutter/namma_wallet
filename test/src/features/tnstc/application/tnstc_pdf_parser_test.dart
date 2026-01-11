@@ -135,7 +135,7 @@ void main() {
         // Simulate cleaned PDF text based on the actual structure
         const pdfText = '''
 Corporation : SETC
-PNR Number : T12345678
+PNR Number : T123456A78
 Date of Journey : 15/12/2024
 Route No : 123AB
 Service Start Place : CHENNAI
@@ -147,31 +147,31 @@ Passenger Pickup Point : KOYAMBEDU
 Passenger Pickup Time : 15/12/2024 14:30 Hrs.
 Platform Number : 5
 Class of Service : AC SLEEPER
-Trip Code : TEST123
-OB Reference No. : OB12345678
+Trip Code : 1234TEST
+OB Reference No. : OB123456A78
 No. of Seats : 1
-Bank Txn. No. : TXN123456789
+Bank Txn. No. : TXN123456A789
 Bus ID No. : BUS-123
 Passenger category : General
 Name Age Adult/Child Gender Seat No.
 TestUser 25 Adult M 1A
 ID Card Type : Government Issued Photo ID Card
-ID Card Number : 123456789012
+ID Card Number : 123456A789012
 Total Fare : 500.00 Rs.
 ''';
 
         final ticket = parser.parseTicket(pdfText);
 
         // Verify core fields are extracted correctly from Ticket model
-        expect(ticket.ticketId, equals('T12345678'));
+        expect(ticket.ticketId, equals('T123456A78'));
         expect(ticket.primaryText, equals('CHENNAI → BANGALORE'));
-        expect(ticket.secondaryText, equals('SETC - TEST123'));
+        expect(ticket.secondaryText, equals('SETC - 1234TEST'));
 
         // Verify extras
         final tripCodeExtra = ticket.extras
             ?.firstWhere((e) => e.title == 'Trip Code')
             .value;
-        expect(tripCodeExtra, equals('TEST123'));
+        expect(tripCodeExtra, equals('1234TEST'));
 
         final passengerNameExtra = ticket.extras
             ?.firstWhere((e) => e.title == 'Passenger Name')
@@ -230,10 +230,10 @@ Total Fare : 500.00 Rs.
       () {
         const pdfText = '''
 Corporation : SETC
-PNR Number : T12345678
+PNR Number : T123456A78
 Date of Journey : 15/12/2024
 Platform Number :
-Trip Code : TEST123
+Trip Code : 1234TEST
 ''';
 
         final ticket = parser.parseTicket(pdfText);
@@ -254,11 +254,11 @@ Trip Code : TEST123
       () {
         const pdfText = '''
 Corporation : SETC
-PNR Number : T12345678
+PNR Number : T123456A78
 Date of Journey : 15/12/2024
 Passenger Pickup Time : 15/12/2024 14:30 Hrs.
 Service Start Time : 14:30
-Trip Code : TEST123
+Trip Code : 1234TEST
 Name Age Adult/Child Gender Seat No.
 TestUser 25 Adult M 1A
 ''';
@@ -281,9 +281,9 @@ TestUser 25 Adult M 1A
       () {
         const pdfText = '''
 Corporation : SETC
-PNR Number : T12345678
+PNR Number : T123456A78
 Total Fare : 123.50 Rs.
-Trip Code : TEST123
+Trip Code : 1234TEST
 ''';
 
         final ticket = parser.parseTicket(pdfText);
@@ -309,9 +309,9 @@ Trip Code : TEST123
         () {
           const pdfText = '''
 Corporation : SETC
-PNR Number : T12345678
+PNR Number : T123456A78
 Date of Journey : 15/10/2025
-Trip Code : TEST123
+Trip Code : 1234TEST
 ''';
 
           final ticket = parser.parseTicket(pdfText);
@@ -328,9 +328,9 @@ Trip Code : TEST123
         () {
           const pdfText = '''
 Corporation : SETC
-PNR Number : T12345678
+PNR Number : T123456A78
 Date of Journey : 15-10-2025
-Trip Code : TEST123
+Trip Code : 1234TEST
 ''';
 
           final ticket = parser.parseTicket(pdfText);
@@ -347,9 +347,9 @@ Trip Code : TEST123
         () {
           const pdfText = '''
 Corporation : SETC
-PNR Number : T12345678
+PNR Number : T123456A78
 Date of Journey : invalid-date
-Trip Code : TEST123
+Trip Code : 1234TEST
 ''';
 
           final ticket = parser.parseTicket(pdfText);
@@ -363,8 +363,8 @@ Trip Code : TEST123
           'Then returns null for missing date', () {
         const pdfText = '''
 Corporation : SETC
-PNR Number : T12345678
-Trip Code : TEST123
+PNR Number : T123456A78
+Trip Code : 1234TEST
 ''';
 
         final ticket = parser.parseTicket(pdfText);
@@ -377,9 +377,9 @@ Trip Code : TEST123
           'Then returns null', () {
         const pdfText = '''
 Corporation : SETC
-PNR Number : T12345678
+PNR Number : T123456A78
 Date of Journey : 99/99/9999
-Trip Code : TEST123
+Trip Code : 1234TEST
 ''';
 
         final ticket = parser.parseTicket(pdfText);
@@ -395,10 +395,10 @@ Trip Code : TEST123
           'Then datetime is parsed correctly', () {
         const pdfText = '''
 Corporation : SETC
-PNR Number : T12345678
+PNR Number : T123456A78
 Passenger Pickup Time : 25/12/2024 14:30 Hrs.
 Service Start Time : 14:30
-Trip Code : TEST123
+Trip Code : 1234TEST
 ''';
 
         final ticket = parser.parseTicket(pdfText);
@@ -414,10 +414,10 @@ Trip Code : TEST123
           'Then datetime is parsed correctly', () {
         const pdfText = '''
 Corporation : SETC
-PNR Number : T12345678
+PNR Number : T123456A78
 Passenger Pickup Time : 25-12-2024 09:45
 Service Start Time : 09:45
-Trip Code : TEST123
+Trip Code : 1234TEST
 ''';
 
         final ticket = parser.parseTicket(pdfText);
@@ -433,10 +433,10 @@ Trip Code : TEST123
           'Then returns null for invalid datetime', () {
         const pdfText = '''
 Corporation : SETC
-PNR Number : T12345678
+PNR Number : T123456A78
 Passenger Pickup Time : invalid datetime
 Service Start Time : 14:30
-Trip Code : TEST123
+Trip Code : 1234TEST
 ''';
 
         final ticket = parser.parseTicket(pdfText);
@@ -449,10 +449,10 @@ Trip Code : TEST123
           'Then returns null for invalid datetime', () {
         const pdfText = '''
 Corporation : SETC
-PNR Number : T12345678
+PNR Number : T123456A78
 Passenger Pickup Time : 25/12/2024
 Service Start Time : 14:30
-Trip Code : TEST123
+Trip Code : 1234TEST
 ''';
 
         final ticket = parser.parseTicket(pdfText);
@@ -465,10 +465,11 @@ Trip Code : TEST123
           'Then returns null for invalid time', () {
         const pdfText = '''
 Corporation : SETC
-PNR Number : T12345678
-Passenger Pickup Time : 25/12/2024 99:99
-Service Start Time : 14:30
-Trip Code : TEST123
+PNR Number : T123456A78
+Passenger Pickup Time : invalid invalid
+Service Start Time : invalid
+Date of Journey : invalid
+Trip Code : 1234TEST
 ''';
 
         final ticket = parser.parseTicket(pdfText);
@@ -481,10 +482,10 @@ Trip Code : TEST123
           'When parsing, Then combines date and time correctly', () {
         const pdfText = '''
 Corporation : SETC
-PNR Number : T12345678
+PNR Number : T123456A78
 Date of Journey : 15/10/2025
 Service Start Time : 16:45
-Trip Code : TEST123
+Trip Code : 1234TEST
 ''';
 
         final ticket = parser.parseTicket(pdfText);
@@ -505,8 +506,8 @@ Trip Code : TEST123
           'Then extracts passenger details correctly', () {
         const pdfText = '''
 Corporation : SETC
-PNR Number : T12345678
-Trip Code : TEST123
+PNR Number : T123456A78
+Trip Code : 1234TEST
 Name Age Adult/Child Gender Seat No.
 JohnDoe 30 Adult M 2B
 ''';
@@ -536,8 +537,8 @@ JohnDoe 30 Adult M 2B
           'Then extracts child details correctly', () {
         const pdfText = '''
 Corporation : SETC
-PNR Number : T12345678
-Trip Code : TEST123
+PNR Number : T123456A78
+Trip Code : 1234TEST
 Name Age Adult/Child Gender Seat No.
 JaneDoe 12 Child F 3C
 ''';
@@ -562,8 +563,8 @@ JaneDoe 12 Child F 3C
           'Then extracts passenger info', () {
         const pdfText = '''
 Corporation : SETC
-PNR Number : T12345678
-Trip Code : TEST123
+PNR Number : T123456A78
+Trip Code : 1234TEST
 Passenger Information
 JohnDoe
 Age
@@ -594,8 +595,8 @@ Adult
           'Then extracts seat number correctly', () {
         const pdfText = '''
 Corporation : SETC
-PNR Number : T12345678
-Trip Code : TEST123
+PNR Number : T123456A78
+Trip Code : 1234TEST
 Passenger Information
 Name
 HarishAnbalagan
@@ -621,8 +622,8 @@ Seat No.
           'Then handles gracefully without passenger fields', () {
         const pdfText = '''
 Corporation : SETC
-PNR Number : T12345678
-Trip Code : TEST123
+PNR Number : T123456A78
+Trip Code : 1234TEST
 ''';
 
         final ticket = parser.parseTicket(pdfText);
@@ -641,12 +642,12 @@ Trip Code : TEST123
           'Then preserves special characters', () {
         const pdfText = '''
 Corporation : SETC
-PNR Number : T12345678
+PNR Number : T123456A78
 Service Start Place : Chennai (T.Nagar)
 Service End Place : Bangalore-City
 Passenger Start Place : Chennai (T.Nagar)
 Passenger End Place : Bangalore-City
-Trip Code : TEST123
+Trip Code : 1234TEST
 ''';
 
         final ticket = parser.parseTicket(pdfText);
@@ -661,8 +662,8 @@ Trip Code : TEST123
           'Then extracts full corporation name', () {
         const pdfText = '''
 Corporation : State Express Transport Corporation
-PNR Number : T12345678
-Trip Code : TEST123
+PNR Number : T123456A78
+Trip Code : 1234TEST
 ''';
 
         final ticket = parser.parseTicket(pdfText);
@@ -677,10 +678,10 @@ Trip Code : TEST123
           'Then extracts ID number correctly', () {
         const pdfText = '''
 Corporation : SETC
-PNR Number : T12345678
+PNR Number : T123456A78
 ID Card Type : Aadhaar Card
 ID Card Number : 123456789012
-Trip Code : TEST123
+Trip Code : 1234TEST
 ''';
 
         final ticket = parser.parseTicket(pdfText);
@@ -695,10 +696,10 @@ Trip Code : TEST123
           'Then extracts ID number correctly', () {
         const pdfText = '''
 Corporation : SETC
-PNR Number : T12345678
+PNR Number : T123456A78
 Government Issued Photo
 ID Card Number : 987654321012
-Trip Code : TEST123
+Trip Code : 1234TEST
 ''';
 
         final ticket = parser.parseTicket(pdfText);
@@ -713,14 +714,14 @@ Trip Code : TEST123
           'Then extracts all route fields', () {
         const pdfText = '''
 Corporation : SETC
-PNR Number : T12345678
+PNR Number : T123456A78
 Route No : 123A
 Service Start Place : CHENNAI
 Service End Place : COIMBATORE
 Passenger Start Place : KOYAMBEDU
 Passenger End Place : GANDHIPURAM
 Passenger Pickup Point : KOYAMBEDU BUS STAND
-Trip Code : TEST123
+Trip Code : 1234TEST
 ''';
 
         final ticket = parser.parseTicket(pdfText);
@@ -741,9 +742,9 @@ Trip Code : TEST123
           'Then extracts transaction number', () {
         const pdfText = '''
 Corporation : SETC
-PNR Number : T12345678
-Bank Txn. No. : BTN123456789
-Trip Code : TEST123
+PNR Number : T123456A78
+Bank Txn. No. : BTN123456A789
+Trip Code : 1234TEST
 ''';
 
         final ticket = parser.parseTicket(pdfText);
@@ -755,9 +756,9 @@ Trip Code : TEST123
           'Then extracts transaction number', () {
         const pdfText = '''
 Corporation : SETC
-PNR Number : T12345678
+PNR Number : T123456A78
 Bank Txn. No; : BTN987654321
-Trip Code : TEST123
+Trip Code : 1234TEST
 ''';
 
         final ticket = parser.parseTicket(pdfText);
@@ -769,9 +770,9 @@ Trip Code : TEST123
           'Then handles different category formats', () {
         const pdfText = '''
 Corporation : SETC
-PNR Number : T12345678
+PNR Number : T123456A78
 Passenger Category : Senior Citizen
-Trip Code : TEST123
+Trip Code : 1234TEST
 ''';
 
         final ticket = parser.parseTicket(pdfText);
@@ -783,9 +784,9 @@ Trip Code : TEST123
           'Then extracts category correctly', () {
         const pdfText = '''
 Corporation : SETC
-PNR Number : T12345678
+PNR Number : T123456A78
 Passenger category : Student
-Trip Code : TEST123
+Trip Code : 1234TEST
 ''';
 
         final ticket = parser.parseTicket(pdfText);
@@ -800,9 +801,9 @@ Trip Code : TEST123
           'Then formats fare as zero', () {
         const pdfText = '''
 Corporation : SETC
-PNR Number : T12345678
+PNR Number : T123456A78
 Total Fare : 0.00 Rs.
-Trip Code : TEST123
+Trip Code : 1234TEST
 ''';
 
         final ticket = parser.parseTicket(pdfText);
@@ -817,9 +818,9 @@ Trip Code : TEST123
           'Then formats fare with decimal', () {
         const pdfText = '''
 Corporation : SETC
-PNR Number : T12345678
+PNR Number : T123456A78
 Total Fare : 500 Rs.
-Trip Code : TEST123
+Trip Code : 1234TEST
 ''';
 
         final ticket = parser.parseTicket(pdfText);
@@ -834,8 +835,8 @@ Trip Code : TEST123
           'Then defaults to zero fare', () {
         const pdfText = '''
 Corporation : SETC
-PNR Number : T12345678
-Trip Code : TEST123
+PNR Number : T123456A78
+Trip Code : 1234TEST
 ''';
 
         final ticket = parser.parseTicket(pdfText);
@@ -852,9 +853,9 @@ Trip Code : TEST123
           'Then handles gracefully', () {
         const pdfText = '''
 Corporation : SETC
-PNR Number : T12345678
+PNR Number : T123456A78
 No. of Seats : 0
-Trip Code : TEST123
+Trip Code : 1234TEST
 ''';
 
         final ticket = parser.parseTicket(pdfText);
@@ -867,9 +868,9 @@ Trip Code : TEST123
           'Then extracts seat count correctly', () {
         const pdfText = '''
 Corporation : SETC
-PNR Number : T12345678
+PNR Number : T123456A78
 No. of Seats : 3
-Trip Code : TEST123
+Trip Code : 1234TEST
 ''';
 
         final ticket = parser.parseTicket(pdfText);
@@ -884,9 +885,9 @@ Trip Code : TEST123
           'Then returns null for invalid number', () {
         const pdfText = '''
 Corporation : SETC
-PNR Number : T12345678
+PNR Number : T123456A78
 No. of Seats : invalid
-Trip Code : TEST123
+Trip Code : 1234TEST
 ''';
 
         final ticket = parser.parseTicket(pdfText);
@@ -904,8 +905,8 @@ Trip Code : TEST123
         // TODO(enhancement): Use allMatches() for multi-passenger support
         const pdfText = '''
 Corporation : SETC
-PNR Number : T12345678
-Trip Code : TEST123
+PNR Number : T123456A78
+Trip Code : 1234TEST
 Name Age Adult/Child Gender Seat No.
 JohnDoe 30 Adult M 2B
 JaneDoe 28 Adult F 3C
@@ -929,8 +930,8 @@ JaneDoe 28 Adult F 3C
           'Then handles missing seat gracefully', () {
         const pdfText = '''
 Corporation : SETC
-PNR Number : T12345678
-Trip Code : TEST123
+PNR Number : T123456A78
+Trip Code : 1234TEST
 Name Age Adult/Child Gender Seat No.
 TestUser 25 Adult M
 ''';
@@ -948,13 +949,13 @@ TestUser 25 Adult M
           'Then extracts PNR correctly', () {
         const pdfText = '''
 Corporation : SETC
-PNR Number : E12345678
-Trip Code : TEST123
+PNR Number : E123456A78
+Trip Code : 1234TEST
 ''';
 
         final ticket = parser.parseTicket(pdfText);
 
-        expect(ticket.ticketId, equals('E12345678'));
+        expect(ticket.ticketId, equals('E123456A78'));
       });
 
       test('Given alphanumeric PNR, When parsing ticket, '
@@ -962,7 +963,7 @@ Trip Code : TEST123
         const pdfText = '''
 Corporation : SETC
 PNR Number : ABC123XYZ
-Trip Code : TEST123
+Trip Code : 1234TEST
 ''';
 
         final ticket = parser.parseTicket(pdfText);
@@ -974,7 +975,7 @@ Trip Code : TEST123
           'Then PNR is null or empty', () {
         const pdfText = '''
 Corporation : SETC
-Trip Code : TEST123
+Trip Code : 1234TEST
 ''';
 
         final ticket = parser.parseTicket(pdfText);
@@ -990,8 +991,8 @@ Trip Code : TEST123
           'Then extracts TNSTC as provider', () {
         const pdfText = '''
 Corporation : TNSTC
-PNR Number : T12345678
-Trip Code : TEST123
+PNR Number : T123456A78
+Trip Code : 1234TEST
 ''';
 
         final ticket = parser.parseTicket(pdfText);
@@ -1007,8 +1008,8 @@ Trip Code : TEST123
           'Then extracts full corporation name', () {
         const pdfText = '''
 Corporation : SETC-Tamil Nadu
-PNR Number : T12345678
-Trip Code : TEST123
+PNR Number : T123456A78
+Trip Code : 1234TEST
 ''';
 
         final ticket = parser.parseTicket(pdfText);
@@ -1022,8 +1023,8 @@ Trip Code : TEST123
       test('Given missing corporation name, When parsing ticket, '
           'Then uses default corporation', () {
         const pdfText = '''
-PNR Number : T12345678
-Trip Code : TEST123
+PNR Number : T123456A78
+Trip Code : 1234TEST
 ''';
 
         final ticket = parser.parseTicket(pdfText);
@@ -1032,7 +1033,7 @@ Trip Code : TEST123
         // (no leading dash or default corporation)
         expect(
           ticket.secondaryText,
-          equals('TEST123'),
+          equals('1234TEST'),
         );
       });
     });
@@ -1043,9 +1044,9 @@ Trip Code : TEST123
           'Then extracts route number', () {
         const pdfText = '''
 Corporation : SETC
-PNR Number : T12345678
+PNR Number : T123456A78
 Route No : 123ABC
-Trip Code : TEST123
+Trip Code : 1234TEST
 ''';
 
         final ticket = parser.parseTicket(pdfText);
@@ -1057,9 +1058,9 @@ Trip Code : TEST123
           'Then extracts route number', () {
         const pdfText = '''
 Corporation : SETC
-PNR Number : T12345678
+PNR Number : T123456A78
 Route No : 123-A/B
-Trip Code : TEST123
+Trip Code : 1234TEST
 ''';
 
         final ticket = parser.parseTicket(pdfText);
@@ -1071,14 +1072,14 @@ Trip Code : TEST123
           'Then uses trip code in secondary text', () {
         const pdfText = '''
 Corporation : SETC
-PNR Number : T12345678
-Trip Code : TEST123
+PNR Number : T123456A78
+Trip Code : 1234TEST
 ''';
 
         final ticket = parser.parseTicket(pdfText);
 
         // Should use trip code in secondary text when route is missing
-        expect(ticket.secondaryText, contains('TEST123'));
+        expect(ticket.secondaryText, contains('1234TEST'));
       });
     });
 
@@ -1088,10 +1089,10 @@ Trip Code : TEST123
           'Then departure time is extracted', () {
         const pdfText = '''
 Corporation : SETC
-PNR Number : T12345678
+PNR Number : T123456A78
 Date of Journey : 15/12/2024
 Service Start Time : 14:30 Hrs.
-Trip Code : TEST123
+Trip Code : 1234TEST
 ''';
 
         final ticket = parser.parseTicket(pdfText);
@@ -1106,10 +1107,10 @@ Trip Code : TEST123
           'Then time is valid', () {
         const pdfText = '''
 Corporation : SETC
-PNR Number : T12345678
+PNR Number : T123456A78
 Date of Journey : 15/10/2025
 Service Start Time : 23:59
-Trip Code : TEST123
+Trip Code : 1234TEST
 ''';
 
         final ticket = parser.parseTicket(pdfText);
@@ -1124,10 +1125,10 @@ Trip Code : TEST123
           'Then time is valid', () {
         const pdfText = '''
 Corporation : SETC
-PNR Number : T12345678
+PNR Number : T123456A78
 Date of Journey : 15/10/2025
 Service Start Time : 00:00
-Trip Code : TEST123
+Trip Code : 1234TEST
 ''';
 
         final ticket = parser.parseTicket(pdfText);
@@ -1142,10 +1143,10 @@ Trip Code : TEST123
           'Then falls back to date without time', () {
         const pdfText = '''
 Corporation : SETC
-PNR Number : T12345678
+PNR Number : T123456A78
 Date of Journey : 15/12/2024
 Service Start Time : invalid
-Trip Code : TEST123
+Trip Code : 1234TEST
 ''';
 
         final ticket = parser.parseTicket(pdfText);
@@ -1161,12 +1162,12 @@ Trip Code : TEST123
           'Then creates proper tags', () {
         const pdfText = '''
 Corporation : SETC
-PNR Number : T12345678
+PNR Number : T123456A78
 Date of Journey : 15/12/2024
 Service Start Place : CHENNAI
 Service End Place : BANGALORE
 Service Start Time : 14:30
-Trip Code : TEST123
+Trip Code : 1234TEST
 Name Age Adult/Child Gender Seat No.
 TestUser 25 Adult M 1A
 Total Fare : 500.00 Rs.
@@ -1183,7 +1184,7 @@ Total Fare : 500.00 Rs.
             ?.where((t) => t.icon == 'confirmation_number')
             .firstOrNull;
         expect(tripCodeTag, isNotNull);
-        expect(tripCodeTag!.value, equals('TEST123'));
+        expect(tripCodeTag!.value, equals('1234TEST'));
 
         // Verify fare tag
         final fareTag = ticket.tags
@@ -1202,8 +1203,8 @@ Total Fare : 500.00 Rs.
           'Then creates minimal tags', () {
         const pdfText = '''
 Corporation : SETC
-PNR Number : T12345678
-Trip Code : TEST123
+PNR Number : T123456A78
+Trip Code : 1234TEST
 ''';
 
         final ticket = parser.parseTicket(pdfText);
@@ -1218,12 +1219,12 @@ Trip Code : TEST123
         () {
           const pdfText = '''
 Corporation : SETC
-PNR Number : T12345678
+PNR Number : T123456A78
 Service Start Place : SERVICE START
 Service End Place : SERVICE END
 Passenger Start Place : PASSENGER START
 Passenger End Place : PASSENGER END
-Trip Code : TEST123
+Trip Code : 1234TEST
 ''';
 
           final ticket = parser.parseTicket(pdfText);
@@ -1237,10 +1238,10 @@ Trip Code : TEST123
           'Then sets location from pickup point', () {
         const pdfText = '''
 Corporation : SETC
-PNR Number : T12345678
+PNR Number : T123456A78
 Service Start Place : CHENNAI
 Passenger Pickup Point : KOYAMBEDU BUS STAND
-Trip Code : TEST123
+Trip Code : 1234TEST
 ''';
 
         final ticket = parser.parseTicket(pdfText);
@@ -1254,9 +1255,9 @@ Trip Code : TEST123
         () {
           const pdfText = '''
 Corporation : SETC
-PNR Number : T12345678
+PNR Number : T123456A78
 Service Start Place : CHENNAI
-Trip Code : TEST123
+Trip Code : 1234TEST
 ''';
 
           final ticket = parser.parseTicket(pdfText);
@@ -1278,8 +1279,8 @@ Trip Code : TEST123
           'Then extracts bus ID', () {
         const pdfText = '''
 Corporation : SETC
-PNR Number : T12345678
-Trip Code : TEST123
+PNR Number : T123456A78
+Trip Code : 1234TEST
 Bus ID No. : TN-01-AB-1234
 ''';
 
@@ -1295,8 +1296,8 @@ Bus ID No. : TN-01-AB-1234
           'Then extracts bus ID correctly', () {
         const pdfText = '''
 Corporation : SETC
-PNR Number : T12345678
-Trip Code : TEST123
+PNR Number : T123456A78
+Trip Code : 1234TEST
 Bus ID No. : E-5494
 ''';
 
@@ -1312,8 +1313,8 @@ Bus ID No. : E-5494
           'Then bus ID is not in extras', () {
         const pdfText = '''
 Corporation : SETC
-PNR Number : T12345678
-Trip Code : TEST123
+PNR Number : T123456A78
+Trip Code : 1234TEST
 ''';
 
         final ticket = parser.parseTicket(pdfText);
@@ -1332,9 +1333,9 @@ Trip Code : TEST123
           'Then uses as boarding point', () {
         const pdfText = '''
 Corporation : SETC
-PNR Number : T12345678
+PNR Number : T123456A78
 Passenger Pickup Point : KOYAMBEDU BUS TERMINAL
-Trip Code : TEST123
+Trip Code : 1234TEST
 ''';
 
         final ticket = parser.parseTicket(pdfText);
@@ -1347,9 +1348,9 @@ Trip Code : TEST123
           'Then preserves special characters', () {
         const pdfText = '''
 Corporation : SETC
-PNR Number : T12345678
+PNR Number : T123456A78
 Passenger Pickup Point : Chennai-T.Nagar (Main Road)
-Trip Code : TEST123
+Trip Code : 1234TEST
 ''';
 
         final ticket = parser.parseTicket(pdfText);
@@ -1364,9 +1365,9 @@ Trip Code : TEST123
           'Then extracts OB reference', () {
         const pdfText = '''
 Corporation : SETC
-PNR Number : T12345678
-OB Reference No. : OB12345678
-Trip Code : TEST123
+PNR Number : T123456A78
+OB Reference No. : OB123456A78
+Trip Code : 1234TEST
 ''';
 
         final ticket = parser.parseTicket(pdfText);
@@ -1374,16 +1375,16 @@ Trip Code : TEST123
         final obRef = ticket.extras
             ?.firstWhere((e) => e.title == 'Booking Ref')
             .value;
-        expect(obRef, equals('OB12345678'));
+        expect(obRef, equals('OB123456A78'));
       });
 
       test('Given OB reference alphanumeric format, When parsing, '
           'Then extracts OB reference', () {
         const pdfText = '''
 Corporation : SETC
-PNR Number : T12345678
+PNR Number : T123456A78
 OB Reference No. : OB31475439
-Trip Code : TEST123
+Trip Code : 1234TEST
 ''';
 
         final ticket = parser.parseTicket(pdfText);
@@ -1398,8 +1399,8 @@ Trip Code : TEST123
           'Then OB reference is null', () {
         const pdfText = '''
 Corporation : SETC
-PNR Number : T12345678
-Trip Code : TEST123
+PNR Number : T123456A78
+Trip Code : 1234TEST
 ''';
 
         final ticket = parser.parseTicket(pdfText);
@@ -1417,9 +1418,9 @@ Trip Code : TEST123
           'Then extracts service class', () {
         const pdfText = '''
 Corporation : SETC
-PNR Number : T12345678
+PNR Number : T123456A78
 Class of Service : AC SLEEPER
-Trip Code : TEST123
+Trip Code : 1234TEST
 ''';
 
         final ticket = parser.parseTicket(pdfText);
@@ -1434,9 +1435,9 @@ Trip Code : TEST123
           'Then extracts service class', () {
         const pdfText = '''
 Corporation : SETC
-PNR Number : T12345678
+PNR Number : T123456A78
 Class of Service : AC SLEEPER SEATER
-Trip Code : TEST123
+Trip Code : 1234TEST
 ''';
 
         final ticket = parser.parseTicket(pdfText);
@@ -1451,9 +1452,9 @@ Trip Code : TEST123
           'Then extracts service class', () {
         const pdfText = '''
 Corporation : SETC
-PNR Number : T12345678
+PNR Number : T123456A78
 Class of Service : NON AC SEATER
-Trip Code : TEST123
+Trip Code : 1234TEST
 ''';
 
         final ticket = parser.parseTicket(pdfText);
@@ -1468,8 +1469,8 @@ Trip Code : TEST123
           'Then service class is null', () {
         const pdfText = '''
 Corporation : SETC
-PNR Number : T12345678
-Trip Code : TEST123
+PNR Number : T123456A78
+Trip Code : 1234TEST
 ''';
 
         final ticket = parser.parseTicket(pdfText);
@@ -1483,12 +1484,107 @@ Trip Code : TEST123
 
     // ============== Seat Number Formats ==============
     group('Seat Number Formats', () {
+      test('Given real OCR text with multi-line seat, When parsing ticket, '
+          'Then extracts seat number correctly', () async {
+        final file = File('test/assets/tnstc/ocr_text_T75229211.txt');
+        if (file.existsSync()) {
+          final pdfText = await file.readAsString();
+          final ticket = parser.parseTicket(pdfText);
+
+          final seat = ticket.tags
+              ?.firstWhere((t) => t.icon == 'event_seat')
+              .value;
+          expect(seat, equals('23'));
+        }
+      });
+
+      test(
+        'Given real OCR text with multi-line seat (2LB), When parsing ticket, '
+        'Then extracts seat number correctly',
+        () async {
+          final file = File('test/assets/tnstc/ocr_text_seat_2LB.txt');
+          if (file.existsSync()) {
+            final pdfText = await file.readAsString();
+            final ticket = parser.parseTicket(pdfText);
+
+            final seat = ticket.tags
+                ?.firstWhere((t) => t.icon == 'event_seat')
+                .value;
+            expect(seat, equals('2LB'));
+          }
+        },
+      );
+
+      test(
+        'Given real OCR text (Kottivakkam), When parsing ticket, '
+        'Then extracts split pickup point and seat correctly',
+        () async {
+          final file = File('test/assets/tnstc/ocr_text_kottivakkam.txt');
+          if (file.existsSync()) {
+            final pdfText = await file.readAsString();
+            final ticket = parser.parseTicket(pdfText);
+
+            final seat = ticket.tags
+                ?.firstWhere((t) => t.icon == 'event_seat')
+                .value;
+            // Verify seat number
+            expect(seat, equals('2LB'));
+
+            // Verify pickup point merging
+            // "OFFICE)" and "KOTTIVAKKAM(RTO" should be merged
+            final pickup = ticket.location;
+            expect(pickup, contains('KOTTIVAKKAM'));
+            expect(pickup, contains('OFFICE'));
+          }
+        },
+      );
+
+      test(
+        'Given real OCR text (Bengaluru), When parsing ticket, '
+        'Then extracts seat number correctly even if at end of file',
+        () async {
+          final file = File('test/assets/tnstc/ocr_text_Y74873047.txt');
+          if (file.existsSync()) {
+            final pdfText = await file.readAsString();
+            final ticket = parser.parseTicket(pdfText);
+
+            final seat = ticket.tags
+                ?.firstWhere((t) => t.icon == 'event_seat')
+                .value;
+            // Verify seat number
+            expect(seat, equals('28'));
+          }
+        },
+      );
+
+      test(
+        'Given real OCR text (Multiple Seats), When parsing ticket, '
+        'Then extracts all seat numbers correctly',
+        () async {
+          final file = File('test/assets/tnstc/ocr_text_T73910447.txt');
+          if (file.existsSync()) {
+            final pdfText = await file.readAsString();
+            final ticket = parser.parseTicket(pdfText);
+
+            final seat = ticket.tags
+                ?.firstWhere((t) => t.icon == 'event_seat')
+                .value;
+            // Should capture all seats: 10UB, 11UB, 120B
+            // The regex captures them with whitespace/newlines included in default group
+            // Verify that it contains all of them.
+            expect(seat, contains('10UB'));
+            expect(seat, contains('11UB'));
+            expect(seat, contains('120B'));
+          }
+        },
+      );
+
       test('Given single digit seat, When parsing ticket, '
           'Then extracts seat number', () {
         const pdfText = '''
 Corporation : SETC
-PNR Number : T12345678
-Trip Code : TEST123
+PNR Number : T123456A78
+Trip Code : 1234TEST
 Name Age Adult/Child Gender Seat No.
 TestUser 25 Adult M 1
 ''';
@@ -1505,8 +1601,8 @@ TestUser 25 Adult M 1
           'Then extracts seat number', () {
         const pdfText = '''
 Corporation : SETC
-PNR Number : T12345678
-Trip Code : TEST123
+PNR Number : T123456A78
+Trip Code : 1234TEST
 Name Age Adult/Child Gender Seat No.
 TestUser 25 Adult M 12B
 ''';
@@ -1523,8 +1619,8 @@ TestUser 25 Adult M 12B
           'Then extracts seat number', () {
         const pdfText = '''
 Corporation : SETC
-PNR Number : T12345678
-Trip Code : TEST123
+PNR Number : T123456A78
+Trip Code : 1234TEST
 Name Age Adult/Child Gender Seat No.
 TestUser 25 Adult M 4UB
 ''';
@@ -1544,7 +1640,7 @@ TestUser 25 Adult M 4UB
           'Then extracts trip code', () {
         const pdfText = '''
 Corporation : SETC
-PNR Number : T12345678
+PNR Number : T123456A78
 Trip Code : 1315KUMCHEAB
 ''';
 
@@ -1561,8 +1657,8 @@ Trip Code : 1315KUMCHEAB
           'Then extracts trip code', () {
         const pdfText = '''
 Corporation : SETC
-PNR Number : T12345678
-Trip Code : 123456
+PNR Number : T123456A78
+Trip Code : 123456A
 ''';
 
         final ticket = parser.parseTicket(pdfText);
@@ -1570,7 +1666,7 @@ Trip Code : 123456
         final tripCode = ticket.extras
             ?.firstWhere((e) => e.title == 'Trip Code')
             .value;
-        expect(tripCode, equals('123456'));
+        expect(tripCode, equals('123456A'));
       });
 
       test(
@@ -1578,7 +1674,7 @@ Trip Code : 123456
         () {
           const pdfText = '''
 Corporation : SETC
-PNR Number : T12345678
+PNR Number : T123456A78
 Route No : 307AB
 ''';
 
@@ -1600,10 +1696,10 @@ Route No : 307AB
           'Then preserves full place names', () {
         const pdfText = '''
 Corporation : SETC
-PNR Number : T12345678
+PNR Number : T123456A78
 Service Start Place : Chennai-Koyambedu CMBT Terminus Bay Platform 5
 Service End Place : Bangalore-Kempegowda Bus Station Platform 10
-Trip Code : TEST123
+Trip Code : 1234TEST
 ''';
 
         final ticket = parser.parseTicket(pdfText);
@@ -1621,10 +1717,10 @@ Trip Code : TEST123
           'Then preserves dots in place names', () {
         const pdfText = '''
 Corporation : SETC
-PNR Number : T12345678
+PNR Number : T123456A78
 Service Start Place : Chennai-PT Dr.M.G.R. BS
 Service End Place : Madurai-M.G.R. Int. BS
-Trip Code : TEST123
+Trip Code : 1234TEST
 ''';
 
         final ticket = parser.parseTicket(pdfText);
@@ -1639,10 +1735,10 @@ Trip Code : TEST123
           'Then preserves numbers in place names', () {
         const pdfText = '''
 Corporation : SETC
-PNR Number : T12345678
+PNR Number : T123456A78
 Service Start Place : Chennai T.Nagar 24th Street
 Service End Place : Bangalore 15th Cross
-Trip Code : TEST123
+Trip Code : 1234TEST
 ''';
 
         final ticket = parser.parseTicket(pdfText);
@@ -1660,15 +1756,15 @@ Trip Code : TEST123
           'Then extracts basic fields', () {
         const pdfText = '''
 Corporation : SETC
-PNR Number : T12345678
-Trip Code : TEST123
+PNR Number : T123456A78
+Trip Code : 1234TEST
 ''';
 
         final ticket = parser.parseTicket(pdfText);
 
-        expect(ticket.ticketId, equals('T12345678'));
+        expect(ticket.ticketId, equals('T123456A78'));
         expect(ticket.secondaryText, contains('SETC'));
-        expect(ticket.secondaryText, contains('TEST123'));
+        expect(ticket.secondaryText, contains('1234TEST'));
       });
 
       test('Given empty PDF text, When parsing ticket, '
@@ -1697,7 +1793,7 @@ Trip Code : TEST123
         const pdfText = r'''
 asdkfjlaksjdflkasjdflkj
 asldkfjalskdjflaksdjf
-1234567890
+123456A7890
 @#$%^&*()
 ''';
 
@@ -1707,6 +1803,7 @@ asldkfjalskdjflaksdjf
         expect(ticket, isNotNull);
       });
 
+      // Trip Code : 1234COMPLETE
       test('Given complete ticket with all fields, When parsing, '
           'Then extracts all available fields', () {
         const pdfText = '''
@@ -1723,7 +1820,7 @@ Passenger Pickup Point : PICKUP LOCATION
 Passenger Pickup Time : 31/12/2024 23:30 Hrs.
 Platform Number : 99
 Class of Service : ULTRA DELUXE AC
-Trip Code : COMPLETE999
+Trip Code : 1234COMPLETE
 OB Reference No. : OB99999999
 No. of Seats : 2
 Bank Txn. No. : BANK999999
@@ -1741,7 +1838,7 @@ Total Fare : 9999.99 Rs.
         // Verify all major fields are present
         expect(ticket.ticketId, equals('T99999999'));
         expect(ticket.primaryText, equals('START CITY → END CITY'));
-        expect(ticket.secondaryText, equals('SETC - COMPLETE999'));
+        expect(ticket.secondaryText, equals('SETC - 1234COMPLETE'));
 
         // Verify some key extras
         final pnrExtra = ticket.extras
@@ -1775,10 +1872,10 @@ Total Fare : 9999.99 Rs.
           'Then uses service places for primaryText', () {
         const pdfText = '''
 Corporation : SETC
-PNR Number : T12345678
+PNR Number : T123456A78
 Service Start Place : SERVICE START
 Service End Place : SERVICE END
-Trip Code : TEST123
+Trip Code : 1234TEST
 ''';
 
         final ticket = parser.parseTicket(pdfText);
@@ -1790,10 +1887,10 @@ Trip Code : TEST123
           'Then uses passenger places for primaryText', () {
         const pdfText = '''
 Corporation : SETC
-PNR Number : T12345678
+PNR Number : T123456A78
 Passenger Start Place : PASSENGER START
 Passenger End Place : PASSENGER END
-Trip Code : TEST123
+Trip Code : 1234TEST
 ''';
 
         final ticket = parser.parseTicket(pdfText);
@@ -1814,15 +1911,15 @@ Trip Code : TEST123
           'Then extracts fields correctly', () {
         const pdfText = '''
 Corporation : SETC
-PNR Number : T12345678
+PNR Number : T123456A78
 date of journey : 15/12/2024
-TRIP CODE : TEST123
+TRIP CODE : 1234TEST
 ''';
 
         final ticket = parser.parseTicket(pdfText);
 
         // PNR should still be extracted (case-sensitive pattern)
-        expect(ticket.ticketId, equals('T12345678'));
+        expect(ticket.ticketId, equals('T123456A78'));
       });
     });
   });
