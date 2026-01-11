@@ -1,4 +1,5 @@
 import 'package:cross_file/cross_file.dart';
+import 'package:flutter/rendering.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
 import 'package:namma_wallet/src/common/services/ocr/ocr_service_interface.dart';
 import 'package:namma_wallet/src/common/services/pdf/pdf_service_interface.dart';
@@ -104,6 +105,8 @@ class PDFService implements IPDFService {
 
         // Clean and normalize the extracted text
         final cleanedText = _cleanExtractedText(rawText);
+
+        debugPrint(cleanedText);
 
         // Log metadata after cleaning (no PII)
         final cleanedLineCount = cleanedText.split('\n').length;

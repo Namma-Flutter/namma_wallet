@@ -64,11 +64,13 @@ class IRCTCTicketMapper extends ClassMapperBase<IRCTCTicket> {
   static const Field<IRCTCTicket, double> _f$ticketFare = Field(
     'ticketFare',
     _$ticketFare,
+    opt: true,
   );
   static double? _$irctcFee(IRCTCTicket v) => v.irctcFee;
   static const Field<IRCTCTicket, double> _f$irctcFee = Field(
     'irctcFee',
     _$irctcFee,
+    opt: true,
   );
   static String? _$transactionId(IRCTCTicket v) => v.transactionId;
   static const Field<IRCTCTicket, String> _f$transactionId = Field(

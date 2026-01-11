@@ -1484,57 +1484,245 @@ Trip Code : 1234TEST
 
     // ============== Seat Number Formats ==============
     group('Seat Number Formats', () {
-      test('Given real OCR text with multi-line seat, When parsing ticket, '
-          'Then extracts seat number correctly', () async {
-        final file = File('test/assets/tnstc/ocr_text_T75229211.txt');
-        if (file.existsSync()) {
-          final pdfText = await file.readAsString();
-          final ticket = parser.parseTicket(pdfText);
-
-          final seat = ticket.tags
-              ?.firstWhere((t) => t.icon == 'event_seat')
-              .value;
-          expect(seat, equals('23'));
-        }
-      });
-
       test(
-        'Given real OCR text with multi-line seat (2LB), When parsing ticket, '
-        'Then extracts seat number correctly',
+        'Given real OCR text (T75229209), When parsing ticket, '
+        'Then extracts all fields including Kottivakkam/Office and Seat 2LB',
         () async {
-          final file = File('test/assets/tnstc/ocr_text_seat_2LB.txt');
+          final file = File('test/assets/tnstc/ocr_text_T75229209.txt');
           if (file.existsSync()) {
             final pdfText = await file.readAsString();
             final ticket = parser.parseTicket(pdfText);
 
+            // 1. Verify Seat (2LB)
             final seat = ticket.tags
                 ?.firstWhere((t) => t.icon == 'event_seat')
                 .value;
             expect(seat, equals('2LB'));
+
+            // 2. Verify Pickup Point (KOTTIVAKKAM(RTO OFFICE))
+            // The parser logic merges: "OFFICE)" and "KOTTIVAKKAM(RTO"
+            final pickup = ticket.location;
+            expect(pickup, contains('KOTTIVAKKAM'));
+            expect(pickup, contains('OFFICE'));
+
+            // 3. Verify PNR
+            expect(ticket.ticketId, equals('T75229209'));
+
+            // 4. Verify Route and Corporation
+            expect(ticket.secondaryText, contains('SETC'));
+            final routeNo = ticket.extras
+                ?.firstWhere((e) => e.title == 'Route No')
+                .value;
+            expect(routeNo, contains('307ELB'));
+
+            // 5. Verify Times and Places
+            expect(ticket.startTime!.day, 20);
+            expect(ticket.startTime!.month, 1);
+            expect(ticket.startTime!.year, 2026);
+            expect(ticket.startTime!.hour, 22);
+            expect(ticket.startTime!.minute, 55);
+            expect(ticket.primaryText, contains('CHENNAI'));
+            expect(ticket.primaryText, contains('KUMBAKONAM'));
+
+            // 6. Verify Fare
+            final fare = ticket.tags
+                ?.firstWhere((t) => t.icon == 'attach_money')
+                .value;
+            expect(fare, equals('₹555.00'));
+
+            // 7. Verify Passenger Name
+            final passengerNames = ticket.extras
+                ?.firstWhere((e) => e.title == 'Passenger Name')
+                .value;
+            expect(passengerNames, equals('HarishAnbalagan'));
+
+            // 8. Verify Class
+            final serviceClass = ticket.extras
+                ?.firstWhere((e) => e.title == 'Service Class')
+                .value;
+            expect(serviceClass, contains('SEATER'));
+
+            // 9. Verify Comprehensive Extras
+            final extras = ticket.extras!;
+            expect(
+              extras.firstWhere((e) => e.title == 'Trip Code').value,
+              equals('2200CHEKUMLB'),
+            );
+            expect(
+              extras.firstWhere((e) => e.title == 'Bus ID').value,
+              equals('E-4950'),
+            );
+            expect(
+              extras.firstWhere((e) => e.title == 'Booking Ref').value,
+              equals('OB31969360'),
+            );
+            expect(
+              extras.firstWhere((e) => e.title == 'ID Card Type').value,
+              equals('ID Card'),
+            );
+            expect(
+              extras.firstWhere((e) => e.title == 'Verification ID').value,
+              equals('736960775578'),
+            );
+            expect(
+              extras.firstWhere((e) => e.title == 'Age').value,
+              equals('26'),
+            );
+            expect(
+              extras.firstWhere((e) => e.title == 'Gender').value,
+              equals('M'),
+            );
           }
         },
       );
 
       test(
-        'Given real OCR text (Kottivakkam), When parsing ticket, '
-        'Then extracts split pickup point and seat correctly',
+        'Given real OCR text (T75229210), When parsing ticket, '
+        'Then extracts all fields including split PNR and Seat 2LB',
         () async {
-          final file = File('test/assets/tnstc/ocr_text_kottivakkam.txt');
+          final file = File('test/assets/tnstc/ocr_text_T75229210.txt');
           if (file.existsSync()) {
             final pdfText = await file.readAsString();
             final ticket = parser.parseTicket(pdfText);
 
+            // 1. Verify Seat
             final seat = ticket.tags
                 ?.firstWhere((t) => t.icon == 'event_seat')
                 .value;
-            // Verify seat number
             expect(seat, equals('2LB'));
 
-            // Verify pickup point merging
-            // "OFFICE)" and "KOTTIVAKKAM(RTO" should be merged
-            final pickup = ticket.location;
-            expect(pickup, contains('KOTTIVAKKAM'));
-            expect(pickup, contains('OFFICE'));
+            // 2. Verify PNR
+            // OCR raw: "T752292 1 o" -> parser should clean to "T75229210"
+            expect(ticket.ticketId, equals('T75229210'));
+
+            // 3. Verify Times
+            expect(ticket.startTime!.day, 22);
+            expect(ticket.startTime!.month, 1);
+            expect(ticket.startTime!.year, 2026);
+            expect(ticket.startTime!.hour, 21);
+            expect(ticket.startTime!.minute, 0);
+
+            // 4. Verify Fare
+            final fare = ticket.tags
+                ?.firstWhere((t) => t.icon == 'attach_money')
+                .value;
+            expect(fare, equals('₹555.00'));
+
+            // 5. Verify Bus ID
+            final busId = ticket.extras
+                ?.firstWhere((e) => e.title == 'Bus ID')
+                .value;
+            expect(busId, equals('E-12275'));
+
+            // 6. Verify Comprehensive Extras
+            final extras = ticket.extras!;
+            expect(
+              extras.firstWhere((e) => e.title == 'Trip Code').value,
+              equals('2100KUMCHELB'),
+            );
+            expect(
+              extras.firstWhere((e) => e.title == 'Route No').value,
+              contains('307LB'),
+            );
+            expect(
+              extras.firstWhere((e) => e.title == 'Booking Ref').value,
+              equals('OB31969360'),
+            );
+            expect(
+              extras.firstWhere((e) => e.title == 'ID Card Type').value,
+              equals('ID Card'),
+            );
+            expect(
+              extras.firstWhere((e) => e.title == 'Verification ID').value,
+              equals('736960775578'),
+            );
+            expect(
+              extras.firstWhere((e) => e.title == 'Age').value,
+              equals('26'),
+            );
+            expect(
+              extras.firstWhere((e) => e.title == 'Gender').value,
+              equals('M'),
+            );
+          }
+        },
+      );
+
+      test(
+        'Given real OCR text (Y74928831), When parsing ticket, '
+        'Then extracts all fields including Seat 23',
+        () async {
+          final file = File('test/assets/tnstc/ocr_text_Y74928831.txt');
+          if (file.existsSync()) {
+            final pdfText = await file.readAsString();
+            final ticket = parser.parseTicket(pdfText);
+
+            // 1. Verify Seat
+            final seat = ticket.tags
+                ?.firstWhere((t) => t.icon == 'event_seat')
+                .value;
+            expect(seat, equals('23'));
+
+            // 2. Verify PNR
+            expect(ticket.ticketId, equals('Y74928831'));
+
+            // 3. Verify Times
+            expect(ticket.startTime!.day, 14);
+            expect(ticket.startTime!.month, 1);
+            expect(ticket.startTime!.year, 2026);
+            expect(ticket.startTime!.hour, 13);
+            expect(ticket.startTime!.minute, 15);
+
+            // 4. Verify Fare
+            final fare = ticket.tags
+                ?.firstWhere((t) => t.icon == 'attach_money')
+                .value;
+            expect(fare, equals('₹291.00'));
+
+            // 5. Verify Class
+            final serviceClass = ticket.extras
+                ?.firstWhere((e) => e.title == 'Service Class')
+                .value;
+            expect(serviceClass, contains('DELUXE 3X2'));
+
+            // 6. Verify Comprehensive Extras
+            final extras = ticket.extras!;
+            expect(
+              extras.firstWhere((e) => e.title == 'Passenger Name').value,
+              equals('Baskar'),
+            );
+            expect(
+              extras.firstWhere((e) => e.title == 'Trip Code').value,
+              equals('1315BANKAAVVO5L'),
+            );
+            expect(
+              extras.firstWhere((e) => e.title == 'Route No').value,
+              contains('451G'),
+            );
+            expect(
+              extras.firstWhere((e) => e.title == 'Bus ID').value,
+              equals('V-4467'),
+            );
+            expect(
+              extras.firstWhere((e) => e.title == 'Booking Ref').value,
+              equals('0B2351 05730'),
+            );
+            expect(
+              extras.firstWhere((e) => e.title == 'ID Card Type').value,
+              equals('Government Issued Photo ID Card'),
+            );
+            expect(
+              extras.firstWhere((e) => e.title == 'Verification ID').value,
+              equals('Government Issued Photo ID Card'),
+            );
+            expect(
+              extras.firstWhere((e) => e.title == 'Age').value,
+              equals('39'),
+            );
+            expect(
+              extras.firstWhere((e) => e.title == 'Gender').value,
+              equals('M'),
+            );
           }
         },
       );
@@ -1553,6 +1741,54 @@ Trip Code : 1234TEST
                 .value;
             // Verify seat number
             expect(seat, equals('28'));
+
+            expect(ticket.ticketId, equals('Y74873047'));
+            expect(ticket.startTime!.day, 13);
+            expect(ticket.startTime!.month, 1);
+            expect(ticket.startTime!.year, 2026);
+            expect(ticket.startTime!.hour, 21);
+            expect(ticket.startTime!.minute, 10);
+            expect(ticket.primaryText, contains('BENGALURU'));
+
+            final fare = ticket.tags
+                ?.firstWhere((t) => t.icon == 'attach_money')
+                .value;
+            expect(fare, equals('₹383.00'));
+
+            // 6. Verify Comprehensive Extras
+            final extras = ticket.extras!;
+            expect(
+              extras.firstWhere((e) => e.title == 'Trip Code').value,
+              equals('2110BANTIDVVO1L'),
+            );
+            expect(
+              extras.firstWhere((e) => e.title == 'Route No').value,
+              contains('462'),
+            );
+            expect(
+              extras.firstWhere((e) => e.title == 'Bus ID').value,
+              equals('V-3630'),
+            );
+            expect(
+              extras.firstWhere((e) => e.title == 'Booking Ref').value,
+              equals('OB235083965'),
+            );
+            expect(
+              extras.firstWhere((e) => e.title == 'ID Card Type').value,
+              equals('Driving Licence'),
+            );
+            expect(
+              extras.firstWhere((e) => e.title == 'Verification ID').value,
+              equals('Driving Licence'),
+            );
+            expect(
+              extras.firstWhere((e) => e.title == 'Age').value,
+              equals('24'),
+            );
+            expect(
+              extras.firstWhere((e) => e.title == 'Gender').value,
+              equals('M'),
+            );
           }
         },
       );
@@ -1570,11 +1806,197 @@ Trip Code : 1234TEST
                 ?.firstWhere((t) => t.icon == 'event_seat')
                 .value;
             // Should capture all seats: 10UB, 11UB, 120B
-            // The regex captures them with whitespace/newlines included in default group
-            // Verify that it contains all of them.
             expect(seat, contains('10UB'));
             expect(seat, contains('11UB'));
             expect(seat, contains('120B'));
+
+            // Verify names
+            final passengerNames = ticket.extras
+                ?.firstWhere((e) => e.title == 'Passenger Name')
+                .value;
+            expect(passengerNames, contains('HarishAnbalagan'));
+
+            // 7. Verify Comprehensive Extras
+            final extras = ticket.extras!;
+            expect(
+              extras.firstWhere((e) => e.title == 'Booking Ref').value,
+              equals('OB31630966'),
+            );
+            expect(
+              extras.firstWhere((e) => e.title == 'Age').value,
+              equals('26'),
+            );
+            expect(
+              extras.firstWhere((e) => e.title == 'Gender').value,
+              equals('M'),
+            );
+
+            expect(passengerNames, contains('HarishAnbalagan'));
+            expect(passengerNames, contains('Rogith'));
+            expect(passengerNames, contains('Kumarank'));
+
+            expect(ticket.ticketId, equals('T73910447'));
+            expect(ticket.startTime!.day, 12);
+            expect(ticket.startTime!.month, 12);
+            expect(ticket.startTime!.year, 2025);
+            expect(ticket.primaryText, contains('CHENNAI'));
+
+            final fare = ticket.tags
+                ?.firstWhere((t) => t.icon == 'attach_money')
+                .value;
+            expect(fare, equals('₹1990.00'));
+          }
+        },
+      );
+
+      test(
+        'Given real OCR text (T73309927), When parsing ticket, '
+        'Then extracts all fields including "Seat :No." and clean names correctly',
+        () async {
+          final file = File('test/assets/tnstc/ocr_text_T73309927.txt');
+          if (file.existsSync()) {
+            final pdfText = await file.readAsString();
+            final ticket = parser.parseTicket(pdfText);
+
+            // 1. Verify Seat (handling "Seat :No.")
+            final seat = ticket.tags
+                ?.firstWhere((t) => t.icon == 'event_seat')
+                .value;
+            expect(seat, equals('4UB'));
+
+            // 2. Verify Name (boundary check against "PNR Number")
+            final passengerNames = ticket.extras
+                ?.firstWhere((e) => e.title == 'Passenger Name')
+                .value;
+            expect(passengerNames, equals('HarishAnbalagan'));
+
+            // 3. Verify PNR
+            expect(ticket.ticketId, equals('T73309927'));
+
+            // 4. Verify Route and Corporation
+            expect(ticket.secondaryText, contains('SETC'));
+            expect(ticket.secondaryText, contains('1315KUMCHEAB'));
+
+            // 5. Verify Times and Places
+            expect(ticket.startTime, isNotNull);
+            expect(ticket.startTime!.day, 18);
+            expect(ticket.startTime!.month, 1);
+            expect(ticket.startTime!.year, 2026);
+            expect(ticket.startTime!.hour, 13);
+            expect(ticket.startTime!.minute, 15);
+            expect(ticket.primaryText, contains('KUMBAKONAM'));
+            expect(ticket.primaryText, contains('CHENNAI-PT DR. M.G.R. BS'));
+
+            // 6. Verify Fare
+            final fareTag = ticket.tags
+                ?.firstWhere((t) => t.icon == 'attach_money')
+                .value;
+            expect(fareTag, equals('₹735.00'));
+
+            // 7. Verify Bus ID
+            final busId = ticket.extras
+                ?.firstWhere((e) => e.title == 'Bus ID')
+                .value;
+            expect(busId, equals('E-5494'));
+
+            // 8. Verify Booking Ref
+            final bookingRef = ticket.extras
+                ?.firstWhere((e) => e.title == 'Booking Ref')
+                .value;
+            expect(bookingRef, equals('OB31475439'));
+
+            // 9. Verify Service Class
+            final serviceClass = ticket.extras
+                ?.firstWhere((e) => e.title == 'Service Class')
+                .value;
+            expect(serviceClass, equals('AC SLEEPER SEATER'));
+          }
+        },
+      );
+
+      test(
+        'Given real OCR text (T73289589), When parsing ticket, '
+        'Then extracts all fields including Bus ID fallback and split lines',
+        () async {
+          final file = File('test/assets/tnstc/ocr_text_T73289589.txt');
+          if (file.existsSync()) {
+            final pdfText = await file.readAsString();
+            final ticket = parser.parseTicket(pdfText);
+
+            // 1. Verify Seat
+            final seat = ticket.tags
+                ?.firstWhere((t) => t.icon == 'event_seat')
+                .value;
+            expect(seat, equals('2LB'));
+
+            // 2. Verify PNR
+            expect(ticket.ticketId, equals('T73289589'));
+
+            // 3. Verify Times
+            expect(ticket.startTime!.day, 30);
+            expect(ticket.startTime!.month, 11);
+            expect(ticket.startTime!.year, 2025);
+            expect(ticket.startTime!.hour, 21);
+            expect(ticket.startTime!.minute, 0);
+
+            // 4. Verify Fare
+            final fare = ticket.tags
+                ?.firstWhere((t) => t.icon == 'attach_money')
+                .value;
+            expect(fare, equals('₹555.00'));
+
+            // 5. Verify Comprehensive Extras
+            final extras = ticket.extras!;
+            expect(
+              extras.firstWhere((e) => e.title == 'Trip Code').value,
+              equals('2100KUMCHELB'),
+            );
+            expect(
+              extras.firstWhere((e) => e.title == 'Route No').value,
+              contains('307LB'),
+            );
+            // Bus ID is on separate line "Bus ID No. :\nE-12275"
+            expect(
+              extras.firstWhere((e) => e.title == 'Bus ID').value,
+              equals('E-12275'),
+            );
+            // OB Ref is on separate line "OB Reference No. :\nOB31470112"
+            expect(
+              extras.firstWhere((e) => e.title == 'Booking Ref').value,
+              equals('OB31470112'),
+            );
+
+            // Verify Platform is NOT erroneously capturing 'Class of Service'
+            // Since it is empty in the file, it should either be absent or empty string.
+            if (extras.any((e) => e.title == 'Platform')) {
+              final platform = extras
+                  .firstWhere((e) => e.title == 'Platform')
+                  .value;
+              expect(platform, isNot(contains('Class of Service')));
+              expect(platform, isEmpty);
+            }
+
+            // ID Card Type is split "ID Card Type: Government Issued Photo\nID Card"
+            // Our fallback should catch "Government Issued Photo ID Card" or similar
+            // The parser logic for "Government Issued Photo" adds "ID Card" suffix if missing, or specific string.
+            // Let's see what logic produces.
+            // In parser: if (pdfText.contains('Government Issued Photo')) -> 'Government Issued Photo ID Card'
+            expect(
+              extras.firstWhere((e) => e.title == 'ID Card Type').value,
+              contains('Government Issued Photo'),
+            );
+            expect(
+              extras.firstWhere((e) => e.title == 'Verification ID').value,
+              equals('736960775578'),
+            );
+            expect(
+              extras.firstWhere((e) => e.title == 'Age').value,
+              equals('26'),
+            );
+            expect(
+              extras.firstWhere((e) => e.title == 'Gender').value,
+              equals('M'),
+            );
           }
         },
       );

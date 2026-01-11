@@ -228,8 +228,14 @@ class Ticket with TicketMappable {
       extras: [
         if (model.pnrNumber.isNotNullOrEmpty)
           ExtrasModel(title: 'PNR Number', value: model.pnrNumber),
-        if (firstPassenger != null && firstPassenger.name.isNotNullOrEmpty)
-          ExtrasModel(title: 'Passenger Name', value: firstPassenger.name),
+        if (model.passengers.isNotEmpty)
+          ExtrasModel(
+            title: 'Passenger Name',
+            value: model.passengers
+                .map((p) => p.name)
+                .where((n) => n.isNotEmpty)
+                .join(', '),
+          ),
         if (firstPassenger?.age != null && firstPassenger!.age > 0)
           ExtrasModel(title: 'Age', value: firstPassenger.age.toString()),
         if (gender != null && gender.isNotNullOrEmpty)
@@ -247,6 +253,7 @@ class Ticket with TicketMappable {
             title: 'Booking Ref',
             value: model.obReferenceNumber!.trim(),
           ),
+
         if (model.classOfService != null &&
             model.classOfService!.trim().isNotNullOrEmpty)
           ExtrasModel(

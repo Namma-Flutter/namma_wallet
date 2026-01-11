@@ -121,13 +121,6 @@ class TNSTCTicketModelMapper extends ClassMapperBase<TNSTCTicketModel> {
     _$numberOfSeats,
     opt: true,
   );
-  static String? _$bankTransactionNumber(TNSTCTicketModel v) =>
-      v.bankTransactionNumber;
-  static const Field<TNSTCTicketModel, String> _f$bankTransactionNumber = Field(
-    'bankTransactionNumber',
-    _$bankTransactionNumber,
-    opt: true,
-  );
   static String? _$busIdNumber(TNSTCTicketModel v) => v.busIdNumber;
   static const Field<TNSTCTicketModel, String> _f$busIdNumber = Field(
     'busIdNumber',
@@ -204,7 +197,6 @@ class TNSTCTicketModelMapper extends ClassMapperBase<TNSTCTicketModel> {
     #tripCode: _f$tripCode,
     #obReferenceNumber: _f$obReferenceNumber,
     #numberOfSeats: _f$numberOfSeats,
-    #bankTransactionNumber: _f$bankTransactionNumber,
     #busIdNumber: _f$busIdNumber,
     #passengerCategory: _f$passengerCategory,
     #passengers: _f$passengers,
@@ -235,7 +227,6 @@ class TNSTCTicketModelMapper extends ClassMapperBase<TNSTCTicketModel> {
       tripCode: data.dec(_f$tripCode),
       obReferenceNumber: data.dec(_f$obReferenceNumber),
       numberOfSeats: data.dec(_f$numberOfSeats),
-      bankTransactionNumber: data.dec(_f$bankTransactionNumber),
       busIdNumber: data.dec(_f$busIdNumber),
       passengerCategory: data.dec(_f$passengerCategory),
       passengers: data.dec(_f$passengers),
@@ -334,7 +325,6 @@ abstract class TNSTCTicketModelCopyWith<$R, $In extends TNSTCTicketModel, $Out>
     String? tripCode,
     String? obReferenceNumber,
     int? numberOfSeats,
-    String? bankTransactionNumber,
     String? busIdNumber,
     String? passengerCategory,
     List<PassengerInfo>? passengers,
@@ -388,7 +378,6 @@ class _TNSTCTicketModelCopyWithImpl<$R, $Out>
     Object? tripCode = $none,
     Object? obReferenceNumber = $none,
     Object? numberOfSeats = $none,
-    Object? bankTransactionNumber = $none,
     Object? busIdNumber = $none,
     Object? passengerCategory = $none,
     List<PassengerInfo>? passengers,
@@ -420,8 +409,6 @@ class _TNSTCTicketModelCopyWithImpl<$R, $Out>
       if (tripCode != $none) #tripCode: tripCode,
       if (obReferenceNumber != $none) #obReferenceNumber: obReferenceNumber,
       if (numberOfSeats != $none) #numberOfSeats: numberOfSeats,
-      if (bankTransactionNumber != $none)
-        #bankTransactionNumber: bankTransactionNumber,
       if (busIdNumber != $none) #busIdNumber: busIdNumber,
       if (passengerCategory != $none) #passengerCategory: passengerCategory,
       if (passengers != null) #passengers: passengers,
@@ -470,10 +457,6 @@ class _TNSTCTicketModelCopyWithImpl<$R, $Out>
       or: $value.obReferenceNumber,
     ),
     numberOfSeats: data.get(#numberOfSeats, or: $value.numberOfSeats),
-    bankTransactionNumber: data.get(
-      #bankTransactionNumber,
-      or: $value.bankTransactionNumber,
-    ),
     busIdNumber: data.get(#busIdNumber, or: $value.busIdNumber),
     passengerCategory: data.get(
       #passengerCategory,

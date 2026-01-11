@@ -21,7 +21,7 @@ class TNSTCTicketModel with TNSTCTicketModelMappable {
     this.tripCode,
     this.obReferenceNumber,
     this.numberOfSeats,
-    this.bankTransactionNumber,
+
     this.busIdNumber,
     this.passengerCategory,
     this.passengers = const [],
@@ -49,7 +49,7 @@ class TNSTCTicketModel with TNSTCTicketModelMappable {
   final String? tripCode;
   final String? obReferenceNumber;
   final int? numberOfSeats;
-  final String? bankTransactionNumber;
+
   final String? busIdNumber;
   final String? passengerCategory;
   final List<PassengerInfo> passengers;
@@ -81,7 +81,6 @@ Class of Service: $classOfService,
 Trip Code: $tripCode,
 OB Reference No: $obReferenceNumber,
 Number of Seats: $numberOfSeats,
-Bank Transaction No: $bankTransactionNumber,
 Bus ID No: $busIdNumber,
 Passenger Category: $passengerCategory,
 Passengers: ${passengers.map((p) => p.toString()).join(', ')},

@@ -24,12 +24,21 @@ class TNSTCPDFParser extends TravelPDFParser {
 
     // Extract all fields using PDF-specific patterns
     // Use non-greedy matching and stop at newlines
-    final corporation = nullIfEmpty(
+    var corporation = nullIfEmpty(
       extractMatch(
-        r'Corporation\s*:\s*([A-Za-z\s-]+?)(?:\n|$)',
+        r'Corporation\s*[:\.]?\s*([A-Za-z\s-]+)(?:\n|$)',
         pdfText,
       ),
     );
+
+    // Fallback detection if standard format is missing
+    if (corporation == null) {
+      if (pdfText.contains('SETC')) {
+        corporation = 'SETC';
+      } else if (pdfText.contains('TNSTC')) {
+        corporation = 'TNSTC';
+      }
+    }
     // PNR may have invisible characters/whitespace from PDF extraction
     // First extract raw PNR (stop at newline), then clean it
     final pnrRaw = extractMatch(
@@ -137,24 +146,27 @@ class TNSTCPDFParser extends TravelPDFParser {
     );
     final platformNumber = nullIfEmpty(
       extractMatch(
-        r'Platform Number\s*:[ \t]*([^\n]*?)(?:\n|$)',
+        r'Platform Number\s*:[ \t]*([^\n]*?)(?=\s*(?:Class of Service)|\n|$)',
         pdfText,
       ),
     );
     final classOfService = nullIfEmpty(
       extractMatch(
-        r'Class of Service\s*:\s*([A-Za-z0-9\s]+?)(?:\n|$)',
+        r'Class\s+of\s+Service\s*[:;-]?\s*([^\n]+)',
         pdfText,
       ),
     );
     // Trip code may be on a different line due to OCR column ordering
     // First try direct extraction, then look for pattern like
-    // 2100KUMCHELB or 2200CHEKUMLB
-    var tripCodeRaw = extractMatch(r'Trip Code\s*:\s*([0-9]+[A-Z]+)', pdfText);
+    // 2100KUMCHELB or 2200CHEKUMLB or 2110BANTIDVVO1L
+    // Must start with digits to avoid capturing labels like "No."
+    var tripCodeRaw = extractMatch(r'Trip Code\s*:\s*(\d+[A-Z0-9]+)', pdfText);
     if (tripCodeRaw.isEmpty) {
       // Look for trip code pattern anywhere in the text (4 digits followed
-      // by uppercased letters)
-      final tripCodeMatch = RegExp(r'\b(\d{4}[A-Z]{4,})\b').firstMatch(pdfText);
+      // by alphanumeric)
+      final tripCodeMatch = RegExp(
+        r'\b(\d{4}[A-Z0-9]{4,})\b',
+      ).firstMatch(pdfText);
       if (tripCodeMatch != null) {
         tripCodeRaw = tripCodeMatch.group(1) ?? '';
       }
@@ -162,7 +174,7 @@ class TNSTCPDFParser extends TravelPDFParser {
     final tripCode = nullIfEmpty(tripCodeRaw);
     final obReferenceNumber = nullIfEmpty(
       extractMatch(
-        r'OB Reference No\.\s*:\s*([A-Z0-9]+)',
+        r'OB Reference No\.\s*:\s*([A-Z0-9 ]+)(?:\n|$)',
         pdfText,
       ),
     );
@@ -176,18 +188,24 @@ class TNSTCPDFParser extends TravelPDFParser {
         ? int.tryParse(numberOfSeatsStr) ?? 1
         : 1;
 
-    final bankTransactionNumber = nullIfEmpty(
-      extractMatch(
-        r'Bank Txn\. No[;.]?\s*:\s*([A-Z0-9]+)',
-        pdfText,
-      ),
+    var busIdNumber = extractMatch(
+      r'Bus ID No\.\s*:\s*([A-Z0-9-]+)',
+      pdfText,
     );
-    final busIdNumber = nullIfEmpty(
-      extractMatch(
-        r'Bus ID No\.\s*:\s*([A-Z0-9-]+)',
-        pdfText,
-      ),
-    );
+    // Hard check to prevent capturing "Passenger" if OCR jumps to next section
+    if (busIdNumber.toLowerCase().contains('passenger')) {
+      busIdNumber = '';
+    }
+
+    if (busIdNumber.isEmpty) {
+      // Fallback: Look for pattern like E-1234, V-3630 (Letter-Numbers)
+      final busIdMatch = RegExp(r'\b([A-Z]+-\d{4,})\b').firstMatch(pdfText);
+      if (busIdMatch != null) {
+        busIdNumber = busIdMatch.group(1) ?? '';
+      }
+    }
+    // Final null check
+    final busIdNumberClean = nullIfEmpty(busIdNumber);
     final passengerCategory = nullIfEmpty(
       extractMatch(
         r'Passenger [Cc]ategory\s*:\s*([A-Za-z\s]+?)(?:\n|$)',
@@ -220,35 +238,55 @@ class TNSTCPDFParser extends TravelPDFParser {
       passengerSeatNumber = passengerMatch.group(5) ?? '';
     } else {
       // Fallback: Extract fields individually if table format is broken
-      // OCR often puts "Name" on one line and actual name on next line
-      // Try to get the line after "Name" header
-      //(not after "Passenger Information")
-      var nameMatch = RegExp(
-        r'^Name\s*$\n\s*([A-Za-z][^\n]+)',
+      // OCR often puts "Name" on one line and actual name on next line(s)
+      // Capture until we see "Age" or "Passenger category" or end of section
+      var nameSectionMatch = RegExp(
+        r'Name\s*\n\s*([\s\S]+?)(?=\n\s*(?:Age|Passenger|Children|Total Fare|PNR Number|Route No|SATELLITE|BS\b|Bus Stand|Terminus|Terminal|Office))',
         multiLine: true,
       ).firstMatch(pdfText);
-      if (nameMatch != null) {
-        passengerName = nameMatch.group(1)?.trim() ?? '';
-      } else {
-        // Secondary fallback: line after Passenger Information
-        nameMatch = RegExp(
-          r'Passenger Information\s*\n\s*(?:Name\s*\n\s*)?([^\n]+)',
-          multiLine: true,
-        ).firstMatch(pdfText);
-        if (nameMatch != null) {
-          passengerName = nameMatch.group(1)?.trim() ?? '';
-        }
+
+      // If strict match fails, try broader match after Passenger Information
+      nameSectionMatch ??= RegExp(
+        r'Passenger Information\s*\n\s*(?:Name\s*\n\s*)?([\s\S]+?)(?=\n\s*(?:Age|Passenger|Children|Total Fare|PNR Number|Route No|SATELLITE|BS\b|Bus Stand|Terminus|Terminal|Office))',
+        multiLine: true,
+      ).firstMatch(pdfText);
+
+      if (nameSectionMatch != null) {
+        final nameBlock = nameSectionMatch.group(1) ?? '';
+        // Split by newline and clean up
+        final names = nameBlock.split('\n').map((s) => s.trim()).where((s) {
+          if (s.isEmpty) return false;
+          if (s.toLowerCase().contains('name')) return false;
+
+          // Filter out lines that look like locations (Bus Stand, etc)
+          final lower = s.toLowerCase();
+          if (lower.endsWith(' bs')) return false;
+          if (lower == 'bs') return false;
+          if (lower.contains('bus stand')) return false;
+          if (lower.contains('satellite')) return false;
+          if (lower.contains('terminus')) return false;
+          if (lower.contains('terminal')) return false;
+          if (lower.contains('office')) return false;
+
+          return true;
+        }).toList();
+
+        // Temporarily store joined names if we are in single-passenger fallback mode
+        // But ideally we should create multiple PassengerInfo objects if valid
+        // For now, let's just join them so at least they appear in the Ticket model
+        passengerName = names.join(', ');
       }
 
-      final ageMatch = RegExp(r'Age\s*\n\s*(\d+)', multiLine: true).firstMatch(
-        pdfText,
-      );
+      final ageMatch = RegExp(
+        r'Age\s*\n\s*(?:(?:\(\d+\)|\d+\.|•)\s*)?(\d+)',
+        multiLine: true,
+      ).firstMatch(pdfText);
       if (ageMatch != null) {
         passengerAge = int.tryParse(ageMatch.group(1) ?? '0') ?? 0;
       }
 
       final genderMatch = RegExp(
-        r'Gender\s*\n\s*([MF])',
+        r'Gender\s*\n\s*(?:(?:\(\d+\)|\d+\.?|•)\s*)?([MF])',
         multiLine: true,
       ).firstMatch(pdfText);
       if (genderMatch != null) {
@@ -266,7 +304,8 @@ class TNSTCPDFParser extends TravelPDFParser {
 
       final seatInlineMatch = RegExp(
         // Match seat numbers separated by comma OR newline
-        r'^Seat No\.?\s*(?:[:\-]?\s*)?(?:\n\s*)?([A-Z0-9]+(?:(?:\s*,\s*|\s*\n\s*)[A-Z0-9]+)*)',
+        // Ensure subsequent lines don't start with keywords like Age, Gender, Important, etc.
+        r'^Seat\s*[:\.]?\s*No\.?\s*(?:[:\-]?\s*)?(?:\n\s*)?([A-Z0-9]+(?:(?:\s*,\s*|\s*\n\s*(?!Age|Gender|Total|Government|ID|Class|Important|Name)(?=[A-Z0-9]))[A-Z0-9]+)*)',
         multiLine: true,
         caseSensitive: false,
       ).firstMatch(pdfText);
@@ -290,14 +329,16 @@ class TNSTCPDFParser extends TravelPDFParser {
 
     // Fallback if precise regex fails
     if (idCardTypeRaw.isEmpty) {
-      if (pdfText.contains('Government Issued Photo')) {
+      // Try looser match first
+      idCardTypeRaw = extractMatch(
+        r'ID Card Type\s*:?\s*(.*)',
+        pdfText,
+      ).trim();
+
+      // Only if still empty or generic, try looking for section header
+      if (idCardTypeRaw.isEmpty &&
+          pdfText.contains('Government Issued Photo')) {
         idCardTypeRaw = 'Government Issued Photo ID Card';
-      } else {
-        // Try looser match - explicitly handle optional colon and whitespace
-        idCardTypeRaw = extractMatch(
-          r'ID Card Type\s*:?\s*(.*)',
-          pdfText,
-        ).trim();
       }
     }
 
@@ -313,7 +354,7 @@ class TNSTCPDFParser extends TravelPDFParser {
 
     final idCardNumber = nullIfEmpty(
       extractMatch(
-        r'ID Card Number\s*:\s*([0-9]+)',
+        r'ID Card Number\s*:\s*([A-Za-z0-9\s]+?)(?:\n|$)',
         pdfText,
       ),
     );
@@ -363,8 +404,7 @@ class TNSTCPDFParser extends TravelPDFParser {
       tripCode: tripCode,
       obReferenceNumber: obReferenceNumber,
       numberOfSeats: numberOfSeats,
-      bankTransactionNumber: bankTransactionNumber,
-      busIdNumber: busIdNumber,
+      busIdNumber: busIdNumberClean,
       passengerCategory: passengerCategory,
       passengers: passengers,
       idCardType: idCardType,
