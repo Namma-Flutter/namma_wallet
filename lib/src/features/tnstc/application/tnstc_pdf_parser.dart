@@ -31,7 +31,8 @@ class TNSTCPDFParser extends TravelPDFParser {
       r'PNR Number\s*:\s*([A-Za-z0-9](?:[A-Za-z0-9\s]*[A-Za-z0-9])?)(?:\n|$)',
       pdfText,
     );
-    // Remove whitespace and fix OCR errors (o -> 0, since PNRs only have digits+uppercase)
+    // Remove whitespace and fix OCR errors
+    // (o -> 0, since PNRs only have digits+uppercase)
     final pnrNumber = pnrRaw
         .replaceAll(RegExp(r'\s'), '')
         .replaceAll('o', '0') // OCR sometimes reads 0 as o
@@ -61,7 +62,8 @@ class TNSTCPDFParser extends TravelPDFParser {
       pdfText,
     );
     // OCR may read columns out of order, causing pickup point to be split:
-    // "Passenger Pickup Point : OFFICE)" followed by "KOTTIVAKKAM(RTO" on next line
+    // "Passenger Pickup Point : OFFICE)" followed by
+    // "KOTTIVAKKAM(RTO" on next line
     // Use dotAll flag to capture across newlines, and manually extract
     final pickupRegex = RegExp(
       r'Passenger Pickup Point\s*:\s*(.*?)(?:\n(.+?))?(?=\nPlatform Number|\nPassenger Pickup Time|\nTrip Code|$)',
@@ -72,11 +74,10 @@ class TNSTCPDFParser extends TravelPDFParser {
     if (pickupMatch != null) {
       final part1 = pickupMatch.group(1)?.trim() ?? '';
       final part2 = pickupMatch.group(2)?.trim() ?? '';
-      // ignore: avoid_print
-      print('[TNSTC DEBUG] Pickup part1: "$part1", part2: "$part2"');
 
       // Combine parts and check if they need reordering
-      // e.g., part1="OFFICE)", part2="KOTTIVAKKAM(RTO" -> "KOTTIVAKKAM(RTO OFFICE)"
+      // e.g., part1="OFFICE)",
+      // part2="KOTTIVAKKAM(RTO" -> "KOTTIVAKKAM(RTO OFFICE)"
       if (part1.isNotEmpty && part2.isNotEmpty) {
         // Check if parts are reversed (part1 ends with ), part2 has opening ()
         if (part1.endsWith(')') &&
@@ -90,8 +91,6 @@ class TNSTCPDFParser extends TravelPDFParser {
         passengerPickupPoint = part1.isNotEmpty ? part1 : part2;
       }
     }
-    // ignore: avoid_print
-    print('[TNSTC DEBUG] Final pickup: "$passengerPickupPoint"');
     final passengerPickupTime = parseDateTime(
       extractMatch(
         r'Passenger Pickup Time\s*:\s*(\d{2}[/-]\d{2}[/-]\d{4}\s+\d{2}:\d{2}(?:\s*Hrs\.?)?)',
