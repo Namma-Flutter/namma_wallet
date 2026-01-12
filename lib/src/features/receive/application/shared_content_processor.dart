@@ -40,7 +40,7 @@ class SharedContentProcessor implements ISharedContentProcessor {
           ? SourceType.pdf
           : SourceType.sms;
 
-      var ticket = _travelParserService.parseTicketFromText(
+      final ticket = _travelParserService.parseTicketFromText(
         content,
         sourceType: sourceType,
       );
