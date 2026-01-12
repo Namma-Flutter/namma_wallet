@@ -36,7 +36,7 @@ PODS:
     - DKImagePickerController/PhotoGallery
     - Flutter
   - Flutter (1.0.0)
-  - flutter_gemma (0.11.13):
+  - flutter_gemma (0.11.16):
     - Flutter
     - MediaPipeTasksGenAI (= 0.10.24)
     - MediaPipeTasksGenAIC (= 0.10.24)
@@ -245,7 +245,7 @@ SPEC CHECKSUMS:
   DKPhotoGallery: b3834fecb755ee09a593d7c9e389d8b5d6deed60
   file_picker: a0560bc09d61de87f12d246fc47d2119e6ef37be
   Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
-  flutter_gemma: 8ed32b19abae2e069095437401f0a2d5ec46c0cb
+  flutter_gemma: a61bb8893b6b77e1088ec27ed519a0711fc84c30
   flutter_native_splash: c32d145d68aeda5502d5f543ee38c192065986cf
   gaimon: ce0b5c042363ed957bb92ee755c361903d3ce0ef
   google_mlkit_commons: 2abe6a70e1824e431d16a51085cb475b672c8aab
@@ -255,8 +255,8 @@ SPEC CHECKSUMS:
   GoogleToolboxForMac: d1a2cbf009c453f4d6ded37c105e2f67a32206d8
   GoogleUtilities: 00c88b9a86066ef77f0da2fab05f65d7768ed8e1
   GTMSessionFetcher: 5aea5ba6bd522a239e236100971f10cb71b96ab6
-  home_widget: f169fc41fd807b4d46ab6615dc44d62adbf9f64f
-  image_picker_ios: 7fe1ff8e34c1790d6fff70a32484959f563a928a
+  home_widget: 54b4f6b36ed8d64cfee594a476225c35c3e45091
+  image_picker_ios: e0ece4aa2a75771a7de3fa735d26d90817041326
   large_file_handler: b37481e9b4972562ffcdc8f75700f47cd592bcec
   listen_sharing_intent: fe0b9a59913cc124dd6cbd55cd9f881de5f75759
   MediaPipeTasksGenAI: 076ba7032a6e9da16db9c7cf0c3b67c751c18bc1
@@ -269,12 +269,12 @@ SPEC CHECKSUMS:
   mobile_scanner: 9157936403f5a0644ca3779a38ff8404c5434a93
   nanopb: fad817b59e0457d11a5dfbde799381cd727c1275
   package_info_plus: af8e2ca6888548050f16fa2f1938db7b5a5df499
-  path_provider_foundation: 080d55be775b7414fd5a5ef3ac137b97b097e564
+  path_provider_foundation: bb55f6dbba17d0dccd6737fe6f7f34fbd0376880
   pdfium_flutter: 512bc19dbbd80b4287d04869aa19ad729289079d
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
   SDWebImage: d0184764be51240d49c761c37f53dd017e1ccaaf
   share_plus: 50da8cb520a8f0f65671c6c6a99b3617ed10a58a
-  shared_preferences_foundation: 9e1978ff2562383bd5676f64ec4e9aa8fa06a6f7
+  shared_preferences_foundation: 7036424c3d8ec98dfe75ff1667cb0cd531ec82bb
   sqflite_darwin: 20b2a3a3b70e43edae938624ce550a3cbf66a3d0
   SwiftyGif: 706c60cf65fa2bc5ee0313beece843c8eb8194d4
   TensorFlowLiteC: 215ef57653dd0fa09a474e7d94d79ae64a870b28

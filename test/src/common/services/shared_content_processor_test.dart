@@ -19,8 +19,9 @@ void main() {
     setUp(() {
       // Arrange - Set up mocked dependencies in a new scope
       fakeLogger = FakeLogger();
-      getIt.pushNewScope();
-      getIt.registerSingleton<ILogger>(fakeLogger);
+      getIt
+        ..pushNewScope()
+        ..registerSingleton<ILogger>(fakeLogger);
     });
 
     tearDown(() async {
@@ -505,7 +506,8 @@ void main() {
             secondaryText: 'Other info',
             location: 'Station',
           );
-          // Create a new mock DAO for the update step, pre-populated with the ticket
+          // Create a new mock DAO for the update step, pre-populated with
+          // the ticket
           // that would have been created in the previous step.
           final updateMockDao = MockTicketDAO();
           await updateMockDao.insertTicket(mockTicket);
