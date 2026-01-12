@@ -85,7 +85,15 @@ Scheduled Departure : 14:30
           // Assert (Then)
           expect(ticket, isNotNull);
           expect(ticket!.ticketId, equals('1234567890'));
-          expect(ticket.primaryText, contains('Chennai Express'));
+          // Primary text should show the route
+          expect(ticket.primaryText, contains('Chennai Central'));
+          expect(ticket.primaryText, contains('Mumbai Central'));
+          // Train name should be in extras
+          final trainNameExtra = ticket.extras?.firstWhere(
+            (e) => e.title == 'Train Name',
+            orElse: () => throw StateError('Train Name not found'),
+          );
+          expect(trainNameExtra?.value, equals('Chennai Express'));
         },
       );
 
@@ -128,11 +136,8 @@ Reservation Upto : Kolkata
           // Assert (Then)
           expect(ticket, isNotNull);
           expect(ticket!.ticketId, equals('9876543210'));
-          // Should use sentinel value (epoch 1970)
-          expect(
-            ticket.startTime,
-            equals(IRCTCTrainParser.invalidDateSentinel),
-          );
+          // Should return null for invalid dates (no default values)
+          expect(ticket.startTime, isNull);
         },
       );
     });

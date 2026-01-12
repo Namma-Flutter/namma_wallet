@@ -32,14 +32,10 @@ class Ticket with TicketMappable {
   }) {
     if ((model.dateOfJourney == null || model.scheduledDeparture == null) &&
         !isUpdate) {
-      getIt<ILogger>().error(
-        '[Ticket.fromIRCTC] Missing required date/time: '
+      getIt<ILogger>().warning(
+        '[Ticket.fromIRCTC] Missing date/time - creating ticket with null startTime: '
         'dateOfJourney=${model.dateOfJourney}, '
         'scheduledDeparture=${model.scheduledDeparture}',
-      );
-      throw ArgumentError(
-        'Cannot create IRCTC ticket: dateOfJourney or '
-        'scheduledDeparture is null',
       );
     }
 
@@ -68,14 +64,22 @@ class Ticket with TicketMappable {
               if (model.travelClass.isNotNullOrEmpty) model.travelClass,
               if (model.passengerName.isNotNullOrEmpty) model.passengerName,
             ].join(' • '),
-      startTime: !isUpdate
-          ? DateTime(
-              journeyDate!.year,
-              journeyDate.month,
-              journeyDate.day,
-              departure!.hour,
-              departure.minute,
-            )
+      startTime: !isUpdate && departure != null && journeyDate != null
+          ? (departure.isUtc
+              ? DateTime.utc(
+                  journeyDate.year,
+                  journeyDate.month,
+                  journeyDate.day,
+                  departure.hour,
+                  departure.minute,
+                )
+              : DateTime(
+                  journeyDate.year,
+                  journeyDate.month,
+                  journeyDate.day,
+                  departure.hour,
+                  departure.minute,
+                ))
           : null,
       location: model.boardingStation,
       tags: [
@@ -104,14 +108,14 @@ class Ticket with TicketMappable {
         ExtrasModel(title: 'Boarding', value: model.boardingStation),
         ExtrasModel(
           title: 'Departure',
-          value: !isUpdate
-              ? DateTimeConverter.instance.formatTime(departure!)
+          value: !isUpdate && departure != null
+              ? DateTimeConverter.instance.formatTime(departure)
               : null,
         ),
         ExtrasModel(
           title: 'Date of Journey',
-          value: !isUpdate
-              ? DateTimeConverter.instance.formatDate(journeyDate!)
+          value: !isUpdate && journeyDate != null
+              ? DateTimeConverter.instance.formatDate(journeyDate)
               : null,
         ),
         ExtrasModel(title: 'Fare', value: model.ticketFare?.toStringAsFixed(2)),
@@ -120,6 +124,7 @@ class Ticket with TicketMappable {
           value: model.irctcFee?.toStringAsFixed(2),
         ),
         ExtrasModel(title: 'Transaction ID', value: model.transactionId),
+        ExtrasModel(title: 'Provider', value: 'IRCTC'),
       ],
     );
   }

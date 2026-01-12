@@ -681,8 +681,8 @@ void main() {
     );
 
     test(
-      'should throw ArgumentError when parsing IRCTC'
-      ' PDF 4565161618 due to N.A. departure time',
+      'should create ticket with null startTime when parsing IRCTC'
+      ' PDF 4565161618 with N.A. departure time',
       () async {
         /// Load the specific sample where departure is "N.A."
         final pdfFile = XFile('test/assets/irctc/4565161618.pdf');
@@ -690,13 +690,14 @@ void main() {
         /// Extract text from the PDF
         final pdfText = await pdfService.extractTextFrom(pdfFile);
 
-        /// The test verifies that the parser rejects the ticket because
-        /// scheduledDeparture is null due to the "N.A."
-        /// value in the source.
-        expect(
-          () => parser.parseTicket(pdfText),
-          throwsA(isA<ArgumentError>()),
-        );
+        /// The parser returns null for unparseable dates instead of using
+        /// default values, following the project's error handling policy.
+        final ticket = parser.parseTicket(pdfText);
+
+        expect(ticket, isNotNull);
+        expect(ticket.ticketId, equals('4565161618'));
+        // Should return null for unparseable departure (no default values)
+        expect(ticket.startTime, isNull);
       },
     );
 
@@ -830,6 +831,413 @@ void main() {
         expect(
           ticket.extras?.firstWhere((e) => e.title == 'Train Name').value,
           equals('KAVERI EXPRESS'), // [cite: 901]
+        );
+      },
+    );
+
+    test(
+      'should parse IRCTC PDF file 4565194077 to Ticket model correctly',
+      () async {
+        final pdfFile = XFile('test/assets/irctc/4565194077.pdf');
+        final pdfText = await pdfService.extractTextFrom(pdfFile);
+        final ticket = parser.parseTicket(pdfText);
+
+        expect(ticket, isNotNull);
+        expect(ticket.ticketId, equals('4565194077'));
+        expect(
+          ticket.primaryText,
+          equals('KOZHIKKODE (CLT) → MGR CHENNAI CTL (MAS)'),
+        );
+        expect(ticket.secondaryText, equals('Train 12686 • SL • RAMKUMAR'));
+        expect(ticket.startTime, isNull);
+        expect(ticket.location, equals('KOZHIKKODE (CLT)'));
+
+        expect(
+          ticket.tags?.firstWhere((t) => t.icon == 'confirmation_number').value,
+          equals('4565194077'),
+        );
+        expect(
+          ticket.tags?.firstWhere((t) => t.icon == 'train').value,
+          equals('12686'),
+        );
+        expect(
+          ticket.tags?.firstWhere((t) => t.icon == 'event_seat').value,
+          equals('SL'),
+        );
+        expect(
+          ticket.tags?.firstWhere((t) => t.icon == 'attach_money').value,
+          equals('₹812.50'),
+        );
+      },
+    );
+
+    test(
+      'should parse IRCTC PDF file 4628586109 to Ticket model correctly',
+      () async {
+        final pdfFile = XFile('test/assets/irctc/4628586109.pdf');
+        final pdfText = await pdfService.extractTextFrom(pdfFile);
+        final ticket = parser.parseTicket(pdfText);
+
+        expect(ticket, isNotNull);
+        expect(ticket.ticketId, equals('4628586109'));
+        expect(
+          ticket.primaryText,
+          equals('CHENNAI EGMORE (MS) → TIRUNELVELI JN (TEN)'),
+        );
+        expect(
+          ticket.secondaryText,
+          equals('Train 12631 • SL • R SENTHURKANI'),
+        );
+        expect(ticket.startTime, equals(DateTime(2025, 3, 10, 20, 40)));
+        expect(ticket.location, equals('CHENNAI EGMORE (MS)'));
+
+        expect(
+          ticket.tags?.firstWhere((t) => t.icon == 'confirmation_number').value,
+          equals('4628586109'),
+        );
+        expect(
+          ticket.tags?.firstWhere((t) => t.icon == 'train').value,
+          equals('12631'),
+        );
+        expect(
+          ticket.tags?.firstWhere((t) => t.icon == 'event_seat').value,
+          equals('SL'),
+        );
+        expect(
+          ticket.tags?.firstWhere((t) => t.icon == 'attach_money').value,
+          equals('₹1030.40'),
+        );
+      },
+    );
+
+    test(
+      'should parse IRCTC PDF file 4634845356 to Ticket model correctly',
+      () async {
+        final pdfFile = XFile('test/assets/irctc/4634845356.pdf');
+        final pdfText = await pdfService.extractTextFrom(pdfFile);
+        final ticket = parser.parseTicket(pdfText);
+
+        expect(ticket, isNotNull);
+        expect(ticket.ticketId, equals('4634845356'));
+        expect(
+          ticket.primaryText,
+          equals('CHENNAI EGMORE (MS) → ARALVAYMOZHI (AAY)'),
+        );
+        expect(ticket.secondaryText, equals('Train 20635 • SL • PREMA M'));
+        expect(ticket.startTime, equals(DateTime(2025, 8, 21, 19, 50)));
+        expect(ticket.location, equals('CHENNAI EGMORE (MS)'));
+
+        expect(
+          ticket.tags?.firstWhere((t) => t.icon == 'confirmation_number').value,
+          equals('4634845356'),
+        );
+        expect(
+          ticket.tags?.firstWhere((t) => t.icon == 'train').value,
+          equals('20635'),
+        );
+        expect(
+          ticket.tags?.firstWhere((t) => t.icon == 'event_seat').value,
+          equals('SL'),
+        );
+        expect(
+          ticket.tags?.firstWhere((t) => t.icon == 'attach_money').value,
+          equals('₹454.95'),
+        );
+      },
+    );
+
+    test(
+      'should parse IRCTC PDF file 4634847925 to Ticket model correctly',
+      () async {
+        final pdfFile = XFile('test/assets/irctc/4634847925.pdf');
+        final pdfText = await pdfService.extractTextFrom(pdfFile);
+        final ticket = parser.parseTicket(pdfText);
+
+        expect(ticket, isNotNull);
+        expect(ticket.ticketId, equals('4634847925'));
+        expect(
+          ticket.primaryText,
+          equals('CHENNAI EGMORE (MS) → ARALVAYMOZHI (AAY)'),
+        );
+        expect(ticket.secondaryText, equals('Train 16127 • 3A • RAMKUMAR R'));
+        expect(ticket.startTime, equals(DateTime(2025, 8, 27, 10, 20)));
+        expect(ticket.location, equals('CHENNAI EGMORE (MS)'));
+
+        expect(
+          ticket.tags?.firstWhere((t) => t.icon == 'confirmation_number').value,
+          equals('4634847925'),
+        );
+        expect(
+          ticket.tags?.firstWhere((t) => t.icon == 'train').value,
+          equals('16127'),
+        );
+        expect(
+          ticket.tags?.firstWhere((t) => t.icon == 'event_seat').value,
+          equals('3A'),
+        );
+        expect(
+          ticket.tags?.firstWhere((t) => t.icon == 'attach_money').value,
+          equals('₹3242.20'),
+        );
+      },
+    );
+
+    test(
+      'should parse IRCTC PDF file 4740095793 to Ticket model correctly',
+      () async {
+        final pdfFile = XFile('test/assets/irctc/4740095793.pdf');
+        final pdfText = await pdfService.extractTextFrom(pdfFile);
+        final ticket = parser.parseTicket(pdfText);
+
+        expect(ticket, isNotNull);
+        expect(ticket.ticketId, equals('4740095793'));
+        expect(
+          ticket.primaryText,
+          equals('TAMBARAM (TBM) → ARALVAYMOZHI (AAY)'),
+        );
+        expect(ticket.secondaryText, equals('Train 20635 • SL • PREMA M'));
+        expect(ticket.startTime, equals(DateTime(2025, 6, 5, 20, 17)));
+        expect(ticket.location, equals('TAMBARAM (TBM)'));
+
+        expect(
+          ticket.tags?.firstWhere((t) => t.icon == 'confirmation_number').value,
+          equals('4740095793'),
+        );
+        expect(
+          ticket.tags?.firstWhere((t) => t.icon == 'train').value,
+          equals('20635'),
+        );
+        expect(
+          ticket.tags?.firstWhere((t) => t.icon == 'event_seat').value,
+          equals('SL'),
+        );
+        expect(
+          ticket.tags?.firstWhere((t) => t.icon == 'attach_money').value,
+          equals('₹1060.40'),
+        );
+      },
+    );
+
+    test(
+      'should parse IRCTC PDF file 4842082738 to Ticket model correctly',
+      () async {
+        final pdfFile = XFile('test/assets/irctc/4842082738.pdf');
+        final pdfText = await pdfService.extractTextFrom(pdfFile);
+        final ticket = parser.parseTicket(pdfText);
+
+        expect(ticket, isNotNull);
+        expect(ticket.ticketId, equals('4842082738'));
+        expect(
+          ticket.primaryText,
+          equals('ARALVAYMOZHI (AAY) → CHENNAI EGMORE (MS)'),
+        );
+        expect(ticket.secondaryText, equals('Train 20636 • SL • PRIYANKA M'));
+        expect(ticket.startTime, equals(DateTime(2025, 8, 31, 17, 48)));
+        expect(ticket.location, equals('ARALVAYMOZHI (AAY)'));
+
+        expect(
+          ticket.tags?.firstWhere((t) => t.icon == 'confirmation_number').value,
+          equals('4842082738'),
+        );
+        expect(
+          ticket.tags?.firstWhere((t) => t.icon == 'train').value,
+          equals('20636'),
+        );
+        expect(
+          ticket.tags?.firstWhere((t) => t.icon == 'event_seat').value,
+          equals('SL'),
+        );
+        expect(
+          ticket.tags?.firstWhere((t) => t.icon == 'attach_money').value,
+          equals('₹2154.50'),
+        );
+      },
+    );
+
+    test(
+      'should parse IRCTC PDF file 42490014967 to Ticket model correctly',
+      () async {
+        final pdfFile = XFile('test/assets/irctc/42490014967.pdf');
+        final pdfText = await pdfService.extractTextFrom(pdfFile);
+        final ticket = parser.parseTicket(pdfText);
+
+        expect(ticket, isNotNull);
+        expect(ticket.ticketId, equals('4249001496'));
+        expect(
+          ticket.primaryText,
+          equals('Electronic Cancellation Slip (ECS) → KOZHIKKODE (CLT)'),
+        );
+        expect(ticket.secondaryText, equals('Train 12685 • SL • RAMKUMAR R'));
+        expect(ticket.startTime, equals(DateTime(2023, 8, 11, 16, 20)));
+        expect(ticket.location, equals('MGR CHENNAI CTL (MAS)'));
+
+        expect(
+          ticket.tags?.firstWhere((t) => t.icon == 'confirmation_number').value,
+          equals('4249001496'),
+        );
+        expect(
+          ticket.tags?.firstWhere((t) => t.icon == 'train').value,
+          equals('12685'),
+        );
+        expect(
+          ticket.tags?.firstWhere((t) => t.icon == 'event_seat').value,
+          equals('SL'),
+        );
+        expect(
+          ticket.tags?.firstWhere((t) => t.icon == 'attach_money').value,
+          equals('₹560.56'),
+        );
+      },
+    );
+
+    test(
+      'should parse IRCTC PDF file 44490000876 to Ticket model correctly',
+      () async {
+        final pdfFile = XFile('test/assets/irctc/44490000876.pdf');
+        final pdfText = await pdfService.extractTextFrom(pdfFile);
+        final ticket = parser.parseTicket(pdfText);
+
+        expect(ticket, isNotNull);
+        expect(ticket.ticketId, equals('4449000087'));
+        expect(
+          ticket.primaryText,
+          equals('Electronic Cancellation Slip (ECS) → MGR CHENNAI CTL (MAS)'),
+        );
+        expect(ticket.secondaryText, equals('Train 12686 • 3A • RAMKUMAR'));
+        expect(ticket.startTime, equals(DateTime(2023, 8, 15, 20, 30)));
+        expect(ticket.location, equals('KOZHIKKODE (CLT)'));
+
+        expect(
+          ticket.tags?.firstWhere((t) => t.icon == 'confirmation_number').value,
+          equals('4449000087'),
+        );
+        expect(
+          ticket.tags?.firstWhere((t) => t.icon == 'train').value,
+          equals('12686'),
+        );
+        expect(
+          ticket.tags?.firstWhere((t) => t.icon == 'event_seat').value,
+          equals('3A'),
+        );
+        expect(
+          ticket.tags?.firstWhere((t) => t.icon == 'attach_money').value,
+          equals('₹1710.56'),
+        );
+      },
+    );
+
+    test(
+      'should parse IRCTC PDF file Ticket_TK784255502p45 '
+      'to Ticket model correctly',
+      () async {
+        final pdfFile = XFile('test/assets/irctc/Ticket_TK784255502p45.pdf');
+        final pdfText = await pdfService.extractTextFrom(pdfFile);
+        final ticket = parser.parseTicket(pdfText);
+
+        expect(ticket, isNotNull);
+        expect(ticket.ticketId, equals('4537429538'));
+        expect(
+          ticket.primaryText,
+          equals('MGR CHENNAI CTL (MAS) → KSR BENGALURU (SBC)'),
+        );
+        expect(ticket.secondaryText, equals('Train 12657 • SL • MAGESH K'));
+        expect(ticket.startTime, equals(DateTime(2025, 10, 26, 22, 50)));
+        expect(ticket.location, equals('MGR CHENNAI CTL (MAS)'));
+
+        expect(
+          ticket.tags?.firstWhere((t) => t.icon == 'confirmation_number').value,
+          equals('4537429538'),
+        );
+        expect(
+          ticket.tags?.firstWhere((t) => t.icon == 'train').value,
+          equals('12657'),
+        );
+        expect(
+          ticket.tags?.firstWhere((t) => t.icon == 'event_seat').value,
+          equals('SL'),
+        );
+        expect(
+          ticket.tags?.firstWhere((t) => t.icon == 'attach_money').value,
+          equals('₹270.00'),
+        );
+      },
+    );
+
+    test(
+      'should parse IRCTC PDF file Ticket_TK833891088p43 '
+      'to Ticket model correctly',
+      () async {
+        final pdfFile = XFile('test/assets/irctc/Ticket_TK833891088p43.pdf');
+        final pdfText = await pdfService.extractTextFrom(pdfFile);
+        final ticket = parser.parseTicket(pdfText);
+
+        expect(ticket, isNotNull);
+        expect(ticket.ticketId, equals('4328673018'));
+        expect(
+          ticket.primaryText,
+          equals('KSR BENGALURU (SBC) → MGR CHENNAI CTL (MAS)'),
+        );
+        expect(ticket.secondaryText, equals('Train 16022 • SL • MAGESH K'));
+        expect(ticket.startTime, equals(DateTime(2026, 1, 13, 23, 50)));
+        expect(ticket.location, equals('KSR BENGALURU (SBC)'));
+
+        // TAG VALIDATION
+        expect(
+          ticket.tags?.firstWhere((t) => t.icon == 'confirmation_number').value,
+          equals('4328673018'),
+        );
+        expect(
+          ticket.tags?.firstWhere((t) => t.icon == 'train').value,
+          equals('16022'),
+        );
+        expect(
+          ticket.tags?.firstWhere((t) => t.icon == 'event_seat').value,
+          equals('SL'),
+        );
+        expect(
+          ticket.tags?.firstWhere((t) => t.icon == 'attach_money').value,
+          equals('₹240.00'),
+        );
+      },
+    );
+
+    test(
+      'should parse IRCTC PDF file tl-tickets-trains to Ticket model correctly',
+      () async {
+        final pdfFile = XFile(
+          'test/assets/irctc/tl-tickets-trains-T99EB5F7F53250024C4258E00.pdf',
+        );
+        final pdfText = await pdfService.extractTextFrom(pdfFile);
+        final ticket = parser.parseTicket(pdfText);
+
+        expect(ticket, isNotNull);
+        expect(ticket.ticketId, equals('4846874185'));
+        expect(
+          ticket.primaryText,
+          equals('Ksr Bengaluru (SBC) → Mgr Chennai Ctl (MAS)'),
+        );
+        expect(
+          ticket.secondaryText,
+          equals('Train 12658 • SL • Justin Benito'),
+        );
+        expect(ticket.startTime, equals(DateTime(2025, 12, 14, 22, 40)));
+        expect(ticket.location, equals('Ksr Bengaluru (SBC)'));
+
+        expect(
+          ticket.tags?.firstWhere((t) => t.icon == 'confirmation_number').value,
+          equals('4846874185'),
+        );
+        expect(
+          ticket.tags?.firstWhere((t) => t.icon == 'train').value,
+          equals('12658'),
+        );
+        expect(
+          ticket.tags?.firstWhere((t) => t.icon == 'event_seat').value,
+          equals('SL'),
+        );
+        expect(
+          ticket.tags?.firstWhere((t) => t.icon == 'attach_money').value,
+          equals('₹1350.00'),
         );
       },
     );

@@ -184,6 +184,8 @@ class IRCTCPDFParser implements ITicketParser {
     final pnr = pick([
       r'PNR(?:[\s\S]{0,50}?)(\d{10})',
       r'PNR\s*[:.-]?\s*(\d{10})',
+      r'PNR\s*No\.?\s*[:][ \t]+([A-Z0-9]{6,10})',
+      r'PNR(?:\s*No\.?)?\s*[:][ \t]+([A-Z0-9]{2,})',
     ]);
 
     /// Extracted origin station name.
@@ -241,12 +243,16 @@ class IRCTCPDFParser implements ITicketParser {
     if (fromStn.isEmpty) {
       fromStn = pick([
         r'From\s*[:]?\s*([A-Z ]+\([A-Z]+\))',
+        r'Boarding Point\s*[:]\s*([A-Za-z ]+)',
       ], caseSensitive: true);
     }
 
     /// Fallback regex for "To"
     if (toStn.isEmpty) {
-      toStn = pick([r'To\s*[:]?\s*([A-Z ]+\([A-Z]+\))'], caseSensitive: true);
+      toStn = pick([
+        r'To\s*[:]?\s*([A-Z ]+\([A-Z]+\))',
+        r'Reservation Upto\s*[:]\s*([A-Za-z ]+)',
+      ], caseSensitive: true);
     }
 
     /// Matches boarding station code.
@@ -277,6 +283,7 @@ class IRCTCPDFParser implements ITicketParser {
     final trainName = pick([
       r'Train No\./\s*Name\s+(?:[:.-])?\s*\d{5}\s*/\s*(.*)',
       r'(?:Train No|Train Name|Train)[\s\S]{0,30}?\d{5}\s*/\s*(.*)',
+      r'Train Name\s*[:]\s*([A-Za-z ]+)',
     ]);
 
     /// Raw travel class as printed on ticket.
