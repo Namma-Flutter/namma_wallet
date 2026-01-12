@@ -1,8 +1,3 @@
-import 'dart:io';
-import 'dart:typed_data';
-
-import 'package:archive/archive.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:fixnum/fixnum.dart';
 import 'package:namma_wallet/src/common/database/proto/namma_wallet.pb.dart';
 import 'package:namma_wallet/src/common/database/ticket_backup_interface.dart';
@@ -10,77 +5,25 @@ import 'package:namma_wallet/src/common/database/wallet_database_interface.dart'
 import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:sqflite/sqflite.dart';
 
-class TicketBackupDao implements ITicketBackup {
+class TicketBackupDao implements ITicketBackupDao {
   TicketBackupDao({IWalletDatabase? database})
       : _database = database ?? getIt<IWalletDatabase>();
 
   final IWalletDatabase _database;
 
-  // CREATE BACKUP (SQLite → Proto → Gzip → File Picker)
   @override
-  Future<String?> createBackup() async {
+  Future<List<Ticket>> fetchAllTickets() async {
     final db = await _database.database;
     final rows = await db.query('tickets');
-
-    final backup = TicketBackup()
-      ..schemaVersion = 1;
-
-    for (final row in rows) {
-      backup.tickets.add(_mapRowToProto(row));
-    }
-
-    // Serialize proto
-    final protoBytes = backup.writeToBuffer();
-
-    // Compress
-    final gzipBytes = GZipEncoder().encode(protoBytes);
-
-    // Mobile-safe save
-    return FilePicker.platform.saveFile(
-      dialogTitle: 'Save Backup',
-      fileName: _generateBackupFileName(),
-      type: FileType.custom,
-      allowedExtensions: ['gz'],
-      bytes: Uint8List.fromList(gzipBytes),
-    );
+    return rows.map(_mapRowToProto).toList();
   }
 
-  // RESTORE BACKUP (File Picker → Gzip → Proto → SQLite)
   @override
-  Future<bool> restoreBackup() async {
-    final result = await FilePicker.platform.pickFiles(
-      dialogTitle: 'Select Backup File',
-      type: FileType.custom,
-      allowedExtensions: ['gz'],
-    );
-
-    if (result == null || result.files.single.path == null) {
-      return false;
-    }
-
-    final backupFile = File(result.files.single.path!);
-    await _restoreFromFile(backupFile);
-    return true;
-  }
-
-  // INTERNAL RESTORE LOGIC
-  Future<void> _restoreFromFile(File backupFile) async {
+  Future<void> restoreTickets(List<Ticket> tickets) async {
     final db = await _database.database;
 
-    final gzipBytes = await backupFile.readAsBytes();
-    final protoBytes = GZipDecoder().decodeBytes(gzipBytes);
-
-    final backup = TicketBackup.fromBuffer(protoBytes);
-
-    if (backup.schemaVersion != 1) {
-      throw Exception('Unsupported backup version');
-    }
-
     await db.transaction((txn) async {
-      // If you want full replace, uncomment:
-      // await txn.delete('tickets');
-
-      for (final ticket in backup.tickets) {
+      for (final ticket in tickets) {
         await txn.insert(
           'tickets',
           _protoToDbMap(ticket),
@@ -90,36 +33,21 @@ class TicketBackupDao implements ITicketBackup {
     });
   }
 
-  // HELPERS
-  String _generateBackupFileName() {
-    final now = DateTime.now();
+  // ---------- MAPPERS ----------
 
-    final date =
-        '${now.year.toString().padLeft(4, '0')}-'
-        '${now.month.toString().padLeft(2, '0')}-'
-        '${now.day.toString().padLeft(2, '0')}';
-
-    final time =
-        '${now.hour.toString().padLeft(2, '0')}-'
-        '${now.minute.toString().padLeft(2, '0')}';
-
-    return 'namma_wallet_${date}_$time.proto.gz';
-  }
-
-  // MAPPERS
   Ticket _mapRowToProto(Map<String, Object?> row) {
     return Ticket()
       ..id = Int64(row['id']! as int)
-      ..ticketId = row['ticket_id'] as String
-      ..primaryText = row['primary_text'] as String
-      ..secondaryText = row['secondary_text'] as String
-      ..type = row['type'] as String
-      ..startTime = row['start_time'] as String
+      ..ticketId = row['ticket_id'] as String? ?? ''
+      ..primaryText = row['primary_text'] as String? ?? ''
+      ..secondaryText = row['secondary_text'] as String? ?? ''
+      ..type = row['type'] as String? ?? ''
+      ..startTime = row['start_time'] as String? ?? ''
       ..endTime = (row['end_time'] ?? '') as String
-      ..location = row['location'] as String
+      ..location = row['location'] as String? ?? ''
       ..tags = row['tags'] as String? ?? ''
       ..extras = row['extras'] as String? ?? ''
-      ..createdAt = row['created_at'] as String
+      ..createdAt = row['created_at'] as String? ?? ''
       ..updatedAt = row['updated_at'] as String? ?? '';
   }
 

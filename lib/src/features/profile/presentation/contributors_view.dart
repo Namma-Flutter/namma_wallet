@@ -137,7 +137,7 @@ class _ContributorsViewState extends State<ContributorsView> {
                 ),
               );
             }
-        
+
             final contributors = snapshot.data!;
             return ListView.builder(
               padding: const EdgeInsets.all(16),
@@ -168,7 +168,14 @@ class _ContributorsViewState extends State<ContributorsView> {
                     onTap: () async {
                       final url = Uri.parse(contributor.profileUrl);
                       try {
-                        await launchUrl(url);
+                        final launched = await launchUrl(url);
+                        if (!launched && context.mounted) {
+                          showSnackbar(
+                            context,
+                            'Could not open ${contributor.profileUrl}',
+                            isError: true,
+                          );
+                        }
                       } on Exception catch (_) {
                         if (context.mounted) {
                           showSnackbar(

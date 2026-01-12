@@ -2,9 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:namma_wallet/src/common/database/ticket_backup_interface.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/routing/app_routes.dart';
+import 'package:namma_wallet/src/common/services/backup/ticket_backup_service_interface.dart';
 import 'package:namma_wallet/src/common/services/haptic/haptic_service_extension.dart';
 import 'package:namma_wallet/src/common/services/haptic/haptic_service_interface.dart';
 import 'package:namma_wallet/src/common/theme/theme_provider.dart';
@@ -23,7 +23,8 @@ class ProfileView extends StatefulWidget {
 
 class _ProfileViewState extends State<ProfileView> {
   final IHapticService hapticService = getIt<IHapticService>();
-  final ITicketBackup backup = getIt<ITicketBackup>();
+  final ITicketBackupService _backupService =
+      getIt<ITicketBackupService>();
   bool _isHapticEnabled = false;
   @override
   void initState() {
@@ -69,7 +70,7 @@ class _ProfileViewState extends State<ProfileView> {
                 const SizedBox(height: 8),
                 // Theme Settings Section
                 ThemeSectionWidget(themeProvider: themeProvider),
-        
+
                 const SizedBox(height: 8),
 
                 // Contributors Section
@@ -79,13 +80,24 @@ class _ProfileViewState extends State<ProfileView> {
                   subtitle: 'Can be used to restore tickets',
                   trailing: const Icon(Icons.chevron_right),
                   onTap: () async {
-                    final file = await backup.createBackup();
+                    try {
+                      final file = await _backupService.createBackup();
 
-                    if (file != null) {
-                      showSnackbar(
-                        context,
-                        'Backup created successfully',
-                      );
+                      if (file != null) {
+                        if (!context.mounted) return;
+                        showSnackbar(
+                          context,
+                          'Backup created successfully',
+                        );
+                      }
+                    } on Exception catch (e) {
+                      if (context.mounted) {
+                        showSnackbar(
+                          context,
+                          'Failed to create backup: $e',
+                          isError: true,
+                        );
+                      }
                     }
                   },
                 ),
@@ -97,16 +109,27 @@ class _ProfileViewState extends State<ProfileView> {
                   subtitle: 'Restore tickets from a backup',
                   trailing: const Icon(Icons.chevron_right),
                   onTap: () async {
-                    final success = await backup.restoreBackup();
-                    if (success) {
-                      showSnackbar(
-                        context,
-                        'Backup restored successfully',
-                      );
-                    } 
+                    try {
+                      final success = await _backupService.restoreBackup();
+                      if (success) {
+                        if (!context.mounted) return;
+                        showSnackbar(
+                          context,
+                          'Backup restored successfully',
+                        );
+                      }
+                    } on Exception catch (e) {
+                      if (context.mounted) {
+                        showSnackbar(
+                          context,
+                          'Failed to restore backup: $e',
+                          isError: true,
+                        );
+                      }
+                    }
                   },
                 ),
-        
+
                 // Contributors Section
                 ProfileTile(
                   icon: Icons.people_outline,
@@ -117,7 +140,7 @@ class _ProfileViewState extends State<ProfileView> {
                     await context.pushNamed(AppRoute.contributors.name);
                   },
                 ),
-        
+
                 // Licenses Section
                 ProfileTile(
                   icon: Icons.article_outlined,
@@ -128,7 +151,7 @@ class _ProfileViewState extends State<ProfileView> {
                     await context.pushNamed(AppRoute.license.name);
                   },
                 ),
-        
+
                 // Contact Us Section
                 ProfileTile(
                   icon: Icons.contact_mail_outlined,
@@ -140,7 +163,7 @@ class _ProfileViewState extends State<ProfileView> {
                       scheme: 'mailto',
                       path: 'support@nammawallet.com',
                     );
-        
+
                     try {
                       if (!await canLaunchUrl(uri)) {
                         if (context.mounted) {
@@ -152,7 +175,7 @@ class _ProfileViewState extends State<ProfileView> {
                         }
                         return;
                       }
-        
+
                       await launchUrl(
                         uri,
                         mode: LaunchMode.externalApplication,
@@ -168,7 +191,7 @@ class _ProfileViewState extends State<ProfileView> {
                     }
                   },
                 ),
-        
+
                 // Haptics Enabled
                 ProfileTile(
                   title: 'Haptics Enabled',
@@ -185,18 +208,20 @@ class _ProfileViewState extends State<ProfileView> {
                         if (!mounted) return;
                         messenger.showSnackBar(
                           SnackBar(
-                            content: Text('Failed to save haptic preference: $e'),
+                            content: Text(
+                              'Failed to save haptic preference: $e',
+                            ),
                           ),
                         );
                         return;
                       }
                       if (!mounted) return;
-        
+
                       // Update UI
                       setState(() {
                         _isHapticEnabled = value;
                       });
-        
+
                       // Optional: give immediate feedback only when enabling.
                       if (value) {
                         hapticService.triggerHaptic(HapticType.selection);

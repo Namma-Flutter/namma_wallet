@@ -8,6 +8,8 @@ import 'package:namma_wallet/src/common/database/user_dao.dart';
 import 'package:namma_wallet/src/common/database/user_dao_interface.dart';
 import 'package:namma_wallet/src/common/database/wallet_database.dart';
 import 'package:namma_wallet/src/common/database/wallet_database_interface.dart';
+import 'package:namma_wallet/src/common/services/backup/ticket_backup_service.dart';
+import 'package:namma_wallet/src/common/services/backup/ticket_backup_service_interface.dart';
 import 'package:namma_wallet/src/common/services/haptic/haptic_service_interface.dart';
 import 'package:namma_wallet/src/common/services/haptic/haptic_services.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
@@ -123,7 +125,10 @@ void setupLocator() {
         ticketDao: getIt<ITicketDAO>(),
       ),
     )
-    ..registerLazySingleton<ITicketBackup>(
+    ..registerLazySingleton<ITicketBackupDao>(
       TicketBackupDao.new,
+    )
+    ..registerLazySingleton<ITicketBackupService>(
+      () => TicketBackupService(getIt<ITicketBackupDao>()),
     );
 }
