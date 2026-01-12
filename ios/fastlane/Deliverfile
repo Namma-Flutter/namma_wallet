@@ -1,0 +1,48 @@
+# Deliverfile - Configuration for fastlane deliver
+# Docs: https://docs.fastlane.tools/actions/deliver/
+
+# App Identifier
+app_identifier "com.nammaflutter.nammawallet"
+
+# Platform
+platform "ios"
+
+# Skip binary upload (use separate lanes for that)
+skip_binary_upload true
+
+# Metadata settings
+skip_metadata false
+metadata_path "./metadata"
+
+# Screenshots settings
+skip_screenshots false
+screenshots_path "./screenshots"
+
+# Overwrite existing screenshots
+overwrite_screenshots true
+
+# Force upload without confirmation prompts
+force true
+
+# Precheck settings (App Store review checks)
+precheck_include_in_app_purchases false
+
+# Submission information
+submission_information({
+  add_id_info_uses_idfa: false
+})
+
+# Phased release for automatic updates
+phased_release false
+
+# Automatically release after approval
+automatic_release true
+
+# Submit for review after metadata upload
+submit_for_review true
+
+# Run precheck before submitting
+run_precheck_before_submit true
+
+# Precheck default rule level
+precheck_default_rule_level :error

@@ -1,6 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_gemma/core/api/flutter_gemma.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:namma_wallet/src/app.dart';
 import 'package:namma_wallet/src/common/database/wallet_database_interface.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
@@ -13,7 +15,8 @@ import 'package:pdfrx/pdfrx.dart';
 import 'package:provider/provider.dart';
 
 Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+  final widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
   /// This is required by the new mediapipe requirement made by flutter gemma
   try {
@@ -158,6 +161,22 @@ Future<void> main() async {
     // Always rethrow to prevent app from starting in broken state
     rethrow;
   }
+
+  FlutterNativeSplash.remove();
+
+  // Restore system UI (status bar & navigation bar) after splash
+  await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+
+  // Optional: set colors for status & navigation bar
+  SystemChrome.setSystemUIOverlayStyle(
+    const SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      systemNavigationBarColor: Colors.transparent,
+      systemNavigationBarDividerColor: Colors.transparent,
+      statusBarIconBrightness: Brightness.dark,
+      systemNavigationBarIconBrightness: Brightness.dark,
+    ),
+  );
 
   runApp(
     ChangeNotifierProvider.value(
