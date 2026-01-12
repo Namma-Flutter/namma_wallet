@@ -57,8 +57,8 @@ platform :ios do
 
     UI.success("✓ Version validation passed - #{version}+#{build_number} (TestFlight latest for v#{version}: #{latest_build || 'none'})")
 
-    # 3. Build IPA with Flutter
-    sh("cd ../.. && fvm flutter build ipa --release")
+    # 3. Build IPA using Makefile (includes get, codegen, wasm removal, and build)
+    sh("cd ../.. && make release-ipa")
 
     # 4. Export and sign the archive (skip building since we just built with Flutter)
     update_code_signing_settings(use_automatic_signing: true)
