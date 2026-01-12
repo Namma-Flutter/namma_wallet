@@ -1065,7 +1065,7 @@ void main() {
         expect(ticket.ticketId, equals('4249001496'));
         expect(
           ticket.primaryText,
-          equals('Electronic Cancellation Slip (ECS) → KOZHIKKODE (CLT)'),
+          equals('MGR CHENNAI CTL (MAS) → KOZHIKKODE (CLT)'),
         );
         expect(ticket.secondaryText, equals('Train 12685 • SL • RAMKUMAR R'));
         expect(ticket.startTime, equals(DateTime(2023, 8, 11, 16, 20)));
@@ -1101,7 +1101,7 @@ void main() {
         expect(ticket.ticketId, equals('4449000087'));
         expect(
           ticket.primaryText,
-          equals('Electronic Cancellation Slip (ECS) → MGR CHENNAI CTL (MAS)'),
+          equals('KOZHIKKODE (CLT) → MGR CHENNAI CTL (MAS)'),
         );
         expect(ticket.secondaryText, equals('Train 12686 • 3A • RAMKUMAR'));
         expect(ticket.startTime, equals(DateTime(2023, 8, 15, 20, 30)));

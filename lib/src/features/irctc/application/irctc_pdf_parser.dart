@@ -69,6 +69,7 @@ class IRCTCPDFParser implements ITicketParser {
       'TQ',
       'PT',
       'CC',
+      'ECS',
     };
 
     String? normalizeClass(String? raw) {
