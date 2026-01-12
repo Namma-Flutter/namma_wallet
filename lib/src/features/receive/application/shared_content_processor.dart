@@ -1,4 +1,5 @@
 import 'package:namma_wallet/src/common/database/ticket_dao_interface.dart';
+import 'package:namma_wallet/src/common/domain/models/extras_model.dart';
 import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 import 'package:namma_wallet/src/common/enums/source_type.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
@@ -131,18 +132,33 @@ class SharedContentProcessor implements ISharedContentProcessor {
     // TNSTC updates usually contain Conductor Mobile No or Vehicle No
     final updateType =
         updateInfo.updates.containsKey('conductorMobileNo') ||
+            updateInfo.updates.containsKey('conductorContact') ||
             updateInfo.updates.containsKey('Conductor Mobile No')
         ? 'Conductor Details'
         : 'Bus Info';
 
-    // The DAO's updateTicketById already handles merging if needed,
-    // but here we are using the helper result format.
-    // For now, let's just use the update method.
-    // NOTE: In a real app, we might want a more sophisticated merge logic here
-    // or rely on the DAO to handle JSON merging.
+    // Convert updates Map to Ticket with extras
+    final updateTicket = Ticket(
+      ticketId: updateInfo.pnrNumber,
+      primaryText: existingTicket.primaryText,
+      secondaryText: existingTicket.secondaryText,
+      location: existingTicket.location,
+      extras: updateInfo.updates.entries
+          .map(
+            (entry) => ExtrasModel(
+              title: entry.key,
+              value: entry.value.toString(),
+            ),
+          )
+          .toList(),
+    );
+
+    // Merge the update ticket with existing ticket
+    final mergedTicket = Ticket.mergeTickets(existingTicket, updateTicket);
+
     await _ticketDao.updateTicketById(
       updateInfo.pnrNumber,
-      existingTicket, // This is simplified, DAO should handle the Map updates
+      mergedTicket,
     );
 
     return TicketUpdatedResult(

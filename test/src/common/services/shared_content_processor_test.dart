@@ -125,29 +125,41 @@ void main() {
         'When processing content and ticket exists, '
         'Then returns TicketUpdatedResult',
         () async {
-          // Arrange (Given)
+          // Arrange (Given) - Using actual TNSTC test data
           final mockUpdateInfo = TicketUpdateInfo(
-            pnrNumber: 'T12345678',
-            providerName: 'TNSTC',
+            pnrNumber: 'T73289589',
+            providerName: 'SETC',
             updates: {
               'conductorContact': '9876543210',
-              'busNumber': 'TN01AB1234',
+              'busNumber': 'E-12275',
             },
           );
 
           final logger = getIt<ILogger>();
+          final mockDao = MockTicketDAO();
+
+          // Insert existing ticket before update (based on real TNSTC data)
+          final mockTicket = Ticket(
+            ticketId: 'T73289589',
+            primaryText: 'KUMBAKONAM → CHENNAI-PT DR. M.G.R. BS',
+            secondaryText: 'NON AC SEATER LOWER BERTH • HarishAnbalagan',
+            location: 'KUMBAKONAM',
+            startTime: DateTime(2025, 11, 30, 21, 0),
+          );
+          await mockDao.insertTicket(mockTicket);
+
           final processor = SharedContentProcessor(
             logger: logger,
             travelParser: MockTravelParserService(
               logger: logger,
               mockUpdateInfo: mockUpdateInfo,
             ),
-            ticketDao: MockTicketDAO(),
+            ticketDao: mockDao,
           );
 
           const updateSms = '''
-            PNR NO. : T12345678, Journey Date : 15/12/2024,
-            Conductor Mobile No: 9876543210, Vehicle No:TN01AB1234
+            PNR NO. : T73289589, Journey Date : 30/11/2025,
+            Conductor Mobile No: 9876543210, Vehicle No:E-12275
           ''';
 
           // Act (When)
@@ -159,7 +171,7 @@ void main() {
           // Assert (Then)
           expect(result, isA<TicketUpdatedResult>());
           final updateResult = result as TicketUpdatedResult;
-          expect(updateResult.pnrNumber, equals('T12345678'));
+          expect(updateResult.pnrNumber, equals('T73289589'));
           expect(updateResult.updateType, equals('Conductor Details'));
         },
       );
@@ -209,23 +221,24 @@ void main() {
         'When processing content, '
         'Then all updates are passed to DAO',
         () async {
-          // Arrange (Given)
+          // Arrange (Given) - Using actual TNSTC test data
           final mockDao = MockTicketDAO();
           final mockUpdateInfo = TicketUpdateInfo(
-            pnrNumber: 'T12345678',
-            providerName: 'TNSTC',
+            pnrNumber: 'T75229209',
+            providerName: 'SETC',
             updates: {
               'conductorContact': '9876543210',
-              'busNumber': 'TN01AB1234',
+              'busNumber': 'E-4950',
               'platform': '5',
             },
           );
 
-          const mockTicket = Ticket(
-            ticketId: 'T12345678',
-            primaryText: 'Origin → Destination',
-            secondaryText: 'Other info',
-            location: 'Station',
+          final mockTicket = Ticket(
+            ticketId: 'T75229209',
+            primaryText: 'CHENNAI-PT DR. M.G.R. BS → KUMBAKONAM',
+            secondaryText: 'NON AC SEATER LOWER BERTH • HarishAnbalagan',
+            location: 'KOTTIVAKKAM(RTO OFFICE)',
+            startTime: DateTime(2026, 1, 20, 22, 55),
           );
           await mockDao.insertTicket(mockTicket);
           final processor = SharedContentProcessor(
@@ -238,9 +251,9 @@ void main() {
           );
 
           const updateSms = '''
-            PNR NO. : T12345678,
+            PNR NO. : T75229209,
             Conductor Mobile No: 9876543210,
-            Vehicle No:TN01AB1234,
+            Vehicle No:E-4950,
             Platform: 5
           ''';
 
@@ -252,15 +265,24 @@ void main() {
 
           // Assert (Then)
           expect(mockDao.updateCalls.length, equals(1));
-          expect(mockDao.updateCalls.first.key, equals('T12345678'));
-          expect(
-            mockDao.updateCalls.first.value,
-            containsPair('conductorContact', '9876543210'),
-          );
-          expect(
-            mockDao.updateCalls.first.value,
-            containsPair('busNumber', 'TN01AB1234'),
-          );
+          expect(mockDao.updateCalls.first.key, equals('T75229209'));
+
+          // Verify updates are in the merged ticket's extras
+          final updatedTicket = mockDao.updateCalls.first.value;
+          expect(updatedTicket, isA<Ticket>());
+
+          final extras = updatedTicket.extras;
+          expect(extras, isNotNull);
+
+          // Check that conductorContact was added
+          final conductorExtra =
+              extras!.firstWhere((e) => e.title == 'conductorContact');
+          expect(conductorExtra.value, equals('9876543210'));
+
+          // Check that busNumber was added
+          final busNumberExtra =
+              extras.firstWhere((e) => e.title == 'busNumber');
+          expect(busNumberExtra.value, equals('E-4950'));
         },
       );
     });
