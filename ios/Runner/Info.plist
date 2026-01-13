@@ -74,17 +74,7 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
-	<key>CFBundleURLTypes</key>
-	<array>
-		<dict>
-			<key>CFBundleTypeRole</key>
-			<string>Editor</string>
-			<key>CFBundleURLSchemes</key>
-			<array>
-				<string>ShareMedia-com.nammaflutter.nammawallet</string>
-			</array>
-		</dict>
-	</array>
+
 	<key>CFBundleDocumentTypes</key>
 	<array>
 		<dict>
