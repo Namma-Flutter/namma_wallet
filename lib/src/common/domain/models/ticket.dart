@@ -26,6 +26,8 @@ class Ticket with TicketMappable {
     this.ticketId,
   });
 
+  String get id => ticketId ?? '';
+
   factory Ticket.fromIRCTC(
     IRCTCTicket model, {
     bool isUpdate = false,

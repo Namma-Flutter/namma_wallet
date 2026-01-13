@@ -139,7 +139,15 @@ class _ImportViewState extends State<ImportView> {
         if (!mounted) return;
 
         if (ticket != null) {
-          showSnackbar(context, 'PDF ticket imported successfully!');
+          // Navigate to Home with ticket ID
+          if (ticket.id.isNotEmpty) {
+            context.goNamed(
+              AppRoute.home.name,
+              extra: ticket.id,
+            );
+          } else {
+            showSnackbar(context, 'PDF ticket imported successfully!');
+          }
         } else {
           showSnackbar(
             context,

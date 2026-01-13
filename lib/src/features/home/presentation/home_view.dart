@@ -18,7 +18,8 @@ import 'package:namma_wallet/src/features/home/presentation/widgets/ticket_card_
 import 'package:namma_wallet/src/features/travel/presentation/widgets/travel_ticket_card_widget.dart';
 
 class HomeView extends StatefulWidget {
-  const HomeView({super.key});
+  final String? highlightTicketId;
+  const HomeView({super.key, this.highlightTicketId});
 
   @override
   State<HomeView> createState() => _HomeViewState();
@@ -115,6 +116,7 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
           child: TravelTicketCardWidget(
             ticket: ticket,
             onTicketDeleted: _loadTicketData,
+            isHighlighted: widget.highlightTicketId == ticket.id,
           ),
         ),
       );

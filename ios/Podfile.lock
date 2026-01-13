@@ -36,7 +36,11 @@ PODS:
     - DKImagePickerController/PhotoGallery
     - Flutter
   - Flutter (1.0.0)
+<<<<<<< HEAD
   - flutter_gemma (0.11.16):
+=======
+  - flutter_gemma (0.11.13):
+>>>>>>> a0523e4 (feat: redirect to home and highlight ticket after import)
     - Flutter
     - MediaPipeTasksGenAI (= 0.10.24)
     - MediaPipeTasksGenAIC (= 0.10.24)
@@ -245,8 +249,12 @@ SPEC CHECKSUMS:
   DKPhotoGallery: b3834fecb755ee09a593d7c9e389d8b5d6deed60
   file_picker: a0560bc09d61de87f12d246fc47d2119e6ef37be
   Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
+<<<<<<< HEAD
   flutter_gemma: a61bb8893b6b77e1088ec27ed519a0711fc84c30
   flutter_native_splash: c32d145d68aeda5502d5f543ee38c192065986cf
+=======
+  flutter_gemma: 8ed32b19abae2e069095437401f0a2d5ec46c0cb
+>>>>>>> a0523e4 (feat: redirect to home and highlight ticket after import)
   gaimon: ce0b5c042363ed957bb92ee755c361903d3ce0ef
   google_mlkit_commons: 2abe6a70e1824e431d16a51085cb475b672c8aab
   google_mlkit_text_recognition: ec2122ec89bfe0d7200763336a6e4ef44810674c

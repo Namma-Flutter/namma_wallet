@@ -33,7 +33,10 @@ final router = GoRouter(
         GoRoute(
           path: AppRoute.home.path,
           name: AppRoute.home.name,
-          builder: (context, state) => const HomeView(),
+          builder: (context, state) {
+            final highlightTicketId = state.extra as String?;
+            return HomeView(highlightTicketId: highlightTicketId);
+          },
         ),
         GoRoute(
           path: AppRoute.import.path,

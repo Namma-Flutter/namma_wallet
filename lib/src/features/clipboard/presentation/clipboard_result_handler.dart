@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:namma_wallet/src/common/routing/app_routes.dart';
 import 'package:namma_wallet/src/common/widgets/snackbar_widget.dart';
 import 'package:namma_wallet/src/features/clipboard/domain/clipboard_content_type.dart';
 import 'package:namma_wallet/src/features/clipboard/domain/clipboard_result.dart';
@@ -13,6 +15,20 @@ class ClipboardResultHandler {
   /// Only shows if context is still mounted.
   static void showResultMessage(BuildContext context, ClipboardResult result) {
     if (!context.mounted) return;
+
+    if (result.isSuccess) {
+      if (result.type == ClipboardContentType.travelTicket &&
+          result.ticket != null) {
+        // Navigate to Home with ticket ID
+        if (result.ticket!.id.isNotEmpty) {
+          context.goNamed(
+            AppRoute.home.name,
+            extra: result.ticket!.id,
+          );
+          return;
+        }
+      }
+    }
 
     final message = result.isSuccess
         ? switch (result.type) {

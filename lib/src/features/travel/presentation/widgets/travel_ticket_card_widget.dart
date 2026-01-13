@@ -11,11 +11,13 @@ class TravelTicketCardWidget extends StatelessWidget {
   const TravelTicketCardWidget({
     required this.ticket,
     this.onTicketDeleted,
+    this.isHighlighted = false,
     super.key,
   });
 
   final Ticket ticket;
   final VoidCallback? onTicketDeleted;
+  final bool isHighlighted;
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +57,15 @@ class TravelTicketCardWidget extends StatelessWidget {
             offset: const Offset(3, 0),
           ),
         ],
-        color: Theme.of(context).colorScheme.surface,
+        color: isHighlighted
+            ? Theme.of(context).colorScheme.primaryContainer.withOpacity(0.3)
+            : Theme.of(context).colorScheme.surface,
+        border: isHighlighted
+            ? Border.all(
+                color: Theme.of(context).colorScheme.primary,
+                width: 2,
+              )
+            : null,
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
