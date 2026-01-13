@@ -2,10 +2,10 @@ import 'dart:io';
 
 import 'package:cross_file/cross_file.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:listen_sharing_intent/listen_sharing_intent.dart';
 import 'package:namma_wallet/src/features/receive/application/sharing_intent_service.dart';
 import 'package:namma_wallet/src/features/receive/domain/shared_content_type.dart';
 import 'package:namma_wallet/src/features/receive/domain/sharing_intent_service_interface.dart';
+import 'package:share_handler/share_handler.dart';
 
 import '../../../../helpers/fake_logger.dart';
 import '../../../../helpers/mock_pdf_service.dart';
@@ -37,13 +37,8 @@ void main() {
 
     group('Initialization', () {
       test('should handle initial media when present', () async {
-        final initialFiles = [
-          SharedMediaFile(
-            path: 'test_path.txt',
-            type: SharedMediaType.text,
-          ),
-        ];
-        mockProvider.initialMedia = initialFiles;
+        final media = SharedMedia(content: 'test_path.txt');
+        mockProvider.initialMedia = media;
 
         var contentReceived = false;
         await service.initialize(
@@ -61,7 +56,7 @@ void main() {
       });
 
       test('should handle stream events', () async {
-        mockProvider.initialMedia = [];
+        mockProvider.initialMedia = null;
 
         var contentReceived = false;
         await service.initialize(
@@ -75,12 +70,7 @@ void main() {
           },
         );
 
-        mockProvider.emitMedia([
-          SharedMediaFile(
-            path: 'stream_path.txt',
-            type: SharedMediaType.text,
-          ),
-        ]);
+        mockProvider.emitMedia(SharedMedia(content: 'stream_path.txt'));
 
         // Wait for stream to process
         await Future<void>.delayed(Duration.zero);
@@ -88,7 +78,7 @@ void main() {
       });
 
       test('should handle stream errors', () async {
-        mockProvider.initialMedia = [];
+        mockProvider.initialMedia = null;
         var errorReported = false;
         await service.initialize(
           onContentReceived: (_, _) => fail('Should not receive content'),
@@ -110,13 +100,15 @@ void main() {
 
         mockPdfService.mockPdfText = 'Extracted PDF Text';
 
-        final files = [
-          SharedMediaFile(
-            path: pdfFile.path,
-            type: SharedMediaType.file,
-          ),
-        ];
-        mockProvider.initialMedia = files;
+        final media = SharedMedia(
+          attachments: [
+            SharedAttachment(
+              path: pdfFile.path,
+              type: SharedAttachmentType.file,
+            ),
+          ],
+        );
+        mockProvider.initialMedia = media;
 
         var contentReceived = false;
         await service.initialize(
@@ -137,13 +129,15 @@ void main() {
         final txtFile = File('${tempDir.path}/test.txt');
         await txtFile.writeAsString('File Content');
 
-        final files = [
-          SharedMediaFile(
-            path: txtFile.path,
-            type: SharedMediaType.file,
-          ),
-        ];
-        mockProvider.initialMedia = files;
+        final media = SharedMedia(
+          attachments: [
+            SharedAttachment(
+              path: txtFile.path,
+              type: SharedAttachmentType.file,
+            ),
+          ],
+        );
+        mockProvider.initialMedia = media;
 
         var contentReceived = false;
         await service.initialize(
@@ -166,13 +160,15 @@ void main() {
         final imgFile = File('${tempDir.path}/image.jpg');
         await imgFile.writeAsString('image data');
 
-        final files = [
-          SharedMediaFile(
-            path: imgFile.path,
-            type: SharedMediaType.image,
-          ),
-        ];
-        mockProvider.initialMedia = files;
+        final media = SharedMedia(
+          attachments: [
+            SharedAttachment(
+              path: imgFile.path,
+              type: SharedAttachmentType.image,
+            ),
+          ],
+        );
+        mockProvider.initialMedia = media;
 
         var errorReported = false;
         await service.initialize(
@@ -188,13 +184,8 @@ void main() {
       });
 
       test('should handle text content (not a file path)', () async {
-        final files = [
-          SharedMediaFile(
-            path: 'Just some shared text',
-            type: SharedMediaType.text,
-          ),
-        ];
-        mockProvider.initialMedia = files;
+        final media = SharedMedia(content: 'Just some shared text');
+        mockProvider.initialMedia = media;
 
         var contentReceived = false;
         await service.initialize(
