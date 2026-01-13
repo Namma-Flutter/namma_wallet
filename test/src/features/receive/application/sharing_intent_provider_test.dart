@@ -11,7 +11,7 @@ class FakeShareHandlerPlatform extends ShareHandlerPlatform {
     ShareHandlerPlatform.instance = this;
   }
 
-  SharedMedia? _initialSharedMedia;
+  SharedMedia? initialSharedMedia;
   final StreamController<SharedMedia> _streamController =
       StreamController<SharedMedia>.broadcast();
 
@@ -20,12 +20,7 @@ class FakeShareHandlerPlatform extends ShareHandlerPlatform {
 
   @override
   Future<SharedMedia?> getInitialSharedMedia() async {
-    return _initialSharedMedia;
-  }
-
-  // Test helpers
-  void setInitialSharedMedia(SharedMedia? media) {
-    _initialSharedMedia = media;
+    return initialSharedMedia;
   }
 
   void addSharedMedia(SharedMedia media) {
@@ -55,7 +50,7 @@ void main() {
 
     test('getInitialSharing calls correct platform method', () async {
       final testMedia = SharedMedia(content: 'test_content');
-      fakePlatform.setInitialSharedMedia(testMedia);
+      fakePlatform.initialSharedMedia = testMedia;
 
       final result = await provider.getInitialSharing();
 
@@ -64,7 +59,7 @@ void main() {
     });
 
     test('getInitialSharing returns null when no media', () async {
-      fakePlatform.setInitialSharedMedia(null);
+      fakePlatform.initialSharedMedia = null;
 
       final result = await provider.getInitialSharing();
 
