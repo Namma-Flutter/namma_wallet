@@ -45,7 +45,7 @@ void main() {
 
     test('getMediaStream returns stream', () {
       final stream = provider.getMediaStream();
-      expect(stream, isA<Stream<List<SharedMedia>>>());
+      expect(stream, isA<Stream<SharedMedia?>>());
     });
   });
 }
