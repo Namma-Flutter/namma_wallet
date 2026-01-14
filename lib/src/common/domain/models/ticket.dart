@@ -26,8 +26,6 @@ class Ticket with TicketMappable {
     this.ticketId,
   });
 
-  String get id => ticketId ?? '';
-
   factory Ticket.fromIRCTC(
     IRCTCTicket model, {
     bool isUpdate = false,
@@ -356,6 +354,8 @@ class Ticket with TicketMappable {
       extras: _mergeExtras(existing.extras, incoming.extras),
     );
   }
+
+  String get id => ticketId ?? '';
 
   /// Sentinel value for merge logic only. Never use as a parsing fallback.
   static const _primaryTextConstant = 'Unknown → Unknown';

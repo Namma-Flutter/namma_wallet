@@ -18,8 +18,9 @@ import 'package:namma_wallet/src/features/home/presentation/widgets/ticket_card_
 import 'package:namma_wallet/src/features/travel/presentation/widgets/travel_ticket_card_widget.dart';
 
 class HomeView extends StatefulWidget {
-  final String? highlightTicketId;
   const HomeView({super.key, this.highlightTicketId});
+
+  final String? highlightTicketId;
 
   @override
   State<HomeView> createState() => _HomeViewState();

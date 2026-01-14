@@ -58,7 +58,9 @@ class TravelTicketCardWidget extends StatelessWidget {
           ),
         ],
         color: isHighlighted
-            ? Theme.of(context).colorScheme.primaryContainer.withOpacity(0.3)
+            ? Theme.of(
+                context,
+              ).colorScheme.primaryContainer.withValues(alpha: 0.3)
             : Theme.of(context).colorScheme.surface,
         border: isHighlighted
             ? Border.all(

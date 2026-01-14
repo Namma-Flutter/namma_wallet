@@ -24,8 +24,7 @@ enum AppRoute {
   contributors(path: '/contributors', name: 'contributors'),
 
   // Debug routes
-  dbViewer(path: '/db-viewer', name: 'dbViewer')
-  ;
+  dbViewer(path: '/db-viewer', name: 'dbViewer');
 
   const AppRoute({required this.path, required this.name});
 
