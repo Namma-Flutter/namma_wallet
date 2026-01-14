@@ -91,12 +91,22 @@ struct TicketWidgetEntryView: View {
     // MARK: Internal
 
     var entry: Provider.Entry
+    @Environment(\.widgetFamily) var family
 
     var body: some View {
-        if let ticket = entry.ticketData {
-            ticketView(ticket: ticket)
-        } else {
-            placeholderView
+        switch family {
+        case .accessoryCircular:
+            accessoryCircularView
+        case .accessoryRectangular:
+            accessoryRectangularView
+        case .accessoryInline:
+            accessoryInlineView
+        default:
+            if let ticket = entry.ticketData {
+                ticketView(ticket: ticket)
+            } else {
+                placeholderView
+            }
         }
     }
 
@@ -123,6 +133,98 @@ struct TicketWidgetEntryView: View {
                 .foregroundStyle(.tertiary)
         }
         .padding()
+    }
+
+    // MARK: - Lock Screen Accessory Views
+
+    private var accessoryCircularView: some View {
+        ZStack {
+            AccessoryWidgetBackground()
+            if let ticket = entry.ticketData {
+                VStack(spacing: 2) {
+                    Image(systemName: iconName(for: ticket.type))
+                        .font(.title3)
+                    if let startTime = ticket.startTime,
+                       let formatted = formatShortTime(startTime)
+                    {
+                        Text(formatted)
+                            .font(.system(.caption2, design: .monospaced))
+                            .minimumScaleFactor(0.8)
+                    }
+                }
+            } else {
+                Image(systemName: "ticket")
+                    .font(.title2)
+            }
+        }
+    }
+
+    private var accessoryRectangularView: some View {
+        if let ticket = entry.ticketData {
+            VStack(alignment: .leading, spacing: 2) {
+                HStack(spacing: 4) {
+                    Image(systemName: iconName(for: ticket.type))
+                        .font(.caption)
+                    Text(ticket.primaryText ?? "No Route")
+                        .font(.headline)
+                        .lineLimit(1)
+                }
+                if let startTime = ticket.startTime,
+                   let formatted = formatDateTime(startTime)
+                {
+                    Text(formatted)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                if let location = ticket.location, !location.isEmpty {
+                    Text(location)
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                }
+            }
+        } else {
+            HStack(spacing: 4) {
+                Image(systemName: "ticket")
+                Text("No Ticket Pinned")
+                    .font(.caption)
+            }
+        }
+    }
+
+    private var accessoryInlineView: some View {
+        if let ticket = entry.ticketData {
+            HStack(spacing: 4) {
+                Image(systemName: iconName(for: ticket.type))
+                Text(ticket.primaryText ?? "No Route")
+            }
+        } else {
+            HStack(spacing: 4) {
+                Image(systemName: "ticket")
+                Text("No Ticket")
+            }
+        }
+    }
+
+    private func formatShortTime(_ isoString: String) -> String? {
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+
+        var date: Date?
+        date = formatter.date(from: isoString)
+
+        if date == nil {
+            formatter.formatOptions = [.withInternetDateTime]
+            date = formatter.date(from: isoString)
+        }
+
+        guard let parsedDate = date else {
+            return nil
+        }
+
+        let displayFormatter = DateFormatter()
+        displayFormatter.dateFormat = "h:mm a"
+        return displayFormatter.string(from: parsedDate)
     }
 
     @ViewBuilder
@@ -236,14 +338,20 @@ struct TicketWidget: Widget {
                 .containerBackground(.fill.tertiary, for: .widget)
         }
         .configurationDisplayName("Ticket Widget")
-        .description("Display your pinned ticket on the home screen.")
-        .supportedFamilies([.systemSmall, .systemMedium])
+        .description("Display your pinned ticket on the home screen or lock screen.")
+        .supportedFamilies([
+            .systemSmall,
+            .systemMedium,
+            .accessoryCircular,
+            .accessoryRectangular,
+            .accessoryInline,
+        ])
     }
 }
 
 // MARK: - Preview
 
-#Preview(as: .systemSmall) {
+#Preview("System Small", as: .systemSmall) {
     TicketWidget()
 } timeline: {
     SimpleEntry(
@@ -254,7 +362,7 @@ struct TicketWidget: Widget {
             secondaryText: "Train 12345 • 3A",
             startTime: "2026-01-15T10:30:00.000",
             location: "Chennai Central",
-            type: "train",
+            type: "TRAIN",
             ticketId: "PNR123456"
         )
     )
@@ -262,5 +370,56 @@ struct TicketWidget: Widget {
         date: .now,
         configuration: ConfigurationAppIntent(),
         ticketData: nil
+    )
+}
+
+#Preview("Circular", as: .accessoryCircular) {
+    TicketWidget()
+} timeline: {
+    SimpleEntry(
+        date: .now,
+        configuration: ConfigurationAppIntent(),
+        ticketData: TicketData(
+            primaryText: "Chennai → Mumbai",
+            secondaryText: "Train 12345 • 3A",
+            startTime: "2026-01-15T10:30:00.000",
+            location: "Chennai Central",
+            type: "TRAIN",
+            ticketId: "PNR123456"
+        )
+    )
+}
+
+#Preview("Rectangular", as: .accessoryRectangular) {
+    TicketWidget()
+} timeline: {
+    SimpleEntry(
+        date: .now,
+        configuration: ConfigurationAppIntent(),
+        ticketData: TicketData(
+            primaryText: "Chennai → Mumbai",
+            secondaryText: "Train 12345 • 3A",
+            startTime: "2026-01-15T10:30:00.000",
+            location: "Chennai Central",
+            type: "TRAIN",
+            ticketId: "PNR123456"
+        )
+    )
+}
+
+#Preview("Inline", as: .accessoryInline) {
+    TicketWidget()
+} timeline: {
+    SimpleEntry(
+        date: .now,
+        configuration: ConfigurationAppIntent(),
+        ticketData: TicketData(
+            primaryText: "Chennai → Mumbai",
+            secondaryText: "Train 12345 • 3A",
+            startTime: "2026-01-15T10:30:00.000",
+            location: "Chennai Central",
+            type: "TRAIN",
+            ticketId: "PNR123456"
+        )
     )
 }
