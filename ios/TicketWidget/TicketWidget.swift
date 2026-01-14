@@ -5,8 +5,11 @@
 //  Created by Harish on 14/01/26.
 //
 
+import os
 import SwiftUI
 import WidgetKit
+
+private let logger = Logger(subsystem: "com.nammaflutter.nammawallet", category: "TicketWidget")
 
 // MARK: - TicketData
 
@@ -68,7 +71,7 @@ struct Provider: AppIntentTimelineProvider {
         do {
             return try JSONDecoder().decode(TicketData.self, from: data)
         } catch {
-            print("Failed to decode ticket data: \(error)")
+            logger.error("Failed to decode ticket data: \(error.localizedDescription)")
             return nil
         }
     }
@@ -85,8 +88,9 @@ struct SimpleEntry: TimelineEntry {
 // MARK: - TicketWidgetEntryView
 
 struct TicketWidgetEntryView: View {
+    // MARK: Internal
+
     var entry: Provider.Entry
-    @Environment(\.widgetFamily) var family
 
     var body: some View {
         if let ticket = entry.ticketData {
@@ -94,6 +98,31 @@ struct TicketWidgetEntryView: View {
         } else {
             placeholderView
         }
+    }
+
+    // MARK: Private
+
+    private static let displayFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MMM d, h:mm a"
+        return formatter
+    }()
+
+    private var placeholderView: some View {
+        VStack(spacing: 8) {
+            Image(systemName: "ticket")
+                .font(.largeTitle)
+                .foregroundColor(.secondary)
+
+            Text("No Ticket Pinned")
+                .font(.caption)
+                .foregroundColor(.secondary)
+
+            Text("Pin a ticket from the app")
+                .font(.caption2)
+                .foregroundStyle(.tertiary)
+        }
+        .padding()
     }
 
     @ViewBuilder
@@ -124,8 +153,10 @@ struct TicketWidgetEntryView: View {
             // Time and location
             HStack {
                 VStack(alignment: .leading, spacing: 2) {
-                    if let startTime = ticket.startTime {
-                        Text(formatDateTime(startTime))
+                    if let startTime = ticket.startTime,
+                       let formatted = formatDateTime(startTime)
+                    {
+                        Text(formatted)
                             .font(.system(.caption2, design: .monospaced))
                             .foregroundColor(.blue)
                     }
@@ -154,30 +185,14 @@ struct TicketWidgetEntryView: View {
         .padding(12)
     }
 
-    private var placeholderView: some View {
-        VStack(spacing: 8) {
-            Image(systemName: "ticket")
-                .font(.largeTitle)
-                .foregroundColor(.secondary)
-
-            Text("No Ticket Pinned")
-                .font(.caption)
-                .foregroundColor(.secondary)
-
-            Text("Pin a ticket from the app")
-                .font(.caption2)
-                .foregroundStyle(.tertiary)
-        }
-        .padding()
-    }
-
     private func iconName(for type: String?) -> String {
         switch type?.uppercased() {
         case "BUS":
             return "bus.fill"
         case "TRAIN":
             return "train.side.front.car"
-        case "TRAM", "METRO":
+        case "METRO",
+             "TRAM":
             return "tram.fill"
         case "FLIGHT":
             return "airplane"
@@ -186,7 +201,7 @@ struct TicketWidgetEntryView: View {
         }
     }
 
-    private func formatDateTime(_ isoString: String) -> String {
+    private func formatDateTime(_ isoString: String) -> String? {
         let formatter = ISO8601DateFormatter()
         formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
 
@@ -201,14 +216,12 @@ struct TicketWidgetEntryView: View {
             return formatDate(date)
         }
 
-        // Return original if parsing fails
-        return isoString
+        // Return nil if parsing fails - let UI handle missing data
+        return nil
     }
 
     private func formatDate(_ date: Date) -> String {
-        let displayFormatter = DateFormatter()
-        displayFormatter.dateFormat = "MMM d, h:mm a"
-        return displayFormatter.string(from: date)
+        return Self.displayFormatter.string(from: date)
     }
 }
 
