@@ -101,7 +101,7 @@ struct TicketWidgetEntryView: View {
         VStack(alignment: .leading, spacing: 4) {
             // Ticket type icon and route
             HStack(spacing: 6) {
-                Image(systemName: ticket.type?.uppercased() == "BUS" ? "bus.fill" : "tram.fill")
+                Image(systemName: iconName(for: ticket.type))
                     .font(.caption)
                     .foregroundColor(.secondary)
 
@@ -169,6 +169,21 @@ struct TicketWidgetEntryView: View {
                 .foregroundStyle(.tertiary)
         }
         .padding()
+    }
+
+    private func iconName(for type: String?) -> String {
+        switch type?.uppercased() {
+        case "BUS":
+            return "bus.fill"
+        case "TRAIN":
+            return "train.side.front.car"
+        case "TRAM", "METRO":
+            return "tram.fill"
+        case "FLIGHT":
+            return "airplane"
+        default:
+            return "ticket.fill"
+        }
     }
 
     private func formatDateTime(_ isoString: String) -> String {
