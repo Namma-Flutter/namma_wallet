@@ -47,7 +47,8 @@ struct Provider: AppIntentTimelineProvider {
         let entry = SimpleEntry(date: Date(), configuration: configuration, ticketData: ticketData)
 
         // Refresh every 15 minutes
-        let nextUpdate = Calendar.current.date(byAdding: .minute, value: 15, to: Date())!
+        let nextUpdate = Calendar.current.date(byAdding: .minute, value: 15, to: Date())
+            ?? Date().addingTimeInterval(15 * 60)
         return Timeline(entries: [entry], policy: .after(nextUpdate))
     }
 
