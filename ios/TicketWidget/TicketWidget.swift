@@ -100,7 +100,7 @@ struct TicketWidgetEntryView: View {
         VStack(alignment: .leading, spacing: 4) {
             // Ticket type icon and route
             HStack(spacing: 6) {
-                Image(systemName: ticket.type == "bus" ? "bus.fill" : "tram.fill")
+                Image(systemName: ticket.type?.uppercased() == "BUS" ? "bus.fill" : "tram.fill")
                     .font(.caption)
                     .foregroundColor(.secondary)
 

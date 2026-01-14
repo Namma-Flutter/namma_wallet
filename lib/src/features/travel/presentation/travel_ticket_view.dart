@@ -62,8 +62,6 @@ class _TravelTicketViewState extends State<TravelTicketView> {
     return ticket.tags!;
   }
 
-  ///
-  // ignore: unused_element
   Future<void> _pinToHomeScreen() async {
     try {
       const iOSWidgetName = 'TicketWidget';
@@ -183,6 +181,22 @@ class _TravelTicketViewState extends State<TravelTicketView> {
         leading: const RoundedBackButton(),
         title: const Text('Ticket View'),
         actions: [
+          Center(
+            child: CircleAvatar(
+              radius: 24,
+              backgroundColor: Theme.of(context).colorScheme.primary,
+              child: IconButton(
+                onPressed: _pinToHomeScreen,
+                icon: const Icon(
+                  Icons.push_pin_outlined,
+                  size: 20,
+                  color: Colors.white,
+                ),
+                tooltip: 'Pin to home screen',
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
           if (widget.ticket.ticketId != null)
             Center(
               child: CircleAvatar(
