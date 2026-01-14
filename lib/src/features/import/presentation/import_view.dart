@@ -140,7 +140,7 @@ class _ImportViewState extends State<ImportView> {
 
         if (ticket != null) {
           // Navigate to Home with ticket ID
-          if (ticket.id.isNotEmpty) {
+          if (ticket.id != null && ticket.id!.isNotEmpty) {
             context.goNamed(
               AppRoute.home.name,
               extra: ticket.id,

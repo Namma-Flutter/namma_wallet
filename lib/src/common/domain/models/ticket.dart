@@ -355,7 +355,7 @@ class Ticket with TicketMappable {
     );
   }
 
-  String get id => ticketId ?? '';
+  String? get id => ticketId;
 
   /// Sentinel value for merge logic only. Never use as a parsing fallback.
   static const _primaryTextConstant = 'Unknown → Unknown';

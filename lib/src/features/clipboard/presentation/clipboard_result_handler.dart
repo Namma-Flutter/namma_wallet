@@ -20,7 +20,7 @@ class ClipboardResultHandler {
       if (result.type == ClipboardContentType.travelTicket &&
           result.ticket != null) {
         // Navigate to Home with ticket ID
-        if (result.ticket!.id.isNotEmpty) {
+        if (result.ticket!.id != null && result.ticket!.id!.isNotEmpty) {
           context.goNamed(
             AppRoute.home.name,
             extra: result.ticket!.id,

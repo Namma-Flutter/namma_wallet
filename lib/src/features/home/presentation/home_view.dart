@@ -117,7 +117,9 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
           child: TravelTicketCardWidget(
             ticket: ticket,
             onTicketDeleted: _loadTicketData,
-            isHighlighted: widget.highlightTicketId == ticket.id,
+            isHighlighted:
+                widget.highlightTicketId != null &&
+                widget.highlightTicketId == ticket.id,
           ),
         ),
       );
