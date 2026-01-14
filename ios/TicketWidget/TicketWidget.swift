@@ -159,6 +159,7 @@ struct TicketWidgetEntryView: View {
         }
     }
 
+    @ViewBuilder
     private var accessoryRectangularView: some View {
         if let ticket = entry.ticketData {
             VStack(alignment: .leading, spacing: 2) {
@@ -192,6 +193,7 @@ struct TicketWidgetEntryView: View {
         }
     }
 
+    @ViewBuilder
     private var accessoryInlineView: some View {
         if let ticket = entry.ticketData {
             HStack(spacing: 4) {
