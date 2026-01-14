@@ -15,7 +15,7 @@ import UIKit
         GeneratedPluginRegistrant.register(with: engineBridge.pluginRegistry)
         if #available(iOS 17.0, *) {
             HomeWidgetPlugin.setConfigurationLookup(to: [
-                "ConfigurableWidget": ConfigurationAppIntent.self,
+                "TicketWidget": ConfigurationAppIntent.self,
             ])
         }
     }

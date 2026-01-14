@@ -170,7 +170,7 @@ class _DbViewerViewState extends State<DbViewerView>
               if (!kIsWeb)
                 ElevatedButton(
                   onPressed: () async {
-                    const iOSWidgetName = 'TicketHomeWidget';
+                    const iOSWidgetName = 'TicketWidget';
                     const androidWidgetName = 'TicketHomeWidget';
                     const dataKey = 'ticket_data';
                     await HomeWidget.saveWidgetData(dataKey, jsonEncode(t));

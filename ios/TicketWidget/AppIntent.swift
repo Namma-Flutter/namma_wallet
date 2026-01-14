@@ -9,10 +9,9 @@ import AppIntents
 import WidgetKit
 
 struct ConfigurationAppIntent: WidgetConfigurationIntent {
-    static var title: LocalizedStringResource { "Configuration" }
-    static var description: IntentDescription { "This is an example widget." }
+    static var title: LocalizedStringResource { "Ticket Widget" }
+    static var description: IntentDescription { "Display your pinned ticket on the home screen." }
 
-    /// An example configurable parameter.
-    @Parameter(title: "Favorite Emoji", default: "😃")
-    var favoriteEmoji: String
+    // No configurable parameters needed for now
+    // The widget displays the ticket that was pinned from the app
 }

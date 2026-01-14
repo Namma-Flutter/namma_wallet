@@ -66,7 +66,7 @@ class _TravelTicketViewState extends State<TravelTicketView> {
   // ignore: unused_element
   Future<void> _pinToHomeScreen() async {
     try {
-      const iOSWidgetName = 'TicketHomeWidget';
+      const iOSWidgetName = 'TicketWidget';
       const androidWidgetName = 'TicketHomeWidget';
       const dataKey = 'ticket_data';
 
