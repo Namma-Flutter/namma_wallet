@@ -118,9 +118,47 @@ struct TicketWidgetEntryView: View {
 
     // MARK: Private
 
+    // MARK: - Cached Formatters
+
     private static let displayFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateFormat = "MMM d, h:mm a"
+        return formatter
+    }()
+
+    private static let shortTimeFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "h:mm a"
+        return formatter
+    }()
+
+    private static let compactDateTimeFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MMM d, HH:mm"
+        return formatter
+    }()
+
+    private static let dateOnlyFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MMM d"
+        return formatter
+    }()
+
+    private static let timeOnlyFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "HH:mm"
+        return formatter
+    }()
+
+    private static let isoFormatter: ISO8601DateFormatter = {
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        return formatter
+    }()
+
+    private static let isoFormatterNoFractional: ISO8601DateFormatter = {
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withInternetDateTime]
         return formatter
     }()
 
@@ -216,25 +254,18 @@ struct TicketWidgetEntryView: View {
         }
     }
 
-    private func formatShortTime(_ isoString: String) -> String? {
-        let formatter = ISO8601DateFormatter()
-        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-
-        var date: Date?
-        date = formatter.date(from: isoString)
-
-        if date == nil {
-            formatter.formatOptions = [.withInternetDateTime]
-            date = formatter.date(from: isoString)
+    private func parseISODate(_ isoString: String) -> Date? {
+        if let date = Self.isoFormatter.date(from: isoString) {
+            return date
         }
+        return Self.isoFormatterNoFractional.date(from: isoString)
+    }
 
-        guard let parsedDate = date else {
+    private func formatShortTime(_ isoString: String) -> String? {
+        guard let parsedDate = parseISODate(isoString) else {
             return nil
         }
-
-        let displayFormatter = DateFormatter()
-        displayFormatter.dateFormat = "h:mm a"
-        return displayFormatter.string(from: parsedDate)
+        return Self.shortTimeFormatter.string(from: parsedDate)
     }
 
     @ViewBuilder
@@ -278,49 +309,17 @@ struct TicketWidgetEntryView: View {
     }
 
     private func formatCompactDateTime(_ isoString: String) -> String? {
-        let formatter = ISO8601DateFormatter()
-        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-
-        var date: Date?
-        date = formatter.date(from: isoString)
-
-        if date == nil {
-            formatter.formatOptions = [.withInternetDateTime]
-            date = formatter.date(from: isoString)
-        }
-
-        guard let parsedDate = date else {
+        guard let parsedDate = parseISODate(isoString) else {
             return nil
         }
-
-        let displayFormatter = DateFormatter()
-        displayFormatter.dateFormat = "MMM d, HH:mm"
-        return displayFormatter.string(from: parsedDate)
+        return Self.compactDateTimeFormatter.string(from: parsedDate)
     }
 
     private func formatDateTimeSeparate(_ isoString: String) -> (date: String, time: String)? {
-        let formatter = ISO8601DateFormatter()
-        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-
-        var date: Date?
-        date = formatter.date(from: isoString)
-
-        if date == nil {
-            formatter.formatOptions = [.withInternetDateTime]
-            date = formatter.date(from: isoString)
-        }
-
-        guard let parsedDate = date else {
+        guard let parsedDate = parseISODate(isoString) else {
             return nil
         }
-
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "MMM d"
-
-        let timeFormatter = DateFormatter()
-        timeFormatter.dateFormat = "HH:mm"
-
-        return (dateFormatter.string(from: parsedDate), timeFormatter.string(from: parsedDate))
+        return (Self.dateOnlyFormatter.string(from: parsedDate), Self.timeOnlyFormatter.string(from: parsedDate))
     }
 
     @ViewBuilder
@@ -400,26 +399,10 @@ struct TicketWidgetEntryView: View {
     }
 
     private func formatDateTime(_ isoString: String) -> String? {
-        let formatter = ISO8601DateFormatter()
-        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-
-        // Try with fractional seconds first
-        if let date = formatter.date(from: isoString) {
-            return formatDate(date)
+        guard let parsedDate = parseISODate(isoString) else {
+            return nil
         }
-
-        // Try without fractional seconds
-        formatter.formatOptions = [.withInternetDateTime]
-        if let date = formatter.date(from: isoString) {
-            return formatDate(date)
-        }
-
-        // Return nil if parsing fails - let UI handle missing data
-        return nil
-    }
-
-    private func formatDate(_ date: Date) -> String {
-        return Self.displayFormatter.string(from: date)
+        return Self.displayFormatter.string(from: parsedDate)
     }
 }
 
