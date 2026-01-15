@@ -101,6 +101,12 @@ struct TicketWidgetEntryView: View {
             accessoryRectangularView
         case .accessoryInline:
             accessoryInlineView
+        case .systemSmall:
+            if let ticket = entry.ticketData {
+                smallTicketView(ticket: ticket)
+            } else {
+                placeholderView
+            }
         default:
             if let ticket = entry.ticketData {
                 ticketView(ticket: ticket)
@@ -227,6 +233,92 @@ struct TicketWidgetEntryView: View {
         let displayFormatter = DateFormatter()
         displayFormatter.dateFormat = "h:mm a"
         return displayFormatter.string(from: parsedDate)
+    }
+
+    @ViewBuilder
+    private func smallTicketView(ticket: TicketData) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            // PNR badge at top
+            if let pnr = ticket.ticketId, !pnr.isEmpty {
+                Text(pnr)
+                    .font(.system(.title3, design: .monospaced, weight: .semibold))
+                    .foregroundColor(.primary)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.6)
+            }
+
+            Spacer()
+
+            // Date and Time on separate lines
+            if let startTime = ticket.startTime,
+               let (date, time) = formatDateTimeSeparate(startTime)
+            {
+                Text(date)
+                    .font(.system(.footnote, design: .monospaced, weight: .medium))
+                    .foregroundColor(.blue)
+                    .lineLimit(1)
+                Text(time)
+                    .font(.system(.title2, design: .monospaced, weight: .semibold))
+                    .foregroundColor(.blue)
+                    .lineLimit(1)
+            }
+
+            // Boarding point
+            if let location = ticket.location, !location.isEmpty {
+                Text(location)
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+            }
+        }
+        .padding(12)
+    }
+
+    private func formatCompactDateTime(_ isoString: String) -> String? {
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+
+        var date: Date?
+        date = formatter.date(from: isoString)
+
+        if date == nil {
+            formatter.formatOptions = [.withInternetDateTime]
+            date = formatter.date(from: isoString)
+        }
+
+        guard let parsedDate = date else {
+            return nil
+        }
+
+        let displayFormatter = DateFormatter()
+        displayFormatter.dateFormat = "MMM d, HH:mm"
+        return displayFormatter.string(from: parsedDate)
+    }
+
+    private func formatDateTimeSeparate(_ isoString: String) -> (date: String, time: String)? {
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+
+        var date: Date?
+        date = formatter.date(from: isoString)
+
+        if date == nil {
+            formatter.formatOptions = [.withInternetDateTime]
+            date = formatter.date(from: isoString)
+        }
+
+        guard let parsedDate = date else {
+            return nil
+        }
+
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "MMM d"
+
+        let timeFormatter = DateFormatter()
+        timeFormatter.dateFormat = "HH:mm"
+
+        return (dateFormatter.string(from: parsedDate), timeFormatter.string(from: parsedDate))
     }
 
     @ViewBuilder

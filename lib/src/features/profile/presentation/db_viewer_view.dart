@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -173,7 +172,8 @@ class _DbViewerViewState extends State<DbViewerView>
                     const iOSWidgetName = 'TicketWidget';
                     const androidWidgetName = 'TicketHomeWidget';
                     const dataKey = 'ticket_data';
-                    await HomeWidget.saveWidgetData(dataKey, jsonEncode(t));
+                    // toJson() already returns a JSON string
+                    await HomeWidget.saveWidgetData(dataKey, t.toJson());
 
                     await HomeWidget.updateWidget(
                       androidName: androidWidgetName,

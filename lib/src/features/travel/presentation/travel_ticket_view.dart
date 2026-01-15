@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:home_widget/home_widget.dart';
@@ -69,8 +67,9 @@ class _TravelTicketViewState extends State<TravelTicketView> {
       const dataKey = 'ticket_data';
 
       // Convert ticket to JSON format for the widget
+      // toJson() already returns a JSON string, no need to encode again
       final ticketData = widget.ticket.toJson();
-      await HomeWidget.saveWidgetData(dataKey, jsonEncode(ticketData));
+      await HomeWidget.saveWidgetData(dataKey, ticketData);
 
       await HomeWidget.updateWidget(
         androidName: androidWidgetName,
