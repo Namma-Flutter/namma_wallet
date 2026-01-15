@@ -439,7 +439,7 @@ struct TicketWidget: Widget {
         ticketData: TicketData(
             primaryText: "Chennai → Mumbai",
             secondaryText: "Train 12345 • 3A",
-            startTime: "2026-01-15T10:30:00.000",
+            startTime: "2026-01-15T10:30:00.000Z",
             location: "Chennai Central",
             type: "TRAIN",
             ticketId: "PNR123456"
@@ -461,7 +461,7 @@ struct TicketWidget: Widget {
         ticketData: TicketData(
             primaryText: "Chennai → Mumbai",
             secondaryText: "Train 12345 • 3A",
-            startTime: "2026-01-15T10:30:00.000",
+            startTime: "2026-01-15T10:30:00.000Z",
             location: "Chennai Central",
             type: "TRAIN",
             ticketId: "PNR123456"
@@ -478,7 +478,7 @@ struct TicketWidget: Widget {
         ticketData: TicketData(
             primaryText: "Chennai → Mumbai",
             secondaryText: "Train 12345 • 3A",
-            startTime: "2026-01-15T10:30:00.000",
+            startTime: "2026-01-15T10:30:00.000Z",
             location: "Chennai Central",
             type: "TRAIN",
             ticketId: "PNR123456"
@@ -495,7 +495,7 @@ struct TicketWidget: Widget {
         ticketData: TicketData(
             primaryText: "Chennai → Mumbai",
             secondaryText: "Train 12345 • 3A",
-            startTime: "2026-01-15T10:30:00.000",
+            startTime: "2026-01-15T10:30:00.000Z",
             location: "Chennai Central",
             type: "TRAIN",
             ticketId: "PNR123456"
