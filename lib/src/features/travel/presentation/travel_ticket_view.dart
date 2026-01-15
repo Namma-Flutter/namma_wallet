@@ -133,6 +133,9 @@ class _TravelTicketViewState extends State<TravelTicketView> {
     try {
       await getIt<ITicketDAO>().deleteTicket(widget.ticket.ticketId!);
 
+      // Check if deleted ticket is pinned to widget and clear it
+      await _clearWidgetIfPinned();
+
       getIt<ILogger>().info(
         '[TravelTicketView] Successfully deleted ticket with '
         'ID: ${widget.ticket.ticketId}',
@@ -169,6 +172,37 @@ class _TravelTicketViewState extends State<TravelTicketView> {
           _isDeleting = false;
         });
       }
+    }
+  }
+
+  Future<void> _clearWidgetIfPinned() async {
+    const dataKey = 'ticket_data';
+    const iOSWidgetName = 'TicketWidget';
+    const androidWidgetName = 'TicketHomeWidget';
+
+    try {
+      final pinnedData = await HomeWidget.getWidgetData<String>(dataKey);
+      if (pinnedData == null) return;
+
+      // Check if the pinned ticket ID matches the deleted ticket
+      final ticketId = widget.ticket.ticketId;
+      if (ticketId != null && pinnedData.contains('"ticket_id":"$ticketId"')) {
+        await HomeWidget.saveWidgetData<String>(dataKey, null);
+        await HomeWidget.updateWidget(
+          androidName: androidWidgetName,
+          iOSName: iOSWidgetName,
+        );
+
+        getIt<ILogger>().info(
+          '[TravelTicketView] Cleared widget data for deleted ticket',
+        );
+      }
+    } on Object catch (e, stackTrace) {
+      getIt<ILogger>().error(
+        '[TravelTicketView] Failed to clear widget data',
+        e,
+        stackTrace,
+      );
     }
   }
 
