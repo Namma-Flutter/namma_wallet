@@ -172,9 +172,11 @@ struct TicketWidgetEntryView: View {
                 HStack(spacing: 4) {
                     Image(systemName: iconName(for: ticket.type))
                         .font(.caption)
-                    Text(ticket.primaryText ?? "No Route")
-                        .font(.headline)
-                        .lineLimit(1)
+                    if let pnr = ticket.ticketId, !pnr.isEmpty {
+                        Text(pnr)
+                            .font(.headline)
+                            .lineLimit(1)
+                    }
                 }
                 if let startTime = ticket.startTime,
                    let formatted = formatDateTime(startTime)
