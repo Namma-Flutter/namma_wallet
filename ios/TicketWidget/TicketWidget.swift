@@ -105,13 +105,13 @@ struct TicketWidgetEntryView: View {
             if let ticket = entry.ticketData {
                 smallTicketView(ticket: ticket)
             } else {
-                placeholderView
+                squareWidgetPlaceholder
             }
         default:
             if let ticket = entry.ticketData {
                 ticketView(ticket: ticket)
             } else {
-                placeholderView
+                squareWidgetPlaceholder
             }
         }
     }
@@ -162,8 +162,8 @@ struct TicketWidgetEntryView: View {
         return formatter
     }()
 
-    private var placeholderView: some View {
-        VStack(spacing: 8) {
+    private var squareWidgetPlaceholder: some View {
+        VStack(alignment: .center, spacing: 8) {
             Image(systemName: "ticket")
                 .font(.largeTitle)
                 .foregroundColor(.secondary)
@@ -175,7 +175,10 @@ struct TicketWidgetEntryView: View {
             Text("Pin a ticket from the app")
                 .font(.caption2)
                 .foregroundStyle(.tertiary)
+                .lineLimit(2)
+                .multilineTextAlignment(.center)
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .padding()
     }
 
