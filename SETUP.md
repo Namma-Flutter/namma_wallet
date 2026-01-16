@@ -6,7 +6,7 @@ This guide will help you set up the development environment for Namma Wallet.
 
 ### Required Software
 
-- Flutter SDK 3.35.2
+- Flutter SDK (managed via FVM)
 - VSCode and Android Studio(for Android development)
 - Xcode 16.4.0 (for iOS development on macOS)
 - Git
@@ -41,17 +41,12 @@ brew install fvm
 ```bash
 git clone https://github.com/<your-username>/namma_wallet.git
 cd namma_wallet
-```
 
 ### 2. Install Flutter Version
 
 ```bash
-# Install and use Flutter 3.35.2 via FVM
-fvm install 3.35.2
-fvm use 3.35.2
-```
-
-### 3. Install Dependencies
+# Install and use project's Flutter version (from .fvmrc)
+fvm use 
 
 ```bash
 # Get Flutter dependencies
@@ -174,7 +169,7 @@ Add to your `.mcp.json` configuration file:
 
 ## Development Environment
 
-- This project uses Flutter 3.35.2 managed via FVM
+- This project uses Flutter managed via FVM
 - Follow feature-based architecture when adding new functionality
 - Adhere to flutter_lints coding standards
 - Serena MCP provides intelligent code analysis and editing capabilities
