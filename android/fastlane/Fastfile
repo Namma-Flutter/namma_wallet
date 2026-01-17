@@ -1,26 +1,49 @@
 default_platform(:android)
 
 platform :android do
-  desc "Build Flutter AAB and upload to Play Store Internal Testing"
+
+  desc "Build Flutter AAB & upload to Play Store Internal Testing"
   lane :internal do
-    # Clean flutter build
-    sh "flutter clean"
-
-    # Get dependencies
-    sh "flutter pub get"
-
-    
-
-    # Build Android App Bundle
-    sh "flutter build appbundle --release"
-
-    # Upload to Play Store Internal Testing
-    upload_to_play_store(
-      track: "internal",
-      aab: "../build/app/outputs/bundle/release/app-release.aab",
-      skip_upload_metadata: false,
-      skip_upload_images: false,
-      skip_upload_screenshots: false
-    ) 
+    flutter_prepare
+    flutter_build_aab
+    upload(track: "internal")
   end
+
+  desc "Build Flutter AAB & upload to Play Store Closed Testing"
+  lane :beta do
+    flutter_prepare
+    flutter_build_aab
+    upload(track: "closed")
+  end
+
+  desc "Build Flutter AAB & upload to Play Store Production"
+  lane :production do
+    flutter_prepare
+    flutter_build_aab
+    upload(track: "production")
+  end
+
+  # -------------------------------
+  # Shared methods
+  # -------------------------------
+
+  private_lane :flutter_prepare do
+    sh "flutter clean"
+    sh "flutter pub get"
+  end
+
+  private_lane :flutter_build_aab do
+    sh "flutter build appbundle --release"
+  end
+
+  private_lane :upload do |options|
+    upload_to_play_store(
+      track: options[:track],
+      aab: "../build/app/outputs/bundle/release/app-release.aab",
+      skip_upload_metadata: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true
+    )
+  end
+
 end
