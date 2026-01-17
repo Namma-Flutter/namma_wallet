@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:namma_wallet/src/common/domain/models/ticket.dart';
+import 'package:namma_wallet/src/common/enums/ticket_type.dart';
 import 'package:namma_wallet/src/features/tnstc/domain/tnstc_model.dart';
 
 void main() {
@@ -20,5 +21,24 @@ void main() {
     expect(ticket.startTime?.day, 18);
     expect(ticket.startTime?.hour, 13);
     expect(ticket.startTime?.minute, 15);
+  });
+
+  test('Ticket should preserve journeyDate during serialization', () {
+    final originalTicket = Ticket(
+      primaryText: 'Chennai -> Bangalore',
+      secondaryText: 'Train',
+      location: 'Chennai',
+      journeyDate: DateTime(2026, 1, 18),
+    );
+
+    final map = originalTicket.toMap();
+    final reconstructedTicket = TicketMapper.fromMap(map);
+
+    expect(reconstructedTicket.journeyDate, isNotNull);
+    final localDate = reconstructedTicket.journeyDate?.toLocal();
+
+    expect(localDate?.year, 2026);
+    expect(localDate?.month, 1);
+    expect(localDate?.day, 18);
   });
 }

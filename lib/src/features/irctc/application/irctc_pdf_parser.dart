@@ -290,11 +290,12 @@ class IRCTCPDFParser implements ITicketParser {
       r'Scheduled Departure[\s\S]{0,10}?[:"]+\s*(\d{2}-[A-Za-z]{3}-\d{4}\s+\d{2}:\d{2})',
       r'Departure[\s\S]{0,10}?\s*(\d{1,2}:\d{2}[\s\S]{0,25}?\d{4})',
       r'Departure[\s\S]{0,10}?\s*(\d{2}-[A-Za-z]{3}-\d{4}[\s\S]{0,25}?\d{1,2}:\d{2})',
+      r'Start Date\*\s*(\d{2}-[A-Za-z]{3}-\d{4})',
     ]);
 
     /// Parses multiple date formats safely.
-    DateTime? parseFlexibleDate(String raw) {
-      if (raw.isEmpty) return null;
+    (DateTime? dateTime, bool? withOutTime) parseFlexibleDate(String raw) {
+      if (raw.isEmpty) return (null, null);
       try {
         final cleaned = raw.replaceAll(RegExp(r'[*"\n]'), ' ').trim();
         final timeMatch = RegExp(r'(\d{1,2}:\d{2})').firstMatch(cleaned);
@@ -303,19 +304,22 @@ class IRCTCPDFParser implements ITicketParser {
           caseSensitive: false,
         ).firstMatch(cleaned);
 
-        if (timeMatch != null && dateMatch != null) {
-          final timeParts = timeMatch.group(1)!.split(':');
+        if (dateMatch != null) {
+          final timeParts = timeMatch?.group(1)?.split(':');
           final dateParts = dateMatch.group(1)!.split('-');
           final month = monthToInt(dateParts[1]);
           if (month == null) {
-            return null;
+            return (null, null);
           } else {
-            return DateTime(
-              int.parse(dateParts[2]),
-              month,
-              int.parse(dateParts[0]),
-              int.parse(timeParts[0]),
-              int.parse(timeParts[1]),
+            return (
+              DateTime(
+                int.parse(dateParts[2]),
+                month,
+                int.parse(dateParts[0]),
+                int.parse(timeParts?[0] ?? '0'),
+                int.parse(timeParts?[1] ?? '0'),
+              ),
+              timeMatch == null,
             );
           }
         }
@@ -326,18 +330,21 @@ class IRCTCPDFParser implements ITicketParser {
           stackTree,
         );
       }
-      return null;
+      return (null, null);
     }
 
+    /// Journey date with the flag of Time present or not.
+    final (dateTime, withoutTime) = parseFlexibleDate(dateTimeRaw);
+
     /// Final parsed scheduled departure DateTime.
-    final scheduledDeparture = parseFlexibleDate(dateTimeRaw);
+    final scheduledDeparture = withoutTime ?? false ? null : dateTime;
 
     /// Extracts journey date (removes time).
-    final dateOfJourney = scheduledDeparture != null
+    final dateOfJourney = dateTime != null
         ? DateTime(
-            scheduledDeparture.year,
-            scheduledDeparture.month,
-            scheduledDeparture.day,
+            dateTime.year,
+            dateTime.month,
+            dateTime.day,
           )
         : null;
 

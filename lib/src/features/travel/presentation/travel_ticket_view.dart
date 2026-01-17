@@ -421,9 +421,9 @@ class _TravelTicketViewState extends State<TravelTicketView> {
                   TravelRowWidget(
                     title1: 'Journey Date',
                     title2: 'Time',
-                    value1: widget.ticket.startTime != null
+                    value1: widget.ticket.journeyDate != null
                         ? DateTimeConverter.instance.formatDate(
-                            widget.ticket.startTime!,
+                            widget.ticket.journeyDate!,
                           )
                         : 'Unknown',
                     value2: widget.ticket.startTime != null

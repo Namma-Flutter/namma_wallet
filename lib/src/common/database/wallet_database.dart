@@ -81,11 +81,12 @@ class WalletDatabase implements IWalletDatabase {
          primary_text TEXT NOT NULL,
          secondary_text TEXT NOT NULL,
          type TEXT NOT NULL,
-         start_time TEXT NOT NULL,
-         end_time TEXT,
+         start_time TEXT DEFAULT NULL,
+         end_time TEXT DEFAULT NULL,
          location TEXT NOT NULL,
          tags TEXT,
          extras TEXT,
+         journey_date TEXT DEFAULT NULL,
          created_at TEXT DEFAULT CURRENT_TIMESTAMP,
          updated_at TEXT DEFAULT NULL
       );

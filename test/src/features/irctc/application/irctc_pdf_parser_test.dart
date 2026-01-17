@@ -681,8 +681,7 @@ void main() {
     );
 
     test(
-      'should throw ArgumentError when parsing IRCTC'
-      ' PDF 4565161618 due to N.A. departure time',
+      'should parse IRCTC PDF 4565161618 correctly even with N.A. departure time',
       () async {
         /// Load the specific sample where departure is "N.A."
         final pdfFile = XFile('test/assets/irctc/4565161618.pdf');
@@ -690,13 +689,13 @@ void main() {
         /// Extract text from the PDF
         final pdfText = await pdfService.extractTextFrom(pdfFile);
 
-        /// The test verifies that the parser rejects the ticket because
-        /// scheduledDeparture is null due to the "N.A."
-        /// value in the source.
-        expect(
-          () => parser.parseTicket(pdfText),
-          throwsA(isA<ArgumentError>()),
-        );
+        final ticket = parser.parseTicket(pdfText);
+
+        expect(ticket, isNotNull);
+        expect(ticket.ticketId, equals('4565161618'));
+
+        /// Start time should be null because the PDF has "N.A."
+        expect(ticket.startTime, isNull);
       },
     );
 

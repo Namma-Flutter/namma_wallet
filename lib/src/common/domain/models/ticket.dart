@@ -20,6 +20,7 @@ class Ticket with TicketMappable {
     required this.location,
     this.startTime,
     this.type = TicketType.train,
+    this.journeyDate,
     this.endTime,
     this.tags,
     this.extras,
@@ -30,16 +31,13 @@ class Ticket with TicketMappable {
     IRCTCTicket model, {
     bool isUpdate = false,
   }) {
-    if ((model.dateOfJourney == null || model.scheduledDeparture == null) &&
-        !isUpdate) {
+    if ((model.dateOfJourney == null) && !isUpdate) {
       getIt<ILogger>().error(
-        '[Ticket.fromIRCTC] Missing required date/time: '
-        'dateOfJourney=${model.dateOfJourney}, '
-        'scheduledDeparture=${model.scheduledDeparture}',
+        '[Ticket.fromIRCTC] Missing required date of journey: '
+        'dateOfJourney=${model.dateOfJourney}, ',
       );
       throw ArgumentError(
-        'Cannot create IRCTC ticket: dateOfJourney or '
-        'scheduledDeparture is null',
+        'Cannot create IRCTC ticket: unable to get dateOfJourney',
       );
     }
 
@@ -68,12 +66,13 @@ class Ticket with TicketMappable {
               if (model.travelClass.isNotNullOrEmpty) model.travelClass,
               if (model.passengerName.isNotNullOrEmpty) model.passengerName,
             ].join(' • '),
-      startTime: !isUpdate
+      journeyDate: model.dateOfJourney,
+      startTime: (!isUpdate && departure != null)
           ? DateTime(
               journeyDate!.year,
               journeyDate.month,
               journeyDate.day,
-              departure!.hour,
+              departure.hour,
               departure.minute,
             )
           : null,
@@ -104,8 +103,8 @@ class Ticket with TicketMappable {
         ExtrasModel(title: 'Boarding', value: model.boardingStation),
         ExtrasModel(
           title: 'Departure',
-          value: !isUpdate
-              ? DateTimeConverter.instance.formatTime(departure!)
+          value: !isUpdate && departure != null
+              ? DateTimeConverter.instance.formatTime(departure)
               : null,
         ),
         ExtrasModel(
@@ -201,6 +200,7 @@ class Ticket with TicketMappable {
                 model.routeNo ?? 'Bus',
             ].where((s) => s != null && s.isNotEmpty).join(' - ')
           : _secondaryTextConstant,
+      journeyDate: model.journeyDate,
       startTime: startTime,
       location:
           model.passengerPickupPoint ??
@@ -350,6 +350,10 @@ class Ticket with TicketMappable {
 
       type: incoming.type,
 
+      journeyDate: (incoming.journeyDate == null)
+          ? existing.journeyDate
+          : incoming.journeyDate,
+
       tags: _mergeTags(existing.tags, incoming.tags),
       extras: _mergeExtras(existing.extras, incoming.extras),
     );
@@ -428,6 +432,8 @@ class Ticket with TicketMappable {
   final TicketType type;
   @MappableField(key: 'start_time')
   final DateTime? startTime;
+  @MappableField(key: 'journey_date')
+  final DateTime? journeyDate;
   @MappableField(key: 'end_time')
   final DateTime? endTime;
   @MappableField(key: 'location')
