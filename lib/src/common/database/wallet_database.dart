@@ -52,8 +52,9 @@ class WalletDatabase implements IWalletDatabase {
           'Upgrading from v$oldVersion to v$newVersion',
         );
         if (oldVersion < 2) {
-          // Robust migration for v2: Adding 'journey_date' and relaxing 'start_time' NOT NULL
-          // SQLite requires a table rebuild for changing column constraints.
+          // Robust migration for v2:
+          //  1. Adding 'journey_date' and relaxing 'start_time' NOT NULL
+          //  2. SQLite requires a table rebuild for changing column constraints
 
           _logger.logDatabase('Upgrade', 'Rebuilding tickets table...');
 
@@ -103,7 +104,8 @@ class WalletDatabase implements IWalletDatabase {
             'CREATE INDEX IF NOT EXISTS idx_tickets_type ON tickets (type);',
           );
           await db.execute(
-            'CREATE INDEX IF NOT EXISTS idx_tickets_start_time ON tickets (start_time);',
+            'CREATE INDEX IF NOT EXISTS idx_tickets_start_time '
+            'ON tickets (start_time);',
           );
 
           _logger.success('Database migration to v2 completed successfully');

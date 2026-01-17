@@ -311,16 +311,22 @@ class IRCTCPDFParser implements ITicketParser {
           if (month == null) {
             return (null, null);
           } else {
-            return (
-              DateTime(
-                int.parse(dateParts[2]),
-                month,
-                int.parse(dateParts[0]),
-                int.parse(timeParts?[0] ?? '0'),
-                int.parse(timeParts?[1] ?? '0'),
-              ),
-              timeMatch == null,
-            );
+            final year = int.parse(dateParts[2]);
+            final day = int.parse(dateParts[0]);
+            if (timeParts != null && timeParts.length == 2) {
+              return (
+                DateTime(
+                  year,
+                  month,
+                  day,
+                  int.parse(timeParts[0]),
+                  int.parse(timeParts[1]),
+                ),
+                false,
+              );
+            } else {
+              return (DateTime(year, month, day), true);
+            }
           }
         }
       } on Exception catch (e, stackTree) {

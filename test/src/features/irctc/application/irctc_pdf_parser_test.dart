@@ -681,7 +681,8 @@ void main() {
     );
 
     test(
-      'should parse IRCTC PDF 4565161618 correctly even with N.A. departure time',
+      'should parse IRCTC PDF 4565161618 correctly '
+      'even with N.A. departure time',
       () async {
         /// Load the specific sample where departure is "N.A."
         final pdfFile = XFile('test/assets/irctc/4565161618.pdf');
@@ -693,6 +694,7 @@ void main() {
 
         expect(ticket, isNotNull);
         expect(ticket.ticketId, equals('4565161618'));
+        expect(ticket.journeyDate, isNotNull);
 
         /// Start time should be null because the PDF has "N.A."
         expect(ticket.startTime, isNull);
