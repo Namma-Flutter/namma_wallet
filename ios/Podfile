@@ -32,16 +32,60 @@ target 'Runner' do
   use_modular_headers!
 
   flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
+
+  # share_handler addition start
+  target 'Share Extension' do
+    inherit! :search_paths
+    pod "share_handler_ios_models", :path => ".symlinks/plugins/share_handler_ios/ios/Models"
+  end
+  # share_handler addition end
+
   target 'RunnerTests' do
     inherit! :search_paths
   end
 end
 
+
+
+$iOSVersion = '16.6'
+
 post_install do |installer|
+  installer.pods_project.build_configurations.each do |config|
+    config.build_settings["EXCLUDED_ARCHS[sdk=*]"] = "armv7"
+    config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = $iOSVersion
+  end
   installer.pods_project.targets.each do |target|
     flutter_additional_ios_build_settings(target)
     target.build_configurations.each do |config|
-      config.build_settings['EXCLUDED_ARCHS[sdk=iphonesimulator*]'] = 'arm64'
+      # Ensure deployment target is high enough
+      if Gem::Version.new($iOSVersion) > Gem::Version.new(config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'])
+        config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = $iOSVersion
+      end
+      # Configure pods for app extension compatibility
+      if target.name.include?("Pods-Share Extension") || target.name.include?("share_handler_ios_models")
+        config.build_settings['APPLICATION_EXTENSION_API_ONLY'] = 'YES'
+      end
+    end
+  end
+
+  # Remove MediaPipe/TensorFlow force_load directives from Share Extension xcconfig files
+  ['debug', 'release', 'profile'].each do |config|
+    xcconfig_path = File.join('Pods', 'Target Support Files', 'Pods-Share Extension', "Pods-Share Extension.#{config}.xcconfig")
+    if File.exist?(xcconfig_path)
+      xcconfig_content = File.read(xcconfig_path)
+
+      # Remove MediaPipe force_load lines
+      xcconfig_content.gsub!(/^OTHER_LDFLAGS\[sdk=iphoneos\*\] = .*MediaPipeTasksGenAIC.*$/, '')
+      xcconfig_content.gsub!(/^OTHER_LDFLAGS\[sdk=iphonesimulator\*\] = .*MediaPipeTasksGenAIC.*$/, '')
+
+      # Remove TensorFlow/MediaPipe/flutter_gemma from FRAMEWORK_SEARCH_PATHS
+      xcconfig_content.gsub!(/"[^"]*TensorFlowLite[^"]*"\s*/, '')
+      xcconfig_content.gsub!(/"[^"]*MediaPipe[^"]*"\s*/, '')
+      xcconfig_content.gsub!(/"[^"]*flutter_gemma[^"]*"\s*/, '')
+      xcconfig_content.gsub!(/"[^"]*google_mlkit[^"]*"\s*/, '')
+
+      File.write(xcconfig_path, xcconfig_content)
+      puts "Cleaned up #{xcconfig_path}"
     end
   end
 end
