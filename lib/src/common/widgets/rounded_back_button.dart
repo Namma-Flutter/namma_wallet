@@ -18,7 +18,8 @@ class RoundedBackButton extends StatelessWidget {
           radius: 24,
           backgroundColor: Theme.of(context).colorScheme.primary,
           child: InkWell(
-            onTap: onPressed ??
+            onTap:
+                onPressed ??
                 () {
                   if (context.canPop()) {
                     context.pop();
