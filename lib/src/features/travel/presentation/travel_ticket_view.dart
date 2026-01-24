@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:home_widget/home_widget.dart';
@@ -62,17 +60,16 @@ class _TravelTicketViewState extends State<TravelTicketView> {
     return ticket.tags!;
   }
 
-  ///
-  // ignore: unused_element
   Future<void> _pinToHomeScreen() async {
     try {
-      const iOSWidgetName = 'TicketHomeWidget';
+      const iOSWidgetName = 'TicketWidget';
       const androidWidgetName = 'TicketHomeWidget';
       const dataKey = 'ticket_data';
 
       // Convert ticket to JSON format for the widget
+      // toJson() already returns a JSON string, no need to encode again
       final ticketData = widget.ticket.toJson();
-      await HomeWidget.saveWidgetData(dataKey, jsonEncode(ticketData));
+      await HomeWidget.saveWidgetData(dataKey, ticketData);
 
       await HomeWidget.updateWidget(
         androidName: androidWidgetName,
@@ -136,6 +133,9 @@ class _TravelTicketViewState extends State<TravelTicketView> {
     try {
       await getIt<ITicketDAO>().deleteTicket(widget.ticket.ticketId!);
 
+      // Check if deleted ticket is pinned to widget and clear it
+      await _clearWidgetIfPinned();
+
       getIt<ILogger>().info(
         '[TravelTicketView] Successfully deleted ticket with '
         'ID: ${widget.ticket.ticketId}',
@@ -148,7 +148,19 @@ class _TravelTicketViewState extends State<TravelTicketView> {
         hapticService.triggerHaptic(
           HapticType.success,
         );
-        context.pop(true); // Return true to indicate ticket was deleted
+
+        // Check if we can pop (normal navigation) or need to
+        // go home (deep link)
+        if (context.canPop()) {
+          context.pop(true); // Return true to indicate ticket was deleted
+        } else {
+          // Opened via deep link with no navigation history, go to home
+          getIt<ILogger>().info(
+            '[TravelTicketView] No navigation history after delete, '
+            'navigating to home',
+          );
+          context.go('/');
+        }
       }
     } on Object catch (e, stackTrace) {
       getIt<ILogger>().error(
@@ -175,6 +187,37 @@ class _TravelTicketViewState extends State<TravelTicketView> {
     }
   }
 
+  Future<void> _clearWidgetIfPinned() async {
+    const dataKey = 'ticket_data';
+    const iOSWidgetName = 'TicketWidget';
+    const androidWidgetName = 'TicketHomeWidget';
+
+    try {
+      final pinnedData = await HomeWidget.getWidgetData<String>(dataKey);
+      if (pinnedData == null) return;
+
+      // Check if the pinned ticket ID matches the deleted ticket
+      final ticketId = widget.ticket.ticketId;
+      if (ticketId != null && pinnedData.contains('"ticket_id":"$ticketId"')) {
+        await HomeWidget.saveWidgetData<String>(dataKey, null);
+        await HomeWidget.updateWidget(
+          androidName: androidWidgetName,
+          iOSName: iOSWidgetName,
+        );
+
+        getIt<ILogger>().info(
+          '[TravelTicketView] Cleared widget data for deleted ticket',
+        );
+      }
+    } on Object catch (e, stackTrace) {
+      getIt<ILogger>().error(
+        '[TravelTicketView] Failed to clear widget data',
+        e,
+        stackTrace,
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -183,6 +226,22 @@ class _TravelTicketViewState extends State<TravelTicketView> {
         leading: const RoundedBackButton(),
         title: const Text('Ticket View'),
         actions: [
+          Center(
+            child: CircleAvatar(
+              radius: 24,
+              backgroundColor: Theme.of(context).colorScheme.primary,
+              child: IconButton(
+                onPressed: _pinToHomeScreen,
+                icon: const Icon(
+                  Icons.push_pin_outlined,
+                  size: 20,
+                  color: Colors.white,
+                ),
+                tooltip: 'Pin to home screen',
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
           if (widget.ticket.ticketId != null)
             Center(
               child: CircleAvatar(
