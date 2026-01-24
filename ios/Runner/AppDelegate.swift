@@ -5,13 +5,6 @@ import UIKit
 @main
 @objc class AppDelegate: FlutterAppDelegate, FlutterImplicitEngineDelegate {
     override func application(
-        _ application: UIApplication,
-        didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
-    ) -> Bool {
-        return super.application(application, didFinishLaunchingWithOptions: launchOptions)
-    }
-
-    override func application(
         _ app: UIApplication,
         open url: URL,
         options: [UIApplication.OpenURLOptionsKey: Any] = [:]
@@ -43,7 +36,7 @@ import UIKit
         GeneratedPluginRegistrant.register(with: engineBridge.pluginRegistry)
         if #available(iOS 17.0, *) {
             HomeWidgetPlugin.setConfigurationLookup(to: [
-                "TicketWidget": ConfigurationAppIntent.self,
+                "TicketWidget": ConfigurationAppIntent.self
             ])
         }
     }
