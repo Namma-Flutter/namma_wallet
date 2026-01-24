@@ -83,8 +83,11 @@ class DeepLinkService implements IDeepLinkService {
           );
 
           if (result.ticket == null) {
-            _onError?.call(Exception('Failed to parse PKPass file'));
-            return;
+            _logger.warning(
+              'DeepLinkService: Failed to parse PKPass file: $path',
+            );
+            _onError?.call(Exception('Failed to parse PKPass file: $path'));
+            continue;
           }
 
           if (result.warning != null) {

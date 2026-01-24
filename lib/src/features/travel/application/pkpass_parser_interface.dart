@@ -5,7 +5,7 @@ import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 ///
 /// Handles parsing PKPass data into tickets and fetching updates.
 abstract interface class IPKPassParser {
-  /// Parses a pkpass file content and returns a Ticket.
+  /// Parses a pkpass file content and returns a Ticket, or null on failure.
   Future<Ticket?> parsePKPass(Uint8List data);
 
   /// Fetches the latest version of the pass from the web service.
