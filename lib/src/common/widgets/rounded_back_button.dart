@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:namma_wallet/src/common/routing/app_routes.dart';
 
 class RoundedBackButton extends StatelessWidget {
   const RoundedBackButton({

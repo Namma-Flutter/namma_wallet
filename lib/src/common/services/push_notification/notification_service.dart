@@ -1,15 +1,29 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
+import 'package:go_router/go_router.dart';
 import 'package:namma_wallet/src/common/domain/models/ticket.dart';
+import 'package:namma_wallet/src/common/routing/app_router.dart';
+import 'package:namma_wallet/src/common/routing/app_routes.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
+/// Top-level function for handling background notifications
+void notificationTapBackground(NotificationResponse notificationResponse) {
+  // handle action
+  if (rootNavigatorKey.currentContext != null) {
+    rootNavigatorKey.currentContext?.goNamed(
+      AppRoute.ticketView.name,
+      pathParameters: {'id': notificationResponse.payload ?? ''},
+    );
+  }
+}
+
 /// Service for managing push notifications, including scheduling
 /// and displaying notifications.
+///
 
 class NotificationService {
   factory NotificationService() => _instance;
@@ -35,9 +49,7 @@ class NotificationService {
 
   /// Initializes the notification service.
 
-  Future<void> initialize({
-    required void Function(String? payload) onSelectNotification,
-  }) async {
+  Future<void> initialize() async {
     await initTimezone();
     const androidSettings = AndroidInitializationSettings(
       '@drawable/ic_notification_small',
@@ -59,11 +71,14 @@ class NotificationService {
     await _plugin.initialize(
       initSettings,
       onDidReceiveNotificationResponse: (details) {
-        onSelectNotification(details.payload);
+        if (rootNavigatorKey.currentContext != null) {
+          rootNavigatorKey.currentContext?.goNamed(
+            AppRoute.ticketView.name,
+            pathParameters: {'id': details.payload ?? ''},
+          );
+        }
       },
-      onDidReceiveBackgroundNotificationResponse: (details) {
-        onSelectNotification(details.payload);
-      },
+      onDidReceiveBackgroundNotificationResponse: notificationTapBackground,
     );
   }
 
@@ -168,7 +183,7 @@ class NotificationService {
         final safeBase = baseHash.abs() % maxBase;
         final notificationId = safeBase * 100 + i;
 
-        final payload = jsonEncode(ticket.toJson());
+        final payload = ticket.ticketId ?? '';
 
         final formattedDateTime = _formatDateTimeForNotification(journeyTime);
         final bodyText = formattedDateTime.isNotEmpty
