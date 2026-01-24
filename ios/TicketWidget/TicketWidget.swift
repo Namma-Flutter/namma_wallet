@@ -192,8 +192,7 @@ struct TicketWidgetEntryView: View {
                     Image(systemName: iconName(for: ticket.type))
                         .font(.title3)
                     if let startTime = ticket.startTime,
-                       let formatted = formatShortTime(startTime)
-                    {
+                       let formatted = formatShortTime(startTime) {
                         Text(formatted)
                             .font(.system(.caption2, design: .monospaced))
                             .minimumScaleFactor(0.8)
@@ -221,8 +220,7 @@ struct TicketWidgetEntryView: View {
                     }
                 }
                 if let startTime = ticket.startTime,
-                   let formatted = formatDateTime(startTime)
-                {
+                   let formatted = formatDateTime(startTime) {
                     Text(formatted)
                         .font(.caption)
                         .foregroundStyle(.secondary)
@@ -290,8 +288,7 @@ struct TicketWidgetEntryView: View {
 
             // Date and Time on separate lines
             if let startTime = ticket.startTime,
-               let (date, time) = formatDateTimeSeparate(startTime)
-            {
+               let (date, time) = formatDateTimeSeparate(startTime) {
                 Text(date)
                     .font(.system(.footnote, design: .monospaced, weight: .medium))
                     .foregroundColor(.blue)
@@ -358,8 +355,7 @@ struct TicketWidgetEntryView: View {
             HStack {
                 VStack(alignment: .leading, spacing: 2) {
                     if let startTime = ticket.startTime,
-                       let formatted = formatDateTime(startTime)
-                    {
+                       let formatted = formatDateTime(startTime) {
                         Text(formatted)
                             .font(.system(.caption2, design: .monospaced))
                             .foregroundColor(.blue)
@@ -438,82 +434,40 @@ struct TicketWidget: Widget {
             .systemMedium,
             .accessoryCircular,
             .accessoryRectangular,
-            .accessoryInline,
+            .accessoryInline
         ])
     }
 }
 
 // MARK: - Preview
 
+private let sampleTicket = TicketData(
+    primaryText: "Chennai → Mumbai", secondaryText: "Train 12345 • 3A",
+    startTime: "2026-01-15T10:30:00.000Z", location: "Chennai Central",
+    type: "TRAIN", ticketId: "PNR123456"
+)
+
 #Preview("System Small", as: .systemSmall) {
     TicketWidget()
 } timeline: {
-    SimpleEntry(
-        date: .now,
-        configuration: ConfigurationAppIntent(),
-        ticketData: TicketData(
-            primaryText: "Chennai → Mumbai",
-            secondaryText: "Train 12345 • 3A",
-            startTime: "2026-01-15T10:30:00.000Z",
-            location: "Chennai Central",
-            type: "TRAIN",
-            ticketId: "PNR123456"
-        )
-    )
-    SimpleEntry(
-        date: .now,
-        configuration: ConfigurationAppIntent(),
-        ticketData: nil
-    )
+    SimpleEntry(date: .now, configuration: ConfigurationAppIntent(), ticketData: sampleTicket)
+    SimpleEntry(date: .now, configuration: ConfigurationAppIntent(), ticketData: nil)
 }
 
 #Preview("Circular", as: .accessoryCircular) {
     TicketWidget()
 } timeline: {
-    SimpleEntry(
-        date: .now,
-        configuration: ConfigurationAppIntent(),
-        ticketData: TicketData(
-            primaryText: "Chennai → Mumbai",
-            secondaryText: "Train 12345 • 3A",
-            startTime: "2026-01-15T10:30:00.000Z",
-            location: "Chennai Central",
-            type: "TRAIN",
-            ticketId: "PNR123456"
-        )
-    )
+    SimpleEntry(date: .now, configuration: ConfigurationAppIntent(), ticketData: sampleTicket)
 }
 
 #Preview("Rectangular", as: .accessoryRectangular) {
     TicketWidget()
 } timeline: {
-    SimpleEntry(
-        date: .now,
-        configuration: ConfigurationAppIntent(),
-        ticketData: TicketData(
-            primaryText: "Chennai → Mumbai",
-            secondaryText: "Train 12345 • 3A",
-            startTime: "2026-01-15T10:30:00.000Z",
-            location: "Chennai Central",
-            type: "TRAIN",
-            ticketId: "PNR123456"
-        )
-    )
+    SimpleEntry(date: .now, configuration: ConfigurationAppIntent(), ticketData: sampleTicket)
 }
 
 #Preview("Inline", as: .accessoryInline) {
     TicketWidget()
 } timeline: {
-    SimpleEntry(
-        date: .now,
-        configuration: ConfigurationAppIntent(),
-        ticketData: TicketData(
-            primaryText: "Chennai → Mumbai",
-            secondaryText: "Train 12345 • 3A",
-            startTime: "2026-01-15T10:30:00.000Z",
-            location: "Chennai Central",
-            type: "TRAIN",
-            ticketId: "PNR123456"
-        )
-    )
+    SimpleEntry(date: .now, configuration: ConfigurationAppIntent(), ticketData: sampleTicket)
 }
