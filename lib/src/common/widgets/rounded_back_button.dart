@@ -22,12 +22,11 @@ class RoundedBackButton extends StatelessWidget {
             onTap:
                 onPressed ??
                 () {
-                  // Check if we can pop, otherwise go to home
-                  if (Navigator.canPop(context)) {
+                  if (context.canPop()) {
                     context.pop();
                   } else {
-                    // If nothing to pop, navigate to home
-                    context.goNamed(AppRoute.home.name);
+                    // No navigation history (e.g., deep link), go to home
+                    context.go('/');
                   }
                 },
             child: const Icon(
