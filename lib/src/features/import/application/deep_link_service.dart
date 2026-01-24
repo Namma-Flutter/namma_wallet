@@ -81,6 +81,12 @@ class DeepLinkService implements IDeepLinkService {
           final result = await _importService.importAndSavePKPassFile(
             XFile(path),
           );
+
+          if (result.ticket == null) {
+            _onError?.call(Exception('Failed to parse PKPass file'));
+            return;
+          }
+
           if (result.warning != null) {
             _onWarning?.call(result.warning!);
           }
