@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:namma_wallet/src/common/routing/app_routes.dart';
 
 class RoundedBackButton extends StatelessWidget {
   const RoundedBackButton({
@@ -18,7 +19,17 @@ class RoundedBackButton extends StatelessWidget {
           radius: 24,
           backgroundColor: Theme.of(context).colorScheme.primary,
           child: InkWell(
-            onTap: onPressed ?? () => context.pop(),
+            onTap:
+                onPressed ??
+                () {
+                  // Check if we can pop, otherwise go to home
+                  if (Navigator.canPop(context)) {
+                    context.pop();
+                  } else {
+                    // If nothing to pop, navigate to home
+                    context.goNamed(AppRoute.home.name);
+                  }
+                },
             child: const Icon(
               Icons.chevron_left,
               size: 28,

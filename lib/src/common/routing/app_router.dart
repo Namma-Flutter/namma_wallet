@@ -16,7 +16,7 @@ import 'package:namma_wallet/src/features/profile/presentation/profile_view.dart
 import 'package:namma_wallet/src/features/receive/presentation/share_success_view.dart';
 import 'package:namma_wallet/src/features/travel/presentation/travel_ticket_view.dart';
 
-final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>(
+final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>(
   debugLabel: 'root',
 );
 final GlobalKey<NavigatorState> _shellNavigatorKey = GlobalKey<NavigatorState>(
@@ -24,7 +24,7 @@ final GlobalKey<NavigatorState> _shellNavigatorKey = GlobalKey<NavigatorState>(
 );
 
 final router = GoRouter(
-  navigatorKey: _rootNavigatorKey,
+  navigatorKey: rootNavigatorKey,
   routes: [
     ShellRoute(
       navigatorKey: _shellNavigatorKey,

@@ -1,14 +1,24 @@
+// import 'dart:convert';
+
+import 'dart:async';
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_gemma/core/api/flutter_gemma.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'package:go_router/go_router.dart';
 import 'package:namma_wallet/src/app.dart';
 import 'package:namma_wallet/src/common/database/wallet_database_interface.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
+import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 import 'package:namma_wallet/src/common/platform_utils/platform_utils.dart';
+import 'package:namma_wallet/src/common/routing/app_router.dart';
+import 'package:namma_wallet/src/common/routing/app_routes.dart';
 import 'package:namma_wallet/src/common/services/haptic/haptic_service_interface.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
+import 'package:namma_wallet/src/common/services/push_notification/notification_service.dart';
 import 'package:namma_wallet/src/common/theme/theme_provider.dart';
 import 'package:namma_wallet/src/features/ai/fallback_parser/application/ai_service_interface.dart';
 import 'package:pdfrx/pdfrx.dart';
@@ -29,6 +39,28 @@ Future<void> main() async {
     // Catch any other throwables
     debugPrint('FlutterGemma initialization failed: $e\n$stackTrace');
   }
+
+  /// Initialize notification service
+  /// Store notification payload for later processing after app is initialized
+
+  await NotificationService().initialize(
+    onSelectNotification: (payload) async {
+      if (payload == null || payload.isEmpty) return;
+      try {
+        final data = jsonDecode(payload) as String;
+        final ticket = TicketMapper.fromJson(data);
+        if (rootNavigatorKey.currentContext != null) {
+          rootNavigatorKey.currentContext?.goNamed(
+            AppRoute.ticketView.name,
+            extra: ticket,
+          );
+        }
+      } on Exception catch (e, stackTrace) {
+        // Log error during notification handling
+        debugPrint('Error handling notification payload: $e\n$stackTrace');
+      }
+    },
+  );
 
   // Initialize pdfrx (required when using PDF engine APIs before widgets)
   // with error handling to prevent app crashes

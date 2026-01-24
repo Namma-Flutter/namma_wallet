@@ -61,6 +61,9 @@ class NotificationService {
       onDidReceiveNotificationResponse: (details) {
         onSelectNotification(details.payload);
       },
+      onDidReceiveBackgroundNotificationResponse: (details) {
+        onSelectNotification(details.payload);
+      },
     );
   }
 
