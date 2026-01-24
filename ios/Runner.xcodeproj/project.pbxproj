@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 70;
+	objectVersion = 54;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -112,21 +112,21 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		6811CF732F166243009E977E /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+		6811CF732F166243009E977E /* Exceptions for "Share Extension" folder in "Share Extension" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
 			);
 			target = 6811CF632F166243009E977E /* Share Extension */;
 		};
-		68B263872F176F2B00743DE6 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+		68B263872F176F2B00743DE6 /* Exceptions for "TicketWidget" folder in "TicketWidgetExtension" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
 			);
 			target = 68B263712F176F2A00743DE6 /* TicketWidgetExtension */;
 		};
-		68B2638B2F17716300743DE6 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+		68B2638B2F17716300743DE6 /* Exceptions for "TicketWidget" folder in "Runner" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				AppIntent.swift,
@@ -136,8 +136,31 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		6811CF652F166243009E977E /* Share Extension */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (6811CF732F166243009E977E /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = "Share Extension"; sourceTree = "<group>"; };
-		68B263772F176F2A00743DE6 /* TicketWidget */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (68B2638B2F17716300743DE6 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, 68B263872F176F2B00743DE6 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = TicketWidget; sourceTree = "<group>"; };
+		6811CF652F166243009E977E /* Share Extension */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				6811CF732F166243009E977E /* Exceptions for "Share Extension" folder in "Share Extension" target */,
+			);
+			explicitFileTypes = {
+			};
+			explicitFolders = (
+			);
+			path = "Share Extension";
+			sourceTree = "<group>";
+		};
+		68B263772F176F2A00743DE6 /* TicketWidget */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				68B2638B2F17716300743DE6 /* Exceptions for "TicketWidget" folder in "Runner" target */,
+				68B263872F176F2B00743DE6 /* Exceptions for "TicketWidget" folder in "TicketWidgetExtension" target */,
+			);
+			explicitFileTypes = {
+			};
+			explicitFolders = (
+			);
+			path = TicketWidget;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -497,7 +520,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\nif command -v swiftlint >/dev/null 2>&1\nthen\n    swiftlint\nelse\n    echo \"warning: `swiftlint` command not found - See https://github.com/realm/SwiftLint#installation for installation instructions.\"\nfi\n";
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\nif command -v swiftlint >/dev/null 2>&1\nthen\n    cd \"${SRCROOT}/..\"\n    swiftlint --config .swiftlint.yml\nelse\n    echo \"warning: `swiftlint` command not found - See https://github.com/realm/SwiftLint#installation for installation instructions.\"\nfi\n";
 		};
 		93AACA07691119C5F093A92E /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -566,13 +589,9 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
-			inputPaths = (
-			);
 			name = "[CP] Copy Pods Resources";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-resources-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -587,13 +606,9 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
-			inputPaths = (
-			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;

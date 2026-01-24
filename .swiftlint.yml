@@ -1,8 +1,11 @@
 # SwiftLint configuration for Flutter iOS project
 
-# Paths to include
+# Paths to include (only our source files)
 included:
-  - ios
+  - ios/Runner
+  - ios/RunnerTests
+  - ios/TicketWidget
+  - ios/Share Extension
 
 # Paths to exclude from linting
 excluded:
@@ -29,19 +32,7 @@ opt_in_rules:
   - vertical_whitespace_closing_braces
   - vertical_whitespace_opening_braces
 
-# Disabled rules
-disabled_rules:
-  - trailing_whitespace
-  - line_length
-
 # Rule configurations
-line_length:
-  warning: 120
-  error: 200
-  ignores_comments: true
-  ignores_urls: true
-  ignores_function_declarations: true
-  ignores_interpolated_strings: true
 
 type_body_length:
   warning: 300
