@@ -148,7 +148,18 @@ class _TravelTicketViewState extends State<TravelTicketView> {
         hapticService.triggerHaptic(
           HapticType.success,
         );
-        context.pop(true); // Return true to indicate ticket was deleted
+
+        // Check if we can pop (normal navigation) or need to go home (deep link)
+        if (context.canPop()) {
+          context.pop(true); // Return true to indicate ticket was deleted
+        } else {
+          // Opened via deep link with no navigation history, go to home
+          getIt<ILogger>().info(
+            '[TravelTicketView] No navigation history after delete, '
+            'navigating to home',
+          );
+          context.go('/');
+        }
       }
     } on Object catch (e, stackTrace) {
       getIt<ILogger>().error(

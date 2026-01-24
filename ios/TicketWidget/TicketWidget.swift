@@ -199,6 +199,7 @@ struct TicketWidgetEntryView: View {
                             .minimumScaleFactor(0.8)
                     }
                 }
+                .widgetURL(widgetURL(for: ticket))
             } else {
                 Image(systemName: "ticket")
                     .font(.title2)
@@ -233,6 +234,7 @@ struct TicketWidgetEntryView: View {
                         .lineLimit(1)
                 }
             }
+            .widgetURL(widgetURL(for: ticket))
         } else {
             HStack(spacing: 4) {
                 Image(systemName: "ticket")
@@ -249,6 +251,7 @@ struct TicketWidgetEntryView: View {
                 Image(systemName: iconName(for: ticket.type))
                 Text(ticket.primaryText ?? "No Route")
             }
+            .widgetURL(widgetURL(for: ticket))
         } else {
             HStack(spacing: 4) {
                 Image(systemName: "ticket")
@@ -309,6 +312,7 @@ struct TicketWidgetEntryView: View {
             }
         }
         .padding(12)
+        .widgetURL(widgetURL(for: ticket))
     }
 
     private func formatCompactDateTime(_ isoString: String) -> String? {
@@ -383,6 +387,7 @@ struct TicketWidgetEntryView: View {
             }
         }
         .padding(12)
+        .widgetURL(widgetURL(for: ticket))
     }
 
     private func iconName(for type: String?) -> String {
@@ -406,6 +411,13 @@ struct TicketWidgetEntryView: View {
             return nil
         }
         return Self.displayFormatter.string(from: parsedDate)
+    }
+
+    private func widgetURL(for ticket: TicketData) -> URL? {
+        guard let ticketId = ticket.ticketId, !ticketId.isEmpty else {
+            return nil
+        }
+        return URL(string: "nammawallet://ticket/\(ticketId)")
     }
 }
 
