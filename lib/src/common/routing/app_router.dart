@@ -43,7 +43,7 @@ final router = GoRouter(
       // nammawallet://ticket/T75229210 -> /ticket/T75229210
       final redirectPath = '/${uri.host}${uri.path}';
       getIt<ILogger>().info(
-        'Deep link redirect: ${uri.toString()} -> $redirectPath',
+        'Deep link redirect: $uri -> $redirectPath',
       );
       return redirectPath;
     }

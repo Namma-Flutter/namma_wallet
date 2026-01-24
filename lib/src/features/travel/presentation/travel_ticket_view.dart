@@ -149,7 +149,8 @@ class _TravelTicketViewState extends State<TravelTicketView> {
           HapticType.success,
         );
 
-        // Check if we can pop (normal navigation) or need to go home (deep link)
+        // Check if we can pop (normal navigation) or need to
+        // go home (deep link)
         if (context.canPop()) {
           context.pop(true); // Return true to indicate ticket was deleted
         } else {
