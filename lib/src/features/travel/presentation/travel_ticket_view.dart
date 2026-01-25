@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:home_widget/home_widget.dart';
@@ -62,26 +64,22 @@ class _TravelTicketViewState extends State<TravelTicketView> {
   }
 
   Future<void> _pinToHomeScreen() async {
+    const iOSWidgetName = 'TicketWidget';
+    const androidWidgetName = 'TicketHomeWidget';
+    const dataKey = 'ticket_data';
+
     try {
-      const iOSWidgetName = 'TicketWidget';
-      const androidWidgetName = 'TicketHomeWidget';
-      const dataKey = 'ticket_data';
-
-      // Convert ticket to JSON format for the widget
-      // toJson() already returns a JSON string, no need to encode again
-      final ticketData = widget.ticket.toJson();
-      await HomeWidget.saveWidgetData(dataKey, ticketData);
-
-      await HomeWidget.updateWidget(
-        androidName: androidWidgetName,
-        iOSName: iOSWidgetName,
-      );
-
-      // from android home widget pin branch
-      final widgetService = getIt<IWidgetService>();
-
-      // Update widget with this ticket
-      await widgetService.updateWidgetWithTicket(widget.ticket);
+      if (Platform.isIOS) {
+        await HomeWidget.saveWidgetData(dataKey, widget.ticket.toJson());
+        await HomeWidget.updateWidget(
+          androidName: androidWidgetName,
+          iOSName: iOSWidgetName,
+        );
+      } else if (Platform.isAndroid) {
+        await getIt<IWidgetService>().updateWidgetWithTicket(widget.ticket);
+      } else {
+        throw UnsupportedError('Unsupported platform');
+      }
 
       if (mounted) {
         showSnackbar(context, 'Ticket pinned to home screen successfully!');
