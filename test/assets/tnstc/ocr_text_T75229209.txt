@@ -1,0 +1,43 @@
+Tamil Nadu State Transport Corporation Ltd.
+(A GOVERNMENT OF TAMILNADU UNDERTAKING)
+E-Ticket/Reservation Voucher
+PNR Number: T75229 209
+Route No: 307ELB
+Service End Place : KUMBAKONAM
+SETC
+Corporation :
+Date of Journey : 20/01/2026
+Service Start Place : CHENNAI-PT DR. M.G.R. BS
+Service Start Time: 22:00 Hrs.
+Passenger Start Place: CHENNAI-PT DR. M.G.R. BS
+Passenger Pickup Point : OFFICE)
+KOTTIVAKKAM(RTO
+Platform Number:
+Trip Code: 2200CHEKUMLB
+No. of Seats : 1 (Adults=1 Children=0)
+Bus ID No. : E-4950
+Passenger Information
+Name
+HarishAnbalagan
+Passenger End Place : KUMBAKONAM
+Passenger Pickup Time : 20/01/2026 22:55 Hrs.
+NON AC LOWER BERTH
+Class of Service
+SEATER
+OB Reference No. : OB31969360
+Bank Tn. No; : CAX65QA17VN27K
+Passenger category: GENERAL PUBLIC
+Adult/Child
+Adult
+Gender
+M
+ID Card Number : 736960775578
+Seat No.
+2LB
+Age
+26
+Government Issued Photo
+ID Card Type ID Card
+Total Fare : 555.00 Rs.
+Important
+• The seat(s) booked under this ticket is/are not transferable.

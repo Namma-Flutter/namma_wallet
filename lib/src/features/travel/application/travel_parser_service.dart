@@ -5,6 +5,8 @@ import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 import 'package:namma_wallet/src/common/enums/source_type.dart';
 import 'package:namma_wallet/src/common/enums/ticket_type.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
+import 'package:namma_wallet/src/features/irctc/application/irctc_pdf_parser.dart';
+import 'package:namma_wallet/src/features/irctc/application/irctc_sms_parser.dart';
 import 'package:namma_wallet/src/features/tnstc/application/tnstc_pdf_parser.dart';
 import 'package:namma_wallet/src/features/tnstc/application/tnstc_sms_parser.dart';
 import 'package:namma_wallet/src/features/travel/application/travel_parser_interface.dart';
@@ -13,6 +15,8 @@ abstract class TravelTicketParser {
   bool canParse(String text);
 
   Ticket parseTicket(String text);
+
+  bool isSMSFormat(String text);
 
   TicketUpdateInfo? parseUpdate(String text) => null;
 
@@ -53,8 +57,9 @@ class TNSTCBusParser implements TravelTicketParser {
   }
 
   /// Detects if the text is SMS format by checking for SMS-specific patterns
-  bool _isSMSFormat(String text) {
-    // SMS contains "SETC" or has SMS-style patterns
+  @override
+  bool isSMSFormat(String text) {
+    // SMS contains TNSTC SMS-style patterns
     // like "From :", "To ", "Trip :"
     // PDF has "Service Start Place", "PNR Number", "Date of Journey"
     final smsPatterns = [
@@ -90,7 +95,7 @@ class TNSTCBusParser implements TravelTicketParser {
   @override
   Ticket parseTicket(String text) {
     // Detect if this is SMS or PDF format
-    final isSMS = _isSMSFormat(text);
+    final isSMS = isSMSFormat(text);
 
     // Use appropriate parser based on format
     if (isSMS) {
@@ -195,130 +200,60 @@ class IRCTCTrainParser implements TravelTicketParser {
 
   @override
   bool canParse(String text) {
-    // Must have IRCTC keyword for reliable detection
     return text.toLowerCase().contains('irctc');
   }
 
   @override
-  Ticket parseTicket(String text) {
-    // For now, create a basic IRCTC ticket
-    // TODO(keerthivasan): Implement proper IRCTC text parsing if needed
-    // Currently IRCTC tickets are primarily handled via QR codes
+  bool isSMSFormat(String text) {
+    final lower = text.toLowerCase();
 
-    // Extract PNR number
-    // Use [ \t]* instead of \s* to avoid matching across newlines
-    final pnrMatch = RegExp(
-      r'PNR No\.[ \t]*:[ \t]*([A-Z0-9]+)',
-      caseSensitive: false,
-    ).firstMatch(text);
-
-    final pnrNumber = pnrMatch?.group(1)?.trim();
-    if (pnrNumber == null || pnrNumber.isEmpty) {
-      return Ticket(
-        ticketId: '',
-        primaryText: 'IRCTC Train Ticket',
-        secondaryText: '',
-        startTime: invalidDateSentinel,
-        location: 'Unknown',
-        extras: [ExtrasModel(title: 'Provider', value: 'IRCTC')],
-      );
-    }
-
-    // Extract train information
-    final trainNumberMatch = RegExp(
-      r'Train No\.\s*:\s*(\d+)',
-      caseSensitive: false,
-    ).firstMatch(text);
-
-    final trainNameMatch = RegExp(
-      r'Train Name\s*:\s*([A-Za-z0-9\s\-]+)',
-      caseSensitive: false,
-    ).firstMatch(text);
-
-    // Extract passenger name
-    final passengerNameMatch = RegExp(
-      r"Passenger Name\s*:\s*([A-Za-z\s.\-']+)",
-      caseSensitive: false,
-    ).firstMatch(text);
-
-    // Extract journey date
-    final dateMatch = RegExp(
-      r'Date of Journey\s*:\s*(\d{2}\/\d{2}\/\d{4})',
-      caseSensitive: false,
-    ).firstMatch(text);
-
-    DateTime? journeyDate;
-    if (dateMatch != null) {
-      try {
-        final dateStr = dateMatch.group(1)!;
-        journeyDate = DateTime.parse(
-          '${dateStr.substring(6, 10)}-${dateStr.substring(3, 5)}'
-          '-${dateStr.substring(0, 2)}',
-        );
-      } on FormatException catch (e) {
-        _logger.debug(
-          '[IRCTCTrainParser] Date parsing failed: ${dateMatch.group(1)} - $e',
-        );
-        journeyDate = null;
-      }
-    }
-
-    // Extract from/to stations
-    final fromMatch = RegExp(
-      r'Boarding Point\s*:\s*([A-Za-z\s]+)',
-      caseSensitive: false,
-    ).firstMatch(text);
-
-    final toMatch = RegExp(
-      r'Reservation Upto\s*:\s*([A-Za-z\s]+)',
-      caseSensitive: false,
-    ).firstMatch(text);
-
-    final primaryText =
-        trainNameMatch?.group(1)?.trim() ?? 'IRCTC Train Ticket';
-    final fromStation = fromMatch?.group(1)?.trim() ?? '';
-    final toStation = toMatch?.group(1)?.trim() ?? '';
-    final secondaryText = '$fromStation to $toStation';
-
-    final extras = <ExtrasModel>[
-      ExtrasModel(title: 'PNR Number', value: pnrNumber),
-      if (trainNumberMatch != null)
-        ExtrasModel(title: 'Train Number', value: trainNumberMatch.group(1)!),
-      if (passengerNameMatch != null)
-        ExtrasModel(
-          title: 'Passenger Name',
-          value: passengerNameMatch.group(1)!.trim(),
-        ),
-      if (journeyDate != null)
-        ExtrasModel(
-          title: 'Journey Date',
-          value: journeyDate.toString().split(' ')[0],
-        ),
-      ExtrasModel(title: 'Provider', value: 'IRCTC'),
+    final smsPatterns = [
+      r'pnr[:\s\-]*\d{6,10}',
+      r'trn[:\s\-]*\d{3,5}',
+      r'doj[:\s\-]*\d{1,2}[-/]\d{1,2}[-/]\d{2,4}',
+      r'\b[A-Z]{2,5}-[A-Z]{2,5}\b',
+      r'dp[:\s\-]*\d{1,2}[:.]\d{2}',
+      r'boarding at\s+[A-Z]{2,5}',
+      r'[A-Za-z]+[ ]?[A-Za-z]*\+?\d*,',
+      '-irctc',
     ];
 
-    // Use sentinel value if parsing fails, with warning log
-    final startTime = journeyDate ?? invalidDateSentinel;
-    if (journeyDate == null) {
-      // Log warning when parsing fails so consumers can detect and handle
-      // invalid/missing journey times. The sentinel value (epoch 1970-01-01)
-      // is used as a fallback. Note: This parser is typically used only when
-      // QR parsing fails, so missing dates should be rare.
-      // Consumers should check for this sentinel value to detect invalid times.
-      _logger.warning(
-        '[IRCTCTrainParser] Journey date parsing failed for PNR: $pnrNumber. '
-        'Using sentinel value ${invalidDateSentinel.toIso8601String()}',
-      );
-    }
+    final pdfPatterns = [
+      'ticket details',
+      'boarding station',
+      'reservation up-to',
+      'train name',
+      'passenger details',
+      'quota',
+      'booking id',
+      'berth',
+      'charting status',
+      'fare break-up',
+      'adhar',
+    ];
 
-    return Ticket(
-      ticketId: pnrNumber,
-      primaryText: primaryText,
-      secondaryText: secondaryText.trim(),
-      startTime: startTime,
-      location: fromMatch?.group(1)?.trim() ?? 'Unknown',
-      extras: extras,
+    final hasSmsPattern = smsPatterns.any(
+      (p) => RegExp(p, caseSensitive: false).hasMatch(text),
     );
+
+    final hasPdfPattern = pdfPatterns.any(
+      (p) => lower.contains(p.toLowerCase()),
+    );
+
+    return hasSmsPattern && !hasPdfPattern;
+  }
+
+  @override
+  Ticket parseTicket(String text) {
+    final isSMS = isSMSFormat(text);
+
+    if (isSMS) {
+      final smsParser = IRCTCSMSParser();
+      return smsParser.parseTicket(text);
+    } else {
+      final pdfParser = IRCTCPDFParser(logger: _logger);
+      return pdfParser.parseTicket(text);
+    }
   }
 
   @override
@@ -367,6 +302,9 @@ class SETCBusParser implements TravelTicketParser {
 
   @override
   TicketUpdateInfo? parseUpdate(String text) => null;
+
+  @override
+  bool isSMSFormat(String text) => true;
 }
 
 class TravelParserService implements ITravelParser {

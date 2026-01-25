@@ -171,13 +171,6 @@ class _ProfileViewState extends State<ProfileView> {
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () async {
-          await context.pushNamed(AppRoute.dbViewer.name);
-        },
-        label: const Text('View DB'),
-        icon: const Icon(Icons.storage),
-      ),
     );
   }
 }
@@ -237,19 +230,16 @@ class ThemeSectionWidget extends StatelessWidget {
                 themeProvider.isDarkMode ? Icons.dark_mode : Icons.light_mode,
               ),
             ),
-            ListTile(
-              leading: const Icon(Icons.brightness_auto),
+            SwitchListTile(
               title: const Text('Use System Theme'),
-              trailing: Switch(
-                value: themeProvider.isSystemMode,
-                onChanged: (value) async {
-                  if (value) {
-                    await themeProvider.setSystemMode();
-                  } else {
-                    await themeProvider.setLightMode();
-                  }
-                },
-              ),
+              value: themeProvider.isSystemMode,
+              onChanged: (value) async {
+                if (value) {
+                  await themeProvider.setSystemMode();
+                } else {
+                  await themeProvider.setLightMode();
+                }
+              },
             ),
           ],
         ),

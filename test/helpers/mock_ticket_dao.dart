@@ -14,51 +14,84 @@ class MockTicketDAO implements ITicketDAO {
   /// Whether to throw an error on update
   final bool shouldThrowOnUpdate;
 
-  /// Store tickets that have been inserted
+  /// Store tickets that have been inserted (Acts as our in-memory DB)
   final List<Ticket> insertedTickets = [];
 
-  /// Store update calls
-  final List<MapEntry<String, Map<String, dynamic>>> updateCalls = [];
-
-  @override
-  Future<int> updateTicketById(
-    String ticketId,
-    Map<String, dynamic> updates,
-  ) async {
-    if (shouldThrowOnUpdate) {
-      throw Exception('Mock update error');
-    }
-
-    updateCalls.add(MapEntry(ticketId, updates));
-    return updateReturnCount;
-  }
-
-  @override
-  Future<int> insertTicket(Ticket ticket) async {
-    insertedTickets.add(ticket);
-    return 1;
-  }
-
-  @override
-  Future<List<Ticket>> getAllTickets() async {
-    return insertedTickets;
-  }
-
-  @override
-  Future<Ticket?> getTicketById(String ticketId) async {
-    return insertedTickets.where((t) => t.ticketId == ticketId).firstOrNull;
-  }
-
-  @override
-  Future<List<Ticket>> getTicketsByType(String type) async {
-    return insertedTickets.where((t) => t.type.name == type).toList();
-  }
+  /// Store update calls for verification
+  /// Changed from `Map<String, dynamic>` to `Ticket` to match new interface
+  final List<MapEntry<String, Ticket>> updateCalls = [];
 
   /// Whether delete should succeed
   bool deleteSuccess = true;
 
   /// Whether to throw an error on operations
   bool shouldThrow = false;
+
+  @override
+  Future<int> handleTicket(Ticket ticket) async {
+    if (shouldThrow) throw Exception('Mock handle error');
+
+    final pnr = ticket.ticketId;
+    if (pnr == null) return -1;
+
+    final existing = await getTicketById(pnr);
+
+    if (existing == null) {
+      // mimic Insert
+      return insertTicket(ticket);
+    } else {
+      // mimic Update/Merge
+      // Use real Factory to ensure tests verify merge logic
+      final merged = Ticket.mergeTickets(existing, ticket);
+      return updateTicketById(pnr, merged);
+    }
+  }
+
+  @override
+  Future<int> insertTicket(Ticket ticket) async {
+    if (shouldThrow) throw Exception('Mock insert error');
+    // Compare enum name to filter by type
+    insertedTickets.add(ticket);
+    return 1;
+  }
+
+  @override
+  Future<int> updateTicketById(String ticketId, Ticket ticket) async {
+    if (shouldThrowOnUpdate) {
+      throw Exception('Mock update error');
+    }
+
+    // 1. Log the call
+    updateCalls.add(MapEntry(ticketId, ticket));
+
+    // 2. Actually update the "In-Memory DB" so subsequent gets work
+    final index = insertedTickets.indexWhere((t) => t.ticketId == ticketId);
+    if (index != -1) {
+      insertedTickets[index] = ticket;
+    }
+
+    return updateReturnCount;
+  }
+
+  @override
+  Future<List<Ticket>> getAllTickets() async {
+    if (shouldThrow) throw Exception('Mock get error');
+    return insertedTickets;
+  }
+
+  @override
+  Future<Ticket?> getTicketById(String ticketId) async {
+    if (shouldThrow) throw Exception('Mock get error');
+    return insertedTickets.where((t) => t.ticketId == ticketId).firstOrNull;
+  }
+
+  @override
+  Future<List<Ticket>> getTicketsByType(String type) async {
+    if (shouldThrow) throw Exception('Mock get error');
+    // Assuming TicketType is an enum,
+    // we compare names or convert string to enum
+    return insertedTickets.where((t) => t.type.name == type).toList();
+  }
 
   @override
   Future<int> deleteTicket(String ticketId) async {

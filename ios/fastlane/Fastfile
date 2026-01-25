@@ -1,0 +1,133 @@
+default_platform(:ios)
+
+# Load environment variables from .env.local
+Dotenv.load('.env.local')
+
+platform :ios do
+  # Shared helper to get API key
+  def api_key
+    # Convert relative path to absolute path (fastlane requires absolute path)
+    key_path = File.expand_path(ENV["APP_STORE_CONNECT_KEY_PATH"], __dir__)
+
+    app_store_connect_api_key(
+      key_id: ENV["APP_STORE_CONNECT_KEY_ID"],
+      issuer_id: ENV["APP_STORE_CONNECT_ISSUER_ID"],
+      key_filepath: key_path
+    )
+  end
+
+  error do |lane, exception|
+    UI.error("#{lane} failed: #{exception.message}")
+  end
+
+  desc "Run all tests"
+  lane :test do
+    sh("cd ../.. && fvm flutter test")
+    UI.success("All tests passed!")
+  end
+
+  desc "Push a new iOS beta build to TestFlight"
+  lane :beta do
+    # 1. Read version from pubspec.yaml (user manages version manually)
+    require 'yaml'
+    pubspec_path = "../../pubspec.yaml"
+    pubspec = YAML.load_file(pubspec_path)
+    version_string = pubspec['version']
+    version, build_number = version_string.split('+')
+    build_number = build_number.to_i
+
+    UI.message("Using version from pubspec.yaml: #{version}+#{build_number}")
+
+    # 2. Validate version+build combination (prevent duplicate uploads)
+    begin
+      latest_build = app_store_build_number(
+        api_key: api_key,
+        app_identifier: "com.nammaflutter.nammawallet",
+        live: false,
+        version: version
+      )
+    rescue => e
+      # Version doesn't exist on TestFlight yet - this is fine
+      latest_build = nil
+    end
+
+    if latest_build && latest_build.to_i >= build_number
+      UI.user_error!("❌ Version #{version}+#{build_number} already exists on TestFlight (latest build for v#{version}: #{latest_build}). Please increment the build number in pubspec.yaml")
+    end
+
+    UI.success("✓ Version validation passed - #{version}+#{build_number} (TestFlight latest for v#{version}: #{latest_build || 'none'})")
+
+    # 3. Build IPA using Makefile (includes get, codegen, wasm removal, and build)
+    sh("cd ../.. && make release-ipa")
+
+    # 4. Export and sign the archive (skip building since we just built with Flutter)
+    update_code_signing_settings(use_automatic_signing: true)
+
+    build_app(
+      clean: false,
+      scheme: "Runner",
+      workspace: "Runner.xcworkspace",
+      export_method: "app-store",
+      skip_build_archive: true,
+      archive_path: "../build/ios/archive/Runner.xcarchive",
+      xcargs: "-allowProvisioningUpdates"
+    )
+
+    # 5. Upload to TestFlight
+    # Safely handle missing changelog files
+    changelog_path = "./metadata/en-US/release_notes.txt"
+    changelog = File.exist?(changelog_path) ? File.read(changelog_path) : "Beta build v#{version} (#{build_number})"
+
+    testflight(
+      api_key: api_key,
+      app_identifier: "com.nammaflutter.nammawallet",
+      changelog: changelog,
+    )
+
+    UI.success("Uploaded build #{build_number} (v#{version}) to TestFlight")
+  end
+
+  desc "Promote an existing build to App Store (Metadata + Submission only)"
+  desc "Usage: fastlane production [version:X.X.X] [build:XXX]"
+  lane :production do |options|
+    # Read from pubspec.yaml if no explicit params provided
+    if options[:version].nil? || options[:build].nil?
+      require 'yaml'
+      pubspec_path = "../../pubspec.yaml"
+      pubspec = YAML.load_file(pubspec_path)
+      version_string = pubspec['version']
+      pubspec_version, pubspec_build = version_string.split('+')
+    end
+
+    # Allow explicit version/build params to override pubspec.yaml
+    version = options[:version] || pubspec_version
+    build = options[:build] || pubspec_build
+
+    UI.important("⚠️  Ensure this matches the TestFlight build you want to promote!")
+    UI.message("Promoting: v#{version} (#{build})")
+
+    # Validate the build exists on TestFlight
+    latest_testflight = app_store_build_number(
+      api_key: api_key,
+      app_identifier: "com.nammaflutter.nammawallet",
+      live: false,
+      version: version
+    )
+
+    if latest_testflight.to_i < build.to_i
+      UI.user_error!("Build #{build} not found on TestFlight for v#{version}. Latest is #{latest_testflight}.")
+    end
+
+    UI.success("✓ Build #{build} verified on TestFlight")
+
+    # 2. Upload Metadata & Submit
+    # All configuration is in Deliverfile - only pass runtime parameters
+    deliver(
+      api_key: api_key,
+      app_version: version,
+      build_number: build,
+    )
+
+    UI.success("Successfully promoted build #{build} (v#{version}) to App Review")
+  end
+end

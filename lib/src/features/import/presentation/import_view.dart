@@ -94,10 +94,6 @@ class _ImportViewState extends State<ImportView> {
   Future<void> _handlePDFPick() async {
     if (_isProcessingPDF) return;
 
-    setState(() {
-      _isProcessingPDF = true;
-    });
-
     try {
       final result = await FilePicker.platform.pickFiles(
         type: FileType.custom,
@@ -107,6 +103,10 @@ class _ImportViewState extends State<ImportView> {
 
       XFile? xFile;
       if (result != null) {
+        setState(() {
+          _isProcessingPDF = true;
+        });
+
         final platformFile = result.files.single;
         if (kIsWeb && platformFile.bytes != null) {
           xFile = XFile.fromData(
@@ -233,7 +233,8 @@ class _ImportViewState extends State<ImportView> {
                             ? 120
                             : 40,
                       ),
-                      GestureDetector(
+                      InkWell(
+                        splashColor: Colors.transparent,
                         onTap: _isProcessingPDF ? null : _handlePDFPick,
                         child: SizedBox(
                           height: pickFileContainerWidth,
