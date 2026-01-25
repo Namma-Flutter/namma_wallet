@@ -43,9 +43,8 @@ class HomeWidgetService implements IWidgetService {
       'com.nammaflutter.nammawallet.TicketListWidgetProvider';
   final String _androidMainWidgetName =
       'com.nammaflutter.nammawallet.MainTicketWidgetProvider';
-  // Used for date formatting in updateWidgetWithTicket method
-  // ignore: unreachable_from_main
-  final DateTimeConverter dateTimeCon = DateTimeConverter.instance;
+
+  final DateTimeConverter _dateTimeCon = DateTimeConverter.instance;
 
   @override
   Future<void> initialize() async {
@@ -77,12 +76,12 @@ class HomeWidgetService implements IWidgetService {
 
       // Format dates
       if (t.startTime != null) {
-        ticketMap['start_time'] = dateTimeCon.formatFullDateTime(
+        ticketMap['start_time'] = _dateTimeCon.formatFullDateTime(
           t.startTime!,
         );
       }
       if (t.endTime != null) {
-        ticketMap['end_time'] = dateTimeCon.formatFullDateTime(
+        ticketMap['end_time'] = _dateTimeCon.formatFullDateTime(
           t.endTime!,
         );
       }
@@ -126,12 +125,6 @@ class HomeWidgetService implements IWidgetService {
         _dataKey,
         jsonEncode(ticketList),
       );
-
-      // for future development
-      // var installedWidgetResult = await HomeWidget.getInstalledWidgets();
-      // var getWidgetData = HomeWidget.getWidgetData("1");
-      // _logger.debug("installedWidgetResult: $installedWidgetResult");
-      // _logger.debug("getWidgetData: $getWidgetData");
 
       await _updateWidget();
 
