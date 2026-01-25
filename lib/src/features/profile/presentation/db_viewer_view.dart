@@ -179,7 +179,7 @@ class _DbViewerViewState extends State<DbViewerView>
                     const dataKey = 'ticket_data';
                     // toJson() already returns a JSON string
                     await HomeWidget.saveWidgetData(dataKey, t.toJson());
-// from android-home-widget0pin branch
+                    // from android-home-widget0pin branch
                     await iWidgetService.updateWidgetWithTicket(t);
 
                     await HomeWidget.updateWidget(
