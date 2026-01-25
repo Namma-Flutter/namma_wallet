@@ -21,4 +21,23 @@ void main() {
     expect(ticket.startTime?.hour, 13);
     expect(ticket.startTime?.minute, 15);
   });
+
+  test('Ticket should preserve journeyDate during serialization', () {
+    final originalTicket = Ticket(
+      primaryText: 'Chennai -> Bangalore',
+      secondaryText: 'Train',
+      location: 'Chennai',
+      journeyDate: DateTime(2026, 1, 18),
+    );
+
+    final map = originalTicket.toMap();
+    final reconstructedTicket = TicketMapper.fromMap(map);
+
+    expect(reconstructedTicket.journeyDate, isNotNull);
+    final localDate = reconstructedTicket.journeyDate?.toLocal();
+
+    expect(localDate?.year, 2026);
+    expect(localDate?.month, 1);
+    expect(localDate?.day, 18);
+  });
 }

@@ -55,6 +55,13 @@ class TicketMapper extends ClassMapperBase<Ticket> {
     opt: true,
     def: TicketType.train,
   );
+  static DateTime? _$journeyDate(Ticket v) => v.journeyDate;
+  static const Field<Ticket, DateTime> _f$journeyDate = Field(
+    'journeyDate',
+    _$journeyDate,
+    key: r'journey_date',
+    opt: true,
+  );
   static DateTime? _$endTime(Ticket v) => v.endTime;
   static const Field<Ticket, DateTime> _f$endTime = Field(
     'endTime',
@@ -89,6 +96,7 @@ class TicketMapper extends ClassMapperBase<Ticket> {
     #location: _f$location,
     #startTime: _f$startTime,
     #type: _f$type,
+    #journeyDate: _f$journeyDate,
     #endTime: _f$endTime,
     #tags: _f$tags,
     #extras: _f$extras,
@@ -102,6 +110,7 @@ class TicketMapper extends ClassMapperBase<Ticket> {
       location: data.dec(_f$location),
       startTime: data.dec(_f$startTime),
       type: data.dec(_f$type),
+      journeyDate: data.dec(_f$journeyDate),
       endTime: data.dec(_f$endTime),
       tags: data.dec(_f$tags),
       extras: data.dec(_f$extras),
@@ -169,6 +178,7 @@ abstract class TicketCopyWith<$R, $In extends Ticket, $Out>
     String? location,
     DateTime? startTime,
     TicketType? type,
+    DateTime? journeyDate,
     DateTime? endTime,
     List<TagModel>? tags,
     List<ExtrasModel>? extras,
@@ -212,6 +222,7 @@ class _TicketCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Ticket, $Out>
     String? location,
     Object? startTime = $none,
     TicketType? type,
+    Object? journeyDate = $none,
     Object? endTime = $none,
     Object? tags = $none,
     Object? extras = $none,
@@ -223,6 +234,7 @@ class _TicketCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Ticket, $Out>
       if (location != null) #location: location,
       if (startTime != $none) #startTime: startTime,
       if (type != null) #type: type,
+      if (journeyDate != $none) #journeyDate: journeyDate,
       if (endTime != $none) #endTime: endTime,
       if (tags != $none) #tags: tags,
       if (extras != $none) #extras: extras,
@@ -236,6 +248,7 @@ class _TicketCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Ticket, $Out>
     location: data.get(#location, or: $value.location),
     startTime: data.get(#startTime, or: $value.startTime),
     type: data.get(#type, or: $value.type),
+    journeyDate: data.get(#journeyDate, or: $value.journeyDate),
     endTime: data.get(#endTime, or: $value.endTime),
     tags: data.get(#tags, or: $value.tags),
     extras: data.get(#extras, or: $value.extras),
