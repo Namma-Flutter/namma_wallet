@@ -34,16 +34,15 @@ class HomeWidgetService implements IWidgetService {
   final String _androidWidgetName = 'TicketListWidgetProvider';
   final String _iOSWidgetName = 'TicketListWidgetProvider';
   final String _dataKey = 'ticket_list';
-  // work manager variables
-  final String _backgroundTaskName = 'widgetBackgroundUpdate';
-  final String _backgroundTaskId = 'ticket_widget_update';
 
   // Android qualified name for the widget receiver
   final String _androidListWidgetName =
       'com.nammaflutter.nammawallet.TicketListWidgetProvider';
   final String _androidMainWidgetName =
       'com.nammaflutter.nammawallet.MainTicketWidgetProvider';
-
+  // work manager variables
+  final String _backgroundTaskName = 'widgetBackgroundUpdate';
+  final String _backgroundTaskId = 'ticket_widget_update';
   final DateTimeConverter _dateTimeCon = DateTimeConverter.instance;
 
   @override

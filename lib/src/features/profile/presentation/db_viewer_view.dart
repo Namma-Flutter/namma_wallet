@@ -189,7 +189,6 @@ class _DbViewerViewState extends State<DbViewerView>
                       throw UnsupportedError(
                         'Pin to Home Screen not supported on this platform.',
                       );
-                      return;
                     }
 
                     if (context.mounted) {
