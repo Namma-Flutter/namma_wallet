@@ -11,7 +11,6 @@ import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 import 'package:namma_wallet/src/common/domain/models/user.dart';
 import 'package:namma_wallet/src/common/services/haptic/haptic_service_extension.dart';
 import 'package:namma_wallet/src/common/services/haptic/haptic_service_interface.dart';
-import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
 import 'package:namma_wallet/src/common/services/widget/widget_service_interface.dart';
 import 'package:namma_wallet/src/common/widgets/rounded_back_button.dart';
 
@@ -30,12 +29,10 @@ class _DbViewerViewState extends State<DbViewerView>
   final IHapticService hapticService = getIt<IHapticService>();
   final IWidgetService iWidgetService = getIt<IWidgetService>();
 
-  late ILogger _iLogger;
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
-    _iLogger = getIt<ILogger>();
     unawaited(_load());
   }
 

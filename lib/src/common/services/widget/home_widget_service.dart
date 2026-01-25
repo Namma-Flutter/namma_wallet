@@ -98,7 +98,9 @@ class HomeWidgetService implements IWidgetService {
           final decoded = jsonDecode(existingJson);
 
           if (decoded is List) {
-            ticketList = decoded.cast<Map<String, dynamic>>();
+            ticketList = List<Map<String, dynamic>>.from(
+              decoded.whereType<Map<String, dynamic>>(),
+            );
           }
         } on Object catch (e, stackTrace) {
           _logger.error(
