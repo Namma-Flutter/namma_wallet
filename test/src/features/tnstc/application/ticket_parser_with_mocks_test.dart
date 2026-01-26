@@ -499,8 +499,9 @@ Trip Code : TEST@#123
           expect(ticket, isNotNull);
           expect(
             ticket.primaryText,
-            contains('Chennai-T.Nagar (Main Road)'),
+            equals('Chennai-T.Nagar (Main Road) → Bangalore@HSR Layout'),
           );
+          expect(ticket.secondaryText, contains('TEST@#123'));
         },
       );
 

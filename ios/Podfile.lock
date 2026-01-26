@@ -36,13 +36,15 @@ PODS:
     - DKImagePickerController/PhotoGallery
     - Flutter
   - Flutter (1.0.0)
-  - flutter_gemma (0.11.13):
+  - flutter_gemma (0.11.16):
     - Flutter
     - MediaPipeTasksGenAI (= 0.10.24)
     - MediaPipeTasksGenAIC (= 0.10.24)
     - TensorFlowLiteC (= 0.0.1-nightly.20250619)
     - TensorFlowLiteSelectTfOps (= 0.0.1-nightly.20250619)
     - TensorFlowLiteSwift (= 0.0.1-nightly.20250619)
+  - flutter_native_splash (2.4.3):
+    - Flutter
   - gaimon (0.0.1):
     - Flutter
   - google_mlkit_commons (0.11.0):
@@ -80,8 +82,6 @@ PODS:
   - image_picker_ios (0.0.1):
     - Flutter
   - large_file_handler (0.0.1):
-    - Flutter
-  - listen_sharing_intent (1.9.2):
     - Flutter
   - MediaPipeTasksGenAI (0.10.24):
     - MediaPipeTasksGenAIC (= 0.10.24)
@@ -124,9 +124,17 @@ PODS:
     - Flutter
     - FlutterMacOS
   - PromisesObjC (2.4.0)
-  - SDWebImage (5.21.4):
-    - SDWebImage/Core (= 5.21.4)
-  - SDWebImage/Core (5.21.4)
+  - SDWebImage (5.21.5):
+    - SDWebImage/Core (= 5.21.5)
+  - SDWebImage/Core (5.21.5)
+  - share_handler_ios (0.0.14):
+    - Flutter
+    - share_handler_ios/share_handler_ios_models (= 0.0.14)
+    - share_handler_ios_models
+  - share_handler_ios/share_handler_ios_models (0.0.14):
+    - Flutter
+    - share_handler_ios_models
+  - share_handler_ios_models (0.0.9)
   - share_plus (0.0.1):
     - Flutter
   - shared_preferences_foundation (0.0.1):
@@ -154,17 +162,19 @@ DEPENDENCIES:
   - file_picker (from `.symlinks/plugins/file_picker/ios`)
   - Flutter (from `Flutter`)
   - flutter_gemma (from `.symlinks/plugins/flutter_gemma/ios`)
+  - flutter_native_splash (from `.symlinks/plugins/flutter_native_splash/ios`)
   - gaimon (from `.symlinks/plugins/gaimon/ios`)
   - google_mlkit_commons (from `.symlinks/plugins/google_mlkit_commons/ios`)
   - google_mlkit_text_recognition (from `.symlinks/plugins/google_mlkit_text_recognition/ios`)
   - home_widget (from `.symlinks/plugins/home_widget/ios`)
   - image_picker_ios (from `.symlinks/plugins/image_picker_ios/ios`)
   - large_file_handler (from `.symlinks/plugins/large_file_handler/ios`)
-  - listen_sharing_intent (from `.symlinks/plugins/listen_sharing_intent/ios`)
   - mobile_scanner (from `.symlinks/plugins/mobile_scanner/darwin`)
   - package_info_plus (from `.symlinks/plugins/package_info_plus/ios`)
   - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
   - pdfium_flutter (from `.symlinks/plugins/pdfium_flutter/darwin`)
+  - share_handler_ios (from `.symlinks/plugins/share_handler_ios/ios`)
+  - share_handler_ios_models (from `.symlinks/plugins/share_handler_ios/ios/Models`)
   - share_plus (from `.symlinks/plugins/share_plus/ios`)
   - shared_preferences_foundation (from `.symlinks/plugins/shared_preferences_foundation/darwin`)
   - sqflite_darwin (from `.symlinks/plugins/sqflite_darwin/darwin`)
@@ -203,6 +213,8 @@ EXTERNAL SOURCES:
     :path: Flutter
   flutter_gemma:
     :path: ".symlinks/plugins/flutter_gemma/ios"
+  flutter_native_splash:
+    :path: ".symlinks/plugins/flutter_native_splash/ios"
   gaimon:
     :path: ".symlinks/plugins/gaimon/ios"
   google_mlkit_commons:
@@ -215,8 +227,6 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/image_picker_ios/ios"
   large_file_handler:
     :path: ".symlinks/plugins/large_file_handler/ios"
-  listen_sharing_intent:
-    :path: ".symlinks/plugins/listen_sharing_intent/ios"
   mobile_scanner:
     :path: ".symlinks/plugins/mobile_scanner/darwin"
   package_info_plus:
@@ -225,6 +235,10 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/path_provider_foundation/darwin"
   pdfium_flutter:
     :path: ".symlinks/plugins/pdfium_flutter/darwin"
+  share_handler_ios:
+    :path: ".symlinks/plugins/share_handler_ios/ios"
+  share_handler_ios_models:
+    :path: ".symlinks/plugins/share_handler_ios/ios/Models"
   share_plus:
     :path: ".symlinks/plugins/share_plus/ios"
   shared_preferences_foundation:
@@ -240,7 +254,8 @@ SPEC CHECKSUMS:
   DKPhotoGallery: b3834fecb755ee09a593d7c9e389d8b5d6deed60
   file_picker: a0560bc09d61de87f12d246fc47d2119e6ef37be
   Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
-  flutter_gemma: 8ed32b19abae2e069095437401f0a2d5ec46c0cb
+  flutter_gemma: a61bb8893b6b77e1088ec27ed519a0711fc84c30
+  flutter_native_splash: c32d145d68aeda5502d5f543ee38c192065986cf
   gaimon: ce0b5c042363ed957bb92ee755c361903d3ce0ef
   google_mlkit_commons: 2abe6a70e1824e431d16a51085cb475b672c8aab
   google_mlkit_text_recognition: ec2122ec89bfe0d7200763336a6e4ef44810674c
@@ -249,10 +264,9 @@ SPEC CHECKSUMS:
   GoogleToolboxForMac: d1a2cbf009c453f4d6ded37c105e2f67a32206d8
   GoogleUtilities: 00c88b9a86066ef77f0da2fab05f65d7768ed8e1
   GTMSessionFetcher: 5aea5ba6bd522a239e236100971f10cb71b96ab6
-  home_widget: f169fc41fd807b4d46ab6615dc44d62adbf9f64f
-  image_picker_ios: 7fe1ff8e34c1790d6fff70a32484959f563a928a
+  home_widget: 54b4f6b36ed8d64cfee594a476225c35c3e45091
+  image_picker_ios: e0ece4aa2a75771a7de3fa735d26d90817041326
   large_file_handler: b37481e9b4972562ffcdc8f75700f47cd592bcec
-  listen_sharing_intent: fe0b9a59913cc124dd6cbd55cd9f881de5f75759
   MediaPipeTasksGenAI: 076ba7032a6e9da16db9c7cf0c3b67c751c18bc1
   MediaPipeTasksGenAIC: ec35d9f431f6a6b651a0bc9f67a4ed149ffa575c
   MLImage: 0ad1c5f50edd027672d8b26b0fee78a8b4a0fc56
@@ -263,12 +277,14 @@ SPEC CHECKSUMS:
   mobile_scanner: 9157936403f5a0644ca3779a38ff8404c5434a93
   nanopb: fad817b59e0457d11a5dfbde799381cd727c1275
   package_info_plus: af8e2ca6888548050f16fa2f1938db7b5a5df499
-  path_provider_foundation: 080d55be775b7414fd5a5ef3ac137b97b097e564
+  path_provider_foundation: bb55f6dbba17d0dccd6737fe6f7f34fbd0376880
   pdfium_flutter: 512bc19dbbd80b4287d04869aa19ad729289079d
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
-  SDWebImage: d0184764be51240d49c761c37f53dd017e1ccaaf
+  SDWebImage: e9c98383c7572d713c1a0d7dd2783b10599b9838
+  share_handler_ios: e2244e990f826b2c8eaa291ac3831569438ba0fb
+  share_handler_ios_models: fc638c9b4330dc7f082586c92aee9dfa0b87b871
   share_plus: 50da8cb520a8f0f65671c6c6a99b3617ed10a58a
-  shared_preferences_foundation: 9e1978ff2562383bd5676f64ec4e9aa8fa06a6f7
+  shared_preferences_foundation: 7036424c3d8ec98dfe75ff1667cb0cd531ec82bb
   sqflite_darwin: 20b2a3a3b70e43edae938624ce550a3cbf66a3d0
   SwiftyGif: 706c60cf65fa2bc5ee0313beece843c8eb8194d4
   TensorFlowLiteC: 215ef57653dd0fa09a474e7d94d79ae64a870b28
@@ -276,6 +292,6 @@ SPEC CHECKSUMS:
   TensorFlowLiteSwift: 6de8da348de331778167a0f751ad74c41d8b0554
   url_launcher_ios: 7a95fa5b60cc718a708b8f2966718e93db0cef1b
 
-PODFILE CHECKSUM: 2dc7251eb3d555e43619b8663f139ec0822bc156
+PODFILE CHECKSUM: 609fba0f6248c1829637ad6ec89702543e0cb526
 
 COCOAPODS: 1.16.2

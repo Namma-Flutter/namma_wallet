@@ -186,9 +186,11 @@ class _AllTicketsViewState extends State<AllTicketsView> {
 
                         return InkWell(
                           onTap: () async {
+                            if (ticket.ticketId == null) return;
+
                             final wasDeleted = await context.pushNamed<bool>(
                               AppRoute.ticketView.name,
-                              extra: ticket,
+                              pathParameters: {'id': ticket.ticketId!},
                             );
 
                             if (mounted && (wasDeleted ?? false)) {

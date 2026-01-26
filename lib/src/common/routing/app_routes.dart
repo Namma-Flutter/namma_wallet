@@ -6,7 +6,7 @@ enum AppRoute {
   profile(path: '/profile', name: 'profile'),
 
   // Ticket related routes
-  ticketView(path: '/ticket', name: 'ticketView'),
+  ticketView(path: '/ticket/:id', name: 'ticketView'),
   allTickets(path: '/all-tickets', name: 'allTickets'),
 
   // Scanner related routes
@@ -24,7 +24,8 @@ enum AppRoute {
   contributors(path: '/contributors', name: 'contributors'),
 
   // Debug routes
-  dbViewer(path: '/db-viewer', name: 'dbViewer');
+  dbViewer(path: '/db-viewer', name: 'dbViewer')
+  ;
 
   const AppRoute({required this.path, required this.name});
 

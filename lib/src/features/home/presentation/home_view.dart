@@ -104,9 +104,11 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
         child: InkWell(
           onTap: () async {
             _hapticService.triggerHaptic(HapticType.selection);
+            if (ticket.ticketId == null) return;
+
             final wasDeleted = await context.pushNamed<bool>(
               AppRoute.ticketView.name,
-              extra: ticket,
+              pathParameters: {'id': ticket.ticketId!},
             );
 
             if (mounted && (wasDeleted ?? false)) {
@@ -274,10 +276,14 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
                             final eventTicket = _eventTickets[index];
                             return InkWell(
                               onTap: () async {
+                                if (eventTicket.ticketId == null) return;
+
                                 final wasDeleted = await context
                                     .pushNamed<bool>(
                                       AppRoute.ticketView.name,
-                                      extra: eventTicket,
+                                      pathParameters: {
+                                        'id': eventTicket.ticketId!,
+                                      },
                                     );
 
                                 if (mounted && (wasDeleted ?? false)) {

@@ -26,7 +26,7 @@ class PKPassParser implements IPKPassParser {
   Future<Ticket?> parsePKPass(Uint8List data) async {
     try {
       final passFile = await PassFile.parse(data);
-
+      _logFullPassDetails(passFile);
       // Extract basic info from barcode or primary fields
       final pnrNumber = _extractPNR(passFile);
       final primaryText = _getPrimaryText(passFile);
@@ -426,5 +426,87 @@ class PKPassParser implements IPKPassParser {
         return null;
       }
     }
+  }
+
+  void _logFullPassDetails(PassFile passFile) {
+    try {
+      final metadata = passFile.metadata;
+
+      Map<String, dynamic> structToMap(PassStructureDictionary? s) {
+        if (s == null) return {};
+        return {
+          'headerFields': _fieldsToList(s.headerFields),
+          'primaryFields': _fieldsToList(s.primaryFields),
+          'secondaryFields': _fieldsToList(s.secondaryFields),
+          'auxiliaryFields': _fieldsToList(s.auxiliaryFields),
+          'backFields': _fieldsToList(s.backFields),
+        };
+      }
+
+      final map = {
+        'description': metadata.description,
+        'organizationName': metadata.organizationName,
+        'passTypeIdentifier': metadata.passTypeIdentifier,
+        'serialNumber': metadata.serialNumber,
+        'teamIdentifier': metadata.teamIdentifier,
+        'relevantDate': metadata.relevantDate?.toIso8601String(),
+        'expirationDate': metadata.expirationDate?.toIso8601String(),
+        'voided': metadata.voided,
+        'logoText': metadata.logoText,
+        'barcodes': metadata.barcodes
+            .map(
+              (b) => {
+                'message': b.message,
+                'format': b.format.toString(),
+                'altText': b.altText,
+              },
+            )
+            .toList(),
+        if (metadata.boardingPass != null)
+          'boardingPass': {
+            'transitType': metadata.boardingPass!.transitType.toString(),
+            ...structToMap(metadata.boardingPass),
+          },
+        if (metadata.eventTicket != null)
+          'eventTicket': structToMap(metadata.eventTicket),
+        if (metadata.coupon != null) 'coupon': structToMap(metadata.coupon),
+        if (metadata.storeCard != null)
+          'storeCard': structToMap(metadata.storeCard),
+        if (metadata.generic != null) 'generic': structToMap(metadata.generic),
+      };
+
+      // Helper to handle DateTime and other non-JSON types
+      Object? toEncodable(dynamic object) {
+        if (object is DateTime) return object.toIso8601String();
+        try {
+          return object.toJson();
+        } catch (_) {
+          return object.toString();
+        }
+      }
+
+      final prettyString = JsonEncoder.withIndent(
+        '  ',
+        toEncodable,
+      ).convert(map);
+      _logger.debug(
+        // ignore: lines_longer_than_80_chars
+        '--------------------------------------------------\nFULL PKPASS METADATA:\n$prettyString\n--------------------------------------------------',
+      );
+    } catch (e, s) {
+      _logger.error('Failed to log full pass details', e, s);
+    }
+  }
+
+  List<Map<String, dynamic>> _fieldsToList(List<dynamic>? fields) {
+    if (fields == null) return [];
+    return fields.whereType<DictionaryField>().map((f) {
+      return {
+        'key': f.key,
+        'label': f.label,
+        'value': _getDictionaryValue(f.value),
+        'changeMessage': f.changeMessage,
+      };
+    }).toList();
   }
 }

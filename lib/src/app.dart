@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/routing/app_router.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
@@ -34,10 +35,17 @@ class _NammaWalletAppState extends State<NammaWalletApp> {
     scaffoldMessengerKey: _scaffoldMessengerKey,
   );
 
+  static const MethodChannel _deepLinkChannel = MethodChannel(
+    'com.nammaflutter.nammawallet/deeplink',
+  );
+
   @override
   void initState() {
     super.initState();
     _logger.info('App initialized');
+
+    // Set up deep link handler
+    _deepLinkChannel.setMethodCallHandler(_handleDeepLink);
 
     // Initialize sharing intent service for file and text content
     unawaited(
@@ -83,6 +91,26 @@ class _NammaWalletAppState extends State<NammaWalletApp> {
         },
       ),
     );
+  }
+
+  Future<void> _handleDeepLink(MethodCall call) async {
+    if (call.method == 'openTicket') {
+      try {
+        final arguments = call.arguments as Map<Object?, Object?>?;
+        final ticketId = arguments?['ticketId'] as String?;
+        if (ticketId == null || ticketId.isEmpty) {
+          _logger.warning('Deep link received with empty ticket ID');
+          return;
+        }
+
+        _logger.info('Deep link received for ticket: $ticketId');
+
+        // Navigate to the ticket detail page with ID in path
+        unawaited(router.push('/ticket/$ticketId'));
+      } on Object catch (e, stackTrace) {
+        _logger.error('Error handling deep link', e, stackTrace);
+      }
+    }
   }
 
   @override

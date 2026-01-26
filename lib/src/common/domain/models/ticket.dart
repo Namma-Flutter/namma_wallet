@@ -181,16 +181,7 @@ class Ticket with TicketMappable {
       }
     }
 
-    final secondaryParts = [
-      if (model.corporation.isNotNullOrEmpty) model.corporation,
-      if (model.tripCode.isNotNullOrEmpty)
-        model.tripCode
-      else if (model.routeNo.isNotNullOrEmpty)
-        model.routeNo,
-    ];
-    final secondaryText = secondaryParts.isNotEmpty
-        ? secondaryParts.join(' - ')
-        : null;
+    startTime ??= model.journeyDate;
 
     /// the constants [_primaryTextConstant] used for primaryText
     /// and [__secondaryTextConstant] used for secondary
@@ -202,7 +193,16 @@ class Ticket with TicketMappable {
           primarySource.isNotNullOrEmpty && primaryDestination.isNotNullOrEmpty
           ? '$primarySource → $primaryDestination'
           : _primaryTextConstant,
-      secondaryText: secondaryText,
+      secondaryText:
+          model.tripCode.isNotNullOrEmpty || model.routeNo.isNotNullOrEmpty
+          ? [
+              if (model.corporation.isNotNullOrEmpty) model.corporation,
+              if (model.tripCode.isNotNullOrEmpty)
+                model.tripCode
+              else
+                model.routeNo ?? 'Bus',
+            ].where((s) => s != null && s.isNotEmpty).join(' - ')
+          : _secondaryTextConstant,
       startTime: startTime,
       location:
           model.passengerPickupPoint ??
@@ -230,8 +230,14 @@ class Ticket with TicketMappable {
       extras: [
         if (model.pnrNumber.isNotNullOrEmpty)
           ExtrasModel(title: 'PNR Number', value: model.pnrNumber),
-        if (firstPassenger != null && firstPassenger.name.isNotNullOrEmpty)
-          ExtrasModel(title: 'Passenger Name', value: firstPassenger.name),
+        if (model.passengers.isNotEmpty)
+          ExtrasModel(
+            title: 'Passenger Name',
+            value: model.passengers
+                .map((p) => p.name)
+                .where((n) => n.isNotEmpty)
+                .join(', '),
+          ),
         if (firstPassenger?.age != null && firstPassenger!.age > 0)
           ExtrasModel(title: 'Age', value: firstPassenger.age.toString()),
         if (gender != null && gender.isNotNullOrEmpty)
@@ -249,6 +255,7 @@ class Ticket with TicketMappable {
             title: 'Booking Ref',
             value: model.obReferenceNumber!.trim(),
           ),
+
         if (model.classOfService != null &&
             model.classOfService!.trim().isNotNullOrEmpty)
           ExtrasModel(
@@ -261,7 +268,7 @@ class Ticket with TicketMappable {
         if (model.passengerPickupTime != null)
           ExtrasModel(
             title: 'Pickup Time',
-            value: DateTimeConverter.instance.formatFullDateTime(
+            value: DateTimeConverter.instance.formatTime(
               model.passengerPickupTime!,
             ),
           ),
@@ -279,16 +286,6 @@ class Ticket with TicketMappable {
           ExtrasModel(
             title: 'Seats',
             value: model.numberOfSeats.toString(),
-          ),
-        if (model.idCardType != null && model.idCardType!.isNotNullOrEmpty)
-          ExtrasModel(
-            title: 'ID Card Type',
-            value: model.idCardType,
-          ),
-        if (model.idCardNumber != null && model.idCardNumber!.isNotNullOrEmpty)
-          ExtrasModel(
-            title: 'Verification ID',
-            value: model.idCardNumber,
           ),
         if (model.conductorMobileNo != null &&
             model.conductorMobileNo!.isNotNullOrEmpty)
@@ -308,6 +305,8 @@ class Ticket with TicketMappable {
           ),
         if (model.tripCode != null && model.tripCode!.isNotNullOrEmpty)
           ExtrasModel(title: 'Trip Code', value: model.tripCode),
+        if (model.routeNo != null && model.routeNo!.trim().isNotNullOrEmpty)
+          ExtrasModel(title: 'Route No', value: model.routeNo!.trim()),
         if (model.serviceStartPlace != null &&
             model.serviceStartPlace!.isNotNullOrEmpty)
           ExtrasModel(title: 'From', value: model.serviceStartPlace)
@@ -330,20 +329,18 @@ class Ticket with TicketMappable {
       ticketId: existing.ticketId,
 
       primaryText:
-          (incoming.primaryText == null ||
-              incoming.primaryText!.isEmpty ||
+          (!incoming.primaryText.isNotNullOrEmpty ||
               incoming.primaryText == _primaryTextConstant)
           ? existing.primaryText
           : incoming.primaryText,
 
       secondaryText:
-          (incoming.secondaryText == null ||
-              incoming.secondaryText!.isEmpty ||
+          (!incoming.secondaryText.isNotNullOrEmpty ||
               incoming.secondaryText == _secondaryTextConstant)
           ? existing.secondaryText
           : incoming.secondaryText,
 
-      location: (incoming.location?.trim().isNotEmpty ?? false)
+      location: (incoming.location?.trim().isNotNullOrEmpty ?? false)
           ? incoming.location
           : existing.location,
 

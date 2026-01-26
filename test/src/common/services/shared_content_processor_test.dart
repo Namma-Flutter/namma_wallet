@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:get_it/get_it.dart';
+import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 import 'package:namma_wallet/src/common/enums/ticket_type.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
@@ -15,18 +15,17 @@ import '../../../helpers/mock_travel_parser_service.dart';
 
 void main() {
   group('SharedContentProcessor', () {
-    final getIt = GetIt.instance;
+    late FakeLogger fakeLogger;
 
     setUp(() {
       // Arrange - Set up mocked dependencies in a new scope
-      final logger = FakeLogger();
+      fakeLogger = FakeLogger();
       getIt
         ..pushNewScope()
-        ..registerSingleton<ILogger>(logger);
+        ..registerSingleton<ILogger>(fakeLogger);
     });
 
     tearDown(() async {
-      // Cleanup - Pop the scope to remove test-specific dependencies
       await getIt.popScope();
     });
 
@@ -159,8 +158,7 @@ void main() {
               logger: logger,
               mockUpdateInfo: mockUpdateInfo,
             ),
-            ticketDao: mockDao,
-            importService: MockImportService(),
+            ticketDao: MockTicketDAO(),
           );
 
           const updateSms = '''
@@ -240,27 +238,20 @@ void main() {
             },
           );
 
-          // Insert the ticket that we're going to update
-          await mockDao.insertTicket(
-            const Ticket(
-              ticketId: 'T12345678',
-              primaryText: 'CHENNAI → BANGALORE',
-              secondaryText: 'SETC - Bus',
-              location: 'CHENNAI',
-              type: TicketType.bus,
-            ),
+          const mockTicket = Ticket(
+            ticketId: 'T12345678',
+            primaryText: 'Origin → Destination',
+            secondaryText: 'Other info',
+            location: 'Station',
           );
-
-          final logger = getIt<ILogger>();
-
+          await mockDao.insertTicket(mockTicket);
           final processor = SharedContentProcessor(
-            logger: logger,
+            logger: getIt<ILogger>(),
             travelParser: MockTravelParserService(
-              logger: logger,
+              logger: getIt<ILogger>(),
               mockUpdateInfo: mockUpdateInfo,
             ),
             ticketDao: mockDao,
-            importService: MockImportService(),
           );
 
           const updateSms = '''
@@ -282,16 +273,12 @@ void main() {
           final updatedTicket = mockDao.updateCalls.first.value;
           final extras = updatedTicket.extras!;
           expect(
-            extras.any(
-              (e) => e.title == 'conductorContact' && e.value == '9876543210',
-            ),
-            isTrue,
+            mockDao.updateCalls.first.value,
+            containsPair('conductorContact', '9876543210'),
           );
           expect(
-            extras.any(
-              (e) => e.title == 'busNumber' && e.value == 'TN01AB1234',
-            ),
-            isTrue,
+            mockDao.updateCalls.first.value,
+            containsPair('busNumber', 'TN01AB1234'),
           );
         },
       );
@@ -303,11 +290,14 @@ void main() {
         'Then returns ProcessingErrorResult',
         () async {
           // Arrange (Given)
-          final mockUpdateInfo = TicketUpdateInfo(
-            pnrNumber: 'T12345678',
-            providerName: 'TNSTC',
-            updates: {'conductorContact': '9876543210'},
+          const mockTicket = Ticket(
+            ticketId: 'T12345678',
+            primaryText: 'Origin → Destination',
+            secondaryText: 'Other info',
+            location: 'Station',
           );
+          final mockDao = MockTicketDAO(shouldThrowOnUpdate: true);
+          await mockDao.insertTicket(mockTicket);
 
           final logger = getIt<ILogger>();
           final mockDao = MockTicketDAO(shouldThrowOnUpdate: true);
@@ -323,11 +313,16 @@ void main() {
           );
 
           final processor = SharedContentProcessor(
-            logger: logger,
+            logger: fakeLogger,
             travelParser: MockTravelParserService(
-              logger: logger,
-              mockUpdateInfo: mockUpdateInfo,
+              logger: fakeLogger,
+              mockUpdateInfo: TicketUpdateInfo(
+                pnrNumber: 'T12345678',
+                providerName: 'TNSTC',
+                updates: {'conductorMobileNo': '9876543210'},
+              ),
             ),
+            ticketDao: mockDao,
             ticketDao: mockDao,
             importService: MockImportService(),
           );
@@ -542,17 +537,29 @@ void main() {
           // Assert (Then)
           expect(createResult, isA<TicketCreatedResult>());
 
-          // Arrange for update
+          // Arrange (Given)
+          const mockTicket = Ticket(
+            ticketId: 'T12345678',
+            primaryText: 'Origin → Destination',
+            secondaryText: 'Other info',
+            location: 'Station',
+          );
+          // Create a new mock DAO for the update step, pre-populated with
+          // the ticket
+          // that would have been created in the previous step.
+          final updateMockDao = MockTicketDAO();
+          await updateMockDao.insertTicket(mockTicket);
           final updateProcessor = SharedContentProcessor(
-            logger: logger,
+            logger: logger, // Using 'logger' as defined in the test scope
             travelParser: MockTravelParserService(
-              logger: logger,
+              logger: logger, // Using 'logger' as defined in the test scope
               mockUpdateInfo: TicketUpdateInfo(
                 pnrNumber: 'T12345678',
                 providerName: 'TNSTC',
-                updates: {'conductorContact': '9876543210'},
+                updates: {'conductorMobileNo': '9876543210'},
               ),
             ),
+            ticketDao: updateMockDao,
             ticketDao: mockDao,
             importService: MockImportService(),
           );

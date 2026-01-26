@@ -15,6 +15,8 @@ import 'package:namma_wallet/src/common/services/ocr/ocr_service_interface.dart'
 import 'package:namma_wallet/src/common/services/ocr/web_ocr_service.dart';
 import 'package:namma_wallet/src/common/services/pdf/pdf_service.dart';
 import 'package:namma_wallet/src/common/services/pdf/pdf_service_interface.dart';
+import 'package:namma_wallet/src/common/services/widget/home_widget_service.dart';
+import 'package:namma_wallet/src/common/services/widget/widget_service_interface.dart';
 import 'package:namma_wallet/src/common/theme/theme_provider.dart';
 import 'package:namma_wallet/src/features/ai/fallback_parser/application/ai_service_interface.dart';
 import 'package:namma_wallet/src/features/ai/fallback_parser/application/gemma_service.dart';
@@ -71,6 +73,9 @@ void setupLocator() {
     )
     ..registerLazySingleton<IAIService>(
       () => kIsWeb ? WebGemmaService() : GemmaService(logger: getIt<ILogger>()),
+    )
+    ..registerLazySingleton<IWidgetService>(
+      () => HomeWidgetService(logger: getIt<ILogger>()),
     )
     // Parsers
     ..registerLazySingleton<TNSTCSMSParser>(TNSTCSMSParser.new)

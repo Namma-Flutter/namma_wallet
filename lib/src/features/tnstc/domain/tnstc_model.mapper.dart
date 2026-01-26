@@ -121,13 +121,6 @@ class TNSTCTicketModelMapper extends ClassMapperBase<TNSTCTicketModel> {
     _$numberOfSeats,
     opt: true,
   );
-  static String? _$bankTransactionNumber(TNSTCTicketModel v) =>
-      v.bankTransactionNumber;
-  static const Field<TNSTCTicketModel, String> _f$bankTransactionNumber = Field(
-    'bankTransactionNumber',
-    _$bankTransactionNumber,
-    opt: true,
-  );
   static String? _$busIdNumber(TNSTCTicketModel v) => v.busIdNumber;
   static const Field<TNSTCTicketModel, String> _f$busIdNumber = Field(
     'busIdNumber',
@@ -143,18 +136,6 @@ class TNSTCTicketModelMapper extends ClassMapperBase<TNSTCTicketModel> {
   static List<PassengerInfo> _$passengers(TNSTCTicketModel v) => v.passengers;
   static const Field<TNSTCTicketModel, List<PassengerInfo>> _f$passengers =
       Field('passengers', _$passengers, opt: true, def: const []);
-  static String? _$idCardType(TNSTCTicketModel v) => v.idCardType;
-  static const Field<TNSTCTicketModel, String> _f$idCardType = Field(
-    'idCardType',
-    _$idCardType,
-    opt: true,
-  );
-  static String? _$idCardNumber(TNSTCTicketModel v) => v.idCardNumber;
-  static const Field<TNSTCTicketModel, String> _f$idCardNumber = Field(
-    'idCardNumber',
-    _$idCardNumber,
-    opt: true,
-  );
   static double? _$totalFare(TNSTCTicketModel v) => v.totalFare;
   static const Field<TNSTCTicketModel, double> _f$totalFare = Field(
     'totalFare',
@@ -204,12 +185,9 @@ class TNSTCTicketModelMapper extends ClassMapperBase<TNSTCTicketModel> {
     #tripCode: _f$tripCode,
     #obReferenceNumber: _f$obReferenceNumber,
     #numberOfSeats: _f$numberOfSeats,
-    #bankTransactionNumber: _f$bankTransactionNumber,
     #busIdNumber: _f$busIdNumber,
     #passengerCategory: _f$passengerCategory,
     #passengers: _f$passengers,
-    #idCardType: _f$idCardType,
-    #idCardNumber: _f$idCardNumber,
     #totalFare: _f$totalFare,
     #boardingPoint: _f$boardingPoint,
     #conductorMobileNo: _f$conductorMobileNo,
@@ -235,12 +213,9 @@ class TNSTCTicketModelMapper extends ClassMapperBase<TNSTCTicketModel> {
       tripCode: data.dec(_f$tripCode),
       obReferenceNumber: data.dec(_f$obReferenceNumber),
       numberOfSeats: data.dec(_f$numberOfSeats),
-      bankTransactionNumber: data.dec(_f$bankTransactionNumber),
       busIdNumber: data.dec(_f$busIdNumber),
       passengerCategory: data.dec(_f$passengerCategory),
       passengers: data.dec(_f$passengers),
-      idCardType: data.dec(_f$idCardType),
-      idCardNumber: data.dec(_f$idCardNumber),
       totalFare: data.dec(_f$totalFare),
       boardingPoint: data.dec(_f$boardingPoint),
       conductorMobileNo: data.dec(_f$conductorMobileNo),
@@ -334,12 +309,9 @@ abstract class TNSTCTicketModelCopyWith<$R, $In extends TNSTCTicketModel, $Out>
     String? tripCode,
     String? obReferenceNumber,
     int? numberOfSeats,
-    String? bankTransactionNumber,
     String? busIdNumber,
     String? passengerCategory,
     List<PassengerInfo>? passengers,
-    String? idCardType,
-    String? idCardNumber,
     double? totalFare,
     String? boardingPoint,
     String? conductorMobileNo,
@@ -388,12 +360,9 @@ class _TNSTCTicketModelCopyWithImpl<$R, $Out>
     Object? tripCode = $none,
     Object? obReferenceNumber = $none,
     Object? numberOfSeats = $none,
-    Object? bankTransactionNumber = $none,
     Object? busIdNumber = $none,
     Object? passengerCategory = $none,
     List<PassengerInfo>? passengers,
-    Object? idCardType = $none,
-    Object? idCardNumber = $none,
     Object? totalFare = $none,
     Object? boardingPoint = $none,
     Object? conductorMobileNo = $none,
@@ -420,13 +389,9 @@ class _TNSTCTicketModelCopyWithImpl<$R, $Out>
       if (tripCode != $none) #tripCode: tripCode,
       if (obReferenceNumber != $none) #obReferenceNumber: obReferenceNumber,
       if (numberOfSeats != $none) #numberOfSeats: numberOfSeats,
-      if (bankTransactionNumber != $none)
-        #bankTransactionNumber: bankTransactionNumber,
       if (busIdNumber != $none) #busIdNumber: busIdNumber,
       if (passengerCategory != $none) #passengerCategory: passengerCategory,
       if (passengers != null) #passengers: passengers,
-      if (idCardType != $none) #idCardType: idCardType,
-      if (idCardNumber != $none) #idCardNumber: idCardNumber,
       if (totalFare != $none) #totalFare: totalFare,
       if (boardingPoint != $none) #boardingPoint: boardingPoint,
       if (conductorMobileNo != $none) #conductorMobileNo: conductorMobileNo,
@@ -470,18 +435,12 @@ class _TNSTCTicketModelCopyWithImpl<$R, $Out>
       or: $value.obReferenceNumber,
     ),
     numberOfSeats: data.get(#numberOfSeats, or: $value.numberOfSeats),
-    bankTransactionNumber: data.get(
-      #bankTransactionNumber,
-      or: $value.bankTransactionNumber,
-    ),
     busIdNumber: data.get(#busIdNumber, or: $value.busIdNumber),
     passengerCategory: data.get(
       #passengerCategory,
       or: $value.passengerCategory,
     ),
     passengers: data.get(#passengers, or: $value.passengers),
-    idCardType: data.get(#idCardType, or: $value.idCardType),
-    idCardNumber: data.get(#idCardNumber, or: $value.idCardNumber),
     totalFare: data.get(#totalFare, or: $value.totalFare),
     boardingPoint: data.get(#boardingPoint, or: $value.boardingPoint),
     conductorMobileNo: data.get(

@@ -24,24 +24,48 @@
         android:enableOnBackInvokedCallback="true"
         android:icon="@mipmap/ic_launcher"
         android:label="Namma Wallet">
+        <!-- Multi-Ticket List Widget Provider -->
         <receiver
-            android:name="com.nammaflutter.nammawallet.TicketHomeWidget"
+            android:name="com.nammaflutter.nammawallet.TicketListWidgetProvider"
             android:exported="false">
+
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.nammaflutter.nammawallet.UPDATE_TICKET_LIST" />
+                <action android:name="com.nammaflutter.nammawallet.UNPIN_TICKET" />
             </intent-filter>
 
             <meta-data
                 android:name="android.appwidget.provider"
-                android:resource="@xml/ticket_home_widget_info" />
+                android:resource="@xml/ticket_list_widget_info" />
         </receiver>
+
+        <!-- Main Ticket Widget Provider (3x3) -->
+        <receiver
+            android:name="com.nammaflutter.nammawallet.MainTicketWidgetProvider"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.nammaflutter.nammawallet.UPDATE_TICKET_LIST" />
+                <action android:name="com.nammaflutter.nammawallet.UNPIN_MAIN_TICKET" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/main_ticket_widget_info" />
+        </receiver>
+
+        <service
+            android:name=".TicketListWidgetService"
+            android:exported="false"
+            android:permission="android.permission.BIND_REMOTEVIEWS"/>
+
 
         <activity
             android:name="com.nammaflutter.nammawallet.MainActivity"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
             android:exported="true"
             android:hardwareAccelerated="true"
-            android:launchMode="singleTop"
+            android:launchMode="singleTask"
             android:taskAffinity=""
             android:theme="@style/LaunchTheme"
             android:windowSoftInputMode="adjustResize">
