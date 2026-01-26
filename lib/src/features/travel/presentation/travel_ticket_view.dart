@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:home_widget/home_widget.dart';
@@ -11,6 +13,7 @@ import 'package:namma_wallet/src/common/helper/date_time_converter.dart';
 import 'package:namma_wallet/src/common/services/haptic/haptic_service_extension.dart';
 import 'package:namma_wallet/src/common/services/haptic/haptic_service_interface.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
+import 'package:namma_wallet/src/common/services/widget/widget_service_interface.dart';
 import 'package:namma_wallet/src/common/theme/styles.dart';
 import 'package:namma_wallet/src/common/widgets/rounded_back_button.dart';
 import 'package:namma_wallet/src/common/widgets/snackbar_widget.dart';
@@ -61,20 +64,22 @@ class _TravelTicketViewState extends State<TravelTicketView> {
   }
 
   Future<void> _pinToHomeScreen() async {
+    const iOSWidgetName = 'TicketWidget';
+    const androidWidgetName = 'TicketHomeWidget';
+    const dataKey = 'ticket_data';
+
     try {
-      const iOSWidgetName = 'TicketWidget';
-      const androidWidgetName = 'TicketHomeWidget';
-      const dataKey = 'ticket_data';
-
-      // Convert ticket to JSON format for the widget
-      // toJson() already returns a JSON string, no need to encode again
-      final ticketData = widget.ticket.toJson();
-      await HomeWidget.saveWidgetData(dataKey, ticketData);
-
-      await HomeWidget.updateWidget(
-        androidName: androidWidgetName,
-        iOSName: iOSWidgetName,
-      );
+      if (Platform.isIOS) {
+        await HomeWidget.saveWidgetData(dataKey, widget.ticket.toJson());
+        await HomeWidget.updateWidget(
+          androidName: androidWidgetName,
+          iOSName: iOSWidgetName,
+        );
+      } else if (Platform.isAndroid) {
+        await getIt<IWidgetService>().updateWidgetWithTicket(widget.ticket);
+      } else {
+        throw UnsupportedError('Unsupported platform');
+      }
 
       if (mounted) {
         showSnackbar(context, 'Ticket pinned to home screen successfully!');

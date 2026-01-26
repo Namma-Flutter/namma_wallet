@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -11,6 +12,7 @@ import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 import 'package:namma_wallet/src/common/domain/models/user.dart';
 import 'package:namma_wallet/src/common/services/haptic/haptic_service_extension.dart';
 import 'package:namma_wallet/src/common/services/haptic/haptic_service_interface.dart';
+import 'package:namma_wallet/src/common/services/widget/widget_service_interface.dart';
 import 'package:namma_wallet/src/common/widgets/rounded_back_button.dart';
 
 class DbViewerView extends StatefulWidget {
@@ -26,6 +28,7 @@ class _DbViewerViewState extends State<DbViewerView>
   List<User> users = <User>[];
   List<Ticket> tickets = <Ticket>[];
   final IHapticService hapticService = getIt<IHapticService>();
+  final IWidgetService _widgetService = getIt<IWidgetService>();
 
   @override
   void initState() {
@@ -169,16 +172,25 @@ class _DbViewerViewState extends State<DbViewerView>
               if (!kIsWeb)
                 ElevatedButton(
                   onPressed: () async {
-                    const iOSWidgetName = 'TicketWidget';
-                    const androidWidgetName = 'TicketHomeWidget';
-                    const dataKey = 'ticket_data';
-                    // toJson() already returns a JSON string
-                    await HomeWidget.saveWidgetData(dataKey, t.toJson());
+                    if (Platform.isIOS) {
+                      const iOSWidgetName = 'TicketWidget';
+                      const androidWidgetName = 'TicketHomeWidget';
+                      const dataKey = 'ticket_data';
+                      // toJson() already returns a JSON string
+                      await HomeWidget.saveWidgetData(dataKey, t.toJson());
+                      await HomeWidget.updateWidget(
+                        androidName: androidWidgetName,
+                        iOSName: iOSWidgetName,
+                      );
+                    } else if (Platform.isAndroid) {
+                      await _widgetService.updateWidgetWithTicket(t);
+                    } else {
+                      // Unsupported platform
+                      throw UnsupportedError(
+                        'Pin to Home Screen not supported on this platform.',
+                      );
+                    }
 
-                    await HomeWidget.updateWidget(
-                      androidName: androidWidgetName,
-                      iOSName: iOSWidgetName,
-                    );
                     if (context.mounted) {
                       context.pop();
                     }
