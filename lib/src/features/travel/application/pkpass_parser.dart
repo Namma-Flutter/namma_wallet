@@ -421,12 +421,7 @@ class PKPassParser implements IPKPassParser {
       // Fallback for any other types or if types are not exactly matched
       return (val as dynamic).value;
     } on Object catch (_) {
-      try {
-        // Ultimate fallback
-        return val.toString();
-      } on Object catch (_) {
-        return null;
-      }
+      return null;
     }
   }
 
