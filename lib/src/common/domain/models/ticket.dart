@@ -15,15 +15,17 @@ part 'ticket.mapper.dart';
 class Ticket with TicketMappable {
   ///
   const Ticket({
-    required this.primaryText,
-    required this.secondaryText,
-    required this.location,
+    this.primaryText,
+    this.secondaryText,
+    this.location,
     this.startTime,
-    this.type = TicketType.train,
+    this.type,
     this.endTime,
     this.tags,
     this.extras,
     this.ticketId,
+    this.imagePath,
+    this.directionsUrl,
   });
 
   factory Ticket.fromIRCTC(
@@ -338,7 +340,7 @@ class Ticket with TicketMappable {
           ? existing.secondaryText
           : incoming.secondaryText,
 
-      location: (incoming.location.trim().isNotNullOrEmpty)
+      location: (incoming.location?.trim().isNotNullOrEmpty ?? false)
           ? incoming.location
           : existing.location,
 
@@ -352,6 +354,8 @@ class Ticket with TicketMappable {
 
       tags: _mergeTags(existing.tags, incoming.tags),
       extras: _mergeExtras(existing.extras, incoming.extras),
+      imagePath: incoming.imagePath ?? existing.imagePath,
+      directionsUrl: incoming.directionsUrl ?? existing.directionsUrl,
     );
   }
 
@@ -421,21 +425,25 @@ class Ticket with TicketMappable {
   @MappableField(key: 'ticket_id')
   final String? ticketId;
   @MappableField(key: 'primary_text')
-  final String primaryText;
+  final String? primaryText;
   @MappableField(key: 'secondary_text')
-  final String secondaryText;
+  final String? secondaryText;
   @MappableField(key: 'type')
-  final TicketType type;
+  final TicketType? type;
   @MappableField(key: 'start_time')
   final DateTime? startTime;
   @MappableField(key: 'end_time')
   final DateTime? endTime;
   @MappableField(key: 'location')
-  final String location;
+  final String? location;
   @MappableField(key: 'tags')
   final List<TagModel>? tags;
   @MappableField(key: 'extras')
   final List<ExtrasModel>? extras;
+  @MappableField(key: 'image_path')
+  final String? imagePath;
+  @MappableField(key: 'directions_url')
+  final String? directionsUrl;
 
   Map<String, Object?> toEntity() {
     final map = toMap()..removeWhere((key, value) => value == null);

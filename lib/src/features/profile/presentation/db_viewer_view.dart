@@ -97,7 +97,7 @@ class _DbViewerViewState extends State<DbViewerView>
           itemCount: tickets.length,
           itemBuilder: (context, index) {
             final t = tickets[index];
-            final subtitle = t.secondaryText;
+            final subtitle = t.secondaryText ?? 'No description';
             return Card(
               margin: const EdgeInsets.all(8),
               child: ListTile(

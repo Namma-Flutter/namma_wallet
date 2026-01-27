@@ -7,6 +7,7 @@ import 'package:namma_wallet/src/common/routing/app_router.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
 import 'package:namma_wallet/src/common/theme/app_theme.dart';
 import 'package:namma_wallet/src/common/theme/theme_provider.dart';
+import 'package:namma_wallet/src/features/import/application/deep_link_service_interface.dart';
 import 'package:namma_wallet/src/features/receive/application/shared_content_processor_interface.dart';
 import 'package:namma_wallet/src/features/receive/domain/sharing_intent_service_interface.dart';
 import 'package:namma_wallet/src/features/receive/presentation/share_handler.dart';
@@ -25,6 +26,7 @@ class _NammaWalletAppState extends State<NammaWalletApp> {
       getIt<ISharingIntentService>();
   late final ISharedContentProcessor _contentProcessor =
       getIt<ISharedContentProcessor>();
+  late final IDeepLinkService _deepLinkService = getIt<IDeepLinkService>();
   late final ILogger _logger = getIt<ILogger>();
   final GlobalKey<ScaffoldMessengerState> _scaffoldMessengerKey =
       GlobalKey<ScaffoldMessengerState>();
@@ -75,6 +77,20 @@ class _NammaWalletAppState extends State<NammaWalletApp> {
             // Optionally notify user of initialization failure
           }),
     );
+
+    // Initialize deep link service for .pkpass files
+    unawaited(
+      _deepLinkService.initialize(
+        onError: (Object error) {
+          _logger.error('Deep link error: $error');
+          _shareHandler.handleError(error.toString());
+        },
+        onWarning: (String message) {
+          _logger.warning('Deep link warning: $message');
+          _shareHandler.handleWarning(message);
+        },
+      ),
+    );
   }
 
   Future<void> _handleDeepLink(MethodCall call) async {
@@ -107,6 +123,7 @@ class _NammaWalletAppState extends State<NammaWalletApp> {
   Future<void> _disposeSharingService() async {
     try {
       await _sharingService.dispose();
+      await _deepLinkService.dispose();
     } on Object catch (e, st) {
       _logger.error('Error disposing sharing service', e, st);
     }

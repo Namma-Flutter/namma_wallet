@@ -25,6 +25,8 @@ import 'package:namma_wallet/src/features/clipboard/application/clipboard_servic
 import 'package:namma_wallet/src/features/clipboard/application/clipboard_service_interface.dart';
 import 'package:namma_wallet/src/features/clipboard/data/clipboard_repository.dart';
 import 'package:namma_wallet/src/features/clipboard/domain/clipboard_repository_interface.dart';
+import 'package:namma_wallet/src/features/import/application/deep_link_service.dart';
+import 'package:namma_wallet/src/features/import/application/deep_link_service_interface.dart';
 import 'package:namma_wallet/src/features/import/application/import_service.dart';
 import 'package:namma_wallet/src/features/import/application/import_service_interface.dart';
 import 'package:namma_wallet/src/features/irctc/application/irctc_qr_parser.dart';
@@ -40,6 +42,8 @@ import 'package:namma_wallet/src/features/settings/application/ai_service_status
 import 'package:namma_wallet/src/features/tnstc/application/ticket_parser_interface.dart';
 import 'package:namma_wallet/src/features/tnstc/application/tnstc_pdf_parser.dart';
 import 'package:namma_wallet/src/features/tnstc/application/tnstc_sms_parser.dart';
+import 'package:namma_wallet/src/features/travel/application/pkpass_parser.dart';
+import 'package:namma_wallet/src/features/travel/application/pkpass_parser_interface.dart';
 import 'package:namma_wallet/src/features/travel/application/travel_parser_interface.dart';
 import 'package:namma_wallet/src/features/travel/application/travel_parser_service.dart';
 
@@ -94,10 +98,14 @@ void setupLocator() {
         logger: getIt<ILogger>(),
         travelParser: getIt<ITravelParser>(),
         ticketDao: getIt<ITicketDAO>(),
+        importService: getIt<IImportService>(),
       ),
     )
     ..registerLazySingleton<IHapticService>(HapticService.new)
     // Feature services
+    ..registerLazySingleton<IPKPassParser>(
+      () => PKPassParser(logger: getIt<ILogger>()),
+    )
     ..registerLazySingleton<IIRCTCQRParser>(IRCTCQRParser.new)
     ..registerLazySingleton<IIRCTCScannerService>(
       () => IRCTCScannerService(
@@ -113,7 +121,14 @@ void setupLocator() {
         travelParser: getIt<ITravelParser>(),
         qrParser: getIt<IIRCTCQRParser>(),
         irctcScannerService: getIt<IIRCTCScannerService>(),
+        pkpassParser: getIt<IPKPassParser>(),
         ticketDao: getIt<ITicketDAO>(),
+      ),
+    )
+    ..registerLazySingleton<IDeepLinkService>(
+      () => DeepLinkService(
+        importService: getIt<IImportService>(),
+        logger: getIt<ILogger>(),
       ),
     )
     // Clipboard - Repository and Service

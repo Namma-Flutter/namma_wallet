@@ -112,8 +112,43 @@
 				<string>com.adobe.pdf</string>
 			</array>
 		</dict>
+        <dict>
+            <key>CFBundleTypeName</key>
+            <string>PassBook Data</string>
+            <key>LSHandlerRank</key>
+            <string>Alternate</string>
+            <key>LSItemContentTypes</key>
+            <array>
+                <string>com.apple.pkpass</string>
+            </array>
+        </dict>
 	</array>
 	<key>LSSupportsOpeningDocumentsInPlace</key>
 	<true/>
+    <key>UTImportedTypeDeclarations</key>
+    <array>
+        <dict>
+            <key>UTTypeConformsTo</key>
+            <array>
+                <string>public.data</string>
+                <string>com.apple.package</string>
+            </array>
+            <key>UTTypeDescription</key>
+            <string>PassBook Data</string>
+            <key>UTTypeIdentifier</key>
+            <string>com.apple.pkpass</string>
+            <key>UTTypeTagSpecification</key>
+            <dict>
+                <key>public.filename-extension</key>
+                <array>
+                    <string>pkpass</string>
+                </array>
+                <key>public.mime-type</key>
+                <array>
+                    <string>application/vnd.apple.pkpass</string>
+                </array>
+            </dict>
+        </dict>
+    </array>
 </dict>
 </plist>

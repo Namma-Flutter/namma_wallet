@@ -114,20 +114,24 @@ class SharingIntentService implements ISharingIntentService {
           final fileExtension = path.extension(filePath).toLowerCase();
 
           // Check if file type is supported
-          if (fileExtension != '.pdf' && !_isSupportedTextFile(fileExtension)) {
+          if (fileExtension != '.pdf' &&
+              fileExtension != '.pkpass' &&
+              !_isSupportedTextFile(fileExtension)) {
             _logger.warning(
               'Skipping unsupported file type: $fileExtension',
             );
             onError(
               'File type $fileExtension is not supported. '
-              'Please share PDF or text files.',
+              'Please share PDF, PKPASS or text files.',
             );
             continue;
           }
 
           final contentType = fileExtension == '.pdf'
               ? SharedContentType.pdf
-              : SharedContentType.sms;
+              : (fileExtension == '.pkpass'
+                    ? SharedContentType.pkpass
+                    : SharedContentType.sms);
 
           final content = await extractContentFromFile(XFile(filePath));
           onContentReceived(content, contentType);
@@ -183,6 +187,10 @@ class SharingIntentService implements ISharingIntentService {
       final content = await file.readAsString();
       _logger.info('Successfully read text file');
       return content;
+    } else if (fileExtension == '.pkpass') {
+      // For pkpass, we pass the file path as the content
+      _logger.info('Returning file path for PKPass: ${file.path}');
+      return file.path;
     } else {
       // Unsupported file type
       _logger.warning(
