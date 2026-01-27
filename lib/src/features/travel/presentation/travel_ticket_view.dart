@@ -354,18 +354,19 @@ class _TravelTicketViewState extends State<TravelTicketView> {
                       ),
                       const SizedBox(width: 16),
                       //* Description (Secondary text)
-                      Expanded(
-                        child: Text(
-                          widget.ticket.secondaryText ?? '',
-                          style: Paragraph03(
-                            color: Theme.of(
-                              context,
-                            ).colorScheme.onSurface,
-                          ).regular,
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 2,
+                      if (widget.ticket.secondaryText?.isNotEmpty ?? false)
+                        Expanded(
+                          child: Text(
+                            widget.ticket.secondaryText ?? '',
+                            style: Paragraph03(
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.onSurface,
+                            ).regular,
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 2,
+                          ),
                         ),
-                      ),
                     ],
                   ),
 
@@ -501,6 +502,11 @@ class _TravelTicketViewState extends State<TravelTicketView> {
                       ];
                     } else {
                       // Fallback to primaryText
+                      final primaryText = widget.ticket.primaryText;
+                      if (primaryText == null || primaryText.isEmpty) {
+                        return <Widget>[];
+                      }
+
                       return <Widget>[
                         Text(
                           widget.ticket.primaryText ?? '',
@@ -541,14 +547,24 @@ class _TravelTicketViewState extends State<TravelTicketView> {
                       width: double.infinity,
                       child: OutlinedButton.icon(
                         onPressed: () async {
-                          final uri = Uri.parse(widget.ticket.directionsUrl!);
-                          if (await canLaunchUrl(uri)) {
-                            await launchUrl(uri);
-                          } else {
+                          try {
+                            final uri = Uri.parse(widget.ticket.directionsUrl!);
+                            if (await canLaunchUrl(uri)) {
+                              await launchUrl(uri);
+                            } else {
+                              if (context.mounted) {
+                                showSnackbar(
+                                  context,
+                                  'Could not open map URL',
+                                  isError: true,
+                                );
+                              }
+                            }
+                          } on FormatException {
                             if (context.mounted) {
                               showSnackbar(
                                 context,
-                                'Could not open map URL',
+                                'Invalid directional URL',
                                 isError: true,
                               );
                             }

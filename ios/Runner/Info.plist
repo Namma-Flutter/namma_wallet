@@ -72,10 +72,6 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
-    <key>CADisableMinimumFrameDurationOnPhone</key>
-    <true/>
-    <key>UIApplicationSupportsIndirectInputEvents</key>
-    <true/>
 	<key>AppGroupId</key>
 	<string>$(CUSTOM_GROUP_ID)</string>
 	<key>NSUserActivityTypes</key>
@@ -116,15 +112,6 @@
 				<string>com.adobe.pdf</string>
 			</array>
 		</dict>
-	</array>
-	<key>LSSupportsOpeningDocumentsInPlace</key>
-	<true/>
-	<key>NSCameraUsageDescription</key>
-    <string>Camera access is required to scan QR codes</string>
-    <key>NSPhotoLibraryUsageDescription</key>
-    <string>This app needs photo library access to scan barcodes from images.</string>
-    <key>CFBundleDocumentTypes</key>
-    <array>
         <dict>
             <key>CFBundleTypeName</key>
             <string>PassBook Data</string>
@@ -135,7 +122,9 @@
                 <string>com.apple.pkpass</string>
             </array>
         </dict>
-    </array>
+	</array>
+	<key>LSSupportsOpeningDocumentsInPlace</key>
+	<true/>
     <key>UTImportedTypeDeclarations</key>
     <array>
         <dict>

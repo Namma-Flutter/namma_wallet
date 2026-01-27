@@ -92,9 +92,13 @@ class SharedContentProcessor implements ISharedContentProcessor {
 
           if (result > 0) {
             _logger.success('Ticket updated successfully');
+            final hasConductorDetails =
+                updateInfo.updates.keys.contains('conductorContact') ||
+                updateInfo.updates.keys.contains('conductorMobileNo') ||
+                updateInfo.updates.keys.contains('Conductor Mobile No');
             return TicketUpdatedResult(
               pnrNumber: updateInfo.pnrNumber,
-              updateType: updateInfo.updates.keys.contains('conductorContact')
+              updateType: hasConductorDetails
                   ? 'Conductor Details'
                   : 'Ticket Update',
             );

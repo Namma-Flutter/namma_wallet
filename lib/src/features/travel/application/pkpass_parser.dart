@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:archive/archive.dart';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:namma_wallet/src/common/domain/models/extras_model.dart';
 import 'package:namma_wallet/src/common/domain/models/tag_model.dart';
@@ -114,7 +115,9 @@ class PKPassParser implements IPKPassParser {
         headers['If-Modified-Since'] = HttpDate.format(modifiedSince);
       }
 
-      final response = await http.get(uri, headers: headers);
+      final response = await http
+          .get(uri, headers: headers)
+          .timeout(const Duration(seconds: 30));
 
       if (response.statusCode == 200) {
         return response.bodyBytes;
@@ -429,6 +432,7 @@ class PKPassParser implements IPKPassParser {
   }
 
   void _logFullPassDetails(PassFile passFile) {
+    if (kDebugMode) return;
     try {
       final metadata = passFile.metadata;
 

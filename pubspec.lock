@@ -756,8 +756,8 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: HEAD
-      resolved-ref: fb718c00ae05eaf1015e0589a842ebc51c251805
+      ref: "v1.9.2"
+      resolved-ref: c372f9b9e641dc1b18a8af1fafc0ca32137e4043
       url: "https://github.com/Zverik/receive_sharing_intent"
     source: git
     version: "1.9.2"

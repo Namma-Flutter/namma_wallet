@@ -271,7 +271,7 @@ void main() {
           expect(mockDao.updateCalls.length, equals(1));
           expect(mockDao.updateCalls.first.key, equals('T12345678'));
           final updatedTicket = mockDao.updateCalls.first.value;
-          final extras = updatedTicket.extras!;
+          expect(updatedTicket.extras, isNotNull);
           expect(
             mockDao.updateCalls.first.value,
             containsPair('conductorContact', '9876543210'),
