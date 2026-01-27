@@ -431,7 +431,7 @@ class PKPassParser implements IPKPassParser {
   }
 
   void _logFullPassDetails(PassFile passFile) {
-    if (kDebugMode) return;
+    if (!kDebugMode) return;
     try {
       final metadata = passFile.metadata;
 

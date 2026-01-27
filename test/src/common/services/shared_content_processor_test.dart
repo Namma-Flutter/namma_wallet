@@ -158,7 +158,7 @@ void main() {
               logger: logger,
               mockUpdateInfo: mockUpdateInfo,
             ),
-            ticketDao: MockTicketDAO(),
+            ticketDao: mockDao,
             importService: MockImportService(),
           );
 
@@ -274,13 +274,21 @@ void main() {
           expect(mockDao.updateCalls.first.key, equals('T12345678'));
           final updatedTicket = mockDao.updateCalls.first.value;
           expect(updatedTicket.extras, isNotNull);
+          // Verify that the extras list contains the expected updates
           expect(
-            mockDao.updateCalls.first.value,
-            containsPair('conductorContact', '9876543210'),
+            updatedTicket.extras!.any(
+              (extra) =>
+                  extra.title == 'conductorContact' &&
+                  extra.value == '9876543210',
+            ),
+            isTrue,
           );
           expect(
-            mockDao.updateCalls.first.value,
-            containsPair('busNumber', 'TN01AB1234'),
+            updatedTicket.extras!.any(
+              (extra) =>
+                  extra.title == 'busNumber' && extra.value == 'TN01AB1234',
+            ),
+            isTrue,
           );
         },
       );
