@@ -159,6 +159,7 @@ void main() {
               mockUpdateInfo: mockUpdateInfo,
             ),
             ticketDao: MockTicketDAO(),
+            importService: MockImportService(),
           );
 
           const updateSms = '''
@@ -252,6 +253,7 @@ void main() {
               mockUpdateInfo: mockUpdateInfo,
             ),
             ticketDao: mockDao,
+            importService: MockImportService(),
           );
 
           const updateSms = '''
@@ -299,19 +301,6 @@ void main() {
           final mockDao = MockTicketDAO(shouldThrowOnUpdate: true);
           await mockDao.insertTicket(mockTicket);
 
-          final logger = getIt<ILogger>();
-          final mockDao = MockTicketDAO(shouldThrowOnUpdate: true);
-          // Insert the ticket so we reach the part that throws
-          await mockDao.insertTicket(
-            const Ticket(
-              ticketId: 'T12345678',
-              primaryText: 'CHENNAI → BANGALORE',
-              secondaryText: 'SETC - Bus',
-              location: 'CHENNAI',
-              type: TicketType.bus,
-            ),
-          );
-
           final processor = SharedContentProcessor(
             logger: fakeLogger,
             travelParser: MockTravelParserService(
@@ -322,7 +311,6 @@ void main() {
                 updates: {'conductorMobileNo': '9876543210'},
               ),
             ),
-            ticketDao: mockDao,
             ticketDao: mockDao,
             importService: MockImportService(),
           );
@@ -560,7 +548,6 @@ void main() {
               ),
             ),
             ticketDao: updateMockDao,
-            ticketDao: mockDao,
             importService: MockImportService(),
           );
 

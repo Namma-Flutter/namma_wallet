@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:archive/archive.dart';
 import 'package:flutter/foundation.dart';
@@ -483,8 +482,10 @@ class PKPassParser implements IPKPassParser {
       Object? toEncodable(dynamic object) {
         if (object is DateTime) return object.toIso8601String();
         try {
-          return object.toJson();
-        } catch (_) {
+          // Explicitly cast to dynamic to call toJson if it exists
+          return (object as dynamic).toJson() as Object?;
+        } on Exception catch (_) {
+          // Fallback to toString if toJson doesn't exist or throws
           return object.toString();
         }
       }
@@ -494,10 +495,10 @@ class PKPassParser implements IPKPassParser {
         toEncodable,
       ).convert(map);
       _logger.debug(
-        // ignore: lines_longer_than_80_chars
+        // ignore: lines_longer_than_80_chars - Separator line for debug output readability
         '--------------------------------------------------\nFULL PKPASS METADATA:\n$prettyString\n--------------------------------------------------',
       );
-    } catch (e, s) {
+    } on Exception catch (e, s) {
       _logger.error('Failed to log full pass details', e, s);
     }
   }
