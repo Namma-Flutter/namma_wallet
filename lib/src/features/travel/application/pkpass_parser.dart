@@ -365,13 +365,13 @@ class PKPassParser implements IPKPassParser {
     final allFields = _getAllFields(passFile.metadata);
 
     for (final key in keys) {
-      final field = allFields
-          .whereType<DictionaryField>()
-          .cast<DictionaryField?>()
-          .firstWhere(
-            (f) => f!.key.toLowerCase() == key.toLowerCase(),
-            orElse: () => null,
-          );
+      DictionaryField? field;
+      for (final f in allFields) {
+        if (f is DictionaryField && f.key.toLowerCase() == key.toLowerCase()) {
+          field = f;
+          break;
+        }
+      }
       if (field != null) {
         final dynamic val = _getDictionaryValue(field.value);
         if (val is String && val.isNotEmpty) return val;
@@ -484,7 +484,7 @@ class PKPassParser implements IPKPassParser {
         try {
           // Explicitly cast to dynamic to call toJson if it exists
           return (object as dynamic).toJson() as Object?;
-        } on Exception catch (_) {
+        } on Object catch (_) {
           // Fallback to toString if toJson doesn't exist or throws
           return object.toString();
         }
