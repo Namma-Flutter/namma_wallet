@@ -1,56 +1,136 @@
-name: Deploy to GitHub Pages
+# name: Deploy to GitHub Pages
+
+# on:
+#   push:
+#     branches:
+#       - main  # Change this to your default branch if different
+#   workflow_dispatch:  # Allows manual triggering from GitHub Actions tab
+
+# # Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+# permissions:
+#   contents: read
+#   pages: write
+#   id-token: write
+
+# # Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
+# # However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
+# concurrency:
+#   group: "pages"
+#   cancel-in-progress: false
+
+# jobs:
+#   build:
+#     runs-on: ubuntu-latest
+
+#     steps:
+#       - name: Checkout code
+#         uses: actions/checkout@v4
+
+#       - name: Setup Flutter
+#         uses: subosito/flutter-action@v2
+#         with:
+#           flutter-version: '3.35.2'
+#           channel: 'stable'
+#           cache: true
+
+#       - name: Get dependencies
+#         run: flutter pub get
+
+#       - name: Build web app with WASM
+#         run: flutter build web --release --wasm --base-href "/${{ github.event.repository.name }}/"
+
+#       - name: Upload artifact
+#         uses: actions/upload-pages-artifact@v3
+#         with:
+#           path: 'build/web'
+
+#   deploy:
+#     environment:
+#       name: github-pages
+#       url: ${{ steps.deployment.outputs.page_url }}
+#     runs-on: ubuntu-latest
+#     needs: build
+#     steps:
+#       - name: Deploy to GitHub Pages
+#         id: deployment
+#         uses: actions/deploy-pages@v4
+
+
+
+name: Android Release
 
 on:
-  push:
-    branches:
-      - main  # Change this to your default branch if different
-  workflow_dispatch:  # Allows manual triggering from GitHub Actions tab
-
-# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
-# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
-concurrency:
-  group: "pages"
-  cancel-in-progress: false
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: "Version bump type"
+        required: true
+        default: build
+        type: choice
+        options:
+          - major
+          - minor
+          - patch
+          - build
+      track:
+        description: "Play Store track"
+        required: true
+        default: internal
+        type: choice
+        options:
+          - internal
+          - beta
+          - production
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  release:
+    runs-on: macos-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout repo
         uses: actions/checkout@v4
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.35.2'
-          channel: 'stable'
+          flutter-version: "3.19.0"
           cache: true
 
-      - name: Get dependencies
-        run: flutter pub get
+      - name: Install FVM
+        run: |
+          dart pub global activate fvm
+          echo "$HOME/.pub-cache/bin" >> $GITHUB_PATH
 
-      - name: Build web app with WASM
-        run: flutter build web --release --wasm --base-href "/${{ github.event.repository.name }}/"
+      - name: Install dependencies
+        run: |
+          fvm install
+          fvm use
+          fvm flutter pub get
 
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+      - name: Setup Ruby (for Fastlane)
+        uses: ruby/setup-ruby@v1
         with:
-          path: 'build/web'
+          ruby-version: "3.3"
 
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+      - name: Install Fastlane
+        run: gem install fastlane
+
+      # 🔐 Decode keystore from GitHub Secrets
+      - name: Decode Keystore
+        run: |
+          echo "${{ secrets.ANDROID_KEYSTORE }}" | base64 --decode > android/app/namma-wallet.keystore
+      - name: Decode Android Fastlane Json
+        run: |
+          echo "${{ secrets.PLAY_STORE_JSON_KEY }}" | base64 --decode > android/fastlane/fastlane-android.json
+
+      - name: Grant execute permission
+        run: chmod +x release.sh
+
+      - name: Run release
+        env:
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+           
+        run: |
+          ./release.sh ${{ inputs.bump }} ${{ inputs.track }}
