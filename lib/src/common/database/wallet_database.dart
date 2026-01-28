@@ -13,7 +13,7 @@ class WalletDatabase implements IWalletDatabase {
   final ILogger _logger;
 
   static const String _dbName = 'namma_wallet.db';
-  static const int _dbVersion = 1;
+  static const int _dbVersion = 3;
 
   Database? _database;
 
@@ -51,6 +51,18 @@ class WalletDatabase implements IWalletDatabase {
           'Upgrade',
           'Upgrading from v$oldVersion to v$newVersion',
         );
+        if (oldVersion < 2) {
+          await db.execute(
+            'ALTER TABLE tickets ADD COLUMN image_path TEXT;',
+          );
+          _logger.success('Database migrated to v2: Added image_path');
+        }
+        if (oldVersion < 3) {
+          await db.execute(
+            'ALTER TABLE tickets ADD COLUMN directions_url TEXT;',
+          );
+          _logger.success('Database migrated to v3: Added directions_url');
+        }
       },
     );
   }
@@ -86,6 +98,8 @@ class WalletDatabase implements IWalletDatabase {
          location TEXT NOT NULL,
          tags TEXT,
          extras TEXT,
+         image_path TEXT,
+         directions_url TEXT,
          created_at TEXT DEFAULT CURRENT_TIMESTAMP,
          updated_at TEXT DEFAULT NULL
       );
