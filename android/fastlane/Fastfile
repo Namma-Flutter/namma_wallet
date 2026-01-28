@@ -28,12 +28,12 @@ platform :android do
   # -------------------------------
 
   private_lane :flutter_prepare do
-    sh "flutter clean"
-    sh "flutter pub get"
+    sh "fvm flutter clean"
+    sh "fvm flutter pub get"
   end
 
   private_lane :flutter_build_aab do
-    sh "flutter build appbundle --release"
+    sh "fvm flutter build appbundle --release"
   end
 
   private_lane :upload do |options|

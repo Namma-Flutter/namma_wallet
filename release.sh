@@ -93,23 +93,31 @@ echo "2) Closed Testing"
 echo "3) Production"
 read -p "Enter choice (1/2/3): " RELEASE_CHOICE
 
+
 case $RELEASE_CHOICE in
   1)
     print_info "Releasing to Internal Testing..."
+     cd android
     fastlane android internal
     ;;
   2)
     print_info "Releasing to Closed Testing..."
+     cd android
     fastlane android beta
     ;;
   3)
     print_info "Releasing to Production..."
+     cd android
     fastlane android production
     ;;
   *)
     print_error "Invalid release choice"
     ;;
 esac
+
+ cd ..
+
+
 
 # ---------- Git commit ----------
 git add pubspec.yaml

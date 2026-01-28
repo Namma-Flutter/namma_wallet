@@ -21,7 +21,23 @@ For _fastlane_ installation instructions, see [Installing _fastlane_](https://do
 [bundle exec] fastlane android internal
 ```
 
-Build Flutter AAB and upload to Play Store Internal Testing
+Build Flutter AAB & upload to Play Store Internal Testing
+
+### android beta
+
+```sh
+[bundle exec] fastlane android beta
+```
+
+Build Flutter AAB & upload to Play Store Closed Testing
+
+### android production
+
+```sh
+[bundle exec] fastlane android production
+```
+
+Build Flutter AAB & upload to Play Store Production
 
 ----
 
