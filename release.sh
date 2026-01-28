@@ -19,18 +19,19 @@ print_info() {
 # ---------- Check git branch ----------
 CURRENT_BRANCH=$(git branch --show-current)
 
-if [ "$CURRENT_BRANCH" != "main" ]; then
-  print_error "You are on '$CURRENT_BRANCH'. Please switch to 'main' branch."
+if [ "$CURRENT_BRANCH" != "feature/fastlane-android" ]; then
+  print_error "You are on '$CURRENT_BRANCH'. Please switch to 'feature/fastlane-android' branch."
 fi
 
-print_info "On main branch ✔"
+print_info "On feature/fastlane-android branch ✔"
 
 # ---------- Flutter clean ----------
 print_info "Running flutter clean..."
-flutter clean
+fvm flutter clean
 
 print_info "Running flutter pub get..."
-flutter pub get
+fvm flutter pub get
+
 
 # ---------- Read current version ----------
 CURRENT_VERSION=$(grep '^version:' pubspec.yaml | awk '{print $2}')
@@ -48,30 +49,38 @@ echo "Select version bump type:"
 echo "1) Major"
 echo "2) Minor"
 echo "3) Patch"
-read -p "Enter choice (1/2/3): " VERSION_CHOICE
+echo "4) Build number only"
+read -p "Enter choice (1/2/3/4): " VERSION_CHOICE
 
 case $VERSION_CHOICE in
   1)
     MAJOR=$((MAJOR + 1))
     MINOR=0
     PATCH=0
+    NEW_BUILD=$((BUILD_NUMBER + 1))
     ;;
   2)
     MINOR=$((MINOR + 1))
     PATCH=0
+    NEW_BUILD=$((BUILD_NUMBER + 1))
     ;;
   3)
     PATCH=$((PATCH + 1))
+    NEW_BUILD=$((BUILD_NUMBER + 1))
+    ;;
+  4)
+    # Only increment build number
+    NEW_BUILD=$((BUILD_NUMBER + 1))
     ;;
   *)
     print_error "Invalid version choice"
     ;;
 esac
 
-NEW_BUILD=$((BUILD_NUMBER + 1))
 NEW_VERSION="$MAJOR.$MINOR.$PATCH+$NEW_BUILD"
 
 print_info "Updating version to $NEW_VERSION"
+
 
 # ---------- Update pubspec.yaml ----------
 sed -i '' "s/^version: .*/version: $NEW_VERSION/" pubspec.yaml
