@@ -1,0 +1,17 @@
+import 'dart:typed_data';
+import 'package:namma_wallet/src/common/domain/models/ticket.dart';
+
+/// Parser for Apple Wallet (PKPass) files.
+///
+/// Handles parsing PKPass data into tickets and fetching updates.
+abstract interface class IPKPassParser {
+  /// Parses a pkpass file content and returns a Ticket, or null on failure.
+  Future<Ticket?> parsePKPass(Uint8List data);
+
+  /// Fetches the latest version of the pass from the web service.
+  /// Returns null if no update is available or if fetch fails.
+  Future<Uint8List?> fetchLatestPass(
+    Uint8List currentPassData, {
+    DateTime? modifiedSince,
+  });
+}

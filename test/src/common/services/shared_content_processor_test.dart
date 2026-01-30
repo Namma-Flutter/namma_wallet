@@ -9,6 +9,7 @@ import 'package:namma_wallet/src/features/receive/domain/shared_content_type.dar
 import 'package:namma_wallet/src/features/travel/application/travel_parser_interface.dart';
 
 import '../../../helpers/fake_logger.dart';
+import '../../../helpers/mock_import_service.dart';
 import '../../../helpers/mock_ticket_dao.dart';
 import '../../../helpers/mock_travel_parser_service.dart';
 
@@ -39,6 +40,7 @@ void main() {
             logger: logger,
             travelParser: MockTravelParserService(logger: logger),
             ticketDao: MockTicketDAO(),
+            importService: MockImportService(),
           );
 
           const smsContent = '''
@@ -72,6 +74,7 @@ void main() {
             logger: logger,
             travelParser: MockTravelParserService(logger: logger),
             ticketDao: MockTicketDAO(),
+            importService: MockImportService(),
           );
 
           // Act (When)
@@ -99,6 +102,7 @@ void main() {
             logger: logger,
             travelParser: MockTravelParserService(logger: logger),
             ticketDao: MockTicketDAO(),
+            importService: MockImportService(),
           );
 
           const malformedContent = 'Random text without structure';
@@ -136,13 +140,26 @@ void main() {
           );
 
           final logger = getIt<ILogger>();
+          final mockDao = MockTicketDAO();
+          // Insert the ticket that we're going to update
+          await mockDao.insertTicket(
+            const Ticket(
+              ticketId: 'T12345678',
+              primaryText: 'CHENNAI → BANGALORE',
+              secondaryText: 'SETC - Bus',
+              location: 'CHENNAI',
+              type: TicketType.bus,
+            ),
+          );
+
           final processor = SharedContentProcessor(
             logger: logger,
             travelParser: MockTravelParserService(
               logger: logger,
               mockUpdateInfo: mockUpdateInfo,
             ),
-            ticketDao: MockTicketDAO(),
+            ticketDao: mockDao,
+            importService: MockImportService(),
           );
 
           const updateSms = '''
@@ -184,6 +201,7 @@ void main() {
               mockUpdateInfo: mockUpdateInfo,
             ),
             ticketDao: MockTicketDAO(updateReturnCount: 0),
+            importService: MockImportService(),
           );
 
           const updateSms = '''
@@ -235,6 +253,7 @@ void main() {
               mockUpdateInfo: mockUpdateInfo,
             ),
             ticketDao: mockDao,
+            importService: MockImportService(),
           );
 
           const updateSms = '''
@@ -253,13 +272,23 @@ void main() {
           // Assert (Then)
           expect(mockDao.updateCalls.length, equals(1));
           expect(mockDao.updateCalls.first.key, equals('T12345678'));
+          final updatedTicket = mockDao.updateCalls.first.value;
+          expect(updatedTicket.extras, isNotNull);
+          // Verify that the extras list contains the expected updates
           expect(
-            mockDao.updateCalls.first.value,
-            containsPair('conductorContact', '9876543210'),
+            updatedTicket.extras!.any(
+              (extra) =>
+                  extra.title == 'conductorContact' &&
+                  extra.value == '9876543210',
+            ),
+            isTrue,
           );
           expect(
-            mockDao.updateCalls.first.value,
-            containsPair('busNumber', 'TN01AB1234'),
+            updatedTicket.extras!.any(
+              (extra) =>
+                  extra.title == 'busNumber' && extra.value == 'TN01AB1234',
+            ),
+            isTrue,
           );
         },
       );
@@ -279,6 +308,7 @@ void main() {
           );
           final mockDao = MockTicketDAO(shouldThrowOnUpdate: true);
           await mockDao.insertTicket(mockTicket);
+
           final processor = SharedContentProcessor(
             logger: fakeLogger,
             travelParser: MockTravelParserService(
@@ -290,6 +320,7 @@ void main() {
               ),
             ),
             ticketDao: mockDao,
+            importService: MockImportService(),
           );
 
           const updateSms = 'PNR NO. : T12345678, Conductor: 9876543210';
@@ -318,6 +349,7 @@ void main() {
             logger: logger,
             travelParser: MockTravelParserService(logger: logger),
             ticketDao: MockTicketDAO(),
+            importService: MockImportService(),
           );
 
           final longContent = 'A' * 100000;
@@ -352,6 +384,7 @@ void main() {
               ),
             ),
             ticketDao: MockTicketDAO(),
+            importService: MockImportService(),
           );
 
           // Act (When)
@@ -483,6 +516,7 @@ void main() {
             logger: logger,
             travelParser: MockTravelParserService(logger: logger),
             ticketDao: mockDao,
+            importService: MockImportService(),
           );
 
           const createSms = '''
@@ -522,6 +556,7 @@ void main() {
               ),
             ),
             ticketDao: updateMockDao,
+            importService: MockImportService(),
           );
 
           const updateSms = 'PNR NO. : T12345678, Conductor: 9876543210';
@@ -548,12 +583,14 @@ void main() {
             logger: logger,
             travelParser: MockTravelParserService(logger: logger),
             ticketDao: MockTicketDAO(),
+            importService: MockImportService(),
           );
 
           final processor2 = SharedContentProcessor(
             logger: logger,
             travelParser: MockTravelParserService(logger: logger),
             ticketDao: MockTicketDAO(),
+            importService: MockImportService(),
           );
 
           // Act (When) - Process concurrently with proper PNR format
