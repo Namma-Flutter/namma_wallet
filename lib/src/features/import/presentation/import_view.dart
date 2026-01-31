@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:ai_barcode_scanner/ai_barcode_scanner.dart';
 import 'package:cross_file/cross_file.dart';
@@ -51,7 +52,9 @@ class _ImportViewState extends State<ImportView> {
       if (!mounted) return;
 
       if (ticket != null) {
-        await NotificationService().scheduleTicketReminderFor(ticket);
+        if (Platform.isAndroid) {
+          await NotificationService().scheduleTicketReminderFor(ticket);
+        }
         if (mounted) {
           showSnackbar(
             context,
@@ -145,7 +148,9 @@ class _ImportViewState extends State<ImportView> {
         if (!mounted) return;
 
         if (ticket != null) {
-          await NotificationService().scheduleTicketReminderFor(ticket);
+          if (Platform.isAndroid) {
+            await NotificationService().scheduleTicketReminderFor(ticket);
+          }
           if (mounted) {
             showSnackbar(context, 'PDF ticket imported successfully!');
           }

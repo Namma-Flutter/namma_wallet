@@ -1,6 +1,7 @@
 // import 'dart:convert';
 
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -49,8 +50,9 @@ Future<void> main() async {
 
   /// Initialize notification service
   /// Store notification payload for later processing after app is initialized
-
-  await NotificationService().initialize();
+  if (Platform.isAndroid) {
+    await NotificationService().initialize();
+  }
 
   // Initialize pdfrx (required when using PDF engine APIs before widgets)
   // with error handling to prevent app crashes

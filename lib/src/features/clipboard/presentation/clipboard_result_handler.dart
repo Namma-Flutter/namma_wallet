@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:namma_wallet/src/common/services/push_notification/notification_service.dart';
@@ -31,7 +32,8 @@ class ClipboardResultHandler {
         : result.errorMessage ?? 'Unknown error occurred';
     if (result.ticket != null &&
         result.isSuccess &&
-        result.type == ClipboardContentType.travelTicket) {
+        result.type == ClipboardContentType.travelTicket &&
+        Platform.isAndroid) {
       unawaited(
         NotificationService().scheduleTicketReminderFor(result.ticket!),
       );
