@@ -52,14 +52,14 @@ class _ImportViewState extends State<ImportView> {
       if (!mounted) return;
 
       if (ticket != null) {
-        if (Platform.isAndroid) {
-          await NotificationService().scheduleTicketReminderFor(ticket);
-        }
         if (mounted) {
           showSnackbar(
             context,
             'QR ticket imported successfully!',
           );
+        }
+        if (Platform.isAndroid) {
+          await NotificationService().scheduleTicketReminderFor(ticket);
         }
       } else {
         showSnackbar(
@@ -148,11 +148,11 @@ class _ImportViewState extends State<ImportView> {
         if (!mounted) return;
 
         if (ticket != null) {
-          if (Platform.isAndroid) {
-            await NotificationService().scheduleTicketReminderFor(ticket);
-          }
           if (mounted) {
             showSnackbar(context, 'PDF ticket imported successfully!');
+          }
+          if (Platform.isAndroid) {
+            await NotificationService().scheduleTicketReminderFor(ticket);
           }
         } else {
           showSnackbar(

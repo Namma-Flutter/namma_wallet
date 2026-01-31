@@ -30,6 +30,12 @@ class ClipboardResultHandler {
             ClipboardContentType.invalid => 'Unknown content type',
           }
         : result.errorMessage ?? 'Unknown error occurred';
+
+    showSnackbar(
+      context,
+      message,
+      isError: !result.isSuccess,
+    );
     if (result.ticket != null &&
         result.isSuccess &&
         result.type == ClipboardContentType.travelTicket &&
@@ -38,11 +44,5 @@ class ClipboardResultHandler {
         NotificationService().scheduleTicketReminderFor(result.ticket!),
       );
     }
-
-    showSnackbar(
-      context,
-      message,
-      isError: !result.isSuccess,
-    );
   }
 }
