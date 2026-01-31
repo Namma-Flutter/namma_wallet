@@ -75,7 +75,7 @@ class NotificationService {
         if (rootNavigatorKey.currentContext != null) {
           rootNavigatorKey.currentContext?.goNamed(
             AppRoute.ticketView.name,
-            pathParameters: {'id': details.payload ?? ''},
+            pathParameters: {'id': details.payload ?? '0'},
           );
         }
       },
@@ -201,7 +201,6 @@ class NotificationService {
         details,
         payload: payload,
         androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
-        matchDateTimeComponents: DateTimeComponents.dateAndTime,
       );
     } on Exception catch (e, stackTrace) {
       if (_logger != null) {
@@ -248,7 +247,7 @@ class NotificationService {
         final safeBase = baseHash.abs() % maxBase;
         final notificationId = safeBase * 100 + i;
 
-        final payload = ticket.ticketId ?? '';
+        final payload = ticket.ticketId ?? '0';
 
         final formattedDateTime = _formatDateTimeForNotification(journeyTime);
         final bodyText = formattedDateTime.isNotEmpty
