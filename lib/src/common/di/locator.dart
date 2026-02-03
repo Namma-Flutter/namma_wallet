@@ -41,6 +41,8 @@ import 'package:namma_wallet/src/features/receive/domain/sharing_intent_service_
 import 'package:namma_wallet/src/features/settings/application/ai_service_status.dart';
 import 'package:namma_wallet/src/features/tnstc/application/ticket_parser_interface.dart';
 import 'package:namma_wallet/src/features/tnstc/application/tnstc_pdf_parser.dart';
+import 'package:namma_wallet/src/features/tnstc/application/tnstc_pnr_fetcher.dart';
+import 'package:namma_wallet/src/features/tnstc/application/tnstc_pnr_fetcher_interface.dart';
 import 'package:namma_wallet/src/features/tnstc/application/tnstc_sms_parser.dart';
 import 'package:namma_wallet/src/features/travel/application/pkpass_parser.dart';
 import 'package:namma_wallet/src/features/travel/application/pkpass_parser_interface.dart';
@@ -114,6 +116,9 @@ void setupLocator() {
         ticketDao: getIt<ITicketDAO>(),
       ),
     )
+    ..registerLazySingleton<ITNSTCPNRFetcher>(
+      () => TNSTCPNRFetcher(logger: getIt<ILogger>()),
+    )
     ..registerLazySingleton<IImportService>(
       () => ImportService(
         logger: getIt<ILogger>(),
@@ -122,6 +127,7 @@ void setupLocator() {
         qrParser: getIt<IIRCTCQRParser>(),
         irctcScannerService: getIt<IIRCTCScannerService>(),
         pkpassParser: getIt<IPKPassParser>(),
+        tnstcPnrFetcher: getIt<ITNSTCPNRFetcher>(),
         ticketDao: getIt<ITicketDAO>(),
       ),
     )

@@ -28,6 +28,12 @@ abstract interface class IImportService {
   /// Returns the parsed ticket if successful, null otherwise
   Future<Ticket?> importQRCode(String qrData);
 
+  /// Import TNSTC ticket using PNR number
+  ///
+  /// Fetches ticket details from TNSTC website and saves it.
+  /// Returns the parsed ticket if successful, null otherwise.
+  Future<Ticket?> importTNSTCByPNR(String pnr);
+
   /// Check if QR code data represents a supported ticket format
   bool isSupportedQRCode(String qrData);
 

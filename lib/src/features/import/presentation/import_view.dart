@@ -1,6 +1,5 @@
 import 'package:ai_barcode_scanner/ai_barcode_scanner.dart';
 import 'package:cross_file/cross_file.dart';
-import 'package:dotted_border/dotted_border.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -14,6 +13,7 @@ import 'package:namma_wallet/src/common/widgets/snackbar_widget.dart';
 import 'package:namma_wallet/src/features/clipboard/application/clipboard_service_interface.dart';
 import 'package:namma_wallet/src/features/clipboard/presentation/clipboard_result_handler.dart';
 import 'package:namma_wallet/src/features/import/application/import_service_interface.dart';
+import 'package:namma_wallet/src/features/import/presentation/widgets/import_method_card_widget.dart';
 
 class ImportView extends StatefulWidget {
   const ImportView({super.key});
@@ -25,10 +25,18 @@ class ImportView extends StatefulWidget {
 class _ImportViewState extends State<ImportView> {
   late final IImportService _importService = getIt<IImportService>();
   late final ILogger _logger = getIt<ILogger>();
+  final TextEditingController _pnrController = TextEditingController();
   bool _isPasting = false;
   bool _isScanning = false;
   bool _isProcessingPDF = false;
   bool _isOpeningScanner = false;
+  bool _isFetchingPNR = false;
+
+  @override
+  void dispose() {
+    _pnrController.dispose();
+    super.dispose();
+  }
 
   Future<void> _handleQRCodeScan(String qrData) async {
     if (_isScanning) return;
@@ -206,176 +214,163 @@ class _ImportViewState extends State<ImportView> {
     }
   }
 
+  Future<void> _handlePNRFetch() async {
+    if (_isFetchingPNR) return;
+
+    final pnr = _pnrController.text.trim();
+    if (pnr.isEmpty) {
+      showSnackbar(
+        context,
+        'Please enter a PNR number',
+        isError: true,
+      );
+      return;
+    }
+
+    setState(() {
+      _isFetchingPNR = true;
+    });
+
+    getIt<IHapticService>().triggerHaptic(
+      HapticType.selection,
+    );
+
+    try {
+      final ticket = await _importService.importTNSTCByPNR(pnr);
+
+      if (!mounted) return;
+
+      if (ticket != null) {
+        _pnrController.clear();
+        showSnackbar(
+          context,
+          'TNSTC ticket imported successfully!',
+        );
+      } else {
+        showSnackbar(
+          context,
+          'Unable to fetch ticket. Please check the PNR number.',
+          isError: true,
+        );
+      }
+    } on Exception catch (e) {
+      if (mounted) {
+        showSnackbar(
+          context,
+          'Error fetching ticket. Please try again.',
+          isError: true,
+        );
+      }
+      _logger.error('PNR fetch error: $e');
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isFetchingPNR = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _openQRScanner() async {
+    if (_isOpeningScanner) return;
+
+    setState(() => _isOpeningScanner = true);
+    try {
+      await context.pushNamed(
+        AppRoute.barcodeScanner.name,
+        extra: _onBarcodeCaptured,
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _isOpeningScanner = false);
+      }
+    }
+  }
+
+  Future<void> _showPNRDialog() async {
+    await showDialog<void>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Enter PNR Number'),
+        content: TextField(
+          controller: _pnrController,
+          decoration: const InputDecoration(
+            hintText: 'e.g., T76296906',
+          ),
+          autofocus: true,
+          textInputAction: TextInputAction.done,
+          onSubmitted: (_) async {
+            context.pop();
+            await _handlePNRFetch();
+          },
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => context.pop(),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () async {
+              context.pop();
+              await _handlePNRFetch();
+            },
+            child: _isFetchingPNR
+                ? const SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : const Text('Fetch'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final borderColor = Theme.of(context).colorScheme.primary;
-    final textColor =
-        Theme.of(context).textTheme.bodyLarge?.color ?? Colors.black;
-    final pickFileContainerWidth = MediaQuery.of(context).size.width > 500
-        ? 400.0
-        : MediaQuery.of(context).size.width - 80;
     return Scaffold(
+      appBar: AppBar(
+        title: const Text('Import Tickets'),
+        centerTitle: true,
+      ),
       body: SafeArea(
-        child: SizedBox(
-          width: double.maxFinite,
-          height: double.maxFinite,
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 30),
-                  child: Column(
-                    children: [
-                      SizedBox(
-                        height:
-                            MediaQuery.of(context).orientation ==
-                                Orientation.portrait
-                            ? 120
-                            : 40,
-                      ),
-                      InkWell(
-                        splashColor: Colors.transparent,
-                        onTap: _isProcessingPDF ? null : _handlePDFPick,
-                        child: SizedBox(
-                          height: pickFileContainerWidth,
-                          width: pickFileContainerWidth,
-                          child: DottedBorder(
-                            options: RoundedRectDottedBorderOptions(
-                              dashPattern: const [5, 12],
-                              strokeWidth: 8,
-                              padding: const EdgeInsets.all(16),
-                              radius: const Radius.circular(24),
-                              color: borderColor,
-                            ),
-                            child: Center(
-                              child: _isProcessingPDF
-                                  ? Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        CircularProgressIndicator(
-                                          color: borderColor,
-                                          strokeWidth: 3,
-                                        ),
-                                        const SizedBox(height: 10),
-                                        Text(
-                                          'Processing PDF...',
-                                          style: TextStyle(
-                                            color: textColor.withAlpha(180),
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                        ),
-                                      ],
-                                    )
-                                  : Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Icon(
-                                          Icons.upload_file,
-                                          size: 90,
-                                          color: textColor.withAlpha(180),
-                                        ),
-                                        const SizedBox(
-                                          height: 5,
-                                        ),
-                                        Text(
-                                          'Upload PDF Here',
-                                          style: TextStyle(
-                                            color: textColor.withAlpha(180),
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(
-                        height: 42,
-                      ),
-                      SizedBox(
-                        width: 141,
-                        height: 42,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 12,
-                            ),
-                            shape: const StadiumBorder(),
-                          ),
-                          onPressed: _isOpeningScanner
-                              ? null
-                              : () async {
-                                  setState(() {
-                                    _isOpeningScanner = true;
-                                  });
-                                  try {
-                                    await context.pushNamed(
-                                      AppRoute.barcodeScanner.name,
-                                      extra: _onBarcodeCaptured,
-                                    );
-                                  } finally {
-                                    if (mounted) {
-                                      setState(() {
-                                        _isOpeningScanner = false;
-                                      });
-                                    }
-                                  }
-                                },
-                          child: const Text(
-                            'Scan QR Code',
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      SizedBox(
-                        width: 141,
-                        height: 42,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Theme.of(
-                              context,
-                            ).colorScheme.secondary,
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 12,
-                            ),
-                            shape: const StadiumBorder(),
-                          ),
-                          onPressed: _isPasting ? null : _handleClipboardRead,
-                          child: _isPasting
-                              ? const SizedBox(
-                                  width: 16,
-                                  height: 16,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    color: Colors.white,
-                                  ),
-                                )
-                              : const Text(
-                                  'Read Clipboard',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: GridView.count(
+            crossAxisCount: 2,
+            mainAxisSpacing: 16,
+            crossAxisSpacing: 16,
+            children: [
+              ImportMethodCardWidget(
+                icon: Icons.upload_file,
+                title: 'Upload PDF',
+                subtitle: 'Import from file',
+                onTap: _handlePDFPick,
+                isLoading: _isProcessingPDF,
+              ),
+              ImportMethodCardWidget(
+                icon: Icons.qr_code_scanner,
+                title: 'Scan QR',
+                subtitle: 'IRCTC tickets',
+                onTap: _openQRScanner,
+                isLoading: _isOpeningScanner,
+              ),
+              ImportMethodCardWidget(
+                icon: Icons.content_paste,
+                title: 'Clipboard',
+                subtitle: 'Parse SMS text',
+                onTap: _handleClipboardRead,
+                isLoading: _isPasting,
+                backgroundColor: Theme.of(context).colorScheme.secondary,
+              ),
+              ImportMethodCardWidget(
+                icon: Icons.search,
+                title: 'TNSTC PNR',
+                subtitle: 'Fetch by number',
+                onTap: _showPNRDialog,
+              ),
+            ],
           ),
         ),
       ),
