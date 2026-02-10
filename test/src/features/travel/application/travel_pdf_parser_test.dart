@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:namma_wallet/src/features/tnstc/application/tnstc_pdf_parser.dart';
+import 'package:namma_wallet/src/features/tnstc/application/tnstc_layout_parser.dart';
 import 'package:namma_wallet/src/features/travel/application/travel_pdf_parser.dart';
 import '../../../../helpers/fake_logger.dart';
 
@@ -10,8 +10,8 @@ void main() {
 
     setUp(() {
       fakeLogger = FakeLogger();
-      // Using TNSTCPDFParser as it extends TravelPDFParser
-      parser = TNSTCPDFParser(logger: fakeLogger);
+      // Using TNSTCLayoutParser as it extends TravelPDFParser
+      parser = TNSTCLayoutParser(logger: fakeLogger);
     });
 
     group('extractMatch', () {

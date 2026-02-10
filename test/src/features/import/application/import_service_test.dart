@@ -1,10 +1,13 @@
 import 'dart:typed_data';
+import 'dart:ui';
+
 import 'package:cross_file/cross_file.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:namma_wallet/src/common/database/ticket_dao_interface.dart';
 import 'package:namma_wallet/src/common/domain/models/extras_model.dart';
 import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 import 'package:namma_wallet/src/common/enums/source_type.dart';
+import 'package:namma_wallet/src/common/services/ocr/ocr_block.dart';
 import 'package:namma_wallet/src/common/services/pdf/pdf_service_interface.dart';
 import 'package:namma_wallet/src/features/import/application/import_service.dart';
 import 'package:namma_wallet/src/features/irctc/application/irctc_qr_parser_interface.dart';
@@ -18,15 +21,56 @@ import '../../../../helpers/fake_logger.dart';
 
 class FakePDFService implements IPDFService {
   String? extractedText;
+  List<OCRBlock>? extractedBlocks;
 
   @override
-  Future<String> extractTextFrom(XFile file) async {
+  Future<String> extractTextForDisplay(XFile file) async {
     return extractedText ?? '';
+  }
+
+  @override
+  Future<String> extractTextFrom(XFile file) => extractTextForDisplay(file);
+
+  @override
+  Future<List<OCRBlock>> extractBlocks(XFile file) async {
+    // If blocks are provided, return them
+    if (extractedBlocks != null) return extractedBlocks!;
+
+    // Otherwise, convert text to pseudo-blocks
+    final text = extractedText ?? '';
+    final lines = text.split('\n');
+    final blocks = <OCRBlock>[];
+
+    for (final (i, line) in lines.indexed) {
+      if (line.trim().isEmpty) continue;
+      blocks.add(
+        OCRBlock(
+          text: line.trim(),
+          boundingBox: Rect.fromLTWH(0, i.toDouble() * 20, 100, 20),
+          page: 0,
+        ),
+      );
+    }
+
+    return blocks;
+  }
+
+  @override
+  Future<Map<String, dynamic>> extractStructuredData(XFile file) async {
+    return {};
   }
 }
 
 class FakeTravelParser implements ITravelParser {
   Ticket? parsedTicket;
+
+  @override
+  Ticket? parseTicketFromBlocks(
+    List<OCRBlock> blocks, {
+    SourceType? sourceType,
+  }) {
+    return parsedTicket;
+  }
 
   @override
   Ticket? parseTicketFromText(String text, {SourceType? sourceType}) {

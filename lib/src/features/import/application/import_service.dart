@@ -51,17 +51,17 @@ class ImportService implements IImportService {
       final filename = pdfFile.name;
       _logger.info('Importing PDF file: $filename');
 
-      // Extract text from PDF
-      final extractedText = await _pdfService.extractTextFrom(pdfFile);
+      // Extract OCR blocks with geometry from PDF
+      final extractedBlocks = await _pdfService.extractBlocks(pdfFile);
 
-      if (extractedText.trim().isEmpty) {
+      if (extractedBlocks.isEmpty) {
         _logger.warning('No text extracted from PDF: $filename');
         return null;
       }
 
-      // Parse the extracted text as a travel ticket
-      final parsedTicket = _travelParser.parseTicketFromText(
-        extractedText,
+      // Parse using OCR blocks (preserves geometry for layout extraction)
+      final parsedTicket = _travelParser.parseTicketFromBlocks(
+        extractedBlocks,
         sourceType: SourceType.pdf,
       );
 

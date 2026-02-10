@@ -1,19 +1,31 @@
 import 'dart:convert';
+import 'dart:ui';
 
 import 'package:namma_wallet/src/common/domain/models/extras_model.dart';
 import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 import 'package:namma_wallet/src/common/enums/source_type.dart';
 import 'package:namma_wallet/src/common/enums/ticket_type.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
+import 'package:namma_wallet/src/common/services/ocr/layout_extractor.dart';
+import 'package:namma_wallet/src/common/services/ocr/ocr_block.dart';
 import 'package:namma_wallet/src/features/irctc/application/irctc_pdf_parser.dart';
 import 'package:namma_wallet/src/features/irctc/application/irctc_sms_parser.dart';
-import 'package:namma_wallet/src/features/tnstc/application/tnstc_pdf_parser.dart';
+import 'package:namma_wallet/src/features/tnstc/application/tnstc_layout_parser.dart';
 import 'package:namma_wallet/src/features/tnstc/application/tnstc_sms_parser.dart';
 import 'package:namma_wallet/src/features/travel/application/travel_parser_interface.dart';
 
 abstract class TravelTicketParser {
   bool canParse(String text);
 
+  /// Parse ticket from OCR blocks (preferred for PDFs)
+  Ticket parseTicketFromBlocks(List<OCRBlock> blocks) {
+    // Default implementation: convert blocks to text and use text parser
+    final extractor = LayoutExtractor(blocks);
+    final text = extractor.toPlainText();
+    return parseTicket(text);
+  }
+
+  /// Parse ticket from plain text (for SMS or legacy support)
   Ticket parseTicket(String text);
 
   bool isSMSFormat(String text);
@@ -93,6 +105,13 @@ class TNSTCBusParser implements TravelTicketParser {
   }
 
   @override
+  Ticket parseTicketFromBlocks(List<OCRBlock> blocks) {
+    // Use layout parser for PDFs (with geometry)
+    final layoutParser = TNSTCLayoutParser(logger: _logger);
+    return layoutParser.parseTicketFromBlocks(blocks);
+  }
+
+  @override
   Ticket parseTicket(String text) {
     // Detect if this is SMS or PDF format
     final isSMS = isSMSFormat(text);
@@ -102,9 +121,36 @@ class TNSTCBusParser implements TravelTicketParser {
       final smsParser = TNSTCSMSParser();
       return smsParser.parseTicket(text);
     } else {
-      final pdfParser = TNSTCPDFParser(logger: _logger);
-      return pdfParser.parseTicket(text);
+      // For plain text (no geometry), convert to pseudo-blocks
+      // This happens when parsing from clipboard or SMS
+      final layoutParser = TNSTCLayoutParser(logger: _logger);
+      final pseudoBlocks = _convertTextToBlocks(text);
+      return layoutParser.parseTicketFromBlocks(pseudoBlocks);
     }
+  }
+
+  /// Converts plain text to pseudo-blocks for layout parsing
+  List<OCRBlock> _convertTextToBlocks(String text) {
+    final lines = text.split('\n');
+    final blocks = <OCRBlock>[];
+
+    for (final (i, line) in lines.indexed) {
+      if (line.trim().isEmpty) continue;
+      blocks.add(
+        OCRBlock(
+          text: line.trim(),
+          boundingBox: Rect.fromLTWH(
+            0,
+            i.toDouble() * 20,
+            100,
+            20,
+          ),
+          page: 0,
+        ),
+      );
+    }
+
+    return blocks;
   }
 
   @override
@@ -184,7 +230,7 @@ class TNSTCBusParser implements TravelTicketParser {
   }
 }
 
-class IRCTCTrainParser implements TravelTicketParser {
+class IRCTCTrainParser extends TravelTicketParser {
   IRCTCTrainParser({required ILogger logger}) : _logger = logger;
   final ILogger _logger;
 
@@ -260,7 +306,7 @@ class IRCTCTrainParser implements TravelTicketParser {
   TicketUpdateInfo? parseUpdate(String text) => null;
 }
 
-class SETCBusParser implements TravelTicketParser {
+class SETCBusParser extends TravelTicketParser {
   @override
   String get providerName => 'SETC';
 
@@ -328,6 +374,78 @@ class TravelParserService implements ITravelParser {
       }
     }
     return null;
+  }
+
+  @override
+  Ticket? parseTicketFromBlocks(
+    List<OCRBlock> blocks, {
+    SourceType? sourceType,
+  }) {
+    try {
+      // Convert blocks to text for canParse check
+      final extractor = LayoutExtractor(blocks);
+      final text = extractor.toPlainText();
+
+      for (final parser in _parsers) {
+        if (parser.canParse(text)) {
+          // Log metadata only (no PII)
+          _logger
+            ..debug(
+              '[TravelParserService] Parsing with ${parser.providerName} '
+              'using ${blocks.length} OCR blocks',
+            )
+            ..info(
+              '[TravelParserService] Attempting to parse with '
+              '${parser.providerName} parser (layout-based)',
+            );
+
+          final ticket = parser.parseTicketFromBlocks(blocks);
+
+          _logger.info(
+            '[TravelParserService] Successfully parsed ticket with '
+            '${parser.providerName} (layout-based)',
+          );
+
+          if (sourceType != null) {
+            // Check if Source Type already exists
+            final hasSourceType =
+                ticket.extras?.any(
+                  (e) => e.title == 'Source Type',
+                ) ??
+                false;
+
+            if (!hasSourceType) {
+              return ticket.copyWith(
+                extras: [
+                  ...?ticket.extras,
+                  ExtrasModel(title: 'Source Type', value: sourceType.name),
+                ],
+              );
+            }
+          }
+          return ticket;
+        }
+      }
+
+      _logger.warning(
+        '[TravelParserService] No parser could handle the OCR blocks',
+      );
+      return null;
+    } on FormatException catch (e, stackTrace) {
+      _logger.error(
+        '[TravelParserService] Format error during ticket parsing',
+        e,
+        stackTrace,
+      );
+      return null;
+    } on Exception catch (e, stackTrace) {
+      _logger.error(
+        '[TravelParserService] Unexpected error during ticket parsing',
+        e,
+        stackTrace,
+      );
+      return null;
+    }
   }
 
   @override
