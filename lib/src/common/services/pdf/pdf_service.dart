@@ -74,9 +74,6 @@ class PDFService implements IPDFService {
             'PDF has ${document.pages.count} pages. Trying OCR fallback...',
           );
 
-          // Dispose Syncfusion document before trying OCR
-          document.dispose();
-
           // Try OCR as fallback for image-based PDFs
           try {
             rawText = await _ocrService.extractTextFromPDF(pdf);
@@ -94,9 +91,6 @@ class PDFService implements IPDFService {
               'Failed to extract text from PDF: OCR fallback failed',
             );
           }
-        } else {
-          // Dispose the document if we got text from Syncfusion
-          document.dispose();
         }
 
         // Log text metadata only (no PII)
@@ -153,9 +147,6 @@ class PDFService implements IPDFService {
             '[PDFService] No text layer found, using OCR for block extraction',
           );
 
-          // Dispose Syncfusion document before OCR
-          document.dispose();
-
           // Use OCR to get blocks with geometry
           try {
             final blocks = await _ocrService.extractBlocksFromPDF(pdf);
@@ -176,9 +167,6 @@ class PDFService implements IPDFService {
         }
 
         // Text layer exists - create pseudo-blocks from text lines
-        // Note: Syncfusion doesn't provide bounding boxes, so we create
-        // synthetic blocks. For true geometry, OCR is more accurate.
-        document.dispose();
 
         final lines = rawText.split('\n');
         final extractedBlocks = <OCRBlock>[];
