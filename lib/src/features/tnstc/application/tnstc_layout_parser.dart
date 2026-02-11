@@ -1,3 +1,4 @@
+import 'package:meta/meta.dart';
 import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 import 'package:namma_wallet/src/common/services/ocr/layout_extractor.dart';
 import 'package:namma_wallet/src/common/services/ocr/ocr_block.dart';
@@ -273,19 +274,32 @@ class TNSTCLayoutParser extends TravelPDFParser {
     return passengers;
   }
 
+  @visibleForTesting
+  String? formatTimeForTesting(String? timeStr) => _formatTime(timeStr);
+
   /// Converts 24-hour time format to 12-hour format with AM/PM.
   /// Examples: "13:15" → "01:15 PM", "09:30" → "09:30 AM"
   String? _formatTime(String? timeStr) {
-    if (timeStr == null || timeStr.isEmpty) return null;
+    if (timeStr == null || timeStr.trim().isEmpty) return null;
 
     // Try to parse time in HH:MM format (24-hour)
-    final timePattern = RegExp(r'(\d{1,2}):(\d{2})');
-    final match = timePattern.firstMatch(timeStr);
+    // Using ^ and $ to ensure the entire string matches the time format.
+    final timePattern = RegExp(r'^(\d{1,2}):(\d{2})$');
+    final match = timePattern.firstMatch(timeStr.trim());
 
-    if (match == null) return timeStr; // Return as-is if not parseable
+    if (match == null) return null;
 
-    final hour = int.tryParse(match.group(1) ?? '0') ?? 0;
-    final minute = match.group(2) ?? '00';
+    final hourStr = match.group(1);
+    final minuteStr = match.group(2);
+
+    if (hourStr == null || minuteStr == null) return null;
+
+    final hour = int.tryParse(hourStr);
+    if (hour == null || hour < 0 || hour > 23) return null;
+
+    // minuteStr should be numeric and two digits per regex
+    final minute = int.tryParse(minuteStr);
+    if (minute == null || minute < 0 || minute > 59) return null;
 
     // Convert to 12-hour format
     String period;
@@ -305,7 +319,7 @@ class TNSTCLayoutParser extends TravelPDFParser {
       period = 'PM';
     }
 
-    return '${displayHour.toString().padLeft(2, '0')}:$minute $period';
+    return '${displayHour.toString().padLeft(2, '0')}:$minuteStr $period';
   }
 
   /// Helper to convert empty strings to null
