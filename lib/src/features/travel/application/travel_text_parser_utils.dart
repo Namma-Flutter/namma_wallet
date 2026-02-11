@@ -11,9 +11,10 @@ class TravelTextParserUtils {
   /// This is a common utility for parsing structured text data.
   static String extractMatch(
     String pattern,
-    String input, {
+    String? input, {
     int groupIndex = 1,
   }) {
+    if (input == null || input.isEmpty) return '';
     final regex = RegExp(pattern, multiLine: true, caseSensitive: false);
     final match = regex.firstMatch(input);
 
@@ -29,9 +30,9 @@ class TravelTextParserUtils {
   ///
   /// Returns the parsed [DateTime] or null if parsing fails.
   /// Logs warnings for invalid date formats.
-  static DateTime? parseDate(String date, {required ILogger logger}) {
-    if (date.isEmpty) {
-      logger.warning('Empty date string provided');
+  static DateTime? parseDate(String? date, {required ILogger logger}) {
+    if (date == null || date.isEmpty) {
+      if (date != null) logger.warning('Empty date string provided');
       return null;
     }
 
@@ -76,9 +77,9 @@ class TravelTextParserUtils {
   ///
   /// Returns the parsed [DateTime] or null if parsing fails.
   /// Logs warnings for invalid datetime formats.
-  static DateTime? parseDateTime(String dateTime, {required ILogger logger}) {
-    if (dateTime.isEmpty) {
-      logger.warning('Empty datetime string provided');
+  static DateTime? parseDateTime(String? dateTime, {required ILogger logger}) {
+    if (dateTime == null || dateTime.isEmpty) {
+      if (dateTime != null) logger.warning('Empty datetime string provided');
       return null;
     }
 
@@ -123,16 +124,16 @@ class TravelTextParserUtils {
   /// Safely parses an integer from a string.
   ///
   /// Returns the parsed integer or [defaultValue] if parsing fails.
-  static int parseInt(String value, {int defaultValue = 0}) {
-    if (value.isEmpty) return defaultValue;
+  static int parseInt(String? value, {int defaultValue = 0}) {
+    if (value == null || value.isEmpty) return defaultValue;
     return int.tryParse(value) ?? defaultValue;
   }
 
   /// Safely parses a double from a string.
   ///
   /// Returns the parsed double or [defaultValue] if parsing fails.
-  static double parseDouble(String value, {double defaultValue = 0.0}) {
-    if (value.isEmpty) return defaultValue;
+  static double parseDouble(String? value, {double defaultValue = 0.0}) {
+    if (value == null || value.isEmpty) return defaultValue;
     return double.tryParse(value) ?? defaultValue;
   }
 }

@@ -19,7 +19,7 @@ abstract class TravelPDFParser implements ITicketParser {
   ///
   /// Returns the matched group (default: group 1) or empty string if no match.
   /// Uses shared utility for consistency across all parsers.
-  String extractMatch(String pattern, String input, {int groupIndex = 1}) {
+  String extractMatch(String pattern, String? input, {int groupIndex = 1}) {
     return TravelTextParserUtils.extractMatch(
       pattern,
       input,
@@ -31,7 +31,7 @@ abstract class TravelPDFParser implements ITicketParser {
   ///
   /// Returns the parsed [DateTime] or null if parsing fails.
   /// Uses shared utility for consistency across all parsers.
-  DateTime? parseDate(String date) {
+  DateTime? parseDate(String? date) {
     return TravelTextParserUtils.parseDate(date, logger: logger);
   }
 
@@ -39,7 +39,7 @@ abstract class TravelPDFParser implements ITicketParser {
   ///
   /// Returns the parsed [DateTime] or null if parsing fails.
   /// Uses shared utility for consistency across all parsers.
-  DateTime? parseDateTime(String dateTime) {
+  DateTime? parseDateTime(String? dateTime) {
     return TravelTextParserUtils.parseDateTime(dateTime, logger: logger);
   }
 
@@ -47,7 +47,7 @@ abstract class TravelPDFParser implements ITicketParser {
   ///
   /// Returns the parsed integer or [defaultValue] if parsing fails.
   /// Uses shared utility for consistency across all parsers.
-  int parseInt(String value, {int defaultValue = 0}) {
+  int parseInt(String? value, {int defaultValue = 0}) {
     return TravelTextParserUtils.parseInt(value, defaultValue: defaultValue);
   }
 
@@ -55,7 +55,7 @@ abstract class TravelPDFParser implements ITicketParser {
   ///
   /// Returns the parsed double or [defaultValue] if parsing fails.
   /// Uses shared utility for consistency across all parsers.
-  double parseDouble(String value, {double defaultValue = 0.0}) {
+  double parseDouble(String? value, {double defaultValue = 0.0}) {
     return TravelTextParserUtils.parseDouble(value, defaultValue: defaultValue);
   }
 }

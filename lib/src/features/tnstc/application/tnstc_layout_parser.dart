@@ -34,7 +34,7 @@ class TNSTCLayoutParser extends TravelPDFParser {
         .toUpperCase();
 
     final journeyDateStr = extractor.findValueForKey('Date of Journey');
-    final journeyDate = parseDate(journeyDateStr ?? '');
+    final journeyDate = parseDate(journeyDateStr);
 
     final routeNo = nullIfEmpty(extractor.findValueForKey('Route No'));
 
@@ -64,7 +64,7 @@ class TNSTCLayoutParser extends TravelPDFParser {
     final passengerPickupTimeStr = extractor.findValueForKey(
       'Passenger Pickup Time',
     );
-    final passengerPickupTime = parseDateTime(passengerPickupTimeStr ?? '');
+    final passengerPickupTime = parseDateTime(passengerPickupTimeStr);
 
     final platformNumber = nullIfEmpty(
       extractor.findValueForKey('Platform Number'),
