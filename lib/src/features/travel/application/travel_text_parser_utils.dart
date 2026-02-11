@@ -66,7 +66,7 @@ class TravelTextParserUtils {
         return null;
       }
 
-      return DateTime(year, month, day);
+      return DateTime.utc(year, month, day);
     } on FormatException catch (e) {
       logger.warning('Failed to parse date: $e');
       return null;

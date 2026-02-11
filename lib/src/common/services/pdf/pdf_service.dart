@@ -111,7 +111,6 @@ class PDFService implements IPDFService {
         return cleanedText;
       } finally {
         // Ensure document is disposed even if an exception occurs
-        // Note: document.dispose() is safe to call multiple times
         document.dispose();
       }
     } on Object catch (e, stackTrace) {
@@ -200,6 +199,8 @@ class PDFService implements IPDFService {
   /// Extracts structured data from a PDF file using layout analysis.
   ///
   /// NOTE: This implementation is currently optimized for TNSTC-style documents.
+  // TODO(harish): Consider accepting field-mapping configuration or delegating
+  // to type-specific extractors as more ticket types are added.
   @override
   Future<Map<String, dynamic>> extractStructuredData(XFile pdf) async {
     try {

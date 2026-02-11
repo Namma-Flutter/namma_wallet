@@ -205,6 +205,12 @@ class TNSTCBusParser extends TravelTicketParser {
   }
 }
 
+/// IRCTC train ticket parser.
+///
+/// Currently uses text-based parsing for both SMS and PDF formats.
+// TODO(harish): Consider implementing geometry-aware extraction (similar to
+// TNSTCLayoutParser) for IRCTC PDFs in a future iteration to better handle
+// complex layouts and improve extraction accuracy.
 class IRCTCTrainParser extends TravelTicketParser {
   IRCTCTrainParser({required ILogger logger}) : _logger = logger;
   final ILogger _logger;
@@ -281,6 +287,11 @@ class IRCTCTrainParser extends TravelTicketParser {
   TicketUpdateInfo? parseUpdate(String text) => null;
 }
 
+/// SETC bus ticket parser.
+///
+/// SETC tickets use the same SMS format as TNSTC, so this parser delegates
+/// to TNSTCSMSParser. Geometry-aware PDF parsing is intentionally not
+/// implemented as SETC tickets are currently only received via SMS.
 class SETCBusParser extends TravelTicketParser {
   @override
   String get providerName => 'SETC';
@@ -364,13 +375,18 @@ class TravelParserService implements ITravelParser {
             );
 
           final ticket = parser.parseTicketFromBlocks(blocks);
+          final augmentedTicket = _augmentTicket(
+            ticket,
+            parser.providerName,
+            sourceType,
+          );
 
           _logger.info(
             '[TravelParserService] Successfully parsed ticket with '
             '${parser.providerName} (layout-based)',
           );
 
-          return _augmentTicket(ticket, parser.providerName, sourceType);
+          return augmentedTicket;
         }
       }
 
@@ -385,7 +401,7 @@ class TravelParserService implements ITravelParser {
         stackTrace,
       );
       return null;
-    } on Object catch (e, stackTrace) {
+    } on Exception catch (e, stackTrace) {
       _logger.error(
         '[TravelParserService] Unexpected error during ticket parsing',
         e,
@@ -417,13 +433,18 @@ class TravelParserService implements ITravelParser {
             );
 
           final ticket = parser.parseTicket(text);
+          final augmentedTicket = _augmentTicket(
+            ticket,
+            parser.providerName,
+            sourceType,
+          );
 
           _logger.info(
             '[TravelParserService] Successfully parsed ticket with '
             '${parser.providerName}',
           );
 
-          return _augmentTicket(ticket, parser.providerName, sourceType);
+          return augmentedTicket;
         }
       }
 
@@ -438,7 +459,7 @@ class TravelParserService implements ITravelParser {
         stackTrace,
       );
       return null;
-    } on Object catch (e, stackTrace) {
+    } on Exception catch (e, stackTrace) {
       _logger.error(
         '[TravelParserService] Unexpected error during ticket parsing',
         e,

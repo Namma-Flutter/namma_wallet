@@ -325,15 +325,17 @@ class IRCTCPDFParser implements ITicketParser {
 
           if (month == null || year == null) {
             return null;
-          } else {
-            return DateTime.utc(
-              year,
-              month,
-              int.parse(dateParts[0]),
-              int.parse(timeParts[0]),
-              int.parse(timeParts[1]),
-            );
           }
+
+          final day = int.tryParse(dateParts[0]);
+          final hour = int.tryParse(timeParts[0]);
+          final minute = int.tryParse(timeParts[1]);
+
+          if (day == null || hour == null || minute == null) {
+            return null;
+          }
+
+          return DateTime.utc(year, month, day, hour, minute);
         }
       } on Exception catch (e, stackTree) {
         _logger.error(

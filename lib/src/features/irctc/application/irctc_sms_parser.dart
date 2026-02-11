@@ -70,7 +70,7 @@ class IRCTCSMSParser implements ITicketParser {
 
     final isUpdate = isUpdateMessage(smsText);
 
-    String? pnr = extract(r'PNR(?:[\s\S]{0,10}?)\b([A-Z0-9]{3,15})\b');
+    var pnr = extract(r'PNR(?:[\s\S]{0,10}?)\b([A-Z0-9]{3,15})\b');
     if (pnr.isEmpty) {
       for (final m in RegExp(r'\b([0-9]{10})\b').allMatches(rawText)) {
         final start = m.start;
@@ -90,7 +90,7 @@ class IRCTCSMSParser implements ITicketParser {
       }
     }
 
-    if (pnr == null || pnr.isEmpty) {
+    if (pnr.isEmpty) {
       throw const FormatException('IRCTC SMS parse failed: PNR not found');
     }
 

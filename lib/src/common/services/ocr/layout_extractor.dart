@@ -185,6 +185,10 @@ class LayoutExtractor {
         final valuePart = candidateText.substring(colonIndex + 1).trim();
 
         // Check if this looks like a field label
+        // NOTE: The two-word key-part heuristic may over-classify values as
+        // field labels for some document types. Works well for TNSTC tickets
+        // where multi-word values rarely contain colons, but may need
+        // refinement for other formats.
         final looksLikeFieldLabel =
             keyPart.split(' ').length >= 2 ||
             _fieldLabelKeywords.any(
