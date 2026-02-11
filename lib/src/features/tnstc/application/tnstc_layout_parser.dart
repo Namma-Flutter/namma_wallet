@@ -7,9 +7,8 @@ import 'package:namma_wallet/src/features/travel/application/travel_pdf_parser.d
 
 /// TNSTC parser using layout-based extraction (geometry + OCR blocks).
 ///
-/// This approach is more reliable than regex-only parsing because it uses
-/// spatial relationships to map keys to values. Falls back to plain text
-/// regex matching when layout extraction fails.
+/// This approach uses spatial relationships to map keys to values.
+/// For plain text inputs, pseudo-blocks are created to reuse this logic.
 ///
 /// Usage:
 /// ```dart
@@ -186,10 +185,7 @@ class TNSTCLayoutParser extends TravelPDFParser {
       endPattern: 'Total Fare',
     );
 
-    if (tableBlocks.isEmpty) {
-      // Fallback to plain text regex (for backward compatibility)
-      return _extractPassengersFromPlainText(extractor.toPlainText());
-    }
+    if (tableBlocks.isEmpty) return passengers;
 
     // Group blocks by row (blocks with similar Y coordinates)
     final rows = <List<OCRBlock>>[];
@@ -248,32 +244,6 @@ class TNSTCLayoutParser extends TravelPDFParser {
     return passengers;
   }
 
-  /// Fallback: Extract passengers using regex from plain text.
-  List<PassengerInfo> _extractPassengersFromPlainText(String text) {
-    final passengers = <PassengerInfo>[];
-
-    // Try table format first
-    final passengerPattern = RegExp(
-      r"([A-Za-z](?:[A-Za-z\s\-'])*[A-Za-z])\s+(\d+)\s+(Adult|Child)\s+(M|F)\s+([A-Z0-9]+)",
-      multiLine: true,
-    );
-    final matches = passengerPattern.allMatches(text);
-
-    for (final match in matches) {
-      passengers.add(
-        PassengerInfo(
-          name: match.group(1) ?? '',
-          age: int.tryParse(match.group(2) ?? ''),
-          type: match.group(3),
-          gender: match.group(4),
-          seatNumber: match.group(5),
-        ),
-      );
-    }
-
-    return passengers;
-  }
-
   @visibleForTesting
   String? formatTimeForTesting(String? timeStr) => _formatTime(timeStr);
 
@@ -326,14 +296,11 @@ class TNSTCLayoutParser extends TravelPDFParser {
   String? nullIfEmpty(String? value) =>
       value == null || value.isEmpty ? null : value;
 
-  /// Legacy method for backward compatibility (uses plain text regex).
   @override
   Ticket parseTicket(String pdfText) {
-    // This is the old regex-based approach - kept for backward compatibility
-    // when only plain text is available (no OCR blocks).
-    // For new code, prefer parseTicketFromBlocks().
-    throw UnimplementedError(
-      'Use parseTicketFromBlocks() with OCR blocks instead',
-    );
+    // Convert plain text to pseudo-blocks for layout parsing.
+    // This allows us to reuse the same parsing logic for both PDF and text.
+    final pseudoBlocks = OCRBlock.fromPlainText(pdfText);
+    return parseTicketFromBlocks(pseudoBlocks);
   }
 }

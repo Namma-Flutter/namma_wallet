@@ -151,21 +151,39 @@ class Ticket with TicketMappable {
         model.serviceStartTime != null &&
         model.serviceStartTime!.isNotNullOrEmpty) {
       try {
-        // serviceStartTime format is usually "HH:mm"
-        final timeParts = model.serviceStartTime!.split(':');
+        // serviceStartTime format is HH:mm or HH:mm AM/PM
+        final timeParts = model.serviceStartTime!.trim().split(':');
         if (timeParts.length == 2) {
-          final hour = int.parse(timeParts[0]);
-          final minute = int.parse(timeParts[1]);
+          final hourPart = timeParts[0];
+          final minuteAndPeriod = timeParts[1].toLowerCase();
 
-          // Validate hour and minute ranges
-          if (hour >= 0 && hour < 24 && minute >= 0 && minute < 60) {
-            startTime = DateTime(
-              model.journeyDate!.year,
-              model.journeyDate!.month,
-              model.journeyDate!.day,
-              hour,
-              minute,
-            );
+          var hour = int.tryParse(hourPart);
+          // minuteAndPeriod might be "15 pm" or "15"
+          final minuteMatch = RegExp(r'^(\d{2})').firstMatch(minuteAndPeriod);
+          final minute = minuteMatch != null
+              ? int.tryParse(minuteMatch.group(1)!)
+              : null;
+
+          if (hour != null && minute != null) {
+            final isPm = minuteAndPeriod.contains('pm');
+            final isAm = minuteAndPeriod.contains('am');
+
+            if (isPm && hour < 12) {
+              hour += 12;
+            } else if (isAm && hour == 12) {
+              hour = 0;
+            }
+
+            // Validate hour and minute ranges
+            if (hour >= 0 && hour < 24 && minute >= 0 && minute < 60) {
+              startTime = DateTime(
+                model.journeyDate!.year,
+                model.journeyDate!.month,
+                model.journeyDate!.day,
+                hour,
+                minute,
+              );
+            }
           }
         }
       } on FormatException catch (e) {

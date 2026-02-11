@@ -1,4 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:get_it/get_it.dart';
+import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
 import 'package:namma_wallet/src/features/tnstc/application/tnstc_layout_parser.dart';
 import '../../../../helpers/fake_logger.dart';
 
@@ -6,11 +8,17 @@ void main() {
   group('TNSTCLayoutParser', () {
     late TNSTCLayoutParser parser;
     late FakeLogger fakeLogger;
+    final getIt = GetIt.instance;
 
     setUp(() {
       fakeLogger = FakeLogger();
+      if (!getIt.isRegistered<ILogger>()) {
+        getIt.registerSingleton<ILogger>(fakeLogger);
+      }
       parser = TNSTCLayoutParser(logger: fakeLogger);
     });
+
+    tearDown(getIt.reset);
 
     group('_formatTime', () {
       test('should return null for null or empty input', () {
@@ -60,6 +68,26 @@ void main() {
       test('should handle single-digit hours correctly', () {
         expect(parser.formatTimeForTesting('5:30'), '05:30 AM');
         expect(parser.formatTimeForTesting(' 5:30 '), '05:30 AM');
+      });
+    });
+
+    group('parseTicket', () {
+      test('should parse ticket from plain text using pseudo-blocks', () {
+        const plainText = '''
+PNR Number : T12345678
+Date of Journey : 25/10/2023
+Service Start Time : 13:15
+''';
+        final ticket = parser.parseTicket(plainText);
+
+        expect(ticket.ticketId, 'T12345678');
+        expect(ticket.startTime, isNotNull);
+        // Date part: 2023-10-25, Time part: 13:15
+        expect(ticket.startTime?.year, 2023);
+        expect(ticket.startTime?.month, 10);
+        expect(ticket.startTime?.day, 25);
+        expect(ticket.startTime?.hour, 13);
+        expect(ticket.startTime?.minute, 15);
       });
     });
   });

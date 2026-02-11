@@ -120,17 +120,11 @@ class TNSTCBusParser implements TravelTicketParser {
       final smsParser = TNSTCSMSParser();
       return smsParser.parseTicket(text);
     } else {
-      // For plain text (no geometry), convert to pseudo-blocks
-      // This happens when parsing from clipboard or SMS
+      // Use the layout parser via pseudo-blocks for plain text.
+      // This ensures consistent parsing logic regardless of input source.
       final layoutParser = TNSTCLayoutParser(logger: _logger);
-      final pseudoBlocks = _convertTextToBlocks(text);
-      return layoutParser.parseTicketFromBlocks(pseudoBlocks);
+      return layoutParser.parseTicket(text);
     }
-  }
-
-  /// Converts plain text to pseudo-blocks for layout parsing
-  List<OCRBlock> _convertTextToBlocks(String text) {
-    return OCRBlock.fromPlainText(text);
   }
 
   @override
