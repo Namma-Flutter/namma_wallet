@@ -34,16 +34,19 @@ class OCRBlock {
   /// Returns true if this block is approximately on the same horizontal line
   /// as [other], within the given [tolerance] (in pixels).
   bool isSameRowAs(OCRBlock other, {double tolerance = 8.0}) {
+    if (page != other.page) return false;
     return (centerY - other.centerY).abs() < tolerance;
   }
 
   /// Returns true if this block is to the right of [other]
   bool isRightOf(OCRBlock other) {
+    if (page != other.page) return false;
     return boundingBox.left > other.boundingBox.right;
   }
 
   /// Returns true if this block is below [other]
   bool isBelow(OCRBlock other) {
+    if (page != other.page) return false;
     return boundingBox.top > other.boundingBox.bottom;
   }
 
