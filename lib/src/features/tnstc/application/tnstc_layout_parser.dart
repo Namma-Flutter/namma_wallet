@@ -18,6 +18,13 @@ import 'package:namma_wallet/src/features/travel/application/travel_pdf_parser.d
 class TNSTCLayoutParser extends TravelPDFParser {
   TNSTCLayoutParser({required super.logger});
 
+  /// Maximum length for a corporation name to be considered valid.
+  ///
+  /// This helps filter out OCR noise or misread headers that aren't actually
+  /// corporation names (e.g., long legal disclaimers).
+  /// Future improvements could use a lookup of known names or regex validation.
+  static const int corporationMaxLength = 20;
+
   /// Parses TNSTC ticket from OCR blocks (with geometry).
   Ticket parseTicketFromBlocks(List<OCRBlock> blocks) {
     final extractor = LayoutExtractor(blocks);
@@ -122,8 +129,9 @@ class TNSTCLayoutParser extends TravelPDFParser {
           .replaceAll(RegExp(r'[-\s]+$'), '') // Remove trailing dashes/spaces
           .trim();
 
-      // If nothing meaningful left, set to null to trigger fallback
-      if (corporation.isEmpty || corporation.length > 20) {
+      // If nothing meaningful left or exceeds max length,
+      // set to null to trigger fallback
+      if (corporation.isEmpty || corporation.length > corporationMaxLength) {
         corporation = null;
       }
     }
