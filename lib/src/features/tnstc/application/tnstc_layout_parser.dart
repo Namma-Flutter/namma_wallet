@@ -187,12 +187,19 @@ class TNSTCLayoutParser extends TravelPDFParser {
 
     if (tableBlocks.isEmpty) return passengers;
 
+    // Calculate dynamic Y-tolerance based on average block height.
+    // This makes grouping resilient to different PDF resolutions.
+    final avgHeight =
+        tableBlocks.map((b) => b.boundingBox.height).reduce((a, b) => a + b) /
+        tableBlocks.length;
+    final rowTolerance = avgHeight > 0 ? avgHeight * 0.5 : 10.0;
+
     // Group blocks by row (blocks with similar Y coordinates)
     final rows = <List<OCRBlock>>[];
     for (final block in tableBlocks) {
       // Find existing row with similar Y coordinate
       final existingRow = rows.firstWhere(
-        (row) => (row.first.centerY - block.centerY).abs() < 10,
+        (row) => (row.first.centerY - block.centerY).abs() < rowTolerance,
         orElse: () => <OCRBlock>[],
       );
 
