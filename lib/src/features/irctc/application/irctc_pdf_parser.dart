@@ -348,17 +348,17 @@ class IRCTCPDFParser implements ITicketParser {
     }
 
     /// Final parsed scheduled departure DateTime.
-    var scheduledDeparture = parseFlexibleDate(dateTimeRaw);
-
-    // Fallback to sentinel for minimal text scans
-    scheduledDeparture ??= DateTime.utc(1970);
+    final scheduledDeparture = parseFlexibleDate(dateTimeRaw);
 
     /// Extracts journey date (removes time).
-    final dateOfJourney = DateTime.utc(
-      scheduledDeparture.year,
-      scheduledDeparture.month,
-      scheduledDeparture.day,
-    );
+    /// Only computed when scheduledDeparture is successfully parsed.
+    final dateOfJourney = scheduledDeparture != null
+        ? DateTime.utc(
+            scheduledDeparture.year,
+            scheduledDeparture.month,
+            scheduledDeparture.day,
+          )
+        : null;
 
     /// Passenger name.
     var pName = '';
