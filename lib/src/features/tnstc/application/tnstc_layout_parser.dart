@@ -82,8 +82,8 @@ class TNSTCLayoutParser extends TravelPDFParser {
 
     final numberOfSeatsStr = extractor.findValueForKey('No. of Seats');
     final numberOfSeats = numberOfSeatsStr != null
-        ? int.tryParse(numberOfSeatsStr) ?? 1
-        : 1;
+        ? int.tryParse(numberOfSeatsStr)
+        : null;
 
     final busIdNumber = nullIfEmpty(extractor.findValueForKey('Bus ID No'));
 
@@ -94,14 +94,13 @@ class TNSTCLayoutParser extends TravelPDFParser {
     final totalFareStr = extractor.findValueForKey('Total Fare');
     final totalFare = totalFareStr != null
         ? double.tryParse(
-                // Remove currency symbols and text,
-                // keep only digits and decimal point
-                totalFareStr
-                    .replaceAll(RegExp(r'[^\d.]'), '')
-                    .replaceAll(RegExp(r'\.+$'), ''), // Remove trailing dots
-              ) ??
-              0.0
-        : 0.0;
+            // Remove currency symbols and text,
+            // keep only digits and decimal point
+            totalFareStr
+                .replaceAll(RegExp(r'[^\d.]'), '')
+                .replaceAll(RegExp(r'\.+$'), ''), // Remove trailing dots
+          )
+        : null;
 
     // Extract passenger info from table section
     final passengers = _extractPassengers(extractor);
