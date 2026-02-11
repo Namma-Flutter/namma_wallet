@@ -246,7 +246,10 @@ class LayoutExtractor {
       return b.page == keyBlock.page &&
           // Use >= to handle pseudo-blocks with exact boundaries
           b.boundingBox.top >= keyBlock.boundingBox.bottom &&
-          (b.boundingBox.top - keyBlock.boundingBox.bottom) < maxDistance;
+          (b.boundingBox.top - keyBlock.boundingBox.bottom) < maxDistance &&
+          // Require horizontal overlap with the key block
+          b.boundingBox.left < keyBlock.boundingBox.right &&
+          b.boundingBox.right > keyBlock.boundingBox.left;
     }).toList();
 
     if (candidates.isEmpty) return null;
