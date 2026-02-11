@@ -221,7 +221,38 @@ class NotificationService {
 
   Future<void> scheduleTicketReminderFor(Ticket ticket) async {
     try {
-      final journeyTime = ticket.startTime ?? ticket.endTime ?? DateTime.now();
+      void logSkip(String message) {
+        if (_logger != null) {
+          _logger.error(message);
+        } else {
+          debugPrint(message);
+        }
+      }
+
+      final journeyTime = ticket.startTime ?? ticket.endTime;
+      if (journeyTime == null) {
+        logSkip('Ticket has no journey time; skipping reminders.');
+        return;
+      }
+
+      final payload = ticket.ticketId;
+      if (payload == null || payload.isEmpty) {
+        logSkip('Ticket ID missing; skipping reminders.');
+        return;
+      }
+
+      final title = ticket.primaryText;
+      if (title == null || title.isEmpty) {
+        logSkip('Ticket title missing; skipping reminders.');
+        return;
+      }
+
+      final location = ticket.location;
+      if (location == null || location.isEmpty) {
+        logSkip('Ticket location missing; skipping reminders.');
+        return;
+      }
+
       final now = DateTime.now();
 
       final reminders = [
@@ -247,18 +278,16 @@ class NotificationService {
         final safeBase = baseHash.abs() % maxBase;
         final notificationId = safeBase * 100 + i;
 
-        final payload = ticket.ticketId ?? '0';
-
         final formattedDateTime = _formatDateTimeForNotification(journeyTime);
         final bodyText = formattedDateTime.isNotEmpty
-            ? '${ticket.location} • Starts - $formattedDateTime'
-            : ticket.location;
+            ? '$location • Starts - $formattedDateTime'
+            : location;
 
         await NotificationService().scheduleTicketReminder(
           id: notificationId,
           dateTime: reminderTime,
-          title: ticket.primaryText ?? 'Ticket Reminder',
-          body: bodyText ?? 'Please check your ticket details.',
+          title: title,
+          body: bodyText,
           payload: payload,
         );
       }

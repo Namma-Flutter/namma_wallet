@@ -1,7 +1,6 @@
 import Flutter
 import home_widget
 import UIKit
-import flutter_local_notifications
 
 @main
 @objc class AppDelegate: FlutterAppDelegate, FlutterImplicitEngineDelegate {
@@ -10,14 +9,6 @@ import flutter_local_notifications
         open url: URL,
         options: [UIApplication.OpenURLOptionsKey: Any] = [:]
     ) -> Bool {
-        // This is required to make any communication available in the action isolate.
-        FlutterLocalNotificationsPlugin.setPluginRegistrantCallback { (registry) in
-            GeneratedPluginRegistrant.register(with: registry)
-        }
-
-        if #available(iOS 10.0, *) {
-            UNUserNotificationCenter.current().delegate = self as UNUserNotificationCenterDelegate
-        }
         // Handle deep links from widgets
         if url.scheme == "nammawallet" {
             // Extract the ticket ID from the URL path
