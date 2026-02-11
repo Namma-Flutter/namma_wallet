@@ -133,6 +133,13 @@ class LayoutExtractor {
       ),
     );
 
+    return _extractValueFromCandidates(candidates);
+  }
+
+  /// Extracts value from a list of candidate blocks based on heuristics.
+  ///
+  /// This logic is shared between same-row and below searches.
+  String? _extractValueFromCandidates(List<OCRBlock> candidates) {
     // Try to extract value from the closest candidate
     // Skip blocks that are clearly other field labels,
     // but limit how many we skip
@@ -251,103 +258,7 @@ class LayoutExtractor {
       ),
     );
 
-    // Try to extract value from the closest candidate
-    // Skip blocks that are clearly other field labels,
-    // but limit how many we skip
-    var skippedCount = 0;
-    const maxSkips = 2; // Give up after skipping 2 field labels
-
-    for (final candidate in candidates) {
-      final candidateText = candidate.text.trim();
-
-      // If block contains inline format (key : value),
-      // check if it's another field
-      if (candidateText.contains(':')) {
-        final colonIndex = candidateText.indexOf(':');
-        final keyPart = candidateText.substring(0, colonIndex).trim();
-        final valuePart = candidateText.substring(colonIndex + 1).trim();
-
-        // Check if this looks like a field label
-        // (has multiple words before colon)
-        // Examples: "Trip Code", "Class of Service", "Platform Number"
-        final looksLikeFieldLabel =
-            keyPart.split(' ').length >= 2 ||
-            keyPart.toLowerCase().contains('number') ||
-            keyPart.toLowerCase().contains('code') ||
-            keyPart.toLowerCase().contains('service') ||
-            keyPart.toLowerCase().contains('class') ||
-            keyPart.toLowerCase().contains('time') ||
-            keyPart.toLowerCase().contains('date') ||
-            keyPart.toLowerCase().contains('place');
-
-        if (looksLikeFieldLabel) {
-          // This is another field label, not a value for our key
-          skippedCount++;
-          if (skippedCount > maxSkips) return null; // Searched too far
-          continue;
-        }
-
-        // Not a field label, return the value part
-        if (valuePart.isEmpty) continue;
-        return valuePart;
-      }
-
-      // No colon - check if it's a standalone section header or field label
-      // Remove trailing punctuation for better matching
-      final lowerText = candidateText.toLowerCase().replaceAll(
-        RegExp(r'[:.!?\s]+$'),
-        '',
-      );
-
-      // Check for section headers (multi-word with common keywords)
-      final isSectionHeader =
-          lowerText.split(' ').length >= 2 &&
-          (lowerText.contains('information') ||
-              lowerText.contains('details') ||
-              lowerText.contains('passenger') ||
-              lowerText.contains('booking') ||
-              lowerText.contains('journey') ||
-              lowerText.contains('section'));
-
-      // Check for field labels (common patterns)
-      final isFieldLabel =
-          lowerText.contains('/') || // "Adult/Child", "Yes/No", etc.
-          lowerText.endsWith(' no') || // "Seat No", "Bus No", etc.
-          lowerText.endsWith(' number') || // "Platform Number", etc.
-          lowerText.endsWith(' time') || // "Pickup Time", etc.
-          lowerText.endsWith(' date') || // "Journey Date", etc.
-          lowerText.endsWith(' ref') || // "Booking Ref", etc.
-          lowerText.endsWith(' class') || // "Service Class", etc.
-          lowerText.endsWith(' name') || // "Passenger Name", etc.
-          lowerText.endsWith(' id') || // "Bus ID", etc.
-          lowerText.endsWith(' code') || // "Trip Code", etc.
-          lowerText == 'seat' ||
-          lowerText == 'seats' ||
-          lowerText == 'age' ||
-          lowerText == 'gender' ||
-          lowerText == 'fare' ||
-          lowerText == 'platform' ||
-          lowerText == 'name' ||
-          lowerText == 'time' ||
-          lowerText == 'date' ||
-          lowerText == 'code' ||
-          lowerText == 'adult' ||
-          lowerText == 'child';
-
-      if (isSectionHeader || isFieldLabel) {
-        // This is a section header or field label, skip it
-        skippedCount++;
-        if (skippedCount > maxSkips) return null; // Searched too far
-        continue;
-      }
-
-      // No colon means it's a plain value, return it cleaned
-      final cleaned = _cleanValue(candidateText);
-      if (cleaned != null && cleaned.isNotEmpty) return cleaned;
-    }
-
-    // No valid value found
-    return null;
+    return _extractValueFromCandidates(candidates);
   }
 
   /// Cleans up extracted values by removing common OCR artifacts.
