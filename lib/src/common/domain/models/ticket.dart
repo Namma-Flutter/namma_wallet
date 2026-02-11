@@ -238,7 +238,7 @@ class Ticket with TicketMappable {
                 .where((n) => n.isNotEmpty)
                 .join(', '),
           ),
-        if (firstPassenger?.age != null && firstPassenger!.age > 0)
+        if (firstPassenger?.age != null && firstPassenger!.age! > 0)
           ExtrasModel(title: 'Age', value: firstPassenger.age.toString()),
         if (gender != null && gender.isNotNullOrEmpty)
           ExtrasModel(title: 'Gender', value: gender),

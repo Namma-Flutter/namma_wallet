@@ -473,8 +473,12 @@ class PassengerInfoMapper extends ClassMapperBase<PassengerInfo> {
 
   static String _$name(PassengerInfo v) => v.name;
   static const Field<PassengerInfo, String> _f$name = Field('name', _$name);
-  static int _$age(PassengerInfo v) => v.age;
-  static const Field<PassengerInfo, int> _f$age = Field('age', _$age);
+  static int? _$age(PassengerInfo v) => v.age;
+  static const Field<PassengerInfo, int> _f$age = Field(
+    'age',
+    _$age,
+    opt: true,
+  );
   static String _$type(PassengerInfo v) => v.type;
   static const Field<PassengerInfo, String> _f$type = Field('type', _$type);
   static String _$gender(PassengerInfo v) => v.gender;
@@ -500,10 +504,10 @@ class PassengerInfoMapper extends ClassMapperBase<PassengerInfo> {
   static PassengerInfo _instantiate(DecodingData data) {
     return PassengerInfo(
       name: data.dec(_f$name),
-      age: data.dec(_f$age),
       type: data.dec(_f$type),
       gender: data.dec(_f$gender),
       seatNumber: data.dec(_f$seatNumber),
+      age: data.dec(_f$age),
     );
   }
 

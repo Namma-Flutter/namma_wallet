@@ -228,7 +228,7 @@ class TNSTCLayoutParser extends TravelPDFParser {
       if (row.length < 3) continue; // Not enough data
 
       final name = row[0].text.trim();
-      final age = row.length > 1 ? int.tryParse(row[1].text.trim()) ?? 0 : 0;
+      final age = row.length > 1 ? int.tryParse(row[1].text.trim()) : null;
       final type = row.length > 2 ? row[2].text.trim() : '';
       final gender = row.length > 3 ? row[3].text.trim() : '';
       final seatNumber = row.length > 4 ? row[4].text.trim() : '';
@@ -264,7 +264,7 @@ class TNSTCLayoutParser extends TravelPDFParser {
       passengers.add(
         PassengerInfo(
           name: match.group(1) ?? '',
-          age: int.tryParse(match.group(2) ?? '0') ?? 0,
+          age: int.tryParse(match.group(2) ?? ''),
           type: match.group(3) ?? '',
           gender: match.group(4) ?? '',
           seatNumber: match.group(5) ?? '',

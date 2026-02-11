@@ -122,13 +122,13 @@ Boarding Point: $boardingPoint
 class PassengerInfo with PassengerInfoMappable {
   const PassengerInfo({
     required this.name,
-    required this.age,
     required this.type,
     required this.gender,
     required this.seatNumber,
+    this.age,
   });
   final String name;
-  final int age;
+  final int? age;
   final String type; // "Adult" or "Child"
   final String gender; // "M" or "F"
   final String seatNumber;
