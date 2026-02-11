@@ -168,27 +168,33 @@ class PDFService implements IPDFService {
 
         // Text layer exists - create pseudo-blocks from text lines
 
-        final lines = rawText.split('\n');
         final extractedBlocks = <OCRBlock>[];
 
-        for (final (i, line) in lines.indexed) {
-          final trimmed = line.trim();
-          if (trimmed.isEmpty) continue;
+        for (var pageIndex = 0; pageIndex < document.pages.count; pageIndex++) {
+          final pageText = PdfTextExtractor(
+            document,
+          ).extractText(startPageIndex: pageIndex, endPageIndex: pageIndex);
 
-          // Create synthetic bounding box (no real geometry from Syncfusion)
-          // This is a limitation - for real geometry, OCR should be used
-          extractedBlocks.add(
-            OCRBlock(
-              text: trimmed,
-              boundingBox: Rect.fromLTWH(
-                0,
-                i.toDouble() * 20, // Synthetic Y position
-                100, // Synthetic width
-                20, // Synthetic height
+          final lines = pageText.split('\n');
+          for (final (i, line) in lines.indexed) {
+            final trimmed = line.trim();
+            if (trimmed.isEmpty) continue;
+
+            // Create synthetic bounding box (no real geometry from Syncfusion)
+            // This is a limitation - for real geometry, OCR should be used
+            extractedBlocks.add(
+              OCRBlock(
+                text: trimmed,
+                boundingBox: Rect.fromLTWH(
+                  0,
+                  i.toDouble() * 20, // Synthetic Y position
+                  100, // Synthetic width
+                  20, // Synthetic height
+                ),
+                page: pageIndex,
               ),
-              page: 0,
-            ),
-          );
+            );
+          }
         }
 
         _logger.debug(
