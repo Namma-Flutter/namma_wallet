@@ -123,17 +123,17 @@ class TravelTextParserUtils {
 
   /// Safely parses an integer from a string.
   ///
-  /// Returns the parsed integer or [defaultValue] if parsing fails.
-  static int parseInt(String? value, {int defaultValue = 0}) {
-    if (value == null || value.isEmpty) return defaultValue;
-    return int.tryParse(value) ?? defaultValue;
+  /// Returns the parsed integer or null if parsing fails.
+  static int? parseInt(String? value) {
+    if (value == null || value.isEmpty) return null;
+    return int.tryParse(value);
   }
 
   /// Safely parses a double from a string.
   ///
-  /// Returns the parsed double or [defaultValue] if parsing fails.
-  static double parseDouble(String? value, {double defaultValue = 0.0}) {
-    if (value == null || value.isEmpty) return defaultValue;
-    return double.tryParse(value) ?? defaultValue;
+  /// Returns the parsed double or null if parsing fails.
+  static double? parseDouble(String? value) {
+    if (value == null || value.isEmpty) return null;
+    return double.tryParse(value);
   }
 }

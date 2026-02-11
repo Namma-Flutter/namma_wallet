@@ -69,11 +69,11 @@ class IRCTCQRParser implements IIRCTCQRParser {
   int _parseInt(String value) {
     if (value.isEmpty) return 0;
     final cleanValue = value.replaceAll(RegExp(r'[^\d]'), '');
-    return TravelTextParserUtils.parseInt(cleanValue);
+    return TravelTextParserUtils.parseInt(cleanValue) ?? 0;
   }
 
-  double _parseAmount(String value) {
-    if (value.isEmpty) return 0;
+  double? _parseAmount(String value) {
+    if (value.isEmpty) return null;
     final cleanValue = value.replaceAll(RegExp(r'[^\d.]'), '');
     return TravelTextParserUtils.parseDouble(cleanValue);
   }

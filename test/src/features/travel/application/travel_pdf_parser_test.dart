@@ -46,22 +46,13 @@ void main() {
         expect(result, 123.45);
       });
 
-      test('should return the default value for an invalid string', () {
+      test('should return null for an invalid string', () {
         // Arrange
         const value = 'abc';
         // Act
         final result = parser.parseDouble(value);
         // Assert
-        expect(result, 0.0);
-      });
-
-      test('should return the custom default value for an invalid string', () {
-        // Arrange
-        const value = 'abc';
-        // Act
-        final result = parser.parseDouble(value, defaultValue: -1);
-        // Assert
-        expect(result, -1.0);
+        expect(result, isNull);
       });
     });
   });

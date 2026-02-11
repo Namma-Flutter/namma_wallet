@@ -45,17 +45,17 @@ abstract class TravelPDFParser implements ITicketParser {
 
   /// Safely parses an integer from a string.
   ///
-  /// Returns the parsed integer or [defaultValue] if parsing fails.
+  /// Returns the parsed integer or null if parsing fails.
   /// Uses shared utility for consistency across all parsers.
-  int parseInt(String? value, {int defaultValue = 0}) {
-    return TravelTextParserUtils.parseInt(value, defaultValue: defaultValue);
+  int? parseInt(String? value) {
+    return TravelTextParserUtils.parseInt(value);
   }
 
   /// Safely parses a double from a string.
   ///
-  /// Returns the parsed double or [defaultValue] if parsing fails.
+  /// Returns the parsed double or null if parsing fails.
   /// Uses shared utility for consistency across all parsers.
-  double parseDouble(String? value, {double defaultValue = 0.0}) {
-    return TravelTextParserUtils.parseDouble(value, defaultValue: defaultValue);
+  double? parseDouble(String? value) {
+    return TravelTextParserUtils.parseDouble(value);
   }
 }

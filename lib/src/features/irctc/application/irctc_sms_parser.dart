@@ -180,7 +180,7 @@ class IRCTCSMSParser implements ITicketParser {
           int.parse(hm[1]),
         );
       } on Exception catch (_) {
-        scheduledDeparture = DateTime.utc(1970);
+        scheduledDeparture = null;
       }
     }
 
