@@ -55,7 +55,7 @@ class ImportService implements IImportService {
       final extractedBlocks = await _pdfService.extractBlocks(pdfFile);
 
       if (extractedBlocks.isEmpty) {
-        _logger.warning('No text extracted from PDF: $filename');
+        _logger.warning('No OCR blocks extracted from PDF: $filename');
         return null;
       }
 
