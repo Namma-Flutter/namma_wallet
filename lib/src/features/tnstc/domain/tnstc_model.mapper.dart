@@ -479,17 +479,23 @@ class PassengerInfoMapper extends ClassMapperBase<PassengerInfo> {
     _$age,
     opt: true,
   );
-  static String _$type(PassengerInfo v) => v.type;
-  static const Field<PassengerInfo, String> _f$type = Field('type', _$type);
-  static String _$gender(PassengerInfo v) => v.gender;
+  static String? _$type(PassengerInfo v) => v.type;
+  static const Field<PassengerInfo, String> _f$type = Field(
+    'type',
+    _$type,
+    opt: true,
+  );
+  static String? _$gender(PassengerInfo v) => v.gender;
   static const Field<PassengerInfo, String> _f$gender = Field(
     'gender',
     _$gender,
+    opt: true,
   );
-  static String _$seatNumber(PassengerInfo v) => v.seatNumber;
+  static String? _$seatNumber(PassengerInfo v) => v.seatNumber;
   static const Field<PassengerInfo, String> _f$seatNumber = Field(
     'seatNumber',
     _$seatNumber,
+    opt: true,
   );
 
   @override

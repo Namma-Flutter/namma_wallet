@@ -22,10 +22,6 @@ class TNSTCLayoutParser extends TravelPDFParser {
   Ticket parseTicketFromBlocks(List<OCRBlock> blocks) {
     final extractor = LayoutExtractor(blocks);
 
-    // Helper to convert empty strings to null
-    String? nullIfEmpty(String? value) =>
-        value == null || value.isEmpty ? null : value;
-
     // Extract fields using layout analysis
     final pnrRaw = extractor.findValueForKey('PNR Number');
     final pnrNumber = pnrRaw
@@ -229,9 +225,11 @@ class TNSTCLayoutParser extends TravelPDFParser {
 
       final name = row[0].text.trim();
       final age = row.length > 1 ? int.tryParse(row[1].text.trim()) : null;
-      final type = row.length > 2 ? row[2].text.trim() : '';
-      final gender = row.length > 3 ? row[3].text.trim() : '';
-      final seatNumber = row.length > 4 ? row[4].text.trim() : '';
+      final type = row.length > 2 ? nullIfEmpty(row[2].text.trim()) : null;
+      final gender = row.length > 3 ? nullIfEmpty(row[3].text.trim()) : null;
+      final seatNumber = row.length > 4
+          ? nullIfEmpty(row[4].text.trim())
+          : null;
 
       if (name.isNotEmpty) {
         passengers.add(
@@ -265,9 +263,9 @@ class TNSTCLayoutParser extends TravelPDFParser {
         PassengerInfo(
           name: match.group(1) ?? '',
           age: int.tryParse(match.group(2) ?? ''),
-          type: match.group(3) ?? '',
-          gender: match.group(4) ?? '',
-          seatNumber: match.group(5) ?? '',
+          type: match.group(3),
+          gender: match.group(4),
+          seatNumber: match.group(5),
         ),
       );
     }
@@ -309,6 +307,10 @@ class TNSTCLayoutParser extends TravelPDFParser {
 
     return '${displayHour.toString().padLeft(2, '0')}:$minute $period';
   }
+
+  /// Helper to convert empty strings to null
+  String? nullIfEmpty(String? value) =>
+      value == null || value.isEmpty ? null : value;
 
   /// Legacy method for backward compatibility (uses plain text regex).
   @override
