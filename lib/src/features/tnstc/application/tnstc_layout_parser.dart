@@ -121,9 +121,9 @@ class TNSTCLayoutParser extends TravelPDFParser {
       corporation = corporation
           .replaceAll(RegExp(r'\(.*?\)', multiLine: true), '') // Remove (...)
           .replaceAll(
-              RegExp('A GOVERNMENT OF.*?UNDERTAKING',
-                  caseSensitive: false),
-              '')
+            RegExp('A GOVERNMENT OF.*?UNDERTAKING', caseSensitive: false),
+            '',
+          )
           .replaceAll(RegExp(r'[-\s]+$'), '') // Remove trailing dashes/spaces
           .trim();
 
@@ -285,7 +285,7 @@ class TNSTCLayoutParser extends TravelPDFParser {
     final timePattern = RegExp(r'(\d{1,2}):(\d{2})');
     final match = timePattern.firstMatch(timeStr);
 
-    if (match == null) return timeStr;  // Return as-is if not parseable
+    if (match == null) return timeStr; // Return as-is if not parseable
 
     final hour = int.tryParse(match.group(1) ?? '0') ?? 0;
     final minute = match.group(2) ?? '00';

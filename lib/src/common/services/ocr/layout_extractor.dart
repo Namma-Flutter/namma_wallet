@@ -137,7 +137,7 @@ class LayoutExtractor {
     // Skip blocks that are clearly other field labels,
     // but limit how many we skip
     var skippedCount = 0;
-    const maxSkips = 2;  // Give up after skipping 2 field labels
+    const maxSkips = 2; // Give up after skipping 2 field labels
 
     for (final candidate in candidates) {
       final candidateText = candidate.text.trim();
@@ -163,7 +163,7 @@ class LayoutExtractor {
         if (looksLikeFieldLabel) {
           // This is another field label, not a value for our key
           skippedCount++;
-          if (skippedCount > maxSkips) return null;  // Searched too far
+          if (skippedCount > maxSkips) return null; // Searched too far
           continue;
         }
 
@@ -174,9 +174,10 @@ class LayoutExtractor {
 
       // No colon - check if it's a standalone section header or field label
       // Remove trailing punctuation for better matching
-      final lowerText = candidateText
-          .toLowerCase()
-          .replaceAll(RegExp(r'[:.!?\s]+$'), '');
+      final lowerText = candidateText.toLowerCase().replaceAll(
+        RegExp(r'[:.!?\s]+$'),
+        '',
+      );
 
       // Check for section headers (multi-word with common keywords)
       final isSectionHeader =
@@ -190,16 +191,16 @@ class LayoutExtractor {
 
       // Check for field labels (common patterns)
       final isFieldLabel =
-          lowerText.contains('/') ||  // "Adult/Child", "Yes/No", etc.
-          lowerText.endsWith(' no') ||  // "Seat No", "Bus No", etc.
-          lowerText.endsWith(' number') ||  // "Platform Number", etc.
-          lowerText.endsWith(' time') ||  // "Pickup Time", etc.
-          lowerText.endsWith(' date') ||  // "Journey Date", etc.
-          lowerText.endsWith(' ref') ||  // "Booking Ref", etc.
-          lowerText.endsWith(' class') ||  // "Service Class", etc.
-          lowerText.endsWith(' name') ||  // "Passenger Name", etc.
-          lowerText.endsWith(' id') ||  // "Bus ID", etc.
-          lowerText.endsWith(' code') ||  // "Trip Code", etc.
+          lowerText.contains('/') || // "Adult/Child", "Yes/No", etc.
+          lowerText.endsWith(' no') || // "Seat No", "Bus No", etc.
+          lowerText.endsWith(' number') || // "Platform Number", etc.
+          lowerText.endsWith(' time') || // "Pickup Time", etc.
+          lowerText.endsWith(' date') || // "Journey Date", etc.
+          lowerText.endsWith(' ref') || // "Booking Ref", etc.
+          lowerText.endsWith(' class') || // "Service Class", etc.
+          lowerText.endsWith(' name') || // "Passenger Name", etc.
+          lowerText.endsWith(' id') || // "Bus ID", etc.
+          lowerText.endsWith(' code') || // "Trip Code", etc.
           lowerText == 'seat' ||
           lowerText == 'seats' ||
           lowerText == 'age' ||
@@ -216,7 +217,7 @@ class LayoutExtractor {
       if (isSectionHeader || isFieldLabel) {
         // This is a section header or field label, skip it
         skippedCount++;
-        if (skippedCount > maxSkips) return null;  // Searched too far
+        if (skippedCount > maxSkips) return null; // Searched too far
         continue;
       }
 
@@ -254,7 +255,7 @@ class LayoutExtractor {
     // Skip blocks that are clearly other field labels,
     // but limit how many we skip
     var skippedCount = 0;
-    const maxSkips = 2;  // Give up after skipping 2 field labels
+    const maxSkips = 2; // Give up after skipping 2 field labels
 
     for (final candidate in candidates) {
       final candidateText = candidate.text.trim();
@@ -282,7 +283,7 @@ class LayoutExtractor {
         if (looksLikeFieldLabel) {
           // This is another field label, not a value for our key
           skippedCount++;
-          if (skippedCount > maxSkips) return null;  // Searched too far
+          if (skippedCount > maxSkips) return null; // Searched too far
           continue;
         }
 
@@ -293,9 +294,10 @@ class LayoutExtractor {
 
       // No colon - check if it's a standalone section header or field label
       // Remove trailing punctuation for better matching
-      final lowerText = candidateText
-          .toLowerCase()
-          .replaceAll(RegExp(r'[:.!?\s]+$'), '');
+      final lowerText = candidateText.toLowerCase().replaceAll(
+        RegExp(r'[:.!?\s]+$'),
+        '',
+      );
 
       // Check for section headers (multi-word with common keywords)
       final isSectionHeader =
@@ -309,16 +311,16 @@ class LayoutExtractor {
 
       // Check for field labels (common patterns)
       final isFieldLabel =
-          lowerText.contains('/') ||  // "Adult/Child", "Yes/No", etc.
-          lowerText.endsWith(' no') ||  // "Seat No", "Bus No", etc.
-          lowerText.endsWith(' number') ||  // "Platform Number", etc.
-          lowerText.endsWith(' time') ||  // "Pickup Time", etc.
-          lowerText.endsWith(' date') ||  // "Journey Date", etc.
-          lowerText.endsWith(' ref') ||  // "Booking Ref", etc.
-          lowerText.endsWith(' class') ||  // "Service Class", etc.
-          lowerText.endsWith(' name') ||  // "Passenger Name", etc.
-          lowerText.endsWith(' id') ||  // "Bus ID", etc.
-          lowerText.endsWith(' code') ||  // "Trip Code", etc.
+          lowerText.contains('/') || // "Adult/Child", "Yes/No", etc.
+          lowerText.endsWith(' no') || // "Seat No", "Bus No", etc.
+          lowerText.endsWith(' number') || // "Platform Number", etc.
+          lowerText.endsWith(' time') || // "Pickup Time", etc.
+          lowerText.endsWith(' date') || // "Journey Date", etc.
+          lowerText.endsWith(' ref') || // "Booking Ref", etc.
+          lowerText.endsWith(' class') || // "Service Class", etc.
+          lowerText.endsWith(' name') || // "Passenger Name", etc.
+          lowerText.endsWith(' id') || // "Bus ID", etc.
+          lowerText.endsWith(' code') || // "Trip Code", etc.
           lowerText == 'seat' ||
           lowerText == 'seats' ||
           lowerText == 'age' ||
@@ -335,7 +337,7 @@ class LayoutExtractor {
       if (isSectionHeader || isFieldLabel) {
         // This is a section header or field label, skip it
         skippedCount++;
-        if (skippedCount > maxSkips) return null;  // Searched too far
+        if (skippedCount > maxSkips) return null; // Searched too far
         continue;
       }
 
