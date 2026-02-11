@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:ui';
 
 import 'package:namma_wallet/src/common/domain/models/extras_model.dart';
 import 'package:namma_wallet/src/common/domain/models/ticket.dart';
@@ -131,26 +130,7 @@ class TNSTCBusParser implements TravelTicketParser {
 
   /// Converts plain text to pseudo-blocks for layout parsing
   List<OCRBlock> _convertTextToBlocks(String text) {
-    final lines = text.split('\n');
-    final blocks = <OCRBlock>[];
-
-    for (final (i, line) in lines.indexed) {
-      if (line.trim().isEmpty) continue;
-      blocks.add(
-        OCRBlock(
-          text: line.trim(),
-          boundingBox: Rect.fromLTWH(
-            0,
-            i.toDouble() * 20,
-            100,
-            20,
-          ),
-          page: 0,
-        ),
-      );
-    }
-
-    return blocks;
+    return OCRBlock.fromPlainText(text);
   }
 
   @override

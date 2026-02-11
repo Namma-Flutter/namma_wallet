@@ -13,6 +13,32 @@ class OCRBlock {
     this.confidence,
   });
 
+  /// Creates a list of pseudo-blocks from plain text, typically for tests or
+  /// when real OCR geometry is unavailable.
+  static List<OCRBlock> fromPlainText(String text, {int page = 0}) {
+    final lines = text.split('\n');
+    final blocks = <OCRBlock>[];
+
+    for (final (i, line) in lines.indexed) {
+      final trimmed = line.trim();
+      if (trimmed.isEmpty) continue;
+      blocks.add(
+        OCRBlock(
+          text: trimmed,
+          boundingBox: Rect.fromLTWH(
+            0,
+            i.toDouble() * 20, // Synthetic Y position
+            100, // Synthetic width
+            20, // Synthetic height
+          ),
+          page: page,
+        ),
+      );
+    }
+
+    return blocks;
+  }
+
   /// The extracted text content
   final String text;
 

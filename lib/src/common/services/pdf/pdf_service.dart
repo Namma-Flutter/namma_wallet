@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:cross_file/cross_file.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
 import 'package:namma_wallet/src/common/services/ocr/layout_extractor.dart';
@@ -175,26 +173,9 @@ class PDFService implements IPDFService {
             document,
           ).extractText(startPageIndex: pageIndex, endPageIndex: pageIndex);
 
-          final lines = pageText.split('\n');
-          for (final (i, line) in lines.indexed) {
-            final trimmed = line.trim();
-            if (trimmed.isEmpty) continue;
-
-            // Create synthetic bounding box (no real geometry from Syncfusion)
-            // This is a limitation - for real geometry, OCR should be used
-            extractedBlocks.add(
-              OCRBlock(
-                text: trimmed,
-                boundingBox: Rect.fromLTWH(
-                  0,
-                  i.toDouble() * 20, // Synthetic Y position
-                  100, // Synthetic width
-                  20, // Synthetic height
-                ),
-                page: pageIndex,
-              ),
-            );
-          }
+          extractedBlocks.addAll(
+            OCRBlock.fromPlainText(pageText, page: pageIndex),
+          );
         }
 
         _logger.debug(
