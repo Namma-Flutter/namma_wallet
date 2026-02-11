@@ -171,21 +171,28 @@ class Ticket with TicketMappable {
             final isPm = minuteAndPeriod.contains('pm');
             final isAm = minuteAndPeriod.contains('am');
 
-            if (isPm && hour < 12) {
-              hour += 12;
-            } else if (isAm && hour == 12) {
-              hour = 0;
-            }
+            // Validate 12-hour format: if AM/PM is present,
+            // hour must be 1-12
+            final isValid12HourFormat =
+                !(isPm || isAm) || (hour >= 1 && hour <= 12);
 
-            // Validate hour and minute ranges
-            if (hour >= 0 && hour < 24 && minute >= 0 && minute < 60) {
-              startTime = DateTime(
-                model.journeyDate!.year,
-                model.journeyDate!.month,
-                model.journeyDate!.day,
-                hour,
-                minute,
-              );
+            if (isValid12HourFormat) {
+              if (isPm && hour < 12) {
+                hour += 12;
+              } else if (isAm && hour == 12) {
+                hour = 0;
+              }
+
+              // Validate hour and minute ranges
+              if (hour >= 0 && hour < 24 && minute >= 0 && minute < 60) {
+                startTime = DateTime(
+                  model.journeyDate!.year,
+                  model.journeyDate!.month,
+                  model.journeyDate!.day,
+                  hour,
+                  minute,
+                );
+              }
             }
           }
         }
