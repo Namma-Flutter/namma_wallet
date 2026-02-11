@@ -72,10 +72,19 @@ class NotificationService {
     await _plugin.initialize(
       initSettings,
       onDidReceiveNotificationResponse: (details) {
+        final payload = details.payload;
+        if (payload == null || payload.isEmpty) {
+          if (_logger != null) {
+            _logger.error('Notification payload missing; skipping navigation.');
+          } else {
+            debugPrint('Notification payload missing; skipping navigation.');
+          }
+          return;
+        }
         if (rootNavigatorKey.currentContext != null) {
           rootNavigatorKey.currentContext?.goNamed(
             AppRoute.ticketView.name,
-            pathParameters: {'id': details.payload ?? '0'},
+            pathParameters: {'id': payload},
           );
         }
       },
@@ -167,8 +176,7 @@ class NotificationService {
     return '$hour:$minute $period';
   }
 
-  String _formatDateTimeForNotification(DateTime? dt) {
-    if (dt == null) return '';
+  String _formatDateTimeForNotification(DateTime dt) {
     final now = DateTime.now();
     final nowDate = DateTime(now.year, now.month, now.day);
     final dtDate = DateTime(dt.year, dt.month, dt.day);
