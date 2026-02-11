@@ -473,12 +473,6 @@ class PassengerInfoMapper extends ClassMapperBase<PassengerInfo> {
 
   static String _$name(PassengerInfo v) => v.name;
   static const Field<PassengerInfo, String> _f$name = Field('name', _$name);
-  static int? _$age(PassengerInfo v) => v.age;
-  static const Field<PassengerInfo, int> _f$age = Field(
-    'age',
-    _$age,
-    opt: true,
-  );
   static String? _$type(PassengerInfo v) => v.type;
   static const Field<PassengerInfo, String> _f$type = Field(
     'type',
@@ -497,14 +491,20 @@ class PassengerInfoMapper extends ClassMapperBase<PassengerInfo> {
     _$seatNumber,
     opt: true,
   );
+  static int? _$age(PassengerInfo v) => v.age;
+  static const Field<PassengerInfo, int> _f$age = Field(
+    'age',
+    _$age,
+    opt: true,
+  );
 
   @override
   final MappableFields<PassengerInfo> fields = const {
     #name: _f$name,
-    #age: _f$age,
     #type: _f$type,
     #gender: _f$gender,
     #seatNumber: _f$seatNumber,
+    #age: _f$age,
   };
 
   static PassengerInfo _instantiate(DecodingData data) {
@@ -581,10 +581,10 @@ abstract class PassengerInfoCopyWith<$R, $In extends PassengerInfo, $Out>
     implements ClassCopyWith<$R, $In, $Out> {
   $R call({
     String? name,
-    int? age,
     String? type,
     String? gender,
     String? seatNumber,
+    int? age,
   });
   PassengerInfoCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
@@ -600,26 +600,26 @@ class _PassengerInfoCopyWithImpl<$R, $Out>
   @override
   $R call({
     String? name,
-    int? age,
-    String? type,
-    String? gender,
-    String? seatNumber,
+    Object? type = $none,
+    Object? gender = $none,
+    Object? seatNumber = $none,
+    Object? age = $none,
   }) => $apply(
     FieldCopyWithData({
       if (name != null) #name: name,
-      if (age != null) #age: age,
-      if (type != null) #type: type,
-      if (gender != null) #gender: gender,
-      if (seatNumber != null) #seatNumber: seatNumber,
+      if (type != $none) #type: type,
+      if (gender != $none) #gender: gender,
+      if (seatNumber != $none) #seatNumber: seatNumber,
+      if (age != $none) #age: age,
     }),
   );
   @override
   PassengerInfo $make(CopyWithData data) => PassengerInfo(
     name: data.get(#name, or: $value.name),
-    age: data.get(#age, or: $value.age),
     type: data.get(#type, or: $value.type),
     gender: data.get(#gender, or: $value.gender),
     seatNumber: data.get(#seatNumber, or: $value.seatNumber),
+    age: data.get(#age, or: $value.age),
   );
 
   @override

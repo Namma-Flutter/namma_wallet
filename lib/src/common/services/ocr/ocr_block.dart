@@ -1,11 +1,15 @@
 import 'dart:ui';
+import 'package:dart_mappable/dart_mappable.dart';
+
+part 'ocr_block.mapper.dart';
 
 /// Represents a block of text extracted from OCR with its geometric location.
 ///
 /// This is the foundation for layout-based field extraction - by preserving
 /// bounding boxes, we can use spatial relationships (same row, below, to the
 /// right) to map keys to values, which is far more reliable than regex alone.
-class OCRBlock {
+@MappableClass()
+class OCRBlock with OCRBlockMappable {
   OCRBlock({
     required this.text,
     required this.boundingBox,

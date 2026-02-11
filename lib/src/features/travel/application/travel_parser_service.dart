@@ -12,6 +12,7 @@ import 'package:namma_wallet/src/features/irctc/application/irctc_sms_parser.dar
 import 'package:namma_wallet/src/features/tnstc/application/tnstc_layout_parser.dart';
 import 'package:namma_wallet/src/features/tnstc/application/tnstc_sms_parser.dart';
 import 'package:namma_wallet/src/features/travel/application/travel_parser_interface.dart';
+import 'package:namma_wallet/src/features/travel/domain/ticket_update_info.dart';
 
 abstract class TravelTicketParser {
   bool canParse(String text);
@@ -36,7 +37,7 @@ abstract class TravelTicketParser {
   TicketType get ticketType;
 }
 
-class TNSTCBusParser implements TravelTicketParser {
+class TNSTCBusParser extends TravelTicketParser {
   TNSTCBusParser({required ILogger logger}) : _logger = logger;
   final ILogger _logger;
 
@@ -299,25 +300,14 @@ class SETCBusParser extends TravelTicketParser {
     final hasSETC = setcPatterns.any(
       (pattern) => text.toUpperCase().contains(pattern.toUpperCase()),
     );
-    final hasTNSTC = text.toUpperCase().contains('TNSTC');
-
-    return hasSETC && !hasTNSTC;
+    return hasSETC;
   }
 
   @override
   Ticket parseTicket(String text) {
     // SETC tickets use the same format as TNSTC SMS
     // Just delegate to the existing TNSTC SMS parser
-    final smsParser = TNSTCSMSParser();
-    final ticket = smsParser.parseTicket(text);
-
-    // Update the provider name to SETC
-    return ticket.copyWith(
-      extras: [
-        ...?ticket.extras?.where((e) => e.title != 'Provider'),
-        ExtrasModel(title: 'Provider', value: 'SETC'),
-      ],
-    );
+    return TNSTCSMSParser().parseTicket(text);
   }
 
   @override
@@ -380,24 +370,7 @@ class TravelParserService implements ITravelParser {
             '${parser.providerName} (layout-based)',
           );
 
-          if (sourceType != null) {
-            // Check if Source Type already exists
-            final hasSourceType =
-                ticket.extras?.any(
-                  (e) => e.title == 'Source Type',
-                ) ??
-                false;
-
-            if (!hasSourceType) {
-              return ticket.copyWith(
-                extras: [
-                  ...?ticket.extras,
-                  ExtrasModel(title: 'Source Type', value: sourceType.name),
-                ],
-              );
-            }
-          }
-          return ticket;
+          return _augmentTicket(ticket, parser.providerName, sourceType);
         }
       }
 
@@ -412,7 +385,7 @@ class TravelParserService implements ITravelParser {
         stackTrace,
       );
       return null;
-    } on Exception catch (e, stackTrace) {
+    } on Object catch (e, stackTrace) {
       _logger.error(
         '[TravelParserService] Unexpected error during ticket parsing',
         e,
@@ -450,24 +423,7 @@ class TravelParserService implements ITravelParser {
             '${parser.providerName}',
           );
 
-          if (sourceType != null) {
-            // Check if Source Type already exists
-            final hasSourceType =
-                ticket.extras?.any(
-                  (e) => e.title == 'Source Type',
-                ) ??
-                false;
-
-            if (!hasSourceType) {
-              return ticket.copyWith(
-                extras: [
-                  ...?ticket.extras,
-                  ExtrasModel(title: 'Source Type', value: sourceType.name),
-                ],
-              );
-            }
-          }
-          return ticket;
+          return _augmentTicket(ticket, parser.providerName, sourceType);
         }
       }
 
@@ -482,7 +438,7 @@ class TravelParserService implements ITravelParser {
         stackTrace,
       );
       return null;
-    } on Exception catch (e, stackTrace) {
+    } on Object catch (e, stackTrace) {
       _logger.error(
         '[TravelParserService] Unexpected error during ticket parsing',
         e,
@@ -494,6 +450,44 @@ class TravelParserService implements ITravelParser {
 
   List<String> getSupportedProviders() {
     return _parsers.map((parser) => parser.providerName).toList();
+  }
+
+  /// Adds "Provider" and "Source Type" extras if not already present.
+  Ticket _augmentTicket(
+    Ticket ticket,
+    String providerName,
+    SourceType? sourceType,
+  ) {
+    var updated = ticket;
+
+    // 1. Add Provider extra if missing
+    final hasProvider =
+        updated.extras?.any((e) => e.title == 'Provider') ?? false;
+    if (!hasProvider) {
+      updated = updated.copyWith(
+        extras: [
+          ...?updated.extras,
+          ExtrasModel(title: 'Provider', value: providerName),
+        ],
+      );
+    }
+
+    // 2. Add Source Type extra if provided and missing
+    if (sourceType != null) {
+      final hasSourceType =
+          updated.extras?.any((e) => e.title == 'Source Type') ?? false;
+
+      if (!hasSourceType) {
+        updated = updated.copyWith(
+          extras: [
+            ...?updated.extras,
+            ExtrasModel(title: 'Source Type', value: sourceType.name),
+          ],
+        );
+      }
+    }
+
+    return updated;
   }
 
   bool isTicketText(String text) {

@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:cross_file/cross_file.dart';
 import 'package:namma_wallet/src/common/services/ocr/ocr_block.dart';
 import 'package:namma_wallet/src/common/services/pdf/pdf_service_interface.dart';
@@ -37,26 +35,7 @@ class MockPDFService implements IPDFService {
     }
 
     // Convert mock text to blocks with synthetic geometry
-    final lines = mockPdfText.split('\n');
-    final blocks = <OCRBlock>[];
-
-    for (final (i, line) in lines.indexed) {
-      if (line.trim().isEmpty) continue;
-      blocks.add(
-        OCRBlock(
-          text: line.trim(),
-          boundingBox: Rect.fromLTWH(
-            0,
-            i.toDouble() * 20,
-            100,
-            20,
-          ),
-          page: 0,
-        ),
-      );
-    }
-
-    return blocks;
+    return OCRBlock.fromPlainText(mockPdfText);
   }
 
   @override

@@ -56,8 +56,10 @@ class Ticket with TicketMappable {
       ticketId: model.pnrNumber,
       primaryText:
           model.fromStation.isNotNullOrEmpty && model.toStation.isNotNullOrEmpty
-          ? '${model.fromStation} → ${model.toStation}'
-          : _primaryTextConstant,
+          ? '${model.fromStation} → ${model.toStation}${model.trainName.isNotNullOrEmpty ? ' (${model.trainName})' : ''}'
+          : (model.trainName.isNotNullOrEmpty
+                ? model.trainName
+                : _primaryTextConstant),
       secondaryText:
           [
             if (model.trainNumber.isNotNullOrEmpty) model.trainNumber,
@@ -71,7 +73,7 @@ class Ticket with TicketMappable {
               if (model.passengerName.isNotNullOrEmpty) model.passengerName,
             ].join(' • '),
       startTime: !isUpdate
-          ? DateTime(
+          ? DateTime.utc(
               journeyDate!.year,
               journeyDate.month,
               journeyDate.day,

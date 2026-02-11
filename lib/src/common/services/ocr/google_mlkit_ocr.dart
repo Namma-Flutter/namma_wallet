@@ -81,6 +81,7 @@ class GoogleMLKitOCR implements IOCRService {
           final inputImage = InputImage.fromFile(tempImageFile);
           final recognizedText = await textRecognizer.processImage(inputImage);
 
+          final startIndex = allBlocks.length;
           // Extract blocks with geometry from ML Kit
           for (final textBlock in recognizedText.blocks) {
             // ML Kit can return text blocks, lines, or elements
@@ -99,7 +100,7 @@ class GoogleMLKitOCR implements IOCRService {
             }
           }
 
-          final blocksOnPage = allBlocks.where((b) => b.page == pageNum).length;
+          final blocksOnPage = allBlocks.length - startIndex;
           _logger.debug(
             '[OCRService] Page ${pageNum + 1} OCR: '
             '$blocksOnPage blocks extracted',

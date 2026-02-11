@@ -198,15 +198,18 @@ class TNSTCLayoutParser extends TravelPDFParser {
     final rows = <List<OCRBlock>>[];
     for (final block in tableBlocks) {
       // Find existing row with similar Y coordinate
-      final existingRow = rows.firstWhere(
-        (row) => (row.first.centerY - block.centerY).abs() < rowTolerance,
-        orElse: () => <OCRBlock>[],
-      );
+      List<OCRBlock>? targetRow;
+      for (final row in rows) {
+        if ((row.first.centerY - block.centerY).abs() < rowTolerance) {
+          targetRow = row;
+          break;
+        }
+      }
 
-      if (existingRow.isEmpty) {
+      if (targetRow == null) {
         rows.add([block]);
       } else {
-        existingRow.add(block);
+        targetRow.add(block);
       }
     }
 

@@ -197,6 +197,9 @@ class PDFService implements IPDFService {
     }
   }
 
+  /// Extracts structured data from a PDF file using layout analysis.
+  ///
+  /// NOTE: This implementation is currently optimized for TNSTC-style documents.
   @override
   Future<Map<String, dynamic>> extractStructuredData(XFile pdf) async {
     try {

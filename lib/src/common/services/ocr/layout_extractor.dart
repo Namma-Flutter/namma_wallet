@@ -18,6 +18,50 @@ class LayoutExtractor {
 
   final List<OCRBlock> blocks;
 
+  /// Keywords that identify a block as a field label.
+  static const _fieldLabelKeywords = [
+    'number',
+    'code',
+    'service',
+    'class',
+    'time',
+    'date',
+    'place',
+    'seat',
+    'seats',
+    'age',
+    'gender',
+    'fare',
+    'platform',
+    'name',
+    'adult',
+    'child',
+  ];
+
+  /// Keywords that identify a block as a section header.
+  static const _sectionHeaderKeywords = [
+    'information',
+    'details',
+    'passenger',
+    'booking',
+    'journey',
+    'section',
+  ];
+
+  /// Standard reading order comparator: top-to-bottom, then left-to-right.
+  static int readingOrderComparator(OCRBlock a, OCRBlock b) {
+    if (a.page != b.page) return a.page.compareTo(b.page);
+
+    final yDiff = a.boundingBox.top - b.boundingBox.top;
+    if (yDiff.abs() > 10) {
+      // Different rows
+      return yDiff.sign.toInt();
+    } else {
+      // Same row, sort by left position
+      return (a.boundingBox.left - b.boundingBox.left).sign.toInt();
+    }
+  }
+
   /// Finds the value associated with a given key label.
   ///
   /// Strategy:
@@ -79,10 +123,6 @@ class LayoutExtractor {
     return valueText.isNotEmpty ? valueText : null;
   }
 
-  /// Finds all blocks that match the key label pattern.
-  ///
-  /// Returns blocks where text contains [pattern] (case-insensitive).
-  /// Sorted by reading order (top-to-bottom, left-to-right).
   List<OCRBlock> findBlocksMatching(String pattern) {
     final lowerPattern = pattern.toLowerCase();
     final matching = blocks.where((b) {
@@ -90,25 +130,13 @@ class LayoutExtractor {
     }).toList();
 
     // Sort by reading order: top to bottom, then left to right
-    return matching..sort((a, b) {
-      final yDiff = a.boundingBox.top - b.boundingBox.top;
-      if (yDiff.abs() > 10) {
-        // Different rows
-        return yDiff.sign.toInt();
-      } else {
-        // Same row, sort by left position
-        return (a.boundingBox.left - b.boundingBox.left).sign.toInt();
-      }
-    });
+    return matching..sort(readingOrderComparator);
   }
 
-  /// Finds the first block containing the key label.
+  /// Finds the first block containing the key label (respects reading order).
   OCRBlock? _findKeyBlock(String keyLabel) {
-    final lowerKey = keyLabel.toLowerCase();
-    final result = blocks.where(
-      (b) => b.text.toLowerCase().contains(lowerKey),
-    );
-    return result.isEmpty ? null : result.first;
+    final matches = findBlocksMatching(keyLabel);
+    return matches.isEmpty ? null : matches.first;
   }
 
   /// Finds value blocks on the same horizontal row, to the right of [keyBlock].
@@ -159,13 +187,9 @@ class LayoutExtractor {
         // Check if this looks like a field label
         final looksLikeFieldLabel =
             keyPart.split(' ').length >= 2 ||
-            keyPart.toLowerCase().contains('number') ||
-            keyPart.toLowerCase().contains('code') ||
-            keyPart.toLowerCase().contains('service') ||
-            keyPart.toLowerCase().contains('class') ||
-            keyPart.toLowerCase().contains('time') ||
-            keyPart.toLowerCase().contains('date') ||
-            keyPart.toLowerCase().contains('place');
+            _fieldLabelKeywords.any(
+              (k) => keyPart.toLowerCase().contains(k),
+            );
 
         if (looksLikeFieldLabel) {
           // This is another field label, not a value for our key
@@ -189,37 +213,16 @@ class LayoutExtractor {
       // Check for section headers (multi-word with common keywords)
       final isSectionHeader =
           lowerText.split(' ').length >= 2 &&
-          (lowerText.contains('information') ||
-              lowerText.contains('details') ||
-              lowerText.contains('passenger') ||
-              lowerText.contains('booking') ||
-              lowerText.contains('journey') ||
-              lowerText.contains('section'));
+          _sectionHeaderKeywords.any(lowerText.contains);
 
       // Check for field labels (common patterns)
       final isFieldLabel =
           lowerText.contains('/') || // "Adult/Child", "Yes/No", etc.
-          lowerText.endsWith(' no') || // "Seat No", "Bus No", etc.
-          lowerText.endsWith(' number') || // "Platform Number", etc.
-          lowerText.endsWith(' time') || // "Pickup Time", etc.
-          lowerText.endsWith(' date') || // "Journey Date", etc.
-          lowerText.endsWith(' ref') || // "Booking Ref", etc.
-          lowerText.endsWith(' class') || // "Service Class", etc.
-          lowerText.endsWith(' name') || // "Passenger Name", etc.
-          lowerText.endsWith(' id') || // "Bus ID", etc.
-          lowerText.endsWith(' code') || // "Trip Code", etc.
-          lowerText == 'seat' ||
-          lowerText == 'seats' ||
-          lowerText == 'age' ||
-          lowerText == 'gender' ||
-          lowerText == 'fare' ||
-          lowerText == 'platform' ||
-          lowerText == 'name' ||
-          lowerText == 'time' ||
-          lowerText == 'date' ||
-          lowerText == 'code' ||
-          lowerText == 'adult' ||
-          lowerText == 'child';
+          _fieldLabelKeywords.any(
+            (k) =>
+                lowerText.endsWith(' $k') ||
+                lowerText == k, // Exact match or Ends with
+          );
 
       if (isSectionHeader || isFieldLabel) {
         // This is a section header or field label, skip it
@@ -307,14 +310,7 @@ class LayoutExtractor {
     }).toList();
 
     // Sort by reading order
-    return sectionBlocks..sort((a, b) {
-      final yDiff = a.boundingBox.top - b.boundingBox.top;
-      if (yDiff.abs() > 10) {
-        return yDiff.sign.toInt();
-      } else {
-        return (a.boundingBox.left - b.boundingBox.left).sign.toInt();
-      }
-    });
+    return sectionBlocks..sort(readingOrderComparator);
   }
 
   /// Returns all text as a single string (for fallback regex matching).
@@ -324,19 +320,7 @@ class LayoutExtractor {
   String toPlainText() {
     // Sort blocks by reading order
     final sortedBlocks = List<OCRBlock>.from(blocks)
-      ..sort((a, b) {
-        // Sort by page first
-        if (a.page != b.page) return a.page.compareTo(b.page);
-
-        // Then by vertical position
-        final yDiff = a.boundingBox.top - b.boundingBox.top;
-        if (yDiff.abs() > 10) {
-          return yDiff.sign.toInt();
-        } else {
-          // Same row, sort by horizontal position
-          return (a.boundingBox.left - b.boundingBox.left).sign.toInt();
-        }
-      });
+      ..sort(readingOrderComparator);
 
     return sortedBlocks.map((b) => b.text).join('\n');
   }

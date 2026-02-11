@@ -182,7 +182,8 @@ class IRCTCPDFParser implements ITicketParser {
 
     /// Extracts PNR number using multiple regex variations.
     final pnr = pick([
-      r'PNR(?:[\s\S]{0,50}?)(\d{10})',
+      r'PNR(?:[ \t]*(?:No\.?)?[ \t]*[:.-]?[ \t]*)(\b[A-Z0-9]{3,15}\b)',
+      r'PNR\b(?:[^\n]{0,30}?)\b([A-Z0-9]{3,15})\b',
       r'PNR\s*[:.-]?\s*(\d{10})',
     ]);
 
@@ -240,13 +241,17 @@ class IRCTCPDFParser implements ITicketParser {
     /// Fallback regex for "From"
     if (fromStn.isEmpty) {
       fromStn = pick([
-        r'From\s*[:]?\s*([A-Z ]+\([A-Z]+\))',
-      ], caseSensitive: true);
+        r'From\s*(?:Station|No\.?)?\s*[:.-]?\s*([^ \n][^\n]*)',
+        r'Boarding\s*(?:Point|Station|At)?\s*[:.-]?\s*([^ \n][^\n]*)',
+      ]);
     }
 
     /// Fallback regex for "To"
     if (toStn.isEmpty) {
-      toStn = pick([r'To\s*[:]?\s*([A-Z ]+\([A-Z]+\))'], caseSensitive: true);
+      toStn = pick([
+        r'To\s*(?:Station)?\s*[:.-]?\s*([^ \n][^\n]*)',
+        r'Reservation\s*(?:Upto|Up-to|To)?\s*[:.-]?\s*([^ \n][^\n]*)',
+      ]);
     }
 
     /// Matches boarding station code.
@@ -277,6 +282,7 @@ class IRCTCPDFParser implements ITicketParser {
     final trainName = pick([
       r'Train No\./\s*Name\s+(?:[:.-])?\s*\d{5}\s*/\s*(.*)',
       r'(?:Train No|Train Name|Train)[\s\S]{0,30}?\d{5}\s*/\s*(.*)',
+      r'Train Name\s*[:.-]?\s*([^\n]+)',
     ]);
 
     /// Raw travel class as printed on ticket.
@@ -290,6 +296,8 @@ class IRCTCPDFParser implements ITicketParser {
       r'Scheduled Departure[\s\S]{0,10}?[:"]+\s*(\d{2}-[A-Za-z]{3}-\d{4}\s+\d{2}:\d{2})',
       r'Departure[\s\S]{0,10}?\s*(\d{1,2}:\d{2}[\s\S]{0,25}?\d{4})',
       r'Departure[\s\S]{0,10}?\s*(\d{2}-[A-Za-z]{3}-\d{4}[\s\S]{0,25}?\d{1,2}:\d{2})',
+      r'Date of Journey\s*[:.-]?\s*(\d{2}[-/]\d{2}[-/]\d{2,4})[\s\S]*?Scheduled Departure\s*[:.-]?\s*(\d{1,2}[:.]\d{2})',
+      r'Date of Journey\s*[:.-]?\s*(\d{2}[-/]\d{2}[-/]\d{2,4})[\s\S]*?Time\s*[:.-]?\s*(\d{1,2}[:.]\d{2})',
     ]);
 
     /// Parses multiple date formats safely.
@@ -299,19 +307,27 @@ class IRCTCPDFParser implements ITicketParser {
         final cleaned = raw.replaceAll(RegExp(r'[*"\n]'), ' ').trim();
         final timeMatch = RegExp(r'(\d{1,2}:\d{2})').firstMatch(cleaned);
         final dateMatch = RegExp(
-          r'(\d{2}-[A-Za-z]{3}-\d{4})',
+          r'(\d{2}[-/][A-Za-z0-9]{2,3}[-/]\d{2,4})',
           caseSensitive: false,
         ).firstMatch(cleaned);
 
         if (timeMatch != null && dateMatch != null) {
           final timeParts = timeMatch.group(1)!.split(':');
-          final dateParts = dateMatch.group(1)!.split('-');
-          final month = monthToInt(dateParts[1]);
-          if (month == null) {
+          final dateStr = dateMatch.group(1)!;
+          final dateParts = dateStr.split(RegExp('[-/]'));
+
+          var year = int.tryParse(dateParts[2]);
+          if (year != null && year < 100) year += 2000;
+
+          final monthStr = dateParts[1];
+          var month = int.tryParse(monthStr);
+          month ??= monthToInt(monthStr);
+
+          if (month == null || year == null) {
             return null;
           } else {
-            return DateTime(
-              int.parse(dateParts[2]),
+            return DateTime.utc(
+              year,
               month,
               int.parse(dateParts[0]),
               int.parse(timeParts[0]),
@@ -330,16 +346,17 @@ class IRCTCPDFParser implements ITicketParser {
     }
 
     /// Final parsed scheduled departure DateTime.
-    final scheduledDeparture = parseFlexibleDate(dateTimeRaw);
+    var scheduledDeparture = parseFlexibleDate(dateTimeRaw);
+
+    // Fallback to sentinel for minimal text scans
+    scheduledDeparture ??= DateTime.utc(1970);
 
     /// Extracts journey date (removes time).
-    final dateOfJourney = scheduledDeparture != null
-        ? DateTime(
-            scheduledDeparture.year,
-            scheduledDeparture.month,
-            scheduledDeparture.day,
-          )
-        : null;
+    final dateOfJourney = DateTime.utc(
+      scheduledDeparture.year,
+      scheduledDeparture.month,
+      scheduledDeparture.day,
+    );
 
     /// Passenger name.
     var pName = '';
