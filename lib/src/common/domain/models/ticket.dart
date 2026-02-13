@@ -57,7 +57,6 @@ class Ticket with TicketMappable {
       primaryText:
           model.fromStation.isNotNullOrEmpty && model.toStation.isNotNullOrEmpty
           ? '${model.fromStation} → ${model.toStation}'
-                '${model.trainName.isNotNullOrEmpty ? ' (${model.trainName})' : ''}'
           : (model.trainName.isNotNullOrEmpty
                 ? model.trainName
                 : _primaryTextConstant),

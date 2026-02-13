@@ -165,8 +165,11 @@ class IRCTCPDFParser implements ITicketParser {
           caseSensitive: caseSensitive,
           multiLine: true,
         ).firstMatch(rawText);
-        if (m != null && m.group(group) != null) {
-          return m.group(group)!.trim().replaceAll('"', '');
+        if (m != null) {
+          final val = (group <= m.groupCount)
+              ? m.group(group)?.trim().replaceAll('"', '') ?? ''
+              : '';
+          if (val.isNotEmpty) return val;
         }
       }
       return '';
@@ -182,9 +185,9 @@ class IRCTCPDFParser implements ITicketParser {
 
     /// Extracts PNR number using multiple regex variations.
     final pnr = pick([
-      r'PNR(?:[ \t]*(?:No\.?)?[ \t]*[:.-]?[ \t]*)(\b[A-Z0-9]{3,15}\b)',
-      r'PNR\b(?:[^\n]{0,30}?)\b([A-Z0-9]{3,15})\b',
-      r'PNR\s*[:.-]?\s*(\d{10})',
+      r'PNR\s*(?:No\.?)?\s*[:.-]?\s*(\d{10})',
+      r'PNR\b[\s\S]{0,30}?\b(\d{10})\b',
+      r'PNR\s*[:.-]?\s*(\b[A-Z0-9]{10}\b)',
     ]);
 
     /// Extracted origin station name.
@@ -296,8 +299,8 @@ class IRCTCPDFParser implements ITicketParser {
       r'Scheduled Departure[\s\S]{0,10}?[:"]+\s*(\d{2}-[A-Za-z]{3}-\d{4}\s+\d{2}:\d{2})',
       r'Departure[\s\S]{0,10}?\s*(\d{1,2}:\d{2}[\s\S]{0,25}?\d{4})',
       r'Departure[\s\S]{0,10}?\s*(\d{2}-[A-Za-z]{3}-\d{4}[\s\S]{0,25}?\d{1,2}:\d{2})',
-      r'Date of Journey\s*[:.-]?\s*(\d{2}[-/]\d{2}[-/]\d{2,4})[\s\S]*?Scheduled Departure\s*[:.-]?\s*(\d{1,2}[:.]\d{2})',
-      r'Date of Journey\s*[:.-]?\s*(\d{2}[-/]\d{2}[-/]\d{2,4})[\s\S]*?Time\s*[:.-]?\s*(\d{1,2}[:.]\d{2})',
+      r'(Date of Journey\s*[:.-]?\s*\d{2}[-/]\d{2}[-/]\d{2,4}[\s\S]*?Scheduled Departure\s*[:.-]?\s*\d{1,2}[:.]\d{2})',
+      r'(Date of Journey\s*[:.-]?\s*\d{2}[-/]\d{2}[-/]\d{2,4}[\s\S]*?Time\s*[:.-]?\s*\d{1,2}[:.]\d{2})',
     ]);
 
     /// Parses multiple date formats safely.
@@ -392,7 +395,7 @@ class IRCTCPDFParser implements ITicketParser {
 
     if (pMatch != null) {
       pName = pMatch.group(1)!.trim();
-      pAge = int.tryParse(pMatch.group(2) ?? '0') ?? 0;
+      pAge = int.tryParse(pMatch.group(2) ?? '') ?? 0;
       pGender = pMatch.group(3)!.trim();
 
       /// Look ahead for passenger status code.

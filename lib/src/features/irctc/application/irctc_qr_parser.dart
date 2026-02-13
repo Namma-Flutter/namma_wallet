@@ -66,10 +66,14 @@ class IRCTCQRParser implements IIRCTCQRParser {
     return data[key] ?? '';
   }
 
-  int _parseInt(String value) {
-    if (value.isEmpty) return 0;
+  int? _parseInt(String value) {
+    if (value.isEmpty) return null;
     final cleanValue = value.replaceAll(RegExp(r'[^\d]'), '');
-    return TravelTextParserUtils.parseInt(cleanValue) ?? 0;
+    final result = TravelTextParserUtils.parseInt(cleanValue);
+    if (result == null && cleanValue.isNotEmpty) {
+      _logger.error('[IRCTCQRParser] Failed to parse age: "$value"');
+    }
+    return result;
   }
 
   double? _parseAmount(String value) {

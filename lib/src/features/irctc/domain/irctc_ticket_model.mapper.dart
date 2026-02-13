@@ -31,7 +31,7 @@ class IRCTCTicketMapper extends ClassMapperBase<IRCTCTicket> {
     'passengerName',
     _$passengerName,
   );
-  static int _$age(IRCTCTicket v) => v.age;
+  static int? _$age(IRCTCTicket v) => v.age;
   static const Field<IRCTCTicket, int> _f$age = Field('age', _$age);
   static String _$status(IRCTCTicket v) => v.status;
   static const Field<IRCTCTicket, String> _f$status = Field('status', _$status);
@@ -246,7 +246,7 @@ class _IRCTCTicketCopyWithImpl<$R, $Out>
   $R call({
     String? pnrNumber,
     String? passengerName,
-    int? age,
+    Object? age = $none,
     String? status,
     String? trainNumber,
     String? trainName,
@@ -265,7 +265,7 @@ class _IRCTCTicketCopyWithImpl<$R, $Out>
     FieldCopyWithData({
       if (pnrNumber != null) #pnrNumber: pnrNumber,
       if (passengerName != null) #passengerName: passengerName,
-      if (age != null) #age: age,
+      if (age != $none) #age: age,
       if (status != null) #status: status,
       if (trainNumber != null) #trainNumber: trainNumber,
       if (trainName != null) #trainName: trainName,
