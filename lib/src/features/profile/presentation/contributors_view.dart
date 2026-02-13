@@ -35,7 +35,7 @@ class ContributorsView extends StatefulWidget {
 class _ContributorsViewState extends State<ContributorsView> {
   late Future<List<Contributor>> _contributorsFuture;
 
-  final repoLink = 'https://github.com/Namma-Flutter/namma_wallet';
+  static const repoLink = 'https://github.com/Namma-Flutter/namma_wallet';
 
   @override
   void initState() {
@@ -111,7 +111,17 @@ class _ContributorsViewState extends State<ContributorsView> {
                 final uri = Uri.parse(repoLink);
 
                 try {
-                  await launchUrl(uri, mode: LaunchMode.externalApplication);
+                  final launched = await launchUrl(
+                    uri,
+                    mode: LaunchMode.externalApplication,
+                  );
+                  if (!launched && context.mounted) {
+                    showSnackbar(
+                      context,
+                      'Cannot open the repository link',
+                      isError: true,
+                    );
+                  }
                 } on Exception catch (_) {
                   if (context.mounted) {
                     showSnackbar(
