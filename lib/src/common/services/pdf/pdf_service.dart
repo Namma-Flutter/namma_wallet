@@ -198,7 +198,7 @@ class PDFService implements IPDFService {
 
   /// Extracts structured data from a PDF file using layout analysis.
   ///
-  /// NOTE: This implementation is currently optimized for TNSTC-style documents.
+  /// NOTE: This implementation is currently optimized for TNSTC-style documents
   // TODO(harish): Consider accepting field-mapping configuration or delegating
   // to type-specific extractors as more ticket types are added.
   @override
