@@ -10,6 +10,7 @@ import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 import 'package:namma_wallet/src/common/routing/app_router.dart';
 import 'package:namma_wallet/src/common/routing/app_routes.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
@@ -33,6 +34,46 @@ class NotificationService {
     return info.identifier;
   }
 
+  /// Checks if the POST_NOTIFICATIONS permission is granted.
+  /// On Android 13+, this permission is required to post notifications.
+  /// On earlier Android versions and other platforms, returns true.
+  Future<bool> _isNotificationPermissionGranted() async {
+    if (!Platform.isAndroid) return true; // iOS handles this differently
+
+    final status = await Permission.notification.status;
+    return status.isGranted;
+  }
+
+  /// Requests POST_NOTIFICATIONS permission on Android 13+.
+  /// Returns true if permission is granted or not needed, false if denied.
+  /// Note: On Android < 13, this returns true automatically as the permission
+  /// is not required.
+  Future<bool> _requestNotificationPermission() async {
+    if (!Platform.isAndroid) return true;
+
+    final status = await Permission.notification.request();
+
+    if (_logger != null) {
+      _logger.info(
+        'Notification permission status: ${status.isDenied
+            ? 'denied'
+            : status.isGranted
+            ? 'granted'
+            : 'pending'}',
+      );
+    } else {
+      debugPrint(
+        'Notification permission status: ${status.isDenied
+            ? 'denied'
+            : status.isGranted
+            ? 'granted'
+            : 'pending'}',
+      );
+    }
+
+    return status.isGranted;
+  }
+
   Future<void> initTimezone() async {
     tz.initializeTimeZones();
 
@@ -52,16 +93,14 @@ class NotificationService {
       '@drawable/ic_notification_small',
     );
     if (Platform.isAndroid) {
-      final androidImpl = _plugin
-          .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin
-          >();
-      final granted =
-          await androidImpl?.requestNotificationsPermission() ?? false;
-      if (_logger != null) {
-        _logger.info('Notification permission granted: $granted');
-      } else {
-        debugPrint('Notification permission granted: $granted');
+      // Request POST_NOTIFICATIONS permission on Android 13+
+      final permissionGranted = await _requestNotificationPermission();
+      if (!permissionGranted) {
+        if (_logger != null) {
+          _logger.info('Notification permission denied by user');
+        } else {
+          debugPrint('Notification permission denied by user');
+        }
       }
     }
     const iosSettings = DarwinInitializationSettings();
@@ -198,6 +237,23 @@ class NotificationService {
     required String body,
     required String payload,
   }) async {
+    // Check permission before scheduling
+    final permissionGranted = await _isNotificationPermissionGranted();
+    if (!permissionGranted) {
+      if (_logger != null) {
+        _logger.info(
+          '''
+          POST_NOTIFICATIONS permission not granted; skipping notification scheduling.''',
+        );
+      } else {
+        debugPrint(
+          '''
+          POST_NOTIFICATIONS permission not granted; skipping notification scheduling.''',
+        );
+      }
+      return;
+    }
+
     final details = await notificatioDetails();
 
     try {
@@ -229,6 +285,21 @@ class NotificationService {
 
   Future<void> scheduleTicketReminderFor(Ticket ticket) async {
     try {
+      // Request permission before attempting to schedule
+      final permissionGranted = await _requestNotificationPermission();
+      if (!permissionGranted) {
+        if (_logger != null) {
+          _logger.info(
+            'POST_NOTIFICATIONS permission denied; cannot schedule reminders.',
+          );
+        } else {
+          debugPrint(
+            'POST_NOTIFICATIONS permission denied; cannot schedule reminders.',
+          );
+        }
+        return;
+      }
+
       void logSkip(String message) {
         if (_logger != null) {
           _logger.error(message);
@@ -320,6 +391,21 @@ class NotificationService {
     required String body,
     required String payload, // your serialized Ticket JSON
   }) async {
+    // Check permission before showing notification
+    final permissionGranted = await _isNotificationPermissionGranted();
+    if (!permissionGranted) {
+      if (_logger != null) {
+        _logger.info(
+          'POST_NOTIFICATIONS permission not granted;cannot show notification.',
+        );
+      } else {
+        debugPrint(
+          'POST_NOTIFICATIONS permission not granted;cannot show notification.',
+        );
+      }
+      return;
+    }
+
     final details = await notificatioDetails();
 
     await _plugin.show(
