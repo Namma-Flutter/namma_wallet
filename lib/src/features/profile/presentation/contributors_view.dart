@@ -13,13 +13,20 @@ class Contributor {
     required this.profileUrl,
   });
 
-  factory Contributor.fromJson(Map<String, dynamic> json) {
+  static Contributor? fromJson(Map<String, dynamic> json) {
+    final name = json['login'];
+    final avatarUrl = json['avatar_url'];
+    final profileUrl = json['html_url'];
+    if (name is! String || avatarUrl is! String || profileUrl is! String) {
+      return null;
+    }
     return Contributor(
-      name: json['login'] as String,
-      avatarUrl: json['avatar_url'] as String,
-      profileUrl: json['html_url'] as String,
+      name: name,
+      avatarUrl: avatarUrl,
+      profileUrl: profileUrl,
     );
   }
+
   final String name;
   final String avatarUrl;
   final String profileUrl;
@@ -72,13 +79,15 @@ class _ContributorsViewState extends State<ContributorsView> {
 
       if (response.statusCode == 200) {
         final body = json.decode(response.body) as List<dynamic>;
-        if (body.isEmpty) {
+        if (body.length < perPage) {
           break; // No more contributors
         }
         contributors.addAll(
-          body.map(
-            (json) => Contributor.fromJson(json as Map<String, dynamic>),
-          ),
+          body
+              .map(
+                (json) => Contributor.fromJson(json as Map<String, dynamic>),
+              )
+              .whereType<Contributor>(),
         );
         page++;
       } else {
@@ -223,6 +232,14 @@ class _ContributorsViewState extends State<ContributorsView> {
                     final url = Uri.parse(contributor.profileUrl);
                     try {
                       await launchUrl(url);
+                      final launched = await launchUrl(url);
+                      if (!launched && context.mounted) {
+                        showSnackbar(
+                          context,
+                          'Could not open ${contributor.profileUrl}',
+                          isError: true,
+                        );
+                      }
                     } on Exception catch (_) {
                       if (context.mounted) {
                         showSnackbar(
