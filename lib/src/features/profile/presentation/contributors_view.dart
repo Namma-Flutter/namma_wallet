@@ -135,7 +135,7 @@ class _ContributorsViewState extends State<ContributorsView> {
               child: const Row(
                 children: [
                   Text(
-                    'Repo',
+                    'Github',
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 16,
