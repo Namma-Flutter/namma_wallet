@@ -23,6 +23,7 @@ class ProfileView extends StatefulWidget {
 
 class _ProfileViewState extends State<ProfileView> {
   final IHapticService hapticService = getIt<IHapticService>();
+
   bool _isHapticEnabled = false;
   @override
   void initState() {
@@ -105,21 +106,18 @@ class _ProfileViewState extends State<ProfileView> {
                   );
 
                   try {
-                    if (!await canLaunchUrl(uri)) {
-                      if (context.mounted) {
-                        showSnackbar(
-                          context,
-                          'No email app found. Please install a mail client.',
-                          isError: true,
-                        );
-                      }
-                      return;
-                    }
-
-                    await launchUrl(
+                    final response = await launchUrl(
                       uri,
                       mode: LaunchMode.externalApplication,
                     );
+
+                    if (!response && context.mounted) {
+                      showSnackbar(
+                        context,
+                        'Failed to open email app. Please try again.',
+                        isError: true,
+                      );
+                    }
                   } on Exception {
                     if (context.mounted) {
                       showSnackbar(
