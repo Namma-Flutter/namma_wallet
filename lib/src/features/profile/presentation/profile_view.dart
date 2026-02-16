@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
@@ -167,6 +168,46 @@ class _ProfileViewState extends State<ProfileView> {
                 ),
                 trailingIsInteractive: true,
               ),
+
+              // Debug Section (only in debug mode)
+              if (kDebugMode) ...[
+                const SizedBox(height: 8),
+                const Divider(),
+                const Padding(
+                  padding: EdgeInsets.all(16),
+                  child: Row(
+                    children: [
+                      Icon(Icons.bug_report, size: 20),
+                      SizedBox(width: 8),
+                      Text(
+                        'Debug Tools',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                ProfileTile(
+                  icon: Icons.storage_outlined,
+                  title: 'Database Viewer',
+                  subtitle: 'View stored users and tickets',
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () async {
+                    await context.pushNamed(AppRoute.dbViewer.name);
+                  },
+                ),
+                ProfileTile(
+                  icon: Icons.document_scanner_outlined,
+                  title: 'OCR Debug Viewer',
+                  subtitle: 'Extract OCR blocks from PDFs',
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () async {
+                    await context.pushNamed(AppRoute.ocrDebug.name);
+                  },
+                ),
+              ],
             ],
           ),
         ),

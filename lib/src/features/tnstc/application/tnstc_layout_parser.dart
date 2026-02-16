@@ -246,6 +246,15 @@ class TNSTCLayoutParser extends TravelPDFParser {
           ? nullIfEmpty(row[4].text.trim())
           : null;
 
+      // Skip rows that don't look like passenger data
+      // (e.g. ID Card rows or other footer information)
+      if (type != null) {
+        final lowerType = type.toLowerCase();
+        if (!lowerType.contains('adult') && !lowerType.contains('child')) {
+          continue;
+        }
+      }
+
       if (name.isNotEmpty) {
         passengers.add(
           PassengerInfo(

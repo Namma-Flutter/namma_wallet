@@ -185,9 +185,12 @@ class IRCTCPDFParser implements ITicketParser {
 
     /// Extracts PNR number using multiple regex variations.
     final pnr = pick([
-      r'PNR\s*(?:No\.?)?\s*[:.-]?\s*(\d{10})',
-      r'PNR\b[\s\S]{0,30}?\b(\d{10})\b',
-      r'PNR\s*[:.-]?\s*(\b[A-Z0-9]{10}\b)',
+      // Numeric PNR: 6-12 digits
+      r'PNR\s*(?:No\.?)?\s*[:.-]?\s*(\d{6,12})',
+      // Alphanumeric PNR (found in some tests): 6-12 chars
+      r'PNR\s*(?:No\.?)?\s*[:.-]?\s*(\b[A-Z0-9]{6,12}\b)',
+      // Fallback for blocks where PNR is embedded
+      r'PNR\b[\s\S]{0,30}?\b([A-Z0-9]{6,12})\b',
     ]);
 
     /// Extracted origin station name.

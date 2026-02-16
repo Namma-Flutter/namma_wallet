@@ -70,22 +70,23 @@ class IRCTCSMSParser implements ITicketParser {
 
     final isUpdate = isUpdateMessage(smsText);
 
-    var pnr = extract(r'PNR(?:[\s\S]{0,10}?)\b([0-9]{10})\b');
+    var pnr = extract(r'PNR\s*(?:No\.?)?\s*[:.-]?\s*\b([A-Z0-9]{6,12})\b');
     if (pnr.isEmpty) {
-      for (final m in RegExp(r'\b([0-9]{10})\b').allMatches(rawText)) {
+      // Fallback: look for 6-12 alphanumeric chars that aren't train numbers
+      for (final m in RegExp(r'\b([A-Z0-9]{6,12})\b').allMatches(rawText)) {
         final start = m.start;
         final prefixStart = start - 16;
         final prefix = rawText.substring(
           prefixStart < 0 ? 0 : prefixStart,
           start,
         );
-        final isTrainNumber = RegExp(
-          r'(?:TRN|Train|Trn)[:\-\s]*$',
+        final isTrainNumberOrClass = RegExp(
+          r'(?:TRN|Train|Trn|Class|Cls)[:\-\s]*$',
           caseSensitive: false,
         ).hasMatch(prefix);
-        if (!isTrainNumber) {
-          pnr = m.group(1) ?? '';
-          break;
+        if (!isTrainNumberOrClass) {
+          pnr = (m.group(1) ?? '').trim();
+          if (pnr.isNotEmpty) break;
         }
       }
     }
