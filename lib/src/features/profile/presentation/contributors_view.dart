@@ -79,9 +79,7 @@ class _ContributorsViewState extends State<ContributorsView> {
 
       if (response.statusCode == 200) {
         final body = json.decode(response.body) as List<dynamic>;
-        if (body.length < perPage) {
-          break; // No more contributors
-        }
+
         contributors.addAll(
           body
               .map(
@@ -90,6 +88,9 @@ class _ContributorsViewState extends State<ContributorsView> {
               .whereType<Contributor>(),
         );
         page++;
+        if (body.length < perPage) {
+          break; // No more contributors
+        }
       } else {
         throw Exception(
           'Failed to load contributors: HTTP ${response.statusCode}\n'
@@ -144,7 +145,7 @@ class _ContributorsViewState extends State<ContributorsView> {
               child: const Row(
                 children: [
                   Text(
-                    'Github',
+                    'GitHub',
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 16,
@@ -231,7 +232,6 @@ class _ContributorsViewState extends State<ContributorsView> {
                   onTap: () async {
                     final url = Uri.parse(contributor.profileUrl);
                     try {
-                      await launchUrl(url);
                       final launched = await launchUrl(url);
                       if (!launched && context.mounted) {
                         showSnackbar(
