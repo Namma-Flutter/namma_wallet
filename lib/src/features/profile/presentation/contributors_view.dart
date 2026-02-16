@@ -82,8 +82,9 @@ class _ContributorsViewState extends State<ContributorsView> {
 
         contributors.addAll(
           body
+              .whereType<Map<String, dynamic>>()
               .map(
-                (json) => Contributor.fromJson(json as Map<String, dynamic>),
+                Contributor.fromJson,
               )
               .whereType<Contributor>(),
         );
@@ -232,7 +233,10 @@ class _ContributorsViewState extends State<ContributorsView> {
                   onTap: () async {
                     final url = Uri.parse(contributor.profileUrl);
                     try {
-                      final launched = await launchUrl(url);
+                      final launched = await launchUrl(
+                        url,
+                        mode: LaunchMode.externalApplication,
+                      );
                       if (!launched && context.mounted) {
                         showSnackbar(
                           context,
