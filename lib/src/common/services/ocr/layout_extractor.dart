@@ -182,7 +182,8 @@ class LayoutExtractor {
     if (candidates.isEmpty) return null;
 
     // Sort by horizontal distance from key block (closest first)
-    // Use vertical proximity as a tie-breaker when horizontal distances are close
+    // Use vertical proximity as a tie-breaker when horizontal
+    // distances are close
     candidates.sort((a, b) {
       final distA = a.boundingBox.left - keyBlock.boundingBox.right;
       final distB = b.boundingBox.left - keyBlock.boundingBox.right;

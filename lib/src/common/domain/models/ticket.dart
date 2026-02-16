@@ -32,7 +32,8 @@ class Ticket with TicketMappable {
     IRCTCTicket model, {
     bool isUpdate = false,
   }) {
-    // If dateOfJourney or scheduledDeparture are null, use a sentinel date (1970-01-01 UTC)
+    // If dateOfJourney or scheduledDeparture are null, use a sentinel
+    // date (1970-01-01 UTC)
     // as per service test expectations.
     final hasValidDateTime =
         model.dateOfJourney != null && model.scheduledDeparture != null;

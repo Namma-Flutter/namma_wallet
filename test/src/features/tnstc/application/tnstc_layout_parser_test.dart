@@ -268,7 +268,8 @@ Service Start Time : 13:15
             '₹${(expected['totalFare']! as double).toStringAsFixed(2)}',
           );
 
-          // Verify first passenger details (parser usually takes the first match
+          // Verify first passenger details (parser usually takes the
+          // first match
           // for fields like name/age/gender if they are unique per line/block)
           expect(extrasMap['Passenger Name'], expected['passengerName']);
           expect(extrasMap['Age'], expected['passengerAge'].toString());

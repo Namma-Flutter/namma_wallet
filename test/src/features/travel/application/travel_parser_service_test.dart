@@ -71,7 +71,7 @@ void main() {
           // Note: We check the ticket's derived fields or extras
           expect(ticket.location, contains('CHENNAI-PT Dr.M.G.R. BS'));
 
-          final extrasMap = {for (var e in ticket.extras!) e.title: e.value};
+          final extrasMap = {for (final e in ticket.extras!) e.title: e.value};
           expect(
             extrasMap['Departure'],
             contains('11:30 PM'),

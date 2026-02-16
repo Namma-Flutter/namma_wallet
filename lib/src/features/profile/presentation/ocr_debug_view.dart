@@ -155,7 +155,7 @@ class _OCRDebugViewState extends State<OCRDebugView> {
 
   String _escapeString(String str) {
     // Escape special characters for Dart string literal
-    return "'${str.replaceAll(r'\', r'\\').replaceAll("'", r"\'").replaceAll('\n', r'\n')}'";
+    return """'${str.replaceAll(r'\', r'\\').replaceAll("'", r"\'").replaceAll('\n', r'\n')}'""";
   }
 
   Future<void> _copyToClipboard(String content, String label) async {
