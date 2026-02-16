@@ -227,16 +227,15 @@ class TNSTCLayoutParser extends TravelPDFParser {
       row.sort((a, b) => a.boundingBox.left.compareTo(b.boundingBox.left));
 
       // Skip header rows
-      if (row.any(
+      final hasHeaderKeyword = row.any(
         (b) =>
             b.text.toLowerCase().contains('age') ||
             b.text.toLowerCase().contains('gender'),
-      )) {
-        continue;
-      }
+      );
+      if (hasHeaderKeyword) continue;
 
       // Expected columns: Name, Age, Adult/Child, Gender, Seat No
-      if (row.length < 3) continue; // Not enough data
+      if (row.length < 3) continue; // Not enough data for a table row
 
       final name = row[0].text.trim();
       final age = row.length > 1 ? int.tryParse(row[1].text.trim()) : null;
@@ -247,7 +246,6 @@ class TNSTCLayoutParser extends TravelPDFParser {
           : null;
 
       // Skip rows that don't look like passenger data
-      // (e.g. ID Card rows or other footer information)
       if (type != null) {
         final lowerType = type.toLowerCase();
         if (!lowerType.contains('adult') && !lowerType.contains('child')) {
@@ -265,6 +263,57 @@ class TNSTCLayoutParser extends TravelPDFParser {
             seatNumber: seatNumber,
           ),
         );
+      }
+    }
+
+    // Vertical list fallback: If we couldn't find multi-column rows,
+    // but have plenty of single-column blocks between headers.
+    if (passengers.isEmpty && tableBlocks.isNotEmpty) {
+      // Filter out labels and headers
+      final dataBlocks = tableBlocks.where((b) {
+        final text = b.text.toLowerCase().replaceAll(':', '').trim();
+        // Only exclude the exact header labels
+        final isHeader =
+            text == 'name' ||
+            text == 'age' ||
+            text == 'adult/child' ||
+            text == 'gender' ||
+            text == 'seat no.' ||
+            text == 'seat no' ||
+            text == 'passenger information';
+        return !isHeader;
+      }).toList();
+
+      // Look for "Adult" or "Child" markers as anchors
+      for (var i = 0; i < dataBlocks.length; i++) {
+        final text = dataBlocks[i].text.toLowerCase().trim();
+        if (text == 'adult' || text == 'child') {
+          // Found 'type' field at index i.
+          // In a vertical list: i-2=Name, i-1=Age, i=Type, i+1=Gender, i+2=Seat
+          final name = i >= 2 ? dataBlocks[i - 2].text.trim() : '';
+          final age = i >= 1
+              ? int.tryParse(dataBlocks[i - 1].text.trim())
+              : null;
+          final type = dataBlocks[i].text.trim();
+          final gender = i + 1 < dataBlocks.length
+              ? nullIfEmpty(dataBlocks[i + 1].text.trim())
+              : null;
+          final seatNumber = i + 2 < dataBlocks.length
+              ? nullIfEmpty(dataBlocks[i + 2].text.trim())
+              : null;
+
+          if (name.isNotEmpty) {
+            passengers.add(
+              PassengerInfo(
+                name: name,
+                age: age,
+                type: type,
+                gender: gender,
+                seatNumber: seatNumber,
+              ),
+            );
+          }
+        }
       }
     }
 

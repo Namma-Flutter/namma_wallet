@@ -1,9 +1,11 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/enums/source_type.dart';
+import 'package:namma_wallet/src/common/enums/ticket_type.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
 import 'package:namma_wallet/src/features/travel/application/travel_parser_service.dart';
 
+import '../../../../fixtures/tnstc_layout_fixtures.dart';
 import '../../../../fixtures/tnstc_sms_fixtures.dart';
 import '../../../../helpers/fake_logger.dart';
 
@@ -25,6 +27,70 @@ void main() {
 
     tearDown(() async {
       await getIt.popScope();
+    });
+
+    group('TNSTC Parser - PDF (Layout) Format', () {
+      test(
+        'Given SETC PDF OCR blocks, When parsing ticket, '
+        'Then returns valid SETC ticket',
+        () {
+          // Arrange
+          final blocks = TnstcLayoutFixtures.t73266848;
+
+          // Act
+          final ticket = service.parseTicketFromBlocks(blocks);
+
+          // Assert
+          expect(ticket, isNotNull);
+          expect(ticket!.ticketId, equals('T73266848'));
+          expect(ticket.type, equals(TicketType.bus));
+          expect(
+            ticket.startTime,
+            isNotNull,
+            reason: 'startTime (journey date) should not be null',
+          );
+
+          // Verify passenger details
+          expect(ticket.extras, isNotNull);
+          final passengerExtra = ticket.extras
+              ?.where((e) => e.title == 'Passenger')
+              .toList();
+          expect(
+            passengerExtra,
+            isNotEmpty,
+            reason: 'Passenger info should be extracted',
+          );
+          expect(passengerExtra![0].value, contains('HarishAnbalagan'));
+          expect(passengerExtra[0].child, isNotNull);
+          final seatExtra = passengerExtra[0].child
+              ?.where((e) => e.title == 'Seat')
+              .firstOrNull;
+          expect(seatExtra?.value, equals('10UB'));
+
+          // Verify missing fields reported by user
+          // Note: We check the ticket's derived fields or extras
+          expect(ticket.location, contains('CHENNAI-PT Dr.M.G.R. BS'));
+
+          final extrasMap = {for (var e in ticket.extras!) e.title: e.value};
+          expect(
+            extrasMap['Departure'],
+            contains('11:30 PM'),
+          ); // From serviceStartTime
+          expect(
+            extrasMap['Pickup Time'],
+            contains('11:30 PM'),
+          ); // From passengerPickupTime
+          expect(extrasMap['Platform'], equals('2'));
+          expect(extrasMap['Service Class'], equals('AC SLEEPER SEATER'));
+          expect(extrasMap['Booking Ref'], equals('OB31464175'));
+          expect(extrasMap['Bus ID'], equals('E-3269'));
+
+          final providerExtra = ticket.extras?.firstWhere(
+            (e) => e.title == 'Provider',
+          );
+          expect(providerExtra?.value, equals('SETC'));
+        },
+      );
     });
 
     group('TNSTC Parser - SMS Format', () {

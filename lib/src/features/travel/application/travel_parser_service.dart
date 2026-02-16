@@ -288,11 +288,9 @@ class IRCTCTrainParser extends TravelTicketParser {
 }
 
 /// SETC bus ticket parser.
-///
-/// SETC tickets use the same SMS format as TNSTC, so this parser delegates
-/// to TNSTCSMSParser. Geometry-aware PDF parsing is intentionally not
-/// implemented as SETC tickets are currently only received via SMS.
 class SETCBusParser extends TravelTicketParser {
+  SETCBusParser({required ILogger logger}) : _logger = logger;
+  final ILogger _logger;
   @override
   String get providerName => 'SETC';
 
@@ -315,24 +313,65 @@ class SETCBusParser extends TravelTicketParser {
   }
 
   @override
-  Ticket parseTicket(String text) {
-    // SETC tickets use the same format as TNSTC SMS
-    // Just delegate to the existing TNSTC SMS parser
-    return TNSTCSMSParser().parseTicket(text);
+  Ticket parseTicketFromBlocks(List<OCRBlock> blocks) {
+    // Use layout parser for PDFs (with geometry).
+    // SETC layout is identical to TNSTC.
+    final layoutParser = TNSTCLayoutParser(logger: _logger);
+    return layoutParser.parseTicketFromBlocks(blocks);
   }
 
   @override
-  TicketUpdateInfo? parseUpdate(String text) => null;
+  Ticket parseTicket(String text) {
+    // Detect if this is SMS or PDF format
+    final isSMS = isSMSFormat(text);
+
+    // Use appropriate parser based on format
+    if (isSMS) {
+      final smsParser = TNSTCSMSParser();
+      return smsParser.parseTicket(text);
+    } else {
+      // Use the layout parser via pseudo-blocks for plain text.
+      final layoutParser = TNSTCLayoutParser(logger: _logger);
+      return layoutParser.parseTicket(text);
+    }
+  }
 
   @override
-  bool isSMSFormat(String text) => true;
+  bool isSMSFormat(String text) {
+    // SMS contains SETC SMS-style patterns (same as TNSTC)
+    final smsPatterns = [
+      r'From\s*:\s*[A-Z]',
+      r'To\s*[A-Z]',
+      r'Trip\s*:\s*',
+      r'Time\s*:\s*,?\s*\d{1,2}:\d{2}',
+      r'Boarding at\s*:',
+    ];
+
+    final pdfPatterns = [
+      'Service Start Place',
+      'Service End Place',
+      'Passenger Pickup Point',
+      'PNR Number',
+      'Bank Txn',
+    ];
+
+    final hasSmsPattern = smsPatterns.any(
+      (pattern) => RegExp(pattern, caseSensitive: false).hasMatch(text),
+    );
+
+    final hasPdfPattern = pdfPatterns.any(
+      (pattern) => text.toLowerCase().contains(pattern.toLowerCase()),
+    );
+
+    return hasSmsPattern && !hasPdfPattern;
+  }
 }
 
 class TravelParserService implements ITravelParser {
   TravelParserService({required ILogger logger})
     : _logger = logger,
       _parsers = [
-        SETCBusParser(),
+        SETCBusParser(logger: logger),
         TNSTCBusParser(logger: logger),
         IRCTCTrainParser(logger: logger),
       ];

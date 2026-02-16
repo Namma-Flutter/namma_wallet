@@ -130,15 +130,10 @@ class Ticket with TicketMappable {
     final primarySource = model.serviceStartPlace ?? model.passengerStartPlace;
     final primaryDestination = model.serviceEndPlace ?? model.passengerEndPlace;
 
-    // Use first passenger for display if available
-    final firstPassenger = model.passengers.isNotEmpty
-        ? model.passengers.first
-        : null;
     // Get seat numbers from either SMS field or first passenger
     final seatNumber = model.seatNumbers.isNotNullOrEmpty
         ? model.seatNumbers
         : null;
-    final gender = firstPassenger?.gender;
 
     var startTime = model.passengerPickupTime;
 
@@ -254,16 +249,26 @@ class Ticket with TicketMappable {
           ExtrasModel(title: 'PNR Number', value: model.pnrNumber),
         if (model.passengers.isNotEmpty)
           ExtrasModel(
-            title: 'Passenger Name',
-            value: model.passengers
-                .map((p) => p.name)
-                .where((n) => n.isNotEmpty)
-                .join(', '),
+            title: 'Passenger',
+            value: model.passengers.first.name,
+            child: [
+              if (model.passengers.first.seatNumber != null)
+                ExtrasModel(
+                  title: 'Seat',
+                  value: model.passengers.first.seatNumber,
+                ),
+              if (model.passengers.first.age != null)
+                ExtrasModel(
+                  title: 'Age',
+                  value: model.passengers.first.age.toString(),
+                ),
+              if (model.passengers.first.gender != null)
+                ExtrasModel(
+                  title: 'Gender',
+                  value: model.passengers.first.gender,
+                ),
+            ],
           ),
-        if (firstPassenger?.age != null && firstPassenger!.age! > 0)
-          ExtrasModel(title: 'Age', value: firstPassenger.age.toString()),
-        if (gender != null && gender.isNotNullOrEmpty)
-          ExtrasModel(title: 'Gender', value: gender),
         if (model.busIdNumber?.trim().isNotNullOrEmpty ?? false)
           ExtrasModel(title: 'Bus ID', value: model.busIdNumber!.trim()),
         if (model.vehicleNumber?.trim().isNotNullOrEmpty ?? false)
@@ -277,6 +282,22 @@ class Ticket with TicketMappable {
             title: 'Booking Ref',
             value: model.obReferenceNumber!.trim(),
           ),
+
+        if (model.serviceStartPlace.isNotNullOrEmpty)
+          ExtrasModel(title: 'From Place', value: model.serviceStartPlace),
+        if (model.serviceEndPlace.isNotNullOrEmpty)
+          ExtrasModel(title: 'To Place', value: model.serviceEndPlace),
+        if (model.passengerStartPlace.isNotNullOrEmpty &&
+            model.passengerStartPlace != model.serviceStartPlace)
+          ExtrasModel(
+            title: 'Passenger From',
+            value: model.passengerStartPlace,
+          ),
+        if (model.passengerEndPlace.isNotNullOrEmpty &&
+            model.passengerEndPlace != model.serviceEndPlace)
+          ExtrasModel(title: 'Passenger To', value: model.passengerEndPlace),
+        if (model.passengerPickupPoint.isNotNullOrEmpty)
+          ExtrasModel(title: 'Pickup Point', value: model.passengerPickupPoint),
 
         if (model.classOfService != null &&
             model.classOfService!.trim().isNotNullOrEmpty)
@@ -297,10 +318,8 @@ class Ticket with TicketMappable {
         if (model.serviceStartTime != null &&
             model.serviceStartTime!.isNotNullOrEmpty)
           ExtrasModel(
-            title: 'Departure Time',
-            value: DateTimeConverter.instance.formatTimeString(
-              model.serviceStartTime!,
-            ),
+            title: 'Departure',
+            value: model.serviceStartTime,
           ),
         if (seatNumber != null && seatNumber.isNotNullOrEmpty)
           ExtrasModel(title: 'Seat Number', value: seatNumber),

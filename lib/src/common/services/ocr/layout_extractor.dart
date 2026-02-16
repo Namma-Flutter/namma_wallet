@@ -74,16 +74,20 @@ class LayoutExtractor {
   /// [maxDistance] limits how far to search for values (prevents wrong matches)
   String? findValueForKey(
     String keyLabel, {
-    double sameRowTolerance = 8.0,
+    double sameRowTolerance = 12.0,
     double maxDistance = 500.0,
   }) {
     final keyBlock = _findKeyBlock(keyLabel);
-    if (keyBlock == null) return null;
+    if (keyBlock == null) {
+      return null;
+    }
 
     // Strategy 0: Check if the key block itself contains the value
     // (common in pseudo-blocks where "Key : Value" is on one line)
     final inlineValue = _extractInlineValue(keyBlock, keyLabel);
-    if (inlineValue != null) return inlineValue;
+    if (inlineValue != null) {
+      return inlineValue;
+    }
 
     // Strategy 1: Look for value on same row, to the right
     final sameRowValue = _findValueOnSameRow(
@@ -91,7 +95,9 @@ class LayoutExtractor {
       tolerance: sameRowTolerance,
       maxDistance: maxDistance,
     );
-    if (sameRowValue != null) return sameRowValue;
+    if (sameRowValue != null) {
+      return sameRowValue;
+    }
 
     // Strategy 2: Look for value on next row (below)
     final belowValue = _findValueBelow(
@@ -123,20 +129,41 @@ class LayoutExtractor {
     return valueText.isNotEmpty ? valueText : null;
   }
 
-  List<OCRBlock> findBlocksMatching(String pattern) {
-    final lowerPattern = pattern.toLowerCase();
-    final matching = blocks.where((b) {
-      return b.text.toLowerCase().contains(lowerPattern);
-    }).toList();
-
-    // Sort by reading order: top to bottom, then left to right
-    return matching..sort(readingOrderComparator);
-  }
-
   /// Finds the first block containing the key label (respects reading order).
-  OCRBlock? _findKeyBlock(String keyLabel) {
-    final matches = findBlocksMatching(keyLabel);
-    return matches.isEmpty ? null : matches.first;
+  OCRBlock? _findKeyBlock(String label) {
+    final lowerLabel = label.toLowerCase();
+    OCRBlock? bestMatch;
+    var bestScore = -1;
+
+    for (final block in blocks) {
+      final text = block.text.trim();
+      final lowerText = text.toLowerCase();
+
+      var score = -1;
+      if (lowerText == lowerLabel) {
+        score = 100;
+      } else if (lowerText == '$lowerLabel:') {
+        score = 90;
+      } else if (lowerText.startsWith('$lowerLabel:')) {
+        score = 80;
+      } else if (lowerText.startsWith(lowerLabel) &&
+          text.length < lowerLabel.length + 5) {
+        score = 70;
+      } else if (lowerText.contains(lowerLabel) && lowerText.endsWith(':')) {
+        score = 60;
+      } else if (lowerText.startsWith(lowerLabel)) {
+        score = 50;
+      } else if (lowerText.contains(lowerLabel)) {
+        score = 40;
+      }
+
+      if (score > bestScore) {
+        bestScore = score;
+        bestMatch = block;
+        if (score == 100) break; // Perfect match
+      }
+    }
+    return bestMatch;
   }
 
   /// Finds value blocks on the same horizontal row, to the right of [keyBlock].
@@ -154,12 +181,19 @@ class LayoutExtractor {
 
     if (candidates.isEmpty) return null;
 
-    // Sort by distance from key block (closest first)
-    candidates.sort(
-      (a, b) => (a.boundingBox.left - keyBlock.boundingBox.right).compareTo(
-        b.boundingBox.left - keyBlock.boundingBox.right,
-      ),
-    );
+    // Sort by horizontal distance from key block (closest first)
+    // Use vertical proximity as a tie-breaker when horizontal distances are close
+    candidates.sort((a, b) {
+      final distA = a.boundingBox.left - keyBlock.boundingBox.right;
+      final distB = b.boundingBox.left - keyBlock.boundingBox.right;
+
+      if ((distA - distB).abs() < 5) {
+        final yDiffA = (a.centerY - keyBlock.centerY).abs();
+        final yDiffB = (b.centerY - keyBlock.centerY).abs();
+        return yDiffA.compareTo(yDiffB);
+      }
+      return distA.compareTo(distB);
+    });
 
     return _extractValueFromCandidates(candidates);
   }
@@ -180,15 +214,21 @@ class LayoutExtractor {
       // If block contains inline format (key : value),
       // check if it's another field
       if (candidateText.contains(':')) {
+        // If it looks like a date/time pattern, return the whole block.
+        // It's likely a value (e.g., "HH:mm" or "DD/MM/YYYY"), not a field label.
+        final isDateOrTimePattern =
+            RegExp(r'\d{1,2}[-/]\d{1,2}[-/]\d{2,4}').hasMatch(candidateText) ||
+            RegExp(r'\d{1,2}:\d{2}').hasMatch(candidateText);
+
+        if (isDateOrTimePattern) {
+          return candidateText;
+        }
+
         final colonIndex = candidateText.indexOf(':');
         final keyPart = candidateText.substring(0, colonIndex).trim();
         final valuePart = candidateText.substring(colonIndex + 1).trim();
 
         // Check if this looks like a field label
-        // NOTE: The two-word key-part heuristic may over-classify values as
-        // field labels for some document types. Works well for TNSTC tickets
-        // where multi-word values rarely contain colons, but may need
-        // refinement for other formats.
         final looksLikeFieldLabel =
             keyPart.split(' ').length >= 2 ||
             _fieldLabelKeywords.any(
@@ -220,13 +260,19 @@ class LayoutExtractor {
           _sectionHeaderKeywords.any(lowerText.contains);
 
       // Check for field labels (common patterns)
+      // Exclude strings that look like dates (DD/MM/YYYY) or times (HH:mm)
+      final isDateOrTime =
+          RegExp(r'\d{1,2}[-/]\d{1,2}[-/]\d{2,4}').hasMatch(lowerText) ||
+          RegExp(r'\d{1,2}:\d{2}').hasMatch(lowerText);
+
       final isFieldLabel =
-          lowerText.contains('/') || // "Adult/Child", "Yes/No", etc.
-          _fieldLabelKeywords.any(
-            (k) =>
-                lowerText.endsWith(' $k') ||
-                lowerText == k, // Exact match or Ends with
-          );
+          !isDateOrTime &&
+          (lowerText.contains('/') || // "Adult/Child", "Yes/No", etc.
+              _fieldLabelKeywords.any(
+                (k) =>
+                    lowerText.endsWith(' $k') ||
+                    lowerText == k, // Exact match or Ends with
+              ));
 
       if (isSectionHeader || isFieldLabel) {
         // This is a section header or field label, skip it

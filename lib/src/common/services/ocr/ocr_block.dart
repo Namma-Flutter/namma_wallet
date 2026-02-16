@@ -63,7 +63,7 @@ class OCRBlock with OCRBlockMappable {
 
   /// Returns true if this block is approximately on the same horizontal line
   /// as [other], within the given [tolerance] (in pixels).
-  bool isSameRowAs(OCRBlock other, {double tolerance = 8.0}) {
+  bool isSameRowAs(OCRBlock other, {double tolerance = 12.0}) {
     if (page != other.page) return false;
     return (centerY - other.centerY).abs() < tolerance;
   }

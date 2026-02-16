@@ -276,6 +276,201 @@ Service Start Time : 13:15
           expect(extrasMap['Seat Number'], expected['seatNumber']);
         },
       );
+
+      test(
+        'should parse SETC ticket T75229209 from real OCR blocks',
+        () {
+          final blocks = TnstcLayoutFixtures.t75229209;
+          final ticket = parser.parseTicketFromBlocks(blocks);
+          const expected = TnstcLayoutFixtures.t75229209Expected;
+
+          // Verify ticket ID
+          expect(ticket.ticketId, expected['pnrNumber']);
+
+          // Verify primary text contains route information
+          expect(ticket.primaryText, contains('CHENNAI'));
+          expect(ticket.primaryText, contains('KUMBAKONAM'));
+
+          // Verify key fields in extras
+          final extrasMap = <String, String>{
+            for (final e in ticket.extras ?? <ExtrasModel>[])
+              if (e.title != null) e.title!: e.value ?? '',
+          };
+
+          expect(extrasMap['PNR Number'], expected['pnrNumber']);
+          expect(extrasMap['Provider'], expected['corporation']);
+          expect(extrasMap['Route No'], expected['routeNo']);
+          expect(extrasMap['Service Class'], expected['classOfService']);
+          expect(extrasMap['Trip Code'], expected['tripCode']);
+          expect(extrasMap['Bus ID'], expected['busIdNumber']);
+          expect(
+            extrasMap['Fare'],
+            '₹${(expected['totalFare']! as double).toStringAsFixed(2)}',
+          );
+
+          // Verify passenger details
+          expect(extrasMap['Passenger Name'], expected['passengerName']);
+          expect(extrasMap['Age'], expected['passengerAge'].toString());
+          expect(extrasMap['Gender'], expected['passengerGender']);
+          expect(extrasMap['Seat Number'], expected['seatNumber']);
+        },
+      );
+
+      test(
+        'should parse SETC ticket T75229210 from real OCR blocks',
+        () {
+          final blocks = TnstcLayoutFixtures.t75229210;
+          final ticket = parser.parseTicketFromBlocks(blocks);
+          const expected = TnstcLayoutFixtures.t75229210Expected;
+
+          // Verify ticket ID
+          expect(ticket.ticketId, expected['pnrNumber']);
+
+          // Verify primary text contains route information
+          expect(ticket.primaryText, contains('KUMBAKONAM'));
+          expect(ticket.primaryText, contains('CHENNAI'));
+
+          // Verify key fields in extras
+          final extrasMap = <String, String>{
+            for (final e in ticket.extras ?? <ExtrasModel>[])
+              if (e.title != null) e.title!: e.value ?? '',
+          };
+
+          expect(extrasMap['PNR Number'], expected['pnrNumber']);
+          expect(extrasMap['Provider'], expected['corporation']);
+          expect(extrasMap['Route No'], expected['routeNo']);
+          expect(extrasMap['Service Class'], expected['classOfService']);
+          expect(extrasMap['Trip Code'], expected['tripCode']);
+          expect(extrasMap['Bus ID'], expected['busIdNumber']);
+          expect(
+            extrasMap['Fare'],
+            '₹${(expected['totalFare']! as double).toStringAsFixed(2)}',
+          );
+
+          // Verify passenger details
+          expect(extrasMap['Passenger Name'], expected['passengerName']);
+          expect(extrasMap['Age'], expected['passengerAge'].toString());
+          expect(extrasMap['Gender'], expected['passengerGender']);
+          expect(extrasMap['Seat Number'], expected['seatNumber']);
+        },
+      );
+
+      test(
+        'should parse SETC ticket T76296907 from real OCR blocks',
+        () {
+          final blocks = TnstcLayoutFixtures.t76296907;
+          final ticket = parser.parseTicketFromBlocks(blocks);
+          const expected = TnstcLayoutFixtures.t76296907Expected;
+
+          // Verify ticket ID
+          expect(ticket.ticketId, expected['pnrNumber']);
+
+          // Verify primary text contains route information
+          expect(ticket.primaryText, contains('KUMBAKONAM'));
+          expect(ticket.primaryText, contains('CHENNAI'));
+
+          // Verify key fields in extras
+          final extrasMap = <String, String>{
+            for (final e in ticket.extras ?? <ExtrasModel>[])
+              if (e.title != null) e.title!: e.value ?? '',
+          };
+
+          expect(extrasMap['PNR Number'], expected['pnrNumber']);
+          expect(extrasMap['Provider'], expected['corporation']);
+          expect(extrasMap['Route No'], expected['routeNo']);
+          expect(extrasMap['Service Class'], expected['classOfService']);
+          expect(extrasMap['Trip Code'], expected['tripCode']);
+          expect(extrasMap['Bus ID'], expected['busIdNumber']);
+          expect(
+            extrasMap['Fare'],
+            '₹${(expected['totalFare']! as double).toStringAsFixed(2)}',
+          );
+
+          // Verify passenger details
+          expect(extrasMap['Passenger Name'], expected['passengerName']);
+          expect(extrasMap['Age'], expected['passengerAge'].toString());
+          expect(extrasMap['Gender'], expected['passengerGender']);
+          expect(extrasMap['Seat Number'], expected['seatNumber']);
+        },
+      );
+
+      test(
+        'should parse VILLUPURAM ticket Y74873047 from real OCR blocks',
+        () {
+          final blocks = TnstcLayoutFixtures.y74873047;
+          final ticket = parser.parseTicketFromBlocks(blocks);
+          const expected = TnstcLayoutFixtures.y74873047Expected;
+
+          // Verify ticket ID
+          expect(ticket.ticketId, expected['pnrNumber']);
+
+          // Verify primary text contains route information
+          expect(ticket.primaryText, contains('BENGALURU'));
+          expect(ticket.primaryText, contains('TITTAKUDI'));
+
+          // Verify key fields in extras
+          final extrasMap = <String, String>{
+            for (final e in ticket.extras ?? <ExtrasModel>[])
+              if (e.title != null) e.title!: e.value ?? '',
+          };
+
+          expect(extrasMap['PNR Number'], expected['pnrNumber']);
+          expect(extrasMap['Provider'], expected['corporation']);
+          expect(extrasMap['Route No'], expected['routeNo']);
+          expect(extrasMap['Service Class'], expected['classOfService']);
+          expect(extrasMap['Trip Code'], expected['tripCode']);
+          expect(extrasMap['Bus ID'], expected['busIdNumber']);
+          expect(
+            extrasMap['Fare'],
+            '₹${(expected['totalFare']! as double).toStringAsFixed(2)}',
+          );
+
+          // Verify passenger details
+          expect(extrasMap['Passenger Name'], expected['passengerName']);
+          expect(extrasMap['Age'], expected['passengerAge'].toString());
+          expect(extrasMap['Gender'], expected['passengerGender']);
+          expect(extrasMap['Seat Number'], expected['seatNumber']);
+        },
+      );
+
+      test(
+        'should parse VILLUPURAM ticket Y74928831 from real OCR blocks',
+        () {
+          final blocks = TnstcLayoutFixtures.y74928831;
+          final ticket = parser.parseTicketFromBlocks(blocks);
+          const expected = TnstcLayoutFixtures.y74928831Expected;
+
+          // Verify ticket ID
+          expect(ticket.ticketId, expected['pnrNumber']);
+
+          // Verify primary text contains route information
+          expect(ticket.primaryText, contains('BENGALURU'));
+          expect(ticket.primaryText, contains('KALLAKURICHI'));
+
+          // Verify key fields in extras
+          final extrasMap = <String, String>{
+            for (final e in ticket.extras ?? <ExtrasModel>[])
+              if (e.title != null) e.title!: e.value ?? '',
+          };
+
+          expect(extrasMap['PNR Number'], expected['pnrNumber']);
+          expect(extrasMap['Provider'], expected['corporation']);
+          expect(extrasMap['Route No'], expected['routeNo']);
+          expect(extrasMap['Service Class'], expected['classOfService']);
+          expect(extrasMap['Trip Code'], expected['tripCode']);
+          expect(extrasMap['Bus ID'], expected['busIdNumber']);
+          expect(
+            extrasMap['Fare'],
+            '₹${(expected['totalFare']! as double).toStringAsFixed(2)}',
+          );
+
+          // Verify passenger details
+          expect(extrasMap['Passenger Name'], expected['passengerName']);
+          expect(extrasMap['Age'], expected['passengerAge'].toString());
+          expect(extrasMap['Gender'], expected['passengerGender']);
+          expect(extrasMap['Seat Number'], expected['seatNumber']);
+        },
+      );
     });
   });
 }
