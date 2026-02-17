@@ -1,10 +1,12 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/routing/app_router.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
+import 'package:namma_wallet/src/common/services/push_notification/notification_service.dart';
 import 'package:namma_wallet/src/common/theme/app_theme.dart';
 import 'package:namma_wallet/src/common/theme/theme_provider.dart';
 import 'package:namma_wallet/src/features/import/application/deep_link_service_interface.dart';
@@ -91,6 +93,19 @@ class _NammaWalletAppState extends State<NammaWalletApp> {
         },
       ),
     );
+
+    // If the app was launched by tapping a notification from a terminated state
+    // handle navigation after the first frame when the navigator is available.
+    if (Platform.isAndroid) {
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        await NotificationService().handleInitialNotification().catchError((
+          Object e,
+          StackTrace s,
+        ) {
+          _logger.error('Error handling initial notification', e, s);
+        });
+      });
+    }
   }
 
   Future<void> _handleDeepLink(MethodCall call) async {
