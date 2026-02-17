@@ -8,7 +8,7 @@
 
 Unlike Apple Wallet or Google Wallet, which support only specific formats, **Namma Wallet** is a flexible, community-driven solution that works with any ticket type and format.
 
-<a href="https://play.google.com/store/apps/details?id=com.nammaflutter.nammawallet"><img src="assets/badges/google_play_badge.png" alt="Get it on Google Play" height="60" width="200"/></a> <a href="https://apps.apple.com/in/app/namma-wallet/id6757295408"><img src="assets/badges/app_store_badge.svg" alt="Download on the App Store" height="60" width="200"/></a>
+<a href="https://play.google.com/store/apps/details?id=com.nammaflutter.nammawallet"><img src="assets/badges/google_play_badge.svg" alt="Get it on Google Play" height="60" width="200"/></a> <a href="https://apps.apple.com/in/app/namma-wallet/id6757295408"><img src="assets/badges/app_store_badge.svg" alt="Download on the App Store" height="60" width="200"/></a>
 
 ---
 
