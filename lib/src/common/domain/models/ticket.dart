@@ -8,12 +8,14 @@ import 'package:namma_wallet/src/common/helper/date_time_converter.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
 import 'package:namma_wallet/src/features/irctc/domain/irctc_ticket_model.dart';
 import 'package:namma_wallet/src/features/tnstc/domain/tnstc_model.dart';
-import 'package:namma_wallet/src/features/travel/application/travel_parser_service.dart';
 
 part 'ticket.mapper.dart';
 
 @MappableClass()
 class Ticket with TicketMappable {
+  /// Sentinel value for invalid/missing dates
+  static final DateTime invalidDateSentinel = DateTime.utc(1970);
+
   ///
   const Ticket({
     this.primaryText,
@@ -43,9 +45,9 @@ class Ticket with TicketMappable {
     }
 
     final journeyDate =
-        model.dateOfJourney ?? IRCTCTrainParser.invalidDateSentinel;
+        model.dateOfJourney ?? Ticket.invalidDateSentinel;
     final departure =
-        model.scheduledDeparture ?? IRCTCTrainParser.invalidDateSentinel;
+        model.scheduledDeparture ?? Ticket.invalidDateSentinel;
 
     /// the constants [_primaryTextConstant] used for primaryText
     /// and [__secondaryTextConstant] used for secondary
