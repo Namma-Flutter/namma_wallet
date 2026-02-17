@@ -8,6 +8,7 @@ import 'package:namma_wallet/src/common/helper/date_time_converter.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
 import 'package:namma_wallet/src/features/irctc/domain/irctc_ticket_model.dart';
 import 'package:namma_wallet/src/features/tnstc/domain/tnstc_model.dart';
+import 'package:namma_wallet/src/features/travel/application/travel_parser_service.dart';
 
 part 'ticket.mapper.dart';
 
@@ -34,19 +35,17 @@ class Ticket with TicketMappable {
   }) {
     if ((model.dateOfJourney == null || model.scheduledDeparture == null) &&
         !isUpdate) {
-      getIt<ILogger>().error(
-        '[Ticket.fromIRCTC] Missing required date/time: '
+      getIt<ILogger>().warning(
+        '[Ticket.fromIRCTC] Missing date/time: '
         'dateOfJourney=${model.dateOfJourney}, '
         'scheduledDeparture=${model.scheduledDeparture}',
       );
-      throw ArgumentError(
-        'Cannot create IRCTC ticket: dateOfJourney or '
-        'scheduledDeparture is null',
-      );
     }
 
-    final journeyDate = !isUpdate ? model.dateOfJourney : null;
-    final departure = !isUpdate ? model.scheduledDeparture : null;
+    final journeyDate =
+        model.dateOfJourney ?? IRCTCTrainParser.invalidDateSentinel;
+    final departure =
+        model.scheduledDeparture ?? IRCTCTrainParser.invalidDateSentinel;
 
     /// the constants [_primaryTextConstant] used for primaryText
     /// and [__secondaryTextConstant] used for secondary
@@ -72,10 +71,10 @@ class Ticket with TicketMappable {
             ].join(' • '),
       startTime: !isUpdate
           ? DateTime(
-              journeyDate!.year,
+              journeyDate.year,
               journeyDate.month,
               journeyDate.day,
-              departure!.hour,
+              departure.hour,
               departure.minute,
             )
           : null,
@@ -107,13 +106,13 @@ class Ticket with TicketMappable {
         ExtrasModel(
           title: 'Departure',
           value: !isUpdate
-              ? DateTimeConverter.instance.formatTime(departure!)
+              ? DateTimeConverter.instance.formatTime(departure)
               : null,
         ),
         ExtrasModel(
           title: 'Date of Journey',
           value: !isUpdate
-              ? DateTimeConverter.instance.formatDate(journeyDate!)
+              ? DateTimeConverter.instance.formatDate(journeyDate)
               : null,
         ),
         ExtrasModel(title: 'Fare', value: model.ticketFare?.toStringAsFixed(2)),

@@ -25,22 +25,30 @@ class HomeView extends StatefulWidget {
 }
 
 class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
+  final TextEditingController _searchController = TextEditingController();
   bool _isLoading = true;
+  List<Ticket> _allTravelTickets = [];
+  List<Ticket> _allEventTickets = [];
   List<Ticket> _travelTickets = [];
   List<Ticket> _eventTickets = [];
+  Timer? _debounce;
 
   late final IHapticService _hapticService;
+
   @override
   void initState() {
     super.initState();
     _hapticService = getIt<IHapticService>();
     WidgetsBinding.instance.addObserver(this);
+    _searchController.addListener(_onSearchChanged);
     unawaited(_loadTicketData());
   }
 
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    _searchController.dispose();
+    _debounce?.cancel();
     super.dispose();
   }
 
@@ -51,8 +59,66 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
     }
   }
 
+  void _onSearchChanged() {
+    setState(() {});
+    if (_debounce?.isActive ?? false) _debounce!.cancel();
+    _debounce = Timer(const Duration(milliseconds: 300), () {
+      _filterTickets(_searchController.text);
+    });
+  }
+
+  void _filterTickets(String query) {
+    if (query.isEmpty) {
+      setState(() {
+        _travelTickets = List.from(_allTravelTickets);
+        _eventTickets = List.from(_allEventTickets);
+      });
+      return;
+    }
+
+    final lowerQuery = query.toLowerCase();
+    setState(() {
+      _travelTickets = _allTravelTickets.where((ticket) {
+        return _matchesQuery(ticket, lowerQuery);
+      }).toList();
+      _eventTickets = _allEventTickets.where((ticket) {
+        return _matchesQuery(ticket, lowerQuery);
+      }).toList();
+    });
+  }
+
+  bool _matchesQuery(Ticket ticket, String query) {
+    final searchTerms = [
+      ticket.ticketId,
+      ticket.primaryText,
+      ticket.secondaryText,
+      ticket.location,
+    ];
+
+    // Check direct fields
+    for (final term in searchTerms) {
+      if (term != null && term.toLowerCase().contains(query)) {
+        return true;
+      }
+    }
+
+    // Check extras
+    if (ticket.extras != null) {
+      for (final extra in ticket.extras!) {
+        if ('${extra.title} ${extra.value}'.toLowerCase().contains(query)) {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  }
+
   Future<void> _loadTicketData() async {
     try {
+      if (!mounted) return;
+      // removed initial setState to avoid flickering/double rebuilds if fast
+      // but keeping it if we want to show loading state specifically on refresh
       setState(() {
         _isLoading = true;
       });
@@ -77,9 +143,27 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
         }
       }
       if (!mounted) return;
+
+      _allTravelTickets = travelTickets;
+      _allEventTickets = eventTickets;
+
+      // Filter locally first to avoid calling _filterTickets which sets state
+      final query = _searchController.text;
+      final filteredTravel = query.isEmpty
+          ? List<Ticket>.from(travelTickets)
+          : travelTickets
+                .where((t) => _matchesQuery(t, query.toLowerCase()))
+                .toList();
+
+      final filteredEvent = query.isEmpty
+          ? List<Ticket>.from(eventTickets)
+          : eventTickets
+                .where((t) => _matchesQuery(t, query.toLowerCase()))
+                .toList();
+
       setState(() {
-        _travelTickets = travelTickets;
-        _eventTickets = eventTickets;
+        _travelTickets = filteredTravel;
+        _eventTickets = filteredEvent;
         _isLoading = false;
       });
 
@@ -133,6 +217,38 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 UserProfileWidget(),
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
+                  child: TextField(
+                    controller: _searchController,
+                    decoration: InputDecoration(
+                      hintText: 'Search tickets (PNR, City, Name)',
+                      prefixIcon: const Icon(Icons.search),
+                      suffixIcon: _searchController.text.isNotEmpty
+                          ? IconButton(
+                              icon: const Icon(Icons.clear),
+                              onPressed: () {
+                                _debounce?.cancel();
+                                _searchController.clear();
+                                setState(() {});
+                                _filterTickets('');
+                              },
+                            )
+                          : null,
+                      filled: true,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                      ),
+                    ),
+                  ),
+                ),
                 Padding(
                   padding: const EdgeInsets.all(16),
                   child: Row(
