@@ -188,8 +188,6 @@ class IRCTCTrainParser implements TravelTicketParser {
   IRCTCTrainParser({required ILogger logger}) : _logger = logger;
   final ILogger _logger;
 
-
-
   @override
   String get providerName => 'IRCTC';
 

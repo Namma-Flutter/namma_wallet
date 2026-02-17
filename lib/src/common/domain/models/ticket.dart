@@ -44,10 +44,8 @@ class Ticket with TicketMappable {
       );
     }
 
-    final journeyDate =
-        model.dateOfJourney ?? Ticket.invalidDateSentinel;
-    final departure =
-        model.scheduledDeparture ?? Ticket.invalidDateSentinel;
+    final journeyDate = model.dateOfJourney ?? Ticket.invalidDateSentinel;
+    final departure = model.scheduledDeparture ?? Ticket.invalidDateSentinel;
 
     /// the constants [_primaryTextConstant] used for primaryText
     /// and [__secondaryTextConstant] used for secondary
