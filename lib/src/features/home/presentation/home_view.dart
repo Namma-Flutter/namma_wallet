@@ -28,7 +28,7 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
   bool _isLoading = true;
   List<Ticket> _travelTickets = [];
   List<Ticket> _eventTickets = [];
-  
+
   // Search feature variables
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
@@ -50,34 +50,36 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
     _searchController.dispose();
     super.dispose();
   }
-  
+
   void _onSearchChanged() {
     setState(() {
       _searchQuery = _searchController.text;
     });
   }
-  
+
   List<Ticket> _filterTickets(List<Ticket> tickets) {
     if (_searchQuery.isEmpty) return tickets;
-    
+
     final query = _searchQuery.toLowerCase();
     return tickets.where((ticket) {
       final pnr = ticket.ticketId?.toLowerCase() ?? '';
       final primary = ticket.primaryText?.toLowerCase() ?? '';
       final secondary = ticket.secondaryText?.toLowerCase() ?? '';
       final type = ticket.type?.name.toLowerCase() ?? '';
-      
-      final hasExtraMatch = ticket.extras?.any((extra) {
-        final title = extra.title?.toLowerCase() ?? '';
-        final value = extra.value?.toLowerCase() ?? '';
-        return title.contains(query) || value.contains(query);
-      }) ?? false;
-      
-      return pnr.contains(query) || 
-             primary.contains(query) || 
-             secondary.contains(query) || 
-             type.contains(query) ||
-             hasExtraMatch;
+
+      final hasExtraMatch =
+          ticket.extras?.any((extra) {
+            final title = extra.title?.toLowerCase() ?? '';
+            final value = extra.value?.toLowerCase() ?? '';
+            return title.contains(query) || value.contains(query);
+          }) ??
+          false;
+
+      return pnr.contains(query) ||
+          primary.contains(query) ||
+          secondary.contains(query) ||
+          type.contains(query) ||
+          hasExtraMatch;
     }).toList();
   }
 
@@ -136,7 +138,7 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     final filteredTravelTickets = _filterTickets(_travelTickets);
     final filteredEventTickets = _filterTickets(_eventTickets);
-  
+
     final cardStackList = filteredTravelTickets.map((ticket) {
       return CardModel(
         radius: const Radius.circular(30),
@@ -173,10 +175,13 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 UserProfileWidget(),
-                
+
                 // Search Bar
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
                   child: TextField(
                     controller: _searchController,
                     decoration: InputDecoration(
@@ -187,8 +192,13 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
                         borderSide: BorderSide.none,
                       ),
                       filled: true,
-                      fillColor: Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(0.5),
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
+                      fillColor: Theme.of(
+                        context,
+                      ).colorScheme.surfaceContainerHighest.withOpacity(0.5),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 0,
+                      ),
                     ),
                   ),
                 ),
@@ -258,7 +268,7 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
                                 ),
                                 const SizedBox(height: 16),
                                 Text(
-                                  _searchQuery.isNotEmpty 
+                                  _searchQuery.isNotEmpty
                                       ? 'No tickets match your search'
                                       : 'No travel tickets found',
                                   style: const TextStyle(
