@@ -192,7 +192,6 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
                       ),
                       filled: true,
 
-
                       fillColor: Colors.grey.withOpacity(0.1),
                       contentPadding: const EdgeInsets.symmetric(
                         horizontal: 16,
