@@ -11,8 +11,8 @@ void main() {
     GetIt.instance.registerSingleton<ILogger>(FakeLogger());
   });
 
-  tearDownAll(() {
-    GetIt.instance.reset();
+  tearDownAll(() async {
+    await GetIt.instance.reset();
   });
 
   // ... tests ...
@@ -31,8 +31,8 @@ void main() {
         toStation: 'MAQ',
         dateOfJourney: DateTime(2023, 10, 25),
         scheduledDeparture: DateTime(2023, 10, 25, 20, 15),
-        ticketFare: 500.0,
-        irctcFee: 20.0,
+        ticketFare: 500,
+        irctcFee: 20,
       );
 
       final ticket = Ticket.fromIRCTC(model);
@@ -45,9 +45,10 @@ void main() {
   );
 
   test(
-    'Ticket.fromIRCTC with null dates should have null startTime and missing extras',
+    'Ticket.fromIRCTC with null dates should have null startTime '
+    'and missing extras',
     () {
-      final model = IRCTCTicket(
+      const model = IRCTCTicket(
         pnrNumber: '1234567890',
         passengerName: 'Jane Doe',
         age: 25,
@@ -57,8 +58,6 @@ void main() {
         boardingStation: 'MAQ',
         fromStation: 'MAQ',
         toStation: 'MAS',
-        dateOfJourney: null,
-        scheduledDeparture: null,
       );
 
       final ticket = Ticket.fromIRCTC(model);
