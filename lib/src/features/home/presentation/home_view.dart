@@ -46,7 +46,6 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    _searchController.removeListener(_onSearchChanged);
     _searchController.dispose();
     super.dispose();
   }
@@ -192,12 +191,11 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
                         borderSide: BorderSide.none,
                       ),
                       filled: true,
-                      fillColor: Theme.of(
-                        context,
-                      ).colorScheme.surfaceContainerHighest.withOpacity(0.5),
+
+
+                      fillColor: Colors.grey.withOpacity(0.1),
                       contentPadding: const EdgeInsets.symmetric(
                         horizontal: 16,
-                        vertical: 0,
                       ),
                     ),
                   ),
