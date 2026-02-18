@@ -13,8 +13,6 @@ part 'ticket.mapper.dart';
 
 @MappableClass()
 class Ticket with TicketMappable {
-
-
   ///
   const Ticket({
     this.primaryText,
