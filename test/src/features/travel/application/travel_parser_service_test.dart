@@ -110,7 +110,7 @@ PNR No. : ABC123
 
       test(
         'Given IRCTC text with invalid journey date, When parsing ticket, '
-        'Then uses sentinel value and logs warning',
+        'Then returns ticket with null startTime',
         () {
           // Arrange (Given)
           const irctcText = '''
@@ -128,11 +128,8 @@ Reservation Upto : Kolkata
           // Assert (Then)
           expect(ticket, isNotNull);
           expect(ticket!.ticketId, equals('9876543210'));
-          // Should use sentinel value (epoch 1970)
-          expect(
-            ticket.startTime,
-            equals(IRCTCTrainParser.invalidDateSentinel),
-          );
+          // Should use null for invalid date
+          expect(ticket.startTime, isNull);
         },
       );
     });

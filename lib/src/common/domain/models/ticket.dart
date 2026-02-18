@@ -13,8 +13,7 @@ part 'ticket.mapper.dart';
 
 @MappableClass()
 class Ticket with TicketMappable {
-  /// Sentinel value for invalid/missing dates
-  static final DateTime invalidDateSentinel = DateTime.utc(1970);
+
 
   ///
   const Ticket({
@@ -44,8 +43,8 @@ class Ticket with TicketMappable {
       );
     }
 
-    final journeyDate = model.dateOfJourney ?? Ticket.invalidDateSentinel;
-    final departure = model.scheduledDeparture ?? Ticket.invalidDateSentinel;
+    final journeyDate = model.dateOfJourney;
+    final departure = model.scheduledDeparture;
 
     /// the constants [_primaryTextConstant] used for primaryText
     /// and [__secondaryTextConstant] used for secondary
@@ -56,7 +55,9 @@ class Ticket with TicketMappable {
       primaryText:
           model.fromStation.isNotNullOrEmpty && model.toStation.isNotNullOrEmpty
           ? '${model.fromStation} → ${model.toStation}'
-          : _primaryTextConstant,
+          : (model.trainName.isNotNullOrEmpty
+                ? model.trainName
+                : _primaryTextConstant),
       secondaryText:
           [
             if (model.trainNumber.isNotNullOrEmpty) model.trainNumber,
@@ -69,7 +70,7 @@ class Ticket with TicketMappable {
               if (model.travelClass.isNotNullOrEmpty) model.travelClass,
               if (model.passengerName.isNotNullOrEmpty) model.passengerName,
             ].join(' • '),
-      startTime: !isUpdate
+      startTime: !isUpdate && journeyDate != null && departure != null
           ? DateTime(
               journeyDate.year,
               journeyDate.month,
@@ -103,24 +104,27 @@ class Ticket with TicketMappable {
         ExtrasModel(title: 'From', value: model.fromStation),
         ExtrasModel(title: 'To', value: model.toStation),
         ExtrasModel(title: 'Boarding', value: model.boardingStation),
-        ExtrasModel(
-          title: 'Departure',
-          value: !isUpdate
-              ? DateTimeConverter.instance.formatTime(departure)
-              : null,
-        ),
-        ExtrasModel(
-          title: 'Date of Journey',
-          value: !isUpdate
-              ? DateTimeConverter.instance.formatDate(journeyDate)
-              : null,
-        ),
+        if (departure != null)
+          ExtrasModel(
+            title: 'Departure',
+            value: !isUpdate
+                ? DateTimeConverter.instance.formatTime(departure)
+                : null,
+          ),
+        if (journeyDate != null)
+          ExtrasModel(
+            title: 'Date of Journey',
+            value: !isUpdate
+                ? DateTimeConverter.instance.formatDate(journeyDate)
+                : null,
+          ),
         ExtrasModel(title: 'Fare', value: model.ticketFare?.toStringAsFixed(2)),
         ExtrasModel(
           title: 'IRCTC Fee',
           value: model.irctcFee?.toStringAsFixed(2),
         ),
         ExtrasModel(title: 'Transaction ID', value: model.transactionId),
+        ExtrasModel(title: 'Provider', value: 'IRCTC'),
       ],
     );
   }

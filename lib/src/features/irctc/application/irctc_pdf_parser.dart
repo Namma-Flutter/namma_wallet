@@ -277,6 +277,7 @@ class IRCTCPDFParser implements ITicketParser {
     final trainName = pick([
       r'Train No\./\s*Name\s+(?:[:.-])?\s*\d{5}\s*/\s*(.*)',
       r'(?:Train No|Train Name|Train)[\s\S]{0,30}?\d{5}\s*/\s*(.*)',
+      r'Train Name\s*[:]\s*([A-Za-z ]+)',
     ]);
 
     /// Raw travel class as printed on ticket.
