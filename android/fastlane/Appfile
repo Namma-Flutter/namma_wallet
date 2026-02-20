@@ -1,2 +1,2 @@
-json_key_file("fastlane/fastlane-android.json") # Path to the json secret file - Follow https://docs.fastlane.tools/actions/supply/#setup to get one
-package_name("com.nammaflutter.nammawallet") # e.g. com.krausefx.app
+json_key_file(ENV['PLAY_STORE_JSON_PATH'])
+package_name(ENV['PACKAGE_NAME'])

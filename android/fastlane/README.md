@@ -1,48 +1,31 @@
-fastlane documentation
-----
+# fastlane documentation
 
 # Installation
 
-Make sure you have the latest version of the Xcode command line tools installed:
-
-```sh
-xcode-select --install
-```
-
 For _fastlane_ installation instructions, see [Installing _fastlane_](https://docs.fastlane.tools/#installing-fastlane)
+
+After setting up the environment, perform the following steps:
+
+*   Ensure your `key.properties` file is in the root of the `android` folder.
+*   Ensure your keystore file is in the `android/app` folder.
+*   Ensure your Google Play service JSON file is in the `android/fastlane` folder.
+*   Set environment variables with the path of the JSON file and the package name. Name the environment variable file `.env.local` and place it in the `android/fastlane` folder. Refer to the `.env.local.example` file in the same folder for guidance.
 
 # Available Actions
 
 ## Android
-
-### android internal
-
-```sh
-[bundle exec] fastlane android internal
-```
-
-Build Flutter AAB & upload to Play Store Internal Testing
-
 ### android beta
+
+To build the app bundle and upload it to Play Store internal testing, run the following command:
 
 ```sh
 [bundle exec] fastlane android beta
 ```
-
-Build Flutter AAB & upload to Play Store Closed Testing
-
 ### android production
+
+To promote the beta build to production, run the following command:
 
 ```sh
 [bundle exec] fastlane android production
 ```
 
-Build Flutter AAB & upload to Play Store Production
-
-----
-
-This README.md is auto-generated and will be re-generated every time [_fastlane_](https://fastlane.tools) is run.
-
-More information about _fastlane_ can be found on [fastlane.tools](https://fastlane.tools).
-
-The documentation of _fastlane_ can be found on [docs.fastlane.tools](https://docs.fastlane.tools).

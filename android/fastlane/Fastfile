@@ -1,49 +1,115 @@
 default_platform(:android)
 
 platform :android do
+  # Load environment variables from .env.local
+  if File.exist?('.env.local')
+    Dotenv.load('.env.local')
+  end
+
 
   desc "Build Flutter AAB & upload to Play Store Internal Testing"
-  lane :internal do
-    flutter_prepare
-    flutter_build_aab
-    upload(track: "internal")
-  end
-
-  desc "Build Flutter AAB & upload to Play Store Closed Testing"
   lane :beta do
-    flutter_prepare
-    flutter_build_aab
-    upload(track: "closed")
-  end
+    # 1. Read version from pubspec.yaml
+    require 'yaml'
+    pubspec_path = "../../pubspec.yaml"
+    pubspec = YAML.load_file(pubspec_path)
+    version_string = pubspec['version']
+    version, build_number = version_string.split('+')
+    build_number = build_number.to_i
 
-  desc "Build Flutter AAB & upload to Play Store Production"
-  lane :production do
-    flutter_prepare
-    flutter_build_aab
-    upload(track: "production")
-  end
+    UI.message("Using version from pubspec.yaml: #{version}+#{build_number}")
 
-  # -------------------------------
-  # Shared methods
-  # -------------------------------
+    # 2. Validate version (prevent duplicate uploads)
+    # Note: Requires configured json_key_file in Appfile
+    begin
+      existing_versions = google_play_track_version_codes(
+        track: "internal",
+        package_name: "com.nammaflutter.nammawallet" 
+      )
+      
+      if existing_versions.include?(build_number)
+        UI.user_error!("❌ Version code #{build_number} already exists on Internal track. Please increment the build number in pubspec.yaml")
+      end
+      UI.success("✓ Version validation passed - #{version}+#{build_number}")
+    rescue => e
+      UI.message("⚠️  Could not verify existing versions: #{e.message}. Proceeding with build...")
+    end
 
-  private_lane :flutter_prepare do
-    sh "fvm flutter clean"
-    sh "fvm flutter pub get"
-  end
+    # 3. Build AAB using Makefile
+    sh("cd ../.. && make release-appbundle")
 
-  private_lane :flutter_build_aab do
-    sh "fvm flutter build appbundle --release"
-  end
+    # 4. Prepare Changelog
+    # Map iOS-style release notes to Android structure
+    changelog_path = "./metadata/en-US/release_notes.txt"
+    changelog_text = File.exist?(changelog_path) ? File.read(changelog_path) : "Beta build v#{version} (#{build_number})"
+    
+    # Write to the path 'supply' expects: fastlane/metadata/android/en-US/changelogs/{version_code}.txt
+    # We are in android/fastlane/
+    dest_changelog_dir = "./metadata/android/en-US/changelogs"
+    FileUtils.mkdir_p(dest_changelog_dir)
+    File.write("#{dest_changelog_dir}/#{build_number}.txt", changelog_text)
 
-  private_lane :upload do |options|
+    # 5. Upload to Play Store
     upload_to_play_store(
-      track: options[:track],
+      track: "internal",
       aab: "../build/app/outputs/bundle/release/app-release.aab",
+      skip_upload_metadata: false,
+      skip_upload_images: true,
+      skip_upload_screenshots: true
+    )
+    
+    UI.success("Uploaded build #{build_number} (v#{version}) to Internal Track")
+  end
+
+  desc "Promote beta build to Production"
+  lane :production do |options|
+    # Read from pubspec.yaml if no explicit params provided
+    if options[:version].nil? || options[:build].nil?
+      require 'yaml'
+      pubspec_path = "../../pubspec.yaml"
+      pubspec = YAML.load_file(pubspec_path)
+      version_string = pubspec['version']
+      version = version_string.split('+')[0]
+      # For Android promotion, we mainly need the version code (build number)
+      build_number = version_string.split('+')[1].to_i
+    else
+      version = options[:version]
+      build_number = options[:build].to_i
+    end
+    
+    # Allow override if passed in options
+    build_number = options[:build].to_i if options[:build]
+
+    UI.important("⚠️  Ensure this matches the Internal build you want to promote!")
+    UI.message("Promoting: v#{version} (#{build_number})")
+
+    # Validate the build exists on Internal
+    begin
+        existing_versions = google_play_track_version_codes(
+            track: "internal",
+            package_name: "com.nammaflutter.nammawallet"
+        )
+        if !existing_versions.include?(build_number)
+            UI.user_error!("Build #{build_number} not found on Internal track.")
+        end
+        UI.success("✓ Build #{build_number} verified on Internal track")
+    rescue => e
+        UI.message("⚠️  Could not verify build on Internal track: #{e.message}. Proceeding...")
+    end
+
+    # Promote
+    upload_to_play_store(
+      track: "internal",
+      track_promote_to: "production",
+      version_code: build_number,
+      skip_upload_aab: true,
       skip_upload_metadata: true,
       skip_upload_images: true,
       skip_upload_screenshots: true
     )
+
+    UI.success("Successfully promoted build #{build_number} (v#{version}) to Production")
   end
 
 end
+
