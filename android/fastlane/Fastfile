@@ -6,7 +6,6 @@ platform :android do
     Dotenv.load('.env.local')
   end
 
-
   desc "Build Flutter AAB & upload to Play Store Internal Testing"
   lane :beta do
     # 1. Read version from pubspec.yaml
@@ -14,25 +13,28 @@ platform :android do
     pubspec_path = "../../pubspec.yaml"
     pubspec = YAML.load_file(pubspec_path)
     version_string = pubspec['version']
-    version, build_number = version_string.split('+')
-    build_number = build_number.to_i
+    UI.user_error!("Missing 'version' in pubspec.yaml") if version_string.nil? || version_string.empty?
+    parts = version_string.split('+')
+    version = parts[0]
+    UI.user_error!("pubspec.yaml version '#{version_string}' is missing build number (expected format: x.y.z+n)") unless parts.length == 2
+    # For Android promotion, we mainly need the version code (build number)
+    build_number = parts[1].to_i
 
     UI.message("Using version from pubspec.yaml: #{version}+#{build_number}")
 
     # 2. Validate version (prevent duplicate uploads)
     # Note: Requires configured json_key_file in Appfile
-    begin
-      existing_versions = google_play_track_version_codes(
-        track: "internal",
-      )
-      
-      if existing_versions.include?(build_number)
-        UI.user_error!("❌ Version code #{build_number} already exists on Internal track. Please increment the build number in pubspec.yaml")
-      end
-      UI.success("✓ Version validation passed - #{version}+#{build_number}")
+    existing_versions = begin
+      google_play_track_version_codes(track: "internal")
     rescue => e
       UI.message("⚠️  Could not verify existing versions: #{e.message}. Proceeding with build...")
+      []
     end
+
+    if existing_versions.include?(build_number)
+      UI.user_error!("❌ Version code #{build_number} already exists on Internal track. Please increment the build number in pubspec.yaml")
+    end
+    UI.success("✓ Version validation passed - #{version}+#{build_number}")
 
     # 3. Build AAB using Makefile
     sh("cd ../.. && make release-appbundle")
@@ -68,29 +70,33 @@ platform :android do
       pubspec_path = "../../pubspec.yaml"
       pubspec = YAML.load_file(pubspec_path)
       version_string = pubspec['version']
-      version = version_string.split('+')[0]
+      UI.user_error!("Missing 'version' in pubspec.yaml") if version_string.nil? || version_string.empty?
+      parts = version_string.split('+')
+      version = parts[0]
+      UI.user_error!("pubspec.yaml version '#{version_string}' is missing build number (expected format: x.y.z+n)") unless parts.length == 2
       # For Android promotion, we mainly need the version code (build number)
-      build_number = version_string.split('+')[1].to_i
+      build_number = parts[1].to_i
     else
       version = options[:version]
       build_number = options[:build].to_i
     end
-    
 
     UI.important("⚠️  Ensure this matches the Internal build you want to promote!")
     UI.message("Promoting: v#{version} (#{build_number})")
 
     # Validate the build exists on Internal
-    begin
-        existing_versions = google_play_track_version_codes(
-            track: "internal",
-        )
-        unless existing_versions.include?(build_number)
-            UI.user_error!("Build #{build_number} not found on Internal track.")
-        end
-        UI.success("✓ Build #{build_number} verified on Internal track")
+    existing_versions = begin
+      google_play_track_version_codes(track: "internal")
     rescue => e
-        UI.message("⚠️  Could not verify build on Internal track: #{e.message}. Proceeding...")
+      UI.message("⚠️  Could not verify build on Internal track: #{e.message}. Proceeding...")
+      nil
+    end
+
+    if existing_versions
+      unless existing_versions.include?(build_number)
+        UI.user_error!("Build #{build_number} not found on Internal track.")
+      end
+      UI.success("✓ Build #{build_number} verified on Internal track")
     end
 
     # Promote
@@ -107,4 +113,3 @@ platform :android do
     UI.success("Successfully promoted build #{build_number} (v#{version}) to Production")
   end
 end
-
