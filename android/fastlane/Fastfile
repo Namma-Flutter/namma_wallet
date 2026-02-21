@@ -1,6 +1,9 @@
 default_platform(:android)
 
 platform :android do
+  # Prevent Fastlane from regenerating README.md on every run
+  skip_docs
+
   # Load environment variables from .env.local
   if File.exist?('.env.local')
     Dotenv.load('.env.local')
@@ -40,7 +43,7 @@ platform :android do
     sh("cd ../.. && make release-appbundle")
 
     # 4. Prepare Changelog
-    # Map iOS-style release notes to Android structure
+    # Map release notes to the path supply expects
     changelog_path = "./metadata/en-US/release_notes.txt"
     changelog_text = File.exist?(changelog_path) ? File.read(changelog_path) : "Beta build v#{version} (#{build_number})"
     
