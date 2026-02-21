@@ -36,6 +36,8 @@ android/fastlane/
 ├── Fastfile                 # Lane definitions (beta, production)
 ├── fastlane-android.json    # Google Play service account key (git-ignored)
 ├── metadata/
+│   ├── en-US/
+│   │   └── release_notes.txt
 │   └── android/en-US/
 │       ├── title.txt              # App title
 │       ├── short_description.txt  # Short description
