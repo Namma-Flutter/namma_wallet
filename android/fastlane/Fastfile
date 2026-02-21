@@ -24,7 +24,6 @@ platform :android do
     begin
       existing_versions = google_play_track_version_codes(
         track: "internal",
-        package_name: "com.nammaflutter.nammawallet" 
       )
       
       if existing_versions.include?(build_number)
@@ -77,8 +76,6 @@ platform :android do
       build_number = options[:build].to_i
     end
     
-    # Allow override if passed in options
-    build_number = options[:build].to_i if options[:build]
 
     UI.important("⚠️  Ensure this matches the Internal build you want to promote!")
     UI.message("Promoting: v#{version} (#{build_number})")
@@ -87,9 +84,8 @@ platform :android do
     begin
         existing_versions = google_play_track_version_codes(
             track: "internal",
-            package_name: "com.nammaflutter.nammawallet"
         )
-        if !existing_versions.include?(build_number)
+        unless existing_versions.include?(build_number)
             UI.user_error!("Build #{build_number} not found on Internal track.")
         end
         UI.success("✓ Build #{build_number} verified on Internal track")
@@ -110,6 +106,5 @@ platform :android do
 
     UI.success("Successfully promoted build #{build_number} (v#{version}) to Production")
   end
-
 end
 
