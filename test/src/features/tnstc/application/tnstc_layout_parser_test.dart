@@ -119,8 +119,12 @@ Service Start Time : 13:15
 
           // Verify key fields in extras
           final extrasMap = <String, String>{
-            for (final e in ticket.extras ?? <ExtrasModel>[])
+            for (final e in ticket.extras ?? <ExtrasModel>[]) ...{
               if (e.title != null) e.title!: e.value ?? '',
+              if (e.child != null)
+                for (final c in e.child!)
+                  if (c.title != null) c.title!: c.value ?? '',
+            },
           };
 
           expect(extrasMap['PNR Number'], expected['pnrNumber']);
@@ -165,8 +169,12 @@ Service Start Time : 13:15
 
           // Verify key fields in extras
           final extrasMap = <String, String>{
-            for (final e in ticket.extras ?? <ExtrasModel>[])
+            for (final e in ticket.extras ?? <ExtrasModel>[]) ...{
               if (e.title != null) e.title!: e.value ?? '',
+              if (e.child != null)
+                for (final c in e.child!)
+                  if (c.title != null) c.title!: c.value ?? '',
+            },
           };
 
           expect(extrasMap['PNR Number'], expected['pnrNumber']);
@@ -211,8 +219,12 @@ Service Start Time : 13:15
 
           // Verify key fields in extras
           final extrasMap = <String, String>{
-            for (final e in ticket.extras ?? <ExtrasModel>[])
+            for (final e in ticket.extras ?? <ExtrasModel>[]) ...{
               if (e.title != null) e.title!: e.value ?? '',
+              if (e.child != null)
+                for (final c in e.child!)
+                  if (c.title != null) c.title!: c.value ?? '',
+            },
           };
 
           expect(extrasMap['PNR Number'], expected['pnrNumber']);
@@ -227,7 +239,7 @@ Service Start Time : 13:15
           );
 
           // Verify passenger details
-          expect(extrasMap['Passenger Name'], expected['passengerName']);
+          expect(extrasMap['Passenger'], expected['passengerName']);
           expect(extrasMap['Age'], expected['passengerAge'].toString());
           expect(extrasMap['Gender'], expected['passengerGender']);
           // Seat number may be null if label format is not recognized
@@ -253,8 +265,12 @@ Service Start Time : 13:15
 
           // Verify key fields in extras
           final extrasMap = <String, String>{
-            for (final e in ticket.extras ?? <ExtrasModel>[])
+            for (final e in ticket.extras ?? <ExtrasModel>[]) ...{
               if (e.title != null) e.title!: e.value ?? '',
+              if (e.child != null)
+                for (final c in e.child!)
+                  if (c.title != null) c.title!: c.value ?? '',
+            },
           };
 
           expect(extrasMap['PNR Number'], expected['pnrNumber']);
@@ -268,12 +284,20 @@ Service Start Time : 13:15
             '₹${(expected['totalFare']! as double).toStringAsFixed(2)}',
           );
 
-          // Verify first passenger details (parser usually takes the
-          // first match
-          // for fields like name/age/gender if they are unique per line/block)
-          expect(extrasMap['Passenger Name'], expected['passengerName']);
-          expect(extrasMap['Age'], expected['passengerAge'].toString());
-          expect(extrasMap['Gender'], expected['passengerGender']);
+          // Verify multi-passenger details
+          expect(extrasMap['Passenger'], expected['passengerName']);
+          expect(
+            extrasMap['Ages'],
+            '26, 21, 24', // Joined from the 3 passengers in the fixture
+          );
+          expect(
+            extrasMap['Genders'],
+            'M, M, M',
+          );
+          expect(
+            extrasMap['Seat Numbers'],
+            '10UB, 11UB, 12UB',
+          );
           expect(extrasMap['Seat Number'], expected['seatNumber']);
         },
       );
@@ -294,8 +318,12 @@ Service Start Time : 13:15
 
           // Verify key fields in extras
           final extrasMap = <String, String>{
-            for (final e in ticket.extras ?? <ExtrasModel>[])
+            for (final e in ticket.extras ?? <ExtrasModel>[]) ...{
               if (e.title != null) e.title!: e.value ?? '',
+              if (e.child != null)
+                for (final c in e.child!)
+                  if (c.title != null) c.title!: c.value ?? '',
+            },
           };
 
           expect(extrasMap['PNR Number'], expected['pnrNumber']);
@@ -310,7 +338,7 @@ Service Start Time : 13:15
           );
 
           // Verify passenger details
-          expect(extrasMap['Passenger Name'], expected['passengerName']);
+          expect(extrasMap['Passenger'], expected['passengerName']);
           expect(extrasMap['Age'], expected['passengerAge'].toString());
           expect(extrasMap['Gender'], expected['passengerGender']);
           expect(extrasMap['Seat Number'], expected['seatNumber']);
@@ -333,8 +361,12 @@ Service Start Time : 13:15
 
           // Verify key fields in extras
           final extrasMap = <String, String>{
-            for (final e in ticket.extras ?? <ExtrasModel>[])
+            for (final e in ticket.extras ?? <ExtrasModel>[]) ...{
               if (e.title != null) e.title!: e.value ?? '',
+              if (e.child != null)
+                for (final c in e.child!)
+                  if (c.title != null) c.title!: c.value ?? '',
+            },
           };
 
           expect(extrasMap['PNR Number'], expected['pnrNumber']);
@@ -349,7 +381,7 @@ Service Start Time : 13:15
           );
 
           // Verify passenger details
-          expect(extrasMap['Passenger Name'], expected['passengerName']);
+          expect(extrasMap['Passenger'], expected['passengerName']);
           expect(extrasMap['Age'], expected['passengerAge'].toString());
           expect(extrasMap['Gender'], expected['passengerGender']);
           expect(extrasMap['Seat Number'], expected['seatNumber']);
@@ -372,8 +404,12 @@ Service Start Time : 13:15
 
           // Verify key fields in extras
           final extrasMap = <String, String>{
-            for (final e in ticket.extras ?? <ExtrasModel>[])
+            for (final e in ticket.extras ?? <ExtrasModel>[]) ...{
               if (e.title != null) e.title!: e.value ?? '',
+              if (e.child != null)
+                for (final c in e.child!)
+                  if (c.title != null) c.title!: c.value ?? '',
+            },
           };
 
           expect(extrasMap['PNR Number'], expected['pnrNumber']);
@@ -388,7 +424,7 @@ Service Start Time : 13:15
           );
 
           // Verify passenger details
-          expect(extrasMap['Passenger Name'], expected['passengerName']);
+          expect(extrasMap['Passenger'], expected['passengerName']);
           expect(extrasMap['Age'], expected['passengerAge'].toString());
           expect(extrasMap['Gender'], expected['passengerGender']);
           expect(extrasMap['Seat Number'], expected['seatNumber']);
@@ -411,8 +447,12 @@ Service Start Time : 13:15
 
           // Verify key fields in extras
           final extrasMap = <String, String>{
-            for (final e in ticket.extras ?? <ExtrasModel>[])
+            for (final e in ticket.extras ?? <ExtrasModel>[]) ...{
               if (e.title != null) e.title!: e.value ?? '',
+              if (e.child != null)
+                for (final c in e.child!)
+                  if (c.title != null) c.title!: c.value ?? '',
+            },
           };
 
           expect(extrasMap['PNR Number'], expected['pnrNumber']);
@@ -427,7 +467,7 @@ Service Start Time : 13:15
           );
 
           // Verify passenger details
-          expect(extrasMap['Passenger Name'], expected['passengerName']);
+          expect(extrasMap['Passenger'], expected['passengerName']);
           expect(extrasMap['Age'], expected['passengerAge'].toString());
           expect(extrasMap['Gender'], expected['passengerGender']);
           expect(extrasMap['Seat Number'], expected['seatNumber']);
@@ -450,8 +490,12 @@ Service Start Time : 13:15
 
           // Verify key fields in extras
           final extrasMap = <String, String>{
-            for (final e in ticket.extras ?? <ExtrasModel>[])
+            for (final e in ticket.extras ?? <ExtrasModel>[]) ...{
               if (e.title != null) e.title!: e.value ?? '',
+              if (e.child != null)
+                for (final c in e.child!)
+                  if (c.title != null) c.title!: c.value ?? '',
+            },
           };
 
           expect(extrasMap['PNR Number'], expected['pnrNumber']);
@@ -466,7 +510,7 @@ Service Start Time : 13:15
           );
 
           // Verify passenger details
-          expect(extrasMap['Passenger Name'], expected['passengerName']);
+          expect(extrasMap['Passenger'], expected['passengerName']);
           expect(extrasMap['Age'], expected['passengerAge'].toString());
           expect(extrasMap['Gender'], expected['passengerGender']);
           expect(extrasMap['Seat Number'], expected['seatNumber']);

@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:namma_wallet/src/common/services/ocr/ocr_block.dart';
 
 /// Utility for extracting structured data from OCR blocks using layout
@@ -22,9 +23,13 @@ class LayoutExtractor {
   static const _fieldLabelKeywords = [
     'number',
     'code',
-    'service',
-    'class',
+    'class', // Retained 'class' as it's a valid keyword, assuming 'classOfService' was an example value.
+    'service', // Retained 'service' as it's a valid keyword, assuming 'classOfService' was an example value.
     'time',
+    'passenger',
+    'pickup',
+    'point',
+    'boarding',
     'date',
     'place',
     'seat',
@@ -32,10 +37,12 @@ class LayoutExtractor {
     'age',
     'gender',
     'fare',
+    'total',
     'platform',
     'name',
     'adult',
     'child',
+    'route',
   ];
 
   /// Keywords that identify a block as a section header.
@@ -82,21 +89,151 @@ class LayoutExtractor {
       return null;
     }
 
-    // Strategy 0: Check if the key block itself contains the value
-    // (common in pseudo-blocks where "Key : Value" is on one line)
-    final inlineValue = _extractInlineValue(keyBlock, keyLabel);
-    if (inlineValue != null) {
-      return inlineValue;
+    final lowerKey = keyLabel.toLowerCase();
+    final lowerText = keyBlock.text.toLowerCase();
+    final keyStartIndex = lowerText.indexOf(lowerKey);
+
+    // Identify start of the value part (after the colon)
+    var colonIndex = -1;
+    if (keyStartIndex != -1) {
+      colonIndex = keyBlock.text.indexOf(':', keyStartIndex + lowerKey.length);
     }
 
-    // Strategy 1: Look for value on same row, to the right
-    final sameRowValue = _findValueOnSameRow(
-      keyBlock,
-      tolerance: sameRowTolerance,
-      maxDistance: maxDistance,
-    );
-    if (sameRowValue != null) {
-      return sameRowValue;
+    // Collect all potential value components on the same row
+    final candidates = <OCRBlock>[];
+
+    // Component 1: Inline value in the key block itself
+    if (colonIndex != -1 && colonIndex < keyBlock.text.length) {
+      var valueText = keyBlock.text.substring(colonIndex + 1).trim();
+      final originalValueText = valueText; // Save for empty check
+
+      if (valueText.isNotEmpty) {
+        // Handle inline multi-key blocks like "From: VAL1 To: VAL2"
+        // Look for the next recognized field label within valueText
+        if (valueText.contains(':')) {
+          // Find the next colon (which marks the start of the next key-value pair)
+          final nextColonIndex = valueText.indexOf(':');
+          final potentialKeyPart = valueText
+              .substring(0, nextColonIndex)
+              .trim();
+
+          // Find which keyword appears EARLIEST in potentialKeyPart (after the value)
+          // and truncate before that keyword
+          int earliestKeywordStart = -1;
+
+          // First, look for multi-word field labels (more specific)
+          final multiWordLabels = [
+            'passenger pickup',
+            'pickup point',
+            'pickup time',
+            'service start',
+            'service end',
+            'boarding point',
+          ];
+
+          for (final label in multiWordLabels) {
+            final labelIndex = potentialKeyPart.toLowerCase().indexOf(label);
+            if (labelIndex > 0 &&
+                (earliestKeywordStart == -1 ||
+                    labelIndex < earliestKeywordStart)) {
+              earliestKeywordStart = labelIndex;
+            }
+          }
+
+          // Then check for single-word keywords if no multi-word found
+          if (earliestKeywordStart == -1) {
+            for (final keyword in _fieldLabelKeywords) {
+              // Check for keyword with leading space (middle of string)
+              final keywordIndex = potentialKeyPart.toLowerCase().indexOf(
+                ' $keyword',
+              );
+              if (keywordIndex > 0 &&
+                  (earliestKeywordStart == -1 ||
+                      keywordIndex < earliestKeywordStart)) {
+                earliestKeywordStart = keywordIndex;
+              }
+              // Also check for keyword at the start of the string
+              final keywordIndexStart = potentialKeyPart.toLowerCase().indexOf(
+                keyword,
+              );
+              if (keywordIndexStart == 0 &&
+                  keywordIndexStart > 0 &&
+                  (earliestKeywordStart == -1 ||
+                      keywordIndexStart < earliestKeywordStart)) {
+                earliestKeywordStart = keywordIndexStart;
+              }
+            }
+          }
+
+          if (earliestKeywordStart > 0) {
+            valueText = potentialKeyPart
+                .substring(0, earliestKeywordStart)
+                .trim();
+          }
+        }
+
+        if (valueText.isNotEmpty) {
+          // Estimate the X position of where the value starts
+          final labelEndRatio = (colonIndex + 1) / keyBlock.text.length;
+          final valueLeft =
+              keyBlock.boundingBox.left +
+              (keyBlock.boundingBox.width * labelEndRatio);
+
+          candidates.add(
+            OCRBlock(
+              text: valueText,
+              boundingBox: Rect.fromLTWH(
+                valueLeft,
+                keyBlock.boundingBox.top,
+                keyBlock.boundingBox.width * (1 - labelEndRatio),
+                keyBlock.boundingBox.height,
+              ),
+              page: keyBlock.page,
+            ),
+          );
+        }
+      } else if (originalValueText.isEmpty) {
+        // Inline value is empty (e.g., "Route No :"), don't fall through to spatial search
+        return null;
+      }
+    }
+
+    // Component 2: Other blocks on the same row
+    final sameRowBlocks = blocks.where((b) {
+      if (b == keyBlock) return false;
+      final isSameRow = b.isSameRowAs(keyBlock, tolerance: sameRowTolerance);
+      final isMinRight = b.centerX > keyBlock.boundingBox.left;
+      final isWithinMaxDist =
+          (b.boundingBox.left - keyBlock.boundingBox.right) < maxDistance;
+
+      return b.page == keyBlock.page &&
+          isSameRow &&
+          isMinRight &&
+          isWithinMaxDist;
+    }).toList();
+    candidates.addAll(sameRowBlocks);
+
+    // If we found any components on the same row, process them
+    if (candidates.isNotEmpty) {
+      // Sort by horizontal position (left-to-right)
+      candidates.sort((a, b) {
+        final diff = a.boundingBox.left - b.boundingBox.left;
+        if (diff.abs() < 1.0) {
+          return a.boundingBox.top.compareTo(b.boundingBox.top);
+        }
+        return diff < 0 ? -1 : 1;
+      });
+
+      final sameRowValue = _extractValueFromCandidates(candidates, maxSkips: 1);
+      if (sameRowValue != null && sameRowValue.isNotEmpty) {
+        return sameRowValue;
+      }
+
+      // If we found a colon but the value was empty/rejected, don't fall back to "below"
+      // unless it was purely a standalone label "Key:".
+      if (colonIndex != -1 && colonIndex < keyBlock.text.length - 1) {
+        return null;
+      }
     }
 
     // Strategy 2: Look for value on next row (below)
@@ -105,88 +242,6 @@ class LayoutExtractor {
       maxDistance: maxDistance,
     );
     return belowValue;
-  }
-
-  /// Extracts value from a block that contains both key and value.
-  ///
-  /// Example: "Service End Place : CHENNAI-PT DR. M.G.R. BS"
-  /// Returns: "CHENNAI-PT DR. M.G.R. BS"
-  ///
-  /// When multiple key-value pairs exist in the same block, extracts only
-  /// the value for the specific key, stopping at the next key if found.
-  ///
-  /// Example input:
-  /// "Passenger Pickup Point : CHENNAI-PT Passenger Pickup Time: 21:00"
-  ///
-  /// For key "Passenger Pickup Point", returns: "CHENNAI-PT"
-  String? _extractInlineValue(OCRBlock block, String keyLabel) {
-    // Check if block contains a colon (indicates key : value format)
-    if (!block.text.contains(':')) return null;
-
-    final lowerKey = keyLabel.toLowerCase();
-    final lowerText = block.text.toLowerCase();
-
-    // Verify this block actually contains the key we're looking for
-    if (!lowerText.contains(lowerKey)) return null;
-
-    // Find the position of the key in the text
-    final keyStartIndex = lowerText.indexOf(lowerKey);
-    if (keyStartIndex == -1) return null;
-
-    // Find the colon after this specific key
-    final searchStartPos = keyStartIndex + lowerKey.length;
-    final colonIndex = block.text.indexOf(':', searchStartPos);
-    if (colonIndex == -1 || colonIndex >= block.text.length - 1) return null;
-
-    // Extract text after the colon
-    var valueText = block.text.substring(colonIndex + 1).trim();
-
-    // Check if there's another key:value pair in the remaining text
-    // Common field labels in tickets that may appear in combined blocks
-    final commonFieldLabels = [
-      'Passenger Pickup Time',
-      'Passenger Pickup Point',
-      'Service Start Time',
-      'Service End Time',
-      'Service Start Place',
-      'Service End Place',
-      'Passenger Start Place',
-      'Passenger End Place',
-      'Date of Journey',
-      'PNR Number',
-      'Route No',
-      'Trip Code',
-      'Platform Number',
-      'Class of Service',
-      'Total Fare',
-      'Bus ID No',
-    ];
-
-    // Look for any of these labels followed by a colon
-    int? earliestMatchIndex;
-    for (final label in commonFieldLabels) {
-      final labelIndex = valueText.indexOf(' $label');
-      if (labelIndex != -1) {
-        // Verify it's followed by optional space and colon
-        final afterLabel = labelIndex + label.length + 1;
-        if (afterLabel < valueText.length) {
-          final remaining = valueText.substring(afterLabel).trimLeft();
-          if (remaining.startsWith(':')) {
-            if (earliestMatchIndex == null ||
-                labelIndex < earliestMatchIndex) {
-              earliestMatchIndex = labelIndex;
-            }
-          }
-        }
-      }
-    }
-
-    if (earliestMatchIndex != null) {
-      // Truncate at the next field label
-      valueText = valueText.substring(0, earliestMatchIndex).trim();
-    }
-
-    return valueText.isNotEmpty ? valueText : null;
   }
 
   /// Finds the first block containing the key label (respects reading order).
@@ -226,129 +281,91 @@ class LayoutExtractor {
     return bestMatch;
   }
 
-  /// Finds value blocks on the same horizontal row, to the right of [keyBlock].
-  String? _findValueOnSameRow(
-    OCRBlock keyBlock, {
-    required double tolerance,
-    required double maxDistance,
-  }) {
-    final candidates = blocks.where((b) {
-      return b.page == keyBlock.page &&
-          b.isSameRowAs(keyBlock, tolerance: tolerance) &&
-          b.isRightOf(keyBlock) &&
-          (b.boundingBox.left - keyBlock.boundingBox.right) < maxDistance;
-    }).toList();
-
-    if (candidates.isEmpty) return null;
-
-    // Sort by horizontal distance from key block (closest first)
-    // Use vertical proximity as a tie-breaker when horizontal
-    // distances are close
-    candidates.sort((a, b) {
-      final distA = a.boundingBox.left - keyBlock.boundingBox.right;
-      final distB = b.boundingBox.left - keyBlock.boundingBox.right;
-
-      if ((distA - distB).abs() < 5) {
-        final yDiffA = (a.centerY - keyBlock.centerY).abs();
-        final yDiffB = (b.centerY - keyBlock.centerY).abs();
-        return yDiffA.compareTo(yDiffB);
-      }
-      return distA.compareTo(distB);
-    });
-
-    return _extractValueFromCandidates(candidates);
-  }
-
   /// Extracts value from a list of candidate blocks based on heuristics.
   ///
   /// This logic is shared between same-row and below searches.
-  String? _extractValueFromCandidates(List<OCRBlock> candidates) {
-    // Try to extract value from the closest candidate
-    // Skip blocks that are clearly other field labels,
-    // but limit how many we skip
+  String? _extractValueFromCandidates(
+    List<OCRBlock> candidates, {
+    int maxSkips = 2,
+  }) {
+    final matchedParts = <String>[];
     var skippedCount = 0;
-    const maxSkips = 2; // Give up after skipping 2 field labels
 
     for (final candidate in candidates) {
       final candidateText = candidate.text.trim();
 
-      // If block contains inline format (key : value),
-      // check if it's another field
+      // HEURISTIC: Check for field label FIRST, even if it contains a date/time.
       if (candidateText.contains(':')) {
-        // If it looks like a date/time pattern, return the whole block.
-        // It's likely a value (e.g., "HH:mm" or "DD/MM/YYYY"), not a field label.
-        final isDateOrTimePattern =
-            RegExp(r'\d{1,2}[-/]\d{1,2}[-/]\d{2,4}').hasMatch(candidateText) ||
-            RegExp(r'\d{1,2}:\d{2}').hasMatch(candidateText);
-
-        if (isDateOrTimePattern) {
-          return candidateText;
-        }
-
         final colonIndex = candidateText.indexOf(':');
         final keyPart = candidateText.substring(0, colonIndex).trim();
         final valuePart = candidateText.substring(colonIndex + 1).trim();
 
-        // Check if this looks like a field label
-        final looksLikeFieldLabel =
-            keyPart.split(' ').length >= 2 ||
-            _fieldLabelKeywords.any(
-              (k) => keyPart.toLowerCase().contains(k),
-            );
+        final isDateOrTimePattern =
+            RegExp(r'\d{1,2}[-/]\d{1,2}[-/]\d{2,4}').hasMatch(candidateText) ||
+            RegExp(r'\d{1,2}:\d{2}').hasMatch(candidateText);
 
-        if (looksLikeFieldLabel) {
-          // This is another field label, not a value for our key
+        final hasFieldKeyword = _fieldLabelKeywords.any(
+          (k) => keyPart.toLowerCase().contains(k),
+        );
+        final hasEnoughWords = keyPart.split(' ').length >= 2;
+
+        final looksLikeFieldLabel =
+            (hasFieldKeyword || hasEnoughWords) && !isDateOrTimePattern;
+
+        // SPECIAL CASE: If it has a field keyword AND a colon, it's almost always a field label
+        // even if it contains a date (e.g., "Passenger Pickup Time: 20/01/2026...")
+        final isStrongFieldLabel = hasFieldKeyword;
+
+        if (looksLikeFieldLabel || isStrongFieldLabel) {
+          // If we already started collecting value, stop at next label
+          if (matchedParts.isNotEmpty) break;
+
+          // Skip this block entirely - it's a field label block
+          // even if it has a value after the colon, we shouldn't use it
+          // for spatial search fallback (test case: Route No : with Passenger Pickup Time below)
           skippedCount++;
-          if (skippedCount > maxSkips) return null; // Searched too far
+          if (skippedCount > maxSkips) return null;
           continue;
         }
-
-        // Not a field label, return the value part
-        if (valuePart.isEmpty) continue;
-        return valuePart;
       }
 
-      // No colon - check if it's a standalone section header or field label
-      // Remove trailing punctuation for better matching
+      // Standalone text (might be a label or a value)
+      final isDateOrTimePattern =
+          RegExp(r'\d{1,2}[-/]\d{1,2}[-/]\d{2,4}').hasMatch(candidateText) ||
+          RegExp(r'\d{1,2}:\d{2}').hasMatch(candidateText);
+
       final lowerText = candidateText.toLowerCase().replaceAll(
         RegExp(r'[:.!?\s]+$'),
         '',
       );
 
-      // Check for section headers (multi-word with common keywords)
       final isSectionHeader =
+          !isDateOrTimePattern &&
           lowerText.split(' ').length >= 2 &&
           _sectionHeaderKeywords.any(lowerText.contains);
 
-      // Check for field labels (common patterns)
-      // Exclude strings that look like dates (DD/MM/YYYY) or times (HH:mm)
-      final isDateOrTime =
-          RegExp(r'\d{1,2}[-/]\d{1,2}[-/]\d{2,4}').hasMatch(lowerText) ||
-          RegExp(r'\d{1,2}:\d{2}').hasMatch(lowerText);
-
       final isFieldLabel =
-          !isDateOrTime &&
-          (lowerText.contains('/') || // "Adult/Child", "Yes/No", etc.
+          !isDateOrTimePattern &&
+          (lowerText.contains('/') ||
               _fieldLabelKeywords.any(
-                (k) =>
-                    lowerText.endsWith(' $k') ||
-                    lowerText == k, // Exact match or Ends with
+                (k) => lowerText.endsWith(' $k') || lowerText == k,
               ));
 
       if (isSectionHeader || isFieldLabel) {
-        // This is a section header or field label, skip it
+        if (matchedParts.isNotEmpty) break;
         skippedCount++;
-        if (skippedCount > maxSkips) return null; // Searched too far
+        if (skippedCount > maxSkips) return null;
         continue;
       }
 
-      // Plain value, return it cleaned
+      // Plain value, add it cleaned
       final cleaned = _cleanValue(candidateText);
-      if (cleaned != null && cleaned.isNotEmpty) return cleaned;
+      if (cleaned != null && cleaned.isNotEmpty) {
+        matchedParts.add(cleaned);
+      }
     }
 
-    // No valid value found
-    return null;
+    return matchedParts.isEmpty ? null : matchedParts.join(' ');
   }
 
   /// Finds value blocks below [keyBlock].
@@ -368,12 +385,18 @@ class LayoutExtractor {
 
     if (candidates.isEmpty) return null;
 
-    // Sort by distance from key block (closest first)
-    candidates.sort(
-      (a, b) => (a.boundingBox.top - keyBlock.boundingBox.bottom).compareTo(
-        b.boundingBox.top - keyBlock.boundingBox.bottom,
-      ),
-    );
+    // Sort by vertical distance from key block (closest first)
+    candidates.sort((a, b) {
+      final yDiffA = a.boundingBox.top - keyBlock.boundingBox.bottom;
+      final yDiffB = b.boundingBox.top - keyBlock.boundingBox.bottom;
+
+      if ((yDiffA - yDiffB).abs() < 5) {
+        final xDiffA = (a.centerX - keyBlock.centerX).abs();
+        final xDiffB = (b.centerX - keyBlock.centerX).abs();
+        return xDiffA.compareTo(xDiffB);
+      }
+      return yDiffA.compareTo(yDiffB);
+    });
 
     return _extractValueFromCandidates(candidates);
   }
@@ -384,12 +407,6 @@ class LayoutExtractor {
 
     // Remove leading punctuation (often from "Key : value" patterns)
     cleaned = cleaned.replaceFirst(RegExp(r'^[:\-.\s]+'), '');
-
-    // Remove trailing time suffixes (e.g., "13:15 Hrs." → "13:15")
-    cleaned = cleaned.replaceAll(
-      RegExp(r'\s*hrs?\.?\s*$', caseSensitive: false),
-      '',
-    );
 
     // Remove trailing punctuation and dots (fixes "735.00 Rs." → "735.00.")
     cleaned = cleaned.replaceFirst(RegExp(r'[:\-.\s]+$'), '');
@@ -413,7 +430,9 @@ class LayoutExtractor {
 
     final sectionBlocks = blocks.where((b) {
       if (b.page != startBlock.page) return false;
-      if (b.boundingBox.top <= startBlock.boundingBox.bottom) return false;
+      // Include blocks that are on the same line as or below the start block.
+      // Use top boundary of start block as reference.
+      if (b.boundingBox.bottom <= startBlock.boundingBox.top) return false;
       if (endBlock != null && b.boundingBox.top >= endBlock.boundingBox.top) {
         return false;
       }

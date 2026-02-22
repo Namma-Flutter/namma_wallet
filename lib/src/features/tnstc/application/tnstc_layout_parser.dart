@@ -83,9 +83,16 @@ class TNSTCLayoutParser extends TravelPDFParser {
       extractor.findValueForKey('OB Reference No'),
     );
 
-    final numberOfSeatsStr = extractor.findValueForKey('No. of Seats');
+    // Try multiple variations of the seat count key
+    final numberOfSeatsStr =
+        extractor.findValueForKey('No. of Seats') ??
+        extractor.findValueForKey('Number of Seats') ??
+        extractor.findValueForKey('Seats');
+
     final numberOfSeats = numberOfSeatsStr != null
-        ? int.tryParse(numberOfSeatsStr)
+        ? int.tryParse(
+            RegExp(r'\d+').firstMatch(numberOfSeatsStr)?.group(0) ?? '',
+          )
         : null;
 
     final busIdNumber = nullIfEmpty(extractor.findValueForKey('Bus ID No'));
@@ -106,7 +113,10 @@ class TNSTCLayoutParser extends TravelPDFParser {
         : null;
 
     // Extract passenger info from table section
-    final passengers = _extractPassengers(extractor);
+    final passengers = _extractPassengers(
+      extractor,
+      expectedCount: numberOfSeats,
+    );
 
     // Use actual passenger count if available,
     // otherwise use numberOfSeats field
@@ -209,7 +219,10 @@ class TNSTCLayoutParser extends TravelPDFParser {
   ///
   /// Looks for blocks between "Name" header and "Total Fare" section,
   /// then uses column alignment to parse rows.
-  List<PassengerInfo> _extractPassengers(LayoutExtractor extractor) {
+  List<PassengerInfo> _extractPassengers(
+    LayoutExtractor extractor, {
+    int? expectedCount,
+  }) {
     final passengers = <PassengerInfo>[];
 
     // Try table-based extraction first
@@ -218,14 +231,16 @@ class TNSTCLayoutParser extends TravelPDFParser {
       endPattern: 'Total Fare',
     );
 
-    if (tableBlocks.isEmpty) return passengers;
+    if (tableBlocks.isEmpty) {
+      return passengers;
+    }
 
     // Calculate dynamic Y-tolerance based on average block height.
     // This makes grouping resilient to different PDF resolutions.
     final avgHeight =
         tableBlocks.map((b) => b.boundingBox.height).reduce((a, b) => a + b) /
         tableBlocks.length;
-    final rowTolerance = avgHeight > 0 ? avgHeight * 0.5 : 10.0;
+    final rowTolerance = avgHeight > 0 ? avgHeight * 0.8 : 12.0;
 
     // Group blocks by row (blocks with similar Y coordinates)
     final rows = <List<OCRBlock>>[];
@@ -293,12 +308,16 @@ class TNSTCLayoutParser extends TravelPDFParser {
         (b) =>
             b.text.toLowerCase().contains('age') ||
             b.text.toLowerCase().contains('gender') ||
-            b.text.toLowerCase().contains('seat'),
+            b.text.toLowerCase().contains('seat') ||
+            b.text.toLowerCase().contains('name'),
       );
-      if (hasHeaderKeyword) continue;
+      if (hasHeaderKeyword) {
+        continue;
+      }
 
-      // Expected columns: Name, Age, Adult/Child, Gender, Seat No
-      if (row.length < 3) continue; // Not enough data for a table row
+      if (row.length < 3) {
+        continue; // Not enough data for a table row
+      }
 
       // Use column alignment if available, otherwise fallback to index
       String? name;
@@ -368,12 +387,21 @@ class TNSTCLayoutParser extends TravelPDFParser {
             seatNumber: seatNumber,
           ),
         );
-      }
+      } else {}
+    }
+
+    // If we already found the expected number of passengers, no need for fallback
+    if (expectedCount != null && passengers.length >= expectedCount) {
+      return passengers;
     }
 
     // Vertical list fallback: If we couldn't find multi-column rows,
-    // but have plenty of single-column blocks between headers.
-    if (passengers.isEmpty && tableBlocks.isNotEmpty) {
+    // or if we found fewer passengers than expected.
+    if (tableBlocks.isNotEmpty &&
+        (passengers.isEmpty ||
+            (expectedCount != null && passengers.length < expectedCount))) {
+      final verticalPassengers = <PassengerInfo>[];
+
       // Filter out labels and headers
       final dataBlocks = tableBlocks.where((b) {
         final text = b.text.toLowerCase().replaceAll(':', '').trim();
@@ -410,7 +438,7 @@ class TNSTCLayoutParser extends TravelPDFParser {
           );
 
           if (name.isNotEmpty) {
-            passengers.add(
+            verticalPassengers.add(
               PassengerInfo(
                 name: name,
                 age: age,
@@ -421,6 +449,13 @@ class TNSTCLayoutParser extends TravelPDFParser {
             );
           }
         }
+      }
+
+      // If vertical layout found more passengers, or if table layout failed
+      // to find all expected passengers but vertical did (or found more), use it.
+      if (verticalPassengers.length > passengers.length) {
+        passengers.clear();
+        passengers.addAll(verticalPassengers);
       }
     }
 

@@ -285,6 +285,12 @@ class Ticket with TicketMappable {
                           .map((p) => p.gender ?? 'N/A')
                           .join(', '),
                     ),
+                    ExtrasModel(
+                      title: 'Seat Numbers',
+                      value: model.passengers
+                          .map((p) => p.seatNumber ?? 'N/A')
+                          .join(', '),
+                    ),
                   ],
           ),
         if (model.busIdNumber?.trim().isNotNullOrEmpty ?? false)
@@ -337,7 +343,9 @@ class Ticket with TicketMappable {
             model.serviceStartTime!.isNotNullOrEmpty)
           ExtrasModel(
             title: 'Departure',
-            value: model.serviceStartTime,
+            value: DateTimeConverter.instance.formatTimeString(
+              model.serviceStartTime!,
+            ),
           ),
         if (seatNumber != null && seatNumber.isNotNullOrEmpty)
           ExtrasModel(title: 'Seat Number', value: seatNumber),

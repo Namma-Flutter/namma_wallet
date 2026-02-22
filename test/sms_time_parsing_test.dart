@@ -68,8 +68,8 @@ void main() {
       expect(tripCodeExtra.value, equals('1315KUMCHEAB'));
 
       final departureExtra = ticket.extras!.firstWhere(
-        (extra) => extra.title == 'Departure Time',
-        orElse: () => throw Exception('Departure Time extra not found'),
+        (extra) => extra.title == 'Departure',
+        orElse: () => throw Exception('Departure extra not found'),
       );
       // formatTimeString converts "13:15" to "01:15 PM"
       expect(departureExtra.value, equals('01:15 PM'));
