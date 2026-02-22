@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package nammawallet;
+
+message Ticket {
+  int64 id = 1;
+  string ticket_id = 2;
+  string primary_text = 3;
+  string secondary_text = 4;
+  string type = 5;
+  string start_time = 6;
+  string end_time = 7;
+  string location = 8;
+  string tags = 9;
+  string extras = 10;
+  string created_at = 11;
+  string updated_at = 12;
+}
+
+message TicketBackup {
+  int32 schema_version = 1;
+  repeated Ticket tickets = 2;
+}

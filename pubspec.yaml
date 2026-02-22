@@ -17,6 +17,7 @@ dependencies:
   dart_mappable: ^4.6.1
   dotted_border: ^3.1.0
   file_picker: ^10.3.8
+  fixnum: ^1.1.1
   flutter:
     sdk: flutter
   flutter_gemma: ^0.12.0
@@ -42,6 +43,7 @@ dependencies:
   pdfrx: ^2.2.24
   pkpass: ^2.2.0
   plugin_platform_interface: ^2.1.8
+  protobuf: ^6.0.0
   provider: ^6.1.5+1
   qr_flutter: ^4.1.0
   share_handler: ^0.0.25

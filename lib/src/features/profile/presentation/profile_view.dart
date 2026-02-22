@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/routing/app_routes.dart';
+import 'package:namma_wallet/src/common/services/backup/ticket_backup_service_interface.dart';
 import 'package:namma_wallet/src/common/services/haptic/haptic_service_extension.dart';
 import 'package:namma_wallet/src/common/services/haptic/haptic_service_interface.dart';
 import 'package:namma_wallet/src/common/theme/theme_provider.dart';
@@ -22,7 +23,8 @@ class ProfileView extends StatefulWidget {
 
 class _ProfileViewState extends State<ProfileView> {
   final IHapticService hapticService = getIt<IHapticService>();
-
+  final ITicketBackupService _backupService =
+      getIt<ITicketBackupService>();
   bool _isHapticEnabled = false;
   @override
   void initState() {
@@ -57,52 +59,110 @@ class _ProfileViewState extends State<ProfileView> {
         leading: const RoundedBackButton(),
         title: const Text('Profile'),
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            spacing: 8,
-            children: [
-              const AIStatusWidget(),
-              const SizedBox(height: 8),
-              // Theme Settings Section
-              ThemeSectionWidget(themeProvider: themeProvider),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              spacing: 8,
+              children: [
+                const AIStatusWidget(),
+                const SizedBox(height: 8),
+                // Theme Settings Section
+                ThemeSectionWidget(themeProvider: themeProvider),
 
-              const SizedBox(height: 8),
+                const SizedBox(height: 8),
 
-              // Contributors Section
-              ProfileTile(
-                icon: Icons.people_outline,
-                title: 'Contributors',
-                subtitle: 'View project contributors',
-                trailing: const Icon(Icons.chevron_right),
-                onTap: () async {
-                  await context.pushNamed(AppRoute.contributors.name);
-                },
-              ),
+                // Contributors Section
+                ProfileTile(
+                  icon: Icons.storage_outlined,
+                  title: 'Create Backup',
+                  subtitle: 'Can be used to restore tickets',
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () async {
+                    try {
+                      final file = await _backupService.createBackup();
 
-              // Licenses Section
-              ProfileTile(
-                icon: Icons.article_outlined,
-                title: 'Licenses',
-                subtitle: 'View open source licenses',
-                trailing: const Icon(Icons.chevron_right),
-                onTap: () async {
-                  await context.pushNamed(AppRoute.license.name);
-                },
-              ),
+                      if (file != null) {
+                        if (!context.mounted) return;
+                        showSnackbar(
+                          context,
+                          'Backup created successfully',
+                        );
+                      }
+                    } on Exception catch (e) {
+                      if (context.mounted) {
+                        showSnackbar(
+                          context,
+                          'Failed to create backup: $e',
+                          isError: true,
+                        );
+                      }
+                    }
+                  },
+                ),
 
-              // Contact Us Section
-              ProfileTile(
-                icon: Icons.contact_mail_outlined,
-                title: 'Contact Us',
-                subtitle: 'Get support or send feedback',
-                trailing: const Icon(Icons.chevron_right),
-                onTap: () async {
-                  final uri = Uri(
-                    scheme: 'mailto',
-                    path: 'support@nammawallet.com',
-                  );
+                // Contributors Section
+                ProfileTile(
+                  icon: Icons.restore_outlined,
+                  title: 'Restore Backup',
+                  subtitle: 'Restore tickets from a backup',
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () async {
+                    try {
+                      final success = await _backupService.restoreBackup();
+                      if (success) {
+                        if (!context.mounted) return;
+                        showSnackbar(
+                          context,
+                          'Backup restored successfully',
+                        );
+                      }
+                    } on Exception catch (e) {
+                      if (context.mounted) {
+                        showSnackbar(
+                          context,
+                          'Failed to restore backup: $e',
+                          isError: true,
+                        );
+                      }
+                    }
+                  },
+                ),
+
+                // Contributors Section
+                ProfileTile(
+                  icon: Icons.people_outline,
+                  title: 'Contributors',
+                  subtitle: 'View project contributors',
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () async {
+                    await context.pushNamed(AppRoute.contributors.name);
+                  },
+                ),
+
+                // Licenses Section
+                ProfileTile(
+                  icon: Icons.article_outlined,
+                  title: 'Licenses',
+                  subtitle: 'View open source licenses',
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () async {
+                    await context.pushNamed(AppRoute.license.name);
+                  },
+                ),
+
+                // Contact Us Section
+                ProfileTile(
+                  icon: Icons.contact_mail_outlined,
+                  title: 'Contact Us',
+                  subtitle: 'Get support or send feedback',
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () async {
+                    final uri = Uri(
+                      scheme: 'mailto',
+                      path: 'support@nammawallet.com',
+                    );
 
                   try {
                     final response = await launchUrl(
@@ -129,43 +189,46 @@ class _ProfileViewState extends State<ProfileView> {
                 },
               ),
 
-              // Haptics Enabled
-              ProfileTile(
-                title: 'Haptics Enabled',
-                icon: Icons.vibration_outlined,
-                trailing: Switch(
-                  value: _isHapticEnabled,
-                  onChanged: (value) async {
-                    final messenger = ScaffoldMessenger.of(context);
-                    try {
-                      // Persist via service
-                      // (updates in-memory and SharedPreferences)
-                      await _saveFlag(value);
-                    } on Exception catch (e) {
+                // Haptics Enabled
+                ProfileTile(
+                  title: 'Haptics Enabled',
+                  icon: Icons.vibration_outlined,
+                  trailing: Switch(
+                    value: _isHapticEnabled,
+                    onChanged: (value) async {
+                      final messenger = ScaffoldMessenger.of(context);
+                      try {
+                        // Persist via service
+                        // (updates in-memory and SharedPreferences)
+                        await _saveFlag(value);
+                      } on Exception catch (e) {
+                        if (!mounted) return;
+                        messenger.showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              'Failed to save haptic preference: $e',
+                            ),
+                          ),
+                        );
+                        return;
+                      }
                       if (!mounted) return;
-                      messenger.showSnackBar(
-                        SnackBar(
-                          content: Text('Failed to save haptic preference: $e'),
-                        ),
-                      );
-                      return;
-                    }
-                    if (!mounted) return;
 
-                    // Update UI
-                    setState(() {
-                      _isHapticEnabled = value;
-                    });
+                      // Update UI
+                      setState(() {
+                        _isHapticEnabled = value;
+                      });
 
-                    // Optional: give immediate feedback only when enabling.
-                    if (value) {
-                      hapticService.triggerHaptic(HapticType.selection);
-                    }
-                  },
+                      // Optional: give immediate feedback only when enabling.
+                      if (value) {
+                        hapticService.triggerHaptic(HapticType.selection);
+                      }
+                    },
+                  ),
+                  trailingIsInteractive: true,
                 ),
-                trailingIsInteractive: true,
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
