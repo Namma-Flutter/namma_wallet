@@ -1590,8 +1590,7 @@ final irctc4449000087ECS = <OCRBlock>[
     page: 1,
   ),
   OCRBlock(
-    text:
-        'OR 24*7 Hrs Customer Support at 14646 OR 0755-6610661, 0755-4090600',
+    text: 'OR 24*7 Hrs Customer Support at 14646 OR 0755-6610661, 0755-4090600',
     boundingBox: const Rect.fromLTRB(
       0,
       960,
@@ -1613,4 +1612,3 @@ final irctc4449000087ECS = <OCRBlock>[
 ];
 // Generated fixture from: Ticket_TK784255502p45.pdf
 // Total blocks: 55
-

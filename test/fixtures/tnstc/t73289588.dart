@@ -5,420 +5,335 @@ import 'dart:ui';
 
 import 'package:namma_wallet/src/common/services/ocr/ocr_block.dart';
 
-final irctc_4117608719 = <OCRBlock>[
+final t73289588 = <OCRBlock>[
   OCRBlock(
-    text: '#',
+    text: 'E-Ticket/Reservation Voucher',
     boundingBox: const Rect.fromLTRB(0, 0, 100, 20),
     page: 0,
   ),
   OCRBlock(
-    text: 'Name',
-    boundingBox: const Rect.fromLTRB(0, 20, 100, 40),
-    page: 0,
-  ),
-  OCRBlock(
-    text: 'Age',
+    text: 'Corporation :',
     boundingBox: const Rect.fromLTRB(0, 40, 100, 60),
     page: 0,
   ),
   OCRBlock(
-    text: 'Gender',
+    text: 'SETC',
     boundingBox: const Rect.fromLTRB(0, 60, 100, 80),
     page: 0,
   ),
   OCRBlock(
-    text: 'Booking Status',
+    text: 'PNR Number :',
+    boundingBox: const Rect.fromLTRB(0, 80, 100, 100),
+    page: 0,
+  ),
+  OCRBlock(
+    text: 'T73289588',
     boundingBox: const Rect.fromLTRB(0, 100, 100, 120),
     page: 0,
   ),
   OCRBlock(
-    text: 'Current Status',
+    text: 'Date of Journey :',
+    boundingBox: const Rect.fromLTRB(0, 120, 100, 140),
+    page: 0,
+  ),
+  OCRBlock(
+    text: '28/11/2025',
     boundingBox: const Rect.fromLTRB(0, 140, 100, 160),
     page: 0,
   ),
   OCRBlock(
-    text: '1.',
+    text: 'Route No :',
     boundingBox: const Rect.fromLTRB(0, 160, 100, 180),
     page: 0,
   ),
   OCRBlock(
-    text: 'SARAVANAKUMAR',
+    text: '307ELB',
     boundingBox: const Rect.fromLTRB(0, 180, 100, 200),
     page: 0,
   ),
   OCRBlock(
-    text: '29',
+    text: 'Service Start Place :',
     boundingBox: const Rect.fromLTRB(0, 200, 100, 220),
     page: 0,
   ),
   OCRBlock(
-    text: 'M',
+    text: 'CHENNAI-PT DR. M.G.R. BS',
+    boundingBox: const Rect.fromLTRB(0, 220, 100, 240),
+    page: 0,
+  ),
+  OCRBlock(
+    text: 'Service End Place :',
+    boundingBox: const Rect.fromLTRB(0, 240, 100, 260),
+    page: 0,
+  ),
+  OCRBlock(
+    text: 'KUMBAKONAM',
     boundingBox: const Rect.fromLTRB(0, 260, 100, 280),
     page: 0,
   ),
   OCRBlock(
-    text: 'CNF',
+    text: 'Service Start Time :',
     boundingBox: const Rect.fromLTRB(0, 280, 100, 300),
     page: 0,
   ),
   OCRBlock(
-    text: '/S2',
+    text: '22:00',
     boundingBox: const Rect.fromLTRB(0, 300, 100, 320),
     page: 0,
   ),
   OCRBlock(
-    text: '/34',
+    text: 'Hrs.',
     boundingBox: const Rect.fromLTRB(0, 320, 100, 340),
     page: 0,
   ),
   OCRBlock(
-    text: '/MIDDLE',
-    boundingBox: const Rect.fromLTRB(0, 340, 100, 360),
-    page: 0,
-  ),
-  OCRBlock(
-    text: 'CNF',
-    boundingBox: const Rect.fromLTRB(0, 360, 100, 380),
-    page: 0,
-  ),
-  OCRBlock(
-    text: '/S2',
+    text: 'Passenger Start Place :',
     boundingBox: const Rect.fromLTRB(0, 380, 100, 400),
     page: 0,
   ),
   OCRBlock(
-    text: '/34',
+    text: 'CHENNAI-PT DR. M.G.R. BS',
     boundingBox: const Rect.fromLTRB(0, 400, 100, 420),
     page: 0,
   ),
   OCRBlock(
-    text: '/MIDDLE',
+    text: 'Passenger End Place :',
     boundingBox: const Rect.fromLTRB(0, 420, 100, 440),
     page: 0,
   ),
   OCRBlock(
-    text: 'Transaction ID: 100005723544746',
+    text: 'KUMBAKONAM',
     boundingBox: const Rect.fromLTRB(0, 440, 100, 460),
     page: 0,
   ),
   OCRBlock(
-    text: 'IR recovers only 57% of cost of travel on an average.',
+    text: 'Passenger Pickup Point :',
     boundingBox: const Rect.fromLTRB(0, 460, 100, 480),
     page: 0,
   ),
   OCRBlock(
-    text: 'Payment Details',
+    text: 'KOTTIVAKKAM(RTO',
     boundingBox: const Rect.fromLTRB(0, 480, 100, 500),
     page: 0,
   ),
   OCRBlock(
-    text: '₹',
+    text: 'OFFICE)',
     boundingBox: const Rect.fromLTRB(0, 500, 100, 520),
     page: 0,
   ),
   OCRBlock(
-    text: '520.00',
+    text: 'Passenger Pickup Time :',
     boundingBox: const Rect.fromLTRB(0, 520, 100, 540),
     page: 0,
   ),
   OCRBlock(
-    text: '₹',
+    text: '28/11/2025 22:55',
     boundingBox: const Rect.fromLTRB(0, 540, 100, 560),
     page: 0,
   ),
   OCRBlock(
-    text: '17.70',
+    text: 'Hrs.',
     boundingBox: const Rect.fromLTRB(0, 560, 100, 580),
     page: 0,
   ),
   OCRBlock(
-    text: '₹',
+    text: 'Platform Number :',
     boundingBox: const Rect.fromLTRB(0, 580, 100, 600),
     page: 0,
   ),
   OCRBlock(
-    text: '11.80',
+    text: '2',
     boundingBox: const Rect.fromLTRB(0, 600, 100, 620),
     page: 0,
   ),
   OCRBlock(
-    text: '₹',
+    text: 'Class of Service :',
     boundingBox: const Rect.fromLTRB(0, 620, 100, 640),
     page: 0,
   ),
   OCRBlock(
-    text: '0.45',
+    text: 'NON AC LOWER BERTH',
     boundingBox: const Rect.fromLTRB(0, 640, 100, 660),
     page: 0,
   ),
   OCRBlock(
-    text: '₹',
+    text: 'SEATER',
     boundingBox: const Rect.fromLTRB(0, 660, 100, 680),
     page: 0,
   ),
   OCRBlock(
-    text: '549.95',
+    text: 'Trip Code :',
     boundingBox: const Rect.fromLTRB(0, 680, 100, 700),
     page: 0,
   ),
   OCRBlock(
-    text: 'PG Charges as applicable (Additional)',
+    text: '2200CHEKUMLB',
     boundingBox: const Rect.fromLTRB(0, 700, 100, 720),
     page: 0,
   ),
   OCRBlock(
-    text: 'Invoice Number:',
+    text: 'OB Reference No. :',
     boundingBox: const Rect.fromLTRB(0, 720, 100, 740),
     page: 0,
   ),
   OCRBlock(
-    text: 'PS25411760871911',
+    text: 'OB31470112',
     boundingBox: const Rect.fromLTRB(0, 740, 100, 760),
     page: 0,
   ),
   OCRBlock(
-    text: 'Address:',
+    text: 'No. of Seats :',
     boundingBox: const Rect.fromLTRB(0, 760, 100, 780),
     page: 0,
   ),
   OCRBlock(
-    text: 'Indian Railways New Delhi',
+    text: '1 (Adults=1 ; Children=0)',
     boundingBox: const Rect.fromLTRB(0, 780, 100, 800),
     page: 0,
   ),
   OCRBlock(
-    text: 'Supplier Information:',
+    text: 'Bank Txn. No. :',
     boundingBox: const Rect.fromLTRB(0, 800, 100, 820),
     page: 0,
   ),
   OCRBlock(
-    text: 'SAC Code:',
+    text: 'BAX6T2M12LV5QL',
     boundingBox: const Rect.fromLTRB(0, 820, 100, 840),
     page: 0,
   ),
   OCRBlock(
-    text: '996421',
+    text: 'Bus ID No. :',
     boundingBox: const Rect.fromLTRB(0, 840, 100, 860),
     page: 0,
   ),
   OCRBlock(
-    text: 'GSTIN:',
+    text: 'E-4950',
     boundingBox: const Rect.fromLTRB(0, 860, 100, 880),
     page: 0,
   ),
   OCRBlock(
-    text: '07AAAGM0289C1ZL',
+    text: 'Passenger category :',
     boundingBox: const Rect.fromLTRB(0, 880, 100, 900),
     page: 0,
   ),
   OCRBlock(
-    text: 'Recipient Information:',
+    text: 'GENERAL PUBLIC',
     boundingBox: const Rect.fromLTRB(0, 900, 100, 920),
     page: 0,
   ),
   OCRBlock(
-    text: 'GSTIN:',
+    text: 'Passenger Information',
     boundingBox: const Rect.fromLTRB(0, 920, 100, 940),
     page: 0,
   ),
   OCRBlock(
-    text: 'NA',
+    text: 'Name',
     boundingBox: const Rect.fromLTRB(0, 940, 100, 960),
     page: 0,
   ),
   OCRBlock(
-    text: 'Name:',
+    text: 'Age',
     boundingBox: const Rect.fromLTRB(0, 960, 100, 980),
     page: 0,
   ),
   OCRBlock(
-    text: 'NA',
+    text: 'Adult/Child',
     boundingBox: const Rect.fromLTRB(0, 980, 100, 1000),
     page: 0,
   ),
   OCRBlock(
-    text: 'Address:',
+    text: 'Gender',
     boundingBox: const Rect.fromLTRB(0, 1000, 100, 1020),
     page: 0,
   ),
   OCRBlock(
-    text: 'Taxable Value:',
+    text: 'Seat No.',
     boundingBox: const Rect.fromLTRB(0, 1020, 100, 1040),
     page: 0,
   ),
   OCRBlock(
-    text: '516',
+    text: 'HarishAnbalagan',
     boundingBox: const Rect.fromLTRB(0, 1040, 100, 1060),
     page: 0,
   ),
   OCRBlock(
-    text: 'CGST Rate:',
+    text: '26',
     boundingBox: const Rect.fromLTRB(0, 1060, 100, 1080),
     page: 0,
   ),
   OCRBlock(
-    text: '2.5%',
+    text: 'Adult',
     boundingBox: const Rect.fromLTRB(0, 1080, 100, 1100),
     page: 0,
   ),
   OCRBlock(
-    text: 'CGST Amount:',
+    text: 'M',
     boundingBox: const Rect.fromLTRB(0, 1100, 100, 1120),
     page: 0,
   ),
   OCRBlock(
-    text: '0.0',
+    text: '2LB',
     boundingBox: const Rect.fromLTRB(0, 1120, 100, 1140),
     page: 0,
   ),
   OCRBlock(
-    text: 'SGST/UGST Rate:',
+    text: 'ID Card Type :',
     boundingBox: const Rect.fromLTRB(0, 1140, 100, 1160),
     page: 0,
   ),
   OCRBlock(
-    text: 'SGST/UGST Amount:',
-    boundingBox: const Rect.fromLTRB(0, 1160, 100, 1180),
-    page: 0,
-  ),
-  OCRBlock(
-    text: 'IGST Rate:',
+    text: 'Government Issued Photo',
     boundingBox: const Rect.fromLTRB(0, 1180, 100, 1200),
     page: 0,
   ),
   OCRBlock(
-    text: '5.0%',
+    text: 'ID Card',
     boundingBox: const Rect.fromLTRB(0, 1200, 100, 1220),
     page: 0,
   ),
   OCRBlock(
-    text: 'IGST Amount:',
+    text: 'ID Card Number :',
     boundingBox: const Rect.fromLTRB(0, 1220, 100, 1240),
     page: 0,
   ),
   OCRBlock(
-    text: '0.0',
-    boundingBox: const Rect.fromLTRB(0, 1240, 100, 1260),
-    page: 0,
-  ),
-  OCRBlock(
-    text: 'Electronic Reservation Slip (ERS)',
+    text: '736960775578',
     boundingBox: const Rect.fromLTRB(0, 1260, 100, 1280),
     page: 0,
   ),
   OCRBlock(
-    text: '-Normal User',
+    text: 'Total Fare : 555.00 Rs.',
     boundingBox: const Rect.fromLTRB(0, 1280, 100, 1300),
     page: 0,
   ),
-  OCRBlock(
-    text: 'Booked From',
-    boundingBox: const Rect.fromLTRB(0, 1300, 100, 1320),
-    page: 0,
-  ),
-  OCRBlock(
-    text: 'To',
-    boundingBox: const Rect.fromLTRB(0, 1320, 100, 1340),
-    page: 0,
-  ),
-  OCRBlock(
-    text: 'VALLIYUR (VLY)',
-    boundingBox: const Rect.fromLTRB(0, 1340, 100, 1360),
-    page: 0,
-  ),
-  OCRBlock(
-    text: 'VALLIYUr (VLY)',
-    boundingBox: const Rect.fromLTRB(0, 1360, 100, 1380),
-    page: 0,
-  ),
-  OCRBlock(
-    text: 'CHENNAI EGMORE (MS)',
-    boundingBox: const Rect.fromLTRB(0, 1380, 100, 1400),
-    page: 0,
-  ),
-  OCRBlock(
-    text: 'Start Date* 13-Apr-2025',
-    boundingBox: const Rect.fromLTRB(0, 1400, 100, 1420),
-    page: 0,
-  ),
-  OCRBlock(
-    text: 'Departure* 18:55 13-Apr-2025',
-    boundingBox: const Rect.fromLTRB(0, 1420, 100, 1440),
-    page: 0,
-  ),
-  OCRBlock(
-    text: 'Arrival* 06:35 14-Apr-2025',
-    boundingBox: const Rect.fromLTRB(0, 1440, 100, 1460),
-    page: 0,
-  ),
-  OCRBlock(
-    text: 'PNR',
-    boundingBox: const Rect.fromLTRB(0, 1460, 100, 1480),
-    page: 0,
-  ),
-  OCRBlock(
-    text: 'Train No./Name',
-    boundingBox: const Rect.fromLTRB(0, 1480, 100, 1500),
-    page: 0,
-  ),
-  OCRBlock(
-    text: 'Class',
-    boundingBox: const Rect.fromLTRB(0, 1500, 100, 1520),
-    page: 0,
-  ),
-  OCRBlock(
-    text: '4117608719',
-    boundingBox: const Rect.fromLTRB(0, 1520, 100, 1540),
-    page: 0,
-  ),
-  OCRBlock(
-    text: '12634 / KANYAKUMARI EXP',
-    boundingBox: const Rect.fromLTRB(0, 1540, 100, 1560),
-    page: 0,
-  ),
-  OCRBlock(
-    text: 'SLEEPER CLASS',
-    boundingBox: const Rect.fromLTRB(0, 1560, 100, 1580),
-    page: 0,
-  ),
-  OCRBlock(
-    text: '(SL)',
-    boundingBox: const Rect.fromLTRB(0, 1580, 100, 1600),
-    page: 0,
-  ),
-  OCRBlock(
-    text: 'Quota',
-    boundingBox: const Rect.fromLTRB(0, 1600, 100, 1620),
-    page: 0,
-  ),
-  OCRBlock(
-    text: 'Distance',
-    boundingBox: const Rect.fromLTRB(0, 1620, 100, 1640),
-    page: 0,
-  ),
-  OCRBlock(
-    text: 'Booking Date',
-    boundingBox: const Rect.fromLTRB(0, 1640, 100, 1660),
-    page: 0,
-  ),
-  OCRBlock(
-    text: 'PREMIUM TATKAL (PT)',
-    boundingBox: const Rect.fromLTRB(0, 1660, 100, 1680),
-    page: 0,
-  ),
-  OCRBlock(
-    text: '695 KM',
-    boundingBox: const Rect.fromLTRB(0, 1680, 100, 1700),
-    page: 0,
-  ),
-  OCRBlock(
-    text: '12-Apr-2025 11:02:18 HRS',
-    boundingBox: const Rect.fromLTRB(0, 1700, 100, 1720),
-    page: 0,
-  ),
-  OCRBlock(
-    text: 'Passenger Details',
-    boundingBox: const Rect.fromLTRB(0, 1720, 100, 1740),
-    page: 0,
-  ),
 ];
+
+/// Expected parsed values for t73289588 fixture
+const Map<String, Object?> t73289588Expected = {
+  'pnrNumber': 'T73289588',
+  'corporation': 'SETC',
+  'journeyDate': '28/11/2025',
+  'routeNo': '307ELB',
+  'serviceStartPlace': 'CHENNAI-PT DR. M.G.R. BS',
+  'serviceEndPlace': 'KUMBAKONAM',
+  'serviceStartTime': '22:00',
+  'passengerPickupPoint': 'KOTTIVAKKAM(RTO OFFICE)',
+  'platformNumber': '2',
+  'classOfService': 'NON AC LOWER BERTH SEATER',
+  'tripCode': '2200CHEKUMLB',
+  'busIdNumber': 'E-4950',
+  'totalFare': 555.00,
+  // Passenger details can't be extracted from pseudo-blocks without labels
+  'passengerName': null,
+  'passengerAge': null,
+  'passengerGender': null,
+  'seatNumber': '2LB',
+};
+
+/// SETC ticket 3: Kumbakonam to Chennai (18/01/2026)
+/// PNR: T73309927
+/// Route: 307AB
+/// Class: AC SLEEPER SEATER
+///
+/// Note: This fixture uses REAL OCR blocks with actual bounding boxes
+/// from PDF extraction (not pseudo-blocks).

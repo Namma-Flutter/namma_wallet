@@ -1443,8 +1443,7 @@ final irctc_4846874185 = <OCRBlock>[
     page: 1,
   ),
   OCRBlock(
-    text:
-        'after filing TDR online within prescribed time for claiming refund.',
+    text: 'after filing TDR online within prescribed time for claiming refund.',
     boundingBox: const Rect.fromLTRB(
       0,
       840,
