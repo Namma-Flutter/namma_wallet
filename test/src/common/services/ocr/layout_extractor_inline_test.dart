@@ -125,5 +125,33 @@ void main() {
         expect(routeNo, isNull);
       },
     );
+
+    test(
+      'should handle split parenthesis value from OCR above the label (T75229209 fixture)',
+      () {
+        // Real OCR case: value is split across two lines
+        // Line 1 (above): KOTTIVAKKAM(RTO
+        // Line 2 (label): Passenger Pickup Point : OFFICE)
+        // Expected result: KOTTIVAKKAM(RTO OFFICE)
+        final blocks = [
+          OCRBlock(
+            text: 'KOTTIVAKKAM(RTO',
+            boundingBox: const Rect.fromLTRB(359, 343, 525, 361),
+            page: 0,
+          ),
+          OCRBlock(
+            text: 'Passenger Pickup Point : OFFICE)',
+            boundingBox: const Rect.fromLTRB(148, 349, 427, 377),
+            page: 0,
+          ),
+        ];
+
+        final extractor = LayoutExtractor(blocks);
+
+        // Should combine the above block with the incomplete inline value
+        final pickupPoint = extractor.findValueForKey('Passenger Pickup Point');
+        expect(pickupPoint, 'KOTTIVAKKAM(RTO OFFICE)');
+      },
+    );
   });
 }

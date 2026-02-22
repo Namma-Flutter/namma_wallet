@@ -226,12 +226,35 @@ class LayoutExtractor {
 
       final sameRowValue = _extractValueFromCandidates(candidates, maxSkips: 1);
       if (sameRowValue != null && sameRowValue.isNotEmpty) {
-        return sameRowValue;
+        // Check if inline value looks incomplete (e.g., ends with ")" suggesting continuation)
+        // Only for specific fields where this is common
+        final inlineValue = colonIndex != -1
+            ? keyBlock.text.substring(colonIndex + 1).trim()
+            : '';
+        final looksIncomplete =
+            (inlineValue.endsWith(')') || inlineValue.endsWith('(')) &&
+            (lowerKey.contains('pickup') || lowerKey.contains('point'));
+
+        if (!looksIncomplete) {
+          return sameRowValue;
+        }
+        // Continue to search above for continuation - don't return null below
       }
 
       // If we found a colon but the value was empty/rejected, don't fall back to "below"
       // unless it was purely a standalone label "Key:".
-      if (colonIndex != -1 && colonIndex < keyBlock.text.length - 1) {
+      // BUT if inline value looks incomplete, skip this and search above instead
+      final inlineValueForCheck = colonIndex != -1
+          ? keyBlock.text.substring(colonIndex + 1).trim()
+          : '';
+      final looksIncompleteForCheck =
+          (inlineValueForCheck.endsWith(')') ||
+              inlineValueForCheck.endsWith('(')) &&
+          (lowerKey.contains('pickup') || lowerKey.contains('point'));
+
+      if (!looksIncompleteForCheck &&
+          colonIndex != -1 &&
+          colonIndex < keyBlock.text.length - 1) {
         return null;
       }
     }
@@ -241,7 +264,28 @@ class LayoutExtractor {
       keyBlock,
       maxDistance: maxDistance,
     );
-    return belowValue;
+    if (belowValue != null) {
+      return belowValue;
+    }
+
+    // If not found below, also try searching above
+    // (handles OCR cases where value appears above the key label)
+    final aboveValue = _findValueAbove(
+      keyBlock,
+      maxDistance: maxDistance,
+    );
+    if (aboveValue != null) {
+      // If there's also an inline value, prepend it AFTER the above value
+      // (above value is physically higher on page, so comes first in reading order)
+      if (colonIndex != -1) {
+        final inlineValue = keyBlock.text.substring(colonIndex + 1).trim();
+        if (inlineValue.isNotEmpty) {
+          return '$aboveValue $inlineValue';
+        }
+      }
+      return aboveValue;
+    }
+    return null;
   }
 
   /// Finds the first block containing the key label (respects reading order).
@@ -396,6 +440,43 @@ class LayoutExtractor {
         return xDiffA.compareTo(xDiffB);
       }
       return yDiffA.compareTo(yDiffB);
+    });
+
+    return _extractValueFromCandidates(candidates);
+  }
+
+  /// Finds value blocks above [keyBlock] (for cases where OCR splits content above the label).
+  String? _findValueAbove(
+    OCRBlock keyBlock, {
+    required double maxDistance,
+  }) {
+    // For above search, use tighter distance to avoid picking up unrelated blocks
+    final tightMaxDistance = 30.0;
+
+    final candidates = blocks.where((b) {
+      if (b == keyBlock) return false;
+      return b.page == keyBlock.page &&
+          // Block is above or overlapping with top of key block
+          b.boundingBox.top < keyBlock.boundingBox.top &&
+          (keyBlock.boundingBox.top - b.boundingBox.bottom) <
+              tightMaxDistance &&
+          // Require horizontal overlap with the key block
+          b.boundingBox.left < keyBlock.boundingBox.right &&
+          b.boundingBox.right > keyBlock.boundingBox.left;
+    }).toList();
+
+    if (candidates.isEmpty) return null;
+
+    // Sort by reading order (top-to-bottom, left-to-right)
+    // For values above the key, we want the one higher on page to come first
+    candidates.sort((a, b) {
+      // First sort by top position (reading order)
+      final topDiff = a.boundingBox.top - b.boundingBox.top;
+      if (topDiff.abs() > 5) {
+        return topDiff < 0 ? -1 : 1;
+      }
+      // Same row, sort by left position
+      return (a.boundingBox.left - b.boundingBox.left) < 0 ? -1 : 1;
     });
 
     return _extractValueFromCandidates(candidates);
