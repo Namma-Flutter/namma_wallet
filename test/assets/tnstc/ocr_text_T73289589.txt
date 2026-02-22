@@ -1,0 +1,72 @@
+E-Ticket/Reservation Voucher
+
+Corporation: SETC
+PNR Number: T73289589
+Date of Journey: 30/11/2025
+Route No: 307LB
+Service Start Place: KUMBAKONAM
+Service End Place: CHENNAI-PT DR. M.G.R. BS
+Service Start Time: 21:00
+ Hrs.
+2
+
+Passenger Start Place: KUMBAKONAM
+Passenger End Place: CHENNAI-PT Dr.M.G.R. BS
+Passenger Pickup Point: KUMBAKONAM
+Passenger Pickup Time: 30/11/2025 21:00
+ Hrs.
+Platform Number: Class of Service: NON AC LOWER BERTH
+SEATER
+Trip Code: 2100KUMCHELB
+OB Reference No. :
+OB31470112
+No. of Seats: 1 (Adults=1 ; Children=0)
+Bank Txn. No. :
+BAX6T2M12LV5QL
+Bus ID No. :
+E-12275
+Passenger category: GENERAL PUBLIC
+Passenger Information
+Name
+Age
+Adult/Child
+Gender
+Seat No.
+HarishAnbalagan
+26
+Adult
+M
+2LB
+ID Card Type: Government Issued Photo
+ID Card
+ID Card Number: 736960775578
+Total Fare: 555.00 Rs.
+
+Important
+The seat(s) booked under this ticket is/are not transferable.
+This e-ticket is valid only for the seat number and bus service specified herein.
+e-Ticket and Mobile Ticket Passengers must carry a printed/Soft copy of the ticket at the time of
+journey. It is passengers responsibility to keep the Printout/Softcopy of the ticket till end of the
+journey.
+If the passenger is traveling with 'e-Ticket / Mobile Ticket', he will have to produce the Original
+Identity Card mentioned in the 'e-Ticket / Mobile Ticket ' at the time of journey.
+Departure time, Running time and Arrival time mentioned in the website is subject to standard
+operating condition. These timings may get varied due to Road block, Traffic condition, Natural
+calamity and unavoidable circumstances.
+The Bus/Seat No. May be subject to change due to curtailment/clubbing of other services and
+unavoidable circumstances.
+Please keep the ticket safely till the end of the journey.
+Please show the ticket at the time of checking.
+Corporation reserves the rights to change/cancel the class of service.
+Time is in 24 hour Railways time format(24HH:MM).
+Half ticket eligible for children between 5 to 12 years. Children above 130cms height will be charged
+full fare unless original age proof certificate is produced at time of journey.
+Further, Full ticket fare will be charged for Sleeper Births for children.
+Cancellation of e-ticket / Mobile tickets is allowed only up to One (1) hour before the scheduled
+departure of the bus service from the Origin Point. After that cancellation will not be allowed. Further,
+cancellation can be done only before 9 PM for the current date journey after 10 PM and next day
+journey before 7 AM.
+For more detail please see the rules & Regulations in www.tnstc.in website.
+For Refund Status please contact to TNSTC Toll Free Number 08066006572/9513948001 or can
+contact for Bank Queries-Billdesk / Helpdesk: 044-49076316 / 49076326.
+Booked By: Harish Anbalagan(harish956686@gmail.com) Printed On: 28/11/2025 At: 10:17:29

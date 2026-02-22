@@ -3,7 +3,7 @@ FLUTTER ?= fvm flutter
 # Dart command - use 'fvm dart' if using FVM, otherwise 'dart'
 DART ?= fvm dart
 
-.PHONY: help clean get codegen release-android release-ios release-apk release-appbundle release-ipa
+.PHONY: help clean get codegen release-android release-ios release-apk release-appbundle release-ipa ios-test ios-beta ios-production
 
 help:
 	@echo "Available targets:"
@@ -15,6 +15,11 @@ help:
 	@echo "  release-apk        - Build Android release APK"
 	@echo "  release-appbundle  - Build Android release App Bundle"
 	@echo "  release-ipa        - Build iOS release IPA"
+	@echo ""
+	@echo "Fastlane iOS targets:"
+	@echo "  ios-test           - Run tests via fastlane"
+	@echo "  ios-beta           - Build and deploy to TestFlight"
+	@echo "  ios-production     - Promote TestFlight build to App Store"
 
 clean:
 	$(FLUTTER) clean
@@ -37,3 +42,13 @@ release-appbundle: get codegen
 release-ipa: get codegen
 	$(DART) run pdfrx:remove_wasm_modules
 	$(FLUTTER) build ipa --release
+
+# Fastlane iOS targets
+ios-test:
+	cd ios && bundle exec fastlane test
+
+ios-beta:
+	cd ios && bundle exec fastlane beta
+
+ios-production:
+	cd ios && bundle exec fastlane production

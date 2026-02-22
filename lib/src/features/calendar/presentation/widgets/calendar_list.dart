@@ -59,9 +59,11 @@ class CalendarList extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: InkWell(
                 onTap: () async {
+                  if (ticket.ticketId == null) return;
+
                   final result = await context.pushNamed<bool>(
                     AppRoute.ticketView.name,
-                    extra: ticket,
+                    pathParameters: {'id': ticket.ticketId!},
                   );
                   if (result ?? false) {
                     await provider.loadTickets();

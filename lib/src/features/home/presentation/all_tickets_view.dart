@@ -88,127 +88,127 @@ class _AllTicketsViewState extends State<AllTicketsView> {
         title: const Text('All Tickets'),
         elevation: 0,
       ),
-      body: SafeArea(
-        child: Column(
-          children: [
-            // Filter chips
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: [
-                    _buildFilterChip('All'),
-                    const SizedBox(width: 8),
-                    _buildFilterChip('Travel'),
-                    const SizedBox(width: 8),
-                    _buildFilterChip('Events'),
-                  ],
-                ),
+      body: Column(
+        children: [
+          // Filter chips
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  _buildFilterChip('All'),
+                  const SizedBox(width: 8),
+                  _buildFilterChip('Travel'),
+                  const SizedBox(width: 8),
+                  _buildFilterChip('Events'),
+                ],
               ),
             ),
-        
-            // Ticket count
-            if (!_isLoading)
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    '${_filteredTickets.length} '
-                    '${_filteredTickets.length == 1 ? 'ticket' : 'tickets'}'
-                    '',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Theme.of(
-                        context,
-                      ).colorScheme.onSurface.withValues(alpha: 0.6),
-                    ),
+          ),
+
+          // Ticket count
+          if (!_isLoading)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  '${_filteredTickets.length} '
+                  '${_filteredTickets.length == 1 ? 'ticket' : 'tickets'}'
+                  '',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withValues(alpha: 0.6),
                   ),
                 ),
               ),
-        
-            const SizedBox(height: 8),
-        
-            // Tickets list
-            Expanded(
-              child: _isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : _filteredTickets.isEmpty
-                  ? Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.airplane_ticket_outlined,
-                            size: 64,
+            ),
+
+          const SizedBox(height: 8),
+
+          // Tickets list
+          Expanded(
+            child: _isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : _filteredTickets.isEmpty
+                ? Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.airplane_ticket_outlined,
+                          size: 64,
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onSurface.withValues(alpha: 0.3),
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          'No tickets found',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w500,
                             color: Theme.of(
                               context,
-                            ).colorScheme.onSurface.withValues(alpha: 0.3),
+                            ).colorScheme.onSurface.withValues(alpha: 0.5),
                           ),
-                          const SizedBox(height: 16),
-                          Text(
-                            'No tickets found',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w500,
-                              color: Theme.of(
-                                context,
-                              ).colorScheme.onSurface.withValues(alpha: 0.5),
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            _selectedFilter == 'All'
-                                ? 'Add tickets to get started'
-                                : 'No $_selectedFilter tickets available',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Theme.of(
-                                context,
-                              ).colorScheme.onSurface.withValues(alpha: 0.4),
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ],
-                      ),
-                    )
-                  : RefreshIndicator(
-                      onRefresh: _loadTicketData,
-                      child: ListView.builder(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 8,
                         ),
-                        itemCount: _filteredTickets.length,
-                        itemBuilder: (context, index) {
-                          final ticket = _filteredTickets[index];
-                          final isEventTicket = ticket.type == TicketType.event;
-        
-                          return InkWell(
-                            onTap: () async {
-                              final wasDeleted = await context.pushNamed<bool>(
-                                AppRoute.ticketView.name,
-                                extra: ticket,
-                              );
-        
-                              if (mounted && (wasDeleted ?? false)) {
-                                await _loadTicketData();
-                              }
-                            },
-                            borderRadius: BorderRadius.circular(16),
-                            child: isEventTicket
-                                ? EventTicketCardWidget(ticket: ticket)
-                                : TravelTicketListCardWidget(
-                                    ticket: ticket,
-                                  ),
-                          );
-                        },
-                      ),
+                        const SizedBox(height: 8),
+                        Text(
+                          _selectedFilter == 'All'
+                              ? 'Add tickets to get started'
+                              : 'No $_selectedFilter tickets available',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurface.withValues(alpha: 0.4),
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
                     ),
-            ),
-          ],
-        ),
+                  )
+                : RefreshIndicator(
+                    onRefresh: _loadTicketData,
+                    child: ListView.builder(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 8,
+                      ),
+                      itemCount: _filteredTickets.length,
+                      itemBuilder: (context, index) {
+                        final ticket = _filteredTickets[index];
+                        final isEventTicket = ticket.type == TicketType.event;
+
+                        return InkWell(
+                          onTap: () async {
+                            if (ticket.ticketId == null) return;
+
+                            final wasDeleted = await context.pushNamed<bool>(
+                              AppRoute.ticketView.name,
+                              pathParameters: {'id': ticket.ticketId!},
+                            );
+
+                            if (mounted && (wasDeleted ?? false)) {
+                              await _loadTicketData();
+                            }
+                          },
+                          borderRadius: BorderRadius.circular(16),
+                          child: isEventTicket
+                              ? EventTicketCardWidget(ticket: ticket)
+                              : TravelTicketListCardWidget(
+                                  ticket: ticket,
+                                ),
+                        );
+                      },
+                    ),
+                  ),
+          ),
+        ],
       ),
     );
   }
@@ -261,6 +261,7 @@ class TravelTicketListCardWidget extends StatelessWidget {
       TicketType.flight => Icons.flight_rounded,
       TicketType.metro => Icons.subway_rounded,
       TicketType.event => Icons.event_rounded,
+      null => Icons.confirmation_number_outlined,
     };
   }
 
@@ -271,7 +272,9 @@ class TravelTicketListCardWidget extends StatelessWidget {
 
   String _getFromLocation() {
     // Use centralized ticket extension for consistent route parsing
-    return ticket.fromLocation ?? ticket.primaryText.split('→')[0].trim();
+    return ticket.fromLocation ??
+        ticket.primaryText?.split('→')[0].trim() ??
+        '';
   }
 
   String _getToLocation() {
@@ -280,7 +283,7 @@ class TravelTicketListCardWidget extends StatelessWidget {
     if (to != null) return to;
 
     // Fallback: parse from primaryText if extension returns null
-    final parts = ticket.primaryText.split('→');
+    final parts = ticket.primaryText?.split('→') ?? [];
     return parts.length > 1 ? parts[1].trim() : '';
   }
 
@@ -391,7 +394,7 @@ class TravelTicketListCardWidget extends StatelessWidget {
                 const SizedBox(height: 8),
                 // Secondary info (train/bus number, etc.)
                 Text(
-                  ticket.secondaryText,
+                  ticket.secondaryText ?? '',
                   style: TextStyle(
                     fontSize: 12,
                     color: Theme.of(

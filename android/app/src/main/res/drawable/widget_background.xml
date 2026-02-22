@@ -1,18 +1,10 @@
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
     android:shape="rectangle">
 
-    <!-- Gradient matching the lime yellow theme -->
-    <gradient
-        android:angle="135"
-        android:endColor="#E0FB25"
-        android:startColor="#E7FC57" />
+    <!-- Light Blue Background -->
+    <solid android:color="#E3F2FD"/>
 
-    <corners android:radius="30dp" />
-
-    <!-- Shadow effect using multiple layers -->
-    <stroke
-        android:width="0dp"
-        android:color="@android:color/transparent" />
+    <corners android:radius="12dp"/>
 
 </shape>
 

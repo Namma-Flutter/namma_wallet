@@ -1,4 +1,5 @@
 # 👜 Namma Wallet
+
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
 [![All Contributors](https://img.shields.io/badge/all_contributors-9-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
@@ -6,6 +7,8 @@
 **Namma Wallet** is an open-source Flutter mobile application for managing digital travel tickets and passes. The app provides a unified interface to save, organize, and view tickets from multiple sources including SMS, PDFs, QR codes, and clipboard text. It features intelligent parsing for Indian transport providers and generates beautiful digital ticket designs.
 
 Unlike Apple Wallet or Google Wallet, which support only specific formats, **Namma Wallet** is a flexible, community-driven solution that works with any ticket type and format.
+
+<a href="https://play.google.com/store/apps/details?id=com.nammaflutter.nammawallet"><img src="assets/badges/google_play_badge.svg" alt="Get it on Google Play" height="60" width="200"/></a> <a href="https://apps.apple.com/in/app/namma-wallet/id6757295408"><img src="assets/badges/app_store_badge.svg" alt="Download on the App Store" height="60" width="200"/></a>
 
 ---
 
@@ -91,18 +94,22 @@ fvm flutter run -d <device-id>
 ### Development Commands
 
 ```bash
-
 # Analyze code
 fvm flutter analyze
 
 # Run tests (when available)
 fvm flutter test
+```
 
-### Build Commands with Makefile
+---
 
-The project includes a `Makefile` for streamlined build processes. By default, it uses FVM (`fvm flutter` and `fvm dart`), but you can override this behavior.
+## 🏗️ Building the App
 
-#### Available Targets
+**⚠️ IMPORTANT: Always use the Makefile for building releases. Never use `flutter build` commands directly.**
+
+The project includes a `Makefile` that handles all necessary build steps, including critical optimizations like WASM module removal. By default, it uses FVM (`fvm flutter` and `fvm dart`), but you can override this behavior.
+
+### Available Targets
 
 **Utility Commands:**
 
@@ -113,7 +120,7 @@ make get        # Get dependencies
 make codegen    # Run code generation
 ```
 
-**Release Builds:**
+**Release Builds (ALWAYS USE THESE):**
 
 ```bash
 make release-apk        # Build Android release APK
@@ -121,14 +128,18 @@ make release-appbundle  # Build Android release App Bundle
 make release-ipa        # Build iOS release IPA
 ```
 
+### Why Use Makefile?
+
 All release builds automatically:
 
-1. Get dependencies
-2. Run code generation
-3. Remove WASM modules (via `dart run pdfrx:remove_wasm_modules`) to reduce app size
+1. Get dependencies (`fvm flutter pub get`)
+2. Run code generation (`build_runner`)
+3. **Remove WASM modules** (via `dart run pdfrx:remove_wasm_modules`) - **Required for pdfrx package**
 4. Build the release version
 
-#### Using Without FVM
+**Skipping the Makefile will result in bloated app sizes and potential build issues.**
+
+### Using Without FVM
 
 If you're not using FVM, override the `FLUTTER` and `DART` variables:
 
@@ -142,9 +153,20 @@ export DART=dart
 make release-apk
 ```
 
-#### CI/CD Integration
+### Fastlane Integration
 
-The release workflow in `.github/workflows/build_and_release.yml` automatically removes WASM modules before building releases for optimal app size.
+Our fastlane scripts (iOS TestFlight deployment) also use the Makefile to ensure consistent builds:
+
+```ruby
+# In ios/fastlane/Fastfile
+sh("cd ../.. && make release-ipa")
+```
+
+This ensures all builds—whether local, CI/CD, or TestFlight—follow the same optimized process.
+
+### CI/CD Integration
+
+The release workflow in `.github/workflows/build_and_release.yml` uses the Makefile for all release builds to maintain consistency.
 
 ---
 

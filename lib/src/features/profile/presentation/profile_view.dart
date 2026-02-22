@@ -164,33 +164,30 @@ class _ProfileViewState extends State<ProfileView> {
                       path: 'support@nammawallet.com',
                     );
 
-                    try {
-                      if (!await canLaunchUrl(uri)) {
-                        if (context.mounted) {
-                          showSnackbar(
-                            context,
-                            'No email app found. Please install a mail client.',
-                            isError: true,
-                          );
-                        }
-                        return;
-                      }
+                  try {
+                    final response = await launchUrl(
+                      uri,
+                      mode: LaunchMode.externalApplication,
+                    );
 
-                      await launchUrl(
-                        uri,
-                        mode: LaunchMode.externalApplication,
+                    if (!response && context.mounted) {
+                      showSnackbar(
+                        context,
+                        'Failed to open email app. Please try again.',
+                        isError: true,
                       );
-                    } on Exception {
-                      if (context.mounted) {
-                        showSnackbar(
-                          context,
-                          'Failed to open email app. Please try again.',
-                          isError: true,
-                        );
-                      }
                     }
-                  },
-                ),
+                  } on Exception {
+                    if (context.mounted) {
+                      showSnackbar(
+                        context,
+                        'Failed to open email app. Please try again.',
+                        isError: true,
+                      );
+                    }
+                  }
+                },
+              ),
 
                 // Haptics Enabled
                 ProfileTile(

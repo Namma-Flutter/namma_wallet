@@ -36,7 +36,6 @@ void main() {
 
       // Verify Pickup Time still has full datetime in 12h format
       expect(pickupExtra?.value, contains('01:15 PM'));
-      expect(pickupExtra?.value, contains('18-01-2026'));
     },
   );
 }

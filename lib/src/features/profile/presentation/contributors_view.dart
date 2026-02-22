@@ -13,13 +13,20 @@ class Contributor {
     required this.profileUrl,
   });
 
-  factory Contributor.fromJson(Map<String, dynamic> json) {
+  static Contributor? fromJson(Map<String, dynamic> json) {
+    final name = json['login'];
+    final avatarUrl = json['avatar_url'];
+    final profileUrl = json['html_url'];
+    if (name is! String || avatarUrl is! String || profileUrl is! String) {
+      return null;
+    }
     return Contributor(
-      name: json['login'] as String,
-      avatarUrl: json['avatar_url'] as String,
-      profileUrl: json['html_url'] as String,
+      name: name,
+      avatarUrl: avatarUrl,
+      profileUrl: profileUrl,
     );
   }
+
   final String name;
   final String avatarUrl;
   final String profileUrl;
@@ -34,6 +41,8 @@ class ContributorsView extends StatefulWidget {
 
 class _ContributorsViewState extends State<ContributorsView> {
   late Future<List<Contributor>> _contributorsFuture;
+
+  static const repoLink = 'https://github.com/Namma-Flutter/namma_wallet';
 
   @override
   void initState() {
@@ -70,15 +79,19 @@ class _ContributorsViewState extends State<ContributorsView> {
 
       if (response.statusCode == 200) {
         final body = json.decode(response.body) as List<dynamic>;
-        if (body.isEmpty) {
-          break; // No more contributors
-        }
+
         contributors.addAll(
-          body.map(
-            (json) => Contributor.fromJson(json as Map<String, dynamic>),
-          ),
+          body
+              .whereType<Map<String, dynamic>>()
+              .map(
+                Contributor.fromJson,
+              )
+              .whereType<Contributor>(),
         );
         page++;
+        if (body.length < perPage) {
+          break; // No more contributors
+        }
       } else {
         throw Exception(
           'Failed to load contributors: HTTP ${response.statusCode}\n'
@@ -95,103 +108,157 @@ class _ContributorsViewState extends State<ContributorsView> {
       appBar: AppBar(
         leading: const RoundedBackButton(),
         title: const Text('Contributors'),
-      ),
-      body: SafeArea(
-        child: FutureBuilder<List<Contributor>>(
-          future: _contributorsFuture,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
-            } else if (snapshot.hasError) {
-              return Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(
-                        Icons.error_outline,
-                        size: 48,
-                        color: Colors.red,
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        'Error loading contributors',
-                        style: Theme.of(context).textTheme.titleLarge,
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        '${snapshot.error}',
-                        textAlign: TextAlign.center,
-                        style: Theme.of(context).textTheme.bodyMedium,
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-              return const Center(
-                child: Padding(
-                  padding: EdgeInsets.all(16),
-                  child: Text('No contributors found.'),
-                ),
-              );
-            }
 
-            final contributors = snapshot.data!;
-            return ListView.builder(
-              padding: const EdgeInsets.all(16),
-              itemCount: contributors.length,
-              itemBuilder: (context, index) {
-                final contributor = contributors[index];
-                return Card(
-                  margin: const EdgeInsets.only(bottom: 8),
-                  elevation: 1,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: ListTile(
-                    leading: CircleAvatar(
-                      backgroundImage: NetworkImage(contributor.avatarUrl),
-                      radius: 24,
-                    ),
-                    title: Text(
-                      contributor.name,
-                      style: const TextStyle(fontWeight: FontWeight.w600),
-                    ),
-                    subtitle: Text(
-                      contributor.profileUrl,
-                      style: const TextStyle(fontSize: 12),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    trailing: const Icon(Icons.open_in_new, size: 20),
-                    onTap: () async {
-                      final url = Uri.parse(contributor.profileUrl);
-                      try {
-                        final launched = await launchUrl(url);
-                        if (!launched && context.mounted) {
-                          showSnackbar(
-                            context,
-                            'Could not open ${contributor.profileUrl}',
-                            isError: true,
-                          );
-                        }
-                      } on Exception catch (_) {
-                        if (context.mounted) {
-                          showSnackbar(
-                            context,
-                            'Could not open ${contributor.profileUrl}',
-                            isError: true,
-                          );
-                        }
-                      }
-                    },
-                  ),
-                );
+        actions: [
+          Container(
+            margin: const EdgeInsets.only(right: 16),
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Theme.of(context).colorScheme.primary,
+                shape: const StadiumBorder(),
+              ),
+
+              onPressed: () async {
+                final uri = Uri.parse(repoLink);
+
+                try {
+                  final launched = await launchUrl(
+                    uri,
+                    mode: LaunchMode.externalApplication,
+                  );
+                  if (!launched && context.mounted) {
+                    showSnackbar(
+                      context,
+                      'Cannot open the repository link',
+                      isError: true,
+                    );
+                  }
+                } on Exception catch (_) {
+                  if (context.mounted) {
+                    showSnackbar(
+                      context,
+                      'Cannot open the repository link',
+                      isError: true,
+                    );
+                  }
+                }
               },
+              child: const Row(
+                children: [
+                  Text(
+                    'GitHub',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+
+                  SizedBox(
+                    width: 4,
+                  ),
+                  Icon(
+                    Icons.open_in_new,
+                    color: Colors.white,
+                    size: 16,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+      body: FutureBuilder<List<Contributor>>(
+        future: _contributorsFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(
+                      Icons.error_outline,
+                      size: 48,
+                      color: Colors.red,
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Error loading contributors',
+                      style: Theme.of(context).textTheme.titleLarge,
+                    ),
+                  ],
+                ),
+              ),
             );
-          },
-        ),
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return const Center(
+              child: Padding(
+                padding: EdgeInsets.all(16),
+                child: Text('No contributors found.'),
+              ),
+            );
+          }
+
+          final contributors = snapshot.data!;
+          return ListView.builder(
+            padding: const EdgeInsets.all(16),
+            itemCount: contributors.length,
+            itemBuilder: (context, index) {
+              final contributor = contributors[index];
+              return Card(
+                margin: const EdgeInsets.only(bottom: 8),
+                elevation: 1,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: ListTile(
+                  leading: CircleAvatar(
+                    backgroundImage: NetworkImage(contributor.avatarUrl),
+                    radius: 24,
+                  ),
+                  title: Text(
+                    contributor.name,
+                    style: const TextStyle(fontWeight: FontWeight.w600),
+                  ),
+                  subtitle: Text(
+                    contributor.profileUrl,
+                    style: const TextStyle(fontSize: 12),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  trailing: const Icon(Icons.open_in_new, size: 20),
+                  onTap: () async {
+                    final url = Uri.parse(contributor.profileUrl);
+                    try {
+                      final launched = await launchUrl(
+                        url,
+                        mode: LaunchMode.externalApplication,
+                      );
+                      if (!launched && context.mounted) {
+                        showSnackbar(
+                          context,
+                          'Could not open ${contributor.profileUrl}',
+                          isError: true,
+                        );
+                      }
+                    } on Exception catch (_) {
+                      if (context.mounted) {
+                        showSnackbar(
+                          context,
+                          'Could not open ${contributor.profileUrl}',
+                          isError: true,
+                        );
+                      }
+                    }
+                  },
+                ),
+              );
+            },
+          );
+        },
       ),
     );
   }
