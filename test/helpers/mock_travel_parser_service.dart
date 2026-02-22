@@ -2,8 +2,8 @@ import 'package:namma_wallet/src/common/domain/models/extras_model.dart';
 import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 import 'package:namma_wallet/src/common/enums/source_type.dart';
 import 'package:namma_wallet/src/common/enums/ticket_type.dart';
-import 'package:namma_wallet/src/features/travel/application/travel_parser_interface.dart';
 import 'package:namma_wallet/src/features/travel/application/travel_parser_service.dart';
+import 'package:namma_wallet/src/features/travel/domain/ticket_update_info.dart';
 
 /// Mock TravelParserService for testing purposes
 class MockTravelParserService extends TravelParserService {

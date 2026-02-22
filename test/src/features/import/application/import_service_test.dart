@@ -1,10 +1,12 @@
 import 'dart:typed_data';
+
 import 'package:cross_file/cross_file.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:namma_wallet/src/common/database/ticket_dao_interface.dart';
 import 'package:namma_wallet/src/common/domain/models/extras_model.dart';
 import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 import 'package:namma_wallet/src/common/enums/source_type.dart';
+import 'package:namma_wallet/src/common/services/ocr/ocr_block.dart';
 import 'package:namma_wallet/src/common/services/pdf/pdf_service_interface.dart';
 import 'package:namma_wallet/src/features/import/application/import_service.dart';
 import 'package:namma_wallet/src/features/irctc/application/irctc_qr_parser_interface.dart';
@@ -13,20 +15,47 @@ import 'package:namma_wallet/src/features/irctc/application/irctc_scanner_servic
 import 'package:namma_wallet/src/features/irctc/domain/irctc_ticket_model.dart';
 import 'package:namma_wallet/src/features/travel/application/pkpass_parser_interface.dart';
 import 'package:namma_wallet/src/features/travel/application/travel_parser_interface.dart';
+import 'package:namma_wallet/src/features/travel/domain/ticket_update_info.dart';
 
 import '../../../../helpers/fake_logger.dart';
 
 class FakePDFService implements IPDFService {
   String? extractedText;
+  List<OCRBlock>? extractedBlocks;
 
   @override
-  Future<String> extractTextFrom(XFile file) async {
+  Future<String> extractTextForDisplay(XFile file) async {
     return extractedText ?? '';
+  }
+
+  @override
+  Future<String> extractTextFrom(XFile file) => extractTextForDisplay(file);
+
+  @override
+  Future<List<OCRBlock>> extractBlocks(XFile file) async {
+    // If blocks are provided, return them
+    if (extractedBlocks != null) return extractedBlocks!;
+
+    // Otherwise, convert text to pseudo-blocks
+    return OCRBlock.fromPlainText(extractedText ?? '');
+  }
+
+  @override
+  Future<Map<String, dynamic>> extractStructuredData(XFile file) async {
+    return {};
   }
 }
 
 class FakeTravelParser implements ITravelParser {
   Ticket? parsedTicket;
+
+  @override
+  Ticket? parseTicketFromBlocks(
+    List<OCRBlock> blocks, {
+    SourceType? sourceType,
+  }) {
+    return parsedTicket;
+  }
 
   @override
   Ticket? parseTicketFromText(String text, {SourceType? sourceType}) {

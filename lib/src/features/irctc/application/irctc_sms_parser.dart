@@ -18,11 +18,11 @@ class IRCTCSMSParser implements ITicketParser {
     }
 
     // Safe date parser – falls back to today if malformed/missing.
-    DateTime? parseDate(String value) {
-      if (value.isEmpty) return null;
+    DateTime parseDate(String value) {
+      if (value.isEmpty) return DateTime.utc(1970);
 
       final parts = value.split(RegExp('[-/]'));
-      if (parts.length != 3) return null;
+      if (parts.length != 3) return DateTime.utc(1970);
 
       try {
         final d = int.parse(parts[0]);
@@ -32,7 +32,7 @@ class IRCTCSMSParser implements ITicketParser {
             : int.parse(parts[2]);
         return DateTime(y, m, d);
       } on Exception catch (_) {
-        return null;
+        return DateTime.utc(1970);
       }
     }
 
@@ -70,27 +70,28 @@ class IRCTCSMSParser implements ITicketParser {
 
     final isUpdate = isUpdateMessage(smsText);
 
-    String? pnr = extract(r'PNR[:\-\s]*([0-9]{6,10})');
+    var pnr = extract(r'PNR\s*(?:No\.?)?\s*[:.-]?\s*\b([A-Z0-9]{6,12})\b');
     if (pnr.isEmpty) {
-      for (final m in RegExp(r'\b([0-9]{10})\b').allMatches(rawText)) {
+      // Fallback: look for 6-12 alphanumeric chars that aren't train numbers
+      for (final m in RegExp(r'\b([A-Z0-9]{6,12})\b').allMatches(rawText)) {
         final start = m.start;
         final prefixStart = start - 16;
         final prefix = rawText.substring(
           prefixStart < 0 ? 0 : prefixStart,
           start,
         );
-        final isTrainNumber = RegExp(
-          r'(?:TRN|Train|Trn)[:\-\s]*$',
+        final isTrainNumberOrClass = RegExp(
+          r'(?:TRN|Train|Trn|Class|Cls)[:\-\s]*$',
           caseSensitive: false,
         ).hasMatch(prefix);
-        if (!isTrainNumber) {
-          pnr = m.group(1) ?? '';
-          break;
+        if (!isTrainNumberOrClass) {
+          pnr = (m.group(1) ?? '').trim();
+          if (pnr.isNotEmpty) break;
         }
       }
     }
 
-    if (pnr == null || pnr.isEmpty) {
+    if (pnr.isEmpty) {
       throw const FormatException('IRCTC SMS parse failed: PNR not found');
     }
 
@@ -168,12 +169,12 @@ class IRCTCSMSParser implements ITicketParser {
       r'(?:DP|Dep|Departure)[:\-\s]*([0-9]{1,2}[:.][0-9]{2})',
     );
 
-    var scheduledDeparture = doj;
+    DateTime? scheduledDeparture = doj;
     if (depRaw.isNotEmpty) {
       final hm = depRaw.replaceAll('.', ':').split(':');
       try {
         scheduledDeparture = DateTime(
-          doj!.year,
+          doj.year,
           doj.month,
           doj.day,
           int.parse(hm[0]),

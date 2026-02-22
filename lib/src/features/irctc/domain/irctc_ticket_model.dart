@@ -28,7 +28,7 @@ class IRCTCTicket with IRCTCTicketMappable {
   final String? transactionId;
   final String passengerName;
   final String? gender;
-  final int age;
+  final int? age;
   final String status;
   final String? quota;
   final String trainNumber;

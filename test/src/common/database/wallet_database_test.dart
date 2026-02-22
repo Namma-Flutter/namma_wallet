@@ -107,6 +107,7 @@ void main() {
               secondaryText: 'TNSTC',
               startTime: DateTime(2024, 12, 15, 10, 30),
               location: 'Koyambedu',
+              type: TicketType.bus,
             ),
             Ticket(
               ticketId: 'TICKET002',
@@ -114,6 +115,7 @@ void main() {
               secondaryText: 'MSRTC',
               startTime: DateTime(2024, 12, 16, 11, 30),
               location: 'Mumbai Central',
+              type: TicketType.bus,
             ),
             Ticket(
               ticketId: 'TICKET003',
@@ -121,6 +123,7 @@ void main() {
               secondaryText: 'UPSRTC',
               startTime: DateTime(2024, 12, 17, 12, 30),
               location: 'ISBT',
+              type: TicketType.bus,
             ),
           ];
 
@@ -152,6 +155,7 @@ void main() {
             secondaryText: 'TNSTC',
             startTime: DateTime(2024, 12, 15, 10, 30),
             location: 'Koyambedu',
+            type: TicketType.bus,
             extras: [
               ExtrasModel(title: 'Passenger', value: 'John Doe'),
               ExtrasModel(title: 'Age', value: '25'),
@@ -167,6 +171,7 @@ void main() {
             // Empty - should be ignored
             secondaryText: '',
             location: '',
+            type: TicketType.bus,
             extras: [
               ExtrasModel(title: 'Age', value: '26'), // UPDATE existing
               ExtrasModel(title: 'Seat', value: '12A'), // INSERT new
@@ -203,6 +208,7 @@ void main() {
             secondaryText: 'TNSTC',
             startTime: DateTime(2024, 12, 15, 10, 30),
             location: 'Koyambedu',
+            type: TicketType.bus,
             tags: [
               TagModel(value: 'PNR123', icon: 'confirmation_number'),
               TagModel(value: 'BUS101', icon: 'train'),
@@ -217,6 +223,7 @@ void main() {
             primaryText: '',
             secondaryText: '',
             location: '',
+            type: TicketType.bus,
             tags: [
               TagModel(value: 'AC', icon: 'info'),
               // Update existing icon to new 'info' style?
@@ -287,6 +294,7 @@ void main() {
             secondaryText: 'UPSRTC',
             startTime: DateTime(2024, 12, 17, 12, 30),
             location: 'ISBT',
+            type: TicketType.bus,
           );
           await ticketDao.insertTicket(ticket);
 
@@ -298,6 +306,7 @@ void main() {
             primaryText: 'Delhi → Jaipur', // Changed
             secondaryText: 'UPSRTC', // Kept same
             location: 'Kashmere Gate', // Changed
+            type: TicketType.bus,
           );
 
           await ticketDao.updateTicketById('CRUD003', updatePayload);
@@ -318,6 +327,7 @@ void main() {
             secondaryText: 'SBSTC',
             startTime: DateTime(2024, 12, 18, 13, 30),
             location: 'Esplanade',
+            type: TicketType.bus,
           );
           await ticketDao.insertTicket(ticket);
 
@@ -339,6 +349,7 @@ void main() {
               secondaryText: '',
               location: '',
               startTime: DateTime(2024, 12, 15, 10),
+              type: TicketType.bus,
             ),
             Ticket(
               ticketId: 'CRUD006',
@@ -346,6 +357,7 @@ void main() {
               secondaryText: '',
               location: '',
               startTime: DateTime(2024, 12, 16, 10),
+              type: TicketType.bus,
             ), // Latest
             Ticket(
               ticketId: 'CRUD007',
@@ -353,6 +365,7 @@ void main() {
               secondaryText: '',
               location: '',
               startTime: DateTime(2024, 12, 14, 10),
+              type: TicketType.bus,
             ),
           ];
 
@@ -390,6 +403,7 @@ void main() {
             secondaryText: '',
             startTime: DateTime(2024, 12, 15, 10, 30),
             location: '',
+            type: TicketType.bus,
             extras: [ExtrasModel(title: 'Passenger', value: 'John Doe')],
           );
           await ticketDao.insertTicket(ticket);
@@ -399,7 +413,8 @@ void main() {
             ticketId: 'EDGE001',
             primaryText: '',
             secondaryText: '',
-            location: '',
+            location: 'Kashmere Gate',
+            type: TicketType.bus,
           );
 
           await ticketDao.handleTicket(update);
@@ -421,6 +436,7 @@ void main() {
             secondaryText: '',
             startTime: DateTime(2024, 12, 15, 10, 30),
             location: '',
+            type: TicketType.bus,
           );
           await ticketDao.insertTicket(ticket);
 
@@ -436,6 +452,7 @@ void main() {
             primaryText: 'Large',
             secondaryText: '',
             location: '',
+            type: TicketType.bus,
             extras: largeExtras,
           );
 
@@ -463,6 +480,7 @@ void main() {
             secondaryText: '',
             startTime: DateTime(2024, 12, 15, 10, 30),
             location: '',
+            type: TicketType.bus,
           );
           await ticketDao.insertTicket(ticket);
 

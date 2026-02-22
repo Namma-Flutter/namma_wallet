@@ -165,8 +165,11 @@ class IRCTCPDFParser implements ITicketParser {
           caseSensitive: caseSensitive,
           multiLine: true,
         ).firstMatch(rawText);
-        if (m != null && m.group(group) != null) {
-          return m.group(group)!.trim().replaceAll('"', '');
+        if (m != null) {
+          final val = (group <= m.groupCount)
+              ? m.group(group)?.trim().replaceAll('"', '') ?? ''
+              : '';
+          if (val.isNotEmpty) return val;
         }
       }
       return '';
@@ -182,8 +185,12 @@ class IRCTCPDFParser implements ITicketParser {
 
     /// Extracts PNR number using multiple regex variations.
     final pnr = pick([
-      r'PNR(?:[\s\S]{0,50}?)(\d{10})',
-      r'PNR\s*[:.-]?\s*(\d{10})',
+      // Numeric PNR: 6-12 digits
+      r'PNR\s*(?:No\.?)?\s*[:.-]?\s*(\d{6,12})',
+      // Alphanumeric PNR (found in some tests): 6-12 chars
+      r'PNR\s*(?:No\.?)?\s*[:.-]?\s*(\b[A-Z0-9]{6,12}\b)',
+      // Fallback for blocks where PNR is embedded
+      r'PNR\b[\s\S]{0,30}?\b([A-Z0-9]{6,12})\b',
     ]);
 
     /// Extracted origin station name.
@@ -240,13 +247,17 @@ class IRCTCPDFParser implements ITicketParser {
     /// Fallback regex for "From"
     if (fromStn.isEmpty) {
       fromStn = pick([
-        r'From\s*[:]?\s*([A-Z ]+\([A-Z]+\))',
-      ], caseSensitive: true);
+        r'From\s*(?:Station|No\.?)?\s*[:.-]?\s*([^ \n][^\n]*)',
+        r'Boarding\s*(?:Point|Station|At)?\s*[:.-]?\s*([^ \n][^\n]*)',
+      ]);
     }
 
     /// Fallback regex for "To"
     if (toStn.isEmpty) {
-      toStn = pick([r'To\s*[:]?\s*([A-Z ]+\([A-Z]+\))'], caseSensitive: true);
+      toStn = pick([
+        r'To\s*(?:Station)?\s*[:.-]?\s*([^ \n][^\n]*)',
+        r'Reservation\s*(?:Upto|Up-to|To)?\s*[:.-]?\s*([^ \n][^\n]*)',
+      ]);
     }
 
     /// Matches boarding station code.
@@ -277,6 +288,7 @@ class IRCTCPDFParser implements ITicketParser {
     final trainName = pick([
       r'Train No\./\s*Name\s+(?:[:.-])?\s*\d{5}\s*/\s*(.*)',
       r'(?:Train No|Train Name|Train)[\s\S]{0,30}?\d{5}\s*/\s*(.*)',
+      r'Train Name\s*[:.-]?\s*([^\n]+)',
     ]);
 
     /// Raw travel class as printed on ticket.
@@ -290,6 +302,8 @@ class IRCTCPDFParser implements ITicketParser {
       r'Scheduled Departure[\s\S]{0,10}?[:"]+\s*(\d{2}-[A-Za-z]{3}-\d{4}\s+\d{2}:\d{2})',
       r'Departure[\s\S]{0,10}?\s*(\d{1,2}:\d{2}[\s\S]{0,25}?\d{4})',
       r'Departure[\s\S]{0,10}?\s*(\d{2}-[A-Za-z]{3}-\d{4}[\s\S]{0,25}?\d{1,2}:\d{2})',
+      r'(Date of Journey\s*[:.-]?\s*\d{2}[-/]\d{2}[-/]\d{2,4}[\s\S]*?Scheduled Departure\s*[:.-]?\s*\d{1,2}[:.]\d{2})',
+      r'(Date of Journey\s*[:.-]?\s*\d{2}[-/]\d{2}[-/]\d{2,4}[\s\S]*?Time\s*[:.-]?\s*\d{1,2}[:.]\d{2})',
     ]);
 
     /// Parses multiple date formats safely.
@@ -299,25 +313,35 @@ class IRCTCPDFParser implements ITicketParser {
         final cleaned = raw.replaceAll(RegExp(r'[*"\n]'), ' ').trim();
         final timeMatch = RegExp(r'(\d{1,2}:\d{2})').firstMatch(cleaned);
         final dateMatch = RegExp(
-          r'(\d{2}-[A-Za-z]{3}-\d{4})',
+          r'(\d{2}[-/][A-Za-z0-9]{2,3}[-/]\d{2,4})',
           caseSensitive: false,
         ).firstMatch(cleaned);
 
         if (timeMatch != null && dateMatch != null) {
           final timeParts = timeMatch.group(1)!.split(':');
-          final dateParts = dateMatch.group(1)!.split('-');
-          final month = monthToInt(dateParts[1]);
-          if (month == null) {
+          final dateStr = dateMatch.group(1)!;
+          final dateParts = dateStr.split(RegExp('[-/]'));
+
+          var year = int.tryParse(dateParts[2]);
+          if (year != null && year < 100) year += 2000;
+
+          final monthStr = dateParts[1];
+          var month = int.tryParse(monthStr);
+          month ??= monthToInt(monthStr);
+
+          if (month == null || year == null) {
             return null;
-          } else {
-            return DateTime(
-              int.parse(dateParts[2]),
-              month,
-              int.parse(dateParts[0]),
-              int.parse(timeParts[0]),
-              int.parse(timeParts[1]),
-            );
           }
+
+          final day = int.tryParse(dateParts[0]);
+          final hour = int.tryParse(timeParts[0]);
+          final minute = int.tryParse(timeParts[1]);
+
+          if (day == null || hour == null || minute == null) {
+            return null;
+          }
+
+          return DateTime.utc(year, month, day, hour, minute);
         }
       } on Exception catch (e, stackTree) {
         _logger.error(
@@ -333,8 +357,9 @@ class IRCTCPDFParser implements ITicketParser {
     final scheduledDeparture = parseFlexibleDate(dateTimeRaw);
 
     /// Extracts journey date (removes time).
+    /// Only computed when scheduledDeparture is successfully parsed.
     final dateOfJourney = scheduledDeparture != null
-        ? DateTime(
+        ? DateTime.utc(
             scheduledDeparture.year,
             scheduledDeparture.month,
             scheduledDeparture.day,
@@ -373,7 +398,7 @@ class IRCTCPDFParser implements ITicketParser {
 
     if (pMatch != null) {
       pName = pMatch.group(1)!.trim();
-      pAge = int.tryParse(pMatch.group(2) ?? '0') ?? 0;
+      pAge = int.tryParse(pMatch.group(2) ?? '') ?? 0;
       pGender = pMatch.group(3)!.trim();
 
       /// Look ahead for passenger status code.

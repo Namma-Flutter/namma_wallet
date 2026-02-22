@@ -82,7 +82,7 @@ class TNSTCSMSParser extends TravelSMSParser {
 
       final numberOfSeats = seatNumbers.isNotEmpty
           ? seatNumbers.split(',').where((s) => s.trim().isNotEmpty).length
-          : 1;
+          : null;
 
       final tnstcModel = TNSTCTicketModel(
         corporation: corporation,

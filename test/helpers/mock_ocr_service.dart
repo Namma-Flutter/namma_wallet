@@ -1,7 +1,15 @@
 import 'package:cross_file/cross_file.dart';
+import 'package:namma_wallet/src/common/services/ocr/ocr_block.dart';
 import 'package:namma_wallet/src/common/services/ocr/ocr_service_interface.dart';
 
 class MockOCRService implements IOCRService {
+  @override
+  Future<List<OCRBlock>> extractBlocksFromPDF(XFile pdfFile) async {
+    // Return mock blocks with synthetic geometry for testing
+    final text = await extractTextFromPDF(pdfFile);
+    return OCRBlock.fromPlainText(text);
+  }
+
   @override
   Future<String> extractTextFromPDF(XFile pdfFile) async {
     return '''

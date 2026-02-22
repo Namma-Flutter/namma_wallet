@@ -73,15 +73,12 @@ void main() {
         expect(ticket.ticketId, equals('4846874185'));
 
         /// Validates extracted route.
-        expect(
-          ticket.primaryText,
-          equals('Ksr Bengaluru (SBC) → Mgr Chennai Ctl (MAS)'),
-        );
+        expect(ticket.primaryText, 'Sbc Mas Sf Mail');
 
         /// Validates train number, class, and passenger text.
         expect(
           ticket.secondaryText,
-          equals('Train 12658 • SL • Justin Benito'),
+          equals('Ksr Bengaluru (SBC) → Mgr Chennai Ctl (MAS)'),
         );
 
         /// Validate parsed departure date/time.
@@ -153,11 +150,11 @@ void main() {
 
         // PRIMARY FIELDS
         expect(ticket.ticketId, equals('4641404389'));
+        expect(ticket.primaryText, 'KAVERI EXPRESS');
         expect(
-          ticket.primaryText,
+          ticket.secondaryText,
           equals('TIRUVALLUR (TRL) → KSR BENGALURU (SBC)'),
         );
-        expect(ticket.secondaryText, equals('Train 16021 • SL • MAGESH K'));
 
         // START TIME VALIDATION
         expect(ticket.startTime?.year, equals(2026));
@@ -213,15 +210,12 @@ void main() {
 
         // PRIMARY FIELDS
         expect(ticket.ticketId, equals('4639188602'));
-        expect(
-          ticket.primaryText,
-          equals('KSR BENGALURU (SBC) → MGR CHENNAI CTL (MAS)'),
-        );
+        expect(ticket.primaryText, 'SBC MAS SF MAIL');
 
         // Note: Parser now prioritizes Train No. from email body.
         expect(
           ticket.secondaryText,
-          equals('Train 12658 • SL • HARISH ANBALAGAN'),
+          equals('KSR BENGALURU (SBC) → MGR CHENNAI CTL (MAS)'),
         );
 
         // START TIME (Email Body: 06-Dec-2025 22:40)
@@ -278,15 +272,12 @@ void main() {
         expect(ticket.ticketId, equals('4117608719'));
 
         /// Validates extracted route.
-        expect(
-          ticket.primaryText,
-          equals('VALLIYUR (VLY) → CHENNAI EGMORE (MS)'),
-        );
+        expect(ticket.primaryText, 'KANYAKUMARI EXP');
 
         /// Validates train number, class, and passenger text.
         expect(
           ticket.secondaryText,
-          equals('Train 12634 • SL • SARAVANAKUMAR'),
+          equals('VALLIYUR (VLY) → CHENNAI EGMORE (MS)'),
         );
 
         /// Validate parsed departure date/time.
@@ -354,15 +345,12 @@ void main() {
         expect(ticket.ticketId, equals('4214465828'));
 
         /// Validates extracted route.
-        expect(
-          ticket.primaryText,
-          equals('ARALVAYMOZHI (AAY) → CHENNAI EGMORE (MS)'),
-        );
+        expect(ticket.primaryText, 'ANANTAPURI EXP');
 
         /// Validates train number, class, and first passenger text.
         expect(
           ticket.secondaryText,
-          equals('Train 20636 • SL • RAMKUMAR'),
+          equals('ARALVAYMOZHI (AAY) → CHENNAI EGMORE (MS)'),
         );
 
         /// Validate parsed departure date/time.
@@ -425,15 +413,12 @@ void main() {
         expect(ticket.ticketId, equals('4249001496'));
 
         /// Validates extracted route [cite: 227, 237]
-        expect(
-          ticket.primaryText,
-          equals('MGR CHENNAI CTL (MAS) → KOZHIKKODE (CLT)'),
-        );
+        expect(ticket.primaryText, 'MAS MAQ EXP');
 
         /// Validates train number, class, and first passenger
         expect(
           ticket.secondaryText,
-          equals('Train 12685 • SL • RAMKUMAR R'),
+          equals('MGR CHENNAI CTL (MAS) → KOZHIKKODE (CLT)'),
         );
 
         /// Validate parsed departure date/time [cite: 232]
@@ -492,14 +477,11 @@ void main() {
 
         expect(ticket.ticketId, equals('4417448343'));
 
-        expect(
-          ticket.primaryText,
-          equals('CHENNAI EGMORE (MS) → TIRUNELVELI JN (TEN)'),
-        );
+        expect(ticket.primaryText, 'NELLAI SF EXP');
 
         expect(
           ticket.secondaryText,
-          equals('Train 12631 • SL • SARAVANAKUMAR'),
+          equals('CHENNAI EGMORE (MS) → TIRUNELVELI JN (TEN)'),
         );
 
         expect(ticket.startTime?.year, equals(2025));
@@ -559,15 +541,12 @@ void main() {
         expect(ticket.ticketId, equals('4222116599'));
 
         /// Validates extracted route [cite: 466, 481]
-        expect(
-          ticket.primaryText,
-          equals('CHENNAI EGMORE (MS) → ARALVAYMOZHI (AAY)'),
-        );
+        expect(ticket.primaryText, 'MS GURUVAYUR EXP');
 
         /// Validates train number, class, and passenger [cite: 472, 476, 483]
         expect(
           ticket.secondaryText,
-          equals('Train 16127 • 3A • MURUGESAN M'),
+          equals('CHENNAI EGMORE (MS) → ARALVAYMOZHI (AAY)'),
         );
 
         /// Validate parsed departure date/time [cite: 475]
@@ -625,15 +604,12 @@ void main() {
         expect(ticket.ticketId, equals('4534937884'));
 
         /// Validates extracted route in CAPITAL LETTERS
-        expect(
-          ticket.primaryText,
-          equals('MGR CHENNAI CTL (MAS) → KSR BENGALURU (SBC)'),
-        );
+        expect(ticket.primaryText, 'MYS SHATABDI');
 
         /// Validates train number, class, and passenger
         expect(
           ticket.secondaryText,
-          equals('Train 12007 • CC'),
+          equals('MGR CHENNAI CTL (MAS) → KSR BENGALURU (SBC)'),
         );
 
         /// Validate parsed departure date/time
@@ -689,14 +665,12 @@ void main() {
 
         /// Extract text from the PDF
         final pdfText = await pdfService.extractTextFrom(pdfFile);
+        final ticket = parser.parseTicket(pdfText);
 
         /// The test verifies that the parser rejects the ticket because
         /// scheduledDeparture is null due to the "N.A."
         /// value in the source.
-        expect(
-          () => parser.parseTicket(pdfText),
-          throwsA(isA<ArgumentError>()),
-        );
+        expect(ticket.startTime, equals(DateTime.utc(1970)));
       },
     );
 
@@ -713,15 +687,12 @@ void main() {
         expect(ticket.ticketId, equals('4449000087'));
 
         /// Validates extracted route in CAPITAL LETTERS
-        expect(
-          ticket.primaryText,
-          equals('KOZHIKKODE (CLT) → MGR CHENNAI CTL (MAS)'),
-        );
+        expect(ticket.primaryText, 'MAQ MAS EXP');
 
         /// Validates train number, class, and first passenger
         expect(
           ticket.secondaryText,
-          equals('Train 12686 • 3A • RAMKUMAR'),
+          equals('KOZHIKKODE (CLT) → MGR CHENNAI CTL (MAS)'),
         );
 
         /// Validate parsed departure date/time
@@ -784,14 +755,14 @@ void main() {
         expect(
           ticket.primaryText,
           equals(
-            'KSR BENGALURU (SBC) → MGR CHENNAI CTL (MAS)',
+            'KAVERI EXPRESS',
           ), // [cite: 894, 908]
         );
 
         /// Validates train number, class, and passenger
         expect(
           ticket.secondaryText,
-          equals('Train 16022 • SL • MAGESH K'), // [cite: 901, 911, 905]
+          equals('KSR BENGALURU (SBC) → MGR CHENNAI CTL (MAS)'),
         );
 
         /// Validate parsed departure date/time

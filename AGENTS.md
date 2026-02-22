@@ -22,6 +22,9 @@ fvm flutter build ios
 # Analyze code
 fvm flutter analyze
 
+# Run SwiftLint for iOS
+cd ios && swiftlint
+
 # Run tests (when available)
 fvm flutter test
 ```
@@ -137,3 +140,81 @@ Examples:
 - Makes errors visible and debuggable
 - Allows callers to handle missing data appropriately
 - Maintains data integrity
+
+### OCR and Layout-Based Extraction
+
+#### Handling Multiple Key-Value Pairs in Single OCR Blocks
+
+When OCR extracts text from PDFs, sometimes multiple key-value pairs appear
+in a single text block on the same line. The `LayoutExtractor` has been
+enhanced to handle this:
+
+**Problem:**
+```
+OCR Block text: "Passenger Pickup Point : CHENNAI Passenger Pickup Time: 21:00"
+```
+
+**Solution:**
+The `_extractInlineValue` method now detects when multiple key-value pairs
+exist in the same block and extracts only the value for the requested key,
+stopping at the next key.
+
+**Example:**
+- Input block: `"Passenger Pickup Point : CHENNAI Passenger Pickup Time: 21:00"`
+- `findValueForKey('Passenger Pickup Point')` returns: `"CHENNAI"`
+- `findValueForKey('Passenger Pickup Time')` returns: `"21:00"`
+
+**Implementation:**
+- Finds the specific key position in the text
+- Extracts text after the colon following that key
+- Uses regex pattern to detect the start of the next key (pattern: word(s) followed by `:`)
+- Truncates the value at the next key boundary
+
+This prevents extraction errors where one field's value incorrectly includes
+the next field's label and value.
+
+### Passenger Table Extraction with Missing Columns
+
+When extracting passenger information from tables, some rows may have missing
+columns (e.g., missing Gender value). The parser now uses column alignment
+based on header positions instead of simple array indexing.
+
+**Problem:**
+```
+Row 1: [Name, Age, Type, Gender, Seat]  // 5 columns
+Row 2: [Name, Age, Type, Gender, Seat]  // 5 columns
+Row 3: [Name, Age, Type, Seat]          // 4 columns (missing Gender)
+```
+
+Old behavior with array indexing:
+- Row 3: row[3] = "Seat Number" → incorrectly assigned as gender
+
+**Solution:**
+The `_extractPassengers` method now:
+1. Identifies header row and records X-coordinate positions for each column
+2. For data rows, assigns each block to its column based on X-position proximity
+3. Missing columns don't cause misalignment of other columns
+
+**Example:**
+- Row 3 with missing Gender: correctly assigns Seat to seatNumber field
+- All three passengers extracted with correct seat numbers
+
+### OCR Error Correction for Seat Numbers
+
+Common OCR errors in seat numbers are automatically corrected:
+
+**Problem:** OCR misreads characters in seat numbers
+- "U" (letter U) is read as "0" (zero)
+- Example: Actual seat "12UB" is read as "120B"
+
+**Solution:** Automatic pattern-based correction
+- Pattern `\d+0B$` → corrected to end with "UB"
+- Pattern `\d+0L$` → corrected to end with "UL"
+
+**Examples:**
+- `120B` → `12UB` ✓
+- `30B` → `3UB` ✓
+- `150L` → `15UL` ✓
+
+This correction is applied during passenger extraction, ensuring seat numbers
+are displayed correctly even when OCR misreads them.

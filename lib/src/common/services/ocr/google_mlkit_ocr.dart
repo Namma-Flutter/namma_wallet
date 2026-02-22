@@ -5,6 +5,7 @@ import 'package:cross_file/cross_file.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:image/image.dart' as img;
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
+import 'package:namma_wallet/src/common/services/ocr/ocr_block.dart';
 import 'package:namma_wallet/src/common/services/ocr/ocr_service_interface.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pdfrx/pdfrx.dart';
@@ -15,7 +16,7 @@ class GoogleMLKitOCR implements IOCRService {
   final ILogger _logger;
 
   @override
-  Future<String> extractTextFromPDF(XFile pdfFile) async {
+  Future<List<OCRBlock>> extractBlocksFromPDF(XFile pdfFile) async {
     PdfDocument? doc;
     TextRecognizer? textRecognizer;
 
@@ -27,7 +28,7 @@ class GoogleMLKitOCR implements IOCRService {
       _logger.debug('[OCRService] PDF opened, pages: ${doc.pages.length}');
 
       textRecognizer = TextRecognizer();
-      final extractedTexts = <String>[];
+      final allBlocks = <OCRBlock>[];
 
       // Get temp directory once outside the loop
       final tempDir = await getTemporaryDirectory();
@@ -80,14 +81,30 @@ class GoogleMLKitOCR implements IOCRService {
           final inputImage = InputImage.fromFile(tempImageFile);
           final recognizedText = await textRecognizer.processImage(inputImage);
 
+          final startIndex = allBlocks.length;
+          // Extract blocks with geometry from ML Kit
+          for (final textBlock in recognizedText.blocks) {
+            // ML Kit can return text blocks, lines, or elements
+            // For maximum granularity, we extract at line level
+            for (final line in textBlock.lines) {
+              if (line.text.trim().isEmpty) continue;
+
+              allBlocks.add(
+                OCRBlock(
+                  text: line.text.trim(),
+                  boundingBox: line.boundingBox,
+                  page: pageNum,
+                  confidence: line.confidence,
+                ),
+              );
+            }
+          }
+
+          final blocksOnPage = allBlocks.length - startIndex;
           _logger.debug(
             '[OCRService] Page ${pageNum + 1} OCR: '
-            '${recognizedText.text.length} chars extracted',
+            '$blocksOnPage blocks extracted',
           );
-
-          if (recognizedText.text.isNotEmpty) {
-            extractedTexts.add(recognizedText.text);
-          }
         } on Object catch (e, stackTrace) {
           _logger.error(
             '[OCRService] Error processing page ${pageNum + 1}',
@@ -106,14 +123,12 @@ class GoogleMLKitOCR implements IOCRService {
         }
       }
 
-      final combinedText = extractedTexts.join('\n\n');
-
       _logger.debug(
-        '[OCRService] OCR complete: ${combinedText.length} total chars from '
-        '${extractedTexts.length} pages',
+        '[OCRService] OCR complete: ${allBlocks.length} total blocks from '
+        '${doc.pages.length} pages',
       );
 
-      return combinedText;
+      return allBlocks;
     } on Object catch (e, stackTrace) {
       _logger.error('[OCRService] OCR extraction failed', e, stackTrace);
       rethrow;
@@ -126,5 +141,25 @@ class GoogleMLKitOCR implements IOCRService {
         await doc.dispose();
       }
     }
+  }
+
+  @override
+  Future<String> extractTextFromPDF(XFile pdfFile) async {
+    // Legacy method: use the new blocks API and concatenate text
+    final blocks = await extractBlocksFromPDF(pdfFile);
+
+    // Group by page and concatenate
+    final pageTexts = <int, List<String>>{};
+    for (final block in blocks) {
+      pageTexts.putIfAbsent(block.page, () => []).add(block.text);
+    }
+
+    // Join pages with double newlines
+    final sortedPages = pageTexts.keys.toList()..sort();
+    final combinedText = sortedPages
+        .map((page) => pageTexts[page]!.join('\n'))
+        .join('\n\n');
+
+    return combinedText;
   }
 }
