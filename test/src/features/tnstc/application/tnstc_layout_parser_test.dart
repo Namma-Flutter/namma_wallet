@@ -519,6 +519,49 @@ Service Start Time : 13:15
           expect(extrasMap['Seat Number'], expected['seatNumber']);
         },
       );
+      test(
+        'should parse SETC ticket T73289589 from real OCR blocks',
+        () {
+          final blocks = TnstcLayoutFixtures.t73289589;
+          final ticket = parser.parseTicketFromBlocks(blocks);
+          const expected = TnstcLayoutFixtures.t73289589Expected;
+
+          // Verify ticket ID
+          expect(ticket.ticketId, expected['pnrNumber']);
+
+          // Verify primary text contains route information
+          expect(ticket.primaryText, contains('KUMBAKONAM'));
+          expect(ticket.primaryText, contains('CHENNAI'));
+
+          // Verify key fields in extras
+          final extrasMap = <String, String>{
+            for (final e in ticket.extras ?? <ExtrasModel>[]) ...{
+              if (e.title != null) e.title!: e.value ?? '',
+              if (e.child != null)
+                for (final c in e.child!)
+                  if (c.title != null) c.title!: c.value ?? '',
+            },
+          };
+
+          expect(extrasMap['PNR Number'], expected['pnrNumber']);
+          expect(extrasMap['Provider'], expected['corporation']);
+          expect(extrasMap['Route No'], expected['routeNo']);
+          expect(extrasMap['Service Class'], expected['classOfService']);
+          expect(extrasMap['Trip Code'], expected['tripCode']);
+          expect(extrasMap['Bus ID'], expected['busIdNumber']);
+          expect(
+            extrasMap['Fare'],
+            '₹${(expected['totalFare']! as double).toStringAsFixed(2)}',
+          );
+
+          expect(extrasMap['Platform'], isNull);
+          // Verify passenger details
+          expect(extrasMap['Passenger'], expected['passengerName']);
+          expect(extrasMap['Age'], expected['passengerAge'].toString());
+          expect(extrasMap['Gender'], expected['passengerGender']);
+          expect(extrasMap['Seat Number'], expected['seatNumber']);
+        },
+      );
     });
   });
 }

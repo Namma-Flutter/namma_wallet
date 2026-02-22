@@ -3143,4 +3143,323 @@ class TnstcLayoutFixtures {
     'passengerGender': 'M',
     'seatNumber': '23',
   };
+
+  /// SETC ticket 4: Kumbakonam to Chennai (30/11/2025)
+  /// PNR: T73289589
+  /// Route: 307LB
+  /// Class: NON AC LOWER BERTH SEATER
+  ///
+  /// Generated from: KUM-CHE-30-11-25.pdf
+  static final t73289589 = <OCRBlock>[
+    OCRBlock(
+      text: 'E-Ticket/Reservation Voucher',
+      boundingBox: const Rect.fromLTRB(0.0, 0.0, 100.0, 20.0),
+      page: 0,
+    ),
+    OCRBlock(
+      text: 'Corporation :',
+      boundingBox: const Rect.fromLTRB(0.0, 40.0, 100.0, 60.0),
+      page: 0,
+    ),
+    OCRBlock(
+      text: 'SETC',
+      boundingBox: const Rect.fromLTRB(0.0, 60.0, 100.0, 80.0),
+      page: 0,
+    ),
+    OCRBlock(
+      text: 'PNR Number :',
+      boundingBox: const Rect.fromLTRB(0.0, 80.0, 100.0, 100.0),
+      page: 0,
+    ),
+    OCRBlock(
+      text: 'T73289589',
+      boundingBox: const Rect.fromLTRB(0.0, 100.0, 100.0, 120.0),
+      page: 0,
+    ),
+    OCRBlock(
+      text: 'Date of Journey :',
+      boundingBox: const Rect.fromLTRB(0.0, 120.0, 100.0, 140.0),
+      page: 0,
+    ),
+    OCRBlock(
+      text: '30/11/2025',
+      boundingBox: const Rect.fromLTRB(0.0, 140.0, 100.0, 160.0),
+      page: 0,
+    ),
+    OCRBlock(
+      text: 'Route No :',
+      boundingBox: const Rect.fromLTRB(0.0, 160.0, 100.0, 180.0),
+      page: 0,
+    ),
+    OCRBlock(
+      text: '307LB',
+      boundingBox: const Rect.fromLTRB(0.0, 180.0, 100.0, 200.0),
+      page: 0,
+    ),
+    OCRBlock(
+      text: 'Service Start Place :',
+      boundingBox: const Rect.fromLTRB(0.0, 200.0, 100.0, 220.0),
+      page: 0,
+    ),
+    OCRBlock(
+      text: 'KUMBAKONAM',
+      boundingBox: const Rect.fromLTRB(0.0, 220.0, 100.0, 240.0),
+      page: 0,
+    ),
+    OCRBlock(
+      text: 'Service End Place :',
+      boundingBox: const Rect.fromLTRB(0.0, 240.0, 100.0, 260.0),
+      page: 0,
+    ),
+    OCRBlock(
+      text: 'CHENNAI-PT DR. M.G.R. BS',
+      boundingBox: const Rect.fromLTRB(0.0, 260.0, 100.0, 280.0),
+      page: 0,
+    ),
+    OCRBlock(
+      text: 'Service Start Time :',
+      boundingBox: const Rect.fromLTRB(0.0, 280.0, 100.0, 300.0),
+      page: 0,
+    ),
+    OCRBlock(
+      text: '21:00',
+      boundingBox: const Rect.fromLTRB(0.0, 300.0, 100.0, 320.0),
+      page: 0,
+    ),
+    OCRBlock(
+      text: 'Hrs.',
+      boundingBox: const Rect.fromLTRB(0.0, 320.0, 100.0, 340.0),
+      page: 0,
+    ),
+    OCRBlock(
+      text: 'Passenger Start Place :',
+      boundingBox: const Rect.fromLTRB(0.0, 380.0, 100.0, 400.0),
+      page: 0,
+    ),
+    OCRBlock(
+      text: 'KUMBAKONAM',
+      boundingBox: const Rect.fromLTRB(0.0, 400.0, 100.0, 420.0),
+      page: 0,
+    ),
+    OCRBlock(
+      text: 'Passenger End Place :',
+      boundingBox: const Rect.fromLTRB(0.0, 420.0, 100.0, 440.0),
+      page: 0,
+    ),
+    OCRBlock(
+      text: 'CHENNAI-PT Dr.M.G.R. BS',
+      boundingBox: const Rect.fromLTRB(0.0, 440.0, 100.0, 460.0),
+      page: 0,
+    ),
+    OCRBlock(
+      text: 'Passenger Pickup Point :',
+      boundingBox: const Rect.fromLTRB(0.0, 460.0, 100.0, 480.0),
+      page: 0,
+    ),
+    OCRBlock(
+      text: 'KUMBAKONAM',
+      boundingBox: const Rect.fromLTRB(0.0, 480.0, 100.0, 500.0),
+      page: 0,
+    ),
+    OCRBlock(
+      text: 'Passenger Pickup Time :',
+      boundingBox: const Rect.fromLTRB(0.0, 500.0, 100.0, 520.0),
+      page: 0,
+    ),
+    OCRBlock(
+      text: '30/11/2025 21:00',
+      boundingBox: const Rect.fromLTRB(0.0, 520.0, 100.0, 540.0),
+      page: 0,
+    ),
+    OCRBlock(
+      text: 'Hrs.',
+      boundingBox: const Rect.fromLTRB(0.0, 540.0, 100.0, 560.0),
+      page: 0,
+    ),
+    OCRBlock(
+      text: 'Platform Number :',
+      boundingBox: const Rect.fromLTRB(0.0, 560.0, 100.0, 580.0),
+      page: 0,
+    ),
+    OCRBlock(
+      text: 'Class of Service :',
+      boundingBox: const Rect.fromLTRB(0.0, 580.0, 100.0, 600.0),
+      page: 0,
+    ),
+    OCRBlock(
+      text: 'NON AC LOWER BERTH',
+      boundingBox: const Rect.fromLTRB(0.0, 600.0, 100.0, 620.0),
+      page: 0,
+    ),
+    OCRBlock(
+      text: 'SEATER',
+      boundingBox: const Rect.fromLTRB(0.0, 620.0, 100.0, 640.0),
+      page: 0,
+    ),
+    OCRBlock(
+      text: 'Trip Code :',
+      boundingBox: const Rect.fromLTRB(0.0, 640.0, 100.0, 660.0),
+      page: 0,
+    ),
+    OCRBlock(
+      text: '2100KUMCHELB',
+      boundingBox: const Rect.fromLTRB(0.0, 660.0, 100.0, 680.0),
+      page: 0,
+    ),
+    OCRBlock(
+      text: 'OB Reference No. :',
+      boundingBox: const Rect.fromLTRB(0.0, 680.0, 100.0, 700.0),
+      page: 0,
+    ),
+    OCRBlock(
+      text: 'OB31470112',
+      boundingBox: const Rect.fromLTRB(0.0, 700.0, 100.0, 720.0),
+      page: 0,
+    ),
+    OCRBlock(
+      text: 'No. of Seats :',
+      boundingBox: const Rect.fromLTRB(0.0, 720.0, 100.0, 740.0),
+      page: 0,
+    ),
+    OCRBlock(
+      text: '1 (Adults=1 ; Children=0)',
+      boundingBox: const Rect.fromLTRB(0.0, 740.0, 100.0, 760.0),
+      page: 0,
+    ),
+    OCRBlock(
+      text: 'Bank Txn. No. :',
+      boundingBox: const Rect.fromLTRB(0.0, 760.0, 100.0, 780.0),
+      page: 0,
+    ),
+    OCRBlock(
+      text: 'BAX6T2M12LV5QL',
+      boundingBox: const Rect.fromLTRB(0.0, 780.0, 100.0, 800.0),
+      page: 0,
+    ),
+    OCRBlock(
+      text: 'Bus ID No. :',
+      boundingBox: const Rect.fromLTRB(0.0, 800.0, 100.0, 820.0),
+      page: 0,
+    ),
+    OCRBlock(
+      text: 'E-12275',
+      boundingBox: const Rect.fromLTRB(0.0, 820.0, 100.0, 840.0),
+      page: 0,
+    ),
+    OCRBlock(
+      text: 'Passenger category :',
+      boundingBox: const Rect.fromLTRB(0.0, 840.0, 100.0, 860.0),
+      page: 0,
+    ),
+    OCRBlock(
+      text: 'GENERAL PUBLIC',
+      boundingBox: const Rect.fromLTRB(0.0, 860.0, 100.0, 880.0),
+      page: 0,
+    ),
+    OCRBlock(
+      text: 'Passenger Information',
+      boundingBox: const Rect.fromLTRB(0.0, 880.0, 100.0, 900.0),
+      page: 0,
+    ),
+    OCRBlock(
+      text: 'Name',
+      boundingBox: const Rect.fromLTRB(0.0, 900.0, 100.0, 920.0),
+      page: 0,
+    ),
+    OCRBlock(
+      text: 'Age',
+      boundingBox: const Rect.fromLTRB(0.0, 920.0, 100.0, 940.0),
+      page: 0,
+    ),
+    OCRBlock(
+      text: 'Adult/Child',
+      boundingBox: const Rect.fromLTRB(0.0, 940.0, 100.0, 960.0),
+      page: 0,
+    ),
+    OCRBlock(
+      text: 'Gender',
+      boundingBox: const Rect.fromLTRB(0.0, 960.0, 100.0, 980.0),
+      page: 0,
+    ),
+    OCRBlock(
+      text: 'Seat No.',
+      boundingBox: const Rect.fromLTRB(0.0, 980.0, 100.0, 1000.0),
+      page: 0,
+    ),
+    OCRBlock(
+      text: 'HarishAnbalagan',
+      boundingBox: const Rect.fromLTRB(0.0, 1000.0, 100.0, 1020.0),
+      page: 0,
+    ),
+    OCRBlock(
+      text: '26',
+      boundingBox: const Rect.fromLTRB(0.0, 1020.0, 100.0, 1040.0),
+      page: 0,
+    ),
+    OCRBlock(
+      text: 'Adult',
+      boundingBox: const Rect.fromLTRB(0.0, 1040.0, 100.0, 1060.0),
+      page: 0,
+    ),
+    OCRBlock(
+      text: 'M',
+      boundingBox: const Rect.fromLTRB(0.0, 1060.0, 100.0, 1080.0),
+      page: 0,
+    ),
+    OCRBlock(
+      text: '2LB',
+      boundingBox: const Rect.fromLTRB(0.0, 1080.0, 100.0, 1100.0),
+      page: 0,
+    ),
+    OCRBlock(
+      text: 'ID Card Type :',
+      boundingBox: const Rect.fromLTRB(0.0, 1100.0, 100.0, 1120.0),
+      page: 0,
+    ),
+    OCRBlock(
+      text: 'Government Issued Photo',
+      boundingBox: const Rect.fromLTRB(0.0, 1140.0, 100.0, 1160.0),
+      page: 0,
+    ),
+    OCRBlock(
+      text: 'ID Card',
+      boundingBox: const Rect.fromLTRB(0.0, 1160.0, 100.0, 1180.0),
+      page: 0,
+    ),
+    OCRBlock(
+      text: 'ID Card Number :',
+      boundingBox: const Rect.fromLTRB(0.0, 1180.0, 100.0, 1200.0),
+      page: 0,
+    ),
+    OCRBlock(
+      text: '736960775578',
+      boundingBox: const Rect.fromLTRB(0.0, 1220.0, 100.0, 1240.0),
+      page: 0,
+    ),
+    OCRBlock(
+      text: 'Total Fare : 555.00 Rs.',
+      boundingBox: const Rect.fromLTRB(0.0, 1240.0, 100.0, 1260.0),
+      page: 0,
+    ),
+  ];
+
+  /// Expected parsed values for t73289589 fixture
+  static const Map<String, Object?> t73289589Expected = {
+    'pnrNumber': 'T73289589',
+    'corporation': 'SETC',
+    'journeyDate': '30/11/2025',
+    'routeNo': '307LB',
+    'serviceStartPlace': 'KUMBAKONAM',
+    'serviceEndPlace': 'CHENNAI-PT DR. M.G.R. BS',
+    'serviceStartTime': '21:00',
+    'passengerPickupPoint': 'KUMBAKONAM',
+    'classOfService': 'NON AC LOWER BERTH SEATER',
+    'tripCode': '2100KUMCHELB',
+    'busIdNumber': 'E-12275',
+    'totalFare': 555.0,
+    'passengerName': 'HarishAnbalagan',
+    'passengerAge': 26,
+    'passengerGender': 'M',
+    'seatNumber': '2LB',
+  };
 }

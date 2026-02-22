@@ -43,6 +43,7 @@ class LayoutExtractor {
     'adult',
     'child',
     'route',
+    'corporation',
   ];
 
   /// Keywords that identify a block as a section header.
@@ -82,7 +83,9 @@ class LayoutExtractor {
   String? findValueForKey(
     String keyLabel, {
     double sameRowTolerance = 12.0,
-    double maxDistance = 500.0,
+    double maxDistance = 100.0,
+    bool searchAbove = true,
+    bool searchBelow = true,
   }) {
     final keyBlock = _findKeyBlock(keyLabel);
     if (keyBlock == null) {
@@ -105,8 +108,6 @@ class LayoutExtractor {
     // Component 1: Inline value in the key block itself
     if (colonIndex != -1 && colonIndex < keyBlock.text.length) {
       var valueText = keyBlock.text.substring(colonIndex + 1).trim();
-      final originalValueText = valueText; // Save for empty check
-
       if (valueText.isNotEmpty) {
         // Handle inline multi-key blocks like "From: VAL1 To: VAL2"
         // Look for the next recognized field label within valueText
@@ -119,7 +120,7 @@ class LayoutExtractor {
 
           // Find which keyword appears EARLIEST in potentialKeyPart (after the value)
           // and truncate before that keyword
-          int earliestKeywordStart = -1;
+          var earliestKeywordStart = -1;
 
           // First, look for multi-word field labels (more specific)
           final multiWordLabels = [
@@ -192,9 +193,6 @@ class LayoutExtractor {
             ),
           );
         }
-      } else if (originalValueText.isEmpty) {
-        // Inline value is empty (e.g., "Route No :"), don't fall through to spatial search
-        return null;
       }
     }
 
@@ -260,30 +258,33 @@ class LayoutExtractor {
     }
 
     // Strategy 2: Look for value on next row (below)
-    final belowValue = _findValueBelow(
-      keyBlock,
-      maxDistance: maxDistance,
-    );
-    if (belowValue != null) {
-      return belowValue;
+    if (searchBelow) {
+      final belowValue = _findValueBelow(
+        keyBlock,
+      );
+      if (belowValue != null) {
+        return belowValue;
+      }
     }
 
     // If not found below, also try searching above
     // (handles OCR cases where value appears above the key label)
-    final aboveValue = _findValueAbove(
-      keyBlock,
-      maxDistance: maxDistance,
-    );
-    if (aboveValue != null) {
-      // If there's also an inline value, prepend it AFTER the above value
-      // (above value is physically higher on page, so comes first in reading order)
-      if (colonIndex != -1) {
-        final inlineValue = keyBlock.text.substring(colonIndex + 1).trim();
-        if (inlineValue.isNotEmpty) {
-          return '$aboveValue $inlineValue';
+    if (searchAbove) {
+      final aboveValue = _findValueAbove(
+        keyBlock,
+        maxDistance: 15,
+      );
+      if (aboveValue != null) {
+        // If there's also an inline value, prepend it AFTER the above value
+        // (above value is physically higher on page, so comes first in reading order)
+        if (colonIndex != -1) {
+          final inlineValue = keyBlock.text.substring(colonIndex + 1).trim();
+          if (inlineValue.isNotEmpty) {
+            return '$aboveValue $inlineValue';
+          }
         }
+        return aboveValue;
       }
-      return aboveValue;
     }
     return null;
   }
@@ -358,17 +359,21 @@ class LayoutExtractor {
 
         // SPECIAL CASE: If it has a field keyword AND a colon, it's almost always a field label
         // even if it contains a date (e.g., "Passenger Pickup Time: 20/01/2026...")
-        final isStrongFieldLabel = hasFieldKeyword;
+        final isStrongFieldLabel =
+            hasFieldKeyword && candidateText.contains(':');
 
         if (looksLikeFieldLabel || isStrongFieldLabel) {
           // If we already started collecting value, stop at next label
           if (matchedParts.isNotEmpty) break;
 
-          // Skip this block entirely - it's a field label block
-          // even if it has a value after the colon, we shouldn't use it
-          // for spatial search fallback (test case: Route No : with Passenger Pickup Time below)
+          // If we hit a strong field label (with colon) before finding any value,
+          // it strongly suggests the current field is empty.
+          // We break to return an empty result for this search direction.
+          if (isStrongFieldLabel && candidateText.contains(':')) break;
+
+          // Skip weak labels - increment skip count and continue
           skippedCount++;
-          if (skippedCount > maxSkips) return null;
+          if (skippedCount > maxSkips) break;
           continue;
         }
       }
@@ -412,10 +417,9 @@ class LayoutExtractor {
     return matchedParts.isEmpty ? null : matchedParts.join(' ');
   }
 
-  /// Finds value blocks below [keyBlock].
   String? _findValueBelow(
     OCRBlock keyBlock, {
-    required double maxDistance,
+    double maxDistance = 30.0,
   }) {
     final candidates = blocks.where((b) {
       return b.page == keyBlock.page &&
@@ -445,13 +449,12 @@ class LayoutExtractor {
     return _extractValueFromCandidates(candidates);
   }
 
-  /// Finds value blocks above [keyBlock] (for cases where OCR splits content above the label).
   String? _findValueAbove(
     OCRBlock keyBlock, {
-    required double maxDistance,
+    double maxDistance = 30.0,
   }) {
     // For above search, use tighter distance to avoid picking up unrelated blocks
-    final tightMaxDistance = 30.0;
+    final tightMaxDistance = maxDistance;
 
     final candidates = blocks.where((b) {
       if (b == keyBlock) return false;

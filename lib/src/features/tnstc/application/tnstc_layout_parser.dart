@@ -70,7 +70,7 @@ class TNSTCLayoutParser extends TravelPDFParser {
     final passengerPickupTime = parseDateTime(passengerPickupTimeStr);
 
     final platformNumber = nullIfEmpty(
-      extractor.findValueForKey('Platform Number'),
+      extractor.findValueForKey('Platform Number', searchAbove: false),
     );
 
     final classOfService = nullIfEmpty(
