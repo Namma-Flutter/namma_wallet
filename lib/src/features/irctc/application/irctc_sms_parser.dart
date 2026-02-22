@@ -70,7 +70,7 @@ class IRCTCSMSParser implements ITicketParser {
 
     final isUpdate = isUpdateMessage(smsText);
 
-    String? pnr = extract(r'PNR[:\-\s]*([0-9]{6,10})');
+    String? pnr = extract(r'PNR(?:[\s.a-z]*)[:\-\s]*([A-Za-z0-9]{6,10})');
     if (pnr.isEmpty) {
       for (final m in RegExp(r'\b([0-9]{10})\b').allMatches(rawText)) {
         final start = m.start;

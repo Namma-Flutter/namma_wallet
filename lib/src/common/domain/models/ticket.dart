@@ -34,19 +34,15 @@ class Ticket with TicketMappable {
   }) {
     if ((model.dateOfJourney == null || model.scheduledDeparture == null) &&
         !isUpdate) {
-      getIt<ILogger>().error(
-        '[Ticket.fromIRCTC] Missing required date/time: '
+      getIt<ILogger>().warning(
+        '[Ticket.fromIRCTC] Missing date/time: '
         'dateOfJourney=${model.dateOfJourney}, '
         'scheduledDeparture=${model.scheduledDeparture}',
       );
-      throw ArgumentError(
-        'Cannot create IRCTC ticket: dateOfJourney or '
-        'scheduledDeparture is null',
-      );
     }
 
-    final journeyDate = !isUpdate ? model.dateOfJourney : null;
-    final departure = !isUpdate ? model.scheduledDeparture : null;
+    final journeyDate = model.dateOfJourney;
+    final departure = model.scheduledDeparture;
 
     /// the constants [_primaryTextConstant] used for primaryText
     /// and [__secondaryTextConstant] used for secondary
@@ -57,7 +53,9 @@ class Ticket with TicketMappable {
       primaryText:
           model.fromStation.isNotNullOrEmpty && model.toStation.isNotNullOrEmpty
           ? '${model.fromStation} → ${model.toStation}'
-          : _primaryTextConstant,
+          : (model.trainName.isNotNullOrEmpty
+                ? model.trainName
+                : _primaryTextConstant),
       secondaryText:
           [
             if (model.trainNumber.isNotNullOrEmpty) model.trainNumber,
@@ -70,12 +68,12 @@ class Ticket with TicketMappable {
               if (model.travelClass.isNotNullOrEmpty) model.travelClass,
               if (model.passengerName.isNotNullOrEmpty) model.passengerName,
             ].join(' • '),
-      startTime: !isUpdate
+      startTime: !isUpdate && journeyDate != null && departure != null
           ? DateTime(
-              journeyDate!.year,
+              journeyDate.year,
               journeyDate.month,
               journeyDate.day,
-              departure!.hour,
+              departure.hour,
               departure.minute,
             )
           : null,
@@ -104,24 +102,23 @@ class Ticket with TicketMappable {
         ExtrasModel(title: 'From', value: model.fromStation),
         ExtrasModel(title: 'To', value: model.toStation),
         ExtrasModel(title: 'Boarding', value: model.boardingStation),
-        ExtrasModel(
-          title: 'Departure',
-          value: !isUpdate
-              ? DateTimeConverter.instance.formatTime(departure!)
-              : null,
-        ),
-        ExtrasModel(
-          title: 'Date of Journey',
-          value: !isUpdate
-              ? DateTimeConverter.instance.formatDate(journeyDate!)
-              : null,
-        ),
+        if (departure != null && !isUpdate)
+          ExtrasModel(
+            title: 'Departure',
+            value: DateTimeConverter.instance.formatTime(departure),
+          ),
+        if (journeyDate != null && !isUpdate)
+          ExtrasModel(
+            title: 'Date of Journey',
+            value: DateTimeConverter.instance.formatDate(journeyDate),
+          ),
         ExtrasModel(title: 'Fare', value: model.ticketFare?.toStringAsFixed(2)),
         ExtrasModel(
           title: 'IRCTC Fee',
           value: model.irctcFee?.toStringAsFixed(2),
         ),
         ExtrasModel(title: 'Transaction ID', value: model.transactionId),
+        ExtrasModel(title: 'Provider', value: 'IRCTC'),
       ],
     );
   }

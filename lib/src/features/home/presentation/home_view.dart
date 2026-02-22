@@ -29,19 +29,57 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
   List<Ticket> _travelTickets = [];
   List<Ticket> _eventTickets = [];
 
+  // Search feature variables
+  final TextEditingController _searchController = TextEditingController();
+  String _searchQuery = '';
+
   late final IHapticService _hapticService;
   @override
   void initState() {
     super.initState();
     _hapticService = getIt<IHapticService>();
     WidgetsBinding.instance.addObserver(this);
+    _searchController.addListener(_onSearchChanged);
     unawaited(_loadTicketData());
   }
 
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    _searchController.dispose();
     super.dispose();
+  }
+
+  void _onSearchChanged() {
+    setState(() {
+      _searchQuery = _searchController.text;
+    });
+  }
+
+  List<Ticket> _filterTickets(List<Ticket> tickets) {
+    if (_searchQuery.isEmpty) return tickets;
+
+    final query = _searchQuery.toLowerCase();
+    return tickets.where((ticket) {
+      final pnr = ticket.ticketId?.toLowerCase() ?? '';
+      final primary = ticket.primaryText?.toLowerCase() ?? '';
+      final secondary = ticket.secondaryText?.toLowerCase() ?? '';
+      final type = ticket.type?.name.toLowerCase() ?? '';
+
+      final hasExtraMatch =
+          ticket.extras?.any((extra) {
+            final title = extra.title?.toLowerCase() ?? '';
+            final value = extra.value?.toLowerCase() ?? '';
+            return title.contains(query) || value.contains(query);
+          }) ??
+          false;
+
+      return pnr.contains(query) ||
+          primary.contains(query) ||
+          secondary.contains(query) ||
+          type.contains(query) ||
+          hasExtraMatch;
+    }).toList();
   }
 
   @override
@@ -97,7 +135,10 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    final cardStackList = _travelTickets.map((ticket) {
+    final filteredTravelTickets = _filterTickets(_travelTickets);
+    final filteredEventTickets = _filterTickets(_eventTickets);
+
+    final cardStackList = filteredTravelTickets.map((ticket) {
       return CardModel(
         radius: const Radius.circular(30),
         shadowColor: Colors.black26,
@@ -133,6 +174,32 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 UserProfileWidget(),
+
+                // Search Bar
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
+                  child: TextField(
+                    controller: _searchController,
+                    decoration: InputDecoration(
+                      hintText: 'Search PNR, City, Transport...',
+                      prefixIcon: const Icon(Icons.search),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
+                      ),
+                      filled: true,
+
+                      fillColor: const Color(0xFFF5F5F5),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                      ),
+                    ),
+                  ),
+                ),
+
                 Padding(
                   padding: const EdgeInsets.all(16),
                   child: Row(
@@ -145,7 +212,7 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      if (_travelTickets.isNotEmpty)
+                      if (filteredTravelTickets.isNotEmpty)
                         TextButton(
                           onPressed: () async {
                             await context.pushNamed(AppRoute.allTickets.name);
@@ -185,35 +252,38 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
                 if (_isLoading)
                   const Center(child: CircularProgressIndicator())
                 else
-                  _travelTickets.isEmpty
-                      ? const Padding(
-                          padding: EdgeInsets.all(32),
+                  filteredTravelTickets.isEmpty
+                      ? Padding(
+                          padding: const EdgeInsets.all(32),
                           child: Center(
                             child: Column(
                               children: [
-                                Icon(
+                                const Icon(
                                   Icons.airplane_ticket_outlined,
                                   size: 64,
                                   color: Colors.grey,
                                 ),
-                                SizedBox(height: 16),
+                                const SizedBox(height: 16),
                                 Text(
-                                  'No travel tickets found',
-                                  style: TextStyle(
+                                  _searchQuery.isNotEmpty
+                                      ? 'No tickets match your search'
+                                      : 'No travel tickets found',
+                                  style: const TextStyle(
                                     fontSize: 18,
                                     fontWeight: FontWeight.w500,
                                     color: Colors.grey,
                                   ),
                                 ),
-                                SizedBox(height: 8),
-                                Text(
-                                  'Paste travel SMS or add tickets manually',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.grey,
+                                const SizedBox(height: 8),
+                                if (_searchQuery.isEmpty)
+                                  const Text(
+                                    'Paste travel SMS or add tickets manually',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.grey,
+                                    ),
+                                    textAlign: TextAlign.center,
                                   ),
-                                  textAlign: TextAlign.center,
-                                ),
                               ],
                             ),
                           ),
@@ -254,13 +324,15 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
                       ),
                       const SizedBox(height: 16),
                       //* More cards list view
-                      if (_eventTickets.isEmpty)
-                        const Padding(
-                          padding: EdgeInsets.all(16),
+                      if (filteredEventTickets.isEmpty)
+                        Padding(
+                          padding: const EdgeInsets.all(16),
                           child: Center(
                             child: Text(
-                              'No event tickets found',
-                              style: TextStyle(
+                              _searchQuery.isNotEmpty
+                                  ? 'No events match your search'
+                                  : 'No event tickets found',
+                              style: const TextStyle(
                                 fontSize: 14,
                                 color: Colors.grey,
                               ),
@@ -271,9 +343,9 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
                         ListView.builder(
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
-                          itemCount: _eventTickets.length,
+                          itemCount: filteredEventTickets.length,
                           itemBuilder: (context, index) {
-                            final eventTicket = _eventTickets[index];
+                            final eventTicket = filteredEventTickets[index];
                             return InkWell(
                               onTap: () async {
                                 if (eventTicket.ticketId == null) return;
