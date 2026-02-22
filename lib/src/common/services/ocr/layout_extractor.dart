@@ -111,6 +111,14 @@ class LayoutExtractor {
   ///
   /// Example: "Service End Place : CHENNAI-PT DR. M.G.R. BS"
   /// Returns: "CHENNAI-PT DR. M.G.R. BS"
+  ///
+  /// When multiple key-value pairs exist in the same block, extracts only
+  /// the value for the specific key, stopping at the next key if found.
+  ///
+  /// Example input:
+  /// "Passenger Pickup Point : CHENNAI-PT Passenger Pickup Time: 21:00"
+  ///
+  /// For key "Passenger Pickup Point", returns: "CHENNAI-PT"
   String? _extractInlineValue(OCRBlock block, String keyLabel) {
     // Check if block contains a colon (indicates key : value format)
     if (!block.text.contains(':')) return null;
@@ -121,11 +129,63 @@ class LayoutExtractor {
     // Verify this block actually contains the key we're looking for
     if (!lowerText.contains(lowerKey)) return null;
 
-    // Split on colon and take everything after it
-    final colonIndex = block.text.indexOf(':');
+    // Find the position of the key in the text
+    final keyStartIndex = lowerText.indexOf(lowerKey);
+    if (keyStartIndex == -1) return null;
+
+    // Find the colon after this specific key
+    final searchStartPos = keyStartIndex + lowerKey.length;
+    final colonIndex = block.text.indexOf(':', searchStartPos);
     if (colonIndex == -1 || colonIndex >= block.text.length - 1) return null;
 
-    final valueText = block.text.substring(colonIndex + 1).trim();
+    // Extract text after the colon
+    var valueText = block.text.substring(colonIndex + 1).trim();
+
+    // Check if there's another key:value pair in the remaining text
+    // Common field labels in tickets that may appear in combined blocks
+    final commonFieldLabels = [
+      'Passenger Pickup Time',
+      'Passenger Pickup Point',
+      'Service Start Time',
+      'Service End Time',
+      'Service Start Place',
+      'Service End Place',
+      'Passenger Start Place',
+      'Passenger End Place',
+      'Date of Journey',
+      'PNR Number',
+      'Route No',
+      'Trip Code',
+      'Platform Number',
+      'Class of Service',
+      'Total Fare',
+      'Bus ID No',
+    ];
+
+    // Look for any of these labels followed by a colon
+    int? earliestMatchIndex;
+    for (final label in commonFieldLabels) {
+      final labelIndex = valueText.indexOf(' $label');
+      if (labelIndex != -1) {
+        // Verify it's followed by optional space and colon
+        final afterLabel = labelIndex + label.length + 1;
+        if (afterLabel < valueText.length) {
+          final remaining = valueText.substring(afterLabel).trimLeft();
+          if (remaining.startsWith(':')) {
+            if (earliestMatchIndex == null ||
+                labelIndex < earliestMatchIndex) {
+              earliestMatchIndex = labelIndex;
+            }
+          }
+        }
+      }
+    }
+
+    if (earliestMatchIndex != null) {
+      // Truncate at the next field label
+      valueText = valueText.substring(0, earliestMatchIndex).trim();
+    }
+
     return valueText.isNotEmpty ? valueText : null;
   }
 

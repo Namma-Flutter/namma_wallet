@@ -180,6 +180,31 @@ class TNSTCLayoutParser extends TravelPDFParser {
     return Ticket.fromTNSTC(tnstcModel);
   }
 
+  /// Corrects common OCR errors in seat numbers.
+  ///
+  /// Common patterns:
+  /// - "120B" → "12UB" (0 misread as U)
+  /// - "10LB" → "1OLB" → "10LB" (O misread as 0)
+  String? _correctSeatNumber(String? seatNumber) {
+    if (seatNumber == null || seatNumber.isEmpty) return seatNumber;
+
+    var corrected = seatNumber;
+
+    // Pattern: digits followed by "0B" → should be "UB"
+    // Examples: "120B" → "12UB", "30B" → "3UB"
+    if (RegExp(r'\d+0B$').hasMatch(corrected)) {
+      corrected = corrected.replaceFirst(RegExp(r'0B$'), 'UB');
+    }
+
+    // Pattern: digits followed by "0L" → should be "UL"
+    // Examples: "120L" → "12UL"
+    if (RegExp(r'\d+0L$').hasMatch(corrected)) {
+      corrected = corrected.replaceFirst(RegExp(r'0L$'), 'UL');
+    }
+
+    return corrected;
+  }
+
   /// Extracts passenger information from table section.
   ///
   /// Looks for blocks between "Name" header and "Total Fare" section,
@@ -221,6 +246,43 @@ class TNSTCLayoutParser extends TravelPDFParser {
       }
     }
 
+    // Find header row to determine column X positions
+    List<OCRBlock>? headerRow;
+    for (final row in rows) {
+      row.sort((a, b) => a.boundingBox.left.compareTo(b.boundingBox.left));
+      final hasTableHeaders = row.any(
+        (b) =>
+            b.text.toLowerCase().contains('age') ||
+            b.text.toLowerCase().contains('gender') ||
+            b.text.toLowerCase().contains('seat'),
+      );
+      if (hasTableHeaders) {
+        headerRow = row;
+        break;
+      }
+    }
+
+    // Define column ranges based on header positions
+    Map<String, double>? columnXPositions;
+    if (headerRow != null) {
+      columnXPositions = {};
+      for (final headerBlock in headerRow) {
+        final headerText = headerBlock.text.toLowerCase();
+        if (headerText.contains('name')) {
+          columnXPositions['name'] = headerBlock.boundingBox.left;
+        } else if (headerText.contains('age')) {
+          columnXPositions['age'] = headerBlock.boundingBox.left;
+        } else if (headerText.contains('adult') ||
+            headerText.contains('child')) {
+          columnXPositions['type'] = headerBlock.boundingBox.left;
+        } else if (headerText.contains('gender')) {
+          columnXPositions['gender'] = headerBlock.boundingBox.left;
+        } else if (headerText.contains('seat')) {
+          columnXPositions['seat'] = headerBlock.boundingBox.left;
+        }
+      }
+    }
+
     // Parse each row as a passenger
     for (final row in rows) {
       // Sort blocks in row by X coordinate (left to right)
@@ -230,20 +292,63 @@ class TNSTCLayoutParser extends TravelPDFParser {
       final hasHeaderKeyword = row.any(
         (b) =>
             b.text.toLowerCase().contains('age') ||
-            b.text.toLowerCase().contains('gender'),
+            b.text.toLowerCase().contains('gender') ||
+            b.text.toLowerCase().contains('seat'),
       );
       if (hasHeaderKeyword) continue;
 
       // Expected columns: Name, Age, Adult/Child, Gender, Seat No
       if (row.length < 3) continue; // Not enough data for a table row
 
-      final name = row[0].text.trim();
-      final age = row.length > 1 ? int.tryParse(row[1].text.trim()) : null;
-      final type = row.length > 2 ? nullIfEmpty(row[2].text.trim()) : null;
-      final gender = row.length > 3 ? nullIfEmpty(row[3].text.trim()) : null;
-      final seatNumber = row.length > 4
-          ? nullIfEmpty(row[4].text.trim())
-          : null;
+      // Use column alignment if available, otherwise fallback to index
+      String? name;
+      String? type;
+      String? gender;
+      String? seatNumber;
+      int? age;
+
+      if (columnXPositions != null && columnXPositions.isNotEmpty) {
+        // Assign blocks to columns based on X position proximity
+        for (final block in row) {
+          final blockX = block.boundingBox.left;
+          final blockText = block.text.trim();
+
+          // Find closest column (within 100px tolerance)
+          String? closestColumn;
+          var minDistance = 100.0;
+
+          for (final entry in columnXPositions.entries) {
+            final distance = (blockX - entry.value).abs();
+            if (distance < minDistance) {
+              minDistance = distance;
+              closestColumn = entry.key;
+            }
+          }
+
+          // Assign to appropriate field
+          switch (closestColumn) {
+            case 'name':
+              name = blockText;
+            case 'age':
+              age = int.tryParse(blockText);
+            case 'type':
+              type = nullIfEmpty(blockText);
+            case 'gender':
+              gender = nullIfEmpty(blockText);
+            case 'seat':
+              seatNumber = _correctSeatNumber(nullIfEmpty(blockText));
+          }
+        }
+      } else {
+        // Fallback to index-based (old behavior)
+        name = row[0].text.trim();
+        age = row.length > 1 ? int.tryParse(row[1].text.trim()) : null;
+        type = row.length > 2 ? nullIfEmpty(row[2].text.trim()) : null;
+        gender = row.length > 3 ? nullIfEmpty(row[3].text.trim()) : null;
+        seatNumber = _correctSeatNumber(
+          row.length > 4 ? nullIfEmpty(row[4].text.trim()) : null,
+        );
+      }
 
       // Skip rows that don't look like passenger data
       if (type != null) {
@@ -253,7 +358,7 @@ class TNSTCLayoutParser extends TravelPDFParser {
         }
       }
 
-      if (name.isNotEmpty) {
+      if (name != null && name.isNotEmpty) {
         passengers.add(
           PassengerInfo(
             name: name,
@@ -298,9 +403,11 @@ class TNSTCLayoutParser extends TravelPDFParser {
           final gender = i + 1 < dataBlocks.length
               ? nullIfEmpty(dataBlocks[i + 1].text.trim())
               : null;
-          final seatNumber = i + 2 < dataBlocks.length
-              ? nullIfEmpty(dataBlocks[i + 2].text.trim())
-              : null;
+          final seatNumber = _correctSeatNumber(
+            i + 2 < dataBlocks.length
+                ? nullIfEmpty(dataBlocks[i + 2].text.trim())
+                : null,
+          );
 
           if (name.isNotEmpty) {
             passengers.add(

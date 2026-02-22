@@ -251,24 +251,41 @@ class Ticket with TicketMappable {
         if (model.passengers.isNotEmpty)
           ExtrasModel(
             title: 'Passenger',
-            value: model.passengers.first.name,
-            child: [
-              if (model.passengers.first.seatNumber != null)
-                ExtrasModel(
-                  title: 'Seat',
-                  value: model.passengers.first.seatNumber,
-                ),
-              if (model.passengers.first.age != null)
-                ExtrasModel(
-                  title: 'Age',
-                  value: model.passengers.first.age.toString(),
-                ),
-              if (model.passengers.first.gender != null)
-                ExtrasModel(
-                  title: 'Gender',
-                  value: model.passengers.first.gender,
-                ),
-            ],
+            value: model.passengers.map((p) => p.name).join(', '),
+            child: model.passengers.length == 1
+                ? [
+                    // Single passenger: show individual details
+                    if (model.passengers.first.seatNumber != null)
+                      ExtrasModel(
+                        title: 'Seat',
+                        value: model.passengers.first.seatNumber,
+                      ),
+                    if (model.passengers.first.age != null)
+                      ExtrasModel(
+                        title: 'Age',
+                        value: model.passengers.first.age.toString(),
+                      ),
+                    if (model.passengers.first.gender != null)
+                      ExtrasModel(
+                        title: 'Gender',
+                        value: model.passengers.first.gender,
+                      ),
+                  ]
+                : [
+                    // Multiple passengers: show combined details
+                    ExtrasModel(
+                      title: 'Ages',
+                      value: model.passengers
+                          .map((p) => p.age?.toString() ?? 'N/A')
+                          .join(', '),
+                    ),
+                    ExtrasModel(
+                      title: 'Genders',
+                      value: model.passengers
+                          .map((p) => p.gender ?? 'N/A')
+                          .join(', '),
+                    ),
+                  ],
           ),
         if (model.busIdNumber?.trim().isNotNullOrEmpty ?? false)
           ExtrasModel(title: 'Bus ID', value: model.busIdNumber!.trim()),
