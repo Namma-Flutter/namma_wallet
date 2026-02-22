@@ -1,3 +1,10 @@
 source "https://rubygems.org"
 
-gem "fastlane"
+# ruby - using 3.4.7 for better fastlane compatibility
+ruby "3.4.7"
+# Core automation tool
+gem "fastlane", "2.231.0"
+
+gem "abbrev"
+
+gem "ostruct"
