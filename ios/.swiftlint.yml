@@ -2,18 +2,18 @@
 
 # Paths to include (only our source files)
 included:
-  - ios/Runner
-  - ios/RunnerTests
-  - ios/TicketWidget
-  - ios/Share Extension
+  - Runner
+  - RunnerTests
+  - TicketWidget
+  - Share Extension
 
 # Paths to exclude from linting
 excluded:
-  - ios/Pods
-  - ios/Flutter
-  - ios/.symlinks
-  - ios/Runner.xcodeproj
-  - ios/Runner.xcworkspace
+  - Pods
+  - Flutter
+  - .symlinks
+  - Runner.xcodeproj
+  - Runner.xcworkspace
 
 # Enabled rules
 opt_in_rules:

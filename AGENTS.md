@@ -22,6 +22,9 @@ fvm flutter build ios
 # Analyze code
 fvm flutter analyze
 
+# Run SwiftLint for iOS
+cd ios && swiftlint
+
 # Run tests (when available)
 fvm flutter test
 ```

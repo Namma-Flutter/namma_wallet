@@ -94,6 +94,9 @@ fvm flutter run -d <device-id>
 # Analyze code
 fvm flutter analyze
 
+# Run SwiftLint for iOS
+cd ios && swiftlint
+
 # Run tests (when available)
 fvm flutter test
 ```
