@@ -390,7 +390,8 @@ class TNSTCLayoutParser extends TravelPDFParser {
       } else {}
     }
 
-    // If we already found the expected number of passengers, no need for fallback
+    // If we already found the expected number of passengers,
+    // no need for fallback
     if (expectedCount != null && passengers.length >= expectedCount) {
       return passengers;
     }
@@ -452,10 +453,12 @@ class TNSTCLayoutParser extends TravelPDFParser {
       }
 
       // If vertical layout found more passengers, or if table layout failed
-      // to find all expected passengers but vertical did (or found more), use it.
+      // to find all expected passengers but vertical did (or found more),
+      // use it.
       if (verticalPassengers.length > passengers.length) {
-        passengers.clear();
-        passengers.addAll(verticalPassengers);
+        passengers
+          ..clear()
+          ..addAll(verticalPassengers);
       }
     }
 
@@ -470,10 +473,16 @@ class TNSTCLayoutParser extends TravelPDFParser {
   String? _formatTime(String? timeStr) {
     if (timeStr == null || timeStr.trim().isEmpty) return null;
 
+    // Strip trailing 'Hrs', 'Hrs.' and period suffixes from OCR artifacts
+    final cleaned = timeStr
+        .trim()
+        .replaceAll(RegExp(r'\s*Hrs\.?\s*$', caseSensitive: false), '')
+        .trim();
+
     // Try to parse time in HH:MM format (24-hour)
     // Using ^ and $ to ensure the entire string matches the time format.
     final timePattern = RegExp(r'^(\d{1,2}):(\d{2})$');
-    final match = timePattern.firstMatch(timeStr.trim());
+    final match = timePattern.firstMatch(cleaned);
 
     if (match == null) return null;
 

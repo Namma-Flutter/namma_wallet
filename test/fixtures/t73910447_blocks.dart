@@ -1,3 +1,6 @@
+// this is just fixture data. This may contain more than 80 character
+// ignore_for_file: lines_longer_than_80_chars
+
 import 'dart:ui';
 
 import 'package:namma_wallet/src/common/services/ocr/ocr_block.dart';

@@ -343,7 +343,8 @@ Service Start Time : 13:15
           expect(extrasMap['Gender'], expected['passengerGender']);
           expect(extrasMap['Seat Number'], expected['seatNumber']);
 
-          // Verify pickup point (specifically for T75229209 which has split OCR)
+          // Verify pickup point
+          // (specifically for T75229209 which has split OCR)
           expect(extrasMap['Pickup Point'], expected['passengerPickupPoint']);
         },
       );

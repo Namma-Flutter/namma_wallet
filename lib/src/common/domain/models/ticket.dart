@@ -47,25 +47,27 @@ class Ticket with TicketMappable {
 
     return Ticket(
       ticketId: model.pnrNumber,
-      primaryText: model.trainName.isNotNullOrEmpty
-          ? model.trainName
-          : (model.fromStation.isNotNullOrEmpty &&
-                    model.toStation.isNotNullOrEmpty
-                ? '${model.fromStation} → ${model.toStation}'
-                : _primaryTextConstant),
+      primaryText:
+          (model.trainNumber.isNotNullOrEmpty &&
+              model.trainName.isNotNullOrEmpty)
+          ? '${model.trainNumber} - ${model.trainName}'
+          : (model.trainName.isNotNullOrEmpty
+                ? model.trainName
+                : (model.fromStation.isNotNullOrEmpty &&
+                          model.toStation.isNotNullOrEmpty
+                      ? '${model.fromStation} → ${model.toStation}'
+                      : _primaryTextConstant)),
       secondaryText: (() {
-        final text =
-            model.trainName.isNotNullOrEmpty &&
-                model.fromStation.isNotNullOrEmpty &&
-                model.toStation.isNotNullOrEmpty
-            ? '${model.fromStation} → ${model.toStation}'
-            : [
-                if (model.trainNumber.isNotNullOrEmpty)
-                  'Train ${model.trainNumber}',
-                if (model.travelClass.isNotNullOrEmpty) model.travelClass,
-                if (model.passengerName.isNotNullOrEmpty) model.passengerName,
-              ].join(' • ');
-        return text.isEmpty ? _secondaryTextConstant : text;
+        if (model.trainNumber.isNotNullOrEmpty &&
+            model.trainName.isNotNullOrEmpty) {
+          return '${model.trainNumber} - ${model.trainName}';
+        }
+        if (model.trainName.isNotNullOrEmpty) return model.trainName;
+        if (model.fromStation.isNotNullOrEmpty &&
+            model.toStation.isNotNullOrEmpty) {
+          return '${model.fromStation} → ${model.toStation}';
+        }
+        return _secondaryTextConstant;
       })(),
       startTime: !isUpdate && hasValidDateTime
           ? DateTime.utc(
@@ -80,7 +82,12 @@ class Ticket with TicketMappable {
       tags: [
         TagModel(value: model.pnrNumber, icon: 'confirmation_number'),
         if (model.trainNumber.isNotNullOrEmpty)
-          TagModel(value: model.trainNumber, icon: 'train'),
+          TagModel(
+            value: model.trainName.isNotNullOrEmpty
+                ? '${model.trainNumber} - ${model.trainName}'
+                : model.trainNumber,
+            icon: 'train',
+          ),
         if (model.travelClass != null && model.travelClass!.isNotNullOrEmpty)
           TagModel(value: model.travelClass, icon: 'event_seat'),
         if (model.status.isNotNullOrEmpty)

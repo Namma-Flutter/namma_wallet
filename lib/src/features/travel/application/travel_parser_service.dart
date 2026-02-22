@@ -7,7 +7,7 @@ import 'package:namma_wallet/src/common/enums/ticket_type.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
 import 'package:namma_wallet/src/common/services/ocr/layout_extractor.dart';
 import 'package:namma_wallet/src/common/services/ocr/ocr_block.dart';
-import 'package:namma_wallet/src/features/irctc/application/irctc_pdf_parser.dart';
+import 'package:namma_wallet/src/features/irctc/application/irctc_layout_parser.dart';
 import 'package:namma_wallet/src/features/irctc/application/irctc_sms_parser.dart';
 import 'package:namma_wallet/src/features/tnstc/application/tnstc_layout_parser.dart';
 import 'package:namma_wallet/src/features/tnstc/application/tnstc_sms_parser.dart';
@@ -207,10 +207,7 @@ class TNSTCBusParser extends TravelTicketParser {
 
 /// IRCTC train ticket parser.
 ///
-/// Currently uses text-based parsing for both SMS and PDF formats.
-// TODO(harish): Consider implementing geometry-aware extraction (similar to
-// TNSTCLayoutParser) for IRCTC PDFs in a future iteration to better handle
-// complex layouts and improve extraction accuracy.
+/// Uses layout-based extraction for PDF parsing and SMS parser for SMS format.
 class IRCTCTrainParser extends TravelTicketParser {
   IRCTCTrainParser({required ILogger logger}) : _logger = logger;
   final ILogger _logger;
@@ -271,6 +268,12 @@ class IRCTCTrainParser extends TravelTicketParser {
   }
 
   @override
+  Ticket parseTicketFromBlocks(List<OCRBlock> blocks) {
+    final layoutParser = IRCTCLayoutParser(logger: _logger);
+    return layoutParser.parseTicketFromBlocks(blocks);
+  }
+
+  @override
   Ticket parseTicket(String text) {
     final isSMS = isSMSFormat(text);
 
@@ -278,8 +281,8 @@ class IRCTCTrainParser extends TravelTicketParser {
       final smsParser = IRCTCSMSParser();
       return smsParser.parseTicket(text);
     } else {
-      final pdfParser = IRCTCPDFParser(logger: _logger);
-      return pdfParser.parseTicket(text);
+      final layoutParser = IRCTCLayoutParser(logger: _logger);
+      return layoutParser.parseTicket(text);
     }
   }
 

@@ -23,8 +23,12 @@ class LayoutExtractor {
   static const _fieldLabelKeywords = [
     'number',
     'code',
-    'class', // Retained 'class' as it's a valid keyword, assuming 'classOfService' was an example value.
-    'service', // Retained 'service' as it's a valid keyword, assuming 'classOfService' was an example value.
+    // Retained 'class' as it's a valid keyword, assuming 'classOfService'
+    // was an example value.
+    'class',
+    // Retained 'service' as it's a valid keyword, assuming 'classOfService'
+    // was an example value.
+    'service',
     'time',
     'passenger',
     'pickup',
@@ -108,17 +112,37 @@ class LayoutExtractor {
     // Component 1: Inline value in the key block itself
     if (colonIndex != -1 && colonIndex < keyBlock.text.length) {
       var valueText = keyBlock.text.substring(colonIndex + 1).trim();
+
+      // If the colon exists but the value is empty (e.g., 'Route No :'),
+      // AND this key appears in a multi-key inline block (another key:value
+      // pair exists before it), then the field is explicitly empty — return
+      // null, don't fall through to spatial search.
+      // For standalone label blocks ('Route No :'), spatial search should
+      // still proceed.
+      if (valueText.isEmpty) {
+        // Check if there's another colon BEFORE our key
+        //(indicates multi-key block)
+        final textBeforeKey = keyStartIndex > 0
+            ? keyBlock.text.substring(0, keyStartIndex)
+            : '';
+        if (textBeforeKey.contains(':')) {
+          return null;
+        }
+      }
+
       if (valueText.isNotEmpty) {
         // Handle inline multi-key blocks like "From: VAL1 To: VAL2"
         // Look for the next recognized field label within valueText
         if (valueText.contains(':')) {
-          // Find the next colon (which marks the start of the next key-value pair)
+          // Find the next colon (which marks the start of
+          //the next key-value pair)
           final nextColonIndex = valueText.indexOf(':');
           final potentialKeyPart = valueText
               .substring(0, nextColonIndex)
               .trim();
 
-          // Find which keyword appears EARLIEST in potentialKeyPart (after the value)
+          // Find which keyword appears EARLIEST in
+          //potentialKeyPart (after the value)
           // and truncate before that keyword
           var earliestKeywordStart = -1;
 
@@ -224,7 +248,8 @@ class LayoutExtractor {
 
       final sameRowValue = _extractValueFromCandidates(candidates, maxSkips: 1);
       if (sameRowValue != null && sameRowValue.isNotEmpty) {
-        // Check if inline value looks incomplete (e.g., ends with ")" suggesting continuation)
+        // Check if inline value looks incomplete (e.g., ends with ")"
+        // suggesting continuation)
         // Only for specific fields where this is common
         final inlineValue = colonIndex != -1
             ? keyBlock.text.substring(colonIndex + 1).trim()
@@ -241,7 +266,8 @@ class LayoutExtractor {
 
       // If we found a colon but the value was empty/rejected, don't fall back to "below"
       // unless it was purely a standalone label "Key:".
-      // BUT if inline value looks incomplete, skip this and search above instead
+      // BUT if inline value looks incomplete, skip this and search above
+      // instead
       final inlineValueForCheck = colonIndex != -1
           ? keyBlock.text.substring(colonIndex + 1).trim()
           : '';
@@ -276,7 +302,8 @@ class LayoutExtractor {
       );
       if (aboveValue != null) {
         // If there's also an inline value, prepend it AFTER the above value
-        // (above value is physically higher on page, so comes first in reading order)
+        // (above value is physically higher on page, so comes first in
+        //reading order)
         if (colonIndex != -1) {
           final inlineValue = keyBlock.text.substring(colonIndex + 1).trim();
           if (inlineValue.isNotEmpty) {
@@ -343,7 +370,6 @@ class LayoutExtractor {
       if (candidateText.contains(':')) {
         final colonIndex = candidateText.indexOf(':');
         final keyPart = candidateText.substring(0, colonIndex).trim();
-        final valuePart = candidateText.substring(colonIndex + 1).trim();
 
         final isDateOrTimePattern =
             RegExp(r'\d{1,2}[-/]\d{1,2}[-/]\d{2,4}').hasMatch(candidateText) ||
@@ -357,7 +383,8 @@ class LayoutExtractor {
         final looksLikeFieldLabel =
             (hasFieldKeyword || hasEnoughWords) && !isDateOrTimePattern;
 
-        // SPECIAL CASE: If it has a field keyword AND a colon, it's almost always a field label
+        // SPECIAL CASE: If it has a field keyword AND a colon, it's almost
+        // always a field label
         // even if it contains a date (e.g., "Passenger Pickup Time: 20/01/2026...")
         final isStrongFieldLabel =
             hasFieldKeyword && candidateText.contains(':');
@@ -366,7 +393,8 @@ class LayoutExtractor {
           // If we already started collecting value, stop at next label
           if (matchedParts.isNotEmpty) break;
 
-          // If we hit a strong field label (with colon) before finding any value,
+          // If we hit a strong field label (with colon) before finding
+          // any value,
           // it strongly suggests the current field is empty.
           // We break to return an empty result for this search direction.
           if (isStrongFieldLabel && candidateText.contains(':')) break;
@@ -453,7 +481,8 @@ class LayoutExtractor {
     OCRBlock keyBlock, {
     double maxDistance = 30.0,
   }) {
-    // For above search, use tighter distance to avoid picking up unrelated blocks
+    // For above search, use tighter distance to avoid picking up unrelated
+    // blocks
     final tightMaxDistance = maxDistance;
 
     final candidates = blocks.where((b) {

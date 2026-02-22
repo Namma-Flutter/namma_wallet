@@ -74,7 +74,8 @@ void main() {
             boundingBox: const Rect.fromLTRB(100, 300, 800, 320),
             page: 0,
           ),
-          // Add some blocks below to ensure it doesn't fall through and pick them up
+          // Add some blocks below to ensure it doesn't fall through
+          // and pick them up
           OCRBlock(
             text: 'Source Type',
             boundingBox: const Rect.fromLTRB(100, 340, 200, 360),
@@ -127,7 +128,8 @@ void main() {
     );
 
     test(
-      'should handle split parenthesis value from OCR above the label (T75229209 fixture)',
+      'should handle split parenthesis value from OCR above'
+      ' the label (T75229209 fixture)',
       () {
         // Real OCR case: value is split across two lines
         // Line 1 (above): KOTTIVAKKAM(RTO

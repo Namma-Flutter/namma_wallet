@@ -76,7 +76,10 @@ void main() {
         ticket.primaryText,
         equals('YESVANTPUR (YPR) → CHENNAI CENTRAL (MAS)'),
       );
-      expect(ticket.secondaryText, equals('Train 12291 • SL • MAGESH K'));
+      expect(
+        ticket.secondaryText,
+        equals('YESVANTPUR (YPR) → CHENNAI CENTRAL (MAS)'),
+      );
 
       /// Validate parsed start time from DOJ + DP fields.
       expect(ticket.startTime?.year, equals(2025));
@@ -177,10 +180,10 @@ void main() {
 
         expect(ticket, isNotNull);
 
-        // Secondary text uses first passenger name correctly
+        // Secondary text uses from → to format
         expect(
           ticket.secondaryText,
-          equals('Train 12692 • SL • HARISH ANBALAGAN+2'),
+          equals('SMVB → CHENNAI CENTRAL (MAS)'),
         );
 
         // Fare tag
@@ -211,7 +214,10 @@ void main() {
         ticket.primaryText,
         equals('CHENNAI CENTRAL (MAS) → SALEM JUNCTION (SA)'),
       );
-      expect(ticket.secondaryText, contains('Train 12679 • 2S'));
+      expect(
+        ticket.secondaryText,
+        equals('CHENNAI CENTRAL (MAS) → SALEM JUNCTION (SA)'),
+      );
 
       // Class tag should correctly detect 2S
       final classTag = ticket.tags?.firstWhere((t) => t.icon == 'event_seat');
