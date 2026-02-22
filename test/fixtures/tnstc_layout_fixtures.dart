@@ -4,6 +4,7 @@ import 'package:namma_wallet/src/common/services/ocr/ocr_block.dart';
 
 import 'tnstc/t73266848.dart' as t73266848_fixture;
 import 'tnstc/t73289588.dart' as t73289588_fixture;
+import 'tnstc/t73289589.dart' as t73289589_fixture;
 import 'tnstc/t73309927.dart' as t73309927_fixture;
 import 'tnstc/t73910447.dart' as t73910447_fixture;
 import 'tnstc/t75229209.dart' as t75229209_fixture;
@@ -11,7 +12,6 @@ import 'tnstc/t75229210.dart' as t75229210_fixture;
 import 'tnstc/t76296907.dart' as t76296907_fixture;
 import 'tnstc/y74873047.dart' as y74873047_fixture;
 import 'tnstc/y74928831.dart' as y74928831_fixture;
-import 'tnstc/t73289589.dart' as t73289589_fixture;
 
 /// Barrel class providing access to all TNSTC layout fixtures.
 /// Each fixture is split into its own file under the tnstc/ directory.

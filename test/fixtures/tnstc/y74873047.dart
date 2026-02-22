@@ -1,5 +1,4 @@
 // this is just fixtures and may contain more than 80 character
-// ignore_for_file: lines_longer_than_80_chars
 
 import 'dart:ui';
 
