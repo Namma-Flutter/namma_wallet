@@ -1,4 +1,4 @@
-import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -13,6 +13,7 @@ import 'package:namma_wallet/src/common/helper/date_time_converter.dart';
 import 'package:namma_wallet/src/common/services/haptic/haptic_service_extension.dart';
 import 'package:namma_wallet/src/common/services/haptic/haptic_service_interface.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
+import 'package:namma_wallet/src/common/services/widget/widget_service_interface.dart';
 import 'package:namma_wallet/src/common/theme/styles.dart';
 import 'package:namma_wallet/src/common/widgets/rounded_back_button.dart';
 import 'package:namma_wallet/src/common/widgets/snackbar_widget.dart';
@@ -20,6 +21,7 @@ import 'package:namma_wallet/src/features/home/domain/ticket_extensions.dart';
 import 'package:namma_wallet/src/features/travel/presentation/widgets/travel_row_widget.dart';
 import 'package:namma_wallet/src/features/travel/presentation/widgets/travel_ticket_shape_line.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class TravelTicketView extends StatefulWidget {
   const TravelTicketView({required this.ticket, super.key});
@@ -62,22 +64,23 @@ class _TravelTicketViewState extends State<TravelTicketView> {
     return ticket.tags!;
   }
 
-  ///
-  // ignore: unused_element
   Future<void> _pinToHomeScreen() async {
+    const iOSWidgetName = 'TicketWidget';
+    const androidWidgetName = 'TicketHomeWidget';
+    const dataKey = 'ticket_data';
+
     try {
-      const iOSWidgetName = 'TicketHomeWidget';
-      const androidWidgetName = 'TicketHomeWidget';
-      const dataKey = 'ticket_data';
-
-      // Convert ticket to JSON format for the widget
-      final ticketData = widget.ticket.toJson();
-      await HomeWidget.saveWidgetData(dataKey, jsonEncode(ticketData));
-
-      await HomeWidget.updateWidget(
-        androidName: androidWidgetName,
-        iOSName: iOSWidgetName,
-      );
+      if (Platform.isIOS) {
+        await HomeWidget.saveWidgetData(dataKey, widget.ticket.toJson());
+        await HomeWidget.updateWidget(
+          androidName: androidWidgetName,
+          iOSName: iOSWidgetName,
+        );
+      } else if (Platform.isAndroid) {
+        await getIt<IWidgetService>().updateWidgetWithTicket(widget.ticket);
+      } else {
+        throw UnsupportedError('Unsupported platform');
+      }
 
       if (mounted) {
         showSnackbar(context, 'Ticket pinned to home screen successfully!');
@@ -136,6 +139,9 @@ class _TravelTicketViewState extends State<TravelTicketView> {
     try {
       await getIt<ITicketDAO>().deleteTicket(widget.ticket.ticketId!);
 
+      // Check if deleted ticket is pinned to widget and clear it
+      await _clearWidgetIfPinned();
+
       getIt<ILogger>().info(
         '[TravelTicketView] Successfully deleted ticket with '
         'ID: ${widget.ticket.ticketId}',
@@ -148,7 +154,19 @@ class _TravelTicketViewState extends State<TravelTicketView> {
         hapticService.triggerHaptic(
           HapticType.success,
         );
-        context.pop(true); // Return true to indicate ticket was deleted
+
+        // Check if we can pop (normal navigation) or need to
+        // go home (deep link)
+        if (context.canPop()) {
+          context.pop(true); // Return true to indicate ticket was deleted
+        } else {
+          // Opened via deep link with no navigation history, go to home
+          getIt<ILogger>().info(
+            '[TravelTicketView] No navigation history after delete, '
+            'navigating to home',
+          );
+          context.go('/');
+        }
       }
     } on Object catch (e, stackTrace) {
       getIt<ILogger>().error(
@@ -175,6 +193,37 @@ class _TravelTicketViewState extends State<TravelTicketView> {
     }
   }
 
+  Future<void> _clearWidgetIfPinned() async {
+    const dataKey = 'ticket_data';
+    const iOSWidgetName = 'TicketWidget';
+    const androidWidgetName = 'TicketHomeWidget';
+
+    try {
+      final pinnedData = await HomeWidget.getWidgetData<String>(dataKey);
+      if (pinnedData == null) return;
+
+      // Check if the pinned ticket ID matches the deleted ticket
+      final ticketId = widget.ticket.ticketId;
+      if (ticketId != null && pinnedData.contains('"ticket_id":"$ticketId"')) {
+        await HomeWidget.saveWidgetData<String>(dataKey, null);
+        await HomeWidget.updateWidget(
+          androidName: androidWidgetName,
+          iOSName: iOSWidgetName,
+        );
+
+        getIt<ILogger>().info(
+          '[TravelTicketView] Cleared widget data for deleted ticket',
+        );
+      }
+    } on Object catch (e, stackTrace) {
+      getIt<ILogger>().error(
+        '[TravelTicketView] Failed to clear widget data',
+        e,
+        stackTrace,
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -183,6 +232,22 @@ class _TravelTicketViewState extends State<TravelTicketView> {
         leading: const RoundedBackButton(),
         title: const Text('Ticket View'),
         actions: [
+          Center(
+            child: CircleAvatar(
+              radius: 24,
+              backgroundColor: Theme.of(context).colorScheme.primary,
+              child: IconButton(
+                onPressed: _pinToHomeScreen,
+                icon: const Icon(
+                  Icons.push_pin_outlined,
+                  size: 20,
+                  color: Colors.white,
+                ),
+                tooltip: 'Pin to home screen',
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
           if (widget.ticket.ticketId != null)
             Center(
               child: CircleAvatar(
@@ -235,6 +300,42 @@ class _TravelTicketViewState extends State<TravelTicketView> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  //* Image (if exists)
+                  if (widget.ticket.imagePath != null) ...[
+                    Builder(
+                      builder: (context) {
+                        final file = File(widget.ticket.imagePath!);
+                        if (file.existsSync()) {
+                          return Column(
+                            children: [
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(12),
+                                child: Image.file(
+                                  file,
+                                  width: double.infinity,
+                                  height: 150,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    getIt<ILogger>().error(
+                                      '[TravelTicketView] Failed to load '
+                                      'ticket image from path: '
+                                      '${widget.ticket.imagePath}',
+                                      error,
+                                      stackTrace,
+                                    );
+                                    return const SizedBox.shrink();
+                                  },
+                                ),
+                              ),
+                              const SizedBox(height: 16),
+                            ],
+                          );
+                        }
+                        return const SizedBox.shrink();
+                      },
+                    ),
+                  ],
+
                   //* Icon & Service
                   Row(
                     children: [
@@ -253,18 +354,19 @@ class _TravelTicketViewState extends State<TravelTicketView> {
                       ),
                       const SizedBox(width: 16),
                       //* Description (Secondary text)
-                      Expanded(
-                        child: Text(
-                          widget.ticket.secondaryText,
-                          style: Paragraph03(
-                            color: Theme.of(
-                              context,
-                            ).colorScheme.onSurface,
-                          ).regular,
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 2,
+                      if (widget.ticket.secondaryText?.isNotEmpty ?? false)
+                        Expanded(
+                          child: Text(
+                            widget.ticket.secondaryText ?? '',
+                            style: Paragraph03(
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.onSurface,
+                            ).regular,
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 2,
+                          ),
                         ),
-                      ),
                     ],
                   ),
 
@@ -400,9 +502,14 @@ class _TravelTicketViewState extends State<TravelTicketView> {
                       ];
                     } else {
                       // Fallback to primaryText
+                      final primaryText = widget.ticket.primaryText;
+                      if (primaryText == null || primaryText.isEmpty) {
+                        return <Widget>[];
+                      }
+
                       return <Widget>[
                         Text(
-                          widget.ticket.primaryText,
+                          widget.ticket.primaryText ?? '',
                           style: Paragraph01(
                             color: Theme.of(
                               context,
@@ -434,6 +541,50 @@ class _TravelTicketViewState extends State<TravelTicketView> {
                   ),
 
                   const SizedBox(height: 16),
+
+                  if (widget.ticket.directionsUrl != null) ...[
+                    SizedBox(
+                      width: double.infinity,
+                      child: OutlinedButton.icon(
+                        onPressed: () async {
+                          try {
+                            final uri = Uri.parse(widget.ticket.directionsUrl!);
+                            if (await canLaunchUrl(uri)) {
+                              await launchUrl(uri);
+                            } else {
+                              if (context.mounted) {
+                                showSnackbar(
+                                  context,
+                                  'Could not open map URL',
+                                  isError: true,
+                                );
+                              }
+                            }
+                          } on FormatException {
+                            if (context.mounted) {
+                              showSnackbar(
+                                context,
+                                'Invalid directional URL',
+                                isError: true,
+                              );
+                            }
+                          }
+                        },
+                        icon: const Icon(Icons.map_outlined),
+                        label: const Text('Get Directions'),
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          side: BorderSide(
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                  ],
 
                   ...() {
                     final filteredExtras = getFilteredExtras(

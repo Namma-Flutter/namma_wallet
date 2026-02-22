@@ -1,5 +1,6 @@
 import 'package:cross_file/cross_file.dart';
 import 'package:namma_wallet/src/common/database/ticket_dao_interface.dart';
+import 'package:namma_wallet/src/common/domain/models/extras_model.dart';
 import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 import 'package:namma_wallet/src/common/enums/source_type.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
@@ -7,6 +8,7 @@ import 'package:namma_wallet/src/common/services/pdf/pdf_service_interface.dart'
 import 'package:namma_wallet/src/features/import/application/import_service_interface.dart';
 import 'package:namma_wallet/src/features/irctc/application/irctc_qr_parser_interface.dart';
 import 'package:namma_wallet/src/features/irctc/application/irctc_scanner_service_interface.dart';
+import 'package:namma_wallet/src/features/travel/application/pkpass_parser_interface.dart';
 import 'package:namma_wallet/src/features/travel/application/travel_parser_interface.dart';
 
 class ImportService implements IImportService {
@@ -16,12 +18,14 @@ class ImportService implements IImportService {
     required ITravelParser travelParser,
     required IIRCTCQRParser qrParser,
     required IIRCTCScannerService irctcScannerService,
+    required IPKPassParser pkpassParser,
     required ITicketDAO ticketDao,
   }) : _logger = logger,
        _pdfService = pdfService,
        _travelParser = travelParser,
        _qrParser = qrParser,
        _irctcScannerService = irctcScannerService,
+       _pkpassParser = pkpassParser,
        _ticketDao = ticketDao;
 
   final ILogger _logger;
@@ -29,10 +33,11 @@ class ImportService implements IImportService {
   final ITravelParser _travelParser;
   final IIRCTCQRParser _qrParser;
   final IIRCTCScannerService _irctcScannerService;
+  final IPKPassParser _pkpassParser;
   final ITicketDAO _ticketDao;
 
   @override
-  List<String> get supportedExtensions => const ['pdf'];
+  List<String> get supportedExtensions => const ['pdf', 'pkpass'];
 
   @override
   bool isSupportedQRCode(String qrData) {
@@ -77,6 +82,45 @@ class ImportService implements IImportService {
     } on Exception catch (e, stackTrace) {
       _logger.error('Error importing PDF file', e, stackTrace);
       return null;
+    }
+  }
+
+  @override
+  Future<TicketImportResult> importAndSavePKPassFile(XFile pkpassFile) async {
+    try {
+      final filename = pkpassFile.name;
+      _logger.info('Importing pkpass file: $filename');
+
+      final bytes = await pkpassFile.readAsBytes();
+      final parsedTicket = await _pkpassParser.parsePKPass(bytes);
+
+      if (parsedTicket == null) {
+        _logger.warning('Failed to parse pkpass: $filename');
+        return const TicketImportResult();
+      }
+
+      await _ticketDao.handleTicket(parsedTicket);
+
+      _logger.success(
+        'Successfully imported and saved PKPass ticket: '
+        '${parsedTicket.ticketId}',
+      );
+
+      // Check provider for warning
+      String? warning;
+      final provider = parsedTicket.extras?.firstWhere(
+        (e) => e.title?.toLowerCase() == 'provider',
+        orElse: () => ExtrasModel(title: '', value: ''),
+      );
+
+      if (provider?.value?.toLowerCase().contains('luma') != true) {
+        warning = 'Imported pass is not from Luma';
+      }
+
+      return TicketImportResult(ticket: parsedTicket, warning: warning);
+    } on Exception catch (e, stackTrace) {
+      _logger.error('Error importing pkpass file', e, stackTrace);
+      return const TicketImportResult();
     }
   }
 

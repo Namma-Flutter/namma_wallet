@@ -1,8 +1,11 @@
 import 'package:ai_barcode_scanner/ai_barcode_scanner.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:namma_wallet/src/common/database/ticket_dao_interface.dart';
+import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 import 'package:namma_wallet/src/common/routing/app_routes.dart';
+import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
 import 'package:namma_wallet/src/features/bottom_navigation/presentation/namma_navigation_bar.dart';
 import 'package:namma_wallet/src/features/calendar/presentation/calendar_view.dart';
 import 'package:namma_wallet/src/features/export/presentation/export_view.dart';
@@ -25,6 +28,27 @@ final GlobalKey<NavigatorState> _shellNavigatorKey = GlobalKey<NavigatorState>(
 
 final router = GoRouter(
   navigatorKey: _rootNavigatorKey,
+  onException: (context, state, _) {
+    getIt<ILogger>().error(
+      'Navigation exception: ${state.uri}',
+      state.error,
+    );
+  },
+  redirect: (context, state) {
+    // Handle deep links with custom scheme (e.g., nammawallet://ticket/123)
+    // Convert to proper path (e.g., /ticket/123)
+    final uri = state.uri;
+    if (uri.scheme == 'nammawallet') {
+      // Reconstruct path from host and path
+      // nammawallet://ticket/T75229210 -> /ticket/T75229210
+      final redirectPath = '/${uri.host}${uri.path}';
+      getIt<ILogger>().info(
+        'Deep link redirect: $uri -> $redirectPath',
+      );
+      return redirectPath;
+    }
+    return null;
+  },
   routes: [
     ShellRoute(
       navigatorKey: _shellNavigatorKey,
@@ -56,13 +80,15 @@ final router = GoRouter(
       path: AppRoute.ticketView.path,
       name: AppRoute.ticketView.name,
       builder: (context, state) {
-        final ticket = state.extra as Ticket?;
-        if (ticket == null) {
-          return const Scaffold(
-            body: Center(child: Text('Ticket not found')),
-          );
+        final ticketId = state.pathParameters['id'];
+
+        if (ticketId != null && ticketId.isNotEmpty) {
+          return _TicketViewLoader(ticketId: ticketId);
         }
-        return TravelTicketView(ticket: ticket);
+
+        return const Scaffold(
+          body: Center(child: Text('Invalid ticket ID')),
+        );
       },
     ),
     GoRoute(
@@ -114,20 +140,58 @@ final router = GoRouter(
       path: AppRoute.shareSuccess.path,
       name: AppRoute.shareSuccess.name,
       builder: (context, state) {
-        final extra = state.extra as Map<String, String>?;
+        final extra = state.extra as Map<String, dynamic>?;
         if (extra == null) {
           return const Scaffold(
             body: Center(child: Text('Invalid share data')),
           );
         }
         return ShareSuccessView(
-          pnrNumber: extra['pnrNumber'] ?? 'Unknown',
-          from: extra['from'] ?? 'Unknown',
-          to: extra['to'] ?? 'Unknown',
-          fare: extra['fare'] ?? '₹0.00',
-          date: extra['date'] ?? 'Unknown',
+          pnrNumber: extra['pnrNumber'] as String?,
+          from: extra['from'] as String?,
+          to: extra['to'] as String?,
+          fare: extra['fare'] as String?,
+          date: extra['date'] as String?,
         );
       },
     ),
   ],
 );
+
+// Widget to load ticket by ID asynchronously
+class _TicketViewLoader extends StatelessWidget {
+  const _TicketViewLoader({required this.ticketId});
+
+  final String ticketId;
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<Ticket?>(
+      future: getIt<ITicketDAO>().getTicketById(ticketId),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
+
+        if (snapshot.hasError) {
+          return Scaffold(
+            body: Center(
+              child: Text('Error loading ticket: ${snapshot.error}'),
+            ),
+          );
+        }
+
+        final ticket = snapshot.data;
+        if (ticket == null) {
+          return const Scaffold(
+            body: Center(child: Text('Ticket not found')),
+          );
+        }
+
+        return TravelTicketView(ticket: ticket);
+      },
+    );
+  }
+}

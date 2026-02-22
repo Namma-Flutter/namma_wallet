@@ -126,6 +126,10 @@ platform :ios do
       api_key: api_key,
       app_version: version,
       build_number: build,
+      release_notes: {
+        'en-US' => File.read(File.expand_path("./metadata/en-US/release_notes.txt", __dir__)),
+        'en-GB' => File.read(File.expand_path("./metadata/en-GB/release_notes.txt", __dir__))
+      },
     )
 
     UI.success("Successfully promoted build #{build} (v#{version}) to App Review")

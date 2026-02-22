@@ -24,17 +24,41 @@
         android:enableOnBackInvokedCallback="true"
         android:icon="@mipmap/ic_launcher"
         android:label="Namma Wallet">
+        <!-- Multi-Ticket List Widget Provider -->
         <receiver
-            android:name="com.nammaflutter.nammawallet.TicketHomeWidget"
+            android:name="com.nammaflutter.nammawallet.TicketListWidgetProvider"
             android:exported="false">
+
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.nammaflutter.nammawallet.UPDATE_TICKET_LIST" />
+                <action android:name="com.nammaflutter.nammawallet.UNPIN_TICKET" />
             </intent-filter>
 
             <meta-data
                 android:name="android.appwidget.provider"
-                android:resource="@xml/ticket_home_widget_info" />
+                android:resource="@xml/ticket_list_widget_info" />
         </receiver>
+
+        <!-- Main Ticket Widget Provider (3x3) -->
+        <receiver
+            android:name="com.nammaflutter.nammawallet.MainTicketWidgetProvider"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.nammaflutter.nammawallet.UPDATE_TICKET_LIST" />
+                <action android:name="com.nammaflutter.nammawallet.UNPIN_MAIN_TICKET" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/main_ticket_widget_info" />
+        </receiver>
+
+        <service
+            android:name=".TicketListWidgetService"
+            android:exported="false"
+            android:permission="android.permission.BIND_REMOTEVIEWS"/>
+
 
         <activity
             android:name="com.nammaflutter.nammawallet.MainActivity"
@@ -88,6 +112,40 @@
                 <action android:name="android.intent.action.SEND" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <data android:mimeType="text/plain" />
+            </intent-filter>
+
+            <!-- Intent filters for PKPass files (Direct View) -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="file" />
+                <data android:scheme="content" />
+                <data android:mimeType="application/vnd.apple.pkpass" />
+                <data android:mimeType="application/vnd-com.apple.pkpass" />
+            </intent-filter>
+
+            <!-- Intent filters for PKPass files (Gmail/Octet-Stream Fallback) -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data android:scheme="file" />
+                <data android:scheme="content" />
+                <data android:mimeType="application/octet-stream" />
+                <data android:mimeType="application/zip" />
+                <data android:host="*" />
+                <data android:pathPattern=".*\\.pkpass" />
+            </intent-filter>
+
+            <!-- Intent filters for sharing PKPass files (Share Menu) -->
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="application/vnd.apple.pkpass" />
             </intent-filter>
         </activity>
         <!--

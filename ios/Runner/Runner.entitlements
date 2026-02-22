@@ -9,6 +9,7 @@
 	<key>com.apple.security.application-groups</key>
 	<array>
 		<string>group.nammawallet.in.ShareExtension</string>
+		<string>group.com.nammaflutter.nammawallet</string>
 	</array>
 </dict>
 </plist>

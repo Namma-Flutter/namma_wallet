@@ -6,7 +6,7 @@ enum AppRoute {
   profile(path: '/profile', name: 'profile'),
 
   // Ticket related routes
-  ticketView(path: '/ticket', name: 'ticketView'),
+  ticketView(path: '/ticket/:id', name: 'ticketView'),
   allTickets(path: '/all-tickets', name: 'allTickets'),
 
   // Scanner related routes
