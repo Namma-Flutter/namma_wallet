@@ -43,6 +43,13 @@ release-ipa: get codegen
 	$(DART) run pdfrx:remove_wasm_modules
 	$(FLUTTER) build ipa --release
 
+# Fastlane android targets
+android-beta:
+	cd android && bundle exec fastlane beta
+
+android-production:
+	cd android && bundle exec fastlane production
+
 # Fastlane iOS targets
 ios-test:
 	cd ios && bundle exec fastlane test
