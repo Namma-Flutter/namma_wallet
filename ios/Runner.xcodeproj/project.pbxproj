@@ -112,21 +112,21 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		6811CF732F166243009E977E /* Exceptions for "Share Extension" folder in "Share Extension" target */ = {
+		6811CF732F166243009E977E /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
 			);
 			target = 6811CF632F166243009E977E /* Share Extension */;
 		};
-		68B263872F176F2B00743DE6 /* Exceptions for "TicketWidget" folder in "TicketWidgetExtension" target */ = {
+		68B263872F176F2B00743DE6 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
 			);
 			target = 68B263712F176F2A00743DE6 /* TicketWidgetExtension */;
 		};
-		68B2638B2F17716300743DE6 /* Exceptions for "TicketWidget" folder in "Runner" target */ = {
+		68B2638B2F17716300743DE6 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				AppIntent.swift,
@@ -136,31 +136,8 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		6811CF652F166243009E977E /* Share Extension */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				6811CF732F166243009E977E /* Exceptions for "Share Extension" folder in "Share Extension" target */,
-			);
-			explicitFileTypes = {
-			};
-			explicitFolders = (
-			);
-			path = "Share Extension";
-			sourceTree = "<group>";
-		};
-		68B263772F176F2A00743DE6 /* TicketWidget */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				68B2638B2F17716300743DE6 /* Exceptions for "TicketWidget" folder in "Runner" target */,
-				68B263872F176F2B00743DE6 /* Exceptions for "TicketWidget" folder in "TicketWidgetExtension" target */,
-			);
-			explicitFileTypes = {
-			};
-			explicitFolders = (
-			);
-			path = TicketWidget;
-			sourceTree = "<group>";
-		};
+		6811CF652F166243009E977E /* Share Extension */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (6811CF732F166243009E977E /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = "Share Extension"; sourceTree = "<group>"; };
+		68B263772F176F2A00743DE6 /* TicketWidget */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (68B2638B2F17716300743DE6 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, 68B263872F176F2B00743DE6 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = TicketWidget; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -589,9 +566,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Copy Pods Resources";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -606,9 +587,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;

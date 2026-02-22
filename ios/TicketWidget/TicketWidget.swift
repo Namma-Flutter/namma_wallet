@@ -88,8 +88,6 @@ struct SimpleEntry: TimelineEntry {
 // MARK: - TicketWidgetEntryView
 
 struct TicketWidgetEntryView: View {
-    // MARK: Internal
-
     var entry: Provider.Entry
     @Environment(\.widgetFamily) var family
 
@@ -115,54 +113,12 @@ struct TicketWidgetEntryView: View {
             }
         }
     }
+}
 
-    // MARK: Private
+// MARK: - Widget Views
 
-    // MARK: - Cached Formatters
-
-    private static let displayFormatter: DateFormatter = {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "MMM d, h:mm a"
-        return formatter
-    }()
-
-    private static let shortTimeFormatter: DateFormatter = {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "h:mm a"
-        return formatter
-    }()
-
-    private static let compactDateTimeFormatter: DateFormatter = {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "MMM d, HH:mm"
-        return formatter
-    }()
-
-    private static let dateOnlyFormatter: DateFormatter = {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "MMM d"
-        return formatter
-    }()
-
-    private static let timeOnlyFormatter: DateFormatter = {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "HH:mm"
-        return formatter
-    }()
-
-    private static let isoFormatter: ISO8601DateFormatter = {
-        let formatter = ISO8601DateFormatter()
-        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-        return formatter
-    }()
-
-    private static let isoFormatterNoFractional: ISO8601DateFormatter = {
-        let formatter = ISO8601DateFormatter()
-        formatter.formatOptions = [.withInternetDateTime]
-        return formatter
-    }()
-
-    private var squareWidgetPlaceholder: some View {
+extension TicketWidgetEntryView {
+    var squareWidgetPlaceholder: some View {
         VStack(alignment: .center, spacing: 8) {
             Image(systemName: "ticket")
                 .font(.largeTitle)
@@ -184,21 +140,21 @@ struct TicketWidgetEntryView: View {
 
     // MARK: - Lock Screen Accessory Views
 
-    private var accessoryCircularView: some View {
+    var accessoryCircularView: some View {
         ZStack {
             AccessoryWidgetBackground()
             if let ticket = entry.ticketData {
                 VStack(spacing: 2) {
-                    Image(systemName: iconName(for: ticket.type))
+                    Image(systemName: TicketHelpers.iconName(for: ticket.type))
                         .font(.title3)
                     if let startTime = ticket.startTime,
-                       let formatted = formatShortTime(startTime) {
+                       let formatted = TicketDateFormatters.formatShortTime(startTime) {
                         Text(formatted)
                             .font(.system(.caption2, design: .monospaced))
                             .minimumScaleFactor(0.8)
                     }
                 }
-                .widgetURL(widgetURL(for: ticket))
+                .widgetURL(TicketHelpers.widgetURL(for: ticket))
             } else {
                 Image(systemName: "ticket")
                     .font(.title2)
@@ -207,11 +163,11 @@ struct TicketWidgetEntryView: View {
     }
 
     @ViewBuilder
-    private var accessoryRectangularView: some View {
+    var accessoryRectangularView: some View {
         if let ticket = entry.ticketData {
             VStack(alignment: .leading, spacing: 2) {
                 HStack(spacing: 4) {
-                    Image(systemName: iconName(for: ticket.type))
+                    Image(systemName: TicketHelpers.iconName(for: ticket.type))
                         .font(.caption)
                     if let pnr = ticket.ticketId, !pnr.isEmpty {
                         Text(pnr)
@@ -220,7 +176,7 @@ struct TicketWidgetEntryView: View {
                     }
                 }
                 if let startTime = ticket.startTime,
-                   let formatted = formatDateTime(startTime) {
+                   let formatted = TicketDateFormatters.formatDateTime(startTime) {
                     Text(formatted)
                         .font(.caption)
                         .foregroundStyle(.secondary)
@@ -232,7 +188,7 @@ struct TicketWidgetEntryView: View {
                         .lineLimit(1)
                 }
             }
-            .widgetURL(widgetURL(for: ticket))
+            .widgetURL(TicketHelpers.widgetURL(for: ticket))
         } else {
             HStack(spacing: 4) {
                 Image(systemName: "ticket")
@@ -243,13 +199,13 @@ struct TicketWidgetEntryView: View {
     }
 
     @ViewBuilder
-    private var accessoryInlineView: some View {
+    var accessoryInlineView: some View {
         if let ticket = entry.ticketData {
             HStack(spacing: 4) {
-                Image(systemName: iconName(for: ticket.type))
+                Image(systemName: TicketHelpers.iconName(for: ticket.type))
                 Text(ticket.primaryText ?? "No Route")
             }
-            .widgetURL(widgetURL(for: ticket))
+            .widgetURL(TicketHelpers.widgetURL(for: ticket))
         } else {
             HStack(spacing: 4) {
                 Image(systemName: "ticket")
@@ -258,24 +214,9 @@ struct TicketWidgetEntryView: View {
         }
     }
 
-    private func parseISODate(_ isoString: String) -> Date? {
-        if let date = Self.isoFormatter.date(from: isoString) {
-            return date
-        }
-        return Self.isoFormatterNoFractional.date(from: isoString)
-    }
-
-    private func formatShortTime(_ isoString: String) -> String? {
-        guard let parsedDate = parseISODate(isoString) else {
-            return nil
-        }
-        return Self.shortTimeFormatter.string(from: parsedDate)
-    }
-
     @ViewBuilder
-    private func smallTicketView(ticket: TicketData) -> some View {
+    func smallTicketView(ticket: TicketData) -> some View {
         VStack(alignment: .leading, spacing: 8) {
-            // PNR badge at top
             if let pnr = ticket.ticketId, !pnr.isEmpty {
                 Text(pnr)
                     .font(.system(.title3, design: .monospaced, weight: .semibold))
@@ -286,9 +227,8 @@ struct TicketWidgetEntryView: View {
 
             Spacer()
 
-            // Date and Time on separate lines
             if let startTime = ticket.startTime,
-               let (date, time) = formatDateTimeSeparate(startTime) {
+               let (date, time) = TicketDateFormatters.formatDateTimeSeparate(startTime) {
                 Text(date)
                     .font(.system(.footnote, design: .monospaced, weight: .medium))
                     .foregroundColor(.blue)
@@ -299,7 +239,6 @@ struct TicketWidgetEntryView: View {
                     .lineLimit(1)
             }
 
-            // Boarding point
             if let location = ticket.location, !location.isEmpty {
                 Text(location)
                     .font(.subheadline)
@@ -309,29 +248,14 @@ struct TicketWidgetEntryView: View {
             }
         }
         .padding(12)
-        .widgetURL(widgetURL(for: ticket))
-    }
-
-    private func formatCompactDateTime(_ isoString: String) -> String? {
-        guard let parsedDate = parseISODate(isoString) else {
-            return nil
-        }
-        return Self.compactDateTimeFormatter.string(from: parsedDate)
-    }
-
-    private func formatDateTimeSeparate(_ isoString: String) -> (date: String, time: String)? {
-        guard let parsedDate = parseISODate(isoString) else {
-            return nil
-        }
-        return (Self.dateOnlyFormatter.string(from: parsedDate), Self.timeOnlyFormatter.string(from: parsedDate))
+        .widgetURL(TicketHelpers.widgetURL(for: ticket))
     }
 
     @ViewBuilder
-    private func ticketView(ticket: TicketData) -> some View {
+    func ticketView(ticket: TicketData) -> some View {
         VStack(alignment: .leading, spacing: 4) {
-            // Ticket type icon and route
             HStack(spacing: 6) {
-                Image(systemName: iconName(for: ticket.type))
+                Image(systemName: TicketHelpers.iconName(for: ticket.type))
                     .font(.caption)
                     .foregroundColor(.secondary)
 
@@ -341,7 +265,6 @@ struct TicketWidgetEntryView: View {
                     .minimumScaleFactor(0.8)
             }
 
-            // Secondary info (train/bus number)
             if let secondary = ticket.secondaryText, !secondary.isEmpty {
                 Text(secondary)
                     .font(.caption)
@@ -351,11 +274,10 @@ struct TicketWidgetEntryView: View {
 
             Spacer()
 
-            // Time and location
             HStack {
                 VStack(alignment: .leading, spacing: 2) {
                     if let startTime = ticket.startTime,
-                       let formatted = formatDateTime(startTime) {
+                       let formatted = TicketDateFormatters.formatDateTime(startTime) {
                         Text(formatted)
                             .font(.system(.caption2, design: .monospaced))
                             .foregroundColor(.blue)
@@ -371,7 +293,6 @@ struct TicketWidgetEntryView: View {
 
                 Spacer()
 
-                // PNR badge
                 if let pnr = ticket.ticketId, !pnr.isEmpty {
                     Text(pnr)
                         .font(.system(.caption2, design: .monospaced, weight: .medium))
@@ -383,37 +304,7 @@ struct TicketWidgetEntryView: View {
             }
         }
         .padding(12)
-        .widgetURL(widgetURL(for: ticket))
-    }
-
-    private func iconName(for type: String?) -> String {
-        switch type?.uppercased() {
-        case "BUS":
-            return "bus.fill"
-        case "TRAIN":
-            return "train.side.front.car"
-        case "METRO",
-             "TRAM":
-            return "tram.fill"
-        case "FLIGHT":
-            return "airplane"
-        default:
-            return "ticket.fill"
-        }
-    }
-
-    private func formatDateTime(_ isoString: String) -> String? {
-        guard let parsedDate = parseISODate(isoString) else {
-            return nil
-        }
-        return Self.displayFormatter.string(from: parsedDate)
-    }
-
-    private func widgetURL(for ticket: TicketData) -> URL? {
-        guard let ticketId = ticket.ticketId, !ticketId.isEmpty else {
-            return nil
-        }
-        return URL(string: "nammawallet://ticket/\(ticketId)")
+        .widgetURL(TicketHelpers.widgetURL(for: ticket))
     }
 }
 
