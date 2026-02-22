@@ -5,7 +5,7 @@ import 'package:namma_wallet/src/common/database/wallet_database_interface.dart'
 import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:sqflite/sqflite.dart';
 
-class TicketBackupDao implements ITicketBackupDao {
+class TicketBackupDao implements ITicketBackupDAO {
   TicketBackupDao({IWalletDatabase? database})
       : _database = database ?? getIt<IWalletDatabase>();
 

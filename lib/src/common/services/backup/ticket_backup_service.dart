@@ -10,7 +10,7 @@ import 'package:namma_wallet/src/common/services/backup/ticket_backup_service_in
 class TicketBackupService implements ITicketBackupService {
   TicketBackupService(this._dao);
 
-  final ITicketBackupDao _dao;
+  final ITicketBackupDAO _dao;
 
   // CREATE BACKUP
     @override

@@ -145,10 +145,10 @@ void setupLocator() {
         ticketDao: getIt<ITicketDAO>(),
       ),
     )
-    ..registerLazySingleton<ITicketBackupDao>(
+    ..registerLazySingleton<ITicketBackupDAO>(
       TicketBackupDao.new,
     )
     ..registerLazySingleton<ITicketBackupService>(
-      () => TicketBackupService(getIt<ITicketBackupDao>()),
+      () => TicketBackupService(getIt<ITicketBackupDAO>()),
     );
 }
