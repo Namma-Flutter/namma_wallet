@@ -72,3 +72,4 @@ android/fastlane/*.json
 ios/Runner.app.dSYM.zip
 ios/Runner.ipa
 android/fastlane/report.xml
+android/build/
