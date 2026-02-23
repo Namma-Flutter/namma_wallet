@@ -218,8 +218,7 @@ class Ticket with TicketMappable {
       location:
           model.passengerPickupPoint ??
           model.boardingPoint ??
-          model.serviceStartPlace ??
-          'Unknown',
+          model.serviceStartPlace,
       type: TicketType.bus,
 
       tags: [

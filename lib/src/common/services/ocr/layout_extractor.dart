@@ -422,10 +422,9 @@ class LayoutExtractor {
 
       final isFieldLabel =
           !isDateOrTimePattern &&
-          (lowerText.contains('/') ||
-              _fieldLabelKeywords.any(
-                (k) => lowerText.endsWith(' $k') || lowerText == k,
-              ));
+          _fieldLabelKeywords.any(
+            (k) => lowerText.endsWith(' $k') || lowerText == k,
+          );
 
       if (isSectionHeader || isFieldLabel) {
         if (matchedParts.isNotEmpty) break;

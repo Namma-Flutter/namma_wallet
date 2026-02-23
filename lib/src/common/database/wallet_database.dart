@@ -66,8 +66,6 @@ class WalletDatabase implements IWalletDatabase {
         if (oldVersion < 4) {
           // SQLite does not support ALTER COLUMN DROP NOT NULL.
           // We recreate the table, copy data, drop old, and rename new.
-          await db.execute('PRAGMA foreign_keys=off;');
-
           await db.execute('''
             CREATE TABLE tickets_new (
                id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -88,8 +86,18 @@ class WalletDatabase implements IWalletDatabase {
           ''');
 
           await db.execute('''
-            INSERT INTO tickets_new (id, ticket_id, primary_text, secondary_text, type, start_time, end_time, location, tags, extras, image_path, directions_url, created_at, updated_at)
-            SELECT id, ticket_id, primary_text, secondary_text, type, start_time, end_time, location, tags, extras, image_path, directions_url, created_at, updated_at FROM tickets;
+            INSERT INTO tickets_new (
+              id, ticket_id, primary_text, secondary_text,
+              type, start_time, end_time, location,
+              tags, extras, image_path, directions_url,
+              created_at, updated_at
+            )
+            SELECT
+              id, ticket_id, primary_text, secondary_text,
+              type, start_time, end_time, location,
+              tags, extras, image_path, directions_url,
+              created_at, updated_at
+            FROM tickets;
           ''');
 
           await db.execute('DROP TABLE tickets;');
@@ -102,8 +110,6 @@ class WalletDatabase implements IWalletDatabase {
             'CREATE INDEX IF NOT EXISTS idx_tickets_start_time ON tickets'
             ' (start_time);',
           );
-
-          await db.execute('PRAGMA foreign_keys=on;');
 
           _logger.success(
             'Database migrated to v4: Made start_time, primary_text,'

@@ -392,7 +392,7 @@ void main() {
         (e) => e.title == 'Passenger 3',
         orElse: () => throw StateError('No Passenger 3 extra'),
       );
-      expect(passenger3?.value, equals('PREMA'));
+      expect(passenger3?.value, equals('TEST PASSENGER FIVE'));
       final gender3 = ticket.extras?.firstWhere(
         (e) => e.title == 'Gender 3',
         orElse: () => throw StateError('No Gender 3 extra'),

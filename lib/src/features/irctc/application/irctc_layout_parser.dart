@@ -33,6 +33,7 @@ class IRCTCLayoutParser extends TravelPDFParser {
     // Match across multiple lines - use [\s\S]* to match anything
     final pnrRaw = _extractByRegex(plainText, [
       r'PNR[\s\S]*?(\d{6,12})',
+      r'PNR\b[\s\S]{0,30}?\b([A-Z0-9]{6,12})\b',
     ], dotAll: true);
     final pnrNumber = pnrRaw?.replaceAll(RegExp(r'\s'), '').toUpperCase();
 
@@ -248,7 +249,7 @@ class IRCTCLayoutParser extends TravelPDFParser {
       travelClass: travelClass,
       fromStation: fromStation,
       toStation: toStation,
-      ticketFare: fare ?? ticketFare,
+      ticketFare: fare,
       irctcFee: irctcFee,
       quota: quota,
       gender: firstPassenger?['gender'],
@@ -453,8 +454,12 @@ class IRCTCLayoutParser extends TravelPDFParser {
     ).firstMatch(dateStr);
     if (match != null) {
       final day = int.tryParse(match.group(1) ?? '');
-      final monthStr = match.group(2) ?? '';
+      final rawMonth = match.group(2) ?? '';
       final year = int.tryParse(match.group(3) ?? '');
+      final monthStr = rawMonth.isEmpty
+          ? ''
+          : rawMonth[0].toUpperCase() +
+                rawMonth.substring(1).toLowerCase();
 
       final month = months[monthStr];
       if (day != null && month != null && year != null) {
