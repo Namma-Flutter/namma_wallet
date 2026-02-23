@@ -36,7 +36,10 @@ void main() {
       expect(ticket, isNotNull);
       expect(ticket.ticketId, equals('4117608719'));
       // Title must include both train number and name
-      expect(ticket.primaryText, equals('12634 - KANYAKUMARI EXP'));
+      expect(
+        ticket.primaryText,
+        equals('12634 - KANYAKUMARI EXP'),
+      );
       expect(ticket.secondaryText, equals('12634 - KANYAKUMARI EXP'));
       expect(ticket.startTime?.year, equals(2025));
       expect(ticket.startTime?.month, equals(4));
@@ -204,7 +207,10 @@ void main() {
 
       expect(ticket, isNotNull);
       expect(ticket.ticketId, equals('4214465828'));
-      expect(ticket.primaryText, equals('20636 - ANANTAPURI EXP'));
+      expect(
+        ticket.primaryText,
+        equals('20636 - ANANTAPURI EXP'),
+      );
       expect(ticket.secondaryText, equals('20636 - ANANTAPURI EXP'));
 
       expect(ticket.startTime?.year, equals(2025));
@@ -360,7 +366,10 @@ void main() {
 
       expect(ticket, isNotNull);
       expect(ticket.ticketId, equals('4222116599'));
-      expect(ticket.primaryText, equals('16127 - MS GURUVAYUR EXP'));
+      expect(
+        ticket.primaryText,
+        equals('16127 - MS GURUVAYUR EXP'),
+      );
       expect(ticket.secondaryText, equals('16127 - MS GURUVAYUR EXP'));
 
       expect(ticket.startTime?.year, equals(2025));
@@ -520,7 +529,10 @@ void main() {
 
       expect(ticket, isNotNull);
       expect(ticket.ticketId, equals('4249001496'));
-      expect(ticket.primaryText, equals('12685 - MAS MAQ EXP'));
+      expect(
+        ticket.primaryText,
+        equals('12685 - MAS MAQ EXP'),
+      );
       expect(ticket.secondaryText, equals('12685 - MAS MAQ EXP'));
 
       expect(ticket.startTime?.year, equals(2023));
@@ -682,7 +694,10 @@ void main() {
 
       expect(ticket, isNotNull);
       expect(ticket.ticketId, equals('4417448343'));
-      expect(ticket.primaryText, equals('12631 - NELLAI SF EXP'));
+      expect(
+        ticket.primaryText,
+        equals('12631 - NELLAI SF EXP'),
+      );
       expect(ticket.secondaryText, equals('12631 - NELLAI SF EXP'));
 
       expect(ticket.startTime?.year, equals(2025));
@@ -843,7 +858,10 @@ void main() {
 
       expect(ticket, isNotNull);
       expect(ticket.ticketId, equals('4449000087'));
-      expect(ticket.primaryText, equals('12686 - MAQ MAS EXP'));
+      expect(
+        ticket.primaryText,
+        equals('12686 - MAQ MAS EXP'),
+      );
       expect(ticket.secondaryText, equals('12686 - MAQ MAS EXP'));
 
       expect(ticket.startTime?.year, equals(2023));
@@ -1004,7 +1022,10 @@ void main() {
 
       expect(ticket, isNotNull);
       expect(ticket.ticketId, equals('4534937884'));
-      expect(ticket.primaryText, equals('12007 - MYS SHATABDI'));
+      expect(
+        ticket.primaryText,
+        equals('12007 - MYS SHATABDI'),
+      );
       expect(ticket.secondaryText, equals('12007 - MYS SHATABDI'));
 
       expect(ticket.startTime?.year, equals(2025));
@@ -1165,7 +1186,10 @@ void main() {
 
       expect(ticket, isNotNull);
       expect(ticket.ticketId, equals('4565194077'));
-      expect(ticket.primaryText, equals('12686 - MAQ MAS EXP'));
+      expect(
+        ticket.primaryText,
+        equals('12686 - MAQ MAS EXP'),
+      );
       expect(ticket.secondaryText, equals('12686 - MAQ MAS EXP'));
 
       // Tags
@@ -1306,7 +1330,10 @@ void main() {
 
       expect(ticket, isNotNull);
       expect(ticket.ticketId, equals('4628586109'));
-      expect(ticket.primaryText, equals('12631 - NELLAI SF EXP'));
+      expect(
+        ticket.primaryText,
+        equals('12631 - NELLAI SF EXP'),
+      );
       expect(ticket.secondaryText, equals('12631 - NELLAI SF EXP'));
 
       expect(ticket.startTime?.year, equals(2025));
@@ -1464,7 +1491,10 @@ void main() {
 
       expect(ticket, isNotNull);
       expect(ticket.ticketId, equals('4634845356'));
-      expect(ticket.primaryText, equals('20635 - ANANTAPURI EXP'));
+      expect(
+        ticket.primaryText,
+        equals('20635 - ANANTAPURI EXP'),
+      );
       expect(ticket.secondaryText, equals('20635 - ANANTAPURI EXP'));
 
       expect(ticket.startTime?.year, equals(2025));
@@ -1620,7 +1650,10 @@ void main() {
 
       expect(ticket, isNotNull);
       expect(ticket.ticketId, equals('4634847925'));
-      expect(ticket.primaryText, equals('16127 - MS GURUVAYUR EXP'));
+      expect(
+        ticket.primaryText,
+        equals('16127 - MS GURUVAYUR EXP'),
+      );
       expect(ticket.secondaryText, equals('16127 - MS GURUVAYUR EXP'));
 
       expect(ticket.startTime?.year, equals(2025));
@@ -1776,7 +1809,10 @@ void main() {
 
       expect(ticket, isNotNull);
       expect(ticket.ticketId, equals('4740095793'));
-      expect(ticket.primaryText, equals('20635 - ANANTAPURI EXP'));
+      expect(
+        ticket.primaryText,
+        equals('20635 - ANANTAPURI EXP'),
+      );
       expect(ticket.secondaryText, equals('20635 - ANANTAPURI EXP'));
 
       expect(ticket.startTime?.year, equals(2025));
@@ -1932,7 +1968,10 @@ void main() {
 
       expect(ticket, isNotNull);
       expect(ticket.ticketId, equals('4842082738'));
-      expect(ticket.primaryText, equals('20636 - ANANTAPURI EXP'));
+      expect(
+        ticket.primaryText,
+        equals('20636 - ANANTAPURI EXP'),
+      );
       expect(ticket.secondaryText, equals('20636 - ANANTAPURI EXP'));
 
       expect(ticket.startTime?.year, equals(2025));
@@ -2088,7 +2127,10 @@ void main() {
 
       expect(ticket, isNotNull);
       expect(ticket.ticketId, equals('4928088531'));
-      expect(ticket.primaryText, equals('16021 - KAVERI EXPRESS'));
+      expect(
+        ticket.primaryText,
+        equals('16021 - KAVERI EXPRESS'),
+      );
       expect(ticket.secondaryText, equals('16021 - KAVERI EXPRESS'));
 
       expect(ticket.startTime?.year, equals(2025));
@@ -2244,7 +2286,10 @@ void main() {
 
       expect(ticket, isNotNull);
       expect(ticket.ticketId, equals('4249001496'));
-      expect(ticket.primaryText, equals('12685 - MAS MAQ EXP'));
+      expect(
+        ticket.primaryText,
+        equals('12685 - MAS MAQ EXP'),
+      );
       expect(ticket.secondaryText, equals('12685 - MAS MAQ EXP'));
 
       expect(ticket.startTime?.year, equals(2023));
@@ -2403,7 +2448,10 @@ void main() {
 
       expect(ticket, isNotNull);
       expect(ticket.ticketId, equals('4449000087'));
-      expect(ticket.primaryText, equals('12686 - MAQ MAS EXP'));
+      expect(
+        ticket.primaryText,
+        equals('12686 - MAQ MAS EXP'),
+      );
       expect(ticket.secondaryText, equals('12686 - MAQ MAS EXP'));
 
       expect(ticket.startTime?.year, equals(2023));
@@ -2562,7 +2610,10 @@ void main() {
 
       expect(ticket, isNotNull);
       expect(ticket.ticketId, equals('4537429538'));
-      expect(ticket.primaryText, equals('12657 - MAS SBC SF MAIL'));
+      expect(
+        ticket.primaryText,
+        equals('12657 - MAS SBC SF MAIL'),
+      );
       expect(ticket.secondaryText, equals('12657 - MAS SBC SF MAIL'));
 
       expect(ticket.startTime?.year, equals(2025));
@@ -2714,7 +2765,10 @@ void main() {
 
       expect(ticket, isNotNull);
       expect(ticket.ticketId, equals('4328673018'));
-      expect(ticket.primaryText, equals('16022 - KAVERI EXPRESS'));
+      expect(
+        ticket.primaryText,
+        equals('16022 - KAVERI EXPRESS'),
+      );
       expect(ticket.secondaryText, equals('16022 - KAVERI EXPRESS'));
 
       expect(ticket.startTime?.year, equals(2026));
@@ -2845,7 +2899,10 @@ void main() {
 
       expect(ticket, isNotNull);
       expect(ticket.ticketId, equals('4937508934'));
-      expect(ticket.primaryText, equals('12083 - Cbe Janshatabdi'));
+      expect(
+        ticket.primaryText,
+        equals('12083 - Cbe Janshatabdi'),
+      );
       expect(ticket.secondaryText, equals('12083 - Cbe Janshatabdi'));
 
       expect(ticket.startTime?.year, equals(2025));
@@ -2998,6 +3055,27 @@ void main() {
         orElse: () => throw StateError('No Date of Journey extra'),
       );
       expect(dojExtra?.value, isNotNull);
+
+      // Check From
+      final fromExtraCheck = ticket.extras?.firstWhere(
+        (e) => e.title == 'From',
+        orElse: () => throw StateError('No From extra'),
+      );
+      expect(fromExtraCheck?.value, equals('Kumbakonam (KMU)'));
+
+      // Check To
+      final toExtraCheck = ticket.extras?.firstWhere(
+        (e) => e.title == 'To',
+        orElse: () => throw StateError('No To extra'),
+      );
+      expect(toExtraCheck?.value, equals('Coimbatore Jn (CBE)'));
+
+      // Check Boarding
+      final boardingExtraCheck = ticket.extras?.firstWhere(
+        (e) => e.title == 'Boarding',
+        orElse: () => throw StateError('No Boarding extra'),
+      );
+      expect(boardingExtraCheck?.value, equals('Kumbakonam (KMU)'));
     });
 
     test('should parse 4846874185 from OCR blocks', () {
@@ -3006,7 +3084,10 @@ void main() {
 
       expect(ticket, isNotNull);
       expect(ticket.ticketId, equals('4846874185'));
-      expect(ticket.primaryText, equals('12658 - Sbc Mas Sf Mail'));
+      expect(
+        ticket.primaryText,
+        equals('12658 - Sbc Mas Sf Mail'),
+      );
       expect(ticket.secondaryText, equals('12658 - Sbc Mas Sf Mail'));
 
       expect(ticket.startTime?.year, equals(2025));
