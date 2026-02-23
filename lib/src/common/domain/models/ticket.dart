@@ -39,33 +39,20 @@ class Ticket with TicketMappable {
     final journeyDate = model.dateOfJourney;
     final departure = model.scheduledDeparture;
 
-    /// the constants [_primaryTextConstant] used for primaryText
-    /// and [__secondaryTextConstant] used for secondary
-    /// are used here only for merging logic, it won't affect the user data.
-
     return Ticket(
       ticketId: model.pnrNumber,
       primaryText:
-          (model.trainNumber.isNotNullOrEmpty &&
-              model.trainName.isNotNullOrEmpty)
-          ? '${model.trainNumber} - ${model.trainName}'
-          : (model.trainName.isNotNullOrEmpty
-                ? model.trainName
-                : (model.fromStation.isNotNullOrEmpty &&
-                          model.toStation.isNotNullOrEmpty
-                      ? '${model.fromStation} → ${model.toStation}'
-                      : _primaryTextConstant)),
+          model.fromStation.isNotNullOrEmpty && model.toStation.isNotNullOrEmpty
+          ? '${model.fromStation} → ${model.toStation}'
+          : null,
       secondaryText: (() {
         if (model.trainNumber.isNotNullOrEmpty &&
             model.trainName.isNotNullOrEmpty) {
           return '${model.trainNumber} - ${model.trainName}';
         }
         if (model.trainName.isNotNullOrEmpty) return model.trainName;
-        if (model.fromStation.isNotNullOrEmpty &&
-            model.toStation.isNotNullOrEmpty) {
-          return '${model.fromStation} → ${model.toStation}';
-        }
-        return _secondaryTextConstant;
+        if (model.trainNumber.isNotNullOrEmpty) return model.trainNumber;
+        return null;
       })(),
       startTime: !isUpdate && hasValidDateTime
           ? DateTime.utc(
@@ -211,16 +198,12 @@ class Ticket with TicketMappable {
 
     startTime ??= model.journeyDate;
 
-    /// the constants [_primaryTextConstant] used for primaryText
-    /// and [__secondaryTextConstant] used for secondary
-    /// are used here only for merging logic, it won't affect the user data.
-
     return Ticket(
       ticketId: model.pnrNumber,
       primaryText:
           primarySource.isNotNullOrEmpty && primaryDestination.isNotNullOrEmpty
           ? '$primarySource → $primaryDestination'
-          : _primaryTextConstant,
+          : null,
       secondaryText:
           model.tripCode.isNotNullOrEmpty || model.routeNo.isNotNullOrEmpty
           ? [
@@ -230,7 +213,7 @@ class Ticket with TicketMappable {
               else
                 model.routeNo ?? 'Bus',
             ].where((s) => s != null && s.isNotEmpty).join(' - ')
-          : _secondaryTextConstant,
+          : null,
       startTime: startTime,
       location:
           model.passengerPickupPoint ??
@@ -405,17 +388,13 @@ class Ticket with TicketMappable {
     return Ticket(
       ticketId: existing.ticketId,
 
-      primaryText:
-          (!incoming.primaryText.isNotNullOrEmpty ||
-              incoming.primaryText == _primaryTextConstant)
-          ? existing.primaryText
-          : incoming.primaryText,
+      primaryText: incoming.primaryText.isNotNullOrEmpty
+          ? incoming.primaryText
+          : existing.primaryText,
 
-      secondaryText:
-          (!incoming.secondaryText.isNotNullOrEmpty ||
-              incoming.secondaryText == _secondaryTextConstant)
-          ? existing.secondaryText
-          : incoming.secondaryText,
+      secondaryText: incoming.secondaryText.isNotNullOrEmpty
+          ? incoming.secondaryText
+          : existing.secondaryText,
 
       location: (incoming.location?.trim().isNotNullOrEmpty ?? false)
           ? incoming.location
@@ -435,12 +414,6 @@ class Ticket with TicketMappable {
       directionsUrl: incoming.directionsUrl ?? existing.directionsUrl,
     );
   }
-
-  /// Sentinel value for merge logic only. Never use as a parsing fallback.
-  static const _primaryTextConstant = 'Unknown → Unknown';
-
-  /// Sentinel value for merge logic only. Never use as a parsing fallback.
-  static const _secondaryTextConstant = 'N/A';
 
   /// Merges Extras (Key-Value pairs).
   /// Strategy: Convert old list to Map. Overwrite only if new value is valid.

@@ -151,7 +151,7 @@ Scheduled Departure : 14:30
           // Assert (Then)
           expect(ticket, isNotNull);
           expect(ticket!.ticketId, equals('1234567890'));
-          expect(ticket.primaryText, contains('Chennai Express'));
+          expect(ticket.secondaryText, contains('Chennai Express'));
         },
       );
 

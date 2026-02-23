@@ -26,14 +26,8 @@ void main() {
 
       // Primary info validations
       expect(ticket.ticketId, equals('4321751237'));
-      expect(
-        ticket.primaryText,
-        equals('Unknown → Unknown'),
-      ); // No route available.
-      expect(
-        ticket.secondaryText,
-        equals('N/A'),
-      );
+      expect(ticket.primaryText, isNull); // No route available.
+      expect(ticket.secondaryText, isNull);
 
       // PNR Tag
       final pnrTag = ticket.tags?.firstWhere(
@@ -76,10 +70,7 @@ void main() {
         ticket.primaryText,
         equals('YESVANTPUR (YPR) → CHENNAI CENTRAL (MAS)'),
       );
-      expect(
-        ticket.secondaryText,
-        equals('YESVANTPUR (YPR) → CHENNAI CENTRAL (MAS)'),
-      );
+      expect(ticket.secondaryText, equals('12291'));
 
       /// Validate parsed start time from DOJ + DP fields.
       expect(ticket.startTime?.year, equals(2025));
@@ -154,6 +145,7 @@ void main() {
         ticket.primaryText,
         equals('TIRUVALLUR (TRL) → BANGALORE CITY (SBC)'),
       );
+      expect(ticket.secondaryText, equals('16021'));
 
       // Status tag includes waitlist number
       final statusTag = ticket.tags?.firstWhere((t) => t.icon == 'info');
@@ -180,9 +172,9 @@ void main() {
 
         expect(ticket, isNotNull);
 
-        // Secondary text uses from → to format
+        // Primary text uses from → to format
         expect(
-          ticket.secondaryText,
+          ticket.primaryText,
           equals('SMVB → CHENNAI CENTRAL (MAS)'),
         );
 
@@ -214,10 +206,7 @@ void main() {
         ticket.primaryText,
         equals('CHENNAI CENTRAL (MAS) → SALEM JUNCTION (SA)'),
       );
-      expect(
-        ticket.secondaryText,
-        equals('CHENNAI CENTRAL (MAS) → SALEM JUNCTION (SA)'),
-      );
+      expect(ticket.secondaryText, equals('12679'));
 
       // Class tag should correctly detect 2S
       final classTag = ticket.tags?.firstWhere((t) => t.icon == 'event_seat');

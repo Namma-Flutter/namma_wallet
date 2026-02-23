@@ -72,12 +72,12 @@ class WalletDatabase implements IWalletDatabase {
             CREATE TABLE tickets_new (
                id INTEGER PRIMARY KEY AUTOINCREMENT,
                ticket_id TEXT NOT NULL UNIQUE,
-               primary_text TEXT NOT NULL,
-               secondary_text TEXT NOT NULL,
+               primary_text TEXT,
+               secondary_text TEXT,
                type TEXT NOT NULL,
                start_time TEXT,
                end_time TEXT,
-               location TEXT NOT NULL,
+               location TEXT,
                tags TEXT,
                extras TEXT,
                image_path TEXT,
@@ -108,7 +108,9 @@ class WalletDatabase implements IWalletDatabase {
 
           await db.execute('PRAGMA foreign_keys=on;');
 
-          _logger.success('Database migrated to v4: Made start_time nullable');
+          _logger.success(
+            'Database migrated to v4: Made start_time, primary_text, secondary_text, and location nullable',
+          );
         }
       },
     );
@@ -137,12 +139,12 @@ class WalletDatabase implements IWalletDatabase {
       CREATE TABLE tickets (
          id INTEGER PRIMARY KEY AUTOINCREMENT,
          ticket_id TEXT NOT NULL UNIQUE,
-         primary_text TEXT NOT NULL,
-         secondary_text TEXT NOT NULL,
+         primary_text TEXT,
+         secondary_text TEXT,
          type TEXT NOT NULL,
          start_time TEXT,
          end_time TEXT,
-         location TEXT NOT NULL,
+         location TEXT,
          tags TEXT,
          extras TEXT,
          image_path TEXT,
