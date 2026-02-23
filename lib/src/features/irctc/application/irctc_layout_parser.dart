@@ -1,3 +1,4 @@
+import 'package:namma_wallet/src/common/domain/models/extras_model.dart';
 import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 import 'package:namma_wallet/src/common/services/ocr/layout_extractor.dart';
 import 'package:namma_wallet/src/common/services/ocr/ocr_block.dart';
@@ -261,7 +262,27 @@ class IRCTCLayoutParser extends TravelPDFParser {
       seatNumber: firstPassenger?['seat'],
     );
 
-    return Ticket.fromIRCTC(model);
+    var ticket = Ticket.fromIRCTC(model);
+
+    // Add extras for additional passengers (2nd, 3rd, etc.)
+    if (passengers.length > 1) {
+      final additionalExtras = <ExtrasModel>[];
+      for (var i = 1; i < passengers.length; i++) {
+        final p = passengers[i];
+        final n = i + 1;
+        additionalExtras.addAll([
+          ExtrasModel(title: 'Passenger $n', value: p['name']),
+          ExtrasModel(title: 'Gender $n', value: p['gender']),
+          ExtrasModel(title: 'Age $n', value: p['age']),
+          ExtrasModel(title: 'Berth $n', value: p['seat']),
+        ]);
+      }
+      ticket = ticket.copyWith(
+        extras: [...?ticket.extras, ...additionalExtras],
+      );
+    }
+
+    return ticket;
   }
 
   String? _formatStation(String? raw) {
@@ -316,26 +337,25 @@ class IRCTCLayoutParser extends TravelPDFParser {
     // Passenger names may contain spaces (e.g. "MURUGESAN M"), so use a lazy
     // match for the name group that stops at the first standalone age number.
     // Updated to allow optional catering service (like "NO FOOD") before status
-    // Allow "1." or just "1" (without period) as the row number prefix,
-    // since some newer IRCTC ticket formats omit the period.
-    // Gender is matched as FEMALE→F, MALE→M (full words), or single M/F.
+    // Group 1: row number, Group 2: name, Group 3: age, Group 4: gender,
+    // Group 5: status (CNF/WL/RAC), Group 6: coach, Group 7: seat number,
+    // Group 8: berth type.
     final passengerPattern = RegExp(
-      r'1\.?\s+([A-Z][A-Za-z .\n]*?)\s+(\d{1,3})\s+(FEMALE|MALE|[MF])\s+(?:(?:NO FOOD|VEG|NON VEG)\s+)?(CNF|WL|RAC|[A-Z]+)(?:\s*/([A-Z0-9]+))?(?:\s*/(\d+))?(?:\s*/([A-Z]+(?: [A-Z]+)?))?',
+      r'(\d+)\.?\s+([A-Z][A-Za-z .\n]*?)\s+(\d{1,3})\s+(FEMALE|MALE|[MF])\s+(?:(?:NO FOOD|VEG|NON VEG)\s+)?(CNF|WL|RAC|[A-Z]+)(?:\s*/([A-Z0-9]+))?(?:\s*/(\d+))?(?:\s*/([A-Z]+(?: [A-Z]+)?))?',
       caseSensitive: false,
     );
 
-    final match = passengerPattern.firstMatch(plainText);
-    if (match != null) {
+    for (final match in passengerPattern.allMatches(plainText)) {
       passengers.add({
         'name': match
-            .group(1)
+            .group(2)
             ?.replaceAll('\n', ' ')
             .trim()
             .replaceAll(RegExp(r'\s+'), ' '),
-        'age': match.group(2)?.trim(),
-        'gender': _normalizeGender(match.group(3)),
-        'status': match.group(4)?.trim(),
-        'seat': _buildSeat(match),
+        'age': match.group(3)?.trim(),
+        'gender': _normalizeGender(match.group(4)),
+        'status': match.group(5)?.trim(),
+        'seat': _buildSeat(match, startGroup: 5),
       });
     }
 
@@ -371,15 +391,15 @@ class IRCTCLayoutParser extends TravelPDFParser {
     return upper;
   }
 
-  String? _buildSeat(RegExpMatch match) {
+  String? _buildSeat(RegExpMatch match, {int startGroup = 4}) {
     final parts = <String>[];
-    for (var i = 4; i <= 7; i++) {
+    for (var i = startGroup; i <= startGroup + 3; i++) {
       final part = match.group(i);
       if (part != null && part.isNotEmpty) {
-        if (i == 4) {
+        if (i == startGroup) {
           // Include waitlist/RAC status in the berth string (e.g., WL/111)
           // but exclude CNF (so CNF/S2/32 becomes S2/32)
-          if (part != 'CNF') {
+          if (part.toUpperCase() != 'CNF') {
             parts.add(part);
           }
         } else {

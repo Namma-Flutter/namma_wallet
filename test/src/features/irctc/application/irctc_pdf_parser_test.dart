@@ -358,6 +358,50 @@ void main() {
         orElse: () => throw StateError('No Date of Journey extra'),
       );
       expect(dojExtra?.value, isNotNull);
+
+      // Check Passenger 2
+      final passenger2 = ticket.extras?.firstWhere(
+        (e) => e.title == 'Passenger 2',
+        orElse: () => throw StateError('No Passenger 2 extra'),
+      );
+      expect(passenger2?.value, equals('PRIYANKA'));
+      final gender2 = ticket.extras?.firstWhere(
+        (e) => e.title == 'Gender 2',
+        orElse: () => throw StateError('No Gender 2 extra'),
+      );
+      expect(gender2?.value, equals('F'));
+      final age2 = ticket.extras?.firstWhere(
+        (e) => e.title == 'Age 2',
+        orElse: () => throw StateError('No Age 2 extra'),
+      );
+      expect(age2?.value, equals('28'));
+      final berth2 = ticket.extras?.firstWhere(
+        (e) => e.title == 'Berth 2',
+        orElse: () => throw StateError('No Berth 2 extra'),
+      );
+      expect(berth2?.value, equals('S1/53/MIDDLE'));
+
+      // Check Passenger 3
+      final passenger3 = ticket.extras?.firstWhere(
+        (e) => e.title == 'Passenger 3',
+        orElse: () => throw StateError('No Passenger 3 extra'),
+      );
+      expect(passenger3?.value, equals('PREMA'));
+      final gender3 = ticket.extras?.firstWhere(
+        (e) => e.title == 'Gender 3',
+        orElse: () => throw StateError('No Gender 3 extra'),
+      );
+      expect(gender3?.value, equals('F'));
+      final age3 = ticket.extras?.firstWhere(
+        (e) => e.title == 'Age 3',
+        orElse: () => throw StateError('No Age 3 extra'),
+      );
+      expect(age3?.value, equals('48'));
+      final berth3 = ticket.extras?.firstWhere(
+        (e) => e.title == 'Berth 3',
+        orElse: () => throw StateError('No Berth 3 extra'),
+      );
+      expect(berth3?.value, equals('S1/54/UPPER'));
     });
 
     test('should parse 4222116599 from OCR blocks', () {
@@ -1801,6 +1845,50 @@ void main() {
         orElse: () => throw StateError('No Date of Journey extra'),
       );
       expect(dojExtra?.value, isNotNull);
+
+      // Check Passenger 2
+      final passenger2 = ticket.extras?.firstWhere(
+        (e) => e.title == 'Passenger 2',
+        orElse: () => throw StateError('No Passenger 2 extra'),
+      );
+      expect(passenger2?.value, equals('PRIYANKA M'));
+      final gender2 = ticket.extras?.firstWhere(
+        (e) => e.title == 'Gender 2',
+        orElse: () => throw StateError('No Gender 2 extra'),
+      );
+      expect(gender2?.value, equals('F'));
+      final age2 = ticket.extras?.firstWhere(
+        (e) => e.title == 'Age 2',
+        orElse: () => throw StateError('No Age 2 extra'),
+      );
+      expect(age2?.value, equals('30'));
+      final berth2 = ticket.extras?.firstWhere(
+        (e) => e.title == 'Berth 2',
+        orElse: () => throw StateError('No Berth 2 extra'),
+      );
+      expect(berth2?.value, equals('WL/24'));
+
+      // Check Passenger 3
+      final passenger3 = ticket.extras?.firstWhere(
+        (e) => e.title == 'Passenger 3',
+        orElse: () => throw StateError('No Passenger 3 extra'),
+      );
+      expect(passenger3?.value, equals('NARESH BABU M'));
+      final gender3 = ticket.extras?.firstWhere(
+        (e) => e.title == 'Gender 3',
+        orElse: () => throw StateError('No Gender 3 extra'),
+      );
+      expect(gender3?.value, equals('M'));
+      final age3 = ticket.extras?.firstWhere(
+        (e) => e.title == 'Age 3',
+        orElse: () => throw StateError('No Age 3 extra'),
+      );
+      expect(age3?.value, equals('28'));
+      final berth3 = ticket.extras?.firstWhere(
+        (e) => e.title == 'Berth 3',
+        orElse: () => throw StateError('No Berth 3 extra'),
+      );
+      expect(berth3?.value, equals('WL/25'));
     });
 
     test('should parse 4740095793 from OCR blocks', () {
@@ -2119,6 +2207,94 @@ void main() {
         orElse: () => throw StateError('No Date of Journey extra'),
       );
       expect(dojExtra?.value, isNotNull);
+
+      // Check Passenger 2
+      final passenger2 = ticket.extras?.firstWhere(
+        (e) => e.title == 'Passenger 2',
+        orElse: () => throw StateError('No Passenger 2 extra'),
+      );
+      expect(passenger2?.value, equals('RAMKUMAR R'));
+      final gender2 = ticket.extras?.firstWhere(
+        (e) => e.title == 'Gender 2',
+        orElse: () => throw StateError('No Gender 2 extra'),
+      );
+      expect(gender2?.value, equals('M'));
+      final age2 = ticket.extras?.firstWhere(
+        (e) => e.title == 'Age 2',
+        orElse: () => throw StateError('No Age 2 extra'),
+      );
+      expect(age2?.value, equals('31'));
+      final berth2 = ticket.extras?.firstWhere(
+        (e) => e.title == 'Berth 2',
+        orElse: () => throw StateError('No Berth 2 extra'),
+      );
+      expect(berth2?.value, equals('PQWL/39'));
+
+      // Check Passenger 3
+      final passenger3 = ticket.extras?.firstWhere(
+        (e) => e.title == 'Passenger 3',
+        orElse: () => throw StateError('No Passenger 3 extra'),
+      );
+      expect(passenger3?.value, equals('M NARESH BABU'));
+      final gender3 = ticket.extras?.firstWhere(
+        (e) => e.title == 'Gender 3',
+        orElse: () => throw StateError('No Gender 3 extra'),
+      );
+      expect(gender3?.value, equals('M'));
+      final age3 = ticket.extras?.firstWhere(
+        (e) => e.title == 'Age 3',
+        orElse: () => throw StateError('No Age 3 extra'),
+      );
+      expect(age3?.value, equals('28'));
+      final berth3 = ticket.extras?.firstWhere(
+        (e) => e.title == 'Berth 3',
+        orElse: () => throw StateError('No Berth 3 extra'),
+      );
+      expect(berth3?.value, equals('PQWL/40'));
+
+      // Check Passenger 4
+      final passenger4 = ticket.extras?.firstWhere(
+        (e) => e.title == 'Passenger 4',
+        orElse: () => throw StateError('No Passenger 4 extra'),
+      );
+      expect(passenger4?.value, equals('MURUGESAN P'));
+      final gender4 = ticket.extras?.firstWhere(
+        (e) => e.title == 'Gender 4',
+        orElse: () => throw StateError('No Gender 4 extra'),
+      );
+      expect(gender4?.value, equals('M'));
+      final age4 = ticket.extras?.firstWhere(
+        (e) => e.title == 'Age 4',
+        orElse: () => throw StateError('No Age 4 extra'),
+      );
+      expect(age4?.value, equals('62'));
+      final berth4 = ticket.extras?.firstWhere(
+        (e) => e.title == 'Berth 4',
+        orElse: () => throw StateError('No Berth 4 extra'),
+      );
+      expect(berth4?.value, equals('PQWL/41'));
+
+      // Check Passenger 5
+      final passenger5 = ticket.extras?.firstWhere(
+        (e) => e.title == 'Passenger 5',
+        orElse: () => throw StateError('No Passenger 5 extra'),
+      );
+      expect(passenger5?.value, equals('PREMA M'));
+      final gender5 = ticket.extras?.firstWhere(
+        (e) => e.title == 'Gender 5',
+        orElse: () => throw StateError('No Gender 5 extra'),
+      );
+      expect(gender5?.value, equals('F'));
+      final age5 = ticket.extras?.firstWhere(
+        (e) => e.title == 'Age 5',
+        orElse: () => throw StateError('No Age 5 extra'),
+      );
+      expect(age5?.value, equals('48'));
+      final berth5 = ticket.extras?.firstWhere(
+        (e) => e.title == 'Berth 5',
+        orElse: () => throw StateError('No Berth 5 extra'),
+      );
+      expect(berth5?.value, equals('PQWL/42'));
     });
 
     test('should parse 4928088531 from OCR blocks', () {
@@ -3076,6 +3252,28 @@ void main() {
         orElse: () => throw StateError('No Boarding extra'),
       );
       expect(boardingExtraCheck?.value, equals('Kumbakonam (KMU)'));
+
+      // Check Passenger 2
+      final passenger2 = ticket.extras?.firstWhere(
+        (e) => e.title == 'Passenger 2',
+        orElse: () => throw StateError('No Passenger 2 extra'),
+      );
+      expect(passenger2?.value, equals('Anbalagan'));
+      final gender2 = ticket.extras?.firstWhere(
+        (e) => e.title == 'Gender 2',
+        orElse: () => throw StateError('No Gender 2 extra'),
+      );
+      expect(gender2?.value, equals('M'));
+      final age2 = ticket.extras?.firstWhere(
+        (e) => e.title == 'Age 2',
+        orElse: () => throw StateError('No Age 2 extra'),
+      );
+      expect(age2?.value, equals('64'));
+      final berth2 = ticket.extras?.firstWhere(
+        (e) => e.title == 'Berth 2',
+        orElse: () => throw StateError('No Berth 2 extra'),
+      );
+      expect(berth2?.value, equals('D6/32/NC'));
     });
 
     test('should parse 4846874185 from OCR blocks', () {
@@ -3166,33 +3364,121 @@ void main() {
       );
       expect(boardingExtra?.value, equals('Ksr Bengaluru'));
 
-      // Check Passenger
+      // Check Passenger 1
       final passengerExtraCheck = ticket.extras?.firstWhere(
         (e) => e.title == 'Passenger',
         orElse: () => throw StateError('No Passenger extra'),
       );
       expect(passengerExtraCheck?.value, equals('Justin Benito'));
 
-      // Check Gender
+      // Check Gender 1
       final genderExtraCheck = ticket.extras?.firstWhere(
         (e) => e.title == 'Gender',
         orElse: () => throw StateError('No Gender extra'),
       );
       expect(genderExtraCheck?.value, equals('M'));
 
-      // Check Age
+      // Check Age 1
       final ageExtraCheck = ticket.extras?.firstWhere(
         (e) => e.title == 'Age',
         orElse: () => throw StateError('No Age extra'),
       );
       expect(ageExtraCheck?.value, equals('19'));
 
-      // Check Berth
+      // Check Berth 1
       final berthExtra = ticket.extras?.firstWhere(
         (e) => e.title == 'Berth',
         orElse: () => throw StateError('No Berth extra'),
       );
       expect(berthExtra?.value, equals('S4/26/MB'));
+
+      // Check Passenger 2
+      final passenger2 = ticket.extras?.firstWhere(
+        (e) => e.title == 'Passenger 2',
+        orElse: () => throw StateError('No Passenger 2 extra'),
+      );
+      expect(passenger2?.value, equals('KUMARAN'));
+      final gender2 = ticket.extras?.firstWhere(
+        (e) => e.title == 'Gender 2',
+        orElse: () => throw StateError('No Gender 2 extra'),
+      );
+      expect(gender2?.value, equals('M'));
+      final age2 = ticket.extras?.firstWhere(
+        (e) => e.title == 'Age 2',
+        orElse: () => throw StateError('No Age 2 extra'),
+      );
+      expect(age2?.value, equals('24'));
+      final berth2 = ticket.extras?.firstWhere(
+        (e) => e.title == 'Berth 2',
+        orElse: () => throw StateError('No Berth 2 extra'),
+      );
+      expect(berth2?.value, equals('S4/27/UB'));
+
+      // Check Passenger 3
+      final passenger3 = ticket.extras?.firstWhere(
+        (e) => e.title == 'Passenger 3',
+        orElse: () => throw StateError('No Passenger 3 extra'),
+      );
+      expect(passenger3?.value, equals('Harish Anbalagan'));
+      final gender3 = ticket.extras?.firstWhere(
+        (e) => e.title == 'Gender 3',
+        orElse: () => throw StateError('No Gender 3 extra'),
+      );
+      expect(gender3?.value, equals('M'));
+      final age3 = ticket.extras?.firstWhere(
+        (e) => e.title == 'Age 3',
+        orElse: () => throw StateError('No Age 3 extra'),
+      );
+      expect(age3?.value, equals('25'));
+      final berth3 = ticket.extras?.firstWhere(
+        (e) => e.title == 'Berth 3',
+        orElse: () => throw StateError('No Berth 3 extra'),
+      );
+      expect(berth3?.value, equals('S4/29/MB'));
+
+      // Check Passenger 4
+      final passenger4 = ticket.extras?.firstWhere(
+        (e) => e.title == 'Passenger 4',
+        orElse: () => throw StateError('No Passenger 4 extra'),
+      );
+      expect(passenger4?.value, equals('Saravanan Kumar'));
+      final gender4 = ticket.extras?.firstWhere(
+        (e) => e.title == 'Gender 4',
+        orElse: () => throw StateError('No Gender 4 extra'),
+      );
+      expect(gender4?.value, equals('M'));
+      final age4 = ticket.extras?.firstWhere(
+        (e) => e.title == 'Age 4',
+        orElse: () => throw StateError('No Age 4 extra'),
+      );
+      expect(age4?.value, equals('24'));
+      final berth4 = ticket.extras?.firstWhere(
+        (e) => e.title == 'Berth 4',
+        orElse: () => throw StateError('No Berth 4 extra'),
+      );
+      expect(berth4?.value, equals('S4/25/LB'));
+
+      // Check Passenger 5
+      final passenger5 = ticket.extras?.firstWhere(
+        (e) => e.title == 'Passenger 5',
+        orElse: () => throw StateError('No Passenger 5 extra'),
+      );
+      expect(passenger5?.value, equals('Rogith Raja'));
+      final gender5 = ticket.extras?.firstWhere(
+        (e) => e.title == 'Gender 5',
+        orElse: () => throw StateError('No Gender 5 extra'),
+      );
+      expect(gender5?.value, equals('M'));
+      final age5 = ticket.extras?.firstWhere(
+        (e) => e.title == 'Age 5',
+        orElse: () => throw StateError('No Age 5 extra'),
+      );
+      expect(age5?.value, equals('21'));
+      final berth5 = ticket.extras?.firstWhere(
+        (e) => e.title == 'Berth 5',
+        orElse: () => throw StateError('No Berth 5 extra'),
+      );
+      expect(berth5?.value, equals('S4/28/LB'));
 
       // Check info tag (status)
       final infoTag = ticket.tags?.firstWhere(
