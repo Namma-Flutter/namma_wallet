@@ -4,14 +4,6 @@ excluded:
   - .symlinks
   - Runner/GeneratedPluginRegistrant.swift
 
-disabled_rules:
-  - line_length
-  - trailing_whitespace
-  - force_cast
-  - force_try
-  - identifier_name
-  - type_name
-
 opt_in_rules:
   - empty_count
   - missing_docs
