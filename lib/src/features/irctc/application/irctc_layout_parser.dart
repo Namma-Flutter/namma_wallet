@@ -27,11 +27,6 @@ class IRCTCLayoutParser extends TravelPDFParser {
     final plainText = extractor.toPlainText();
 
     logger.info('IRCTC: Parsing with plainText length: ${plainText.length}');
-    if (plainText.length > 500) {
-      logger.info('IRCTC: First 500 chars: ${plainText.substring(0, 500)}');
-    } else {
-      logger.info('IRCTC: Full text: $plainText');
-    }
 
     // Use regex for IRCTC since layout extraction is unreliable
     //with pseudo-blocks

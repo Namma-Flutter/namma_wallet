@@ -182,7 +182,6 @@ class LayoutExtractor {
                 keyword,
               );
               if (keywordIndexStart == 0 &&
-                  keywordIndexStart > 0 &&
                   (earliestKeywordStart == -1 ||
                       keywordIndexStart < earliestKeywordStart)) {
                 earliestKeywordStart = keywordIndexStart;
