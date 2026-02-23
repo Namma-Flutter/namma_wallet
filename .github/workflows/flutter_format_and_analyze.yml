@@ -37,7 +37,7 @@ jobs:
       # Try to find an existing format-failure comment created by the bot (from previous runs)
       - name: Find previous format-failure comment
         id: find_comment
-        uses: peter-evans/find-comment@v3
+        uses: peter-evans/find-comment@v4
         with:
           issue-number: ${{ github.event.pull_request.number }}
           comment-author: "github-actions[bot]"
@@ -110,9 +110,59 @@ jobs:
         if: ${{ steps.format_check.outputs.exit_code == '0' }}
         run: flutter analyze --write=flutter_analyze.log
 
-      - name: Comment analyze results
-        if: ${{ steps.format_check.outputs.exit_code == '0' && !cancelled() }}
-        uses: yorifuji/flutter-analyze-commenter@v1
+      - name: Parse analyze results
+        id: analyze_results
+        if: ${{ steps.format_check.outputs.exit_code == '0' }}
+        run: |
+          if [ -f flutter_analyze.log ]; then
+            content=$(cat flutter_analyze.log)
+            if echo "$content" | grep -q "No issues found"; then
+              echo "has_issues=false" >> $GITHUB_OUTPUT
+              {
+                echo 'body<<ANALYZE_EOF'
+                echo "✅ **Flutter analysis passed** — no issues found."
+                echo 'ANALYZE_EOF'
+              } >> $GITHUB_OUTPUT
+            else
+              {
+                echo 'body<<ANALYZE_EOF'
+                echo "❌ **Flutter analysis found issues:**"
+                echo '```'
+                echo "$content"
+                echo '```'
+                echo 'ANALYZE_EOF'
+              } >> $GITHUB_OUTPUT
+              echo "has_issues=true" >> $GITHUB_OUTPUT
+            fi
+          else
+            echo "has_issues=false" >> $GITHUB_OUTPUT
+            {
+              echo 'body<<ANALYZE_EOF'
+              echo "✅ **Flutter analysis passed** — no issues found."
+              echo 'ANALYZE_EOF'
+            } >> $GITHUB_OUTPUT
+          fi
+
+      - name: Find previous analyze comment
+        id: find_analyze_comment
+        if: ${{ steps.format_check.outputs.exit_code == '0' }}
+        uses: peter-evans/find-comment@v4
         with:
-          analyze-log: flutter_analyze.log
-          verbose: true
+          issue-number: ${{ github.event.pull_request.number }}
+          comment-author: "github-actions[bot]"
+          body-includes: "Flutter analysis"
+
+      - name: Create analyze comment
+        if: ${{ steps.format_check.outputs.exit_code == '0' && steps.find_analyze_comment.outputs.comment-id == '' }}
+        uses: peter-evans/create-or-update-comment@v5
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          body: ${{ steps.analyze_results.outputs.body }}
+
+      - name: Update analyze comment
+        if: ${{ steps.format_check.outputs.exit_code == '0' && steps.find_analyze_comment.outputs.comment-id != '' }}
+        uses: peter-evans/create-or-update-comment@v5
+        with:
+          comment-id: ${{ steps.find_analyze_comment.outputs.comment-id }}
+          edit-mode: replace
+          body: ${{ steps.analyze_results.outputs.body }}
