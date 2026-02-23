@@ -483,7 +483,7 @@ void main() {
         (e) => e.title == 'Berth',
         orElse: () => throw StateError('No Berth extra'),
       );
-      expect(berthExtra?.value, equals('26'));
+      expect(berthExtra?.value, equals('WL/26'));
 
       // Check Distance
       final distanceExtra = ticket.extras?.firstWhere(
@@ -1739,7 +1739,7 @@ void main() {
         (e) => e.title == 'Berth',
         orElse: () => throw StateError('No Berth extra'),
       );
-      expect(berthExtra?.value, equals('23'));
+      expect(berthExtra?.value, equals('WL/23'));
 
       // Check Distance
       final distanceExtra = ticket.extras?.firstWhere(
@@ -2051,7 +2051,7 @@ void main() {
         (e) => e.title == 'Berth',
         orElse: () => throw StateError('No Berth extra'),
       );
-      expect(berthExtra?.value, equals('38'));
+      expect(berthExtra?.value, equals('PQWL/38'));
 
       // Check Distance
       final distanceExtra = ticket.extras?.firstWhere(
@@ -2642,7 +2642,7 @@ void main() {
         (e) => e.title == 'Berth',
         orElse: () => throw StateError('No Berth extra'),
       );
-      expect(berthExtra?.value, equals('111'));
+      expect(berthExtra?.value, equals('WL/111'));
 
       // Check Distance
       final distanceExtra = ticket.extras?.firstWhere(
@@ -2794,7 +2794,7 @@ void main() {
         (e) => e.title == 'Berth',
         orElse: () => throw StateError('No Berth extra'),
       );
-      expect(berthExtra?.value, equals('20'));
+      expect(berthExtra?.value, equals('RLWL/20'));
 
       // Check Distance
       final distanceExtra = ticket.extras?.firstWhere(

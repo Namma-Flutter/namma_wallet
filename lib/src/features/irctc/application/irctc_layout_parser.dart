@@ -376,8 +376,13 @@ class IRCTCLayoutParser extends TravelPDFParser {
     for (var i = 4; i <= 7; i++) {
       final part = match.group(i);
       if (part != null && part.isNotEmpty) {
-        // Exclude the status from the seat string if it is group 4
-        if (i > 4) {
+        if (i == 4) {
+          // Include waitlist/RAC status in the berth string (e.g., WL/111)
+          // but exclude CNF (so CNF/S2/32 becomes S2/32)
+          if (part != 'CNF') {
+            parts.add(part);
+          }
+        } else {
           parts.add(part);
         }
       }

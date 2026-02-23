@@ -102,7 +102,8 @@ class WalletDatabase implements IWalletDatabase {
             'CREATE INDEX IF NOT EXISTS idx_tickets_type ON tickets (type);',
           );
           await db.execute(
-            'CREATE INDEX IF NOT EXISTS idx_tickets_start_time ON tickets (start_time);',
+            'CREATE INDEX IF NOT EXISTS idx_tickets_start_time ON tickets'
+            ' (start_time);',
           );
 
           await db.execute('PRAGMA foreign_keys=on;');
