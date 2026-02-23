@@ -5,15 +5,15 @@ part 'irctc_ticket_model.mapper.dart';
 @MappableClass()
 class IRCTCTicket with IRCTCTicketMappable {
   const IRCTCTicket({
-    required this.pnrNumber,
-    required this.passengerName,
-    required this.age,
-    required this.status,
-    required this.trainNumber,
-    required this.trainName,
-    required this.boardingStation,
-    required this.fromStation,
-    required this.toStation,
+    this.pnrNumber,
+    this.passengerName,
+    this.age,
+    this.status,
+    this.trainNumber,
+    this.trainName,
+    this.boardingStation,
+    this.fromStation,
+    this.toStation,
     this.ticketFare,
     this.irctcFee,
     this.transactionId,
@@ -28,25 +28,25 @@ class IRCTCTicket with IRCTCTicketMappable {
     this.seatNumber,
   });
 
-  final String pnrNumber;
+  final String? pnrNumber;
   final String? transactionId;
-  final String passengerName;
+  final String? passengerName;
   final String? gender;
   final int? age;
-  final String status;
+  final String? status;
   final String? quota;
-  final String trainNumber;
-  final String trainName;
+  final String? trainNumber;
+  final String? trainName;
   final DateTime? scheduledDeparture;
   final DateTime? dateOfJourney;
   final String? arrivalTime;
   final int? distance;
   final DateTime? bookingDate;
   final String? seatNumber;
-  final String boardingStation;
+  final String? boardingStation;
   final String? travelClass;
-  final String fromStation;
-  final String toStation;
+  final String? fromStation;
+  final String? toStation;
   final double? ticketFare;
   final double? irctcFee;
 

@@ -21,44 +21,55 @@ class IRCTCTicketMapper extends ClassMapperBase<IRCTCTicket> {
   @override
   final String id = 'IRCTCTicket';
 
-  static String _$pnrNumber(IRCTCTicket v) => v.pnrNumber;
+  static String? _$pnrNumber(IRCTCTicket v) => v.pnrNumber;
   static const Field<IRCTCTicket, String> _f$pnrNumber = Field(
     'pnrNumber',
     _$pnrNumber,
+    opt: true,
   );
-  static String _$passengerName(IRCTCTicket v) => v.passengerName;
+  static String? _$passengerName(IRCTCTicket v) => v.passengerName;
   static const Field<IRCTCTicket, String> _f$passengerName = Field(
     'passengerName',
     _$passengerName,
+    opt: true,
   );
   static int? _$age(IRCTCTicket v) => v.age;
-  static const Field<IRCTCTicket, int> _f$age = Field('age', _$age);
-  static String _$status(IRCTCTicket v) => v.status;
-  static const Field<IRCTCTicket, String> _f$status = Field('status', _$status);
-  static String _$trainNumber(IRCTCTicket v) => v.trainNumber;
+  static const Field<IRCTCTicket, int> _f$age = Field('age', _$age, opt: true);
+  static String? _$status(IRCTCTicket v) => v.status;
+  static const Field<IRCTCTicket, String> _f$status = Field(
+    'status',
+    _$status,
+    opt: true,
+  );
+  static String? _$trainNumber(IRCTCTicket v) => v.trainNumber;
   static const Field<IRCTCTicket, String> _f$trainNumber = Field(
     'trainNumber',
     _$trainNumber,
+    opt: true,
   );
-  static String _$trainName(IRCTCTicket v) => v.trainName;
+  static String? _$trainName(IRCTCTicket v) => v.trainName;
   static const Field<IRCTCTicket, String> _f$trainName = Field(
     'trainName',
     _$trainName,
+    opt: true,
   );
-  static String _$boardingStation(IRCTCTicket v) => v.boardingStation;
+  static String? _$boardingStation(IRCTCTicket v) => v.boardingStation;
   static const Field<IRCTCTicket, String> _f$boardingStation = Field(
     'boardingStation',
     _$boardingStation,
+    opt: true,
   );
-  static String _$fromStation(IRCTCTicket v) => v.fromStation;
+  static String? _$fromStation(IRCTCTicket v) => v.fromStation;
   static const Field<IRCTCTicket, String> _f$fromStation = Field(
     'fromStation',
     _$fromStation,
+    opt: true,
   );
-  static String _$toStation(IRCTCTicket v) => v.toStation;
+  static String? _$toStation(IRCTCTicket v) => v.toStation;
   static const Field<IRCTCTicket, String> _f$toStation = Field(
     'toStation',
     _$toStation,
+    opt: true,
   );
   static double? _$ticketFare(IRCTCTicket v) => v.ticketFare;
   static const Field<IRCTCTicket, double> _f$ticketFare = Field(
@@ -280,15 +291,15 @@ class _IRCTCTicketCopyWithImpl<$R, $Out>
       IRCTCTicketMapper.ensureInitialized();
   @override
   $R call({
-    String? pnrNumber,
-    String? passengerName,
+    Object? pnrNumber = $none,
+    Object? passengerName = $none,
     Object? age = $none,
-    String? status,
-    String? trainNumber,
-    String? trainName,
-    String? boardingStation,
-    String? fromStation,
-    String? toStation,
+    Object? status = $none,
+    Object? trainNumber = $none,
+    Object? trainName = $none,
+    Object? boardingStation = $none,
+    Object? fromStation = $none,
+    Object? toStation = $none,
     Object? ticketFare = $none,
     Object? irctcFee = $none,
     Object? transactionId = $none,
@@ -303,15 +314,15 @@ class _IRCTCTicketCopyWithImpl<$R, $Out>
     Object? seatNumber = $none,
   }) => $apply(
     FieldCopyWithData({
-      if (pnrNumber != null) #pnrNumber: pnrNumber,
-      if (passengerName != null) #passengerName: passengerName,
+      if (pnrNumber != $none) #pnrNumber: pnrNumber,
+      if (passengerName != $none) #passengerName: passengerName,
       if (age != $none) #age: age,
-      if (status != null) #status: status,
-      if (trainNumber != null) #trainNumber: trainNumber,
-      if (trainName != null) #trainName: trainName,
-      if (boardingStation != null) #boardingStation: boardingStation,
-      if (fromStation != null) #fromStation: fromStation,
-      if (toStation != null) #toStation: toStation,
+      if (status != $none) #status: status,
+      if (trainNumber != $none) #trainNumber: trainNumber,
+      if (trainName != $none) #trainName: trainName,
+      if (boardingStation != $none) #boardingStation: boardingStation,
+      if (fromStation != $none) #fromStation: fromStation,
+      if (toStation != $none) #toStation: toStation,
       if (ticketFare != $none) #ticketFare: ticketFare,
       if (irctcFee != $none) #irctcFee: irctcFee,
       if (transactionId != $none) #transactionId: transactionId,

@@ -426,7 +426,7 @@ PNR NO. : T123456789
     group('Error Handling', () {
       test(
         'Given malformed text that matches pattern, When parsing fails, '
-        'Then returns ticket with empty ticketId',
+        'Then returns ticket with null ticketId',
         () {
           // Arrange (Given)
           const malformedText = '''
@@ -439,9 +439,9 @@ Train No. :
           final ticket = service.parseTicketFromText(malformedText);
 
           // Assert (Then)
-          // Should still parse but with empty ticketId
+          // Should still parse but with null ticketId (PNR absent)
           expect(ticket, isNotNull);
-          expect(ticket!.ticketId, isEmpty);
+          expect(ticket!.ticketId, isNull);
         },
       );
 
