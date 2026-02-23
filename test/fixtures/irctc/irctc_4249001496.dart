@@ -5,7 +5,7 @@ import 'dart:ui';
 
 import 'package:namma_wallet/src/common/services/ocr/ocr_block.dart';
 
-final irctc_4249001496 = <OCRBlock>[
+final irctc4249001496 = <OCRBlock>[
   OCRBlock(
     text: '#',
     boundingBox: const Rect.fromLTRB(
@@ -1681,5 +1681,5 @@ final irctc_4249001496 = <OCRBlock>[
   ),
 ];
 
-// Generated fixture from: 4417448343.pdf
+// Generated fixture from: 4249001496.pdf
 // Total blocks: 168

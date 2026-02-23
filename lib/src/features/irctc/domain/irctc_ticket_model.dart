@@ -57,12 +57,22 @@ class IRCTCTicket with IRCTCTicketMappable {
               '${dateOfJourney!.year}'
         : 'Unknown';
 
+    final bookingDateStr = bookingDate != null
+        ? '${bookingDate!.day.toString().padLeft(2, '0')}-'
+              '${bookingDate!.month.toString().padLeft(2, '0')}-'
+              '${bookingDate!.year}'
+        : 'Unknown';
+
     return 'IRCTCTicket{\n'
         '  PNR: $pnrNumber\n'
         '  Passenger: $passengerName ($gender, $age)\n'
         '  Train: $trainNumber - $trainName\n'
         '  Journey: $fromStation → $toStation\n'
         '  Date: $journeyDateStr\n'
+        '  Arrival: ${arrivalTime ?? 'Unknown'}\n'
+        '  Distance: ${distance != null ? '$distance km' : 'Unknown'}\n'
+        '  Booking Date: $bookingDateStr\n'
+        '  Seat: ${seatNumber ?? 'Unknown'}\n'
         '  Class: $travelClass\n'
         '  Status: $status\n'
         '  Fare: ₹$ticketFare + ₹$irctcFee\n'

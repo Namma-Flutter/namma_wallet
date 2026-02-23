@@ -34,7 +34,7 @@ class IrctcLayoutFixtures {
   static final List<OCRBlock> irctc_4222116599 =
       irctc_4222116599_fixture.irctc_4222116599;
   static final List<OCRBlock> irctc_4249001496 =
-      irctc_4249001496_fixture.irctc_4249001496;
+      irctc_4249001496_fixture.irctc4249001496;
   static final List<OCRBlock> irctc_4417448343 =
       irctc_4417448343_fixture.irctc_4417448343;
   static final List<OCRBlock> irctc_4449000087 =

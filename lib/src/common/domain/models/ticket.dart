@@ -55,7 +55,7 @@ class Ticket with TicketMappable {
         return null;
       })(),
       startTime: !isUpdate && hasValidDateTime
-          ? DateTime.utc(
+          ? DateTime(
               journeyDate!.year,
               journeyDate.month,
               journeyDate.day,
@@ -88,7 +88,7 @@ class Ticket with TicketMappable {
         ExtrasModel(title: 'PNR Number', value: model.pnrNumber),
         ExtrasModel(title: 'Passenger', value: model.passengerName),
         ExtrasModel(title: 'Gender', value: model.gender),
-        ExtrasModel(title: 'Age', value: model.age.toString()),
+        ExtrasModel(title: 'Age', value: model.age?.toString()),
         ExtrasModel(title: 'Berth', value: model.seatNumber),
         ExtrasModel(title: 'Train Name', value: model.trainName),
         ExtrasModel(title: 'Quota', value: model.quota),
@@ -268,21 +268,36 @@ class Ticket with TicketMappable {
                     // Multiple passengers: show combined details
                     ExtrasModel(
                       title: 'Ages',
-                      value: model.passengers
-                          .map((p) => p.age?.toString() ?? 'N/A')
-                          .join(', '),
+                      value: (() {
+                        final vals = model.passengers
+                            .map((p) => p.age?.toString())
+                            .where((v) => v != null)
+                            .cast<String>()
+                            .join(', ');
+                        return vals.isEmpty ? null : vals;
+                      })(),
                     ),
                     ExtrasModel(
                       title: 'Genders',
-                      value: model.passengers
-                          .map((p) => p.gender ?? 'N/A')
-                          .join(', '),
+                      value: (() {
+                        final vals = model.passengers
+                            .map((p) => p.gender)
+                            .where((v) => v != null && v.isNotEmpty)
+                            .cast<String>()
+                            .join(', ');
+                        return vals.isEmpty ? null : vals;
+                      })(),
                     ),
                     ExtrasModel(
                       title: 'Seat Numbers',
-                      value: model.passengers
-                          .map((p) => p.seatNumber ?? 'N/A')
-                          .join(', '),
+                      value: (() {
+                        final vals = model.passengers
+                            .map((p) => p.seatNumber)
+                            .where((v) => v != null && v.isNotEmpty)
+                            .cast<String>()
+                            .join(', ');
+                        return vals.isEmpty ? null : vals;
+                      })(),
                     ),
                   ],
           ),
@@ -367,18 +382,6 @@ class Ticket with TicketMappable {
           ExtrasModel(title: 'Trip Code', value: model.tripCode),
         if (model.routeNo != null && model.routeNo!.trim().isNotNullOrEmpty)
           ExtrasModel(title: 'Route No', value: model.routeNo!.trim()),
-        if (model.serviceStartPlace != null &&
-            model.serviceStartPlace!.isNotNullOrEmpty)
-          ExtrasModel(title: 'From', value: model.serviceStartPlace)
-        else if (model.passengerStartPlace != null &&
-            model.passengerStartPlace!.isNotNullOrEmpty)
-          ExtrasModel(title: 'From', value: model.passengerStartPlace),
-        if (model.serviceEndPlace != null &&
-            model.serviceEndPlace!.isNotNullOrEmpty)
-          ExtrasModel(title: 'To', value: model.serviceEndPlace)
-        else if (model.passengerEndPlace != null &&
-            model.passengerEndPlace!.isNotNullOrEmpty)
-          ExtrasModel(title: 'To', value: model.passengerEndPlace),
         ExtrasModel(title: 'Source Type', value: sourceType),
       ],
     );
@@ -406,7 +409,7 @@ class Ticket with TicketMappable {
 
       endTime: (incoming.endTime == null) ? existing.endTime : incoming.endTime,
 
-      type: incoming.type,
+      type: incoming.type ?? existing.type,
 
       tags: _mergeTags(existing.tags, incoming.tags),
       extras: _mergeExtras(existing.extras, incoming.extras),

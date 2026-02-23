@@ -158,7 +158,7 @@ class LayoutExtractor {
 
           for (final label in multiWordLabels) {
             final labelIndex = potentialKeyPart.toLowerCase().indexOf(label);
-            if (labelIndex > 0 &&
+            if (labelIndex >= 0 &&
                 (earliestKeywordStart == -1 ||
                     labelIndex < earliestKeywordStart)) {
               earliestKeywordStart = labelIndex;
@@ -172,7 +172,7 @@ class LayoutExtractor {
               final keywordIndex = potentialKeyPart.toLowerCase().indexOf(
                 ' $keyword',
               );
-              if (keywordIndex > 0 &&
+              if (keywordIndex >= 0 &&
                   (earliestKeywordStart == -1 ||
                       keywordIndex < earliestKeywordStart)) {
                 earliestKeywordStart = keywordIndex;
@@ -181,7 +181,7 @@ class LayoutExtractor {
               final keywordIndexStart = potentialKeyPart.toLowerCase().indexOf(
                 keyword,
               );
-              if (keywordIndexStart == 0 &&
+              if (keywordIndexStart >= 0 &&
                   (earliestKeywordStart == -1 ||
                       keywordIndexStart < earliestKeywordStart)) {
                 earliestKeywordStart = keywordIndexStart;
@@ -189,7 +189,7 @@ class LayoutExtractor {
             }
           }
 
-          if (earliestKeywordStart > 0) {
+          if (earliestKeywordStart >= 0) {
             valueText = potentialKeyPart
                 .substring(0, earliestKeywordStart)
                 .trim();
@@ -522,7 +522,6 @@ class LayoutExtractor {
 
     // Remove trailing punctuation and dots (fixes "735.00 Rs." → "735.00.")
     cleaned = cleaned.replaceFirst(RegExp(r'[:\-.\s]+$'), '');
-    cleaned = cleaned.replaceFirst(RegExp(r'\.+$'), ''); // Remove trailing dots
 
     return cleaned.isEmpty ? null : cleaned;
   }

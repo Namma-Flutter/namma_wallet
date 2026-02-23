@@ -96,9 +96,6 @@ class WalletDatabase implements IWalletDatabase {
           await db.execute('ALTER TABLE tickets_new RENAME TO tickets;');
 
           await db.execute(
-            'CREATE INDEX IF NOT EXISTS idx_tickets_id ON tickets (id);',
-          );
-          await db.execute(
             'CREATE INDEX IF NOT EXISTS idx_tickets_type ON tickets (type);',
           );
           await db.execute(
@@ -109,7 +106,8 @@ class WalletDatabase implements IWalletDatabase {
           await db.execute('PRAGMA foreign_keys=on;');
 
           _logger.success(
-            'Database migrated to v4: Made start_time, primary_text, secondary_text, and location nullable',
+            'Database migrated to v4: Made start_time, primary_text,'
+            ' secondary_text, and location nullable',
           );
         }
       },
@@ -156,9 +154,6 @@ class WalletDatabase implements IWalletDatabase {
 
     await db.execute(query);
 
-    await db.execute(
-      'CREATE INDEX IF NOT EXISTS idx_tickets_id ON tickets (id);',
-    );
     await db.execute(
       'CREATE INDEX IF NOT EXISTS idx_tickets_type ON tickets (type);',
     );
