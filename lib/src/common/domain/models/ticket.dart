@@ -116,8 +116,10 @@ class Ticket with TicketMappable {
         ExtrasModel(title: 'Boarding', value: model.boardingStation),
         ExtrasModel(
           title: 'Departure',
-          value: !isUpdate && departure != null
-              ? DateTimeConverter.instance.formatTime(departure)
+          value: !isUpdate
+              ? (departure != null
+                    ? DateTimeConverter.instance.formatTime(departure)
+                    : model.departureTimeStr)
               : null,
         ),
         ExtrasModel(

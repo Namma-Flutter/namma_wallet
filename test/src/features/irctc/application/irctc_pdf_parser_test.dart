@@ -3141,5 +3141,20 @@ void main() {
       );
       expect(dojExtra?.value, isNotNull);
     });
+
+    test('should parse 4565161618 from OCR blocks', () {
+      final blocks = IrctcLayoutFixtures.irctc_4565161618;
+      final ticket = parser.parseTicketFromBlocks(blocks);
+
+      expect(ticket, isNotNull);
+      expect(ticket.ticketId, equals('4565161618'));
+
+      final departureExtra = ticket.extras
+          ?.where((e) => e.title == 'Departure')
+          .firstOrNull;
+
+      expect(departureExtra, isNotNull);
+      expect(departureExtra?.value, equals('N.A.'));
+    });
   });
 }

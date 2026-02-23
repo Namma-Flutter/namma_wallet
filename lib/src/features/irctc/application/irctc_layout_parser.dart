@@ -74,12 +74,15 @@ class IRCTCLayoutParser extends TravelPDFParser {
     // Convert "13-Apr-2025" to "13/04/2025"
     final journeyDate = _parseIrctcDate(journeyDateStr);
 
-    // Time format is "18:55 13-Apr-2025" - need to extract just the time
+    // Time format is "18:55 13-Apr-2025", but can also be "N.A."
     final departureTimeStr = _extractByRegex(plainText, [
-      r'Departure\*\s*(\d{1,2}:\d{2})',
+      r'Departure\*\s*(\d{1,2}:\d{2}|N\.A\.)',
     ]);
-    // Convert "18:55 13-Apr-2025" to just time "18:55"
-    final departureTime = parseDateTime(departureTimeStr?.split(' ').first);
+    // Convert "18:55 13-Apr-2025" to just time "18:55" if it's a time
+    final departureTimePart = departureTimeStr?.split(' ').first;
+    final departureTime = departureTimePart != 'N.A.'
+        ? parseDateTime(departureTimePart)
+        : null;
 
     DateTime? scheduledDeparture;
     if (journeyDate != null && departureTime != null) {
@@ -90,7 +93,9 @@ class IRCTCLayoutParser extends TravelPDFParser {
         departureTime.hour,
         departureTime.minute,
       );
-    } else if (journeyDate != null && departureTimeStr != null) {
+    } else if (journeyDate != null &&
+        departureTimeStr != null &&
+        departureTimeStr != 'N.A.') {
       final timeMatch = RegExp(
         r'(\d{1,2}):(\d{2})',
       ).firstMatch(departureTimeStr);
@@ -255,6 +260,7 @@ class IRCTCLayoutParser extends TravelPDFParser {
       trainNumber: trainNumber ?? '',
       trainName: trainName ?? '',
       scheduledDeparture: scheduledDeparture,
+      departureTimeStr: departureTimeStr,
       dateOfJourney: journeyDate,
       boardingStation: boardingStation ?? '',
       travelClass: travelClass,

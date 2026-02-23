@@ -21,6 +21,7 @@ class IRCTCTicket with IRCTCTicketMappable {
     this.quota,
     this.travelClass,
     this.scheduledDeparture,
+    this.departureTimeStr,
     this.dateOfJourney,
     this.arrivalTime,
     this.distance,
@@ -38,6 +39,7 @@ class IRCTCTicket with IRCTCTicketMappable {
   final String trainNumber;
   final String trainName;
   final DateTime? scheduledDeparture;
+  final String? departureTimeStr;
   final DateTime? dateOfJourney;
   final String? arrivalTime;
   final int? distance;

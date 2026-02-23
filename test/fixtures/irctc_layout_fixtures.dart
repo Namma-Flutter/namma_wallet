@@ -22,6 +22,7 @@ import 'irctc/irctc_4842082738.dart' as irctc_4842082738_fixture;
 import 'irctc/irctc_4846874185.dart' as irctc_4846874185_fixture;
 import 'irctc/irctc_4928088531.dart' as irctc_4928088531_fixture;
 import 'irctc/irctc_4937508934.dart' as irctc_4937508934_fixture;
+import 'irctc/irctc_4565161618.dart' as irctc_4565161618_fixture;
 
 /// Barrel class providing access to all IRCTC layout fixtures.
 /// Each fixture is split into its own file under the irctc/ directory.
@@ -66,4 +67,6 @@ class IrctcLayoutFixtures {
       irctc_4937508934_fixture.irctc_4937508934;
   static final List<OCRBlock> irctc_4846874185 =
       irctc_4846874185_fixture.irctc_4846874185;
+  static final List<OCRBlock> irctc_4565161618 =
+      irctc_4565161618_fixture.irctc_4565161618;
 }
