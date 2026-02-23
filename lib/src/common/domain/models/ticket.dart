@@ -315,9 +315,9 @@ class Ticket with TicketMappable {
           ),
 
         if (model.serviceStartPlace.isNotNullOrEmpty)
-          ExtrasModel(title: 'From Place', value: model.serviceStartPlace),
+          ExtrasModel(title: 'From', value: model.serviceStartPlace),
         if (model.serviceEndPlace.isNotNullOrEmpty)
-          ExtrasModel(title: 'To Place', value: model.serviceEndPlace),
+          ExtrasModel(title: 'To', value: model.serviceEndPlace),
         if (model.passengerStartPlace.isNotNullOrEmpty &&
             model.passengerStartPlace != model.serviceStartPlace)
           ExtrasModel(

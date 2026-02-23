@@ -138,6 +138,8 @@ Service Start Time : 13:15
             extrasMap['Fare'],
             '₹${(expected['totalFare']! as double).toStringAsFixed(2)}',
           );
+          expect(extrasMap['From'], expected['serviceStartPlace']);
+          expect(extrasMap['To'], expected['serviceEndPlace']);
 
           // Note: Passenger details can't be extracted from pseudo-blocks
           // without proper labels, so we don't test those fields here
@@ -187,6 +189,8 @@ Service Start Time : 13:15
             extrasMap['Fare'],
             '₹${(expected['totalFare']! as double).toStringAsFixed(2)}',
           );
+          expect(extrasMap['From'], expected['serviceStartPlace']);
+          expect(extrasMap['To'], expected['serviceEndPlace']);
 
           // Note: Passenger details can't be extracted from pseudo-blocks
           // without proper labels, so we don't test those fields here
@@ -237,6 +241,8 @@ Service Start Time : 13:15
             extrasMap['Fare'],
             '₹${(expected['totalFare']! as double).toStringAsFixed(2)}',
           );
+          expect(extrasMap['From'], expected['serviceStartPlace']);
+          expect(extrasMap['To'], expected['serviceEndPlace']);
 
           // Verify passenger details
           expect(extrasMap['Passenger'], expected['passengerName']);
@@ -283,6 +289,8 @@ Service Start Time : 13:15
             extrasMap['Fare'],
             '₹${(expected['totalFare']! as double).toStringAsFixed(2)}',
           );
+          expect(extrasMap['From'], expected['serviceStartPlace']);
+          expect(extrasMap['To'], expected['serviceEndPlace']);
 
           // Verify multi-passenger details
           expect(extrasMap['Passenger'], expected['passengerName']);
@@ -336,6 +344,8 @@ Service Start Time : 13:15
             extrasMap['Fare'],
             '₹${(expected['totalFare']! as double).toStringAsFixed(2)}',
           );
+          expect(extrasMap['From'], expected['serviceStartPlace']);
+          expect(extrasMap['To'], expected['serviceEndPlace']);
 
           // Verify passenger details
           expect(extrasMap['Passenger'], expected['passengerName']);
@@ -383,6 +393,8 @@ Service Start Time : 13:15
             extrasMap['Fare'],
             '₹${(expected['totalFare']! as double).toStringAsFixed(2)}',
           );
+          expect(extrasMap['From'], expected['serviceStartPlace']);
+          expect(extrasMap['To'], expected['serviceEndPlace']);
 
           // Verify passenger details
           expect(extrasMap['Passenger'], expected['passengerName']);
@@ -426,6 +438,8 @@ Service Start Time : 13:15
             extrasMap['Fare'],
             '₹${(expected['totalFare']! as double).toStringAsFixed(2)}',
           );
+          expect(extrasMap['From'], expected['serviceStartPlace']);
+          expect(extrasMap['To'], expected['serviceEndPlace']);
 
           // Verify passenger details
           expect(extrasMap['Passenger'], expected['passengerName']);
@@ -469,6 +483,8 @@ Service Start Time : 13:15
             extrasMap['Fare'],
             '₹${(expected['totalFare']! as double).toStringAsFixed(2)}',
           );
+          expect(extrasMap['From'], expected['serviceStartPlace']);
+          expect(extrasMap['To'], expected['serviceEndPlace']);
 
           // Verify passenger details
           expect(extrasMap['Passenger'], expected['passengerName']);
@@ -512,6 +528,8 @@ Service Start Time : 13:15
             extrasMap['Fare'],
             '₹${(expected['totalFare']! as double).toStringAsFixed(2)}',
           );
+          expect(extrasMap['From'], expected['serviceStartPlace']);
+          expect(extrasMap['To'], expected['serviceEndPlace']);
 
           // Verify passenger details
           expect(extrasMap['Passenger'], expected['passengerName']);
@@ -556,6 +574,8 @@ Service Start Time : 13:15
           );
 
           expect(extrasMap['Platform'], isNull);
+          expect(extrasMap['From'], expected['serviceStartPlace']);
+          expect(extrasMap['To'], expected['serviceEndPlace']);
           // Verify passenger details
           expect(extrasMap['Passenger'], expected['passengerName']);
           expect(extrasMap['Age'], expected['passengerAge'].toString());

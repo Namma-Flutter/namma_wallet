@@ -46,7 +46,7 @@ class IRCTCLayoutParser extends TravelPDFParser {
       multiLine: true,
     ).firstMatch(plainText);
     var trainNumber = trainLineMatch?.group(1);
-    var trainName = trainLineMatch?.group(2);
+    var trainName = trainLineMatch?.group(2)?.trim();
 
     // If train number/name not found in first pattern, try alternative patterns
     if (trainNumber == null || trainName == null) {
@@ -60,7 +60,7 @@ class IRCTCLayoutParser extends TravelPDFParser {
         r'Train Name[\s\S]{0,20}?([^\n\r]+)',
         caseSensitive: false,
       ).firstMatch(plainText);
-      trainName = trainNameMatch?.group(1);
+      trainName = trainNameMatch?.group(1)?.trim();
     }
 
     // Date format is "13-Apr-2025" - need to convert to parseDate format
