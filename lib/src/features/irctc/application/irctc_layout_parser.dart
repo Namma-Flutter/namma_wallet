@@ -328,7 +328,7 @@ class IRCTCLayoutParser extends TravelPDFParser {
     // since some newer IRCTC ticket formats omit the period.
     // Gender is matched as FEMALE→F, MALE→M (full words), or single M/F.
     final passengerPattern = RegExp(
-      r'1\.?\s+([A-Z][A-Za-z .\n]*?)\s+(\d{1,3})\s+(FEMALE|MALE|[MF])\s+(?:(?:NO FOOD|VEG|NON VEG)\s+)?(CNF|WL|RAC|[A-Z]+)(?:\s*/([A-Z0-9]+))?(?:\s*/(\d+))?(?:\s*/([A-Z]+))?',
+      r'1\.?\s+([A-Z][A-Za-z .\n]*?)\s+(\d{1,3})\s+(FEMALE|MALE|[MF])\s+(?:(?:NO FOOD|VEG|NON VEG)\s+)?(CNF|WL|RAC|[A-Z]+)(?:\s*/([A-Z0-9]+))?(?:\s*/(\d+))?(?:\s*/([A-Z]+(?: [A-Z]+)?))?',
       caseSensitive: false,
     );
 
