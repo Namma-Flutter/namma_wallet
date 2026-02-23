@@ -114,26 +114,17 @@ jobs:
         id: analyze_results
         if: ${{ steps.format_check.outputs.exit_code == '0' }}
         run: |
-          if [ -f flutter_analyze.log ]; then
+          if [ -f flutter_analyze.log ] && [ -s flutter_analyze.log ]; then
             content=$(cat flutter_analyze.log)
-            if echo "$content" | grep -q "No issues found"; then
-              echo "has_issues=false" >> $GITHUB_OUTPUT
-              {
-                echo 'body<<ANALYZE_EOF'
-                echo "✅ **Flutter analysis passed** — no issues found."
-                echo 'ANALYZE_EOF'
-              } >> $GITHUB_OUTPUT
-            else
-              {
-                echo 'body<<ANALYZE_EOF'
-                echo "❌ **Flutter analysis found issues:**"
-                echo '```'
-                echo "$content"
-                echo '```'
-                echo 'ANALYZE_EOF'
-              } >> $GITHUB_OUTPUT
-              echo "has_issues=true" >> $GITHUB_OUTPUT
-            fi
+            {
+              echo 'body<<ANALYZE_EOF'
+              echo "❌ **Flutter analysis found issues:**"
+              echo '```'
+              echo "$content"
+              echo '```'
+              echo 'ANALYZE_EOF'
+            } >> $GITHUB_OUTPUT
+            echo "has_issues=true" >> $GITHUB_OUTPUT
           else
             echo "has_issues=false" >> $GITHUB_OUTPUT
             {
