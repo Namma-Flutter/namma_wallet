@@ -77,7 +77,7 @@ final irctc_4222116599 = <OCRBlock>[
     page: 0,
   ),
   OCRBlock(
-    text: 'Transaction ID: 100005916711382',
+    text: 'Transaction ID: 100000000000001',
     boundingBox: const Rect.fromLTRB(0, 360, 100, 380),
     page: 0,
   ),
@@ -142,7 +142,7 @@ final irctc_4222116599 = <OCRBlock>[
     page: 0,
   ),
   OCRBlock(
-    text: 'PS25422211659911',
+    text: 'PS00000000000001',
     boundingBox: const Rect.fromLTRB(0, 620, 100, 640),
     page: 0,
   ),
@@ -863,5 +863,5 @@ final irctc_4222116599 = <OCRBlock>[
   ),
 ];
 
-// Generated fixture from: 4249001496.pdf
+// Generated fixture from: 4222116599.pdf
 // Total blocks: 164

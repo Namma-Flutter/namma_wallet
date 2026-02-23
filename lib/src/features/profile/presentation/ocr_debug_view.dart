@@ -349,7 +349,7 @@ class _OCRDebugViewState extends State<OCRDebugView> {
                   ),
                 ],
               ),
-              Expanded(
+              Flexible(
                 child: SingleChildScrollView(
                   padding: const EdgeInsets.all(16),
                   child: SelectableText(

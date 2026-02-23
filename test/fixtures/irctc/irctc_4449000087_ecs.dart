@@ -247,7 +247,7 @@ final irctc4449000087ECS = <OCRBlock>[
     page: 0,
   ),
   OCRBlock(
-    text: 'Transaction ID: 100004191230796',
+    text: 'Transaction ID: 100000000000001',
     boundingBox: const Rect.fromLTRB(
       0,
       600,
@@ -377,7 +377,7 @@ final irctc4449000087ECS = <OCRBlock>[
     page: 0,
   ),
   OCRBlock(
-    text: 'PS23444900008722',
+    text: 'PS00000000000001',
     boundingBox: const Rect.fromLTRB(
       0,
       860,

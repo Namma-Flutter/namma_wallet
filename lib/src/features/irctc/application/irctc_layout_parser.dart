@@ -458,8 +458,7 @@ class IRCTCLayoutParser extends TravelPDFParser {
       final year = int.tryParse(match.group(3) ?? '');
       final monthStr = rawMonth.isEmpty
           ? ''
-          : rawMonth[0].toUpperCase() +
-                rawMonth.substring(1).toLowerCase();
+          : rawMonth[0].toUpperCase() + rawMonth.substring(1).toLowerCase();
 
       final month = months[monthStr];
       if (day != null && month != null && year != null) {
@@ -468,5 +467,4 @@ class IRCTCLayoutParser extends TravelPDFParser {
     }
     return null;
   }
-
 }
