@@ -109,21 +109,42 @@ class IRCTCLayoutParser extends TravelPDFParser {
       }
     }
 
-    // "Booked From" is a column header, optionally followed by "To" (the other
-    // column header) on the next line. Skip it before capturing the station.
+    // "Booked From" or "Boarding From" is a column header, optionally
+    // followed by "To" on the next line. Skip it before capturing the station.
+    // Handles three station formats:
+    //   (a) "STATION NAME (CODE)" — parenthesized code
+    //   (b) "STATION NAME - CODE" — dash-separated code
+    //   (c) "Station Name\n(CODE)" — name and code on separate lines
     final fromStationRaw = _extractByRegex(plainText, [
-      r'Booked From\n(?:To\n)?([A-Z][A-Za-z &.]+\([A-Z]{2,4}\))',
+      r'(?:Booked|Boarding) From\n(?:To\n)?([A-Z][A-Za-z &.]+\([A-Z]{2,4}\))',
+      r'(?:Booked|Boarding) From\n(?:To\n)?([A-Z][A-Za-z &.]+ - [A-Z]{2,4})',
+      r'(?:Booked|Boarding) From\n(?:To\n)?([A-Z][A-Za-z &.]+)\n\([A-Z]{2,4}\)',
     ]);
-    final fromStation = _formatStation(fromStationRaw);
+    // For split-block format, append the code from the next line
+    var fromStation = _formatStation(fromStationRaw);
+    if (fromStation != null &&
+        !RegExp(r'\([A-Z]{2,4}\)').hasMatch(fromStation) &&
+        !fromStation.contains(' - ')) {
+      final codeMatch = RegExp(
+        r'(?:Booked|Boarding) From\n(?:To\n)?' +
+            RegExp.escape(fromStationRaw ?? '') +
+            r'\n(\([A-Z]{2,4}\))',
+      ).firstMatch(plainText);
+      if (codeMatch != null) {
+        fromStation = '${fromStation.trim()} ${codeMatch.group(1)}';
+      }
+    }
 
     // The destination station appears immediately before "Start Date*" in the
     // plain text, which is more reliable than matching the "To" column header.
-    // Handles two formats:
+    // Handles three formats:
     //   (a) "STATION NAME (CODE)\nStart Date*"
     //   (b) "STATION NAME - CODE\n[optional line]\nStart Date*"
+    //   (c) "Station Name (CODE)" — mixed case with parenthesized code
     final toStationRaw = _extractByRegex(plainText, [
       r'([A-Z][A-Za-z &.]+\([A-Z]{2,4}\))\nStart Date',
       r'([A-Z][A-Za-z &.]+ - [A-Z]{2,4})\n(?:[^\n]+\n)?Start Date',
+      r'([A-Za-z][A-Za-z &.]+\([A-Z]{2,4}\))\nStart Date',
     ]);
     final toStation = _formatStation(toStationRaw);
 
@@ -147,6 +168,12 @@ class IRCTCLayoutParser extends TravelPDFParser {
     final quotaMatch = quotaRegex.firstMatch(plainText);
     final quota = quotaMatch?.group(0);
 
+    // Distance
+    final distanceStr = _extractByRegex(plainText, [
+      r'(\d+)\s*KM',
+    ]);
+    final distance = int.tryParse(distanceStr ?? '');
+
     // Transaction ID
     final transactionIdMatch = RegExp(
       r'Transaction ID:\s*(\d+)',
@@ -161,10 +188,11 @@ class IRCTCLayoutParser extends TravelPDFParser {
     ).firstMatch(plainText);
     arrivalMatch?.group(1);
 
-    // Extract all fare amounts from OCR blocks.
-    // Use [\d,]+ to also match comma-formatted numbers like "1,875.00".
+    // Extract fare amounts from OCR blocks.
+    // First try the ₹-prefixed format: "₹ 520.00"
+    // Then fall back to label-based format: "Total Fare : 308.0"
     final allFares = RegExp(
-      r'₹\s*([\d,]+\.\d{2})',
+      r'₹\s*([\d,]+\.\d{1,2})',
       caseSensitive: false,
     ).allMatches(plainText).toList();
     double? ticketFare;
@@ -175,10 +203,43 @@ class IRCTCLayoutParser extends TravelPDFParser {
 
     if (allFares.isNotEmpty) {
       ticketFare = parseFare(allFares[0].group(1)!);
-      if (allFares.length > 1) {
+      totalFare = parseFare(allFares.last.group(1)!);
+    }
+
+    // Extract IRCTC fee by label to avoid positional errors
+    // (old approach assumed 2nd ₹ amount was IRCTC fee, but catering
+    // charges ₹0.00 appear before IRCTC fee in some ticket formats).
+    // Allow \n between label and ₹ amount since OCR may split them.
+    final irctcFeeMatch = RegExp(
+      r'(?:IRCTC Convenience Fee|Convenience Fee)[^₹]*?₹\s*([\d,]+\.\d{1,2})',
+      caseSensitive: false,
+    ).firstMatch(plainText);
+    if (irctcFeeMatch != null) {
+      irctcFee = parseFare(irctcFeeMatch.group(1)!);
+    } else {
+      // Try label-based format: "Convenience Fee : 17.7"
+      final convFeeMatch = RegExp(
+        r'Convenience Fee\s*:\s*([\d,]+\.?\d*)',
+        caseSensitive: false,
+      ).firstMatch(plainText);
+      if (convFeeMatch != null) {
+        irctcFee = parseFare(convFeeMatch.group(1)!);
+      } else if (allFares.length > 1) {
+        // Last resort: use positional (2nd amount)
         irctcFee = parseFare(allFares[1].group(1)!);
       }
-      totalFare = parseFare(allFares.last.group(1)!);
+    }
+
+    // Try label-based fare extraction if ₹-prefixed fares not found
+    if (ticketFare == null) {
+      final labelFareMatch = RegExp(
+        r'(?:Total Fare|Total Amount)\s*(?:\(.*?\))?\s*:\s*([\d,]+\.?\d*)',
+        caseSensitive: false,
+      ).firstMatch(plainText);
+      if (labelFareMatch != null) {
+        totalFare = parseFare(labelFareMatch.group(1)!);
+        ticketFare = totalFare;
+      }
     }
 
     final fare = totalFare ?? ticketFare;
@@ -204,6 +265,8 @@ class IRCTCLayoutParser extends TravelPDFParser {
       quota: quota,
       gender: firstPassenger?['gender'],
       transactionId: transactionId,
+      distance: distance,
+      seatNumber: firstPassenger?['seat'],
     );
 
     return Ticket.fromIRCTC(model);
@@ -261,8 +324,11 @@ class IRCTCLayoutParser extends TravelPDFParser {
     // Passenger names may contain spaces (e.g. "MURUGESAN M"), so use a lazy
     // match for the name group that stops at the first standalone age number.
     // Updated to allow optional catering service (like "NO FOOD") before status
+    // Allow "1." or just "1" (without period) as the row number prefix,
+    // since some newer IRCTC ticket formats omit the period.
+    // Gender is matched as FEMALE→F, MALE→M (full words), or single M/F.
     final passengerPattern = RegExp(
-      r'1\.\s*([A-Z][A-Z .\n]*?)\s+(\d{1,3})\s+([MF])\s+(?:(?:NO FOOD|VEG|NON VEG)\s+)?(CNF|WL|RAC|[A-Z]+)(?:\s*/([A-Z0-9]+))?(?:\s*/(\d+))?(?:\s*/([A-Z]+))?',
+      r'1\.?\s+([A-Z][A-Za-z .\n]*?)\s+(\d{1,3})\s+(FEMALE|MALE|[MF])\s+(?:(?:NO FOOD|VEG|NON VEG)\s+)?(CNF|WL|RAC|[A-Z]+)(?:\s*/([A-Z0-9]+))?(?:\s*/(\d+))?(?:\s*/([A-Z]+))?',
       caseSensitive: false,
     );
 
@@ -275,7 +341,7 @@ class IRCTCLayoutParser extends TravelPDFParser {
             .trim()
             .replaceAll(RegExp(r'\s+'), ' '),
         'age': match.group(2)?.trim(),
-        'gender': match.group(3)?.trim().toUpperCase(),
+        'gender': _normalizeGender(match.group(3)),
         'status': match.group(4)?.trim(),
         'seat': _buildSeat(match),
       });
@@ -283,7 +349,7 @@ class IRCTCLayoutParser extends TravelPDFParser {
 
     if (passengers.isEmpty) {
       final fallbackPattern = RegExp(
-        r'1\.\s*([A-Z][A-Z .\n]*?)\s+(\d{1,3})\s+([MF])',
+        r'1\.?\s+([A-Z][A-Za-z .\n]*?)\s+(\d{1,3})\s+(FEMALE|MALE|[MF])',
         caseSensitive: false,
       );
       final fallbackMatch = fallbackPattern.firstMatch(plainText);
@@ -295,7 +361,7 @@ class IRCTCLayoutParser extends TravelPDFParser {
               .trim()
               .replaceAll(RegExp(r'\s+'), ' '),
           'age': fallbackMatch.group(2)?.trim(),
-          'gender': fallbackMatch.group(3)?.trim().toUpperCase(),
+          'gender': _normalizeGender(fallbackMatch.group(3)),
           'status': null,
         });
       }
@@ -304,15 +370,27 @@ class IRCTCLayoutParser extends TravelPDFParser {
     return passengers;
   }
 
+  /// Normalizes gender values: FEMALE→F, MALE→M, keeps M/F as-is.
+  String? _normalizeGender(String? raw) {
+    if (raw == null) return null;
+    final upper = raw.trim().toUpperCase();
+    if (upper == 'FEMALE') return 'F';
+    if (upper == 'MALE') return 'M';
+    return upper;
+  }
+
   String? _buildSeat(RegExpMatch match) {
     final parts = <String>[];
     for (var i = 4; i <= 7; i++) {
       final part = match.group(i);
       if (part != null && part.isNotEmpty) {
-        parts.add(part);
+        // Exclude the status from the seat string if it is group 4
+        if (i > 4) {
+          parts.add(part);
+        }
       }
     }
-    return parts.isNotEmpty ? parts.join() : null;
+    return parts.isNotEmpty ? parts.join('/') : null;
   }
 
   String? nullIfEmpty(String? value) =>
@@ -372,6 +450,11 @@ class IRCTCLayoutParser extends TravelPDFParser {
       r'Quota(?:[\s\S]{0,20}?)([A-Za-z ]+\([A-Z]+\))',
     ]);
 
+    final distanceStr = _extractByRegex(plainText, [
+      r'(\d+)\s*KM',
+    ]);
+    final distance = int.tryParse(distanceStr ?? '');
+
     // Extract all fare amounts
     final allFares = RegExp(
       r'₹\s*(\d+\.\d{2})',
@@ -413,6 +496,8 @@ class IRCTCLayoutParser extends TravelPDFParser {
       irctcFee: irctcFee,
       quota: quota,
       gender: firstPassenger?['gender'],
+      distance: distance,
+      seatNumber: firstPassenger?['seat'],
     );
 
     return Ticket.fromIRCTC(model);
@@ -780,11 +865,21 @@ class IRCTCLayoutParser extends TravelPDFParser {
         status = 'CNF';
       }
 
+      String? seatStr;
+      if (status != null && status.contains('/')) {
+        final parts = status.split('/');
+        status = parts.first;
+        if (parts.length > 1) {
+          seatStr = parts.sublist(1).join('/');
+        }
+      }
+
       passengers.add({
         'name': name,
         'age': age,
         'gender': gender,
         'status': status,
+        'seat': ?seatStr,
       });
     }
 

@@ -104,8 +104,13 @@ class Ticket with TicketMappable {
         ExtrasModel(title: 'Passenger', value: model.passengerName),
         ExtrasModel(title: 'Gender', value: model.gender),
         ExtrasModel(title: 'Age', value: model.age.toString()),
+        ExtrasModel(title: 'Berth', value: model.seatNumber),
         ExtrasModel(title: 'Train Name', value: model.trainName),
         ExtrasModel(title: 'Quota', value: model.quota),
+        ExtrasModel(
+          title: 'Distance',
+          value: model.distance != null ? '${model.distance} KM' : null,
+        ),
         ExtrasModel(title: 'From', value: model.fromStation),
         ExtrasModel(title: 'To', value: model.toStation),
         ExtrasModel(title: 'Boarding', value: model.boardingStation),
