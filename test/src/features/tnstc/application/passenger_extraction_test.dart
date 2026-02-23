@@ -24,7 +24,7 @@ void main() {
     test(
       'should extract all 3 passengers from t73910447',
       () {
-        // t73910447 has 3 passengers: HarishAnbalagan, Rogith, Kumarank
+        // t73910447 has 3 passengers: TEST PASSENGER 5, TEST PASSENGER 6, TEST PASSENGER 7
         final blocks = TnstcLayoutFixtures.t73910447;
 
         // Parse ticket from blocks

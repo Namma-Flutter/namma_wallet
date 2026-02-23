@@ -101,7 +101,7 @@ final t76296907 = <OCRBlock>[
     page: 0,
   ),
   OCRBlock(
-    text: 'HarishAnbalagan',
+    text: 'TEST PASSENGER 5',
     boundingBox: const Rect.fromLTRB(139, 547, 277, 565),
     page: 0,
   ),
@@ -222,7 +222,7 @@ const Map<String, Object?> t76296907Expected = {
   'tripCode': '2220KUMCHEAB',
   'busIdNumber': 'E-8262',
   'totalFare': 735.0,
-  'passengerName': 'HarishAnbalagan',
+  'passengerName': 'TEST PASSENGER 5',
   'passengerAge': 26,
   'passengerGender': 'M',
   'seatNumber': '4UB',

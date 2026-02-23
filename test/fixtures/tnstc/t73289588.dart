@@ -251,7 +251,7 @@ final t73289588 = <OCRBlock>[
     page: 0,
   ),
   OCRBlock(
-    text: 'HarishAnbalagan',
+    text: 'TEST PASSENGER 5',
     boundingBox: const Rect.fromLTRB(0, 1040, 100, 1060),
     page: 0,
   ),

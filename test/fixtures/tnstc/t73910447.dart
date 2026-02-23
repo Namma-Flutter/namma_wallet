@@ -217,7 +217,7 @@ final t73910447 = <OCRBlock>[
     confidence: 0.9,
   ),
   OCRBlock(
-    text: 'HarishAnbalagan',
+    text: 'TEST PASSENGER 5',
     boundingBox: const Rect.fromLTRB(
       139,
       548,
@@ -228,7 +228,7 @@ final t73910447 = <OCRBlock>[
     confidence: 0.9,
   ),
   OCRBlock(
-    text: 'Rogith',
+    text: 'TEST PASSENGER 6',
     boundingBox: const Rect.fromLTRB(
       139,
       570,
@@ -239,7 +239,7 @@ final t73910447 = <OCRBlock>[
     confidence: 0.9,
   ),
   OCRBlock(
-    text: 'Kumarank',
+    text: 'TEST PASSENGER 7',
     boundingBox: const Rect.fromLTRB(
       140,
       593,
@@ -890,7 +890,7 @@ const Map<String, Object?> t73910447Expected = {
   'tripCode': '2100CHEBANNS',
   'busIdNumber': 'E-4892',
   'totalFare': 1990.00,
-  'passengerName': 'HarishAnbalagan, Rogith, Kumarank',
+  'passengerName': 'TEST PASSENGER 5, TEST PASSENGER 6, TEST PASSENGER 7',
   'passengerAge': 26,
   'passengerGender': 'M',
   'seatNumber': '10UB, 11UB, 12UB',

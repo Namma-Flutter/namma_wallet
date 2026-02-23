@@ -91,7 +91,7 @@ final t73309927 = <OCRBlock>[
     page: 0,
   ),
   OCRBlock(
-    text: 'HarishAnbalagan',
+    text: 'TEST PASSENGER 5',
     boundingBox: const Rect.fromLTRB(138, 601, 275, 620),
     page: 0,
   ),
@@ -217,7 +217,7 @@ const Map<String, Object?> t73309927Expected = {
   'tripCode': '1315KUMCHEAB',
   'busIdNumber': 'E-5494',
   'totalFare': 735.00,
-  'passengerName': 'HarishAnbalagan',
+  'passengerName': 'TEST PASSENGER 5',
   'passengerAge': 26,
   'passengerGender': 'M',
   // Seat label is 'Seat :No.' which parser doesn't recognize

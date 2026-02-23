@@ -164,7 +164,7 @@ void main() {
         const smsText =
             'PNR:4621385568,TRN:12692,DOJ:23-11-24,SL,SMVB-MAS,DP:23:00,'
             'Boarding at SMVB only,\n'
-            'HARISH ANBALAGAN+2,S4 15,S4 16,S4 9,\n'
+            'TEST PASSENGER THREE+2,S4 15,S4 16,S4 9,\n'
             'Fare:780,C Fee:11.8+PG\n'
             'QR Code URL:https://qr.indianrail.gov.in?q=M60LCLB0 -IRCTC';
 

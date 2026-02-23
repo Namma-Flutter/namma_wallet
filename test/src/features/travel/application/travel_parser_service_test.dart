@@ -60,7 +60,7 @@ void main() {
             isNotEmpty,
             reason: 'Passenger info should be extracted',
           );
-          expect(passengerExtra![0].value, contains('HarishAnbalagan'));
+          expect(passengerExtra![0].value, contains('TEST PASSENGER 5'));
           expect(passengerExtra[0].child, isNotNull);
           final seatExtra = passengerExtra[0].child
               ?.where((e) => e.title == 'Seat')

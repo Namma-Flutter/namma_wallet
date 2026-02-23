@@ -77,7 +77,7 @@ final irctc_4634847925 = <OCRBlock>[
     page: 0,
   ),
   OCRBlock(
-    text: 'RAMKUMAR R',
+    text: 'TEST PASSENGER THREE',
     boundingBox: const Rect.fromLTRB(
       0,
       180,
@@ -157,7 +157,7 @@ final irctc_4634847925 = <OCRBlock>[
     page: 0,
   ),
   OCRBlock(
-    text: 'PRIYANKA M',
+    text: 'TEST PASSENGER FOUR',
     boundingBox: const Rect.fromLTRB(
       0,
       380,

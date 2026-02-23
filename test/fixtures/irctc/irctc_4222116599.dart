@@ -42,7 +42,7 @@ final irctc_4222116599 = <OCRBlock>[
     page: 0,
   ),
   OCRBlock(
-    text: 'MURUGESAN M',
+    text: 'TEST PASSENGER ONE',
     boundingBox: const Rect.fromLTRB(0, 180, 100, 200),
     page: 0,
   ),
