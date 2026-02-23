@@ -17,12 +17,12 @@ class IRCTCSMSParser implements ITicketParser {
       return m == null ? '' : (m.group(group) ?? '').trim();
     }
 
-    // Safe date parser – falls back to today if malformed/missing.
-    DateTime parseDate(String value) {
-      if (value.isEmpty) return DateTime.utc(1970);
+    // Safe date parser – falls back to null if malformed/missing.
+    DateTime? parseDate(String value) {
+      if (value.isEmpty) return null;
 
       final parts = value.split(RegExp('[-/]'));
-      if (parts.length != 3) return DateTime.utc(1970);
+      if (parts.length != 3) return null;
 
       try {
         final d = int.parse(parts[0]);
@@ -32,7 +32,7 @@ class IRCTCSMSParser implements ITicketParser {
             : int.parse(parts[2]);
         return DateTime(y, m, d);
       } on Exception catch (_) {
-        return DateTime.utc(1970);
+        return null;
       }
     }
 
@@ -169,8 +169,8 @@ class IRCTCSMSParser implements ITicketParser {
       r'(?:DP|Dep|Departure)[:\-\s]*([0-9]{1,2}[:.][0-9]{2})',
     );
 
-    DateTime? scheduledDeparture = doj;
-    if (depRaw.isNotEmpty) {
+    var scheduledDeparture = doj;
+    if (depRaw.isNotEmpty && doj != null) {
       final hm = depRaw.replaceAll('.', ':').split(':');
       try {
         scheduledDeparture = DateTime(
@@ -183,6 +183,8 @@ class IRCTCSMSParser implements ITicketParser {
       } on Exception catch (_) {
         scheduledDeparture = null;
       }
+    } else if (depRaw.isNotEmpty && doj == null) {
+      scheduledDeparture = null;
     }
 
     var passenger = extract(r'Passenger[:\-\s]*([A-Za-z \+]+)');

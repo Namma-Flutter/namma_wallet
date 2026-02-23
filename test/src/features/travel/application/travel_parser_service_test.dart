@@ -194,10 +194,10 @@ Reservation Upto : Kolkata
           // Assert (Then)
           expect(ticket, isNotNull);
           expect(ticket!.ticketId, equals('9876543210'));
-          // Should use sentinel value (epoch 1970)
+          // Should be null instead of a sentinel value
           expect(
             ticket.startTime,
-            equals(IRCTCTrainParser.invalidDateSentinel),
+            isNull,
           );
         },
       );

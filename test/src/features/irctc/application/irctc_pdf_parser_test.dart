@@ -3154,7 +3154,7 @@ void main() {
           .firstOrNull;
 
       expect(departureExtra, isNotNull);
-      expect(departureExtra?.value, equals('N.A.'));
+      expect(departureExtra?.value, isNull);
     });
   });
 }

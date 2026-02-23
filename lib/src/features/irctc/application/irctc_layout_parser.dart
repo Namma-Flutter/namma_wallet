@@ -78,22 +78,9 @@ class IRCTCLayoutParser extends TravelPDFParser {
     final departureTimeStr = _extractByRegex(plainText, [
       r'Departure\*\s*(\d{1,2}:\d{2}|N\.A\.)',
     ]);
-    // Convert "18:55 13-Apr-2025" to just time "18:55" if it's a time
-    final departureTimePart = departureTimeStr?.split(' ').first;
-    final departureTime = departureTimePart != 'N.A.'
-        ? parseDateTime(departureTimePart)
-        : null;
 
     DateTime? scheduledDeparture;
-    if (journeyDate != null && departureTime != null) {
-      scheduledDeparture = DateTime.utc(
-        journeyDate.year,
-        journeyDate.month,
-        journeyDate.day,
-        departureTime.hour,
-        departureTime.minute,
-      );
-    } else if (journeyDate != null &&
+    if (journeyDate != null &&
         departureTimeStr != null &&
         departureTimeStr != 'N.A.') {
       final timeMatch = RegExp(
@@ -260,7 +247,6 @@ class IRCTCLayoutParser extends TravelPDFParser {
       trainNumber: trainNumber ?? '',
       trainName: trainName ?? '',
       scheduledDeparture: scheduledDeparture,
-      departureTimeStr: departureTimeStr,
       dateOfJourney: journeyDate,
       boardingStation: boardingStation ?? '',
       travelClass: travelClass,
@@ -611,7 +597,7 @@ class IRCTCLayoutParser extends TravelPDFParser {
     return null;
   }
 
-  DateTime? _parseTimeWithRegex(String text) {
+  ({int hour, int minute})? _parseTimeWithRegex(String text) {
     // First try to get time from "Departure*" pattern with time before date
     final depTimePattern = RegExp(
       r'Departure\*\s*(\d{1,2}:\d{2})',
@@ -620,13 +606,12 @@ class IRCTCLayoutParser extends TravelPDFParser {
     final depMatch = depTimePattern.firstMatch(text);
     if (depMatch != null) {
       final timeStr = depMatch.group(1)!.trim();
-      // Parse time manually since parseDateTime expects date+time
       final parts = timeStr.split(':');
       if (parts.length == 2) {
         final hour = int.tryParse(parts[0]);
         final minute = int.tryParse(parts[1]);
         if (hour != null && minute != null) {
-          return DateTime.utc(1970, 1, 1, hour, minute);
+          return (hour: hour, minute: minute);
         }
       }
     }
@@ -646,7 +631,7 @@ class IRCTCLayoutParser extends TravelPDFParser {
           final hour = int.tryParse(parts[0]);
           final minute = int.tryParse(parts[1]);
           if (hour != null && minute != null) {
-            return DateTime.utc(1970, 1, 1, hour, minute);
+            return (hour: hour, minute: minute);
           }
         }
       }

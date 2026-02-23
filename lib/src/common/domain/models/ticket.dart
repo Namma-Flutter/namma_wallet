@@ -32,9 +32,7 @@ class Ticket with TicketMappable {
     IRCTCTicket model, {
     bool isUpdate = false,
   }) {
-    // If dateOfJourney or scheduledDeparture are null, use a sentinel
-    // date (1970-01-01 UTC)
-    // as per service test expectations.
+    // If dateOfJourney or scheduledDeparture are null,startTime will be null
     final hasValidDateTime =
         model.dateOfJourney != null && model.scheduledDeparture != null;
 
@@ -77,7 +75,7 @@ class Ticket with TicketMappable {
               departure!.hour,
               departure.minute,
             )
-          : DateTime.utc(1970), // Sentinel date
+          : null,
       location: model.boardingStation,
       tags: [
         TagModel(value: model.pnrNumber, icon: 'confirmation_number'),
@@ -116,10 +114,8 @@ class Ticket with TicketMappable {
         ExtrasModel(title: 'Boarding', value: model.boardingStation),
         ExtrasModel(
           title: 'Departure',
-          value: !isUpdate
-              ? (departure != null
-                    ? DateTimeConverter.instance.formatTime(departure)
-                    : model.departureTimeStr)
+          value: !isUpdate && departure != null
+              ? DateTimeConverter.instance.formatTime(departure)
               : null,
         ),
         ExtrasModel(

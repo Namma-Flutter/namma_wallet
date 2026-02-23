@@ -102,12 +102,6 @@ class IRCTCTicketMapper extends ClassMapperBase<IRCTCTicket> {
     _$scheduledDeparture,
     opt: true,
   );
-  static String? _$departureTimeStr(IRCTCTicket v) => v.departureTimeStr;
-  static const Field<IRCTCTicket, String> _f$departureTimeStr = Field(
-    'departureTimeStr',
-    _$departureTimeStr,
-    opt: true,
-  );
   static DateTime? _$dateOfJourney(IRCTCTicket v) => v.dateOfJourney;
   static const Field<IRCTCTicket, DateTime> _f$dateOfJourney = Field(
     'dateOfJourney',
@@ -157,7 +151,6 @@ class IRCTCTicketMapper extends ClassMapperBase<IRCTCTicket> {
     #quota: _f$quota,
     #travelClass: _f$travelClass,
     #scheduledDeparture: _f$scheduledDeparture,
-    #departureTimeStr: _f$departureTimeStr,
     #dateOfJourney: _f$dateOfJourney,
     #arrivalTime: _f$arrivalTime,
     #distance: _f$distance,
@@ -183,7 +176,6 @@ class IRCTCTicketMapper extends ClassMapperBase<IRCTCTicket> {
       quota: data.dec(_f$quota),
       travelClass: data.dec(_f$travelClass),
       scheduledDeparture: data.dec(_f$scheduledDeparture),
-      departureTimeStr: data.dec(_f$departureTimeStr),
       dateOfJourney: data.dec(_f$dateOfJourney),
       arrivalTime: data.dec(_f$arrivalTime),
       distance: data.dec(_f$distance),
@@ -269,7 +261,6 @@ abstract class IRCTCTicketCopyWith<$R, $In extends IRCTCTicket, $Out>
     String? quota,
     String? travelClass,
     DateTime? scheduledDeparture,
-    String? departureTimeStr,
     DateTime? dateOfJourney,
     String? arrivalTime,
     int? distance,
@@ -305,7 +296,6 @@ class _IRCTCTicketCopyWithImpl<$R, $Out>
     Object? quota = $none,
     Object? travelClass = $none,
     Object? scheduledDeparture = $none,
-    Object? departureTimeStr = $none,
     Object? dateOfJourney = $none,
     Object? arrivalTime = $none,
     Object? distance = $none,
@@ -329,7 +319,6 @@ class _IRCTCTicketCopyWithImpl<$R, $Out>
       if (quota != $none) #quota: quota,
       if (travelClass != $none) #travelClass: travelClass,
       if (scheduledDeparture != $none) #scheduledDeparture: scheduledDeparture,
-      if (departureTimeStr != $none) #departureTimeStr: departureTimeStr,
       if (dateOfJourney != $none) #dateOfJourney: dateOfJourney,
       if (arrivalTime != $none) #arrivalTime: arrivalTime,
       if (distance != $none) #distance: distance,
@@ -358,7 +347,6 @@ class _IRCTCTicketCopyWithImpl<$R, $Out>
       #scheduledDeparture,
       or: $value.scheduledDeparture,
     ),
-    departureTimeStr: data.get(#departureTimeStr, or: $value.departureTimeStr),
     dateOfJourney: data.get(#dateOfJourney, or: $value.dateOfJourney),
     arrivalTime: data.get(#arrivalTime, or: $value.arrivalTime),
     distance: data.get(#distance, or: $value.distance),

@@ -212,10 +212,6 @@ class IRCTCTrainParser extends TravelTicketParser {
   IRCTCTrainParser({required ILogger logger}) : _logger = logger;
   final ILogger _logger;
 
-  /// Sentinel value for invalid/missing journey dates
-  /// This is UTC(1970,1,1) - epoch start time
-  static final DateTime invalidDateSentinel = DateTime.utc(1970);
-
   @override
   String get providerName => 'IRCTC';
 
