@@ -2685,6 +2685,27 @@ void main() {
         orElse: () => throw StateError('No Date of Journey extra'),
       );
       expect(dojExtra?.value, isNotNull);
+
+      // Check From
+      final fromExtra = ticket.extras?.firstWhere(
+        (e) => e.title == 'From',
+        orElse: () => throw StateError('No From extra'),
+      );
+      expect(fromExtra?.value, equals('MGR CHENNAI CTL (MAS)'));
+
+      // Check To
+      final toExtra = ticket.extras?.firstWhere(
+        (e) => e.title == 'To',
+        orElse: () => throw StateError('No To extra'),
+      );
+      expect(toExtra?.value, equals('KSR BENGALURU (SBC)'));
+
+      // Check Boarding
+      final boardingExtra = ticket.extras?.firstWhere(
+        (e) => e.title == 'Boarding',
+        orElse: () => throw StateError('No Boarding extra'),
+      );
+      expect(boardingExtra?.value, equals('MGR CHENNAI CTL (MAS)'));
     });
 
     test('should parse 4328673018 from OCR blocks', () {

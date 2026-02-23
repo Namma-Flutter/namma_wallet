@@ -134,9 +134,9 @@ class IRCTCLayoutParser extends TravelPDFParser {
     //   (b) "STATION NAME - CODE\n[optional line]\nStart Date*"
     //   (c) "Station Name (CODE)" — mixed case with parenthesized code
     final toStationRaw = _extractByRegex(plainText, [
-      r'([A-Z][A-Za-z &.]+\([A-Z]{2,4}\))\nStart Date',
-      r'([A-Z][A-Za-z &.]+ - [A-Z]{2,4})\n(?:[^\n]+\n)?Start Date',
-      r'([A-Za-z][A-Za-z &.]+\([A-Z]{2,4}\))\nStart Date',
+      r'([A-Z][A-Za-z &.]+\([A-Z]{2,4}\))\n(?:Start Date|Departure)',
+      r'([A-Z][A-Za-z &.]+ - [A-Z]{2,4})\n(?:[^\n]+\n)?(?:Start Date|Departure)',
+      r'([A-Za-z][A-Za-z &.]+\([A-Z]{2,4}\))\n(?:Start Date|Departure)',
     ]);
     final toStation = _formatStation(toStationRaw);
 
