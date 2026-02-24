@@ -30,17 +30,14 @@ class UserProfileWidget extends StatelessWidget {
           ),
 
           //* Profile
-          InkWell(
-            onTap: () async {
+          IconButton(
+            onPressed: () async {
               hapticService.triggerHaptic(
                 HapticType.selection,
               );
               await context.pushNamed(AppRoute.profile.name);
             },
-            child: CircleAvatar(
-              radius: 28,
-              backgroundColor: Colors.grey[200],
-            ),
+            icon: const Icon(Icons.settings),
           ),
         ],
       ),

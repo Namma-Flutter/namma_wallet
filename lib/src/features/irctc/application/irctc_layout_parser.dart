@@ -147,22 +147,15 @@ class IRCTCLayoutParser extends TravelPDFParser {
     final travelClassRaw = classMatch?.group(1);
     final travelClass = normalizeClass(travelClassRaw);
 
-    // Quota - from "PREMIUM TATKAL (PT)" pattern or standalone tokens.
-    // Short-code group is optional to capture names like "TATKAL" alone.
+    // Quota - from "PREMIUM TATKAL (PT)" pattern - get the last match
+    // with PT or other quota codes
+    // Also match just the quota name without parentheses
     final quotaRegex = RegExp(
-      r'(PREMIUM TATKAL|TATKAL|GENERAL|PRAVIS|LOUIS|RAILWAY|PQ|CK|RL|RS|LB|OP)(?:\s*\(?(PT|TQ|GN|PQ|CK|RL|RS|LB|OP)\)?)?',
+      r'(PREMIUM TATKAL|TATKAL|GENERAL|PRAVIS|LOUIS|RAILWAY|PQ|CK|RL|RS|LB|OP)\s*\(?(PT|TQ|GN|PQ|CK|RL|RS|LB|OP)\)?',
       caseSensitive: false,
     );
     final quotaMatch = quotaRegex.firstMatch(plainText);
-    String? quota = quotaMatch?.group(0);
-    // Fallback: try to match a standalone parenthesized short code like "(GN)"
-    if (quota == null) {
-      final shortCodeMatch = RegExp(
-        r'\((PT|TQ|GN|PQ|CK|RL|RS|LB|OP)\)',
-        caseSensitive: false,
-      ).firstMatch(plainText);
-      quota = shortCodeMatch?.group(0);
-    }
+    final quota = quotaMatch?.group(0);
 
     // Distance
     final distanceStr = _extractByRegex(plainText, [
@@ -361,7 +354,7 @@ class IRCTCLayoutParser extends TravelPDFParser {
         'age': match.group(3)?.trim(),
         'gender': _normalizeGender(match.group(4)),
         'status': match.group(5)?.trim(),
-        'seat': _buildSeat(match, startGroup: 5),
+        'seat': _buildSeat(match),
       });
     }
 

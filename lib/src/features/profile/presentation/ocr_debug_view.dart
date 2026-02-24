@@ -84,7 +84,7 @@ class _OCRDebugViewState extends State<OCRDebugView> {
         _ocrBlocks = blocks;
         _isLoading = false;
       });
-    } catch (e) {
+    } on Object catch (e) {
       if (!mounted) return;
 
       showSnackbar(

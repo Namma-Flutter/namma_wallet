@@ -28,105 +28,6 @@ class Ticket with TicketMappable {
     this.directionsUrl,
   });
 
-  factory Ticket.fromIRCTC(
-    IRCTCTicket model, {
-    bool isUpdate = false,
-  }) {
-    // If dateOfJourney or scheduledDeparture are null,startTime will be null
-    final hasValidDateTime =
-        model.dateOfJourney != null && model.scheduledDeparture != null;
-
-    final journeyDate = model.dateOfJourney;
-    final departure = model.scheduledDeparture;
-
-    return Ticket(
-      ticketId: model.pnrNumber,
-      primaryText:
-          model.fromStation.isNotNullOrEmpty && model.toStation.isNotNullOrEmpty
-          ? '${model.fromStation} → ${model.toStation}'
-          : null,
-      secondaryText: _buildIrctcSecondaryText(model),
-      startTime: !isUpdate && hasValidDateTime
-          ? DateTime(
-              journeyDate!.year,
-              journeyDate.month,
-              journeyDate.day,
-              departure!.hour,
-              departure.minute,
-            )
-          : null,
-      location: model.boardingStation,
-      tags: [
-        TagModel(value: model.pnrNumber, icon: 'confirmation_number'),
-        if (model.trainNumber.isNotNullOrEmpty)
-          TagModel(
-            value: model.trainName.isNotNullOrEmpty
-                ? '${model.trainNumber} - ${model.trainName}'
-                : model.trainNumber,
-            icon: 'train',
-          ),
-        if (model.travelClass != null && model.travelClass!.isNotNullOrEmpty)
-          TagModel(value: model.travelClass, icon: 'event_seat'),
-        if (model.status.isNotNullOrEmpty)
-          TagModel(value: model.status, icon: 'info'),
-        if ((model.ticketFare ?? 0) > 0)
-          TagModel(
-            value: '₹${model.ticketFare?.toStringAsFixed(2)}',
-            icon: 'attach_money',
-          ),
-      ],
-      type: TicketType.train,
-      extras: [
-        ExtrasModel(title: 'PNR Number', value: model.pnrNumber),
-        ExtrasModel(title: 'Passenger', value: model.passengerName),
-        ExtrasModel(title: 'Gender', value: model.gender),
-        ExtrasModel(title: 'Age', value: model.age?.toString()),
-        ExtrasModel(title: 'Berth', value: model.seatNumber),
-        ExtrasModel(title: 'Train Name', value: model.trainName),
-        ExtrasModel(title: 'Quota', value: model.quota),
-        ExtrasModel(
-          title: 'Distance',
-          value: model.distance != null ? '${model.distance} KM' : null,
-        ),
-        ExtrasModel(title: 'From', value: model.fromStation),
-        ExtrasModel(title: 'To', value: model.toStation),
-        ExtrasModel(title: 'Boarding', value: model.boardingStation),
-        ExtrasModel(
-          title: 'Departure',
-          value: !isUpdate && departure != null
-              ? DateTimeConverter.instance.formatTime(departure)
-              : null,
-        ),
-        ExtrasModel(
-          title: 'Arrival',
-          value: !isUpdate ? model.arrivalTime : null,
-        ),
-        ExtrasModel(
-          title: 'Date of Journey',
-          value: !isUpdate && journeyDate != null
-              ? DateTimeConverter.instance.formatDate(journeyDate)
-              : null,
-        ),
-        ExtrasModel(title: 'Fare', value: model.ticketFare?.toStringAsFixed(2)),
-        ExtrasModel(
-          title: 'IRCTC Fee',
-          value: model.irctcFee?.toStringAsFixed(2),
-        ),
-        ExtrasModel(title: 'Transaction ID', value: model.transactionId),
-      ],
-    );
-  }
-
-  static String? _buildIrctcSecondaryText(IRCTCTicket model) {
-    if (model.trainNumber.isNotNullOrEmpty &&
-        model.trainName.isNotNullOrEmpty) {
-      return '${model.trainNumber} - ${model.trainName}';
-    }
-    if (model.trainName.isNotNullOrEmpty) return model.trainName;
-    if (model.trainNumber.isNotNullOrEmpty) return model.trainNumber;
-    return null;
-  }
-
   factory Ticket.fromTNSTC(
     TNSTCTicketModel model, {
     String sourceType = 'PDF',
@@ -421,6 +322,105 @@ class Ticket with TicketMappable {
       imagePath: incoming.imagePath ?? existing.imagePath,
       directionsUrl: incoming.directionsUrl ?? existing.directionsUrl,
     );
+  }
+
+  factory Ticket.fromIRCTC(
+    IRCTCTicket model, {
+    bool isUpdate = false,
+  }) {
+    // If dateOfJourney or scheduledDeparture are null,startTime will be null
+    final hasValidDateTime =
+        model.dateOfJourney != null && model.scheduledDeparture != null;
+
+    final journeyDate = model.dateOfJourney;
+    final departure = model.scheduledDeparture;
+
+    return Ticket(
+      ticketId: model.pnrNumber,
+      primaryText:
+          model.fromStation.isNotNullOrEmpty && model.toStation.isNotNullOrEmpty
+          ? '${model.fromStation} → ${model.toStation}'
+          : null,
+      secondaryText: _buildIrctcSecondaryText(model),
+      startTime: !isUpdate && hasValidDateTime
+          ? DateTime(
+              journeyDate!.year,
+              journeyDate.month,
+              journeyDate.day,
+              departure!.hour,
+              departure.minute,
+            )
+          : null,
+      location: model.boardingStation,
+      tags: [
+        TagModel(value: model.pnrNumber, icon: 'confirmation_number'),
+        if (model.trainNumber.isNotNullOrEmpty)
+          TagModel(
+            value: model.trainName.isNotNullOrEmpty
+                ? '${model.trainNumber} - ${model.trainName}'
+                : model.trainNumber,
+            icon: 'train',
+          ),
+        if (model.travelClass != null && model.travelClass!.isNotNullOrEmpty)
+          TagModel(value: model.travelClass, icon: 'event_seat'),
+        if (model.status.isNotNullOrEmpty)
+          TagModel(value: model.status, icon: 'info'),
+        if ((model.ticketFare ?? 0) > 0)
+          TagModel(
+            value: '₹${model.ticketFare?.toStringAsFixed(2)}',
+            icon: 'attach_money',
+          ),
+      ],
+      type: TicketType.train,
+      extras: [
+        ExtrasModel(title: 'PNR Number', value: model.pnrNumber),
+        ExtrasModel(title: 'Passenger', value: model.passengerName),
+        ExtrasModel(title: 'Gender', value: model.gender),
+        ExtrasModel(title: 'Age', value: model.age?.toString()),
+        ExtrasModel(title: 'Berth', value: model.seatNumber),
+        ExtrasModel(title: 'Train Name', value: model.trainName),
+        ExtrasModel(title: 'Quota', value: model.quota),
+        ExtrasModel(
+          title: 'Distance',
+          value: model.distance != null ? '${model.distance} KM' : null,
+        ),
+        ExtrasModel(title: 'From', value: model.fromStation),
+        ExtrasModel(title: 'To', value: model.toStation),
+        ExtrasModel(title: 'Boarding', value: model.boardingStation),
+        ExtrasModel(
+          title: 'Departure',
+          value: !isUpdate && departure != null
+              ? DateTimeConverter.instance.formatTime(departure)
+              : null,
+        ),
+        ExtrasModel(
+          title: 'Arrival',
+          value: !isUpdate ? model.arrivalTime : null,
+        ),
+        ExtrasModel(
+          title: 'Date of Journey',
+          value: !isUpdate && journeyDate != null
+              ? DateTimeConverter.instance.formatDate(journeyDate)
+              : null,
+        ),
+        ExtrasModel(title: 'Fare', value: model.ticketFare?.toStringAsFixed(2)),
+        ExtrasModel(
+          title: 'IRCTC Fee',
+          value: model.irctcFee?.toStringAsFixed(2),
+        ),
+        ExtrasModel(title: 'Transaction ID', value: model.transactionId),
+      ],
+    );
+  }
+
+  static String? _buildIrctcSecondaryText(IRCTCTicket model) {
+    if (model.trainNumber.isNotNullOrEmpty &&
+        model.trainName.isNotNullOrEmpty) {
+      return '${model.trainNumber} - ${model.trainName}';
+    }
+    if (model.trainName.isNotNullOrEmpty) return model.trainName;
+    if (model.trainNumber.isNotNullOrEmpty) return model.trainNumber;
+    return null;
   }
 
   /// Merges Extras (Key-Value pairs).
