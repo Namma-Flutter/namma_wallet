@@ -24,13 +24,13 @@ class TNSTCApiTicketParser {
     final match = RegExp(r'^(\d{1,2}):(\d{2})(?::\d{2})?\s*$').firstMatch(
       cleaned,
     );
-    if (match == null) return cleaned;
+    if (match == null) return null;
 
     final hour = int.tryParse(match.group(1)!);
     final minute = int.tryParse(match.group(2)!);
 
-    if (hour == null || minute == null) return cleaned;
-    if (hour < 0 || hour > 23 || minute < 0 || minute > 59) return cleaned;
+    if (hour == null || minute == null) return null;
+    if (hour < 0 || hour > 23 || minute < 0 || minute > 59) return null;
 
     final normalizedHour = hour.toString().padLeft(2, '0');
     final normalizedMinute = minute.toString().padLeft(2, '0');

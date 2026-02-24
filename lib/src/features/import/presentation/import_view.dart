@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
+import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 import 'package:namma_wallet/src/common/routing/app_routes.dart';
 import 'package:namma_wallet/src/common/services/haptic/haptic_service_extension.dart';
 import 'package:namma_wallet/src/common/services/haptic/haptic_service_interface.dart';
@@ -239,8 +240,8 @@ class _ImportViewState extends State<ImportView> {
     }
   }
 
-  Future<void> _handlePNRFetch() async {
-    if (_isFetchingPNR) return;
+  Future<Ticket?> _handlePNRFetch() async {
+    if (_isFetchingPNR) return null;
 
     final pnr = _pnrController.text.trim();
     final phoneNumber = _phoneController.text.trim();
@@ -250,7 +251,7 @@ class _ImportViewState extends State<ImportView> {
         'Please enter a PNR number',
         isError: true,
       );
-      return;
+      return null;
     }
     if (phoneNumber.isEmpty) {
       showSnackbar(
@@ -258,7 +259,7 @@ class _ImportViewState extends State<ImportView> {
         'Please enter your phone number',
         isError: true,
       );
-      return;
+      return null;
     }
 
     setState(() {
@@ -270,26 +271,17 @@ class _ImportViewState extends State<ImportView> {
     );
 
     try {
-      final ticket = await _importService.importTNSTCByPNR(pnr, phoneNumber);
+      final ticket = await _importService.importTNSTCByPNR(
+        pnr,
+        phoneNumber,
+      );
 
-      if (!mounted) return;
+      if (!mounted) return null;
 
       if (ticket != null) {
         _pnrController.clear();
         _phoneController.clear();
-        final id = ticket.ticketId;
-        if (id != null) {
-          context.go(AppRoute.home.path);
-          await context.pushNamed(
-            AppRoute.ticketView.name,
-            pathParameters: {'id': id},
-          );
-        } else {
-          showSnackbar(
-            context,
-            'TNSTC ticket imported successfully!',
-          );
-        }
+        return ticket;
       } else {
         showSnackbar(
           context,
@@ -306,6 +298,7 @@ class _ImportViewState extends State<ImportView> {
         );
       }
       _logger.error('PNR fetch error: $e');
+      return null;
     } finally {
       if (mounted) {
         setState(() {
@@ -313,6 +306,8 @@ class _ImportViewState extends State<ImportView> {
         });
       }
     }
+
+    return null;
   }
 
   Future<void> _openQRScanner() async {
@@ -332,57 +327,92 @@ class _ImportViewState extends State<ImportView> {
   }
 
   Future<void> _showPNRDialog() async {
+    final rootContext = context;
+    var isFetchingDialog = false;
+
     await showDialog<void>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Enter PNR and Phone Number'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: _pnrController,
-              decoration: const InputDecoration(
-                labelText: 'PNR Number',
-                hintText: 'e.g., T76296906',
-              ),
-              autofocus: true,
-              textInputAction: TextInputAction.next,
+      context: rootContext,
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (context, setDialogState) {
+          Future<void> submit() async {
+            if (isFetchingDialog) return;
+            setDialogState(() => isFetchingDialog = true);
+
+            final ticket = await _handlePNRFetch();
+
+            if (context.mounted) {
+              setDialogState(() => isFetchingDialog = false);
+            }
+
+            if (ticket == null || !rootContext.mounted) {
+              return;
+            }
+
+            if (dialogContext.mounted) {
+              dialogContext.pop();
+            }
+
+            final id = ticket.ticketId;
+            if (id != null) {
+              rootContext.go(AppRoute.home.path);
+              await rootContext.pushNamed(
+                AppRoute.ticketView.name,
+                pathParameters: {'id': id},
+                queryParameters: {'fromImport': '1'},
+              );
+            } else {
+              showSnackbar(
+                rootContext,
+                'TNSTC ticket imported successfully!',
+              );
+            }
+          }
+
+          return AlertDialog(
+            title: const Text('Enter PNR and Phone Number'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: _pnrController,
+                  decoration: const InputDecoration(
+                    labelText: 'PNR Number',
+                    hintText: 'e.g., T76296906',
+                  ),
+                  autofocus: true,
+                  textInputAction: TextInputAction.next,
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: _phoneController,
+                  decoration: const InputDecoration(
+                    labelText: 'Phone Number',
+                    hintText: 'e.g., 9876543210',
+                  ),
+                  keyboardType: TextInputType.phone,
+                  textInputAction: TextInputAction.done,
+                  onSubmitted: (_) async => submit(),
+                ),
+              ],
             ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: _phoneController,
-              decoration: const InputDecoration(
-                labelText: 'Phone Number',
-                hintText: 'e.g., 9876543210',
+            actions: [
+              TextButton(
+                onPressed: isFetchingDialog ? null : () => dialogContext.pop(),
+                child: const Text('Cancel'),
               ),
-              keyboardType: TextInputType.phone,
-              textInputAction: TextInputAction.done,
-              onSubmitted: (_) async {
-                context.pop();
-                await _handlePNRFetch();
-              },
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => context.pop(),
-            child: const Text('Cancel'),
-          ),
-          FilledButton(
-            onPressed: () async {
-              context.pop();
-              await _handlePNRFetch();
-            },
-            child: _isFetchingPNR
-                ? const SizedBox(
-                    width: 16,
-                    height: 16,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                : const Text('Fetch'),
-          ),
-        ],
+              FilledButton(
+                onPressed: isFetchingDialog ? null : () async => submit(),
+                child: isFetchingDialog
+                    ? const SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Text('Fetch'),
+              ),
+            ],
+          );
+        },
       ),
     );
   }

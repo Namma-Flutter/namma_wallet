@@ -13,6 +13,7 @@ import 'package:namma_wallet/src/common/helper/date_time_converter.dart';
 import 'package:namma_wallet/src/common/services/haptic/haptic_service_extension.dart';
 import 'package:namma_wallet/src/common/services/haptic/haptic_service_interface.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
+import 'package:namma_wallet/src/common/services/ticket_change_notifier.dart';
 import 'package:namma_wallet/src/common/services/widget/widget_service_interface.dart';
 import 'package:namma_wallet/src/common/theme/styles.dart';
 import 'package:namma_wallet/src/common/widgets/rounded_back_button.dart';
@@ -24,9 +25,14 @@ import 'package:qr_flutter/qr_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class TravelTicketView extends StatefulWidget {
-  const TravelTicketView({required this.ticket, super.key});
+  const TravelTicketView({
+    required this.ticket,
+    this.openedFromImport = false,
+    super.key,
+  });
 
   final Ticket ticket;
+  final bool openedFromImport;
 
   @override
   State<TravelTicketView> createState() => _TravelTicketViewState();
@@ -86,9 +92,19 @@ class _TravelTicketViewState extends State<TravelTicketView> {
     }
 
     final uri = Uri(scheme: 'tel', path: dialable);
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri);
-      return;
+    try {
+      if (await canLaunchUrl(uri)) {
+        final launched = await launchUrl(uri);
+        if (launched) {
+          return;
+        }
+      }
+    } on Exception catch (e, stackTrace) {
+      getIt<ILogger>().error(
+        '[TravelTicketView] Failed to launch dialer',
+        e,
+        stackTrace,
+      );
     }
 
     if (!mounted) return;
@@ -169,6 +185,9 @@ class _TravelTicketViewState extends State<TravelTicketView> {
 
     try {
       await getIt<ITicketDAO>().deleteTicket(widget.ticket.ticketId!);
+
+      // Notify listeners that ticket data changed
+      getIt<TicketChangeNotifier>().notifyTicketChanged();
 
       // Check if deleted ticket is pinned to widget and clear it
       await _clearWidgetIfPinned();

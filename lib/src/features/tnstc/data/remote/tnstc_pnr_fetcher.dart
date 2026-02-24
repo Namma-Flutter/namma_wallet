@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:html/dom.dart';
 import 'package:html/parser.dart' as html_parser;
 import 'package:http/http.dart' as http;
@@ -25,6 +27,7 @@ class TNSTCPNRFetcher implements ITNSTCPNRFetcher {
   static const String _baseUrl = 'https://www.tnstc.in/OTRSOnline';
   static const String _formUrl = '$_baseUrl/preKnowYourConductor.do';
   static const String _submitUrl = '$_baseUrl/manageKnowYourConductor.do';
+  static const Duration _requestTimeout = Duration(seconds: 15);
 
   @override
   Future<TNSTCTicketModel?> fetchTicketByPNR(
@@ -49,7 +52,15 @@ class TNSTCPNRFetcher implements ITNSTCPNRFetcher {
       final client = http.Client();
       try {
         _logger.logHttpRequest('GET', _formUrl);
-        final formResponse = await client.get(Uri.parse(_formUrl));
+        http.Response formResponse;
+        try {
+          formResponse = await client
+              .get(Uri.parse(_formUrl))
+              .timeout(_requestTimeout);
+        } on TimeoutException catch (e, stackTrace) {
+          _logger.error('Timed out loading TNSTC form page', e, stackTrace);
+          return null;
+        }
         _logger.logHttpResponse('GET', _formUrl, formResponse.statusCode);
 
         if (formResponse.statusCode != 200) {
@@ -69,21 +80,29 @@ class TNSTCPNRFetcher implements ITNSTCPNRFetcher {
             : _submitUrl;
 
         _logger.logHttpRequest('POST', submitUrlWithSession);
-        final response = await client.post(
-          Uri.parse(submitUrlWithSession),
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'Referer': _formUrl,
-          },
-          body: {
-            'hiddenAction': 'GetPnrDetails',
-            'radViewType': 'P',
-            'txtPnrId': pnrTrimmed,
-            'txtEmailId': '',
-            'txtMobileNo': '',
-            'txtFromDate': currentDate,
-          },
-        );
+        http.Response response;
+        try {
+          response = await client
+              .post(
+                Uri.parse(submitUrlWithSession),
+                headers: {
+                  'Content-Type': 'application/x-www-form-urlencoded',
+                  'Referer': _formUrl,
+                },
+                body: {
+                  'hiddenAction': 'GetPnrDetails',
+                  'radViewType': 'P',
+                  'txtPnrId': pnrTrimmed,
+                  'txtEmailId': '',
+                  'txtMobileNo': '',
+                  'txtFromDate': currentDate,
+                },
+              )
+              .timeout(_requestTimeout);
+        } on TimeoutException catch (e, stackTrace) {
+          _logger.error('Timed out submitting TNSTC PNR lookup', e, stackTrace);
+          return null;
+        }
         _logger.logHttpResponse(
           'POST',
           submitUrlWithSession,
@@ -146,6 +165,12 @@ class TNSTCPNRFetcher implements ITNSTCPNRFetcher {
         return null;
       }
 
+      final parsedPnr = data['PNR No']?.trim();
+      if (parsedPnr == null || parsedPnr.isEmpty) {
+        _logger.warning('Parsed response missing PNR No for input PNR: $pnr');
+        return null;
+      }
+
       final apiPhoneNumber = _extractPassengerPhoneNumber(data);
       if (apiPhoneNumber == null) {
         _logger.warning('Passenger phone number not found for PNR: $pnr');
@@ -174,7 +199,7 @@ class TNSTCPNRFetcher implements ITNSTCPNRFetcher {
       }
 
       return TNSTCTicketModel(
-        pnrNumber: data['PNR No'] ?? pnr,
+        pnrNumber: parsedPnr,
         tripCode: data['Trip Code'],
         corporation: data['Corporation Code'],
         serviceStartPlace: data['From Place Name'],
@@ -190,7 +215,7 @@ class TNSTCPNRFetcher implements ITNSTCPNRFetcher {
           }
           return <PassengerInfo>[PassengerInfo(name: passengerName)];
         }(),
-        smsSeatNumbers: data['Seat No'],
+        smsSeatNumbers: _normalizeSeatNumbers(data['Seat No']),
         conductorMobileNo: data['Conductor Mobile No'],
         vehicleNumber: data['Vehicle No'],
       );
@@ -268,5 +293,31 @@ class TNSTCPNRFetcher implements ITNSTCPNRFetcher {
       return digitsOnly.substring(digitsOnly.length - 10);
     }
     return digitsOnly;
+  }
+
+  String? _normalizeSeatNumbers(String? rawSeats) {
+    if (rawSeats == null || rawSeats.trim().isEmpty) {
+      return rawSeats;
+    }
+
+    final normalized = rawSeats
+        .split(',')
+        .map((seat) => seat.trim())
+        .map(
+          (seat) => seat.replaceAllMapped(
+            RegExp(r'(\d+)0B$'),
+            (m) => '${m.group(1)}UB',
+          ),
+        )
+        .map(
+          (seat) => seat.replaceAllMapped(
+            RegExp(r'(\d+)0L$'),
+            (m) => '${m.group(1)}UL',
+          ),
+        )
+        .where((seat) => seat.isNotEmpty)
+        .join(', ');
+
+    return normalized.isEmpty ? null : normalized;
   }
 }

@@ -14,6 +14,7 @@ import 'package:namma_wallet/src/common/services/ocr/google_mlkit_ocr.dart';
 import 'package:namma_wallet/src/common/services/ocr/ocr_service_interface.dart';
 import 'package:namma_wallet/src/common/services/ocr/web_ocr_service.dart';
 import 'package:namma_wallet/src/common/services/pdf/pdf_service.dart';
+import 'package:namma_wallet/src/common/services/ticket_change_notifier.dart';
 import 'package:namma_wallet/src/common/services/pdf/pdf_service_interface.dart';
 import 'package:namma_wallet/src/common/services/widget/home_widget_service.dart';
 import 'package:namma_wallet/src/common/services/widget/web_widget_service.dart';
@@ -56,6 +57,8 @@ void setupLocator() {
   getIt
     // Logger - Initialize first
     ..registerSingleton<ILogger>(NammaLogger())
+    // Notifiers
+    ..registerSingleton<TicketChangeNotifier>(TicketChangeNotifier())
     // Providers
     ..registerSingleton<ThemeProvider>(ThemeProvider())
     ..registerSingleton<AIServiceStatus>(AIServiceStatus())

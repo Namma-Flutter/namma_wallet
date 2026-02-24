@@ -400,10 +400,12 @@ void main() {
         expect(result.type, equals(TicketType.bus));
 
         // Verify source type in extras
-        final sourceExtra = result.extras?.firstWhere(
-          (e) => e.title == 'Source Type',
-          orElse: () => ExtrasModel(title: '', value: ''),
-        );
+        final sourceExtras = result.extras
+            ?.where((e) => e.title == 'Source Type')
+            .toList();
+        final sourceExtra = (sourceExtras != null && sourceExtras.isNotEmpty)
+            ? sourceExtras.first
+            : null;
         expect(sourceExtra?.value, equals('API'));
       });
     });
