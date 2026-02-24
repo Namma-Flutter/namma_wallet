@@ -8,6 +8,7 @@ jobs:
   branch-name:
     name: Validate Branch Name
     runs-on: ubuntu-latest
+    if: github.actor != 'imgbot[bot]'
     permissions:
       contents: read
       pull-requests: read
@@ -43,6 +44,7 @@ jobs:
   commitlint:
     name: Conventional Commits
     runs-on: ubuntu-latest
+    if: github.actor != 'imgbot[bot]'
     needs: branch-name
     permissions:
       contents: read
