@@ -7,8 +7,9 @@ This guide explains how to complete the setup for automatic deployment to GitHub
 ## What's Already Done
 
 ✅ Created `.github/workflows/deploy_github_pages.yml` workflow file
-✅ Configured automatic deployment on every push to `main` branch
+✅ Configured automatic deployment on every branch push
 ✅ Added manual deployment trigger option
+✅ Added branch preview deployments at `/previews/<branch>/`
 
 ## Steps to Enable GitHub Pages
 
@@ -24,13 +25,15 @@ git push origin main
 
 1. Go to your repository on GitHub
 2. Click **Settings** → **Pages** (in the left sidebar)
-3. Under **Source**, select:
-   - **Source**: `GitHub Actions`
+3. Under **Build and deployment**, select:
+   - **Source**: `Deploy from a branch`
+   - **Branch**: `gh-pages`
+   - **Folder**: `/ (root)`
 4. Click **Save**
 
 ### 3. Trigger the First Deployment
 
-The workflow will automatically run on the next push to `main`. You can also:
+The workflow will automatically run on the next push to any branch. You can also:
 
 - **Manually trigger**: Go to **Actions** tab → **Deploy to GitHub Pages** → **Run workflow**
 - **Wait for automatic trigger**: Push any change to `main` branch
@@ -45,6 +48,15 @@ https://<your-github-username>.github.io/<repository-name>/
 
 For example: `https://yourusername.github.io/namma_wallet/`
 
+Branch previews are available at:
+
+```text
+https://<your-github-username>.github.io/<repository-name>/previews/<branch-slug>/
+```
+
+Example:
+`https://yourusername.github.io/namma_wallet/previews/bugfix-web-not-working/`
+
 ## How It Works
 
 The workflow:
@@ -52,8 +64,9 @@ The workflow:
 1. **Builds** the Flutter web app using `flutter build web --release --wasm`
 2. **Compiles** to WebAssembly (WASM) for improved performance and faster load times
 3. **Configures** the base href for GitHub Pages subdirectory hosting
-4. **Uploads** the build artifacts from `build/web`
-5. **Deploys** to GitHub Pages automatically
+4. **Publishes** main branch to `/` on `gh-pages`
+5. **Publishes** non-main branches to `/previews/<branch-slug>/` on `gh-pages`
+6. **Keeps** existing preview folders so branch deploys do not overwrite each other
 
 ### Why WASM?
 
@@ -65,14 +78,10 @@ WebAssembly provides:
 
 ## Customization
 
-### Change Trigger Branch
+### Branch Routing
 
-If your default branch is not `main`, edit line 5 in the workflow file:
-
-```yaml
-branches:
-  - main  # Change to your branch name (e.g., master, develop)
-```
+- `main` deploys to root: `/`
+- all other branches deploy to: `/previews/<branch-slug>/`
 
 ### Manual Deployment Only
 
@@ -88,7 +97,8 @@ To disable automatic deployment on push, remove lines 3-5 and keep only `workflo
 
 ### Pages Not Found (404)
 
-- Verify GitHub Pages is enabled with **Source: GitHub Actions**
+- Verify GitHub Pages is enabled with **Source: Deploy from a branch**
+- Verify branch is set to **gh-pages** and folder is **/(root)**
 - Check that the base href is correctly set
 - Ensure the workflow completed successfully
 
@@ -96,9 +106,7 @@ To disable automatic deployment on push, remove lines 3-5 and keep only `workflo
 
 The workflow includes necessary permissions:
 
-- `contents: read` - to checkout code
-- `pages: write` - to deploy to Pages
-- `id-token: write` - for authentication
+- `contents: write` - to push built files to the `gh-pages` branch
 
 If issues persist, verify repository settings allow GitHub Actions.
 
