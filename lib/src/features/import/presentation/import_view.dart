@@ -277,10 +277,19 @@ class _ImportViewState extends State<ImportView> {
       if (ticket != null) {
         _pnrController.clear();
         _phoneController.clear();
-        showSnackbar(
-          context,
-          'TNSTC ticket imported successfully!',
-        );
+        final id = ticket.ticketId;
+        if (id != null) {
+          context.go(AppRoute.home.path);
+          await context.pushNamed(
+            AppRoute.ticketView.name,
+            pathParameters: {'id': id},
+          );
+        } else {
+          showSnackbar(
+            context,
+            'TNSTC ticket imported successfully!',
+          );
+        }
       } else {
         showSnackbar(
           context,

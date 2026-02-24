@@ -11,7 +11,7 @@ class TNSTCApiTicketParser {
       smsSeatNumbers: normalizedSeats,
     );
 
-    return Ticket.fromTNSTC(normalizedModel, sourceType: 'PNR');
+    return Ticket.fromTNSTC(normalizedModel, sourceType: 'API');
   }
 
   String? _normalizeServiceStartTime(String? raw) {

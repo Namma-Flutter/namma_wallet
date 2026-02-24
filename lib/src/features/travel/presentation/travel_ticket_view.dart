@@ -64,6 +64,37 @@ class _TravelTicketViewState extends State<TravelTicketView> {
     return ticket.tags!;
   }
 
+  String? get _conductorPhoneNumber {
+    final value =
+        widget.ticket.getExtraByTitle('conductor contact') ??
+        widget.ticket.getExtraByTitle('conductor mobile no');
+    if (value == null) return null;
+
+    final cleaned = value.trim();
+    if (cleaned.isEmpty || cleaned == '--') {
+      return null;
+    }
+
+    return cleaned;
+  }
+
+  Future<void> _callConductor(String phoneNumber) async {
+    final dialable = phoneNumber.replaceAll(RegExp(r'[^\d+]'), '');
+    if (dialable.isEmpty) {
+      showSnackbar(context, 'Invalid conductor phone number', isError: true);
+      return;
+    }
+
+    final uri = Uri(scheme: 'tel', path: dialable);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri);
+      return;
+    }
+
+    if (!mounted) return;
+    showSnackbar(context, 'Could not open dialer', isError: true);
+  }
+
   Future<void> _pinToHomeScreen() async {
     const iOSWidgetName = 'TicketWidget';
     const androidWidgetName = 'TicketHomeWidget';
@@ -722,6 +753,29 @@ class _TravelTicketViewState extends State<TravelTicketView> {
                   ),
                 ),
               ),
+            if (_conductorPhoneNumber != null) ...[
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: FilledButton.icon(
+                    onPressed: () async {
+                      await _callConductor(_conductorPhoneNumber!);
+                    },
+                    icon: const Icon(Icons.call),
+                    label: const Text('Call Conductor'),
+                    style: FilledButton.styleFrom(
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+            ],
             const SizedBox(height: 16),
           ],
         ),

@@ -182,7 +182,7 @@ class FakeTNSTCApiTicketParser extends TNSTCApiTicketParser {
   @override
   Ticket parse(TNSTCTicketModel model) {
     lastInputModel = model;
-    return parsedTicket ?? Ticket.fromTNSTC(model, sourceType: 'PNR');
+    return parsedTicket ?? Ticket.fromTNSTC(model, sourceType: 'API');
   }
 }
 
@@ -404,7 +404,7 @@ void main() {
           (e) => e.title == 'Source Type',
           orElse: () => ExtrasModel(title: '', value: ''),
         );
-        expect(sourceExtra?.value, equals('PNR'));
+        expect(sourceExtra?.value, equals('API'));
       });
     });
   });

@@ -182,7 +182,14 @@ class TNSTCPNRFetcher implements ITNSTCPNRFetcher {
         classOfService: data['Class Name'],
         journeyDate: journeyDate,
         serviceStartTime: data['Depaturue Time'],
-        boardingPoint: data['Passenger Name'],
+        boardingPoint: data['Passenger Pickup Point'] ?? data['Boarding Point'],
+        passengers: () {
+          final passengerName = data['Passenger Name']?.trim();
+          if (passengerName == null || passengerName.isEmpty) {
+            return const <PassengerInfo>[];
+          }
+          return <PassengerInfo>[PassengerInfo(name: passengerName)];
+        }(),
         smsSeatNumbers: data['Seat No'],
         conductorMobileNo: data['Conductor Mobile No'],
         vehicleNumber: data['Vehicle No'],

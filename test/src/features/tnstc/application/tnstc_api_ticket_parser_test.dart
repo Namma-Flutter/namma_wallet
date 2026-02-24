@@ -51,5 +51,33 @@ void main() {
       expect(seatExtra?.value, '4UB');
       expect(seatTag?.value, '4UB');
     });
+
+    test(
+      'should fallback location to from place when pickup point is missing',
+      () {
+      const model = TNSTCTicketModel(
+        pnrNumber: 'T76296907',
+        serviceStartPlace: 'KUMBAKONAM',
+      );
+
+      final ticket = parser.parse(model);
+
+      expect(ticket.location, 'KUMBAKONAM');
+      },
+    );
+
+    test('should preserve passenger name in extras', () {
+      const model = TNSTCTicketModel(
+        pnrNumber: 'T76296907',
+        passengers: [PassengerInfo(name: 'HarishAnbalagan')],
+      );
+
+      final ticket = parser.parse(model);
+      final passengerExtra = ticket.extras?.firstWhere(
+        (e) => e.title == 'Passenger',
+      );
+
+      expect(passengerExtra?.value, 'HarishAnbalagan');
+    });
   });
 }
