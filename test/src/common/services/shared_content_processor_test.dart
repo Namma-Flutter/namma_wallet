@@ -508,16 +508,19 @@ void main() {
         () {
           // Arrange (Given)
           const result = TicketCreatedResult(
-            ticketId: 'T12345678',
             pnrNumber: 'T12345678',
             from: 'Chennai',
             to: 'Bangalore',
             fare: '500.00',
             date: '2024-12-15',
+            ticketId: 'TICKET-UUID-001',
           );
 
+          // Act (When)
+          final ticketId = result.ticketId;
+
           // Assert (Then)
-          expect(result.ticketId, equals('T12345678'));
+          expect(ticketId, equals('TICKET-UUID-001'));
         },
       );
     });
