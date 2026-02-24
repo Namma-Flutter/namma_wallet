@@ -189,7 +189,15 @@ class _ImportViewState extends State<ImportView> {
 
         if (!mounted) return;
 
-        ClipboardResultHandler.showResultMessage(context, result);
+        final ticketId = result.ticket?.ticketId;
+        if (result.isSuccess && ticketId != null) {
+          context.pushReplacementNamed(
+            AppRoute.ticketView.name,
+            pathParameters: {'id': ticketId},
+          );
+        } else {
+          ClipboardResultHandler.showResultMessage(context, result);
+        }
       } on Exception catch (e) {
         if (mounted) {
           showSnackbar(
