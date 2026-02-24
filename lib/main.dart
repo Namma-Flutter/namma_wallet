@@ -1,3 +1,8 @@
+// import 'dart:convert';
+
+import 'dart:async';
+import 'dart:io';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -10,6 +15,7 @@ import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/platform_utils/platform_utils.dart';
 import 'package:namma_wallet/src/common/services/haptic/haptic_service_interface.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
+import 'package:namma_wallet/src/common/services/push_notification/notification_service.dart';
 import 'package:namma_wallet/src/common/services/widget/widget_service_interface.dart';
 import 'package:namma_wallet/src/common/theme/theme_provider.dart';
 import 'package:namma_wallet/src/features/ai/fallback_parser/application/ai_service_interface.dart';
@@ -40,6 +46,12 @@ Future<void> main() async {
   } on Object catch (e, stackTrace) {
     // Catch any other throwables
     debugPrint('FlutterGemma initialization failed: $e\n$stackTrace');
+  }
+
+  /// Initialize notification service
+  /// Store notification payload for later processing after app is initialized
+  if (Platform.isAndroid) {
+    await NotificationService().initialize();
   }
 
   // Initialize pdfrx (required when using PDF engine APIs before widgets)

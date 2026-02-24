@@ -1,4 +1,8 @@
+import 'dart:async';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:namma_wallet/src/common/services/push_notification/notification_service.dart';
 import 'package:namma_wallet/src/common/widgets/snackbar_widget.dart';
 import 'package:namma_wallet/src/features/clipboard/domain/clipboard_content_type.dart';
 import 'package:namma_wallet/src/features/clipboard/domain/clipboard_result.dart';
@@ -11,7 +15,10 @@ class ClipboardResultHandler {
   ///
   /// Displays success message or error.
   /// Only shows if context is still mounted.
-  static void showResultMessage(BuildContext context, ClipboardResult result) {
+  static void showResultMessage(
+    BuildContext context,
+    ClipboardResult result,
+  ) {
     if (!context.mounted) return;
 
     final message = result.isSuccess
@@ -29,5 +36,13 @@ class ClipboardResultHandler {
       message,
       isError: !result.isSuccess,
     );
+    if (result.ticket != null &&
+        result.isSuccess &&
+        result.type == ClipboardContentType.travelTicket &&
+        Platform.isAndroid) {
+      unawaited(
+        NotificationService().scheduleTicketReminderFor(result.ticket!),
+      );
+    }
   }
 }
