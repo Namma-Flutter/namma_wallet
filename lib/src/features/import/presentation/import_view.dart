@@ -48,9 +48,9 @@ class _ImportViewState extends State<ImportView> {
       if (!mounted) return;
 
       if (ticket != null) {
-        showSnackbar(
-          context,
-          'QR ticket imported successfully!',
+        context.pushReplacementNamed(
+          AppRoute.ticketView.name,
+          pathParameters: {'id': ticket.ticketId!},
         );
       } else {
         showSnackbar(
@@ -139,7 +139,10 @@ class _ImportViewState extends State<ImportView> {
         if (!mounted) return;
 
         if (ticket != null) {
-          showSnackbar(context, 'PDF ticket imported successfully!');
+          context.pushReplacementNamed(
+            AppRoute.ticketView.name,
+            pathParameters: {'id': ticket.ticketId!},
+          );
         } else {
           showSnackbar(
             context,
