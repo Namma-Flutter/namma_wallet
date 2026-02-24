@@ -1,0 +1,41 @@
+name: AndroidLint
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - .github/workflows/android-lint.yml
+      - android/**
+
+jobs:
+  android-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6.0.2
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version-file: pubspec.yaml
+          cache: true
+      - name: Install dependencies
+        run: flutter pub get
+      - name: Set up JDK
+        uses: actions/setup-java@v5.2.0
+        with:
+          distribution: jetbrains
+          java-version: 21
+          cache: gradle
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v5.0.2
+        with:
+          gradle-version: wrapper
+      - name: Run Android lint
+        run: gradle -p android :app:lintDebug
+      - name: GitHub Action for Android Lint
+        uses: yutailang0119/action-android-lint@v5.0.0
+        with:
+          report-path: android/**/build/reports/lint-results*.xml
+          ignore-warnings: true

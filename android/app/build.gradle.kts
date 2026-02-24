@@ -34,7 +34,7 @@ android {
 
     defaultConfig {
         applicationId = "com.nammaflutter.nammawallet"
-        minSdk = 26
+        minSdk = 29
         targetSdk = 36
         versionCode = flutter.versionCode
         versionName = flutter.versionName
@@ -47,10 +47,13 @@ android {
         create("release") {
             storeFile = file("namma-wallet.keystore")
             storePassword =
-                System.getenv("ANDROID_KEYSTORE_PASSWORD") ?: keystoreProperties.getProperty("storePassword")
-            keyAlias = System.getenv("ANDROID_KEY_ALIAS") ?: keystoreProperties.getProperty("keyAlias")
+                System.getenv("ANDROID_KEYSTORE_PASSWORD")
+                    ?: keystoreProperties.getProperty("storePassword")
+            keyAlias =
+                System.getenv("ANDROID_KEY_ALIAS") ?: keystoreProperties.getProperty("keyAlias")
             keyPassword =
-                System.getenv("ANDROID_KEY_PASSWORD") ?: keystoreProperties.getProperty("keyPassword")
+                System.getenv("ANDROID_KEY_PASSWORD")
+                    ?: keystoreProperties.getProperty("keyPassword")
         }
     }
 
@@ -63,6 +66,10 @@ android {
 
     buildFeatures {
         viewBinding = true
+    }
+
+    lint {
+        checkDependencies = false
     }
 }
 

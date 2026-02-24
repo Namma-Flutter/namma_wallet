@@ -386,10 +386,10 @@ packages:
     dependency: "direct main"
     description:
       name: flutter_gemma
-      sha256: "2b1df65a5c5d03f63a2322aa741fa7b8163097cbd4c51e5bbc40be0b312f97d5"
+      sha256: b9f29e79e54159949a95404fe16fd4987c03dabdedb2ba8a29eb19bf4c3ec6d8
       url: "https://pub.dev"
     source: hosted
-    version: "0.12.0"
+    version: "0.12.4"
   flutter_gen_core:
     dependency: transitive
     description:
