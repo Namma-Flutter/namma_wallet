@@ -147,15 +147,22 @@ class IRCTCLayoutParser extends TravelPDFParser {
     final travelClassRaw = classMatch?.group(1);
     final travelClass = normalizeClass(travelClassRaw);
 
-    // Quota - from "PREMIUM TATKAL (PT)" pattern - get the last match
-    // with PT or other quota codes
-    // Also match just the quota name without parentheses
+    // Quota - from "PREMIUM TATKAL (PT)" pattern or standalone tokens.
+    // Short-code group is optional to capture names like "TATKAL" alone.
     final quotaRegex = RegExp(
-      r'(PREMIUM TATKAL|TATKAL|GENERAL|PRAVIS|LOUIS|RAILWAY|PQ|CK|RL|RS|LB|OP)\s*\(?(PT|TQ|GN|PQ|CK|RL|RS|LB|OP)\)?',
+      r'(PREMIUM TATKAL|TATKAL|GENERAL|PRAVIS|LOUIS|RAILWAY|PQ|CK|RL|RS|LB|OP)(?:\s*\(?(PT|TQ|GN|PQ|CK|RL|RS|LB|OP)\)?)?',
       caseSensitive: false,
     );
     final quotaMatch = quotaRegex.firstMatch(plainText);
-    final quota = quotaMatch?.group(0);
+    String? quota = quotaMatch?.group(0);
+    // Fallback: try to match a standalone parenthesized short code like "(GN)"
+    if (quota == null) {
+      final shortCodeMatch = RegExp(
+        r'\((PT|TQ|GN|PQ|CK|RL|RS|LB|OP)\)',
+        caseSensitive: false,
+      ).firstMatch(plainText);
+      quota = shortCodeMatch?.group(0);
+    }
 
     // Distance
     final distanceStr = _extractByRegex(plainText, [
@@ -267,12 +274,14 @@ class IRCTCLayoutParser extends TravelPDFParser {
       for (var i = 1; i < passengers.length; i++) {
         final p = passengers[i];
         final n = i + 1;
-        additionalExtras.addAll([
-          ExtrasModel(title: 'Passenger $n', value: p['name']),
-          ExtrasModel(title: 'Gender $n', value: p['gender']),
-          ExtrasModel(title: 'Age $n', value: p['age']),
-          ExtrasModel(title: 'Berth $n', value: p['seat']),
-        ]);
+        additionalExtras.addAll(
+          [
+            ExtrasModel(title: 'Passenger $n', value: p['name']),
+            ExtrasModel(title: 'Gender $n', value: p['gender']),
+            ExtrasModel(title: 'Age $n', value: p['age']),
+            ExtrasModel(title: 'Berth $n', value: p['seat']),
+          ].where((e) => e.value != null && e.value!.isNotEmpty),
+        );
       }
       ticket = ticket.copyWith(
         extras: [...?ticket.extras, ...additionalExtras],
@@ -388,7 +397,7 @@ class IRCTCLayoutParser extends TravelPDFParser {
     return upper;
   }
 
-  String? _buildSeat(RegExpMatch match, {int startGroup = 4}) {
+  String? _buildSeat(RegExpMatch match, {int startGroup = 5}) {
     final parts = <String>[];
     for (var i = startGroup; i <= startGroup + 3; i++) {
       final part = match.group(i);

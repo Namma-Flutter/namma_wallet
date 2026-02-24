@@ -84,16 +84,16 @@ class _OCRDebugViewState extends State<OCRDebugView> {
         _ocrBlocks = blocks;
         _isLoading = false;
       });
-    } on Exception catch (e) {
+    } catch (e) {
       if (!mounted) return;
-
-      setState(() => _isLoading = false);
 
       showSnackbar(
         context,
         'Failed to process PDF: $e',
         isError: true,
       );
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
@@ -155,7 +155,7 @@ class _OCRDebugViewState extends State<OCRDebugView> {
 
   String _escapeString(String str) {
     // Escape special characters for Dart string literal
-    return """'${str.replaceAll(r'\', r'\\').replaceAll("'", r"\'").replaceAll('\$', r'\$').replaceAll('\n', r'\n').replaceAll('\r', r'\r').replaceAll('\t', r'\t')}'""";
+    return """'${str.replaceAll(r'\', r'\\').replaceAll("'", r"\'").replaceAll(r'$', r'\$').replaceAll('\n', r'\n').replaceAll('\r', r'\r').replaceAll('\t', r'\t')}'""";
   }
 
   Future<void> _copyToClipboard(String content, String label) async {
@@ -349,7 +349,8 @@ class _OCRDebugViewState extends State<OCRDebugView> {
                   ),
                 ],
               ),
-              Flexible(
+              SizedBox(
+                height: MediaQuery.of(context).size.height * 0.8,
                 child: SingleChildScrollView(
                   padding: const EdgeInsets.all(16),
                   child: SelectableText(

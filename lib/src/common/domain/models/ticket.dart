@@ -45,15 +45,7 @@ class Ticket with TicketMappable {
           model.fromStation.isNotNullOrEmpty && model.toStation.isNotNullOrEmpty
           ? '${model.fromStation} → ${model.toStation}'
           : null,
-      secondaryText: (() {
-        if (model.trainNumber.isNotNullOrEmpty &&
-            model.trainName.isNotNullOrEmpty) {
-          return '${model.trainNumber} - ${model.trainName}';
-        }
-        if (model.trainName.isNotNullOrEmpty) return model.trainName;
-        if (model.trainNumber.isNotNullOrEmpty) return model.trainNumber;
-        return null;
-      })(),
+      secondaryText: _buildIrctcSecondaryText(model),
       startTime: !isUpdate && hasValidDateTime
           ? DateTime(
               journeyDate!.year,
@@ -106,6 +98,10 @@ class Ticket with TicketMappable {
               : null,
         ),
         ExtrasModel(
+          title: 'Arrival',
+          value: !isUpdate ? model.arrivalTime : null,
+        ),
+        ExtrasModel(
           title: 'Date of Journey',
           value: !isUpdate && journeyDate != null
               ? DateTimeConverter.instance.formatDate(journeyDate)
@@ -119,6 +115,16 @@ class Ticket with TicketMappable {
         ExtrasModel(title: 'Transaction ID', value: model.transactionId),
       ],
     );
+  }
+
+  static String? _buildIrctcSecondaryText(IRCTCTicket model) {
+    if (model.trainNumber.isNotNullOrEmpty &&
+        model.trainName.isNotNullOrEmpty) {
+      return '${model.trainNumber} - ${model.trainName}';
+    }
+    if (model.trainName.isNotNullOrEmpty) return model.trainName;
+    if (model.trainNumber.isNotNullOrEmpty) return model.trainNumber;
+    return null;
   }
 
   factory Ticket.fromTNSTC(
@@ -211,7 +217,7 @@ class Ticket with TicketMappable {
               if (model.tripCode.isNotNullOrEmpty)
                 model.tripCode
               else
-                model.routeNo ?? 'Bus',
+                model.routeNo,
             ].where((s) => s != null && s.isNotEmpty).join(' - ')
           : null,
       startTime: startTime,
