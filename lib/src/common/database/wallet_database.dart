@@ -13,7 +13,7 @@ class WalletDatabase implements IWalletDatabase {
   final ILogger _logger;
 
   static const String _dbName = 'namma_wallet.db';
-  static const int _dbVersion = 3;
+  static const int _dbVersion = 4;
 
   Database? _database;
 
@@ -63,6 +63,59 @@ class WalletDatabase implements IWalletDatabase {
           );
           _logger.success('Database migrated to v3: Added directions_url');
         }
+        if (oldVersion < 4) {
+          // SQLite does not support ALTER COLUMN DROP NOT NULL.
+          // We recreate the table, copy data, drop old, and rename new.
+          await db.execute('''
+            CREATE TABLE tickets_new (
+               id INTEGER PRIMARY KEY AUTOINCREMENT,
+               ticket_id TEXT NOT NULL UNIQUE,
+               primary_text TEXT,
+               secondary_text TEXT,
+               type TEXT NOT NULL,
+               start_time TEXT,
+               end_time TEXT,
+               location TEXT,
+               tags TEXT,
+               extras TEXT,
+               image_path TEXT,
+               directions_url TEXT,
+               created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+               updated_at TEXT DEFAULT NULL
+            );
+          ''');
+
+          await db.execute('''
+            INSERT INTO tickets_new (
+              id, ticket_id, primary_text, secondary_text,
+              type, start_time, end_time, location,
+              tags, extras, image_path, directions_url,
+              created_at, updated_at
+            )
+            SELECT
+              id, ticket_id, primary_text, secondary_text,
+              type, start_time, end_time, location,
+              tags, extras, image_path, directions_url,
+              created_at, updated_at
+            FROM tickets;
+          ''');
+
+          await db.execute('DROP TABLE tickets;');
+          await db.execute('ALTER TABLE tickets_new RENAME TO tickets;');
+
+          await db.execute(
+            'CREATE INDEX IF NOT EXISTS idx_tickets_type ON tickets (type);',
+          );
+          await db.execute(
+            'CREATE INDEX IF NOT EXISTS idx_tickets_start_time ON tickets'
+            ' (start_time);',
+          );
+
+          _logger.success(
+            'Database migrated to v4: Made start_time, primary_text,'
+            ' secondary_text, and location nullable',
+          );
+        }
       },
     );
   }
@@ -90,12 +143,12 @@ class WalletDatabase implements IWalletDatabase {
       CREATE TABLE tickets (
          id INTEGER PRIMARY KEY AUTOINCREMENT,
          ticket_id TEXT NOT NULL UNIQUE,
-         primary_text TEXT NOT NULL,
-         secondary_text TEXT NOT NULL,
+         primary_text TEXT,
+         secondary_text TEXT,
          type TEXT NOT NULL,
-         start_time TEXT NOT NULL,
+         start_time TEXT,
          end_time TEXT,
-         location TEXT NOT NULL,
+         location TEXT,
          tags TEXT,
          extras TEXT,
          image_path TEXT,
@@ -107,9 +160,6 @@ class WalletDatabase implements IWalletDatabase {
 
     await db.execute(query);
 
-    await db.execute(
-      'CREATE INDEX IF NOT EXISTS idx_tickets_id ON tickets (id);',
-    );
     await db.execute(
       'CREATE INDEX IF NOT EXISTS idx_tickets_type ON tickets (type);',
     );

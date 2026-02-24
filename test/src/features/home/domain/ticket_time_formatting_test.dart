@@ -18,7 +18,7 @@ void main() {
       final ticket = Ticket.fromTNSTC(model);
 
       final departureExtra = ticket.extras?.firstWhere(
-        (e) => e.title == 'Departure Time',
+        (e) => e.title == 'Departure',
       );
       final pickupExtra = ticket.extras?.firstWhere(
         (e) => e.title == 'Pickup Time',

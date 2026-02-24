@@ -6,6 +6,7 @@ import 'package:namma_wallet/src/features/clipboard/application/clipboard_servic
 import 'package:namma_wallet/src/features/clipboard/domain/clipboard_content_type.dart';
 import 'package:namma_wallet/src/features/clipboard/domain/clipboard_repository_interface.dart';
 import 'package:namma_wallet/src/features/travel/application/travel_parser_interface.dart';
+import 'package:namma_wallet/src/features/travel/domain/ticket_update_info.dart';
 
 import '../../../../helpers/fake_logger.dart';
 
