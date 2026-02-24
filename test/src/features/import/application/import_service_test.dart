@@ -6,6 +6,7 @@ import 'package:namma_wallet/src/common/database/ticket_dao_interface.dart';
 import 'package:namma_wallet/src/common/domain/models/extras_model.dart';
 import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 import 'package:namma_wallet/src/common/enums/source_type.dart';
+import 'package:namma_wallet/src/common/enums/ticket_type.dart';
 import 'package:namma_wallet/src/common/services/ocr/ocr_block.dart';
 import 'package:namma_wallet/src/common/services/pdf/pdf_service_interface.dart';
 import 'package:namma_wallet/src/features/import/application/import_service.dart';
@@ -13,6 +14,9 @@ import 'package:namma_wallet/src/features/irctc/application/irctc_qr_parser_inte
 import 'package:namma_wallet/src/features/irctc/application/irctc_scanner_service.dart';
 import 'package:namma_wallet/src/features/irctc/application/irctc_scanner_service_interface.dart';
 import 'package:namma_wallet/src/features/irctc/domain/irctc_ticket_model.dart';
+import 'package:namma_wallet/src/features/tnstc/application/tnstc_api_ticket_parser.dart';
+import 'package:namma_wallet/src/features/tnstc/data/remote/tnstc_pnr_fetcher_interface.dart';
+import 'package:namma_wallet/src/features/tnstc/domain/tnstc_model.dart';
 import 'package:namma_wallet/src/features/travel/application/pkpass_parser_interface.dart';
 import 'package:namma_wallet/src/features/travel/application/travel_parser_interface.dart';
 import 'package:namma_wallet/src/features/travel/domain/ticket_update_info.dart';
@@ -113,6 +117,27 @@ class FakePKPassParser implements IPKPassParser {
   }
 }
 
+class FakeTNSTCPNRFetcher implements ITNSTCPNRFetcher {
+  TNSTCTicketModel? fetchedTicket;
+  bool shouldThrow = false;
+  String? lastFetchedPnr;
+  String? lastFetchedPhoneNumber;
+
+  @override
+  Future<TNSTCTicketModel?> fetchTicketByPNR(
+    String pnr,
+    String phoneNumber,
+  ) async {
+    lastFetchedPnr = pnr;
+    lastFetchedPhoneNumber = phoneNumber;
+
+    if (shouldThrow) {
+      throw Exception('Network error');
+    }
+    return fetchedTicket;
+  }
+}
+
 class FakeTicketDAO implements ITicketDAO {
   Ticket? handledTicket;
   bool shouldThrowError = false;
@@ -150,6 +175,17 @@ class FakeTicketDAO implements ITicketDAO {
   Future<List<Ticket>> getTicketsByType(String type) async => [];
 }
 
+class FakeTNSTCApiTicketParser extends TNSTCApiTicketParser {
+  Ticket? parsedTicket;
+  TNSTCTicketModel? lastInputModel;
+
+  @override
+  Ticket parse(TNSTCTicketModel model) {
+    lastInputModel = model;
+    return parsedTicket ?? Ticket.fromTNSTC(model, sourceType: 'API');
+  }
+}
+
 void main() {
   group('ImportService', () {
     late ImportService importService;
@@ -159,6 +195,8 @@ void main() {
     late FakeIRCTCQRParser fakeIRCTCQRParser;
     late FakeIRCTCScannerService fakeIRCTCScannerService;
     late FakePKPassParser fakePKPassParser;
+    late FakeTNSTCPNRFetcher fakeTNSTCPNRFetcher;
+    late FakeTNSTCApiTicketParser fakeTNSTCApiTicketParser;
     late FakeTicketDAO fakeTicketDAO;
 
     setUp(() {
@@ -168,6 +206,8 @@ void main() {
       fakeIRCTCQRParser = FakeIRCTCQRParser();
       fakeIRCTCScannerService = FakeIRCTCScannerService();
       fakePKPassParser = FakePKPassParser();
+      fakeTNSTCPNRFetcher = FakeTNSTCPNRFetcher();
+      fakeTNSTCApiTicketParser = FakeTNSTCApiTicketParser();
       fakeTicketDAO = FakeTicketDAO();
       importService = ImportService(
         logger: fakeLogger,
@@ -176,6 +216,8 @@ void main() {
         qrParser: fakeIRCTCQRParser,
         irctcScannerService: fakeIRCTCScannerService,
         pkpassParser: fakePKPassParser,
+        tnstcPnrFetcher: fakeTNSTCPNRFetcher,
+        tnstcApiTicketParser: fakeTNSTCApiTicketParser,
         ticketDao: fakeTicketDAO,
       );
     });
@@ -267,6 +309,105 @@ void main() {
           expect(result.ticket, isNull);
         },
       );
+    });
+
+    group('importTNSTCByPNR', () {
+      final testTnstcTicket = TNSTCTicketModel(
+        pnrNumber: 'T76296906',
+        corporation: 'TNSTC',
+        tripCode: 'TRP123',
+        serviceStartPlace: 'Chennai',
+        serviceEndPlace: 'Bangalore',
+        classOfService: 'Sleeper',
+        journeyDate: DateTime(2025, 1, 20),
+        serviceStartTime: '22:00',
+        boardingPoint: 'CMBT',
+        smsSeatNumbers: 'L1, L2',
+        conductorMobileNo: '9876543210',
+        vehicleNumber: 'TN01AB1234',
+      );
+
+      test('should successfully import and save TNSTC ticket', () async {
+        fakeTNSTCPNRFetcher.fetchedTicket = testTnstcTicket;
+
+        final result = await importService.importTNSTCByPNR(
+          'T76296906',
+          '9876543210',
+        );
+
+        expect(result, isNotNull);
+        expect(result!.ticketId, equals('T76296906'));
+        expect(fakeTicketDAO.handledTicket, isNotNull);
+        expect(fakeTicketDAO.handledTicket!.ticketId, equals('T76296906'));
+        expect(fakeTNSTCPNRFetcher.lastFetchedPnr, equals('T76296906'));
+        expect(
+          fakeTNSTCPNRFetcher.lastFetchedPhoneNumber,
+          equals('9876543210'),
+        );
+      });
+
+      test('should return null when PNR fetcher returns null', () async {
+        fakeTNSTCPNRFetcher.fetchedTicket = null;
+
+        final result = await importService.importTNSTCByPNR(
+          'INVALID',
+          '9876543210',
+        );
+
+        expect(result, isNull);
+        expect(fakeTicketDAO.handledTicket, isNull);
+      });
+
+      test('should return null when PNR fetcher throws exception', () async {
+        fakeTNSTCPNRFetcher.shouldThrow = true;
+
+        final result = await importService.importTNSTCByPNR(
+          'T76296906',
+          '9876543210',
+        );
+
+        expect(result, isNull);
+        expect(fakeTicketDAO.handledTicket, isNull);
+      });
+
+      test('should return null when database operation fails', () async {
+        fakeTNSTCPNRFetcher.fetchedTicket = testTnstcTicket;
+        fakeTicketDAO.shouldThrowError = true;
+
+        final result = await importService.importTNSTCByPNR(
+          'T76296906',
+          '9876543210',
+        );
+
+        expect(result, isNull);
+      });
+
+      test('should convert TNSTC ticket to generic Ticket model', () async {
+        fakeTNSTCPNRFetcher.fetchedTicket = testTnstcTicket;
+
+        final result = await importService.importTNSTCByPNR(
+          'T76296906',
+          '9876543210',
+        );
+
+        expect(result, isNotNull);
+        expect(
+          fakeTNSTCApiTicketParser.lastInputModel,
+          equals(testTnstcTicket),
+        );
+        expect(result!.primaryText, equals('Chennai → Bangalore'));
+        expect(result.location, equals('CMBT'));
+        expect(result.type, equals(TicketType.bus));
+
+        // Verify source type in extras
+        final sourceExtras = result.extras
+            ?.where((e) => e.title == 'Source Type')
+            .toList();
+        final sourceExtra = (sourceExtras != null && sourceExtras.isNotEmpty)
+            ? sourceExtras.first
+            : null;
+        expect(sourceExtra?.value, equals('API'));
+      });
     });
   });
 }

@@ -25,6 +25,11 @@ class MockImportService implements IImportService {
   }
 
   @override
+  Future<Ticket?> importTNSTCByPNR(String pnr, String phoneNumber) async {
+    return mockTicket;
+  }
+
+  @override
   bool isSupportedQRCode(String qrData) {
     return false;
   }

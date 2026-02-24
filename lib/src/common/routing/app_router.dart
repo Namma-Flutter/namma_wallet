@@ -82,9 +82,13 @@ final router = GoRouter(
       name: AppRoute.ticketView.name,
       builder: (context, state) {
         final ticketId = state.pathParameters['id'];
+        final openedFromImport = state.uri.queryParameters['fromImport'] == '1';
 
         if (ticketId != null && ticketId.isNotEmpty) {
-          return _TicketViewLoader(ticketId: ticketId);
+          return _TicketViewLoader(
+            ticketId: ticketId,
+            openedFromImport: openedFromImport,
+          );
         }
 
         return const Scaffold(
@@ -166,9 +170,13 @@ final router = GoRouter(
 
 // Widget to load ticket by ID asynchronously
 class _TicketViewLoader extends StatelessWidget {
-  const _TicketViewLoader({required this.ticketId});
+  const _TicketViewLoader({
+    required this.ticketId,
+    required this.openedFromImport,
+  });
 
   final String ticketId;
+  final bool openedFromImport;
 
   @override
   Widget build(BuildContext context) {
@@ -196,7 +204,10 @@ class _TicketViewLoader extends StatelessWidget {
           );
         }
 
-        return TravelTicketView(ticket: ticket);
+        return TravelTicketView(
+          ticket: ticket,
+          openedFromImport: openedFromImport,
+        );
       },
     );
   }
