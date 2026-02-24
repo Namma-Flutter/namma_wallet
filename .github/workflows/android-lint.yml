@@ -28,8 +28,13 @@ jobs:
           distribution: jetbrains
           java-version: 21
           cache: gradle
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: wrapper
+          build-root-directory: android
       - name: Run Android lint
-        run: ./android/gradlew -p android lint
+        run: gradle -p android :app:lintDebug
       - name: GitHub Action for Android Lint
         uses: yutailang0119/action-android-lint@v5.0.0
         with:

@@ -34,7 +34,7 @@ android {
 
     defaultConfig {
         applicationId = "com.nammaflutter.nammawallet"
-        minSdk = 26
+        minSdk = 29
         targetSdk = 36
         versionCode = flutter.versionCode
         versionName = flutter.versionName
