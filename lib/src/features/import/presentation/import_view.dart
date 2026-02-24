@@ -154,8 +154,11 @@ class _ImportViewState extends State<ImportView> {
         } else {
           showSnackbar(
             context,
-            'Unable to read text from this PDF or content does'
-            ' not match any supported ticket format.',
+            kIsWeb
+                ? 'PDF import is not supported on web for scanned/image-only '
+                      'tickets. Web currently supports SMS extraction only.'
+                : 'Unable to read text from this PDF or content does'
+                      ' not match any supported ticket format.',
             isError: true,
           );
         }

@@ -16,6 +16,7 @@ import 'package:namma_wallet/src/common/services/ocr/web_ocr_service.dart';
 import 'package:namma_wallet/src/common/services/pdf/pdf_service.dart';
 import 'package:namma_wallet/src/common/services/pdf/pdf_service_interface.dart';
 import 'package:namma_wallet/src/common/services/widget/home_widget_service.dart';
+import 'package:namma_wallet/src/common/services/widget/web_widget_service.dart';
 import 'package:namma_wallet/src/common/services/widget/widget_service_interface.dart';
 import 'package:namma_wallet/src/common/theme/theme_provider.dart';
 import 'package:namma_wallet/src/features/ai/fallback_parser/application/ai_service_interface.dart';
@@ -29,6 +30,7 @@ import 'package:namma_wallet/src/features/import/application/deep_link_service.d
 import 'package:namma_wallet/src/features/import/application/deep_link_service_interface.dart';
 import 'package:namma_wallet/src/features/import/application/import_service.dart';
 import 'package:namma_wallet/src/features/import/application/import_service_interface.dart';
+import 'package:namma_wallet/src/features/import/application/web_deep_link_service.dart';
 import 'package:namma_wallet/src/features/irctc/application/irctc_qr_parser.dart';
 import 'package:namma_wallet/src/features/irctc/application/irctc_qr_parser_interface.dart';
 import 'package:namma_wallet/src/features/irctc/application/irctc_scanner_service.dart';
@@ -73,7 +75,9 @@ void setupLocator() {
       () => kIsWeb ? WebGemmaService() : GemmaService(logger: getIt<ILogger>()),
     )
     ..registerLazySingleton<IWidgetService>(
-      () => HomeWidgetService(logger: getIt<ILogger>()),
+      () => kIsWeb
+          ? WebWidgetService(logger: getIt<ILogger>())
+          : HomeWidgetService(logger: getIt<ILogger>()),
     )
     // Parsers
     ..registerLazySingleton<TNSTCSMSParser>(TNSTCSMSParser.new)
@@ -121,10 +125,12 @@ void setupLocator() {
       ),
     )
     ..registerLazySingleton<IDeepLinkService>(
-      () => DeepLinkService(
-        importService: getIt<IImportService>(),
-        logger: getIt<ILogger>(),
-      ),
+      () => kIsWeb
+          ? WebDeepLinkService(logger: getIt<ILogger>())
+          : DeepLinkService(
+              importService: getIt<IImportService>(),
+              logger: getIt<ILogger>(),
+            ),
     )
     // Clipboard - Repository and Service
     ..registerLazySingleton<IClipboardRepository>(ClipboardRepository.new)
