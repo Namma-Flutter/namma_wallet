@@ -20,6 +20,7 @@ sealed class SharedContentResult with SharedContentResultMappable {
 class TicketCreatedResult extends SharedContentResult
     with TicketCreatedResultMappable {
   const TicketCreatedResult({
+    this.ticketId,
     required this.pnrNumber,
     required this.from,
     required this.to,
@@ -28,6 +29,7 @@ class TicketCreatedResult extends SharedContentResult
     this.warning,
   });
 
+  final String? ticketId;
   final String? pnrNumber;
   final String? from;
   final String? to;

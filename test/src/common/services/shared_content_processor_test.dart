@@ -501,6 +501,25 @@ void main() {
           );
         },
       );
+
+      test(
+        'Given TicketCreatedResult with ticketId, When checking fields, '
+        'Then ticketId is accessible',
+        () {
+          // Arrange (Given)
+          const result = TicketCreatedResult(
+            ticketId: 'T12345678',
+            pnrNumber: 'T12345678',
+            from: 'Chennai',
+            to: 'Bangalore',
+            fare: '500.00',
+            date: '2024-12-15',
+          );
+
+          // Assert (Then)
+          expect(result.ticketId, equals('T12345678'));
+        },
+      );
     });
 
     group('processContent - Integration Scenarios', () {

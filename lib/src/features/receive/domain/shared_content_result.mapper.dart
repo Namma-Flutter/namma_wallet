@@ -82,6 +82,12 @@ class TicketCreatedResultMapper extends ClassMapperBase<TicketCreatedResult> {
   @override
   final String id = 'TicketCreatedResult';
 
+  static String? _$ticketId(TicketCreatedResult v) => v.ticketId;
+  static const Field<TicketCreatedResult, String> _f$ticketId = Field(
+    'ticketId',
+    _$ticketId,
+    opt: true,
+  );
   static String? _$pnrNumber(TicketCreatedResult v) => v.pnrNumber;
   static const Field<TicketCreatedResult, String> _f$pnrNumber = Field(
     'pnrNumber',
@@ -113,6 +119,7 @@ class TicketCreatedResultMapper extends ClassMapperBase<TicketCreatedResult> {
 
   @override
   final MappableFields<TicketCreatedResult> fields = const {
+    #ticketId: _f$ticketId,
     #pnrNumber: _f$pnrNumber,
     #from: _f$from,
     #to: _f$to,
@@ -123,6 +130,7 @@ class TicketCreatedResultMapper extends ClassMapperBase<TicketCreatedResult> {
 
   static TicketCreatedResult _instantiate(DecodingData data) {
     return TicketCreatedResult(
+      ticketId: data.dec(_f$ticketId),
       pnrNumber: data.dec(_f$pnrNumber),
       from: data.dec(_f$from),
       to: data.dec(_f$to),
@@ -204,6 +212,7 @@ abstract class TicketCreatedResultCopyWith<
     implements SharedContentResultCopyWith<$R, $In, $Out> {
   @override
   $R call({
+    String? ticketId,
     String? pnrNumber,
     String? from,
     String? to,
@@ -226,6 +235,7 @@ class _TicketCreatedResultCopyWithImpl<$R, $Out>
       TicketCreatedResultMapper.ensureInitialized();
   @override
   $R call({
+    Object? ticketId = $none,
     Object? pnrNumber = $none,
     Object? from = $none,
     Object? to = $none,
@@ -234,6 +244,7 @@ class _TicketCreatedResultCopyWithImpl<$R, $Out>
     Object? warning = $none,
   }) => $apply(
     FieldCopyWithData({
+      if (ticketId != $none) #ticketId: ticketId,
       if (pnrNumber != $none) #pnrNumber: pnrNumber,
       if (from != $none) #from: from,
       if (to != $none) #to: to,
@@ -244,6 +255,7 @@ class _TicketCreatedResultCopyWithImpl<$R, $Out>
   );
   @override
   TicketCreatedResult $make(CopyWithData data) => TicketCreatedResult(
+    ticketId: data.get(#ticketId, or: $value.ticketId),
     pnrNumber: data.get(#pnrNumber, or: $value.pnrNumber),
     from: data.get(#from, or: $value.from),
     to: data.get(#to, or: $value.to),
