@@ -16,27 +16,15 @@ class ShareHandler {
   /// Handle the result of shared content processing
   void handleResult(SharedContentResult result) {
     switch (result) {
-      case TicketCreatedResult(
-        :final pnrNumber,
-        :final from,
-        :final to,
-        :final fare,
-        :final date,
-        :final warning,
-      ):
+      case TicketCreatedResult(:final ticketId, :final warning):
         if (warning != null) {
           handleWarning(warning);
         }
-        router.go(
-          AppRoute.shareSuccess.path,
-          extra: {
-            'pnrNumber': pnrNumber,
-            'from': from,
-            'to': to,
-            'fare': fare,
-            'date': date,
-          },
-        );
+        if (ticketId != null) {
+          router.go('/ticket/$ticketId');
+        } else {
+          router.go(AppRoute.home.path);
+        }
 
       case TicketUpdatedResult(:final pnrNumber, :final updateType):
         // Reuse share success screen with update-specific values
