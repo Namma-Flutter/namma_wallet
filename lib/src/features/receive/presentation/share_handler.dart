@@ -14,7 +14,7 @@ class ShareHandler {
   final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey;
 
   /// Handle the result of shared content processing
-  void handleResult(SharedContentResult result) {
+  Future<void> handleResult(SharedContentResult result) async {
     switch (result) {
       case TicketCreatedResult(:final ticketId, :final warning):
         if (warning != null) {
@@ -22,7 +22,7 @@ class ShareHandler {
         }
         if (ticketId != null) {
           router.go(AppRoute.home.path);
-          router.push('/ticket/$ticketId');
+          await router.push('/ticket/$ticketId');
         } else {
           router.go(AppRoute.home.path);
         }

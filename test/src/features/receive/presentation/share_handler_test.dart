@@ -32,7 +32,7 @@ void main() {
       test(
         'Given TicketCreatedResult with ticketId, When handleResult called, '
         'Then navigates to ticket view path',
-        () {
+        () async {
           // Arrange (Given)
           const result = TicketCreatedResult(
             pnrNumber: 'T12345678',
@@ -44,7 +44,7 @@ void main() {
           );
 
           // Act (When)
-          handler.handleResult(result);
+          await handler.handleResult(result);
 
           // Assert (Then)
           verify(fakeRouter.go('/')).called(1);
@@ -56,7 +56,7 @@ void main() {
         'Given TicketCreatedResult with null ticketId, '
         'When handleResult called, '
         'Then navigates to home',
-        () {
+        () async {
           // Arrange (Given)
           const result = TicketCreatedResult(
             pnrNumber: 'T12345678',
@@ -67,7 +67,7 @@ void main() {
           );
 
           // Act (When)
-          handler.handleResult(result);
+          await handler.handleResult(result);
 
           // Assert (Then)
           verify(fakeRouter.go('/')).called(1);
@@ -78,7 +78,7 @@ void main() {
         'Given TicketCreatedResult with ticketId and warning, '
         'When handleResult called, '
         'Then navigates to ticket view and shows warning',
-        () {
+        () async {
           // Arrange (Given)
           const result = TicketCreatedResult(
             pnrNumber: 'T12345678',
@@ -91,7 +91,7 @@ void main() {
           );
 
           // Act (When)
-          handler.handleResult(result);
+          await handler.handleResult(result);
 
           // Assert (Then)
           verify(fakeRouter.go('/')).called(1);
