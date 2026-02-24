@@ -21,7 +21,8 @@ class ShareHandler {
           handleWarning(warning);
         }
         if (ticketId != null) {
-          router.go('/ticket/$ticketId');
+          router.go(AppRoute.home.path);
+          router.push('/ticket/$ticketId');
         } else {
           router.go(AppRoute.home.path);
         }

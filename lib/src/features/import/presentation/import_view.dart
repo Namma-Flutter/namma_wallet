@@ -48,7 +48,8 @@ class _ImportViewState extends State<ImportView> {
       if (!mounted) return;
 
       if (ticket != null) {
-        context.pushReplacementNamed(
+        context.go(AppRoute.home.path);
+        context.pushNamed(
           AppRoute.ticketView.name,
           pathParameters: {'id': ticket.ticketId!},
         );
@@ -139,7 +140,8 @@ class _ImportViewState extends State<ImportView> {
         if (!mounted) return;
 
         if (ticket != null) {
-          context.pushReplacementNamed(
+          context.go(AppRoute.home.path);
+          context.pushNamed(
             AppRoute.ticketView.name,
             pathParameters: {'id': ticket.ticketId!},
           );
@@ -191,7 +193,8 @@ class _ImportViewState extends State<ImportView> {
 
         final ticketId = result.ticket?.ticketId;
         if (result.isSuccess && ticketId != null) {
-          context.pushReplacementNamed(
+          context.go(AppRoute.home.path);
+          context.pushNamed(
             AppRoute.ticketView.name,
             pathParameters: {'id': ticketId},
           );

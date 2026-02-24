@@ -47,7 +47,8 @@ void main() {
           handler.handleResult(result);
 
           // Assert (Then)
-          verify(fakeRouter.go('/ticket/T12345678')).called(1);
+          verify(fakeRouter.go('/')).called(1);
+          verify(fakeRouter.push('/ticket/T12345678')).called(1);
         },
       );
 
@@ -93,7 +94,8 @@ void main() {
           handler.handleResult(result);
 
           // Assert (Then)
-          verify(fakeRouter.go('/ticket/T12345678')).called(1);
+          verify(fakeRouter.go('/')).called(1);
+          verify(fakeRouter.push('/ticket/T12345678')).called(1);
         },
       );
     });
