@@ -55,14 +55,14 @@ void main() {
     test(
       'should fallback location to from place when pickup point is missing',
       () {
-      const model = TNSTCTicketModel(
-        pnrNumber: 'T76296907',
-        serviceStartPlace: 'KUMBAKONAM',
-      );
+        const model = TNSTCTicketModel(
+          pnrNumber: 'T76296907',
+          serviceStartPlace: 'KUMBAKONAM',
+        );
 
-      final ticket = parser.parse(model);
+        final ticket = parser.parse(model);
 
-      expect(ticket.location, 'KUMBAKONAM');
+        expect(ticket.location, 'KUMBAKONAM');
       },
     );
 
