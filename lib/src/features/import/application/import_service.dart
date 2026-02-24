@@ -46,9 +46,10 @@ class ImportService implements IImportService {
 
   @override
   Future<Ticket?> importAndSavePDFFile(XFile pdfFile) async {
+    // Use basename to avoid logging full path with sensitive directory info
+    final filename = pdfFile.name;
+
     try {
-      // Use basename to avoid logging full path with sensitive directory info
-      final filename = pdfFile.name;
       _logger.info('Importing PDF file: $filename');
 
       // Extract OCR blocks with geometry from PDF
@@ -79,7 +80,15 @@ class ImportService implements IImportService {
         'Successfully imported and saved PDF ticket: ${parsedTicket.ticketId}',
       );
       return parsedTicket;
-    } on Exception catch (e, stackTrace) {
+    } on Object catch (e, stackTrace) {
+      if (e is UnsupportedError) {
+        _logger.warning(
+          'PDF import is not supported on web for this file: $filename. '
+          'Web currently supports SMS extraction only.',
+        );
+        return null;
+      }
+
       _logger.error('Error importing PDF file', e, stackTrace);
       return null;
     }
