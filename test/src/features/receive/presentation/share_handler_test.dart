@@ -52,7 +52,8 @@ void main() {
       );
 
       test(
-        'Given TicketCreatedResult with null ticketId, When handleResult called, '
+        'Given TicketCreatedResult with null ticketId, '
+        'When handleResult called, '
         'Then navigates to home',
         () {
           // Arrange (Given)
@@ -62,7 +63,6 @@ void main() {
             to: 'Bangalore',
             fare: '500',
             date: '15/12/2024',
-            ticketId: null,
           );
 
           // Act (When)
@@ -74,7 +74,8 @@ void main() {
       );
 
       test(
-        'Given TicketCreatedResult with ticketId and warning, When handleResult called, '
+        'Given TicketCreatedResult with ticketId and warning, '
+        'When handleResult called, '
         'Then navigates to ticket view and shows warning',
         () {
           // Arrange (Given)

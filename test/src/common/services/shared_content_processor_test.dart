@@ -123,7 +123,9 @@ void main() {
       );
 
       test(
-        'Given valid SMS content with extractable PNR, When processing content, Then TicketCreatedResult.ticketId equals the extracted PNR',
+        'Given valid SMS content with extractable PNR, '
+        'When processing content, '
+        'Then TicketCreatedResult.ticketId equals the extracted PNR',
         () async {
           // Arrange (Given)
           final logger = getIt<ILogger>();
@@ -134,7 +136,8 @@ void main() {
             importService: MockImportService(),
           );
 
-          // The MockTravelParserService extracts 'T12345678' and sets it as ticketId
+          // The MockTravelParserService extracts 'T12345678' and
+          // sets it as ticketId
           const smsContent = '''
             Corporation : SETC, From : CHENNAI To BANGALORE
             PNR NO. : T12345678, Trip Code : Trip123
