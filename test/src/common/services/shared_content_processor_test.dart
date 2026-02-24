@@ -121,6 +121,39 @@ void main() {
           );
         },
       );
+
+      test(
+        'Given valid SMS content, When processing content, '
+        'Then TicketCreatedResult includes ticketId from parsed ticket',
+        () async {
+          // Arrange (Given)
+          final logger = getIt<ILogger>();
+          final processor = SharedContentProcessor(
+            logger: logger,
+            travelParser: MockTravelParserService(logger: logger),
+            ticketDao: MockTicketDAO(),
+            importService: MockImportService(),
+          );
+
+          // The MockTravelParserService extracts 'T12345678' and sets it as ticketId
+          const smsContent = '''
+            Corporation : SETC, From : CHENNAI To BANGALORE
+            PNR NO. : T12345678, Trip Code : Trip123
+            Journey Date : 15/12/2024, Time : 14:30
+          ''';
+
+          // Act (When)
+          final result = await processor.processContent(
+            smsContent,
+            SharedContentType.sms,
+          );
+
+          // Assert (Then)
+          expect(result, isA<TicketCreatedResult>());
+          final ticketResult = result as TicketCreatedResult;
+          expect(ticketResult.ticketId, equals('T12345678'));
+        },
+      );
     });
 
     group('processContent - Ticket Updates', () {
