@@ -22,8 +22,8 @@ class ImportService implements IImportService {
     required IIRCTCScannerService irctcScannerService,
     required IPKPassParser pkpassParser,
     required ITNSTCPNRFetcher tnstcPnrFetcher,
+    required TNSTCApiTicketParser tnstcApiTicketParser,
     required ITicketDAO ticketDao,
-    TNSTCApiTicketParser? tnstcApiTicketParser,
   }) : _logger = logger,
        _pdfService = pdfService,
        _travelParser = travelParser,
@@ -31,7 +31,7 @@ class ImportService implements IImportService {
        _irctcScannerService = irctcScannerService,
        _pkpassParser = pkpassParser,
        _tnstcPnrFetcher = tnstcPnrFetcher,
-       _tnstcApiTicketParser = tnstcApiTicketParser ?? TNSTCApiTicketParser(),
+       _tnstcApiTicketParser = tnstcApiTicketParser,
        _ticketDao = ticketDao;
 
   final ILogger _logger;
