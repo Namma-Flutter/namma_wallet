@@ -64,6 +64,10 @@ android {
     buildFeatures {
         viewBinding = true
     }
+
+    lint {
+        checkDependencies = false
+    }
 }
 
 flutter {
