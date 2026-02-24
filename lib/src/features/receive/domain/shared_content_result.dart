@@ -25,6 +25,7 @@ class TicketCreatedResult extends SharedContentResult
     required this.to,
     required this.fare,
     required this.date,
+    this.ticketId,
     this.warning,
   });
 
@@ -33,6 +34,7 @@ class TicketCreatedResult extends SharedContentResult
   final String? to;
   final String? fare;
   final String? date;
+  final String? ticketId;
   final String? warning;
 }
 
