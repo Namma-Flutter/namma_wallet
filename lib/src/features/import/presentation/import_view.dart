@@ -56,10 +56,14 @@ class _ImportViewState extends State<ImportView> {
       if (!mounted) return;
 
       if (ticket != null) {
-        showSnackbar(
-          context,
-          'QR ticket imported successfully!',
-        );
+        final id = ticket.ticketId;
+        if (id != null) {
+          context.go(AppRoute.home.path);
+          await context.pushNamed(
+            AppRoute.ticketView.name,
+            pathParameters: {'id': id},
+          );
+        }
       } else {
         showSnackbar(
           context,
@@ -147,12 +151,22 @@ class _ImportViewState extends State<ImportView> {
         if (!mounted) return;
 
         if (ticket != null) {
-          showSnackbar(context, 'PDF ticket imported successfully!');
+          final id = ticket.ticketId;
+          if (id != null) {
+            context.go(AppRoute.home.path);
+            await context.pushNamed(
+              AppRoute.ticketView.name,
+              pathParameters: {'id': id},
+            );
+          }
         } else {
           showSnackbar(
             context,
-            'Unable to read text from this PDF or content does'
-            ' not match any supported ticket format.',
+            kIsWeb
+                ? 'PDF import is not supported on web for scanned/image-only '
+                      'tickets. Web currently supports SMS extraction only.'
+                : 'Unable to read text from this PDF or content does'
+                      ' not match any supported ticket format.',
             isError: true,
           );
         }
@@ -194,7 +208,16 @@ class _ImportViewState extends State<ImportView> {
 
         if (!mounted) return;
 
-        ClipboardResultHandler.showResultMessage(context, result);
+        final ticketId = result.ticket?.ticketId;
+        if (result.isSuccess && ticketId != null) {
+          context.go(AppRoute.home.path);
+          await context.pushNamed(
+            AppRoute.ticketView.name,
+            pathParameters: {'id': ticketId},
+          );
+        } else {
+          ClipboardResultHandler.showResultMessage(context, result);
+        }
       } on Exception catch (e) {
         if (mounted) {
           showSnackbar(

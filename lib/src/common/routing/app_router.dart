@@ -12,11 +12,12 @@ import 'package:namma_wallet/src/features/export/presentation/export_view.dart';
 import 'package:namma_wallet/src/features/home/presentation/all_tickets_view.dart';
 import 'package:namma_wallet/src/features/home/presentation/home_view.dart';
 import 'package:namma_wallet/src/features/import/presentation/import_view.dart';
-import 'package:namma_wallet/src/features/profile/presentation/contributors_view.dart';
-import 'package:namma_wallet/src/features/profile/presentation/db_viewer_view.dart';
-import 'package:namma_wallet/src/features/profile/presentation/license_view.dart';
-import 'package:namma_wallet/src/features/profile/presentation/profile_view.dart';
 import 'package:namma_wallet/src/features/receive/presentation/share_success_view.dart';
+import 'package:namma_wallet/src/features/settings/presentation/contributors_view.dart';
+import 'package:namma_wallet/src/features/settings/presentation/db_viewer_view.dart';
+import 'package:namma_wallet/src/features/settings/presentation/license_view.dart';
+import 'package:namma_wallet/src/features/settings/presentation/ocr_debug_view.dart';
+import 'package:namma_wallet/src/features/settings/presentation/settings_view.dart';
 import 'package:namma_wallet/src/features/travel/presentation/travel_ticket_view.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>(
@@ -97,9 +98,9 @@ final router = GoRouter(
       builder: (context, state) => const AllTicketsView(),
     ),
     GoRoute(
-      path: AppRoute.profile.path,
-      name: AppRoute.profile.name,
-      builder: (context, state) => const ProfileView(),
+      path: AppRoute.settings.path,
+      name: AppRoute.settings.name,
+      builder: (context, state) => const SettingsView(),
     ),
     GoRoute(
       path: AppRoute.barcodeScanner.path,
@@ -125,6 +126,11 @@ final router = GoRouter(
       path: AppRoute.dbViewer.path,
       name: AppRoute.dbViewer.name,
       builder: (context, state) => const DbViewerView(),
+    ),
+    GoRoute(
+      path: AppRoute.ocrDebug.path,
+      name: AppRoute.ocrDebug.name,
+      builder: (context, state) => const OCRDebugView(),
     ),
     GoRoute(
       path: AppRoute.license.path,

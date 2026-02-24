@@ -377,11 +377,11 @@ void main() {
             .firstOrNull;
 
         expect(seatTag, isNull);
-        // Should default to 1 seat if empty
-        expect(
-          ticket.extras?.firstWhere((e) => e.title == 'Seats').value,
-          equals('1'),
-        );
+        // Should return null for seats if empty
+        final seatsExtra = ticket.extras
+            ?.where((e) => e.title == 'Seats')
+            .firstOrNull;
+        expect(seatsExtra, isNull);
       });
 
       test('should handle seat number field missing completely', () {
@@ -395,10 +395,10 @@ void main() {
             .firstOrNull;
 
         expect(seatTag, isNull);
-        expect(
-          ticket.extras?.firstWhere((e) => e.title == 'Seats').value,
-          equals('1'),
-        );
+        final seatsExtra = ticket.extras
+            ?.where((e) => e.title == 'Seats')
+            .firstOrNull;
+        expect(seatsExtra, isNull);
       });
     });
   });

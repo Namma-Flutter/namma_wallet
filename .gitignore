@@ -62,7 +62,7 @@ config.json
 **/*.jks
 
 # Environment variables
-.env
+android/fastlane/.env.local
 .env.local
 .env.*.local
 ios/fastlane/report.xml
@@ -72,3 +72,5 @@ android/fastlane/*.json
 ios/Runner.app.dSYM.zip
 ios/Runner.ipa
 android/fastlane/report.xml
+coverage/
+android/build/

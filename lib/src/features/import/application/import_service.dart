@@ -50,22 +50,23 @@ class ImportService implements IImportService {
 
   @override
   Future<Ticket?> importAndSavePDFFile(XFile pdfFile) async {
+    // Use basename to avoid logging full path with sensitive directory info
+    final filename = pdfFile.name;
+
     try {
-      // Use basename to avoid logging full path with sensitive directory info
-      final filename = pdfFile.name;
       _logger.info('Importing PDF file: $filename');
 
-      // Extract text from PDF
-      final extractedText = await _pdfService.extractTextFrom(pdfFile);
+      // Extract OCR blocks with geometry from PDF
+      final extractedBlocks = await _pdfService.extractBlocks(pdfFile);
 
-      if (extractedText.trim().isEmpty) {
-        _logger.warning('No text extracted from PDF: $filename');
+      if (extractedBlocks.isEmpty) {
+        _logger.warning('No OCR blocks extracted from PDF: $filename');
         return null;
       }
 
-      // Parse the extracted text as a travel ticket
-      final parsedTicket = _travelParser.parseTicketFromText(
-        extractedText,
+      // Parse using OCR blocks (preserves geometry for layout extraction)
+      final parsedTicket = _travelParser.parseTicketFromBlocks(
+        extractedBlocks,
         sourceType: SourceType.pdf,
       );
 
@@ -83,7 +84,15 @@ class ImportService implements IImportService {
         'Successfully imported and saved PDF ticket: ${parsedTicket.ticketId}',
       );
       return parsedTicket;
-    } on Exception catch (e, stackTrace) {
+    } on Object catch (e, stackTrace) {
+      if (e is UnsupportedError) {
+        _logger.warning(
+          'PDF import is not supported on web for this file: $filename. '
+          'Web currently supports SMS extraction only.',
+        );
+        return null;
+      }
+
       _logger.error('Error importing PDF file', e, stackTrace);
       return null;
     }

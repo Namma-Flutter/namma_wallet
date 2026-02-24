@@ -178,7 +178,7 @@ class SharingIntentService implements ISharingIntentService {
     if (fileExtension == '.pdf') {
       // Extract text from PDF using PDFService
       _logger.info('Extracting text from PDF: ${file.path}');
-      final content = await _pdfService.extractTextFrom(file);
+      final content = await _pdfService.extractTextForDisplay(file);
       _logger.info('Successfully extracted text from PDF');
       return content;
     } else if (_isSupportedTextFile(fileExtension)) {

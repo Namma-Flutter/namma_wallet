@@ -18,6 +18,17 @@ void main() {
       expect(passenger.seatNumber, '12A');
     });
 
+    test('should instantiate with null fields', () {
+      const passenger = PassengerInfo(
+        name: 'Empty Seat',
+      );
+      expect(passenger.name, 'Empty Seat');
+      expect(passenger.age, isNull);
+      expect(passenger.type, isNull);
+      expect(passenger.gender, isNull);
+      expect(passenger.seatNumber, isNull);
+    });
+
     test('toString should return a formatted string', () {
       const passenger = PassengerInfo(
         name: 'Jane Doe',
@@ -30,6 +41,15 @@ void main() {
         passenger.toString(),
         'PassengerInfo(Name: Jane Doe, Age: 28, Type: Adult, '
         'Gender: F, Seat: 12B)',
+      );
+    });
+
+    test('toString should handle null fields', () {
+      const passenger = PassengerInfo(name: 'Jane Doe');
+      expect(
+        passenger.toString(),
+        'PassengerInfo(Name: Jane Doe, Age: null, Type: null, '
+        'Gender: null, Seat: null)',
       );
     });
 
