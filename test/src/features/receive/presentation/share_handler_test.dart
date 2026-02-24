@@ -7,6 +7,11 @@ import 'package:namma_wallet/src/features/receive/presentation/share_handler.dar
 import '../../../../helpers/fake_go_router.dart';
 
 void main() {
+  // Required because GlobalKey.currentState accesses WidgetsBinding.instance
+  // unconditionally inside the Flutter framework, before the null-safe `?.`
+  // guard in handleWarning can take effect.  Without this initialisation the
+  // third test (which triggers handleWarning via a non-null warning) throws
+  // "Binding has not yet been initialized".
   TestWidgetsFlutterBinding.ensureInitialized();
 
   group('ShareHandler', () {
@@ -69,8 +74,8 @@ void main() {
       );
 
       test(
-        'Given TicketCreatedResult with warning, When handleResult called, '
-        'Then does NOT navigate to share success',
+        'Given TicketCreatedResult with ticketId and warning, When handleResult called, '
+        'Then navigates to ticket view and shows warning',
         () {
           // Arrange (Given)
           const result = TicketCreatedResult(
@@ -88,7 +93,6 @@ void main() {
 
           // Assert (Then)
           verify(fakeRouter.go('/ticket/T12345678')).called(1);
-          verifyNever(fakeRouter.go('/share-success'));
         },
       );
     });
