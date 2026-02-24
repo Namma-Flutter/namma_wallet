@@ -26,6 +26,7 @@ class _ImportViewState extends State<ImportView> {
   late final IImportService _importService = getIt<IImportService>();
   late final ILogger _logger = getIt<ILogger>();
   final TextEditingController _pnrController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
   bool _isPasting = false;
   bool _isScanning = false;
   bool _isProcessingPDF = false;
@@ -35,6 +36,7 @@ class _ImportViewState extends State<ImportView> {
   @override
   void dispose() {
     _pnrController.dispose();
+    _phoneController.dispose();
     super.dispose();
   }
 
@@ -241,10 +243,19 @@ class _ImportViewState extends State<ImportView> {
     if (_isFetchingPNR) return;
 
     final pnr = _pnrController.text.trim();
+    final phoneNumber = _phoneController.text.trim();
     if (pnr.isEmpty) {
       showSnackbar(
         context,
         'Please enter a PNR number',
+        isError: true,
+      );
+      return;
+    }
+    if (phoneNumber.isEmpty) {
+      showSnackbar(
+        context,
+        'Please enter your phone number',
         isError: true,
       );
       return;
@@ -259,12 +270,13 @@ class _ImportViewState extends State<ImportView> {
     );
 
     try {
-      final ticket = await _importService.importTNSTCByPNR(pnr);
+      final ticket = await _importService.importTNSTCByPNR(pnr, phoneNumber);
 
       if (!mounted) return;
 
       if (ticket != null) {
         _pnrController.clear();
+        _phoneController.clear();
         showSnackbar(
           context,
           'TNSTC ticket imported successfully!',
@@ -272,7 +284,7 @@ class _ImportViewState extends State<ImportView> {
       } else {
         showSnackbar(
           context,
-          'Unable to fetch ticket. Please check the PNR number.',
+          'Unable to fetch ticket. Verify PNR and phone number.',
           isError: true,
         );
       }
@@ -314,18 +326,34 @@ class _ImportViewState extends State<ImportView> {
     await showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Enter PNR Number'),
-        content: TextField(
-          controller: _pnrController,
-          decoration: const InputDecoration(
-            hintText: 'e.g., T76296906',
-          ),
-          autofocus: true,
-          textInputAction: TextInputAction.done,
-          onSubmitted: (_) async {
-            context.pop();
-            await _handlePNRFetch();
-          },
+        title: const Text('Enter PNR and Phone Number'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: _pnrController,
+              decoration: const InputDecoration(
+                labelText: 'PNR Number',
+                hintText: 'e.g., T76296906',
+              ),
+              autofocus: true,
+              textInputAction: TextInputAction.next,
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: _phoneController,
+              decoration: const InputDecoration(
+                labelText: 'Phone Number',
+                hintText: 'e.g., 9876543210',
+              ),
+              keyboardType: TextInputType.phone,
+              textInputAction: TextInputAction.done,
+              onSubmitted: (_) async {
+                context.pop();
+                await _handlePNRFetch();
+              },
+            ),
+          ],
         ),
         actions: [
           TextButton(
@@ -390,7 +418,7 @@ class _ImportViewState extends State<ImportView> {
               ImportMethodCardWidget(
                 icon: Icons.search,
                 title: 'TNSTC PNR',
-                subtitle: 'Fetch by number',
+                subtitle: 'PNR + phone',
                 onTap: _showPNRDialog,
               ),
             ],

@@ -27,13 +27,21 @@ class TNSTCPNRFetcher implements ITNSTCPNRFetcher {
   static const String _submitUrl = '$_baseUrl/manageKnowYourConductor.do';
 
   @override
-  Future<TNSTCTicketModel?> fetchTicketByPNR(String pnr) async {
+  Future<TNSTCTicketModel?> fetchTicketByPNR(
+    String pnr,
+    String phoneNumber,
+  ) async {
     try {
       _logger.info('Fetching TNSTC ticket for PNR: $pnr');
 
       final pnrTrimmed = pnr.trim();
+      final phoneTrimmed = phoneNumber.trim();
       if (pnrTrimmed.isEmpty) {
         _logger.warning('PNR is empty');
+        return null;
+      }
+      if (phoneTrimmed.isEmpty) {
+        _logger.warning('Phone number is empty');
         return null;
       }
 
@@ -88,7 +96,11 @@ class TNSTCPNRFetcher implements ITNSTCPNRFetcher {
         }
 
         // Step 3: Parse HTML response
-        final ticket = _parseHtmlResponse(response.body, pnrTrimmed);
+        final ticket = _parseHtmlResponse(
+          response.body,
+          pnrTrimmed,
+          phoneTrimmed,
+        );
         if (ticket != null) {
           _logger.success('Successfully fetched ticket for PNR: $pnr');
         } else {
@@ -111,7 +123,11 @@ class TNSTCPNRFetcher implements ITNSTCPNRFetcher {
   }
 
   /// Parses HTML response and extracts ticket information
-  TNSTCTicketModel? _parseHtmlResponse(String html, String pnr) {
+  TNSTCTicketModel? _parseHtmlResponse(
+    String html,
+    String pnr,
+    String phoneNumber,
+  ) {
     try {
       final document = html_parser.parse(html);
 
@@ -127,6 +143,22 @@ class TNSTCPNRFetcher implements ITNSTCPNRFetcher {
       // Validate that we have essential data
       if (data.isEmpty) {
         _logger.warning('No ticket data found in HTML for PNR: $pnr');
+        return null;
+      }
+
+      final apiPhoneNumber = _extractPassengerPhoneNumber(data);
+      if (apiPhoneNumber == null) {
+        _logger.warning('Passenger phone number not found for PNR: $pnr');
+        return null;
+      }
+
+      final normalizedInputPhone = _normalizePhone(phoneNumber);
+      final normalizedApiPhone = _normalizePhone(apiPhoneNumber);
+
+      if (normalizedInputPhone.isEmpty ||
+          normalizedApiPhone.isEmpty ||
+          normalizedInputPhone != normalizedApiPhone) {
+        _logger.warning('Phone verification failed for PNR: $pnr');
         return null;
       }
 
@@ -187,5 +219,47 @@ class TNSTCPNRFetcher implements ITNSTCPNRFetcher {
     }
 
     return data;
+  }
+
+  String? _extractPassengerPhoneNumber(Map<String, String> data) {
+    const candidateKeys = <String>{
+      'mobileno',
+      'mobilenumber',
+      'passengermobileno',
+      'passengermobilenumber',
+      'phoneno',
+      'phonenumber',
+      'contactnumber',
+    };
+
+    for (final entry in data.entries) {
+      final normalizedKey = entry.key.toLowerCase().replaceAll(
+        RegExp('[^a-z0-9]'),
+        '',
+      );
+      if (!candidateKeys.contains(normalizedKey)) {
+        continue;
+      }
+
+      // Safety: never treat conductor phone as passenger phone.
+      if (normalizedKey.contains('conductor')) {
+        continue;
+      }
+
+      final value = entry.value.trim();
+      if (value.isNotEmpty) {
+        return value;
+      }
+    }
+
+    return null;
+  }
+
+  String _normalizePhone(String phoneNumber) {
+    final digitsOnly = phoneNumber.replaceAll(RegExp(r'\D'), '');
+    if (digitsOnly.length > 10) {
+      return digitsOnly.substring(digitsOnly.length - 10);
+    }
+    return digitsOnly;
   }
 }

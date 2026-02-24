@@ -7,6 +7,8 @@ import 'package:namma_wallet/src/features/tnstc/domain/tnstc_model.dart';
 /// retrieve ticket information for a given PNR number.
 abstract interface class ITNSTCPNRFetcher {
   /// Fetches ticket details from TNSTC website using the provided PNR number.
+  /// Returns ticket data only if the provided phone number matches the
+  /// passenger phone returned by the API.
   ///
   /// Returns a [TNSTCTicketModel] if the PNR is valid and ticket data
   /// is successfully fetched and parsed. Returns `null` if:
@@ -21,10 +23,10 @@ abstract interface class ITNSTCPNRFetcher {
   ///
   /// Example:
   /// ```dart
-  /// final ticket = await fetcher.fetchTicketByPNR('T76296906');
+  /// final ticket = await fetcher.fetchTicketByPNR('T76296906', '9876543210');
   /// if (ticket != null) {
   ///   print('Found ticket: ${ticket.displayPnr}');
   /// }
   /// ```
-  Future<TNSTCTicketModel?> fetchTicketByPNR(String pnr);
+  Future<TNSTCTicketModel?> fetchTicketByPNR(String pnr, String phoneNumber);
 }

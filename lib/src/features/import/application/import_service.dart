@@ -8,6 +8,7 @@ import 'package:namma_wallet/src/common/services/pdf/pdf_service_interface.dart'
 import 'package:namma_wallet/src/features/import/application/import_service_interface.dart';
 import 'package:namma_wallet/src/features/irctc/application/irctc_qr_parser_interface.dart';
 import 'package:namma_wallet/src/features/irctc/application/irctc_scanner_service_interface.dart';
+import 'package:namma_wallet/src/features/tnstc/application/tnstc_api_ticket_parser.dart';
 import 'package:namma_wallet/src/features/tnstc/application/tnstc_pnr_fetcher_interface.dart';
 import 'package:namma_wallet/src/features/travel/application/pkpass_parser_interface.dart';
 import 'package:namma_wallet/src/features/travel/application/travel_parser_interface.dart';
@@ -22,6 +23,7 @@ class ImportService implements IImportService {
     required IPKPassParser pkpassParser,
     required ITNSTCPNRFetcher tnstcPnrFetcher,
     required ITicketDAO ticketDao,
+    TNSTCApiTicketParser? tnstcApiTicketParser,
   }) : _logger = logger,
        _pdfService = pdfService,
        _travelParser = travelParser,
@@ -29,6 +31,7 @@ class ImportService implements IImportService {
        _irctcScannerService = irctcScannerService,
        _pkpassParser = pkpassParser,
        _tnstcPnrFetcher = tnstcPnrFetcher,
+       _tnstcApiTicketParser = tnstcApiTicketParser ?? TNSTCApiTicketParser(),
        _ticketDao = ticketDao;
 
   final ILogger _logger;
@@ -38,6 +41,7 @@ class ImportService implements IImportService {
   final IIRCTCScannerService _irctcScannerService;
   final IPKPassParser _pkpassParser;
   final ITNSTCPNRFetcher _tnstcPnrFetcher;
+  final TNSTCApiTicketParser _tnstcApiTicketParser;
   final ITicketDAO _ticketDao;
 
   @override
@@ -167,12 +171,15 @@ class ImportService implements IImportService {
   }
 
   @override
-  Future<Ticket?> importTNSTCByPNR(String pnr) async {
+  Future<Ticket?> importTNSTCByPNR(String pnr, String phoneNumber) async {
     try {
       _logger.info('Importing TNSTC ticket by PNR');
 
       // Fetch ticket from TNSTC website
-      final tnstcTicket = await _tnstcPnrFetcher.fetchTicketByPNR(pnr);
+      final tnstcTicket = await _tnstcPnrFetcher.fetchTicketByPNR(
+        pnr,
+        phoneNumber,
+      );
 
       if (tnstcTicket == null) {
         _logger.warning('Failed to fetch TNSTC ticket for PNR: $pnr');
@@ -180,7 +187,7 @@ class ImportService implements IImportService {
       }
 
       // Convert to generic Ticket model
-      final ticket = Ticket.fromTNSTC(tnstcTicket, sourceType: 'PNR');
+      final ticket = _tnstcApiTicketParser.parse(tnstcTicket);
 
       // Save to database
       await _ticketDao.handleTicket(ticket);

@@ -25,7 +25,7 @@ class MockImportService implements IImportService {
   }
 
   @override
-  Future<Ticket?> importTNSTCByPNR(String pnr) async {
+  Future<Ticket?> importTNSTCByPNR(String pnr, String phoneNumber) async {
     return mockTicket;
   }
 
