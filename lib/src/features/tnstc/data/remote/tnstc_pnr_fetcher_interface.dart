@@ -5,6 +5,7 @@ import 'package:namma_wallet/src/features/tnstc/domain/tnstc_model.dart';
 ///
 /// This service makes HTTP requests to the TNSTC online portal to
 /// retrieve ticket information for a given PNR number.
+// ignore: one_member_abstracts
 abstract interface class ITNSTCPNRFetcher {
   /// Fetches ticket details from TNSTC website using the provided PNR number.
   /// Returns ticket data only if the provided phone number matches the
