@@ -156,6 +156,40 @@ void main() {
           expect(ticketResult.ticketId, equals('T12345678'));
         },
       );
+
+      test(
+        'Given a PKPass file path, '
+        'When processing content, '
+        'Then TicketCreatedResult.ticketId equals the imported ticket id',
+        () async {
+          // Arrange (Given)
+          const mockTicket = Ticket(
+            ticketId: 'PKPASS-UUID-001',
+            primaryText: 'CHENNAI → BANGALORE',
+            secondaryText: 'SETC - Bus',
+            location: 'CHENNAI',
+            type: TicketType.bus,
+          );
+          final logger = getIt<ILogger>();
+          final processor = SharedContentProcessor(
+            logger: logger,
+            travelParser: MockTravelParserService(logger: logger),
+            ticketDao: MockTicketDAO(),
+            importService: MockImportService(mockTicket: mockTicket),
+          );
+
+          // Act (When)
+          final result = await processor.processContent(
+            '/mock/path/ticket.pkpass',
+            SharedContentType.pkpass,
+          );
+
+          // Assert (Then)
+          expect(result, isA<TicketCreatedResult>());
+          final ticketResult = result as TicketCreatedResult;
+          expect(ticketResult.ticketId, equals('PKPASS-UUID-001'));
+        },
+      );
     });
 
     group('processContent - Ticket Updates', () {
