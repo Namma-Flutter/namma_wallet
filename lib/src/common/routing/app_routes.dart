@@ -3,7 +3,6 @@ enum AppRoute {
   home(path: '/', name: 'home'),
   import(path: '/import', name: 'import'),
   calendar(path: '/calendar', name: 'calendar'),
-  profile(path: '/profile', name: 'profile'),
 
   // Ticket related routes
   ticketView(path: '/ticket/:id', name: 'ticketView'),

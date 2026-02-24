@@ -10,18 +10,18 @@ import 'package:namma_wallet/src/common/services/haptic/haptic_service_interface
 import 'package:namma_wallet/src/common/theme/theme_provider.dart';
 import 'package:namma_wallet/src/common/widgets/rounded_back_button.dart';
 import 'package:namma_wallet/src/common/widgets/snackbar_widget.dart';
-import 'package:namma_wallet/src/features/profile/presentation/ai_status_widget.dart';
+import 'package:namma_wallet/src/features/settings/presentation/ai_status_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class ProfileView extends StatefulWidget {
-  const ProfileView({super.key});
+class SettingsView extends StatefulWidget {
+  const SettingsView({super.key});
 
   @override
-  State<ProfileView> createState() => _ProfileViewState();
+  State<SettingsView> createState() => _SettingsViewState();
 }
 
-class _ProfileViewState extends State<ProfileView> {
+class _SettingsViewState extends State<SettingsView> {
   final IHapticService hapticService = getIt<IHapticService>();
 
   bool _isHapticEnabled = false;
@@ -56,7 +56,7 @@ class _ProfileViewState extends State<ProfileView> {
     return Scaffold(
       appBar: AppBar(
         leading: const RoundedBackButton(),
-        title: const Text('Profile'),
+        title: const Text('Settings'),
       ),
       body: SingleChildScrollView(
         child: Padding(

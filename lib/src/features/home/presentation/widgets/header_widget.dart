@@ -35,7 +35,7 @@ class UserProfileWidget extends StatelessWidget {
               hapticService.triggerHaptic(
                 HapticType.selection,
               );
-              await context.pushNamed(AppRoute.profile.name);
+              await context.pushNamed(AppRoute.settings.name);
             },
             icon: const Icon(Icons.settings),
           ),
