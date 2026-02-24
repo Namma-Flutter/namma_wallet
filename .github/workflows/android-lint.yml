@@ -1,0 +1,28 @@
+name: AndroidLint
+
+on:
+  pull_request:
+    paths:
+      - .github/workflows/android-lint.yml
+      - android/**
+
+jobs:
+  android-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - name: set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: jetbrains
+          java-version: 21
+          cache: gradle
+      - run: ./android/gradlew -p android lint
+      - name: GitHub Action for Android Lint
+        uses: yutailang0119/action-android-lint@v5.0.0
+        with:
+          report-path: android/**/build/reports/lint-results*.xml
+          ignore-warnings: true
+        continue-on-error: false
