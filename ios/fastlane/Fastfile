@@ -40,7 +40,7 @@ platform :ios do
 
     # 2. Validate version+build combination (prevent duplicate uploads)
     begin
-      latest_build = app_store_build_number(
+          latest_build = app_store_build_number(
         api_key: api_key,
         app_identifier: "com.nammaflutter.nammawallet",
         live: false,

@@ -28,104 +28,6 @@ class Ticket with TicketMappable {
     this.directionsUrl,
   });
 
-  factory Ticket.fromIRCTC(
-    IRCTCTicket model, {
-    bool isUpdate = false,
-  }) {
-    if ((model.dateOfJourney == null || model.scheduledDeparture == null) &&
-        !isUpdate) {
-      getIt<ILogger>().error(
-        '[Ticket.fromIRCTC] Missing required date/time: '
-        'dateOfJourney=${model.dateOfJourney}, '
-        'scheduledDeparture=${model.scheduledDeparture}',
-      );
-      throw ArgumentError(
-        'Cannot create IRCTC ticket: dateOfJourney or '
-        'scheduledDeparture is null',
-      );
-    }
-
-    final journeyDate = !isUpdate ? model.dateOfJourney : null;
-    final departure = !isUpdate ? model.scheduledDeparture : null;
-
-    /// the constants [_primaryTextConstant] used for primaryText
-    /// and [__secondaryTextConstant] used for secondary
-    /// are used here only for merging logic, it won't affect the user data.
-
-    return Ticket(
-      ticketId: model.pnrNumber,
-      primaryText:
-          model.fromStation.isNotNullOrEmpty && model.toStation.isNotNullOrEmpty
-          ? '${model.fromStation} → ${model.toStation}'
-          : _primaryTextConstant,
-      secondaryText:
-          [
-            if (model.trainNumber.isNotNullOrEmpty) model.trainNumber,
-            if (model.travelClass.isNotNullOrEmpty) model.travelClass,
-          ].isEmpty
-          ? _secondaryTextConstant
-          : [
-              if (model.trainNumber.isNotNullOrEmpty)
-                'Train ${model.trainNumber}',
-              if (model.travelClass.isNotNullOrEmpty) model.travelClass,
-              if (model.passengerName.isNotNullOrEmpty) model.passengerName,
-            ].join(' • '),
-      startTime: !isUpdate
-          ? DateTime(
-              journeyDate!.year,
-              journeyDate.month,
-              journeyDate.day,
-              departure!.hour,
-              departure.minute,
-            )
-          : null,
-      location: model.boardingStation,
-      tags: [
-        TagModel(value: model.pnrNumber, icon: 'confirmation_number'),
-        if (model.trainNumber.isNotNullOrEmpty)
-          TagModel(value: model.trainNumber, icon: 'train'),
-        if (model.travelClass != null && model.travelClass!.isNotNullOrEmpty)
-          TagModel(value: model.travelClass, icon: 'event_seat'),
-        if (model.status.isNotNullOrEmpty)
-          TagModel(value: model.status, icon: 'info'),
-        if ((model.ticketFare ?? 0) > 0)
-          TagModel(
-            value: '₹${model.ticketFare?.toStringAsFixed(2)}',
-            icon: 'attach_money',
-          ),
-      ],
-      extras: [
-        ExtrasModel(title: 'PNR Number', value: model.pnrNumber),
-        ExtrasModel(title: 'Passenger', value: model.passengerName),
-        ExtrasModel(title: 'Gender', value: model.gender),
-        ExtrasModel(title: 'Age', value: model.age.toString()),
-        ExtrasModel(title: 'Train Name', value: model.trainName),
-        ExtrasModel(title: 'Quota', value: model.quota),
-        ExtrasModel(title: 'From', value: model.fromStation),
-        ExtrasModel(title: 'To', value: model.toStation),
-        ExtrasModel(title: 'Boarding', value: model.boardingStation),
-        ExtrasModel(
-          title: 'Departure',
-          value: !isUpdate
-              ? DateTimeConverter.instance.formatTime(departure!)
-              : null,
-        ),
-        ExtrasModel(
-          title: 'Date of Journey',
-          value: !isUpdate
-              ? DateTimeConverter.instance.formatDate(journeyDate!)
-              : null,
-        ),
-        ExtrasModel(title: 'Fare', value: model.ticketFare?.toStringAsFixed(2)),
-        ExtrasModel(
-          title: 'IRCTC Fee',
-          value: model.irctcFee?.toStringAsFixed(2),
-        ),
-        ExtrasModel(title: 'Transaction ID', value: model.transactionId),
-      ],
-    );
-  }
-
   factory Ticket.fromTNSTC(
     TNSTCTicketModel model, {
     String sourceType = 'PDF',
@@ -133,15 +35,10 @@ class Ticket with TicketMappable {
     final primarySource = model.serviceStartPlace ?? model.passengerStartPlace;
     final primaryDestination = model.serviceEndPlace ?? model.passengerEndPlace;
 
-    // Use first passenger for display if available
-    final firstPassenger = model.passengers.isNotEmpty
-        ? model.passengers.first
-        : null;
     // Get seat numbers from either SMS field or first passenger
     final seatNumber = model.seatNumbers.isNotNullOrEmpty
         ? model.seatNumbers
         : null;
-    final gender = firstPassenger?.gender;
 
     var startTime = model.passengerPickupTime;
 
@@ -151,21 +48,46 @@ class Ticket with TicketMappable {
         model.serviceStartTime != null &&
         model.serviceStartTime!.isNotNullOrEmpty) {
       try {
-        // serviceStartTime format is usually "HH:mm"
-        final timeParts = model.serviceStartTime!.split(':');
+        // serviceStartTime format is HH:mm or HH:mm AM/PM
+        final timeParts = model.serviceStartTime!.trim().split(':');
         if (timeParts.length == 2) {
-          final hour = int.parse(timeParts[0]);
-          final minute = int.parse(timeParts[1]);
+          final hourPart = timeParts[0];
+          final minuteAndPeriod = timeParts[1].toLowerCase();
 
-          // Validate hour and minute ranges
-          if (hour >= 0 && hour < 24 && minute >= 0 && minute < 60) {
-            startTime = DateTime(
-              model.journeyDate!.year,
-              model.journeyDate!.month,
-              model.journeyDate!.day,
-              hour,
-              minute,
-            );
+          var hour = int.tryParse(hourPart);
+          // minuteAndPeriod might be "15 pm" or "15"
+          final minuteMatch = RegExp(r'^(\d{2})').firstMatch(minuteAndPeriod);
+          final minute = minuteMatch != null
+              ? int.tryParse(minuteMatch.group(1)!)
+              : null;
+
+          if (hour != null && minute != null) {
+            final isPm = minuteAndPeriod.contains('pm');
+            final isAm = minuteAndPeriod.contains('am');
+
+            // Validate 12-hour format: if AM/PM is present,
+            // hour must be 1-12
+            final isValid12HourFormat =
+                !(isPm || isAm) || (hour >= 1 && hour <= 12);
+
+            if (isValid12HourFormat) {
+              if (isPm && hour < 12) {
+                hour += 12;
+              } else if (isAm && hour == 12) {
+                hour = 0;
+              }
+
+              // Validate hour and minute ranges
+              if (hour >= 0 && hour < 24 && minute >= 0 && minute < 60) {
+                startTime = DateTime(
+                  model.journeyDate!.year,
+                  model.journeyDate!.month,
+                  model.journeyDate!.day,
+                  hour,
+                  minute,
+                );
+              }
+            }
           }
         }
       } on FormatException catch (e) {
@@ -183,16 +105,12 @@ class Ticket with TicketMappable {
 
     startTime ??= model.journeyDate;
 
-    /// the constants [_primaryTextConstant] used for primaryText
-    /// and [__secondaryTextConstant] used for secondary
-    /// are used here only for merging logic, it won't affect the user data.
-
     return Ticket(
       ticketId: model.pnrNumber,
       primaryText:
           primarySource.isNotNullOrEmpty && primaryDestination.isNotNullOrEmpty
           ? '$primarySource → $primaryDestination'
-          : _primaryTextConstant,
+          : null,
       secondaryText:
           model.tripCode.isNotNullOrEmpty || model.routeNo.isNotNullOrEmpty
           ? [
@@ -200,15 +118,14 @@ class Ticket with TicketMappable {
               if (model.tripCode.isNotNullOrEmpty)
                 model.tripCode
               else
-                model.routeNo ?? 'Bus',
+                model.routeNo,
             ].where((s) => s != null && s.isNotEmpty).join(' - ')
-          : _secondaryTextConstant,
+          : null,
       startTime: startTime,
       location:
           model.passengerPickupPoint ??
           model.boardingPoint ??
-          model.serviceStartPlace ??
-          'Unknown',
+          model.serviceStartPlace,
       type: TicketType.bus,
 
       tags: [
@@ -232,16 +149,64 @@ class Ticket with TicketMappable {
           ExtrasModel(title: 'PNR Number', value: model.pnrNumber),
         if (model.passengers.isNotEmpty)
           ExtrasModel(
-            title: 'Passenger Name',
-            value: model.passengers
-                .map((p) => p.name)
-                .where((n) => n.isNotEmpty)
-                .join(', '),
+            title: 'Passenger',
+            value: model.passengers.map((p) => p.name).join(', '),
+            child: model.passengers.length == 1
+                ? [
+                    // Single passenger: show individual details
+                    if (model.passengers.first.seatNumber != null)
+                      ExtrasModel(
+                        title: 'Seat',
+                        value: model.passengers.first.seatNumber,
+                      ),
+                    if (model.passengers.first.age != null)
+                      ExtrasModel(
+                        title: 'Age',
+                        value: model.passengers.first.age.toString(),
+                      ),
+                    if (model.passengers.first.gender != null)
+                      ExtrasModel(
+                        title: 'Gender',
+                        value: model.passengers.first.gender,
+                      ),
+                  ]
+                : [
+                    // Multiple passengers: show combined details
+                    ExtrasModel(
+                      title: 'Ages',
+                      value: (() {
+                        final vals = model.passengers
+                            .map((p) => p.age?.toString())
+                            .where((v) => v != null)
+                            .cast<String>()
+                            .join(', ');
+                        return vals.isEmpty ? null : vals;
+                      })(),
+                    ),
+                    ExtrasModel(
+                      title: 'Genders',
+                      value: (() {
+                        final vals = model.passengers
+                            .map((p) => p.gender)
+                            .where((v) => v != null && v.isNotEmpty)
+                            .cast<String>()
+                            .join(', ');
+                        return vals.isEmpty ? null : vals;
+                      })(),
+                    ),
+                    ExtrasModel(
+                      title: 'Seat Numbers',
+                      value: (() {
+                        final vals = model.passengers
+                            .map((p) => p.seatNumber)
+                            .where((v) => v != null && v.isNotEmpty)
+                            .cast<String>()
+                            .join(', ');
+                        return vals.isEmpty ? null : vals;
+                      })(),
+                    ),
+                  ],
           ),
-        if (firstPassenger?.age != null && firstPassenger!.age > 0)
-          ExtrasModel(title: 'Age', value: firstPassenger.age.toString()),
-        if (gender != null && gender.isNotNullOrEmpty)
-          ExtrasModel(title: 'Gender', value: gender),
         if (model.busIdNumber?.trim().isNotNullOrEmpty ?? false)
           ExtrasModel(title: 'Bus ID', value: model.busIdNumber!.trim()),
         if (model.vehicleNumber?.trim().isNotNullOrEmpty ?? false)
@@ -255,6 +220,22 @@ class Ticket with TicketMappable {
             title: 'Booking Ref',
             value: model.obReferenceNumber!.trim(),
           ),
+
+        if (model.serviceStartPlace.isNotNullOrEmpty)
+          ExtrasModel(title: 'From', value: model.serviceStartPlace),
+        if (model.serviceEndPlace.isNotNullOrEmpty)
+          ExtrasModel(title: 'To', value: model.serviceEndPlace),
+        if (model.passengerStartPlace.isNotNullOrEmpty &&
+            model.passengerStartPlace != model.serviceStartPlace)
+          ExtrasModel(
+            title: 'Passenger From',
+            value: model.passengerStartPlace,
+          ),
+        if (model.passengerEndPlace.isNotNullOrEmpty &&
+            model.passengerEndPlace != model.serviceEndPlace)
+          ExtrasModel(title: 'Passenger To', value: model.passengerEndPlace),
+        if (model.passengerPickupPoint.isNotNullOrEmpty)
+          ExtrasModel(title: 'Pickup Point', value: model.passengerPickupPoint),
 
         if (model.classOfService != null &&
             model.classOfService!.trim().isNotNullOrEmpty)
@@ -275,13 +256,13 @@ class Ticket with TicketMappable {
         if (model.serviceStartTime != null &&
             model.serviceStartTime!.isNotNullOrEmpty)
           ExtrasModel(
-            title: 'Departure Time',
+            title: 'Departure',
             value: DateTimeConverter.instance.formatTimeString(
               model.serviceStartTime!,
             ),
           ),
         if (seatNumber != null && seatNumber.isNotNullOrEmpty)
-          ExtrasModel(title: 'Seat', value: seatNumber),
+          ExtrasModel(title: 'Seat Number', value: seatNumber),
         if (model.numberOfSeats != null)
           ExtrasModel(
             title: 'Seats',
@@ -307,18 +288,6 @@ class Ticket with TicketMappable {
           ExtrasModel(title: 'Trip Code', value: model.tripCode),
         if (model.routeNo != null && model.routeNo!.trim().isNotNullOrEmpty)
           ExtrasModel(title: 'Route No', value: model.routeNo!.trim()),
-        if (model.serviceStartPlace != null &&
-            model.serviceStartPlace!.isNotNullOrEmpty)
-          ExtrasModel(title: 'From', value: model.serviceStartPlace)
-        else if (model.passengerStartPlace != null &&
-            model.passengerStartPlace!.isNotNullOrEmpty)
-          ExtrasModel(title: 'From', value: model.passengerStartPlace),
-        if (model.serviceEndPlace != null &&
-            model.serviceEndPlace!.isNotNullOrEmpty)
-          ExtrasModel(title: 'To', value: model.serviceEndPlace)
-        else if (model.passengerEndPlace != null &&
-            model.passengerEndPlace!.isNotNullOrEmpty)
-          ExtrasModel(title: 'To', value: model.passengerEndPlace),
         ExtrasModel(title: 'Source Type', value: sourceType),
       ],
     );
@@ -328,17 +297,13 @@ class Ticket with TicketMappable {
     return Ticket(
       ticketId: existing.ticketId,
 
-      primaryText:
-          (!incoming.primaryText.isNotNullOrEmpty ||
-              incoming.primaryText == _primaryTextConstant)
-          ? existing.primaryText
-          : incoming.primaryText,
+      primaryText: incoming.primaryText.isNotNullOrEmpty
+          ? incoming.primaryText
+          : existing.primaryText,
 
-      secondaryText:
-          (!incoming.secondaryText.isNotNullOrEmpty ||
-              incoming.secondaryText == _secondaryTextConstant)
-          ? existing.secondaryText
-          : incoming.secondaryText,
+      secondaryText: incoming.secondaryText.isNotNullOrEmpty
+          ? incoming.secondaryText
+          : existing.secondaryText,
 
       location: (incoming.location?.trim().isNotNullOrEmpty ?? false)
           ? incoming.location
@@ -350,7 +315,7 @@ class Ticket with TicketMappable {
 
       endTime: (incoming.endTime == null) ? existing.endTime : incoming.endTime,
 
-      type: incoming.type,
+      type: incoming.type ?? existing.type,
 
       tags: _mergeTags(existing.tags, incoming.tags),
       extras: _mergeExtras(existing.extras, incoming.extras),
@@ -359,11 +324,104 @@ class Ticket with TicketMappable {
     );
   }
 
-  /// Sentinel value for merge logic only. Never use as a parsing fallback.
-  static const _primaryTextConstant = 'Unknown → Unknown';
+  factory Ticket.fromIRCTC(
+    IRCTCTicket model, {
+    bool isUpdate = false,
+  }) {
+    // If dateOfJourney or scheduledDeparture are null,startTime will be null
+    final hasValidDateTime =
+        model.dateOfJourney != null && model.scheduledDeparture != null;
 
-  /// Sentinel value for merge logic only. Never use as a parsing fallback.
-  static const _secondaryTextConstant = 'N/A';
+    final journeyDate = model.dateOfJourney;
+    final departure = model.scheduledDeparture;
+
+    return Ticket(
+      ticketId: model.pnrNumber,
+      primaryText:
+          model.fromStation.isNotNullOrEmpty && model.toStation.isNotNullOrEmpty
+          ? '${model.fromStation} → ${model.toStation}'
+          : null,
+      secondaryText: _buildIrctcSecondaryText(model),
+      startTime: !isUpdate && hasValidDateTime
+          ? DateTime(
+              journeyDate!.year,
+              journeyDate.month,
+              journeyDate.day,
+              departure!.hour,
+              departure.minute,
+            )
+          : null,
+      location: model.boardingStation,
+      tags: [
+        TagModel(value: model.pnrNumber, icon: 'confirmation_number'),
+        if (model.trainNumber.isNotNullOrEmpty)
+          TagModel(
+            value: model.trainName.isNotNullOrEmpty
+                ? '${model.trainNumber} - ${model.trainName}'
+                : model.trainNumber,
+            icon: 'train',
+          ),
+        if (model.travelClass != null && model.travelClass!.isNotNullOrEmpty)
+          TagModel(value: model.travelClass, icon: 'event_seat'),
+        if (model.status.isNotNullOrEmpty)
+          TagModel(value: model.status, icon: 'info'),
+        if ((model.ticketFare ?? 0) > 0)
+          TagModel(
+            value: '₹${model.ticketFare?.toStringAsFixed(2)}',
+            icon: 'attach_money',
+          ),
+      ],
+      type: TicketType.train,
+      extras: [
+        ExtrasModel(title: 'PNR Number', value: model.pnrNumber),
+        ExtrasModel(title: 'Passenger', value: model.passengerName),
+        ExtrasModel(title: 'Gender', value: model.gender),
+        ExtrasModel(title: 'Age', value: model.age?.toString()),
+        ExtrasModel(title: 'Berth', value: model.seatNumber),
+        ExtrasModel(title: 'Train Name', value: model.trainName),
+        ExtrasModel(title: 'Quota', value: model.quota),
+        ExtrasModel(
+          title: 'Distance',
+          value: model.distance != null ? '${model.distance} KM' : null,
+        ),
+        ExtrasModel(title: 'From', value: model.fromStation),
+        ExtrasModel(title: 'To', value: model.toStation),
+        ExtrasModel(title: 'Boarding', value: model.boardingStation),
+        ExtrasModel(
+          title: 'Departure',
+          value: !isUpdate && departure != null
+              ? DateTimeConverter.instance.formatTime(departure)
+              : null,
+        ),
+        ExtrasModel(
+          title: 'Arrival',
+          value: !isUpdate ? model.arrivalTime : null,
+        ),
+        ExtrasModel(
+          title: 'Date of Journey',
+          value: !isUpdate && journeyDate != null
+              ? DateTimeConverter.instance.formatDate(journeyDate)
+              : null,
+        ),
+        ExtrasModel(title: 'Fare', value: model.ticketFare?.toStringAsFixed(2)),
+        ExtrasModel(
+          title: 'IRCTC Fee',
+          value: model.irctcFee?.toStringAsFixed(2),
+        ),
+        ExtrasModel(title: 'Transaction ID', value: model.transactionId),
+      ],
+    );
+  }
+
+  static String? _buildIrctcSecondaryText(IRCTCTicket model) {
+    if (model.trainNumber.isNotNullOrEmpty &&
+        model.trainName.isNotNullOrEmpty) {
+      return '${model.trainNumber} - ${model.trainName}';
+    }
+    if (model.trainName.isNotNullOrEmpty) return model.trainName;
+    if (model.trainNumber.isNotNullOrEmpty) return model.trainNumber;
+    return null;
+  }
 
   /// Merges Extras (Key-Value pairs).
   /// Strategy: Convert old list to Map. Overwrite only if new value is valid.

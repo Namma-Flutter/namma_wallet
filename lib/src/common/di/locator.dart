@@ -39,8 +39,6 @@ import 'package:namma_wallet/src/features/receive/application/sharing_intent_ser
 import 'package:namma_wallet/src/features/receive/application/web_sharing_intent_service.dart';
 import 'package:namma_wallet/src/features/receive/domain/sharing_intent_service_interface.dart';
 import 'package:namma_wallet/src/features/settings/application/ai_service_status.dart';
-import 'package:namma_wallet/src/features/tnstc/application/ticket_parser_interface.dart';
-import 'package:namma_wallet/src/features/tnstc/application/tnstc_pdf_parser.dart';
 import 'package:namma_wallet/src/features/tnstc/application/tnstc_sms_parser.dart';
 import 'package:namma_wallet/src/features/travel/application/pkpass_parser.dart';
 import 'package:namma_wallet/src/features/travel/application/pkpass_parser_interface.dart';
@@ -79,9 +77,6 @@ void setupLocator() {
     )
     // Parsers
     ..registerLazySingleton<TNSTCSMSParser>(TNSTCSMSParser.new)
-    ..registerLazySingleton<ITicketParser>(
-      () => TNSTCPDFParser(logger: getIt<ILogger>()),
-    )
     ..registerLazySingleton<ITravelParser>(
       () => TravelParserService(logger: getIt<ILogger>()),
     )

@@ -3,7 +3,6 @@ enum AppRoute {
   home(path: '/', name: 'home'),
   import(path: '/import', name: 'import'),
   calendar(path: '/calendar', name: 'calendar'),
-  profile(path: '/profile', name: 'profile'),
 
   // Ticket related routes
   ticketView(path: '/ticket/:id', name: 'ticketView'),
@@ -24,7 +23,8 @@ enum AppRoute {
   contributors(path: '/contributors', name: 'contributors'),
 
   // Debug routes
-  dbViewer(path: '/db-viewer', name: 'dbViewer')
+  dbViewer(path: '/db-viewer', name: 'dbViewer'),
+  ocrDebug(path: '/ocr-debug', name: 'ocrDebug')
   ;
 
   const AppRoute({required this.path, required this.name});

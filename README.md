@@ -1,4 +1,5 @@
 # 👜 Namma Wallet
+
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
 [![All Contributors](https://img.shields.io/badge/all_contributors-9-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
@@ -6,6 +7,8 @@
 **Namma Wallet** is an open-source Flutter mobile application for managing digital travel tickets and passes. The app provides a unified interface to save, organize, and view tickets from multiple sources including SMS, PDFs, QR codes, and clipboard text. It features intelligent parsing for Indian transport providers and generates beautiful digital ticket designs.
 
 Unlike Apple Wallet or Google Wallet, which support only specific formats, **Namma Wallet** is a flexible, community-driven solution that works with any ticket type and format.
+
+<a href="https://play.google.com/store/apps/details?id=com.nammaflutter.nammawallet"><img src="assets/badges/google_play_badge.svg" alt="Get it on Google Play" height="60" width="200"/></a> <a href="https://apps.apple.com/in/app/namma-wallet/id6757295408"><img src="assets/badges/app_store_badge.svg" alt="Download on the App Store" height="60" width="200"/></a>
 
 ---
 
@@ -93,6 +96,9 @@ fvm flutter run -d <device-id>
 ```bash
 # Analyze code
 fvm flutter analyze
+
+# Run SwiftLint for iOS
+cd ios && swiftlint
 
 # Run tests (when available)
 fvm flutter test
@@ -245,3 +251,12 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
 This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
+
+
+## Android Release Signing File Structure
+android/
+├── key.properties          ✅ (DO NOT COMMIT)
+├── app/
+│   ├── namma-wallet.keystore  ✅ (DO NOT COMMIT)
+│   └── build.gradle.kts
+
