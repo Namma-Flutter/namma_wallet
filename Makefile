@@ -51,9 +51,6 @@ android-production:
 	cd android && bundle exec fastlane production
 
 # Fastlane iOS targets
-ios-test:
-	cd ios && bundle exec fastlane test
-
 ios-beta:
 	cd ios && bundle exec fastlane beta
 
