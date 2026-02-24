@@ -123,8 +123,7 @@ void main() {
       );
 
       test(
-        'Given valid SMS content, When processing content, '
-        'Then TicketCreatedResult includes ticketId from parsed ticket',
+        'Given valid SMS content with extractable PNR, When processing content, Then TicketCreatedResult.ticketId equals the extracted PNR',
         () async {
           // Arrange (Given)
           final logger = getIt<ILogger>();
