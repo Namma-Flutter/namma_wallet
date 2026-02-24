@@ -149,6 +149,9 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
                         TextButton(
                           onPressed: () async {
                             await context.pushNamed(AppRoute.allTickets.name);
+                            if (mounted) {
+                              await _loadTicketData();
+                            }
                           },
                           style: TextButton.styleFrom(
                             padding: const EdgeInsets.symmetric(
