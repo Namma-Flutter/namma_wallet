@@ -48,11 +48,14 @@ class _ImportViewState extends State<ImportView> {
       if (!mounted) return;
 
       if (ticket != null) {
-        context.go(AppRoute.home.path);
-        await context.pushNamed(
-          AppRoute.ticketView.name,
-          pathParameters: {'id': ticket.ticketId!},
-        );
+        final id = ticket.ticketId;
+        if (id != null) {
+          context.go(AppRoute.home.path);
+          await context.pushNamed(
+            AppRoute.ticketView.name,
+            pathParameters: {'id': id},
+          );
+        }
       } else {
         showSnackbar(
           context,
@@ -140,11 +143,14 @@ class _ImportViewState extends State<ImportView> {
         if (!mounted) return;
 
         if (ticket != null) {
-          context.go(AppRoute.home.path);
-          await context.pushNamed(
-            AppRoute.ticketView.name,
-            pathParameters: {'id': ticket.ticketId!},
-          );
+          final id = ticket.ticketId;
+          if (id != null) {
+            context.go(AppRoute.home.path);
+            await context.pushNamed(
+              AppRoute.ticketView.name,
+              pathParameters: {'id': id},
+            );
+          }
         } else {
           showSnackbar(
             context,
