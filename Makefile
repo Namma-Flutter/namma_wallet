@@ -3,7 +3,7 @@ FLUTTER ?= fvm flutter
 # Dart command - use 'fvm dart' if using FVM, otherwise 'dart'
 DART ?= fvm dart
 
-.PHONY: help clean get codegen release-android release-ios release-apk release-appbundle release-ipa ios-test ios-beta ios-production
+.PHONY: help clean get codegen release-android release-ios release-apk release-appbundle release-ipa ios-test ios-beta ios-release-candidate ios-production android-release-candidate
 
 help:
 	@echo "Available targets:"
@@ -47,6 +47,9 @@ release-ipa: get codegen
 android-beta:
 	cd android && bundle exec fastlane beta
 
+android-release-candidate:
+	cd android && bundle exec fastlane release-candidate
+
 android-production:
 	cd android && bundle exec fastlane production
 
@@ -54,5 +57,27 @@ android-production:
 ios-beta:
 	cd ios && bundle exec fastlane beta
 
+ios-release-candidate:
+	cd ios && bundle exec fastlane release-candidate
+
 ios-production:
 	cd ios && bundle exec fastlane production
+
+# Combined Deployment Targets
+.PHONY: deploy-beta deploy-release-candidate deploy-production coverage
+
+# Beta: Deploy to TestFlight beta and Play Store internal
+deploy-beta: ios-beta android-beta
+
+# Release Candidate: Promote both iOS and Android to Release Candidate
+deploy-release-candidate: ios-release-candidate android-release-candidate
+
+# Production: Promote both iOS and Android to production
+deploy-production: ios-production android-production
+
+# Runs tests with coverage and generates HTML coverage report,
+# excluding all generated *.g.dart files (Riverpod, Freezed, JSON, etc.)
+coverage:
+	$(FLUTTER) test --coverage
+	lcov --remove coverage/lcov.info '**/*.g.dart' -o coverage/lcov.info
+	genhtml coverage/lcov.info -o coverage/html
