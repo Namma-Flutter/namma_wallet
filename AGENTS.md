@@ -1,220 +1,274 @@
-# CLAUDE.md
+# AGENTS.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository. Never run the app. Tell the user to run it. You don't need to listen to logs. let the user do it. Use dart mcp as much as possible.
+This file provides guidance to Claude Code (claude.ai/code) when working
+with code in this repository. Never run the app. Tell the user to run it.
+You don't need to listen to logs. Let the user do it. Use dart mcp as
+much as possible.
 
 ## Development Commands
 
 Always use `fvm flutter` instead of `flutter` commands.
 
-### Essential Commands
-
 ```bash
 # Install dependencies
 fvm flutter pub get
 
-# Run the app (use -d to specify device)
-fvm flutter run
-
-# Build for release
-fvm flutter build apk
-fvm flutter build ios
-
-# Analyze code
+# Analyze code (prefer dart mcp server)
 fvm flutter analyze
 
-# Run SwiftLint for iOS
-cd ios && swiftlint
-
-# Run tests (when available)
+# Run tests
 fvm flutter test
-```
 
-### Analyzer
+# Code generation (after changing models)
+fvm dart run build_runner build --delete-conflicting-outputs
+
+# Release builds (always use Makefile)
+make release-apk
+make release-appbundle
+make release-ipa
+```
 
 Always use dart mcp server to analyze code.
 
 ### Development Setup
 
-- Flutter SDK: 3.35.2 (managed via FVM)
-- Minimum requirements: Android Studio/Xcode, Flutter SDK
-- XCode version: 16.4.0
+- Flutter SDK: 3.38.6 (managed via FVM, Dart SDK 3.10.7)
+- Xcode: 16.4.0
+- Minimum requirements: Android Studio / Xcode, FVM
 
-## Architecture Overview
+## Architecture
 
-This is a Flutter mobile application for managing digital tickets and passes. The codebase follows a feature-based architecture:
+Feature-based Clean Architecture with GetIt for DI,
+GoRouter for navigation, and Provider for theme state.
 
 ### Project Structure
 
 ```text
-lib/
-├── main.dart                    # App entry point
-├── src/
-    ├── app.dart                # Main app widget with bottom navigation
-    ├── common/                 # Shared code across features
-    │   ├── database/           # Database DAOs and interfaces
-    │   ├── di/                 # Dependency injection setup
-    │   ├── domain/             # Shared domain models
-    │   │   └── models/         # Core models (Ticket, User, etc.)
-    │   ├── enums/              # Shared enumerations
-    │   ├── helper/             # Utility helpers
-    │   ├── routing/            # App routing configuration
-    │   ├── services/           # Core services (PDF, OCR, Logger)
-    │   ├── theme/              # App theming
-    │   └── widgets/            # Reusable UI widgets
-    └── features/               # Feature modules
-        ├── ai/                 # AI-powered parsing
-        │   └── fallback_parser/ # Fallback AI parser for unsupported formats
-        ├── bottom_navigation/  # App navigation bar
-        ├── calendar/           # Calendar view for tickets
-        ├── clipboard/          # Clipboard ticket import
-        ├── events/             # Event ticket support
-        ├── export/             # Wallet export functionality
-        ├── home/               # Main home page
-        ├── import/             # Import tickets from various sources
-        ├── irctc/              # IRCTC train ticket support
-        ├── pdf_extract/        # PDF parsing services
-        ├── profile/            # User profile
-        ├── receive/            # Share intent handling
-        ├── tnstc/              # TNSTC bus ticket support
-        └── travel/             # Generic travel ticket parsing
+lib/src/
+├── app.dart                     # Main app widget
+├── common/                      # Shared code
+│   ├── database/                # SQLite DAOs (sqflite)
+│   ├── di/locator.dart          # GetIt service registration
+│   ├── domain/models/           # Ticket, User, ExtrasModel
+│   ├── enums/                   # TicketType, etc.
+│   ├── routing/                 # GoRouter + AppRoute enum
+│   ├── services/                # Logger, OCR, PDF, Haptic, Widget
+│   ├── theme/                   # Material 3 light/dark themes
+│   └── widgets/                 # Shared UI components
+└── features/
+    ├── ai/                      # Gemma AI fallback parser
+    ├── bottom_navigation/       # Navigation bar
+    ├── calendar/                # Calendar view (TableCalendar)
+    ├── clipboard/               # Clipboard ticket parsing
+    ├── common/generated/        # flutter_gen output
+    ├── events/                  # Event ticket support
+    ├── export/                  # Export functionality
+    ├── home/                    # Home screen + ticket cards
+    ├── import/                  # File import (PDF, PKPass)
+    ├── irctc/                   # IRCTC train tickets
+    ├── receive/                 # Share intent / deep link handling
+    ├── settings/                # Settings, DB viewer, OCR debug
+    ├── tnstc/                   # TNSTC/SETC bus tickets
+    └── travel/                  # Travel parser orchestration + PKPass
 ```
 
-### Key Features
+### Layer Convention (per feature)
 
-- **Ticket Management**: Save and organize tickets from various sources (SMS, PDF, manual entry)
-- **PDF Processing**: Uses Syncfusion PDF library for ticket extraction
-- **Multi-source Support**: TNSTC, SETC, buses, trains, general tickets
+Each feature follows this internal structure:
 
-### Architecture Patterns
+- `application/` - Services, use cases, business logic
+- `domain/` - Models (with `@MappableClass()`)
+- `presentation/` - Views and widgets
+- `data/` - Repositories, remote/local data sources
 
-- **Feature-first architecture**: Each feature is a self-contained module with its own domain, application, and presentation layers
-- **Clean Architecture**: Clear separation between domain (models, interfaces), application (services, use cases), data (repositories), and presentation (views, widgets)
-- **Shared kernel**: Common domain models (Ticket, User) live in `common/domain/models/` to avoid circular dependencies
-- **Interface-based design**: All services and repositories implement interfaces for testability and flexibility
-- **Dependency injection**: GetIt service locator pattern used throughout the app
-- **Service-oriented architecture**: Core services (PDF, OCR, Logger) are shared across features
-- Bottom navigation with three main sections: Home, Calendar, Profile
+### Key Design Patterns
 
-### Dependencies
+- **Strategy**: `TravelParserService` dispatches to TNSTC/SETC/IRCTC parsers
+- **DAO**: Database abstraction (`ITicketDAO`, `IUserDAO`)
+- **Service Locator**: GetIt singleton/lazy-singleton registration
+- **Interface Segregation**: All services have `I`-prefixed interfaces
+- **Facade**: `ImportService` coordinates PDF, OCR, parser, and DB services
+- **Observer**: `TicketChangeNotifier` for reactive ticket list updates
 
-Key packages:
+### Dependency Injection (locator.dart)
 
-- `syncfusion_flutter_pdf`: PDF processing
-- `file_picker`: File selection
-- `uuid`: Unique identifier generation
+All services registered in `lib/src/common/di/locator.dart` via GetIt.
+Platform-specific implementations selected with `kIsWeb`:
 
-### Code Style
+- `ILogger` → `NammaLogger` (Talker)
+- `IWalletDatabase` → `WalletDatabase` (sqflite)
+- `IOCRService` → `GoogleMLKitOCR` / `WebOCRService`
+- `IPDFService` → `PDFService` (Syncfusion + OCR fallback)
+- `IAIService` → `GemmaService` / `WebGemmaService`
+- `IHapticService` → `HapticService`
+- `IWidgetService` → `HomeWidgetService` / `WebWidgetService`
+- Parsers: `ITravelParser`, `IPKPassParser`, `IIRCTCParser`
 
-- Uses `flutter_lints` for linting rules
-- Standard Flutter/Dart conventions
-- Analysis options configured in `analysis_options.yaml`
+### Database
 
-### Naming Conventions
+SQLite via sqflite. Database: `namma_wallet.db`, version 4.
 
-- **Views**: Use "view" suffix for main/page widgets (e.g., `HomeView`, `TicketListView`)
-  - File naming: `home_view.dart`, `ticket_list_view.dart`
-  - Class naming: `class HomeView extends StatefulWidget`
-- **Widgets**: Use "widget" suffix for smaller reusable components (e.g., `TicketCardWidget`, `ButtonWidget`)
-  - File naming: `ticket_card_widget.dart`, `button_widget.dart`
-  - Class naming: `class TicketCardWidget extends StatelessWidget`
+**tickets table**: id, ticket_id (unique), primary_text,
+secondary_text, type, start_time, end_time (nullable),
+location, tags (JSON), extras (JSON), image_path,
+directions_url, created_at, updated_at.
 
-### Error Handling and Parsing Rules
+DAO methods: `handleTicket()` (upsert), `getAllTickets()`,
+`getTicketById()`, `updateTicket()`, `deleteTicket()`.
+
+### Routing
+
+GoRouter with `AppRoute` enum. Deep link scheme: `nammawallet://`.
+Shell route wraps Home, Import, Calendar with bottom navigation.
+
+### Serialization
+
+`dart_mappable` with `@MappableClass()`. Generated `.mapper.dart`
+files provide `toMap()`, `toJson()`, `fromMap()`, `fromJson()`.
+Run `make codegen` after changing models.
+
+## Naming Conventions
+
+| Type | Convention | Example |
+| --- | --- | --- |
+| Views (pages) | `*View` | `HomeView`, `CalendarView` |
+| Widgets (reusable) | `*Widget` | `TicketCardWidget` |
+| Interfaces | `I*` prefix | `ILogger`, `ITicketDAO` |
+| Services | `*Service` | `ImportService`, `PDFService` |
+| Providers | `*Provider` | `ThemeProvider`, `CalendarProvider` |
+| Models | `*Model` | `TNSTCTicketModel`, `EventModel` |
+| Files | snake_case | `home_view.dart`, `locator.dart` |
+| Classes | PascalCase | `TravelParserService` |
+| Enums | PascalCase | `TicketType`, `AppRoute` |
+
+## Code Style
+
+- Linting: `very_good_analysis` (strict)
+- Generated files (`*.mapper.dart`, `*.gen.dart`) excluded from lint
+- `public_member_api_docs` rule is disabled
+- Logging: Talker in debug, disabled in production (no PII)
+
+## Error Handling
 
 ### CRITICAL: Never Fall Back to Default Values
 
 - **Never use fallback/default values** when parsing fails
 - **Always return `null`** if parsing, extraction, or validation fails
-- **Never silently substitute** with current date, empty strings, or placeholder values
+- **Never silently substitute** with current date, empty strings,
+  or placeholder values
 - **Explicit failure is better than implicit incorrect data**
 
 Examples:
-- ❌ Bad: Date parsing fails → fallback to `DateTime.now()`
-- ✅ Good: Date parsing fails → return `null`
-- ❌ Bad: PNR extraction fails → use `"Unknown"`
-- ✅ Good: PNR extraction fails → return `null` or empty string `""`
-- ❌ Bad: Malformed data → substitute with default value
-- ✅ Good: Malformed data → return `null`
 
-**Why?**
-- Prevents silent data corruption
-- Makes errors visible and debuggable
-- Allows callers to handle missing data appropriately
-- Maintains data integrity
+- Bad: Date parsing fails → fallback to `DateTime.now()`
+- Good: Date parsing fails → return `null`
+- Bad: PNR extraction fails → use `"Unknown"`
+- Good: PNR extraction fails → return `null`
+
+## Parser System
+
+### Travel Parser Strategy
+
+`TravelParserService` routes to the correct parser based on input:
+
+```text
+Input (SMS/PDF/QR)
+  → TravelParserService.canParse() / isSMSFormat()
+    → TNSTCBusParser   (TNSTC + SETC buses)
+    → IRCTCTrainParser (Indian Railways)
+    → PKPassParser     (Apple Wallet .pkpass files)
+```
+
+Each parser implements:
+
+- `canParse(String)` → bool
+- `parseTicket(String)` → Ticket (SMS)
+- `parseTicketFromBlocks(List<OCRBlock>)` → Ticket (PDF)
+- `isSMSFormat(String)` → bool
+- `parseUpdate(String)` → TicketUpdateInfo? (updates)
 
 ### OCR and Layout-Based Extraction
 
-#### Handling Multiple Key-Value Pairs in Single OCR Blocks
+**Inline key-value splitting**: When OCR extracts multiple key-value
+pairs in one text block, `_extractInlineValue` splits by detecting
+the next key (pattern: words followed by `:`).
 
-When OCR extracts text from PDFs, sometimes multiple key-value pairs appear
-in a single text block on the same line. The `LayoutExtractor` has been
-enhanced to handle this:
+**Column-aligned table parsing**: Passenger tables with missing
+columns use header X-coordinate positions instead of array indexing
+to avoid column misalignment.
 
-**Problem:**
-```
-OCR Block text: "Passenger Pickup Point : CHENNAI Passenger Pickup Time: 21:00"
-```
+**OCR error correction**: Seat number patterns like `120B` are
+auto-corrected to `12UB` (OCR misreads `U` as `0`).
+Patterns: `\d+0B$` → `UB`, `\d+0L$` → `UL`.
 
-**Solution:**
-The `_extractInlineValue` method now detects when multiple key-value pairs
-exist in the same block and extracts only the value for the requested key,
-stopping at the next key.
+## Deployment
 
-**Example:**
-- Input block: `"Passenger Pickup Point : CHENNAI Passenger Pickup Time: 21:00"`
-- `findValueForKey('Passenger Pickup Point')` returns: `"CHENNAI"`
-- `findValueForKey('Passenger Pickup Time')` returns: `"21:00"`
+Three-stage pipeline via Makefile + Fastlane:
 
-**Implementation:**
-- Finds the specific key position in the text
-- Extracts text after the colon following that key
-- Uses regex pattern to detect the start of the next key (pattern: word(s) followed by `:`)
-- Truncates the value at the next key boundary
-
-This prevents extraction errors where one field's value incorrectly includes
-the next field's label and value.
-
-### Passenger Table Extraction with Missing Columns
-
-When extracting passenger information from tables, some rows may have missing
-columns (e.g., missing Gender value). The parser now uses column alignment
-based on header positions instead of simple array indexing.
-
-**Problem:**
-```
-Row 1: [Name, Age, Type, Gender, Seat]  // 5 columns
-Row 2: [Name, Age, Type, Gender, Seat]  // 5 columns
-Row 3: [Name, Age, Type, Seat]          // 4 columns (missing Gender)
+```text
+Beta → Release Candidate → Production
 ```
 
-Old behavior with array indexing:
-- Row 3: row[3] = "Seat Number" → incorrectly assigned as gender
+| Stage | Android | iOS |
+| --- | --- | --- |
+| Beta | `make android-beta` | `make ios-beta` |
+| RC | `make android-release-candidate` | `make ios-release-candidate` |
+| Production | `make android-production` | `make ios-production` |
 
-**Solution:**
-The `_extractPassengers` method now:
-1. Identifies header row and records X-coordinate positions for each column
-2. For data rows, assigns each block to its column based on X-position proximity
-3. Missing columns don't cause misalignment of other columns
+Combined: `make deploy-beta`, `make deploy-release-candidate`,
+`make deploy-production`.
 
-**Example:**
-- Row 3 with missing Gender: correctly assigns Seat to seatNumber field
-- All three passengers extracted with correct seat numbers
+All versions read from `pubspec.yaml`. Never build directly
+with `flutter build` — always use Makefile targets.
 
-### OCR Error Correction for Seat Numbers
+## Testing
 
-Common OCR errors in seat numbers are automatically corrected:
+Test structure mirrors `lib/src/`:
 
-**Problem:** OCR misreads characters in seat numbers
-- "U" (letter U) is read as "0" (zero)
-- Example: Actual seat "12UB" is read as "120B"
+```text
+test/
+├── src/features/          # Feature tests
+├── fixtures/              # SMS/layout test data
+└── helpers/               # Test utilities
+```
 
-**Solution:** Automatic pattern-based correction
-- Pattern `\d+0B$` → corrected to end with "UB"
-- Pattern `\d+0L$` → corrected to end with "UL"
+- Unit tests: Parser logic, service methods
+- Widget tests: Provider state, UI interactions
+- Mocking: `mockito` for service interfaces
+- Fixtures: Real SMS and PDF layout data
+- Coverage: `make coverage` (excludes `*.g.dart`)
 
-**Examples:**
-- `120B` → `12UB` ✓
-- `30B` → `3UB` ✓
-- `150L` → `15UL` ✓
+## Key Dependencies
 
-This correction is applied during passenger extraction, ensuring seat numbers
-are displayed correctly even when OCR misreads them.
+| Package | Purpose |
+| --- | --- |
+| `get_it` | Dependency injection |
+| `go_router` | Navigation and deep links |
+| `provider` | Theme state management |
+| `sqflite` | SQLite database |
+| `dart_mappable` | JSON serialization (code-gen) |
+| `syncfusion_flutter_pdf` | PDF text extraction |
+| `google_mlkit_text_recognition` | OCR (mobile) |
+| `pkpass` | Apple Wallet pass parsing |
+| `flutter_gemma` | On-device AI model |
+| `table_calendar` | Calendar widget |
+| `talker_flutter` | Logging framework |
+| `home_widget` | Home screen widget |
+| `share_handler` | Share intent handling |
+| `ai_barcode_scanner` | QR/barcode scanning |
+
+## Platform-Specific Notes
+
+### iOS
+
+- Deep links via `AppDelegate.swift` (MethodChannel)
+- Home widget via WidgetKit (iOS 17+)
+- App group: `group.com.nammaflutter.nammawallet`
+- Share extension for .pkpass files
+
+### Android
+
+- Home screen widget (`TicketListWidgetProvider`)
+- Background tasks via WorkManager
+- App shortcuts support
+- Signing via keystore (managed by Fastlane)
