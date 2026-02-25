@@ -4,7 +4,7 @@
 [![All Contributors](https://img.shields.io/badge/all_contributors-9-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
-**Namma Wallet** is an open-source Flutter mobile application for managing digital travel tickets and passes. The app provides a unified interface to save, organize, and view tickets from multiple sources including SMS, PDFs, QR codes, and clipboard text. It features intelligent parsing for Indian transport providers and generates beautiful digital ticket designs.
+**Namma Wallet** is an open-source Flutter mobile application for managing digital travel tickets and passes. The app provides a unified interface to save, organise, and view tickets from multiple sources, including SMS, PDFs, QR codes, and clipboard text. It features intelligent parsing for Indian transport providers and generates beautiful digital ticket designs.
 
 Unlike Apple Wallet or Google Wallet, which support only specific formats, **Namma Wallet** is a flexible, community-driven solution that works with any ticket type and format.
 
@@ -19,7 +19,7 @@ Unlike Apple Wallet or Google Wallet, which support only specific formats, **Nam
 * **SMS Parsing** – Automatically extract tickets from TNSTC, IRCTC, and SETC SMS messages
 * **PDF Processing** – Parse TNSTC bus tickets from PDF files using Syncfusion PDF library
 * **QR Code Scanning** – Scan IRCTC train ticket QR codes with full metadata extraction
-* **Clipboard Processing** – Read and parse travel ticket text from clipboard
+* **Clipboard Processing** – Read and parse travel ticket text from the clipboard
 
 ### 🎫 **Supported Ticket Types**
 
@@ -55,7 +55,7 @@ Namma Wallet can import and display `.pkpass` files — the standard format used
 * Date, time, and relevant location
 * Gate, seat, platform, or venue details
 * Pass thumbnail or logo image
-* Provider / organisation name
+* Provider/organisation name
 
 **Pass updates:**
 
@@ -155,7 +155,7 @@ fvm flutter test
 
 **⚠️ IMPORTANT: Always use the Makefile for building releases. Never use `flutter build` commands directly.**
 
-The project includes a `Makefile` that handles all necessary build steps, including critical optimizations like WASM module removal. By default, it uses FVM (`fvm flutter` and `fvm dart`), but you can override this behavior.
+The project includes a `Makefile` that handles all necessary build steps, including critical optimizations like WASM module removal. By default, it uses FVM (`fvm flutter` and `fvm dart`), but you can override this behaviour.
 
 ### Available Targets
 
