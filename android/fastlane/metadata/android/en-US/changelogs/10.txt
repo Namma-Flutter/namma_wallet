@@ -1,1 +1,2 @@
-Beta build v0.0.4 (10)
+- Enhanced TNSTC and IRCTC ticket parsing
+- New search TNSTC/SETC ticket by PNR and phone number
