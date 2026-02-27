@@ -17,6 +17,7 @@ import 'package:namma_wallet/src/features/settings/presentation/contributors_vie
 import 'package:namma_wallet/src/features/settings/presentation/db_viewer_view.dart';
 import 'package:namma_wallet/src/features/settings/presentation/license_view.dart';
 import 'package:namma_wallet/src/features/settings/presentation/ocr_debug_view.dart';
+import 'package:namma_wallet/src/features/settings/presentation/reminder_settings_view.dart';
 import 'package:namma_wallet/src/features/settings/presentation/settings_view.dart';
 import 'package:namma_wallet/src/features/travel/presentation/travel_ticket_view.dart';
 
@@ -101,6 +102,11 @@ final router = GoRouter(
       path: AppRoute.settings.path,
       name: AppRoute.settings.name,
       builder: (context, state) => const SettingsView(),
+    ),
+    GoRoute(
+      path: AppRoute.reminderSettings.path,
+      name: AppRoute.reminderSettings.name,
+      builder: (context, state) => const ReminderSettingsView(),
     ),
     GoRoute(
       path: AppRoute.barcodeScanner.path,

@@ -71,6 +71,17 @@ class _SettingsViewState extends State<SettingsView> {
 
               const SizedBox(height: 8),
 
+              // Reminder Settings Section
+              ProfileTile(
+                icon: Icons.notifications_active_outlined,
+                title: 'Reminder Settings',
+                subtitle: 'Configure notification reminder intervals',
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () async {
+                  await context.pushNamed(AppRoute.reminderSettings.name);
+                },
+              ),
+
               // Contributors Section
               ProfileTile(
                 icon: Icons.people_outline,

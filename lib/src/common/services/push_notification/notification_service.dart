@@ -10,6 +10,7 @@ import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 import 'package:namma_wallet/src/common/routing/app_router.dart';
 import 'package:namma_wallet/src/common/routing/app_routes.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
+import 'package:namma_wallet/src/common/services/notification/reminder_preferences_service.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
@@ -215,17 +216,28 @@ class NotificationService {
     return '$hour:$minute $period';
   }
 
+  /// Converts UTC DateTime to local timezone
+  DateTime _toLocalTime(DateTime dt) {
+    if (dt.isUtc) {
+      return dt.toLocal();
+    }
+    return dt;
+  }
+
   String _formatDateTimeForNotification(DateTime dt) {
+    // Convert to local timezone if it's in UTC
+    final localDt = _toLocalTime(dt);
+
     final now = DateTime.now();
     final nowDate = DateTime(now.year, now.month, now.day);
-    final dtDate = DateTime(dt.year, dt.month, dt.day);
+    final dtDate = DateTime(localDt.year, localDt.month, localDt.day);
     final diffDays = dtDate.difference(nowDate).inDays;
-    final time = _formatTime12(dt);
+    final time = _formatTime12(localDt);
 
     if (diffDays == 0) return time;
     if (diffDays == 1) return 'Tomorrow $time';
 
-    return '${dt.day}/${dt.month}/${dt.year} $time';
+    return '${localDt.day}/${localDt.month}/${localDt.year} $time';
   }
 
   /// Schedules a ticket reminder notification.
@@ -334,14 +346,49 @@ class NotificationService {
 
       final now = DateTime.now();
 
-      final reminders = [
-        const Duration(hours: 24),
-        const Duration(hours: 4),
-        const Duration(hours: 2),
-      ];
+      // Get reminder preferences for this ticket or use default
+      IReminderPreferencesService? preferencesService;
+      try {
+        preferencesService = getIt<IReminderPreferencesService>();
+      } on Exception {
+        // If preferences service is not available, use hardcoded defaults
+        preferencesService = null;
+      }
 
-      for (var i = 0; i < reminders.length; i++) {
-        final reminderTime = journeyTime.subtract(reminders[i]);
+      var selectedIntervals = <int>[24, 4, 2];
+      var customDateTimes = <DateTime>[];
+
+      if (preferencesService != null && payload.isNotEmpty) {
+        try {
+          final prefs = await preferencesService.getRemainderPreferences(
+            payload,
+          );
+
+          if (prefs.isEnabled) {
+            selectedIntervals = prefs.selectedIntervals;
+            customDateTimes = prefs.customDateTimes;
+          } else {
+            // Reminders disabled for this ticket
+            logSkip('Reminders disabled for ticket $payload.');
+            return;
+          }
+        } on Exception catch (e, st) {
+          if (_logger != null) {
+            _logger.error(
+              'Error retrieving reminder preferences; using defaults',
+              e,
+              st,
+            );
+          }
+          selectedIntervals = [24, 4, 2];
+        }
+      }
+
+      // Schedule standard interval reminders
+      for (var i = 0; i < selectedIntervals.length; i++) {
+        final reminderTime = journeyTime.subtract(
+          Duration(hours: selectedIntervals[i]),
+        );
 
         // Skip if already passed
         if (reminderTime.isBefore(now)) continue;
@@ -365,6 +412,32 @@ class NotificationService {
         await NotificationService().scheduleTicketReminder(
           id: notificationId,
           dateTime: reminderTime,
+          title: title,
+          body: bodyText,
+          payload: payload,
+        );
+      }
+
+      // Schedule custom datetime reminders
+      for (var i = 0; i < customDateTimes.length; i++) {
+        final customDateTime = customDateTimes[i];
+        if (customDateTime.isBefore(now)) continue;
+
+        final baseHash =
+            ticket.ticketId?.hashCode ?? ticket.primaryText.hashCode;
+        const maxInt32 = 0x7FFFFFFF;
+        const maxBase = maxInt32 ~/ 100;
+        final safeBase = baseHash.abs() % maxBase;
+        final notificationId = safeBase * 100 + selectedIntervals.length + i;
+
+        final formattedDateTime = _formatDateTimeForNotification(journeyTime);
+        final bodyText = formattedDateTime.isNotEmpty
+            ? '$location • Starts - $formattedDateTime'
+            : location;
+
+        await NotificationService().scheduleTicketReminder(
+          id: notificationId,
+          dateTime: customDateTime,
           title: title,
           body: bodyText,
           payload: payload,

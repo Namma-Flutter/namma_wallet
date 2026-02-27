@@ -19,6 +19,7 @@ enum AppRoute {
 
   // Settings and configuration
   settings(path: '/settings', name: 'settings'),
+  reminderSettings(path: '/reminder-settings', name: 'reminderSettings'),
   license(path: '/license', name: 'license'),
   contributors(path: '/contributors', name: 'contributors'),
 
