@@ -61,7 +61,7 @@ class _NammaWalletAppState extends State<NammaWalletApp> {
               );
 
               // Handle the result using the share handler
-              _shareHandler.handleResult(result);
+              await _shareHandler.handleResult(result);
             },
             onError: (error) {
               _logger.error('Sharing intent error: $error');

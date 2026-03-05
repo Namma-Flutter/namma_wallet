@@ -15,6 +15,7 @@ import 'package:namma_wallet/src/common/services/haptic/haptic_service_extension
 import 'package:namma_wallet/src/common/services/haptic/haptic_service_interface.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
 import 'package:namma_wallet/src/common/services/notification/reminder_preferences_service.dart';
+import 'package:namma_wallet/src/common/services/ticket_change_notifier.dart';
 import 'package:namma_wallet/src/common/services/widget/widget_service_interface.dart';
 import 'package:namma_wallet/src/common/theme/styles.dart';
 import 'package:namma_wallet/src/common/widgets/rounded_back_button.dart';
@@ -27,9 +28,14 @@ import 'package:qr_flutter/qr_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class TravelTicketView extends StatefulWidget {
-  const TravelTicketView({required this.ticket, super.key});
+  const TravelTicketView({
+    required this.ticket,
+    this.openedFromImport = false,
+    super.key,
+  });
 
   final Ticket ticket;
+  final bool openedFromImport;
 
   @override
   State<TravelTicketView> createState() => _TravelTicketViewState();
@@ -118,6 +124,47 @@ class _TravelTicketViewState extends State<TravelTicketView> {
     return ticket.tags!;
   }
 
+  String? get _conductorPhoneNumber {
+    final value =
+        widget.ticket.getExtraByTitle('conductor contact') ??
+        widget.ticket.getExtraByTitle('conductor mobile no');
+    if (value == null) return null;
+
+    final cleaned = value.trim();
+    if (cleaned.isEmpty || cleaned == '--') {
+      return null;
+    }
+
+    return cleaned;
+  }
+
+  Future<void> _callConductor(String phoneNumber) async {
+    final dialable = phoneNumber.replaceAll(RegExp(r'[^\d+]'), '');
+    if (dialable.isEmpty) {
+      showSnackbar(context, 'Invalid conductor phone number', isError: true);
+      return;
+    }
+
+    final uri = Uri(scheme: 'tel', path: dialable);
+    try {
+      if (await canLaunchUrl(uri)) {
+        final launched = await launchUrl(uri);
+        if (launched) {
+          return;
+        }
+      }
+    } on Exception catch (e, stackTrace) {
+      getIt<ILogger>().error(
+        '[TravelTicketView] Failed to launch dialer',
+        e,
+        stackTrace,
+      );
+    }
+
+    if (!mounted) return;
+    showSnackbar(context, 'Could not open dialer', isError: true);
+  }
+
   Future<void> _pinToHomeScreen() async {
     const iOSWidgetName = 'TicketWidget';
     const androidWidgetName = 'TicketHomeWidget';
@@ -192,6 +239,9 @@ class _TravelTicketViewState extends State<TravelTicketView> {
 
     try {
       await getIt<ITicketDAO>().deleteTicket(widget.ticket.ticketId!);
+
+      // Notify listeners that ticket data changed
+      getIt<TicketChangeNotifier>().notifyTicketChanged();
 
       // Check if deleted ticket is pinned to widget and clear it
       await _clearWidgetIfPinned();
@@ -799,6 +849,29 @@ class _TravelTicketViewState extends State<TravelTicketView> {
                   ),
                 ),
               ),
+            if (_conductorPhoneNumber != null) ...[
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: FilledButton.icon(
+                    onPressed: () async {
+                      await _callConductor(_conductorPhoneNumber!);
+                    },
+                    icon: const Icon(Icons.call),
+                    label: const Text('Call Conductor'),
+                    style: FilledButton.styleFrom(
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+            ],
             const SizedBox(height: 16),
           ],
         ),

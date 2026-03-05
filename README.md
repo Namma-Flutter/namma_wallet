@@ -4,11 +4,11 @@
 [![All Contributors](https://img.shields.io/badge/all_contributors-9-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
-**Namma Wallet** is an open-source Flutter mobile application for managing digital travel tickets and passes. The app provides a unified interface to save, organize, and view tickets from multiple sources including SMS, PDFs, QR codes, and clipboard text. It features intelligent parsing for Indian transport providers and generates beautiful digital ticket designs.
+**Namma Wallet** is an open-source Flutter mobile application for managing digital travel tickets and passes. The app provides a unified interface to save, organise, and view tickets from multiple sources, including SMS, PDFs, QR codes, and clipboard text. It features intelligent parsing for Indian transport providers and generates beautiful digital ticket designs.
 
 Unlike Apple Wallet or Google Wallet, which support only specific formats, **Namma Wallet** is a flexible, community-driven solution that works with any ticket type and format.
 
-<a href="https://play.google.com/store/apps/details?id=com.nammaflutter.nammawallet"><img src="assets/badges/google_play_badge.svg" alt="Get it on Google Play" height="60" width="200"/></a> <a href="https://apps.apple.com/in/app/namma-wallet/id6757295408"><img src="assets/badges/app_store_badge.svg" alt="Download on the App Store" height="60" width="200"/></a>
+[![Get it on Google Play](assets/badges/google_play_badge.svg)](https://play.google.com/store/apps/details?id=com.nammaflutter.nammawallet) [![Download on the App Store](assets/badges/app_store_badge.svg)](https://apps.apple.com/in/app/namma-wallet/id6757295408)
 
 ---
 
@@ -19,7 +19,7 @@ Unlike Apple Wallet or Google Wallet, which support only specific formats, **Nam
 * **SMS Parsing** – Automatically extract tickets from TNSTC, IRCTC, and SETC SMS messages
 * **PDF Processing** – Parse TNSTC bus tickets from PDF files using Syncfusion PDF library
 * **QR Code Scanning** – Scan IRCTC train ticket QR codes with full metadata extraction
-* **Clipboard Processing** – Read and parse travel ticket text from clipboard
+* **Clipboard Processing** – Read and parse travel ticket text from the clipboard
 
 ### 🎫 **Supported Ticket Types**
 
@@ -27,6 +27,51 @@ Unlike Apple Wallet or Google Wallet, which support only specific formats, **Nam
 * **Train Tickets** – IRCTC with complete QR code support and PNR lookup
 * **Event Tickets** – Concert, movie, and general event passes
 * **Flight/Metro** – Model support for future implementations
+
+### 🍎 **Apple Wallet Pass (.pkpass) Support**
+
+Namma Wallet can import and display `.pkpass` files — the standard format used by Apple Wallet for boarding passes, event tickets, coupons, and store cards.
+
+**Supported pass types:**
+
+| Pass type | Examples |
+| --- | --- |
+| Boarding Pass | Flights, trains, buses |
+| Event Ticket | Concerts, conferences, sports |
+| Coupon | Discount and loyalty passes |
+| Store Card | Membership and reward cards |
+| Generic | Any other pass format |
+
+**How to import a `.pkpass` file:**
+
+* **Share** — Open a `.pkpass` file from Mail, Safari, Files, or any app and share it to Namma Wallet
+* **File picker** — Use the import screen to pick a `.pkpass` file directly
+* **Deep link** — Open a `.pkpass` file with Namma Wallet set as the default handler
+
+**What gets extracted:**
+
+* Ticket ID, PNR, or confirmation number (from barcode or pass fields)
+* Origin → Destination or event name
+* Date, time, and relevant location
+* Gate, seat, platform, or venue details
+* Pass thumbnail or logo image
+* Provider/organisation name
+
+**Pass updates:**
+
+Passes that include a `webServiceURL` (e.g. Luma event passes) are automatically refreshed from the provider's server using the standard Apple Pass web service protocol.
+
+---
+
+## 📸 Screenshots
+
+| Home | All Tickets | Ticket View |
+| --- | --- | --- |
+| ![Home](assets/screenshots/home.png) | ![All Tickets](assets/screenshots/all_tickets.png) | ![Ticket View](assets/screenshots/ticket_view.png) |
+
+| Import | Calendar | Settings |
+| --- | --- | --- |
+| ![Import](assets/screenshots/import.png) | ![Calendar](assets/screenshots/calendar.png) | ![Settings](assets/screenshots/settings.png) |
 
 ---
 
@@ -110,7 +155,7 @@ fvm flutter test
 
 **⚠️ IMPORTANT: Always use the Makefile for building releases. Never use `flutter build` commands directly.**
 
-The project includes a `Makefile` that handles all necessary build steps, including critical optimizations like WASM module removal. By default, it uses FVM (`fvm flutter` and `fvm dart`), but you can override this behavior.
+The project includes a `Makefile` that handles all necessary build steps, including critical optimizations like WASM module removal. By default, it uses FVM (`fvm flutter` and `fvm dart`), but you can override this behaviour.
 
 ### Available Targets
 
@@ -158,14 +203,68 @@ make release-apk
 
 ### Fastlane Integration
 
-Our fastlane scripts (iOS TestFlight deployment) also use the Makefile to ensure consistent builds:
+Our fastlane scripts use the Makefile internally to ensure consistent builds across all environments.
 
-```ruby
-# In ios/fastlane/Fastfile
-sh("cd ../.. && make release-ipa")
+---
+
+## 🚢 Deployment
+
+Deployments are managed via Fastlane. Each platform has three lanes that mirror the same release pipeline.
+
+### Release Pipeline
+
+```text
+Beta (closed testing) → Release Candidate (open/external testing) → Production
 ```
 
-This ensures all builds—whether local, CI/CD, or TestFlight—follow the same optimized process.
+| Stage | Android track | iOS destination |
+| --- | --- | --- |
+| Beta | `namma-flutter-int-track` | TestFlight |
+| Release Candidate | Open Testing (`beta`) | NammaFlutter + External groups |
+| Production | Production | App Store |
+
+### Fastlane Setup
+
+Install Fastlane bundle dependencies before running any lane:
+
+```bash
+cd android && bundle install && cd ..
+cd ios && bundle install && cd ..
+```
+
+Each platform requires a `.env.local` file in its `fastlane/` directory with the required credentials. See `.env.local.example` for the required keys.
+
+### Commands
+
+Deploy both platforms together:
+
+```bash
+make deploy-beta               # Build and upload to beta tracks
+make deploy-release-candidate  # Promote beta → RC on both platforms
+make deploy-production         # Promote RC → production on both platforms
+```
+
+Or deploy a single platform:
+
+```bash
+# Android
+make android-beta
+make android-release-candidate
+make android-production
+
+# iOS
+make ios-beta
+make ios-release-candidate
+make ios-production
+```
+
+### What each lane does
+
+**`beta`** — Reads version from `pubspec.yaml`, validates no duplicate build exists, builds the app via `make release-appbundle` / `make release-ipa`, and uploads to the beta track.
+
+**`release-candidate`** — Promotes the current `pubspec.yaml` build from the beta track to the RC track/groups. No rebuild required.
+
+**`production`** — Promotes the current `pubspec.yaml` build to production.
 
 ### CI/CD Integration
 
@@ -177,7 +276,8 @@ The release workflow in `.github/workflows/build_and_release.yml` uses the Makef
 
 ### Code Style & Conventions
 
-* Uses `flutter_lints` for consistent code formatting
+* Uses `very_good_analysis` for consistent code linting
+* Uses `dart format .` for code formatting
 * **Views** use "view" suffix for main/page widgets (e.g., `HomeView`)
 * **Widgets** use "widget" suffix for reusable components (e.g., `TicketCardWidget`)
 * Follows standard Flutter/Dart conventions with analysis options configured
@@ -252,11 +352,10 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 
 This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
 
-
 ## Android Release Signing File Structure
+
 android/
 ├── key.properties          ✅ (DO NOT COMMIT)
 ├── app/
 │   ├── namma-wallet.keystore  ✅ (DO NOT COMMIT)
 │   └── build.gradle.kts
-

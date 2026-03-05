@@ -1,1 +1,2 @@
-PKPass support
+- Enhanced TNSTC and IRCTC ticket parsing
+- New search TNSTC/SETC ticket by PNR and phone number

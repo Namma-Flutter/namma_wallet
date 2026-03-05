@@ -121,6 +121,75 @@ void main() {
           );
         },
       );
+
+      test(
+        'Given valid SMS content with extractable PNR, '
+        'When processing content, '
+        'Then TicketCreatedResult.ticketId equals the extracted PNR',
+        () async {
+          // Arrange (Given)
+          final logger = getIt<ILogger>();
+          final processor = SharedContentProcessor(
+            logger: logger,
+            travelParser: MockTravelParserService(logger: logger),
+            ticketDao: MockTicketDAO(),
+            importService: MockImportService(),
+          );
+
+          // The MockTravelParserService extracts 'T12345678' and
+          // sets it as ticketId
+          const smsContent = '''
+            Corporation : SETC, From : CHENNAI To BANGALORE
+            PNR NO. : T12345678, Trip Code : Trip123
+            Journey Date : 15/12/2024, Time : 14:30
+          ''';
+
+          // Act (When)
+          final result = await processor.processContent(
+            smsContent,
+            SharedContentType.sms,
+          );
+
+          // Assert (Then)
+          expect(result, isA<TicketCreatedResult>());
+          final ticketResult = result as TicketCreatedResult;
+          expect(ticketResult.ticketId, equals('T12345678'));
+        },
+      );
+
+      test(
+        'Given a PKPass file path, '
+        'When processing content, '
+        'Then TicketCreatedResult.ticketId equals the imported ticket id',
+        () async {
+          // Arrange (Given)
+          const mockTicket = Ticket(
+            ticketId: 'PKPASS-UUID-001',
+            primaryText: 'CHENNAI → BANGALORE',
+            secondaryText: 'SETC - Bus',
+            location: 'CHENNAI',
+            type: TicketType.bus,
+          );
+          final logger = getIt<ILogger>();
+          final processor = SharedContentProcessor(
+            logger: logger,
+            travelParser: MockTravelParserService(logger: logger),
+            ticketDao: MockTicketDAO(),
+            importService: MockImportService(mockTicket: mockTicket),
+          );
+
+          // Act (When)
+          final result = await processor.processContent(
+            '/mock/path/ticket.pkpass',
+            SharedContentType.pkpass,
+          );
+
+          // Assert (Then)
+          expect(result, isA<TicketCreatedResult>());
+          final ticketResult = result as TicketCreatedResult;
+          expect(ticketResult.ticketId, equals('PKPASS-UUID-001'));
+        },
+      );
     });
 
     group('processContent - Ticket Updates', () {
@@ -499,6 +568,28 @@ void main() {
             const TicketNotFoundResult(pnrNumber: ''),
             isA<SharedContentResult>(),
           );
+        },
+      );
+
+      test(
+        'Given TicketCreatedResult with ticketId, When checking fields, '
+        'Then ticketId is accessible',
+        () {
+          // Arrange (Given)
+          const result = TicketCreatedResult(
+            pnrNumber: 'T12345678',
+            from: 'Chennai',
+            to: 'Bangalore',
+            fare: '500.00',
+            date: '2024-12-15',
+            ticketId: 'TICKET-UUID-001',
+          );
+
+          // Act (When)
+          final ticketId = result.ticketId;
+
+          // Assert (Then)
+          expect(ticketId, equals('TICKET-UUID-001'));
         },
       );
     });

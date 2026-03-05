@@ -61,6 +61,7 @@ class SharedContentProcessor implements ISharedContentProcessor {
           to: ticket.toLocation,
           fare: ticket.fare,
           date: ticket.date,
+          ticketId: ticket.ticketId,
           warning: result.warning,
         );
       }
@@ -170,6 +171,7 @@ class SharedContentProcessor implements ISharedContentProcessor {
         to: ticket.toLocation,
         fare: ticket.fare,
         date: ticket.date,
+        ticketId: ticket.ticketId,
       );
     } on Exception catch (e, stackTrace) {
       _logger.error(

@@ -1,4 +1,5 @@
 import 'package:cross_file/cross_file.dart';
+import 'package:flutter/foundation.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
 import 'package:namma_wallet/src/common/services/ocr/layout_extractor.dart';
 import 'package:namma_wallet/src/common/services/ocr/ocr_block.dart';
@@ -66,6 +67,17 @@ class PDFService implements IPDFService {
 
         // Check if PDF might be image-based or use unsupported fonts
         if (rawText.trim().isEmpty) {
+          if (kIsWeb) {
+            _logger.warning(
+              '[PDFService] No text extracted from PDF and OCR fallback is '
+              'not supported on web',
+            );
+            throw UnsupportedError(
+              'Failed to extract text from PDF: PDF has no readable text '
+              'layer and OCR fallback is not supported on web platform.',
+            );
+          }
+
           _logger.warning(
             '[PDFService] No text extracted from PDF. This PDF may be '
             'image-based or use fonts that are not supported. '
@@ -114,6 +126,11 @@ class PDFService implements IPDFService {
         document.dispose();
       }
     } on Object catch (e, stackTrace) {
+      if (e is UnsupportedError) {
+        _logger.warning('[PDFService] $e');
+        rethrow;
+      }
+
       _logger.error(
         '[PDFService] Error extracting text from PDF',
         e,
@@ -140,6 +157,18 @@ class PDFService implements IPDFService {
 
         // Check if PDF has extractable text
         if (rawText.trim().isEmpty || rawText.length < _minExpectedTextLength) {
+          if (kIsWeb) {
+            _logger.warning(
+              '[PDFService] No text layer found and OCR block extraction is '
+              'not supported on web',
+            );
+            throw UnsupportedError(
+              'Failed to extract blocks from PDF: PDF has no readable text '
+              'layer and OCR fallback is not supported on web platform. '
+              'Web currently supports SMS extraction only.',
+            );
+          }
+
           _logger.warning(
             '[PDFService] No text layer found, using OCR for block extraction',
           );
@@ -187,6 +216,11 @@ class PDFService implements IPDFService {
         document.dispose();
       }
     } on Object catch (e, stackTrace) {
+      if (e is UnsupportedError) {
+        _logger.warning('[PDFService] $e');
+        rethrow;
+      }
+
       _logger.error(
         '[PDFService] Error extracting blocks from PDF',
         e,
@@ -231,6 +265,11 @@ class PDFService implements IPDFService {
       // Remove null values
       return structuredData..removeWhere((key, value) => value == null);
     } on Object catch (e, stackTrace) {
+      if (e is UnsupportedError) {
+        _logger.warning('[PDFService] $e');
+        rethrow;
+      }
+
       _logger.error(
         '[PDFService] Error extracting structured data from PDF',
         e,

@@ -16,7 +16,9 @@ import 'package:namma_wallet/src/common/services/ocr/ocr_service_interface.dart'
 import 'package:namma_wallet/src/common/services/ocr/web_ocr_service.dart';
 import 'package:namma_wallet/src/common/services/pdf/pdf_service.dart';
 import 'package:namma_wallet/src/common/services/pdf/pdf_service_interface.dart';
+import 'package:namma_wallet/src/common/services/ticket_change_notifier.dart';
 import 'package:namma_wallet/src/common/services/widget/home_widget_service.dart';
+import 'package:namma_wallet/src/common/services/widget/web_widget_service.dart';
 import 'package:namma_wallet/src/common/services/widget/widget_service_interface.dart';
 import 'package:namma_wallet/src/common/theme/theme_provider.dart';
 import 'package:namma_wallet/src/features/ai/fallback_parser/application/ai_service_interface.dart';
@@ -30,6 +32,7 @@ import 'package:namma_wallet/src/features/import/application/deep_link_service.d
 import 'package:namma_wallet/src/features/import/application/deep_link_service_interface.dart';
 import 'package:namma_wallet/src/features/import/application/import_service.dart';
 import 'package:namma_wallet/src/features/import/application/import_service_interface.dart';
+import 'package:namma_wallet/src/features/import/application/web_deep_link_service.dart';
 import 'package:namma_wallet/src/features/irctc/application/irctc_qr_parser.dart';
 import 'package:namma_wallet/src/features/irctc/application/irctc_qr_parser_interface.dart';
 import 'package:namma_wallet/src/features/irctc/application/irctc_scanner_service.dart';
@@ -40,7 +43,10 @@ import 'package:namma_wallet/src/features/receive/application/sharing_intent_ser
 import 'package:namma_wallet/src/features/receive/application/web_sharing_intent_service.dart';
 import 'package:namma_wallet/src/features/receive/domain/sharing_intent_service_interface.dart';
 import 'package:namma_wallet/src/features/settings/application/ai_service_status.dart';
+import 'package:namma_wallet/src/features/tnstc/application/tnstc_api_ticket_parser.dart';
 import 'package:namma_wallet/src/features/tnstc/application/tnstc_sms_parser.dart';
+import 'package:namma_wallet/src/features/tnstc/data/remote/tnstc_pnr_fetcher.dart';
+import 'package:namma_wallet/src/features/tnstc/data/remote/tnstc_pnr_fetcher_interface.dart';
 import 'package:namma_wallet/src/features/travel/application/pkpass_parser.dart';
 import 'package:namma_wallet/src/features/travel/application/pkpass_parser_interface.dart';
 import 'package:namma_wallet/src/features/travel/application/travel_parser_interface.dart';
@@ -52,6 +58,8 @@ void setupLocator() {
   getIt
     // Logger - Initialize first
     ..registerSingleton<ILogger>(NammaLogger())
+    // Notifiers
+    ..registerSingleton<TicketChangeNotifier>(TicketChangeNotifier())
     // Providers
     ..registerSingleton<ThemeProvider>(ThemeProvider())
     ..registerSingleton<AIServiceStatus>(AIServiceStatus())
@@ -74,7 +82,9 @@ void setupLocator() {
       () => kIsWeb ? WebGemmaService() : GemmaService(logger: getIt<ILogger>()),
     )
     ..registerLazySingleton<IWidgetService>(
-      () => HomeWidgetService(logger: getIt<ILogger>()),
+      () => kIsWeb
+          ? WebWidgetService(logger: getIt<ILogger>())
+          : HomeWidgetService(logger: getIt<ILogger>()),
     )
     ..registerLazySingleton<IReminderPreferencesService>(
       () => ReminderPreferencesService(logger: getIt<ILogger>()),
@@ -113,6 +123,10 @@ void setupLocator() {
         ticketDao: getIt<ITicketDAO>(),
       ),
     )
+    ..registerLazySingleton<ITNSTCPNRFetcher>(
+      () => TNSTCPNRFetcher(logger: getIt<ILogger>()),
+    )
+    ..registerLazySingleton<TNSTCApiTicketParser>(TNSTCApiTicketParser.new)
     ..registerLazySingleton<IImportService>(
       () => ImportService(
         logger: getIt<ILogger>(),
@@ -121,14 +135,18 @@ void setupLocator() {
         qrParser: getIt<IIRCTCQRParser>(),
         irctcScannerService: getIt<IIRCTCScannerService>(),
         pkpassParser: getIt<IPKPassParser>(),
+        tnstcPnrFetcher: getIt<ITNSTCPNRFetcher>(),
+        tnstcApiTicketParser: getIt<TNSTCApiTicketParser>(),
         ticketDao: getIt<ITicketDAO>(),
       ),
     )
     ..registerLazySingleton<IDeepLinkService>(
-      () => DeepLinkService(
-        importService: getIt<IImportService>(),
-        logger: getIt<ILogger>(),
-      ),
+      () => kIsWeb
+          ? WebDeepLinkService(logger: getIt<ILogger>())
+          : DeepLinkService(
+              importService: getIt<IImportService>(),
+              logger: getIt<ILogger>(),
+            ),
     )
     // Clipboard - Repository and Service
     ..registerLazySingleton<IClipboardRepository>(ClipboardRepository.new)

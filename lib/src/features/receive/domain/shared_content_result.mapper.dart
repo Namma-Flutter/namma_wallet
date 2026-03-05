@@ -104,6 +104,12 @@ class TicketCreatedResultMapper extends ClassMapperBase<TicketCreatedResult> {
     'date',
     _$date,
   );
+  static String? _$ticketId(TicketCreatedResult v) => v.ticketId;
+  static const Field<TicketCreatedResult, String> _f$ticketId = Field(
+    'ticketId',
+    _$ticketId,
+    opt: true,
+  );
   static String? _$warning(TicketCreatedResult v) => v.warning;
   static const Field<TicketCreatedResult, String> _f$warning = Field(
     'warning',
@@ -118,6 +124,7 @@ class TicketCreatedResultMapper extends ClassMapperBase<TicketCreatedResult> {
     #to: _f$to,
     #fare: _f$fare,
     #date: _f$date,
+    #ticketId: _f$ticketId,
     #warning: _f$warning,
   };
 
@@ -128,6 +135,7 @@ class TicketCreatedResultMapper extends ClassMapperBase<TicketCreatedResult> {
       to: data.dec(_f$to),
       fare: data.dec(_f$fare),
       date: data.dec(_f$date),
+      ticketId: data.dec(_f$ticketId),
       warning: data.dec(_f$warning),
     );
   }
@@ -209,6 +217,7 @@ abstract class TicketCreatedResultCopyWith<
     String? to,
     String? fare,
     String? date,
+    String? ticketId,
     String? warning,
   });
   TicketCreatedResultCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
@@ -231,6 +240,7 @@ class _TicketCreatedResultCopyWithImpl<$R, $Out>
     Object? to = $none,
     Object? fare = $none,
     Object? date = $none,
+    Object? ticketId = $none,
     Object? warning = $none,
   }) => $apply(
     FieldCopyWithData({
@@ -239,6 +249,7 @@ class _TicketCreatedResultCopyWithImpl<$R, $Out>
       if (to != $none) #to: to,
       if (fare != $none) #fare: fare,
       if (date != $none) #date: date,
+      if (ticketId != $none) #ticketId: ticketId,
       if (warning != $none) #warning: warning,
     }),
   );
@@ -249,6 +260,7 @@ class _TicketCreatedResultCopyWithImpl<$R, $Out>
     to: data.get(#to, or: $value.to),
     fare: data.get(#fare, or: $value.fare),
     date: data.get(#date, or: $value.date),
+    ticketId: data.get(#ticketId, or: $value.ticketId),
     warning: data.get(#warning, or: $value.warning),
   );
 

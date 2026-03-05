@@ -9,110 +9,115 @@ platform :android do
     Dotenv.load('.env.local')
   end
 
-  desc "Build Flutter AAB & upload to Play Store Internal Testing"
-  lane :beta do
-    # 1. Read version from pubspec.yaml
+  # Shared helpers
+
+  def pubspec_version_info
     require 'yaml'
-    pubspec_path = "../../pubspec.yaml"
-    pubspec = YAML.load_file(pubspec_path)
-    version_string = pubspec['version']
+    version_string = YAML.load_file("../../pubspec.yaml")['version']
     UI.user_error!("Missing 'version' in pubspec.yaml") if version_string.nil? || version_string.empty?
     parts = version_string.split('+')
-    version = parts[0]
     UI.user_error!("pubspec.yaml version '#{version_string}' is missing build number (expected format: x.y.z+n)") unless parts.length == 2
-    # For Android promotion, we mainly need the version code (build number)
-    build_number = parts[1].to_i
+    { version: parts[0], version_code: parts[1].to_i }
+  end
 
-    UI.message("Using version from pubspec.yaml: #{version}+#{build_number}")
+  def changelog(version, version_code)
+    changelog_path = "./metadata/en-US/release_notes.txt"
+    File.exist?(changelog_path) ? File.read(changelog_path) : "Beta build v#{version} (#{version_code})"
+  end
 
-    # 2. Validate version (prevent duplicate uploads)
-    # Note: Requires configured json_key_file in Appfile
+  desc "Build and upload to namma-flutter-int-track"
+  lane :beta do
+    info = pubspec_version_info
+    version = info[:version]
+    version_code = info[:version_code]
+
+    UI.message("Using version from pubspec.yaml: #{version}+#{version_code}")
+
+    # Validate version (prevent duplicate uploads)
     existing_versions = begin
-      google_play_track_version_codes(track: "internal")
+      google_play_track_version_codes(track: "namma-flutter-int-track")
     rescue => e
       UI.message("⚠️  Could not verify existing versions: #{e.message}. Proceeding with build...")
       []
     end
 
-    if existing_versions.include?(build_number)
-      UI.user_error!("❌ Version code #{build_number} already exists on Internal track. Please increment the build number in pubspec.yaml")
+    if existing_versions.include?(version_code)
+      UI.user_error!("❌ Version code #{version_code} already exists on namma-flutter-int-track. Please increment the build number in pubspec.yaml")
     end
-    UI.success("✓ Version validation passed - #{version}+#{build_number}")
+    UI.success("✓ Version validation passed - #{version}+#{version_code}")
 
-    # 3. Build AAB using Makefile
     sh("cd ../.. && make release-appbundle")
 
-    # 4. Prepare Changelog
-    # Map release notes to the path supply expects
-    changelog_path = "./metadata/en-US/release_notes.txt"
-    changelog_text = File.exist?(changelog_path) ? File.read(changelog_path) : "Beta build v#{version} (#{build_number})"
-    
-    # Write to the path 'supply' expects: fastlane/metadata/android/en-US/changelogs/{version_code}.txt
-    # We are in android/fastlane/
+    # Write changelog to the path supply expects
     dest_changelog_dir = "./metadata/android/en-US/changelogs"
     FileUtils.mkdir_p(dest_changelog_dir)
-    File.write("#{dest_changelog_dir}/#{build_number}.txt", changelog_text)
+    File.write("#{dest_changelog_dir}/#{version_code}.txt", changelog(version, version_code))
 
-    # 5. Upload to Play Store
     upload_to_play_store(
-      track: "internal",
+      track: "namma-flutter-int-track",
       aab: "../build/app/outputs/bundle/release/app-release.aab",
       skip_upload_metadata: true,
       skip_upload_images: true,
       skip_upload_screenshots: true
     )
-    
-    UI.success("Uploaded build #{build_number} (v#{version}) to Internal Track")
+
+    UI.success("Uploaded build #{version_code} (v#{version}) to namma-flutter-int-track")
   end
 
-  desc "Promote beta build to Production"
+  desc "Promote namma-flutter-int-track to Open Testing"
+  lane :'release-candidate' do
+    info = pubspec_version_info
+    version = info[:version]
+    version_code = info[:version_code]
+
+    UI.message("Promoting v#{version} (#{version_code}) to Open Testing")
+
+    upload_to_play_store(
+      root_url: "https://androidpublisher.googleapis.com/",
+      track: 'namma-flutter-int-track',
+      track_promote_to: 'beta',
+      version_code: version_code,
+      skip_upload_aab: true,
+      skip_upload_metadata: true,
+      skip_upload_changelogs: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true,
+    )
+
+    UI.success("Promoted v#{version} (#{version_code}) to Open Testing (Release Candidate)")
+  end
+
+  desc "Promote to Production"
   lane :production do |options|
-    # Read from pubspec.yaml if no explicit params provided
-    if options[:version].nil? || options[:build].nil?
-      require 'yaml'
-      pubspec_path = "../../pubspec.yaml"
-      pubspec = YAML.load_file(pubspec_path)
-      version_string = pubspec['version']
-      UI.user_error!("Missing 'version' in pubspec.yaml") if version_string.nil? || version_string.empty?
-      parts = version_string.split('+')
-      version = parts[0]
-      UI.user_error!("pubspec.yaml version '#{version_string}' is missing build number (expected format: x.y.z+n)") unless parts.length == 2
-      # For Android promotion, we mainly need the version code (build number)
-      build_number = parts[1].to_i
-    else
-      version = options[:version]
-      build_number = options[:build].to_i
-    end
+    info = pubspec_version_info
+    version = options[:version] || info[:version]
+    version_code = options[:build] ? options[:build].to_i : info[:version_code]
 
-    UI.important("⚠️  Ensure this matches the Internal build you want to promote!")
-    UI.message("Promoting: v#{version} (#{build_number})")
+    UI.message("Promoting: v#{version} (#{version_code})")
 
-    # Validate the build exists on Internal
+    # Validate the build exists on the track
     existing_versions = begin
-      google_play_track_version_codes(track: "internal")
+      google_play_track_version_codes(track: "namma-flutter-int-track")
     rescue => e
-      UI.message("⚠️  Could not verify build on Internal track: #{e.message}. Proceeding...")
+      UI.message("⚠️  Could not verify build on namma-flutter-int-track: #{e.message}. Proceeding...")
       nil
     end
 
-    if existing_versions
-      unless existing_versions.include?(build_number)
-        UI.user_error!("Build #{build_number} not found on Internal track.")
-      end
-      UI.success("✓ Build #{build_number} verified on Internal track")
+    if existing_versions && !existing_versions.include?(version_code)
+      UI.user_error!("Build #{version_code} not found on namma-flutter-int-track.")
     end
+    UI.success("✓ Build #{version_code} verified")
 
-    # Promote
     upload_to_play_store(
-      track: "internal",
+      track: "namma-flutter-int-track",
       track_promote_to: "production",
-      version_code: build_number,
+      version_code: version_code,
       skip_upload_aab: true,
       skip_upload_metadata: true,
       skip_upload_images: true,
       skip_upload_screenshots: true
     )
 
-    UI.success("Successfully promoted build #{build_number} (v#{version}) to Production")
+    UI.success("Successfully promoted build #{version_code} (v#{version}) to Production")
   end
 end

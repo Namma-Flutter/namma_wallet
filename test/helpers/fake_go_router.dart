@@ -15,6 +15,13 @@ class FakeGoRouter extends Mock implements GoRouter {
     if (invocation.memberName == #pop) {
       return null;
     }
+    if (invocation.memberName == #push) {
+      return super.noSuchMethod(
+        invocation,
+        returnValue: Future<dynamic>.value(),
+        returnValueForMissingStub: Future<dynamic>.value(),
+      );
+    }
     return super.noSuchMethod(
       invocation,
       returnValue: returnValue,

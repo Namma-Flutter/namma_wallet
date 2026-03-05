@@ -249,6 +249,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.2"
+  cupertino_icons:
+    dependency: "direct main"
+    description:
+      name: cupertino_icons
+      sha256: ba631d1c7f7bef6b729a622b7b752645a2d076dba9976925b8f25725a30e1ee6
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.8"
   dart_mappable:
     dependency: "direct main"
     description:
@@ -297,22 +305,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.1.3+1"
-  dotted_border:
-    dependency: "direct main"
-    description:
-      name: dotted_border
-      sha256: "99b091ec6891ba0c5331fdc2b502993c7c108f898995739a73c6845d71dad70c"
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.1.0"
-  equatable:
-    dependency: transitive
-    description:
-      name: equatable
-      sha256: "3e0141505477fd8ad55d6eb4e7776d3fe8430be8e497ccb1521370c3f21a3e2b"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.0.8"
   fake_async:
     dependency: transitive
     description:
@@ -394,10 +386,10 @@ packages:
     dependency: "direct main"
     description:
       name: flutter_gemma
-      sha256: "2b1df65a5c5d03f63a2322aa741fa7b8163097cbd4c51e5bbc40be0b312f97d5"
+      sha256: b9f29e79e54159949a95404fe16fd4987c03dabdedb2ba8a29eb19bf4c3ec6d8
       url: "https://pub.dev"
     source: hosted
-    version: "0.12.0"
+    version: "0.12.4"
   flutter_gen_core:
     dependency: transitive
     description:
@@ -609,7 +601,7 @@ packages:
     source: hosted
     version: "1.0.0"
   html:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: html
       sha256: "6d1264f2dffa1b1101c25a91dff0dc2daee4c18e87cd8538729773c073dbf602"

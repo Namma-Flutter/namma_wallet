@@ -12,6 +12,7 @@ import 'package:namma_wallet/src/common/enums/ticket_type.dart';
 import 'package:namma_wallet/src/common/routing/app_routes.dart';
 import 'package:namma_wallet/src/common/services/haptic/haptic_service_extension.dart';
 import 'package:namma_wallet/src/common/services/haptic/haptic_service_interface.dart';
+import 'package:namma_wallet/src/common/services/ticket_change_notifier.dart';
 import 'package:namma_wallet/src/common/widgets/snackbar_widget.dart';
 import 'package:namma_wallet/src/features/home/presentation/widgets/header_widget.dart';
 import 'package:namma_wallet/src/features/home/presentation/widgets/ticket_card_widget.dart';
@@ -30,18 +31,29 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
   List<Ticket> _eventTickets = [];
 
   late final IHapticService _hapticService;
+  late final TicketChangeNotifier _ticketChangeNotifier;
+
   @override
   void initState() {
     super.initState();
     _hapticService = getIt<IHapticService>();
+    _ticketChangeNotifier = getIt<TicketChangeNotifier>();
+    _ticketChangeNotifier.addListener(_onTicketChanged);
     WidgetsBinding.instance.addObserver(this);
     unawaited(_loadTicketData());
   }
 
   @override
   void dispose() {
+    _ticketChangeNotifier.removeListener(_onTicketChanged);
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
+  }
+
+  void _onTicketChanged() {
+    if (mounted) {
+      unawaited(_loadTicketData());
+    }
   }
 
   @override
@@ -106,12 +118,12 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
             _hapticService.triggerHaptic(HapticType.selection);
             if (ticket.ticketId == null) return;
 
-            final wasDeleted = await context.pushNamed<bool>(
+            await context.pushNamed(
               AppRoute.ticketView.name,
               pathParameters: {'id': ticket.ticketId!},
             );
 
-            if (mounted && (wasDeleted ?? false)) {
+            if (mounted) {
               await _loadTicketData();
             }
           },
@@ -281,15 +293,14 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
                               onTap: () async {
                                 if (eventTicket.ticketId == null) return;
 
-                                final wasDeleted = await context
-                                    .pushNamed<bool>(
-                                      AppRoute.ticketView.name,
-                                      pathParameters: {
-                                        'id': eventTicket.ticketId!,
-                                      },
-                                    );
+                                await context.pushNamed(
+                                  AppRoute.ticketView.name,
+                                  pathParameters: {
+                                    'id': eventTicket.ticketId!,
+                                  },
+                                );
 
-                                if (mounted && (wasDeleted ?? false)) {
+                                if (mounted) {
                                   await _loadTicketData();
                                 }
                               },
