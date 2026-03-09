@@ -21,7 +21,10 @@ import 'package:namma_wallet/src/common/widgets/snackbar_widget.dart';
 import 'package:namma_wallet/src/features/home/domain/ticket_extensions.dart';
 import 'package:namma_wallet/src/features/travel/presentation/widgets/travel_row_widget.dart';
 import 'package:namma_wallet/src/features/travel/presentation/widgets/travel_ticket_shape_line.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:screenshot/screenshot.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class TravelTicketView extends StatefulWidget {
@@ -40,6 +43,8 @@ class TravelTicketView extends StatefulWidget {
 
 class _TravelTicketViewState extends State<TravelTicketView> {
   bool _isDeleting = false;
+  bool _isSharing = false;
+  final ScreenshotController _screenshotController = ScreenshotController();
 
   // Helper method to handle empty values
   String getValueOrDefault(String? value) {
@@ -274,6 +279,52 @@ class _TravelTicketViewState extends State<TravelTicketView> {
     }
   }
 
+  Future<void> _shareTicket() async {
+    setState(() {
+      _isSharing = true;
+    });
+
+    try {
+      final imageBytes = await _screenshotController.capture();
+      if (imageBytes == null) {
+        if (mounted) {
+          showSnackbar(
+            context,
+            'Failed to generate ticket image',
+            isError: true,
+          );
+        }
+        return;
+      }
+
+      final directory = await getApplicationDocumentsDirectory();
+      final imagePath = await File(
+        '${directory.path}/ticket_${DateTime.now().millisecondsSinceEpoch}.png',
+      ).create();
+      await imagePath.writeAsBytes(imageBytes);
+
+      final shareText = widget.ticket.primaryText ?? 'My Ticket';
+      // Using Share.shareXFiles due to older share_plus usage
+      // ignore: deprecated_member_use
+      await Share.shareXFiles([XFile(imagePath.path)], text: shareText);
+    } on Object catch (e, stackTrace) {
+      getIt<ILogger>().error(
+        '[TravelTicketView] Failed to share ticket',
+        e,
+        stackTrace,
+      );
+      if (mounted) {
+        showSnackbar(context, 'Failed to share ticket: $e', isError: true);
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isSharing = false;
+        });
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -295,6 +346,31 @@ class _TravelTicketViewState extends State<TravelTicketView> {
                 ),
                 tooltip: 'Pin to home screen',
               ),
+            ),
+          ),
+          const SizedBox(width: 8),
+          Center(
+            child: CircleAvatar(
+              radius: 24,
+              backgroundColor: Theme.of(context).colorScheme.primary,
+              child: _isSharing
+                  ? const SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    )
+                  : IconButton(
+                      onPressed: _isSharing ? null : _shareTicket,
+                      icon: const Icon(
+                        Icons.share_outlined,
+                        size: 20,
+                        color: Colors.white,
+                      ),
+                      tooltip: 'Share ticket',
+                    ),
             ),
           ),
           const SizedBox(width: 8),
@@ -326,10 +402,12 @@ class _TravelTicketViewState extends State<TravelTicketView> {
           const SizedBox(width: 16),
         ],
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Container(
+      body: Screenshot(
+        controller: _screenshotController,
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              Container(
               margin: const EdgeInsets.only(top: 16, left: 16, right: 16),
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
@@ -772,31 +850,32 @@ class _TravelTicketViewState extends State<TravelTicketView> {
                   ),
                 ),
               ),
-            if (_conductorPhoneNumber != null) ...[
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: SizedBox(
-                  width: double.infinity,
-                  child: FilledButton.icon(
-                    onPressed: () async {
-                      await _callConductor(_conductorPhoneNumber!);
-                    },
-                    icon: const Icon(Icons.call),
-                    label: const Text('Call Conductor'),
-                    style: FilledButton.styleFrom(
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+              if (_conductorPhoneNumber != null) ...[
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: FilledButton.icon(
+                      onPressed: () async {
+                        await _callConductor(_conductorPhoneNumber!);
+                      },
+                      icon: const Icon(Icons.call),
+                      label: const Text('Call Conductor'),
+                      style: FilledButton.styleFrom(
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
+                const SizedBox(height: 16),
+              ],
               const SizedBox(height: 16),
             ],
-            const SizedBox(height: 16),
-          ],
+          ),
         ),
       ),
     );
