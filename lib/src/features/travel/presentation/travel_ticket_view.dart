@@ -297,7 +297,7 @@ class _TravelTicketViewState extends State<TravelTicketView> {
         return;
       }
 
-      final directory = await getApplicationDocumentsDirectory();
+      final directory = await getTemporaryDirectory();
       final imagePath = await File(
         '${directory.path}/ticket_${DateTime.now().millisecondsSinceEpoch}.png',
       ).create();
