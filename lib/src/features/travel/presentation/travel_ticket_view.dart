@@ -233,29 +233,33 @@ class _TravelTicketViewState extends State<TravelTicketView> {
         constraints: BoxConstraints(maxWidth: screenWidth),
       );
 
-      final directory = await getApplicationDocumentsDirectory();
+      final directory = await getTemporaryDirectory();
       final imagePath = await File(
         '${directory.path}/ticket_${DateTime.now().millisecondsSinceEpoch}.png',
       ).create();
       await imagePath.writeAsBytes(imageBytes);
 
-      final title = widget.ticket.primaryText ?? 'My Ticket';
-      final journeyDate = widget.ticket.startTime != null
-          ? '''${DateTimeConverter.instance.formatDate(widget.ticket.startTime!)} at ${DateTimeConverter.instance.formatTime(widget.ticket.startTime!)}'''
-          : null;
+      try {
+        final title = widget.ticket.primaryText ?? 'My Ticket';
+        final journeyDate = widget.ticket.startTime != null
+            ? '''${DateTimeConverter.instance.formatDate(widget.ticket.startTime!)} at ${DateTimeConverter.instance.formatTime(widget.ticket.startTime!)}'''
+            : null;
 
-      final shareText = [
-        '🎫 $title',
-        if (journeyDate != null) '📅 $journeyDate',
-        '',
-        'Managed with Namma Wallet – your smart travel companion.',
-        '📲 Android: https://play.google.com/store/apps/details?id=com.nammaflutter.nammawallet',
-        '🍎 iOS: https://apps.apple.com/in/app/namma-wallet/id6757295408',
-      ].join('\n');
+        final shareText = [
+          '🎫 $title',
+          if (journeyDate != null) '📅 $journeyDate',
+          '',
+          'Managed with Namma Wallet – your smart travel companion.',
+          '📲 Android: https://play.google.com/store/apps/details?id=com.nammaflutter.nammawallet',
+          '🍎 iOS: https://apps.apple.com/in/app/namma-wallet/id6757295408',
+        ].join('\n');
 
-      // shareXFiles is the correct API; suppressing the unrelated deprecation
-      // ignore: deprecated_member_use
-      await Share.shareXFiles([XFile(imagePath.path)], text: shareText);
+        // shareXFiles is the correct API; suppressing the unrelated deprecation
+        // ignore: deprecated_member_use
+        await Share.shareXFiles([XFile(imagePath.path)], text: shareText);
+      } finally {
+        await imagePath.delete();
+      }
     } on Object catch (e, stackTrace) {
       getIt<ILogger>().error(
         '[TravelTicketView] Failed to share ticket',
