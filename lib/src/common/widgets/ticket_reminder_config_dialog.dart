@@ -115,11 +115,13 @@ class _TicketReminderConfigDialogState
   Future<void> _addCustomDateTime() async {
     final journeyTime = widget.ticket.startTime;
     if (journeyTime == null) {
-      showSnackbar(
-        widget.context,
-        'Cannot add custom reminder without journey time',
-        isError: true,
-      );
+      if (mounted) {
+        showSnackbar(
+          context,
+          'Cannot add custom reminder without journey time',
+          isError: true,
+        );
+      }
       return;
     }
 
@@ -127,11 +129,13 @@ class _TicketReminderConfigDialogState
 
     // Check if journey time is in the past
     if (journeyTime.isBefore(now)) {
-      showSnackbar(
-        widget.context,
-        'Cannot add reminders for past journeys',
-        isError: true,
-      );
+      if (mounted) {
+        showSnackbar(
+          context,
+          'Cannot add reminders for past journeys',
+          isError: true,
+        );
+      }
       return;
     }
 
@@ -149,6 +153,9 @@ class _TicketReminderConfigDialogState
     );
 
     if (selectedDate == null) return;
+
+    // Check if widget is still mounted before using context
+    if (!mounted) return;
 
     // Show time picker
     final selectedTime = await showTimePicker(
@@ -170,7 +177,7 @@ class _TicketReminderConfigDialogState
     if (customDateTime.isAfter(journeyTime)) {
       if (mounted) {
         showSnackbar(
-          widget.context,
+          context,
           'Reminder time must be before journey start time',
           isError: true,
         );
@@ -194,7 +201,7 @@ class _TicketReminderConfigDialogState
   Future<void> _savePreferences() async {
     if (_isEnabled && _selectedIntervals.isEmpty && _customDateTimes.isEmpty) {
       showSnackbar(
-        widget.context,
+        context,
         'Please select at least one reminder interval',
         isError: true,
       );
@@ -237,7 +244,7 @@ class _TicketReminderConfigDialogState
       );
 
       if (mounted) {
-        showSnackbar(widget.context, 'Reminder preferences saved successfully');
+        showSnackbar(context, 'Reminder preferences saved successfully');
         Navigator.pop(context, true);
       }
     } on Exception catch (e, st) {
@@ -248,7 +255,7 @@ class _TicketReminderConfigDialogState
       );
       if (mounted) {
         showSnackbar(
-          widget.context,
+          context,
           'Failed to save preferences: $e',
           isError: true,
         );
@@ -609,7 +616,7 @@ class _TicketReminderConfigDialogState
                                 children: [
                                   Expanded(
                                     child: Text(
-                                      '${DateTimeConverter.instance.formatDate(dt)} '
+                                      '''${DateTimeConverter.instance.formatDate(dt)} '''
                                       'at ${_formatTime12(dt)}',
                                       style: Paragraph02(
                                         color: Theme.of(
@@ -638,7 +645,8 @@ class _TicketReminderConfigDialogState
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         child: Text(
-                          'Reminders are disabled. Toggle "Enable Reminders" to configure.',
+                          '''
+Reminders are disabled. Toggle "Enable Reminders" to configure.''',
                           style: Paragraph03(
                             color: Theme.of(
                               context,
