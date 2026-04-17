@@ -45,16 +45,6 @@ class _TravelTicketViewState extends State<TravelTicketView> {
   bool _isSharing = false;
   final ScreenshotController _screenshotController = ScreenshotController();
 
-  String? get _conductorPhoneNumber {
-    final value =
-        widget.ticket.getExtraByTitle('conductor contact') ??
-        widget.ticket.getExtraByTitle('conductor mobile no');
-    if (value == null) return null;
-    final cleaned = value.trim();
-    if (cleaned.isEmpty || cleaned == '--') return null;
-    return cleaned;
-  }
-
   Future<void> _callConductor(String phoneNumber) async {
     final dialable = phoneNumber.replaceAll(RegExp(r'[^\d+]'), '');
     if (dialable.isEmpty) {
