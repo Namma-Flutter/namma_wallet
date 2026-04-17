@@ -434,6 +434,16 @@ class _TicketCardContent extends StatelessWidget {
                               width: double.infinity,
                               height: 150,
                               fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) {
+                                getIt<ILogger>().error(
+                                  '[TravelTicketView] Failed to load '
+                                  'ticket image from path: '
+                                  '${ticket.imagePath}',
+                                  error,
+                                  stackTrace,
+                                );
+                                return const SizedBox.shrink();
+                              },
                             ),
                           ),
                           const SizedBox(height: 16),
