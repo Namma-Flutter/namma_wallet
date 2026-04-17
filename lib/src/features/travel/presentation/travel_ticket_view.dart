@@ -241,7 +241,7 @@ class _TravelTicketViewState extends State<TravelTicketView> {
 
       final title = widget.ticket.primaryText ?? 'My Ticket';
       final journeyDate = widget.ticket.startTime != null
-          ? '${DateTimeConverter.instance.formatDate(widget.ticket.startTime!)} at ${DateTimeConverter.instance.formatTime(widget.ticket.startTime!)}'
+          ? '''${DateTimeConverter.instance.formatDate(widget.ticket.startTime!)} at ${DateTimeConverter.instance.formatTime(widget.ticket.startTime!)}'''
           : null;
 
       final shareText = [
