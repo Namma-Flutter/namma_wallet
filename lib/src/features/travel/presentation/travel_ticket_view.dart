@@ -338,7 +338,8 @@ class _TravelTicketViewState extends State<TravelTicketView> {
         actions: [
           if (!_isLoadingReminder &&
               widget.ticket.startTime != null &&
-              widget.ticket.startTime!.isAfter(DateTime.now()))
+              widget.ticket.startTime!.isAfter(DateTime.now()) &&
+              Platform.isAndroid)
             Center(
               child: CircleAvatar(
                 radius: 24,
