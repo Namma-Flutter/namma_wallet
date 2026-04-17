@@ -199,8 +199,7 @@ class _TravelTicketViewState extends State<TravelTicketView> {
       if (pinnedData == null) return;
 
       final ticketId = widget.ticket.ticketId;
-      if (ticketId != null &&
-          pinnedData.contains('"ticket_id":"$ticketId"')) {
+      if (ticketId != null && pinnedData.contains('"ticket_id":"$ticketId"')) {
         await HomeWidget.saveWidgetData<String>(dataKey, null);
         await HomeWidget.updateWidget(
           androidName: androidWidgetName,
@@ -446,10 +445,9 @@ class _TicketCardContent extends StatelessWidget {
                   children: [
                     CircleAvatar(
                       radius: 16,
-                      backgroundColor: Theme.of(context)
-                          .colorScheme
-                          .primary
-                          .withValues(alpha: 0.1),
+                      backgroundColor: Theme.of(
+                        context,
+                      ).colorScheme.primary.withValues(alpha: 0.1),
                       child: Icon(
                         ticket.type == TicketType.bus
                             ? Icons.airport_shuttle_outlined
@@ -535,10 +533,9 @@ class _TicketCardContent extends StatelessWidget {
             size: Size(MediaQuery.of(context).size.width * 0.95, 40),
             painter: TravelTicketShapeLine(
               backgroundColor: Theme.of(context).colorScheme.surface,
-              dashedLineColor: Theme.of(context)
-                  .colorScheme
-                  .onSurface
-                  .withValues(alpha: 0.3),
+              dashedLineColor: Theme.of(
+                context,
+              ).colorScheme.onSurface.withValues(alpha: 0.3),
             ),
           ),
           if (ticket.hasPnrOrId)
@@ -606,10 +603,9 @@ class _TicketCardContent extends StatelessWidget {
                   Icon(
                     Icons.wallet,
                     size: 14,
-                    color: Theme.of(context)
-                        .colorScheme
-                        .onSurface
-                        .withValues(alpha: 0.4),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withValues(alpha: 0.4),
                   ),
                   const SizedBox(width: 6),
                   Text(
@@ -617,10 +613,9 @@ class _TicketCardContent extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 12,
                       letterSpacing: 0.4,
-                      color: Theme.of(context)
-                          .colorScheme
-                          .onSurface
-                          .withValues(alpha: 0.4),
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withValues(alpha: 0.4),
                     ),
                   ),
                 ],
@@ -644,10 +639,9 @@ class _TicketCardContent extends StatelessWidget {
             child: Icon(
               Icons.arrow_downward_rounded,
               size: 24,
-              color: Theme.of(context)
-                  .colorScheme
-                  .primary
-                  .withValues(alpha: 0.6),
+              color: Theme.of(
+                context,
+              ).colorScheme.primary.withValues(alpha: 0.6),
             ),
           ),
         ),
@@ -681,7 +675,9 @@ class _TicketCardContent extends StatelessWidget {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Expanded(child: _ExtraCell(extra: extras[i], align: TextAlign.start)),
+              Expanded(
+                child: _ExtraCell(extra: extras[i], align: TextAlign.start),
+              ),
               if (i + 1 < extras.length)
                 Expanded(
                   child: _ExtraCell(extra: extras[i + 1], align: TextAlign.end),
@@ -743,16 +739,16 @@ class _ExtraCell extends StatelessWidget {
   Widget build(BuildContext context) {
     final isEnd = align == TextAlign.end;
     return Column(
-      crossAxisAlignment:
-          isEnd ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+      crossAxisAlignment: isEnd
+          ? CrossAxisAlignment.end
+          : CrossAxisAlignment.start,
       children: [
         Text(
           extra.title ?? '-',
           style: Paragraph03(
-            color: Theme.of(context)
-                .colorScheme
-                .onSurface
-                .withValues(alpha: 0.7),
+            color: Theme.of(
+              context,
+            ).colorScheme.onSurface.withValues(alpha: 0.7),
           ).regular,
         ),
         const SizedBox(height: 4),
