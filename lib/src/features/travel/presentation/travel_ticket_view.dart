@@ -6,7 +6,6 @@ import 'package:home_widget/home_widget.dart';
 import 'package:namma_wallet/src/common/database/ticket_dao_interface.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/domain/models/extras_model.dart';
-import 'package:namma_wallet/src/common/domain/models/tag_model.dart';
 import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 import 'package:namma_wallet/src/common/enums/ticket_type.dart';
 import 'package:namma_wallet/src/common/helper/date_time_converter.dart';
@@ -46,46 +45,13 @@ class _TravelTicketViewState extends State<TravelTicketView> {
   bool _isSharing = false;
   final ScreenshotController _screenshotController = ScreenshotController();
 
-  // Helper method to handle empty values
-  String getValueOrDefault(String? value) {
-    return (value?.isEmpty ?? true) ? '--' : value!;
-  }
-
-  // Helper methods moved to TicketExtrasExtension in ticket_extensions.dart
-
-  List<ExtrasModel> getFilteredExtras(Ticket ticket) {
-    if (ticket.extras == null) return [];
-
-    // Filter out From and To if both exist
-    final from = ticket.fromLocation;
-    final to = ticket.toLocation;
-
-    if (from != null && to != null) {
-      return ticket.extras!.where((extra) {
-        final title = extra.title?.toLowerCase();
-        return title != 'from' && title != 'to';
-      }).toList();
-    }
-
-    return ticket.extras!;
-  }
-
-  List<TagModel> getFilteredTags(Ticket ticket) {
-    if (ticket.tags == null) return [];
-    return ticket.tags!;
-  }
-
   String? get _conductorPhoneNumber {
     final value =
         widget.ticket.getExtraByTitle('conductor contact') ??
         widget.ticket.getExtraByTitle('conductor mobile no');
     if (value == null) return null;
-
     final cleaned = value.trim();
-    if (cleaned.isEmpty || cleaned == '--') {
-      return null;
-    }
-
+    if (cleaned.isEmpty || cleaned == '--') return null;
     return cleaned;
   }
 
@@ -100,9 +66,7 @@ class _TravelTicketViewState extends State<TravelTicketView> {
     try {
       if (await canLaunchUrl(uri)) {
         final launched = await launchUrl(uri);
-        if (launched) {
-          return;
-        }
+        if (launched) return;
       }
     } on Exception catch (e, stackTrace) {
       getIt<ILogger>().error(
@@ -174,9 +138,7 @@ class _TravelTicketViewState extends State<TravelTicketView> {
     );
 
     if (mounted && (confirmed ?? false)) {
-      getIt<IHapticService>().triggerHaptic(
-        HapticType.selection,
-      );
+      getIt<IHapticService>().triggerHaptic(HapticType.selection);
       await _deleteTicket();
     }
   }
@@ -184,17 +146,11 @@ class _TravelTicketViewState extends State<TravelTicketView> {
   Future<void> _deleteTicket() async {
     if (widget.ticket.ticketId == null) return;
 
-    setState(() {
-      _isDeleting = true;
-    });
+    setState(() => _isDeleting = true);
 
     try {
       await getIt<ITicketDAO>().deleteTicket(widget.ticket.ticketId!);
-
-      // Notify listeners that ticket data changed
       getIt<TicketChangeNotifier>().notifyTicketChanged();
-
-      // Check if deleted ticket is pinned to widget and clear it
       await _clearWidgetIfPinned();
 
       getIt<ILogger>().info(
@@ -204,18 +160,12 @@ class _TravelTicketViewState extends State<TravelTicketView> {
 
       if (mounted) {
         final hapticService = getIt<IHapticService>();
-
         showSnackbar(context, 'Ticket deleted successfully');
-        hapticService.triggerHaptic(
-          HapticType.success,
-        );
+        hapticService.triggerHaptic(HapticType.success);
 
-        // Check if we can pop (normal navigation) or need to
-        // go home (deep link)
         if (context.canPop()) {
-          context.pop(true); // Return true to indicate ticket was deleted
+          context.pop(true);
         } else {
-          // Opened via deep link with no navigation history, go to home
           getIt<ILogger>().info(
             '[TravelTicketView] No navigation history after delete, '
             'navigating to home',
@@ -231,20 +181,11 @@ class _TravelTicketViewState extends State<TravelTicketView> {
       );
 
       if (mounted) {
-        final hapticService = getIt<IHapticService>();
-
         showSnackbar(context, 'Failed to delete ticket: $e', isError: true);
-
-        hapticService.triggerHaptic(
-          HapticType.error,
-        );
+        getIt<IHapticService>().triggerHaptic(HapticType.error);
       }
     } finally {
-      if (mounted) {
-        setState(() {
-          _isDeleting = false;
-        });
-      }
+      if (mounted) setState(() => _isDeleting = false);
     }
   }
 
@@ -257,15 +198,14 @@ class _TravelTicketViewState extends State<TravelTicketView> {
       final pinnedData = await HomeWidget.getWidgetData<String>(dataKey);
       if (pinnedData == null) return;
 
-      // Check if the pinned ticket ID matches the deleted ticket
       final ticketId = widget.ticket.ticketId;
-      if (ticketId != null && pinnedData.contains('"ticket_id":"$ticketId"')) {
+      if (ticketId != null &&
+          pinnedData.contains('"ticket_id":"$ticketId"')) {
         await HomeWidget.saveWidgetData<String>(dataKey, null);
         await HomeWidget.updateWidget(
           androidName: androidWidgetName,
           iOSName: iOSWidgetName,
         );
-
         getIt<ILogger>().info(
           '[TravelTicketView] Cleared widget data for deleted ticket',
         );
@@ -280,22 +220,29 @@ class _TravelTicketViewState extends State<TravelTicketView> {
   }
 
   Future<void> _shareTicket() async {
-    setState(() {
-      _isSharing = true;
-    });
+    setState(() => _isSharing = true);
 
     try {
-      final imageBytes = await _screenshotController.capture();
-      if (imageBytes == null) {
-        if (mounted) {
-          showSnackbar(
-            context,
-            'Failed to generate ticket image',
-            isError: true,
-          );
-        }
-        return;
-      }
+      final pixelRatio = MediaQuery.of(context).devicePixelRatio;
+      final screenWidth = MediaQuery.of(context).size.width;
+      final imageBytes = await _screenshotController.captureFromLongWidget(
+        InheritedTheme.captureAll(
+          context,
+          MediaQuery(
+            data: MediaQuery.of(context),
+            child: Material(
+              type: MaterialType.transparency,
+              child: _TicketCardContent(
+                ticket: widget.ticket,
+                forScreenshot: true,
+              ),
+            ),
+          ),
+        ),
+        pixelRatio: pixelRatio,
+        context: context,
+        constraints: BoxConstraints(maxWidth: screenWidth),
+      );
 
       final directory = await getApplicationDocumentsDirectory();
       final imagePath = await File(
@@ -303,8 +250,21 @@ class _TravelTicketViewState extends State<TravelTicketView> {
       ).create();
       await imagePath.writeAsBytes(imageBytes);
 
-      final shareText = widget.ticket.primaryText ?? 'My Ticket';
-      // Using Share.shareXFiles due to older share_plus usage
+      final title = widget.ticket.primaryText ?? 'My Ticket';
+      final journeyDate = widget.ticket.startTime != null
+          ? '${DateTimeConverter.instance.formatDate(widget.ticket.startTime!)} at ${DateTimeConverter.instance.formatTime(widget.ticket.startTime!)}'
+          : null;
+
+      final shareText = [
+        '🎫 $title',
+        if (journeyDate != null) '📅 $journeyDate',
+        '',
+        'Managed with Namma Wallet – your smart travel companion.',
+        '📲 Android: https://play.google.com/store/apps/details?id=com.nammaflutter.nammawallet',
+        '🍎 iOS: https://apps.apple.com/in/app/namma-wallet/id6757295408',
+      ].join('\n');
+
+      // shareXFiles is the correct API; suppressing the unrelated deprecation
       // ignore: deprecated_member_use
       await Share.shareXFiles([XFile(imagePath.path)], text: shareText);
     } on Object catch (e, stackTrace) {
@@ -317,11 +277,7 @@ class _TravelTicketViewState extends State<TravelTicketView> {
         showSnackbar(context, 'Failed to share ticket: $e', isError: true);
       }
     } finally {
-      if (mounted) {
-        setState(() {
-          _isSharing = false;
-        });
-      }
+      if (mounted) setState(() => _isSharing = false);
     }
   }
 
@@ -333,88 +289,267 @@ class _TravelTicketViewState extends State<TravelTicketView> {
         leading: const RoundedBackButton(),
         title: const Text('Ticket View'),
         actions: [
-          Center(
-            child: CircleAvatar(
-              radius: 24,
-              backgroundColor: Theme.of(context).colorScheme.primary,
-              child: IconButton(
-                onPressed: _pinToHomeScreen,
-                icon: const Icon(
-                  Icons.push_pin_outlined,
-                  size: 20,
-                  color: Colors.white,
+          if (_isSharing || _isDeleting)
+            const Padding(
+              padding: EdgeInsets.only(right: 16),
+              child: SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              ),
+            )
+          else
+            PopupMenuButton<String>(
+              icon: const Icon(Icons.more_vert),
+              onSelected: (value) async {
+                switch (value) {
+                  case 'pin':
+                    await _pinToHomeScreen();
+                  case 'share':
+                    await _shareTicket();
+                  case 'delete':
+                    await _showDeleteConfirmation();
+                }
+              },
+              itemBuilder: (context) => [
+                const PopupMenuItem(
+                  value: 'pin',
+                  child: ListTile(
+                    leading: Icon(Icons.push_pin_outlined),
+                    title: Text('Pin to home screen'),
+                    contentPadding: EdgeInsets.zero,
+                  ),
                 ),
-                tooltip: 'Pin to home screen',
-              ),
-            ),
-          ),
-          const SizedBox(width: 8),
-          Center(
-            child: CircleAvatar(
-              radius: 24,
-              backgroundColor: Theme.of(context).colorScheme.primary,
-              child: _isSharing
-                  ? const SizedBox(
-                      width: 16,
-                      height: 16,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        color: Colors.white,
+                const PopupMenuItem(
+                  value: 'share',
+                  child: ListTile(
+                    leading: Icon(Icons.share_outlined),
+                    title: Text('Share ticket'),
+                    contentPadding: EdgeInsets.zero,
+                  ),
+                ),
+                if (widget.ticket.ticketId != null)
+                  PopupMenuItem(
+                    value: 'delete',
+                    child: ListTile(
+                      leading: Icon(
+                        Icons.delete,
+                        color: Colors.red.shade400,
                       ),
-                    )
-                  : IconButton(
-                      onPressed: _isSharing ? null : _shareTicket,
-                      icon: const Icon(
-                        Icons.share_outlined,
-                        size: 20,
-                        color: Colors.white,
+                      title: Text(
+                        'Delete ticket',
+                        style: TextStyle(color: Colors.red.shade400),
                       ),
-                      tooltip: 'Share ticket',
+                      contentPadding: EdgeInsets.zero,
                     ),
+                  ),
+              ],
             ),
-          ),
-          const SizedBox(width: 8),
-          if (widget.ticket.ticketId != null)
-            Center(
-              child: CircleAvatar(
-                radius: 24,
-                backgroundColor: Colors.red.shade400,
-                child: _isDeleting
-                    ? const SizedBox(
-                        width: 16,
-                        height: 16,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: Colors.white,
-                        ),
-                      )
-                    : IconButton(
-                        onPressed: _isDeleting ? null : _showDeleteConfirmation,
-                        icon: const Icon(
-                          Icons.delete,
-                          size: 20,
-                          color: Colors.white,
-                        ),
-                        tooltip: 'Delete ticket',
-                      ),
-              ),
-            ),
-          const SizedBox(width: 16),
         ],
       ),
-      body: Screenshot(
-        controller: _screenshotController,
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              Container(
-              margin: const EdgeInsets.only(top: 16, left: 16, right: 16),
+      body: SingleChildScrollView(
+        child: _TicketCardContent(
+          ticket: widget.ticket,
+          onCallConductor: _callConductor,
+        ),
+      ),
+    );
+  }
+}
+
+class _TicketCardContent extends StatelessWidget {
+  const _TicketCardContent({
+    required this.ticket,
+    this.forScreenshot = false,
+    this.onCallConductor,
+  });
+
+  final Ticket ticket;
+  final bool forScreenshot;
+  final void Function(String phoneNumber)? onCallConductor;
+
+  String? get _conductorPhone {
+    final value =
+        ticket.getExtraByTitle('conductor contact') ??
+        ticket.getExtraByTitle('conductor mobile no');
+    if (value == null) return null;
+    final cleaned = value.trim();
+    if (cleaned.isEmpty || cleaned == '--') return null;
+    return cleaned;
+  }
+
+  List<ExtrasModel> get _filteredExtras {
+    if (ticket.extras == null) return [];
+    final from = ticket.fromLocation;
+    final to = ticket.toLocation;
+    if (from != null && to != null) {
+      return ticket.extras!.where((extra) {
+        final title = extra.title?.toLowerCase();
+        return title != 'from' && title != 'to';
+      }).toList();
+    }
+    return ticket.extras!;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final conductorPhone = _conductorPhone;
+
+    return ColoredBox(
+      color: Theme.of(context).scaffoldBackgroundColor,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            margin: const EdgeInsets.only(top: 16, left: 16, right: 16),
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surface,
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(16),
+                topRight: Radius.circular(16),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.1),
+                  blurRadius: 8,
+                  spreadRadius: 1,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (ticket.imagePath != null)
+                  Builder(
+                    builder: (context) {
+                      final file = File(ticket.imagePath!);
+                      if (!file.existsSync()) return const SizedBox.shrink();
+                      return Column(
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: Image.file(
+                              file,
+                              width: double.infinity,
+                              height: 150,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                        ],
+                      );
+                    },
+                  ),
+                Row(
+                  children: [
+                    CircleAvatar(
+                      radius: 16,
+                      backgroundColor: Theme.of(context)
+                          .colorScheme
+                          .primary
+                          .withValues(alpha: 0.1),
+                      child: Icon(
+                        ticket.type == TicketType.bus
+                            ? Icons.airport_shuttle_outlined
+                            : Icons.tram_outlined,
+                        size: 18,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    if (ticket.secondaryText?.isNotEmpty ?? false)
+                      Expanded(
+                        child: Text(
+                          ticket.secondaryText ?? '',
+                          style: Paragraph03(
+                            color: Theme.of(context).colorScheme.onSurface,
+                          ).regular,
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 2,
+                        ),
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                ..._buildRoute(context),
+                const SizedBox(height: 12),
+                TravelRowWidget(
+                  title1: 'Journey Date',
+                  title2: 'Time',
+                  value1: ticket.startTime != null
+                      ? DateTimeConverter.instance.formatDate(ticket.startTime!)
+                      : 'Unknown',
+                  value2: ticket.startTime != null
+                      ? DateTimeConverter.instance.formatTime(ticket.startTime!)
+                      : 'Unknown',
+                ),
+                const SizedBox(height: 16),
+                if (!forScreenshot && ticket.directionsUrl != null) ...[
+                  SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton.icon(
+                      onPressed: () async {
+                        try {
+                          final uri = Uri.parse(ticket.directionsUrl!);
+                          if (await canLaunchUrl(uri)) {
+                            await launchUrl(uri);
+                          } else if (context.mounted) {
+                            showSnackbar(
+                              context,
+                              'Could not open map URL',
+                              isError: true,
+                            );
+                          }
+                        } on FormatException {
+                          if (context.mounted) {
+                            showSnackbar(
+                              context,
+                              'Invalid directional URL',
+                              isError: true,
+                            );
+                          }
+                        }
+                      },
+                      icon: const Icon(Icons.map_outlined),
+                      label: const Text('Get Directions'),
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        side: BorderSide(
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                ],
+                ..._buildExtras(context),
+              ],
+            ),
+          ),
+          CustomPaint(
+            size: Size(MediaQuery.of(context).size.width * 0.95, 40),
+            painter: TravelTicketShapeLine(
+              backgroundColor: Theme.of(context).colorScheme.surface,
+              dashedLineColor: Theme.of(context)
+                  .colorScheme
+                  .onSurface
+                  .withValues(alpha: 0.3),
+            ),
+          ),
+          if (ticket.hasPnrOrId)
+            Container(
+              margin: const EdgeInsets.only(bottom: 16, left: 16, right: 16),
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
                 color: Theme.of(context).colorScheme.surface,
                 borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(16),
-                  topRight: Radius.circular(16),
+                  bottomLeft: Radius.circular(16),
+                  bottomRight: Radius.circular(16),
                 ),
                 boxShadow: [
                   BoxShadow(
@@ -425,459 +560,212 @@ class _TravelTicketViewState extends State<TravelTicketView> {
                   ),
                 ],
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              child: Center(
+                child: QrImageView(
+                  data: ticket.pnrOrId ?? 'xxx',
+                  size: 200,
+                  eyeStyle: QrEyeStyle(
+                    eyeShape: QrEyeShape.square,
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+                  dataModuleStyle: QrDataModuleStyle(
+                    dataModuleShape: QrDataModuleShape.square,
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+                ),
+              ),
+            ),
+          if (!forScreenshot && conductorPhone != null) ...[
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: SizedBox(
+                width: double.infinity,
+                child: FilledButton.icon(
+                  onPressed: () => onCallConductor?.call(conductorPhone),
+                  icon: const Icon(Icons.call),
+                  label: const Text('Call Conductor'),
+                  style: FilledButton.styleFrom(
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+          ],
+          const SizedBox(height: 16),
+          if (forScreenshot)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 20),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  //* Image (if exists)
-                  if (widget.ticket.imagePath != null) ...[
-                    Builder(
-                      builder: (context) {
-                        final file = File(widget.ticket.imagePath!);
-                        if (file.existsSync()) {
-                          return Column(
-                            children: [
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(12),
-                                child: Image.file(
-                                  file,
-                                  width: double.infinity,
-                                  height: 150,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stackTrace) {
-                                    getIt<ILogger>().error(
-                                      '[TravelTicketView] Failed to load '
-                                      'ticket image from path: '
-                                      '${widget.ticket.imagePath}',
-                                      error,
-                                      stackTrace,
-                                    );
-                                    return const SizedBox.shrink();
-                                  },
-                                ),
-                              ),
-                              const SizedBox(height: 16),
-                            ],
-                          );
-                        }
-                        return const SizedBox.shrink();
-                      },
-                    ),
-                  ],
-
-                  //* Icon & Service
-                  Row(
-                    children: [
-                      CircleAvatar(
-                        radius: 16,
-                        backgroundColor: Theme.of(
-                          context,
-                        ).colorScheme.primary.withValues(alpha: 0.1),
-                        child: Icon(
-                          widget.ticket.type == TicketType.bus
-                              ? Icons.airport_shuttle_outlined
-                              : Icons.tram_outlined,
-                          size: 18,
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      //* Description (Secondary text)
-                      if (widget.ticket.secondaryText?.isNotEmpty ?? false)
-                        Expanded(
-                          child: Text(
-                            widget.ticket.secondaryText ?? '',
-                            style: Paragraph03(
-                              color: Theme.of(
-                                context,
-                              ).colorScheme.onSurface,
-                            ).regular,
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 2,
-                          ),
-                        ),
-                    ],
+                  Icon(
+                    Icons.wallet,
+                    size: 14,
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withValues(alpha: 0.4),
                   ),
-
-                  const SizedBox(height: 16),
-
-                  //* Route Display (From → To with chips)
-                  ...() {
-                    final from = widget.ticket.fromLocation;
-                    final to = widget.ticket.toLocation;
-
-                    if (from != null && to != null) {
-                      return <Widget>[
-                        // Origin chip
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 12,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Theme.of(context).colorScheme.surface,
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: Theme.of(
-                                context,
-                              ).colorScheme.onSurface.withValues(alpha: 0.1),
-                              width: 0.5,
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withValues(
-                                  alpha: 0.05,
-                                ),
-                                blurRadius: 4,
-                                offset: const Offset(0, 2),
-                              ),
-                            ],
-                          ),
-                          child: Row(
-                            children: [
-                              Icon(
-                                Icons.trip_origin,
-                                size: 20,
-                                color: Theme.of(
-                                  context,
-                                ).colorScheme.primary,
-                              ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: Text(
-                                  from,
-                                  style: Paragraph02(
-                                    color: Theme.of(
-                                      context,
-                                    ).colorScheme.onSurface,
-                                  ).semiBold,
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 2,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-
-                        // Arrow
-                        Center(
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                              vertical: 8,
-                            ),
-                            child: Icon(
-                              Icons.arrow_downward_rounded,
-                              size: 24,
-                              color:
-                                  Theme.of(
-                                    context,
-                                  ).colorScheme.primary.withValues(
-                                    alpha: 0.6,
-                                  ),
-                            ),
-                          ),
-                        ),
-
-                        // Destination chip
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 12,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Theme.of(context).colorScheme.surface,
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: Theme.of(
-                                context,
-                              ).colorScheme.onSurface.withValues(alpha: 0.1),
-                              width: 0.5,
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withValues(
-                                  alpha: 0.05,
-                                ),
-                                blurRadius: 4,
-                                offset: const Offset(0, 2),
-                              ),
-                            ],
-                          ),
-                          child: Row(
-                            children: [
-                              Icon(
-                                Icons.location_on,
-                                size: 20,
-                                color: Theme.of(
-                                  context,
-                                ).colorScheme.primary,
-                              ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: Text(
-                                  to,
-                                  style: Paragraph02(
-                                    color: Theme.of(
-                                      context,
-                                    ).colorScheme.onSurface,
-                                  ).semiBold,
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 2,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ];
-                    } else {
-                      // Fallback to primaryText
-                      final primaryText = widget.ticket.primaryText;
-                      if (primaryText == null || primaryText.isEmpty) {
-                        return <Widget>[];
-                      }
-
-                      return <Widget>[
-                        Text(
-                          widget.ticket.primaryText ?? '',
-                          style: Paragraph01(
-                            color: Theme.of(
-                              context,
-                            ).colorScheme.onSurface,
-                          ).semiBold,
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 3,
-                        ),
-                      ];
-                    }
-                  }(),
-
-                  const SizedBox(height: 12),
-
-                  //* Date - Time
-                  TravelRowWidget(
-                    title1: 'Journey Date',
-                    title2: 'Time',
-                    value1: widget.ticket.startTime != null
-                        ? DateTimeConverter.instance.formatDate(
-                            widget.ticket.startTime!,
-                          )
-                        : 'Unknown',
-                    value2: widget.ticket.startTime != null
-                        ? DateTimeConverter.instance.formatTime(
-                            widget.ticket.startTime!,
-                          )
-                        : 'Unknown',
-                  ),
-
-                  const SizedBox(height: 16),
-
-                  if (widget.ticket.directionsUrl != null) ...[
-                    SizedBox(
-                      width: double.infinity,
-                      child: OutlinedButton.icon(
-                        onPressed: () async {
-                          try {
-                            final uri = Uri.parse(widget.ticket.directionsUrl!);
-                            if (await canLaunchUrl(uri)) {
-                              await launchUrl(uri);
-                            } else {
-                              if (context.mounted) {
-                                showSnackbar(
-                                  context,
-                                  'Could not open map URL',
-                                  isError: true,
-                                );
-                              }
-                            }
-                          } on FormatException {
-                            if (context.mounted) {
-                              showSnackbar(
-                                context,
-                                'Invalid directional URL',
-                                isError: true,
-                              );
-                            }
-                          }
-                        },
-                        icon: const Icon(Icons.map_outlined),
-                        label: const Text('Get Directions'),
-                        style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                          side: BorderSide(
-                            color: Theme.of(context).colorScheme.primary,
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                      ),
+                  const SizedBox(width: 6),
+                  Text(
+                    'by Namma Wallet',
+                    style: TextStyle(
+                      fontSize: 12,
+                      letterSpacing: 0.4,
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withValues(alpha: 0.4),
                     ),
-                    const SizedBox(height: 16),
-                  ],
-
-                  ...() {
-                    final filteredExtras = getFilteredExtras(
-                      widget.ticket,
-                    );
-                    if (filteredExtras.isEmpty) return <Widget>[];
-
-                    return <Widget>[
-                      const SizedBox(height: 12),
-                      // 2-column grid layout
-                      for (var i = 0; i < filteredExtras.length; i += 2)
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 8),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // Left item
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      filteredExtras[i].title ?? '-',
-                                      style: Paragraph03(
-                                        color:
-                                            Theme.of(
-                                              context,
-                                            ).colorScheme.onSurface.withValues(
-                                              alpha: 0.7,
-                                            ),
-                                      ).regular,
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      filteredExtras[i].value ?? '-',
-                                      overflow: TextOverflow.ellipsis,
-                                      maxLines: 2,
-                                      style: Paragraph03(
-                                        color: Theme.of(
-                                          context,
-                                        ).colorScheme.onSurface,
-                                      ).semiBold,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              // Right item (if exists)
-                              if (i + 1 < filteredExtras.length)
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.end,
-                                    children: [
-                                      Text(
-                                        filteredExtras[i + 1].title ?? '-',
-                                        style: Paragraph03(
-                                          color:
-                                              Theme.of(
-                                                    context,
-                                                  ).colorScheme.onSurface
-                                                  .withValues(
-                                                    alpha: 0.7,
-                                                  ),
-                                        ).regular,
-                                      ),
-                                      const SizedBox(height: 4),
-                                      Text(
-                                        filteredExtras[i + 1].value ?? '-',
-                                        overflow: TextOverflow.ellipsis,
-                                        maxLines: 2,
-                                        textAlign: TextAlign.end,
-                                        style: Paragraph03(
-                                          color: Theme.of(
-                                            context,
-                                          ).colorScheme.onSurface,
-                                        ).semiBold,
-                                      ),
-                                    ],
-                                  ),
-                                )
-                              else
-                                const Expanded(child: SizedBox()),
-                            ],
-                          ),
-                        ),
-                    ];
-                  }(),
+                  ),
                 ],
               ),
             ),
-            CustomPaint(
-              size: Size(MediaQuery.of(context).size.width * 0.95, 40),
-              painter: TravelTicketShapeLine(
-                backgroundColor: Theme.of(context).colorScheme.surface,
-                dashedLineColor: Theme.of(context).colorScheme.onSurface
-                    .withValues(
-                      alpha: 0.3,
-                    ),
-              ),
+        ],
+      ),
+    );
+  }
+
+  List<Widget> _buildRoute(BuildContext context) {
+    final from = ticket.fromLocation;
+    final to = ticket.toLocation;
+
+    if (from != null && to != null) {
+      return [
+        _LocationChip(icon: Icons.trip_origin, location: from),
+        Center(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            child: Icon(
+              Icons.arrow_downward_rounded,
+              size: 24,
+              color: Theme.of(context)
+                  .colorScheme
+                  .primary
+                  .withValues(alpha: 0.6),
             ),
-            if (widget.ticket.hasPnrOrId)
-              Container(
-                margin: const EdgeInsets.only(
-                  bottom: 16,
-                  left: 16,
-                  right: 16,
-                ),
-                padding: const EdgeInsets.all(24),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surface,
-                  borderRadius: const BorderRadius.only(
-                    bottomLeft: Radius.circular(16),
-                    bottomRight: Radius.circular(16),
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.1),
-                      blurRadius: 8,
-                      spreadRadius: 1,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: Center(
-                  child: QrImageView(
-                    data: widget.ticket.pnrOrId ?? 'xxx',
-                    size: 200,
-                    eyeStyle: QrEyeStyle(
-                      eyeShape: QrEyeShape.square,
-                      color: Theme.of(context).colorScheme.onSurface,
-                    ),
-                    dataModuleStyle: QrDataModuleStyle(
-                      dataModuleShape: QrDataModuleShape.square,
-                      color: Theme.of(context).colorScheme.onSurface,
-                    ),
-                  ),
-                ),
-              ),
-              if (_conductorPhoneNumber != null) ...[
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: SizedBox(
-                    width: double.infinity,
-                    child: FilledButton.icon(
-                      onPressed: () async {
-                        await _callConductor(_conductorPhoneNumber!);
-                      },
-                      icon: const Icon(Icons.call),
-                      label: const Text('Call Conductor'),
-                      style: FilledButton.styleFrom(
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 16),
-              ],
-              const SizedBox(height: 16),
+          ),
+        ),
+        _LocationChip(icon: Icons.location_on, location: to),
+      ];
+    }
+
+    final primaryText = ticket.primaryText;
+    if (primaryText == null || primaryText.isEmpty) return [];
+    return [
+      Text(
+        primaryText,
+        style: Paragraph01(
+          color: Theme.of(context).colorScheme.onSurface,
+        ).semiBold,
+        overflow: TextOverflow.ellipsis,
+        maxLines: 3,
+      ),
+    ];
+  }
+
+  List<Widget> _buildExtras(BuildContext context) {
+    final extras = _filteredExtras;
+    if (extras.isEmpty) return [];
+
+    return [
+      const SizedBox(height: 12),
+      for (var i = 0; i < extras.length; i += 2)
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(child: _ExtraCell(extra: extras[i], align: TextAlign.start)),
+              if (i + 1 < extras.length)
+                Expanded(
+                  child: _ExtraCell(extra: extras[i + 1], align: TextAlign.end),
+                )
+              else
+                const Expanded(child: SizedBox()),
             ],
           ),
         ),
+    ];
+  }
+}
+
+class _LocationChip extends StatelessWidget {
+  const _LocationChip({required this.icon, required this.location});
+
+  final IconData icon;
+  final String location;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1),
+          width: 0.5,
+        ),
       ),
+      child: Row(
+        children: [
+          Icon(icon, size: 20, color: Theme.of(context).colorScheme.primary),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              location,
+              style: Paragraph02(
+                color: Theme.of(context).colorScheme.onSurface,
+              ).semiBold,
+              overflow: TextOverflow.ellipsis,
+              maxLines: 2,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ExtraCell extends StatelessWidget {
+  const _ExtraCell({required this.extra, required this.align});
+
+  final ExtrasModel extra;
+  final TextAlign align;
+
+  @override
+  Widget build(BuildContext context) {
+    final isEnd = align == TextAlign.end;
+    return Column(
+      crossAxisAlignment:
+          isEnd ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+      children: [
+        Text(
+          extra.title ?? '-',
+          style: Paragraph03(
+            color: Theme.of(context)
+                .colorScheme
+                .onSurface
+                .withValues(alpha: 0.7),
+          ).regular,
+        ),
+        const SizedBox(height: 4),
+        Text(
+          extra.value ?? '-',
+          overflow: TextOverflow.ellipsis,
+          maxLines: 2,
+          textAlign: align,
+          style: Paragraph03(
+            color: Theme.of(context).colorScheme.onSurface,
+          ).semiBold,
+        ),
+      ],
     );
   }
 }
