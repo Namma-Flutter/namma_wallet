@@ -57,7 +57,6 @@
                 <action android:name="com.htc.intent.action.QUICKBOOT_POWERON"/>
             </intent-filter>
         </receiver>
-        <receiver android:exported="false" android:name="com.dexterous.flutterlocalnotifications.FlutterLocalNotificationsReceiver"/>
 
         <!-- Main Ticket Widget Provider (3x3) -->
         <receiver
