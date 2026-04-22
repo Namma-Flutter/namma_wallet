@@ -38,7 +38,7 @@ class _TicketReminderConfigDialogState
   bool _isEnabled = true;
   bool _isLoading = true;
   bool _isSaving = false;
-  late ReminderPreferences _previousPreferences;
+  ReminderPreferences _previousPreferences = ReminderPreferences.defaultPreferences;
 
   // All available hour options
   static const List<int> _availableHours = [
