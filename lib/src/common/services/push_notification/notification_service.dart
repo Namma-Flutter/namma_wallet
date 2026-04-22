@@ -6,6 +6,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:go_router/go_router.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
+import 'package:namma_wallet/src/common/domain/models/reminder_preferences.dart';
 import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 import 'package:namma_wallet/src/common/routing/app_router.dart';
 import 'package:namma_wallet/src/common/routing/app_routes.dart';
@@ -370,8 +371,29 @@ class NotificationService {
           );
 
           if (prefs.isEnabled) {
-            selectedIntervals = prefs.selectedIntervals;
-            customDateTimes = prefs.customDateTimes;
+            // Check if these are the hardcoded defaults and fetch global
+            // defaults if so, mirroring TicketReminderConfigDialog logic
+            if (prefs == ReminderPreferences.defaultPreferences) {
+              try {
+                final globalDefaults =
+                    await preferencesService.getDefaultRemainderPreferences();
+                selectedIntervals = globalDefaults.selectedIntervals;
+                customDateTimes = globalDefaults.customDateTimes;
+              } on Exception catch (e, st) {
+                if (_logger != null) {
+                  _logger?.error(
+                    'Error retrieving global default preferences; using '
+                    'hardcoded defaults',
+                    e,
+                    st,
+                  );
+                }
+                selectedIntervals = [24, 4, 2];
+              }
+            } else {
+              selectedIntervals = prefs.selectedIntervals;
+              customDateTimes = prefs.customDateTimes;
+            }
           } else {
             // Reminders disabled for this ticket
             logSkip('Reminders disabled for ticket $payload.');
