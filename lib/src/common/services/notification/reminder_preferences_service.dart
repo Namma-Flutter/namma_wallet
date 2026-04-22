@@ -33,7 +33,7 @@ class ReminderPreferencesService implements IReminderPreferencesService {
   }
 
   final ILogger _logger;
-  late SharedPreferences _prefs;
+  SharedPreferences? _prefs;
   Future<void>? _initFuture;
 
   static const String _defaultPreferencesKey = 'reminder_preferences_default';
@@ -72,8 +72,15 @@ class ReminderPreferencesService implements IReminderPreferencesService {
   Future<ReminderPreferences> getRemainderPreferences(String ticketId) async {
     try {
       await _ensureInitialized();
+      if (_prefs == null) {
+        _logger.warning(
+          '[ReminderPreferencesService] SharedPreferences unavailable for '
+          'ticket $ticketId, returning default',
+        );
+        return ReminderPreferences.defaultPreferences;
+      }
       final key = _getTicketPreferencesKey(ticketId);
-      final jsonString = _prefs.getString(key);
+      final jsonString = _prefs!.getString(key);
 
       if (jsonString == null) {
         _logger.info(
@@ -110,9 +117,16 @@ class ReminderPreferencesService implements IReminderPreferencesService {
   ) async {
     try {
       await _ensureInitialized();
+      if (_prefs == null) {
+        _logger.warning(
+          '[ReminderPreferencesService] SharedPreferences unavailable, '
+          'cannot save preferences for ticket $ticketId',
+        );
+        return;
+      }
       final key = _getTicketPreferencesKey(ticketId);
       final jsonString = jsonEncode(preferences.toMap());
-      await _prefs.setString(key, jsonString);
+      await _prefs!.setString(key, jsonString);
 
       _logger.info(
         '[ReminderPreferencesService] Saved preferences for ticket $ticketId',
@@ -131,8 +145,15 @@ class ReminderPreferencesService implements IReminderPreferencesService {
   Future<void> deleteRemainderPreferences(String ticketId) async {
     try {
       await _ensureInitialized();
+      if (_prefs == null) {
+        _logger.warning(
+          '[ReminderPreferencesService] SharedPreferences unavailable, '
+          'cannot delete preferences for ticket $ticketId',
+        );
+        return;
+      }
       final key = _getTicketPreferencesKey(ticketId);
-      await _prefs.remove(key);
+      await _prefs!.remove(key);
 
       _logger.info(
         '[ReminderPreferencesService] Deleted preferences for ticket $ticketId',
@@ -151,7 +172,14 @@ class ReminderPreferencesService implements IReminderPreferencesService {
   Future<ReminderPreferences> getDefaultRemainderPreferences() async {
     try {
       await _ensureInitialized();
-      final jsonString = _prefs.getString(_defaultPreferencesKey);
+      if (_prefs == null) {
+        _logger.warning(
+          '[ReminderPreferencesService] SharedPreferences unavailable, '
+          'returning default preferences',
+        );
+        return ReminderPreferences.defaultPreferences;
+      }
+      final jsonString = _prefs!.getString(_defaultPreferencesKey);
 
       if (jsonString == null) {
         _logger.info(
@@ -185,8 +213,15 @@ class ReminderPreferencesService implements IReminderPreferencesService {
   ) async {
     try {
       await _ensureInitialized();
+      if (_prefs == null) {
+        _logger.warning(
+          '[ReminderPreferencesService] SharedPreferences unavailable, '
+          'cannot save default preferences',
+        );
+        return;
+      }
       final jsonString = jsonEncode(preferences.toMap());
-      await _prefs.setString(_defaultPreferencesKey, jsonString);
+      await _prefs!.setString(_defaultPreferencesKey, jsonString);
 
       _logger.info(
         '[ReminderPreferencesService] Saved default preferences',

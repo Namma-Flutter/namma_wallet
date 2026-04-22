@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/domain/models/reminder_preferences.dart';
@@ -85,7 +86,10 @@ class _TicketReminderConfigDialogState
             // Check if custom vs using hardcoded defaults
             final hardcodedDefaults =
                 ReminderPreferences.defaultPreferences.selectedIntervals;
-            final isCustom = ticketPrefs.selectedIntervals != hardcodedDefaults;
+            final isCustom = !listEquals(
+              ticketPrefs.selectedIntervals,
+              hardcodedDefaults,
+            );
             _selectedIntervals = isCustom
                 ? ticketPrefs.selectedIntervals.toList()
                 : globalDefaults.selectedIntervals.toList();
