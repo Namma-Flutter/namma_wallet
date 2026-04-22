@@ -37,9 +37,11 @@ class _ReminderSettingsViewState extends State<ReminderSettingsView> {
     7,
     8,
     9,
+    10,
     12,
     24,
   ];
+
 
   @override
   void initState() {
