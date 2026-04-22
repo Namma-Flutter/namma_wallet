@@ -21,14 +21,17 @@ import 'package:timezone/timezone.dart' as tz;
 
 class NotificationService {
   factory NotificationService() => _instance;
-  NotificationService._internal()
-    : _logger = getIt.isRegistered<ILogger>() ? getIt<ILogger>() : null;
+  NotificationService._internal();
   static final NotificationService _instance = NotificationService._internal();
 
   final FlutterLocalNotificationsPlugin _plugin =
       FlutterLocalNotificationsPlugin();
 
-  final ILogger? _logger;
+  /// Lazily retrieves the logger instance from GetIt.
+  /// This ensures the logger is available even if NotificationService is
+  /// instantiated before setupLocator() is called.
+  ILogger? get _logger =>
+      getIt.isRegistered<ILogger>() ? getIt<ILogger>() : null;
 
   Future<String> getLocalTimezoneId() async {
     final info = await FlutterTimezone.getLocalTimezone();
@@ -55,7 +58,7 @@ class NotificationService {
     final status = await Permission.notification.request();
 
     if (_logger != null) {
-      _logger.info(
+      _logger?.info(
         'Notification permission status: ${status.isDenied
             ? 'denied'
             : status.isGranted
@@ -98,7 +101,7 @@ class NotificationService {
       final permissionGranted = await _requestNotificationPermission();
       if (!permissionGranted) {
         if (_logger != null) {
-          _logger.info('Notification permission denied by user');
+          _logger?.info('Notification permission denied by user');
         } else {
           debugPrint('Notification permission denied by user');
         }
@@ -115,7 +118,9 @@ class NotificationService {
         final payload = details.payload;
         if (payload == null || payload.isEmpty) {
           if (_logger != null) {
-            _logger.error('Notification payload missing; skipping navigation.');
+            _logger?.error(
+              'Notification payload missing; skipping navigation.',
+            );
           } else {
             debugPrint('Notification payload missing; skipping navigation.');
           }
@@ -141,7 +146,7 @@ class NotificationService {
         if (payload != null && payload.isNotEmpty) {
           _initialNotificationPayload = payload;
           if (_logger != null) {
-            _logger.info(
+            _logger?.info(
               'App launched from notification with payload: $payload',
             );
           } else {
@@ -151,7 +156,7 @@ class NotificationService {
       }
     } on Exception catch (e, st) {
       if (_logger != null) {
-        _logger.error('Error checking notification launch details', e, st);
+        _logger?.error('Error checking notification launch details', e, st);
       } else {
         debugPrint('Error checking notification launch details: $e\n$st');
       }
@@ -253,7 +258,7 @@ class NotificationService {
     final permissionGranted = await _isNotificationPermissionGranted();
     if (!permissionGranted) {
       if (_logger != null) {
-        _logger.info(
+        _logger?.info(
           '''
           POST_NOTIFICATIONS permission not granted; skipping notification scheduling.''',
         );
@@ -280,7 +285,7 @@ class NotificationService {
       );
     } on Exception catch (e, stackTrace) {
       if (_logger != null) {
-        _logger.error('Error scheduling ticket reminders', e, stackTrace);
+        _logger?.error('Error scheduling ticket reminders', e, stackTrace);
       } else {
         debugPrint(
           'Error scheduling ticket reminders: $e\n$stackTrace',
@@ -301,7 +306,7 @@ class NotificationService {
       final permissionGranted = await _requestNotificationPermission();
       if (!permissionGranted) {
         if (_logger != null) {
-          _logger.info(
+          _logger?.info(
             'POST_NOTIFICATIONS permission denied; cannot schedule reminders.',
           );
         } else {
@@ -314,7 +319,7 @@ class NotificationService {
 
       void logSkip(String message) {
         if (_logger != null) {
-          _logger.error(message);
+          _logger?.error(message);
         } else {
           debugPrint(message);
         }
@@ -374,7 +379,7 @@ class NotificationService {
           }
         } on Exception catch (e, st) {
           if (_logger != null) {
-            _logger.error(
+            _logger?.error(
               'Error retrieving reminder preferences; using defaults',
               e,
               st,
@@ -446,7 +451,7 @@ class NotificationService {
     } on Exception catch (e, stackTrace) {
       // Log error scheduling reminders
       if (_logger != null) {
-        _logger.error('Error scheduling ticket reminders', e, stackTrace);
+        _logger?.error('Error scheduling ticket reminders', e, stackTrace);
       } else {
         debugPrint(
           'Error scheduling ticket reminders: $e\n$stackTrace',
@@ -468,7 +473,7 @@ class NotificationService {
     final permissionGranted = await _isNotificationPermissionGranted();
     if (!permissionGranted) {
       if (_logger != null) {
-        _logger.info(
+        _logger?.info(
           'POST_NOTIFICATIONS permission not granted;cannot show notification.',
         );
       } else {

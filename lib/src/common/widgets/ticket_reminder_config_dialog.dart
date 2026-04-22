@@ -213,8 +213,9 @@ class _TicketReminderConfigDialogState
     });
 
     try {
-      // Cancel existing notifications if reminders are being disabled
-      if (_previousPreferences.isEnabled && !_isEnabled) {
+      // Always cancel previous reminders first to avoid duplicates
+      // when intervals or custom datetimes change
+      if (_previousPreferences.isEnabled) {
         await _cancelAllReminders(_previousPreferences);
       }
 
@@ -234,7 +235,7 @@ class _TicketReminderConfigDialogState
         preferences,
       );
 
-      // Schedule reminders only if enabled
+      // Schedule new reminders only if enabled
       if (_isEnabled) {
         await _scheduleSelectedReminders();
       }
