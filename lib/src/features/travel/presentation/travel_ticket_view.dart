@@ -247,9 +247,11 @@ class _TravelTicketViewState extends State<TravelTicketView> {
       await getIt<ITicketDAO>().deleteTicket(widget.ticket.ticketId!);
 
       // Cancel all scheduled reminders and delete preferences for this ticket
-      await getIt<INotificationService>().cancelAllRemindersForTicket(
-        widget.ticket,
-      );
+      if (Platform.isAndroid) {
+        await getIt<INotificationService>().cancelAllRemindersForTicket(
+          widget.ticket,
+        );
+      }
 
       // Notify listeners that ticket data changed
       getIt<TicketChangeNotifier>().notifyTicketChanged();
