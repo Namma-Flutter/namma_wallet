@@ -12,6 +12,7 @@ import 'package:namma_wallet/src/common/routing/app_router.dart';
 import 'package:namma_wallet/src/common/routing/app_routes.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
 import 'package:namma_wallet/src/common/services/notification/reminder_preferences_service.dart';
+import 'package:namma_wallet/src/common/services/push_notification/notification_service_interface.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
@@ -20,7 +21,7 @@ import 'package:timezone/timezone.dart' as tz;
 /// and displaying notifications.
 ///
 
-class NotificationService {
+class NotificationService implements INotificationService {
   factory NotificationService() => _instance;
   NotificationService._internal();
   static final NotificationService _instance = NotificationService._internal();
@@ -92,6 +93,7 @@ class NotificationService {
 
   String? _initialNotificationPayload;
 
+  @override
   Future<void> initialize() async {
     await initTimezone();
     const androidSettings = AndroidInitializationSettings(
@@ -166,6 +168,7 @@ class NotificationService {
 
   /// If the app was launched from a terminated state by tapping a
   /// notification, navigate to the appropriate page once the UI is ready.
+  @override
   Future<void> handleInitialNotification() async {
     final payload = _initialNotificationPayload;
     if (payload == null || payload.isEmpty) return;
@@ -248,6 +251,7 @@ class NotificationService {
 
   /// Schedules a ticket reminder notification.
 
+  @override
   Future<void> scheduleTicketReminder({
     required int id,
     required DateTime dateTime,
@@ -295,12 +299,14 @@ class NotificationService {
     }
   }
 
+  @override
   Future<void> cancelTicketReminder(int id) async {
     await _plugin.cancel(id);
   }
 
   /// Schedules multiple reminders for a ticket at predefined intervals.
 
+  @override
   Future<void> scheduleTicketReminderFor(Ticket ticket) async {
     try {
       // Request permission before attempting to schedule
@@ -459,7 +465,7 @@ class NotificationService {
             ? '$location • Starts - $formattedDateTime'
             : location;
 
-        await NotificationService().scheduleTicketReminder(
+        await scheduleTicketReminder(
           id: notificationId,
           dateTime: reminderTime,
           title: title,
@@ -485,7 +491,7 @@ class NotificationService {
             ? '$location • Starts - $formattedDateTime'
             : location;
 
-        await NotificationService().scheduleTicketReminder(
+        await scheduleTicketReminder(
           id: notificationId,
           dateTime: customDateTime,
           title: title,
@@ -508,6 +514,7 @@ class NotificationService {
   /// Shows a ticket notification immediately.
   /// Used for testing or immediate alerts.
 
+  @override
   Future<void> showInstantNotification({
     required int id,
     required String title,
@@ -551,6 +558,7 @@ class NotificationService {
   /// 3. Deletes the stored reminder preferences for the ticket
   ///
   /// Errors are logged but do not propagate to avoid blocking ticket deletion.
+  @override
   Future<void> cancelAllRemindersForTicket(Ticket ticket) async {
     final ticketId = ticket.ticketId;
     if (ticketId == null || ticketId.isEmpty) {

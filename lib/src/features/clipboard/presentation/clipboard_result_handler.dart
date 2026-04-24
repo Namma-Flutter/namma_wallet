@@ -2,7 +2,8 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:namma_wallet/src/common/services/push_notification/notification_service.dart';
+import 'package:namma_wallet/src/common/di/locator.dart';
+import 'package:namma_wallet/src/common/services/push_notification/notification_service_interface.dart';
 import 'package:namma_wallet/src/common/widgets/snackbar_widget.dart';
 import 'package:namma_wallet/src/features/clipboard/domain/clipboard_content_type.dart';
 import 'package:namma_wallet/src/features/clipboard/domain/clipboard_result.dart';
@@ -41,7 +42,7 @@ class ClipboardResultHandler {
         result.type == ClipboardContentType.travelTicket &&
         Platform.isAndroid) {
       unawaited(
-        NotificationService().scheduleTicketReminderFor(result.ticket!),
+        getIt<INotificationService>().scheduleTicketReminderFor(result.ticket!),
       );
     }
   }

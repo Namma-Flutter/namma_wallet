@@ -8,7 +8,7 @@ import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 import 'package:namma_wallet/src/common/helper/date_time_converter.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
 import 'package:namma_wallet/src/common/services/notification/reminder_preferences_service.dart';
-import 'package:namma_wallet/src/common/services/push_notification/notification_service.dart';
+import 'package:namma_wallet/src/common/services/push_notification/notification_service_interface.dart';
 import 'package:namma_wallet/src/common/theme/styles.dart';
 import 'package:namma_wallet/src/common/widgets/snackbar_widget.dart';
 
@@ -189,7 +189,7 @@ class _TicketReminderConfigDialogState
       }
       return;
     }
-
+    if (!mounted) return;
     setState(() {
       _customDateTimes
         ..add(customDateTime)
@@ -312,7 +312,7 @@ class _TicketReminderConfigDialogState
           ? '$location • Starts - $formattedDateTime'
           : location;
 
-      await NotificationService().scheduleTicketReminder(
+      await getIt<INotificationService>().scheduleTicketReminder(
         id: notificationId,
         dateTime: reminderTime,
         title: title,
@@ -339,7 +339,7 @@ class _TicketReminderConfigDialogState
           ? '$location • Starts - $formattedDateTime'
           : location;
 
-      await NotificationService().scheduleTicketReminder(
+      await getIt<INotificationService>().scheduleTicketReminder(
         id: notificationId,
         dateTime: customDateTime,
         title: title,
@@ -363,14 +363,18 @@ class _TicketReminderConfigDialogState
       // Cancel all standard interval reminders
       for (var i = 0; i < previousPrefs.selectedIntervals.length; i++) {
         final notificationId = safeBase * 100 + i;
-        await NotificationService().cancelTicketReminder(notificationId);
+        await getIt<INotificationService>().cancelTicketReminder(
+          notificationId,
+        );
       }
 
       // Cancel all custom datetime reminders
       for (var i = 0; i < previousPrefs.customDateTimeMillis.length; i++) {
         final notificationId =
             safeBase * 100 + previousPrefs.selectedIntervals.length + i;
-        await NotificationService().cancelTicketReminder(notificationId);
+        await getIt<INotificationService>().cancelTicketReminder(
+          notificationId,
+        );
       }
 
       _logger.info(

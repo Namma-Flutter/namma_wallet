@@ -15,7 +15,7 @@ import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/platform_utils/platform_utils.dart';
 import 'package:namma_wallet/src/common/services/haptic/haptic_service_interface.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
-import 'package:namma_wallet/src/common/services/push_notification/notification_service.dart';
+import 'package:namma_wallet/src/common/services/push_notification/notification_service_interface.dart';
 import 'package:namma_wallet/src/common/services/widget/widget_service_interface.dart';
 import 'package:namma_wallet/src/common/theme/theme_provider.dart';
 import 'package:namma_wallet/src/features/ai/fallback_parser/application/ai_service_interface.dart';
@@ -53,7 +53,16 @@ Future<void> main() async {
   /// Initialize notification service
   /// Store notification payload for later processing after app is initialized
   if (Platform.isAndroid) {
-    await NotificationService().initialize();
+    try {
+      await getIt<INotificationService>().initialize();
+    } on Exception catch (e, stackTrace) {
+      // Notification initialization failed - continue app startup
+      // Notifications may be unavailable but other features should work
+      debugPrint('Notification service initialization failed: $e\n$stackTrace');
+    } on Object catch (e, stackTrace) {
+      // Catch any other throwables
+      debugPrint('Notification service initialization failed: $e\n$stackTrace');
+    }
   }
 
   // Initialize pdfrx (required when using PDF engine APIs before widgets)

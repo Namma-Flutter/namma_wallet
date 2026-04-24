@@ -15,7 +15,7 @@ import 'package:namma_wallet/src/common/services/haptic/haptic_service_extension
 import 'package:namma_wallet/src/common/services/haptic/haptic_service_interface.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
 import 'package:namma_wallet/src/common/services/notification/reminder_preferences_service.dart';
-import 'package:namma_wallet/src/common/services/push_notification/notification_service.dart';
+import 'package:namma_wallet/src/common/services/push_notification/notification_service_interface.dart';
 import 'package:namma_wallet/src/common/services/ticket_change_notifier.dart';
 import 'package:namma_wallet/src/common/services/widget/widget_service_interface.dart';
 import 'package:namma_wallet/src/common/theme/styles.dart';
@@ -247,7 +247,9 @@ class _TravelTicketViewState extends State<TravelTicketView> {
       await getIt<ITicketDAO>().deleteTicket(widget.ticket.ticketId!);
 
       // Cancel all scheduled reminders and delete preferences for this ticket
-      await NotificationService().cancelAllRemindersForTicket(widget.ticket);
+      await getIt<INotificationService>().cancelAllRemindersForTicket(
+        widget.ticket,
+      );
 
       // Notify listeners that ticket data changed
       getIt<TicketChangeNotifier>().notifyTicketChanged();
