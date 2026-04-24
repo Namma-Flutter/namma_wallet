@@ -41,12 +41,20 @@ class ReminderPreferencesMapper extends ClassMapperBase<ReminderPreferences> {
     opt: true,
     def: true,
   );
+  static bool _$isCustomized(ReminderPreferences v) => v.isCustomized;
+  static const Field<ReminderPreferences, bool> _f$isCustomized = Field(
+    'isCustomized',
+    _$isCustomized,
+    opt: true,
+    def: false,
+  );
 
   @override
   final MappableFields<ReminderPreferences> fields = const {
     #selectedIntervals: _f$selectedIntervals,
     #customDateTimeMillis: _f$customDateTimeMillis,
     #isEnabled: _f$isEnabled,
+    #isCustomized: _f$isCustomized,
   };
 
   static ReminderPreferences _instantiate(DecodingData data) {
@@ -54,6 +62,7 @@ class ReminderPreferencesMapper extends ClassMapperBase<ReminderPreferences> {
       selectedIntervals: data.dec(_f$selectedIntervals),
       customDateTimeMillis: data.dec(_f$customDateTimeMillis),
       isEnabled: data.dec(_f$isEnabled),
+      isCustomized: data.dec(_f$isCustomized),
     );
   }
 
@@ -133,6 +142,7 @@ abstract class ReminderPreferencesCopyWith<
     List<int>? selectedIntervals,
     List<int>? customDateTimeMillis,
     bool? isEnabled,
+    bool? isCustomized,
   });
   ReminderPreferencesCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
     Then<$Out2, $R2> t,
@@ -166,12 +176,14 @@ class _ReminderPreferencesCopyWithImpl<$R, $Out>
     List<int>? selectedIntervals,
     List<int>? customDateTimeMillis,
     bool? isEnabled,
+    bool? isCustomized,
   }) => $apply(
     FieldCopyWithData({
       if (selectedIntervals != null) #selectedIntervals: selectedIntervals,
       if (customDateTimeMillis != null)
         #customDateTimeMillis: customDateTimeMillis,
       if (isEnabled != null) #isEnabled: isEnabled,
+      if (isCustomized != null) #isCustomized: isCustomized,
     }),
   );
   @override
@@ -185,6 +197,7 @@ class _ReminderPreferencesCopyWithImpl<$R, $Out>
       or: $value.customDateTimeMillis,
     ),
     isEnabled: data.get(#isEnabled, or: $value.isEnabled),
+    isCustomized: data.get(#isCustomized, or: $value.isCustomized),
   );
 
   @override

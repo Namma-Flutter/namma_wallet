@@ -95,7 +95,7 @@ class ReminderPreferencesService implements IReminderPreferencesService {
 
       _logger.info(
         '[ReminderPreferencesService] Retrieved preferences for ticket '
-        '$ticketId',
+        '$ticketId (isCustomized=${preferences.isCustomized})',
       );
 
       return preferences;
@@ -125,7 +125,14 @@ class ReminderPreferencesService implements IReminderPreferencesService {
         return;
       }
       final key = _getTicketPreferencesKey(ticketId);
-      final jsonString = jsonEncode(preferences.toMap());
+      // Mark as customized when explicitly saving user preferences
+      final customizedPreferences = ReminderPreferences(
+        selectedIntervals: preferences.selectedIntervals,
+        customDateTimeMillis: preferences.customDateTimeMillis,
+        isEnabled: preferences.isEnabled,
+        isCustomized: true,
+      );
+      final jsonString = jsonEncode(customizedPreferences.toMap());
       await _prefs!.setString(key, jsonString);
 
       _logger.info(

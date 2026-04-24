@@ -377,9 +377,11 @@ class NotificationService implements INotificationService {
           );
 
           if (prefs.isEnabled) {
-            // Check if these are the hardcoded defaults and fetch global
-            // defaults if so, mirroring TicketReminderConfigDialog logic
-            if (prefs == ReminderPreferences.defaultPreferences) {
+            // If the ticket has never been customized (isCustomized=false),
+            // fetch and use the global default preferences.
+            // If isCustomized=true, always respect the stored preferences
+            // regardless of their values.
+            if (!prefs.isCustomized) {
               try {
                 final globalDefaults = await preferencesService
                     .getDefaultRemainderPreferences();
@@ -397,6 +399,7 @@ class NotificationService implements INotificationService {
                 selectedIntervals = [24, 4, 2];
               }
             } else {
+              // User has customized this ticket, use stored preferences
               selectedIntervals = prefs.selectedIntervals;
               customDateTimes = prefs.customDateTimes;
             }

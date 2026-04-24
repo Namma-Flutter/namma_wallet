@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/domain/models/reminder_preferences.dart';
@@ -81,20 +80,14 @@ class _TicketReminderConfigDialogState
 
       if (mounted) {
         setState(() {
-          // Use ticket-specific intervals if they've been customized
-          // Otherwise, use global default intervals from settings
-          if (ticketPrefs.selectedIntervals.isNotEmpty) {
-            // Check if custom vs using hardcoded defaults
-            final hardcodedDefaults =
-                ReminderPreferences.defaultPreferences.selectedIntervals;
-            final isCustom = !listEquals(
-              ticketPrefs.selectedIntervals,
-              hardcodedDefaults,
-            );
-            _selectedIntervals = isCustom
-                ? ticketPrefs.selectedIntervals.toList()
-                : globalDefaults.selectedIntervals.toList();
+          // If the ticket has never been customized (isCustomized=false),
+          // use global default intervals. Otherwise, use the stored preferences
+          // regardless of their values.
+          if (ticketPrefs.isCustomized) {
+            // User has explicitly customized this ticket, use stored values
+            _selectedIntervals = ticketPrefs.selectedIntervals.toList();
           } else {
+            // Ticket has never been customized, use global defaults
             _selectedIntervals = globalDefaults.selectedIntervals.toList();
           }
 
