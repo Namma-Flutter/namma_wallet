@@ -375,8 +375,8 @@ class NotificationService {
             // defaults if so, mirroring TicketReminderConfigDialog logic
             if (prefs == ReminderPreferences.defaultPreferences) {
               try {
-                final globalDefaults =
-                    await preferencesService.getDefaultRemainderPreferences();
+                final globalDefaults = await preferencesService
+                    .getDefaultRemainderPreferences();
                 selectedIntervals = globalDefaults.selectedIntervals;
                 customDateTimes = globalDefaults.customDateTimes;
               } on Exception catch (e, st) {
@@ -408,6 +408,29 @@ class NotificationService {
             );
           }
           selectedIntervals = [24, 4, 2];
+        }
+      }
+
+      // Persist the resolved preferences for this ticket
+      if (preferencesService != null && payload.isNotEmpty) {
+        try {
+          await preferencesService.saveRemainderPreferences(
+            payload,
+            ReminderPreferences(
+              selectedIntervals: selectedIntervals,
+              customDateTimeMillis: customDateTimes
+                  .map((dt) => dt.millisecondsSinceEpoch)
+                  .toList(),
+            ),
+          );
+        } on Exception catch (e, st) {
+          if (_logger != null) {
+            _logger?.error(
+              'Error persisting reminder preferences for ticket $payload',
+              e,
+              st,
+            );
+          }
         }
       }
 
@@ -515,5 +538,119 @@ class NotificationService {
       details,
       payload: payload,
     );
+  }
+
+  /// Cancels all scheduled reminders for a ticket and deletes stored
+  /// reminder preferences.
+  ///
+  /// This method:
+  /// 1. Loads the ticket's reminder preferences to determine how many
+  ///    notifications were scheduled
+  /// 2. Cancels each scheduled notification using the same ID computation
+  ///    scheme as [scheduleTicketReminderFor]
+  /// 3. Deletes the stored reminder preferences for the ticket
+  ///
+  /// Errors are logged but do not propagate to avoid blocking ticket deletion.
+  Future<void> cancelAllRemindersForTicket(Ticket ticket) async {
+    final ticketId = ticket.ticketId;
+    if (ticketId == null || ticketId.isEmpty) {
+      if (_logger != null) {
+        _logger?.info(
+          '[NotificationService] Ticket has no ID; skipping reminder cleanup',
+        );
+      }
+      return;
+    }
+
+    try {
+      // Load reminder preferences to know how many reminders were scheduled
+      IReminderPreferencesService? preferencesService;
+      try {
+        preferencesService = getIt<IReminderPreferencesService>();
+      } on Exception {
+        preferencesService = null;
+      }
+
+      if (preferencesService == null) {
+        if (_logger != null) {
+          _logger?.warning(
+            '[NotificationService] Preferences service unavailable; '
+            'skipping reminder cleanup for ticket $ticketId',
+          );
+        }
+        return;
+      }
+
+      final prefs = await preferencesService.getRemainderPreferences(ticketId);
+
+      final baseHash = ticket.ticketId?.hashCode ?? ticket.primaryText.hashCode;
+      const maxInt32 = 0x7FFFFFFF;
+      const maxBase = maxInt32 ~/ 100;
+      final safeBase = baseHash.abs() % maxBase;
+
+      // Cancel standard interval reminders
+      for (var i = 0; i < prefs.selectedIntervals.length; i++) {
+        final notificationId = safeBase * 100 + i;
+        try {
+          await cancelTicketReminder(notificationId);
+        } on Exception catch (e, st) {
+          if (_logger != null) {
+            _logger?.error(
+              '[NotificationService] Failed to cancel notification '
+              '$notificationId for ticket $ticketId',
+              e,
+              st,
+            );
+          }
+        }
+      }
+
+      // Cancel custom datetime reminders
+      for (var i = 0; i < prefs.customDateTimes.length; i++) {
+        final notificationId =
+            safeBase * 100 + prefs.selectedIntervals.length + i;
+        try {
+          await cancelTicketReminder(notificationId);
+        } on Exception catch (e, st) {
+          if (_logger != null) {
+            _logger?.error(
+              '[NotificationService] Failed to cancel notification '
+              '$notificationId for ticket $ticketId',
+              e,
+              st,
+            );
+          }
+        }
+      }
+
+      // Delete stored reminder preferences
+      try {
+        await preferencesService.deleteRemainderPreferences(ticketId);
+        if (_logger != null) {
+          _logger?.info(
+            '[NotificationService] Successfully cleaned up reminders for '
+            'ticket $ticketId',
+          );
+        }
+      } on Exception catch (e, st) {
+        if (_logger != null) {
+          _logger?.error(
+            '[NotificationService] Failed to delete reminder preferences for '
+            'ticket $ticketId',
+            e,
+            st,
+          );
+        }
+      }
+    } on Exception catch (e, st) {
+      if (_logger != null) {
+        _logger?.error(
+          '[NotificationService] Error cancelling reminders for ticket '
+          '$ticketId',
+          e,
+          st,
+        );
+      }
+    }
   }
 }
