@@ -50,21 +50,6 @@ Future<void> main() async {
     debugPrint('FlutterGemma initialization failed: $e\n$stackTrace');
   }
 
-  /// Initialize notification service
-  /// Store notification payload for later processing after app is initialized
-  if (Platform.isAndroid) {
-    try {
-      await getIt<INotificationService>().initialize();
-    } on Exception catch (e, stackTrace) {
-      // Notification initialization failed - continue app startup
-      // Notifications may be unavailable but other features should work
-      debugPrint('Notification service initialization failed: $e\n$stackTrace');
-    } on Object catch (e, stackTrace) {
-      // Catch any other throwables
-      debugPrint('Notification service initialization failed: $e\n$stackTrace');
-    }
-  }
-
   // Initialize pdfrx (required when using PDF engine APIs before widgets)
   // with error handling to prevent app crashes
   var pdfFeaturesEnabled = true;
@@ -173,6 +158,12 @@ Future<void> main() async {
     logger?.info('Initializing widget service...');
     await getIt<IWidgetService>().initialize();
     logger?.success('Widget service initialized');
+
+    if (Platform.isAndroid) {
+      logger?.info('Initializing notification service...');
+      await getIt<INotificationService>().initialize();
+      logger?.success('Notification service initialized');
+    }
 
     logger?.success('All services initialized successfully');
   } on Object catch (e, stackTrace) {
