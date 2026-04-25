@@ -18,6 +18,7 @@ import 'package:namma_wallet/src/common/services/pdf/pdf_service.dart';
 import 'package:namma_wallet/src/common/services/pdf/pdf_service_interface.dart';
 import 'package:namma_wallet/src/common/services/push_notification/notification_service.dart';
 import 'package:namma_wallet/src/common/services/push_notification/notification_service_interface.dart';
+import 'package:namma_wallet/src/common/services/push_notification/web_notification_service.dart';
 import 'package:namma_wallet/src/common/services/ticket_change_notifier.dart';
 import 'package:namma_wallet/src/common/services/widget/home_widget_service.dart';
 import 'package:namma_wallet/src/common/services/widget/web_widget_service.dart';
@@ -92,7 +93,7 @@ void setupLocator() {
       () => ReminderPreferencesService(logger: getIt<ILogger>()),
     )
     ..registerLazySingleton<INotificationService>(
-      NotificationService.new,
+      () => kIsWeb ? WebNotificationService() : NotificationService(),
     )
     // Parsers
     ..registerLazySingleton<TNSTCSMSParser>(TNSTCSMSParser.new)

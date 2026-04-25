@@ -76,7 +76,17 @@ class _TicketReminderConfigDialogState
       );
 
       // Store previous preferences for comparison when saving
-      _previousPreferences = ticketPrefs;
+      // If the ticket has never been customized, use global defaults for interval count
+      // to match what was actually scheduled. This ensures cancellation uses the correct count.
+      if (ticketPrefs.isCustomized) {
+        _previousPreferences = ticketPrefs;
+      } else {
+        _previousPreferences = ReminderPreferences(
+          selectedIntervals: globalDefaults.selectedIntervals,
+          customDateTimeMillis: ticketPrefs.customDateTimeMillis,
+          isEnabled: ticketPrefs.isEnabled,
+        );
+      }
 
       if (mounted) {
         setState(() {
