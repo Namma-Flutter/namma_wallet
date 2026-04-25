@@ -6,6 +6,8 @@ import 'package:namma_wallet/src/common/database/user_dao.dart';
 import 'package:namma_wallet/src/common/database/user_dao_interface.dart';
 import 'package:namma_wallet/src/common/database/wallet_database.dart';
 import 'package:namma_wallet/src/common/database/wallet_database_interface.dart';
+import 'package:namma_wallet/src/common/services/archive/archive_service.dart';
+import 'package:namma_wallet/src/common/services/archive/archive_service_interface.dart';
 import 'package:namma_wallet/src/common/services/haptic/haptic_service_interface.dart';
 import 'package:namma_wallet/src/common/services/haptic/haptic_services.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
@@ -67,6 +69,8 @@ void setupLocator() {
     // DAOs
     ..registerLazySingleton<ITicketDAO>(TicketDao.new)
     ..registerLazySingleton<IUserDAO>(UserDao.new)
+    // Archive service
+    ..registerLazySingleton<IArchiveService>(ArchiveService.new)
     // Core services
     ..registerLazySingleton<IOCRService>(
       () => kIsWeb ? WebOCRService() : GoogleMLKitOCR(logger: getIt<ILogger>()),

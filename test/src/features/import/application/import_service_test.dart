@@ -173,6 +173,18 @@ class FakeTicketDAO implements ITicketDAO {
 
   @override
   Future<List<Ticket>> getTicketsByType(String type) async => [];
+
+  @override
+  Future<List<Ticket>> getActiveTickets() async => [];
+
+  @override
+  Future<List<Ticket>> getArchivedTickets() async => [];
+
+  @override
+  Future<int> archivePastTickets() async => 0;
+
+  @override
+  Future<int> purgeOldArchivedTickets({int retentionDays = 30}) async => 0;
 }
 
 class FakeTNSTCApiTicketParser extends TNSTCApiTicketParser {

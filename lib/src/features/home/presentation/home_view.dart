@@ -10,6 +10,7 @@ import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 import 'package:namma_wallet/src/common/enums/ticket_type.dart';
 import 'package:namma_wallet/src/common/routing/app_routes.dart';
+import 'package:namma_wallet/src/common/services/archive/archive_service_interface.dart';
 import 'package:namma_wallet/src/common/services/haptic/haptic_service_extension.dart';
 import 'package:namma_wallet/src/common/services/haptic/haptic_service_interface.dart';
 import 'package:namma_wallet/src/common/services/ticket_change_notifier.dart';
@@ -59,6 +60,8 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
+      // Run archive maintenance in background on app resume
+      unawaited(getIt<IArchiveService>().runArchiveMaintenance());
       unawaited(_loadTicketData());
     }
   }
@@ -69,7 +72,7 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
         _isLoading = true;
       });
 
-      final tickets = await getIt<ITicketDAO>().getAllTickets();
+      final tickets = await getIt<ITicketDAO>().getActiveTickets();
 
       if (!mounted) return;
 

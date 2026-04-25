@@ -36,6 +36,18 @@ class StubTicketDAO implements ITicketDAO {
     String ticketId,
     Ticket ticket, // Updated from Map to Ticket
   ) async => 0;
+
+  @override
+  Future<List<Ticket>> getActiveTickets() async => tickets;
+
+  @override
+  Future<List<Ticket>> getArchivedTickets() async => [];
+
+  @override
+  Future<int> archivePastTickets() async => 0;
+
+  @override
+  Future<int> purgeOldArchivedTickets({int retentionDays = 30}) async => 0;
 }
 
 void main() {

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -8,6 +10,7 @@ import 'package:namma_wallet/src/app.dart';
 import 'package:namma_wallet/src/common/database/wallet_database_interface.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/platform_utils/platform_utils.dart';
+import 'package:namma_wallet/src/common/services/archive/archive_service_interface.dart';
 import 'package:namma_wallet/src/common/services/haptic/haptic_service_interface.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
 import 'package:namma_wallet/src/common/services/widget/widget_service_interface.dart';
@@ -181,6 +184,9 @@ Future<void> main() async {
   }
 
   FlutterNativeSplash.remove();
+
+  // Run archive maintenance in the background (non-blocking)
+  unawaited(getIt<IArchiveService>().runArchiveMaintenance());
 
   // Restore system UI (status bar & navigation bar) after splash
   await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
