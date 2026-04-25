@@ -6,7 +6,6 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:go_router/go_router.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
-import 'package:namma_wallet/src/common/domain/models/reminder_preferences.dart';
 import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 import 'package:namma_wallet/src/common/routing/app_router.dart';
 import 'package:namma_wallet/src/common/routing/app_routes.dart';
@@ -420,29 +419,6 @@ class NotificationService implements INotificationService {
         }
       }
 
-      // Persist the resolved preferences for this ticket
-      if (preferencesService != null && payload.isNotEmpty) {
-        try {
-          await preferencesService.saveRemainderPreferences(
-            payload,
-            ReminderPreferences(
-              selectedIntervals: selectedIntervals,
-              customDateTimeMillis: customDateTimes
-                  .map((dt) => dt.millisecondsSinceEpoch)
-                  .toList(),
-            ),
-          );
-        } on Exception catch (e, st) {
-          if (_logger != null) {
-            _logger?.error(
-              'Error persisting reminder preferences for ticket $payload',
-              e,
-              st,
-            );
-          }
-        }
-      }
-
       // Schedule standard interval reminders
       for (var i = 0; i < selectedIntervals.length; i++) {
         final reminderTime = journeyTime.subtract(
@@ -551,14 +527,18 @@ class NotificationService implements INotificationService {
   }
 
   /// Cancels all scheduled reminders for a ticket and deletes stored
-  /// reminder preferences.
+  /// reminder preferences if they exist.
   ///
   /// This method:
-  /// 1. Loads the ticket's reminder preferences to determine how many
-  ///    notifications were scheduled
-  /// 2. Cancels each scheduled notification using the same ID computation
-  ///    scheme as [scheduleTicketReminderFor]
-  /// 3. Deletes the stored reminder preferences for the ticket
+  /// 1. Cancels a fixed range of notification IDs (0-99 for the ticket's
+  ///    safeBase) using the same ID computation scheme as
+  ///    [scheduleTicketReminderFor]
+  /// 2. Deletes stored reminder preferences for the ticket if they exist
+  ///    (only customized tickets have stored preferences)
+  ///
+  /// Note: Non-customized tickets don't have stored preferences, so we cancel
+  /// a fixed range to cover all possible scheduled reminders. Customized
+  /// tickets will also have their stored preferences deleted.
   ///
   /// Errors are logged but do not propagate to avoid blocking ticket deletion.
   @override
@@ -574,33 +554,13 @@ class NotificationService implements INotificationService {
     }
 
     try {
-      // Load reminder preferences to know how many reminders were scheduled
-      IReminderPreferencesService? preferencesService;
-      try {
-        preferencesService = getIt<IReminderPreferencesService>();
-      } on Exception {
-        preferencesService = null;
-      }
-
-      if (preferencesService == null) {
-        if (_logger != null) {
-          _logger?.warning(
-            '[NotificationService] Preferences service unavailable; '
-            'skipping reminder cleanup for ticket $ticketId',
-          );
-        }
-        return;
-      }
-
-      final prefs = await preferencesService.getRemainderPreferences(ticketId);
-
       final baseHash = ticket.ticketId?.hashCode ?? ticket.primaryText.hashCode;
       const maxInt32 = 0x7FFFFFFF;
       const maxBase = maxInt32 ~/ 100;
       final safeBase = baseHash.abs() % maxBase;
 
-      // Cancel standard interval reminders
-      for (var i = 0; i < prefs.selectedIntervals.length; i++) {
+      // Cancel all possible reminder IDs for this ticket (fixed range 0-99)
+      for (var i = 0; i < 100; i++) {
         final notificationId = safeBase * 100 + i;
         try {
           await cancelTicketReminder(notificationId);
@@ -616,41 +576,33 @@ class NotificationService implements INotificationService {
         }
       }
 
-      // Cancel custom datetime reminders
-      for (var i = 0; i < prefs.customDateTimes.length; i++) {
-        final notificationId =
-            safeBase * 100 + prefs.selectedIntervals.length + i;
+      // Attempt to delete stored reminder preferences if they exist
+      // (only customized tickets have stored preferences)
+      IReminderPreferencesService? preferencesService;
+      try {
+        preferencesService = getIt<IReminderPreferencesService>();
+      } on Exception {
+        preferencesService = null;
+      }
+
+      if (preferencesService != null) {
         try {
-          await cancelTicketReminder(notificationId);
+          await preferencesService.deleteRemainderPreferences(ticketId);
+          if (_logger != null) {
+            _logger?.info(
+              '[NotificationService] Successfully cleaned up reminders for '
+              'ticket $ticketId',
+            );
+          }
         } on Exception catch (e, st) {
           if (_logger != null) {
             _logger?.error(
-              '[NotificationService] Failed to cancel notification '
-              '$notificationId for ticket $ticketId',
+              '[NotificationService] Failed to delete reminder preferences for '
+              'ticket $ticketId',
               e,
               st,
             );
           }
-        }
-      }
-
-      // Delete stored reminder preferences
-      try {
-        await preferencesService.deleteRemainderPreferences(ticketId);
-        if (_logger != null) {
-          _logger?.info(
-            '[NotificationService] Successfully cleaned up reminders for '
-            'ticket $ticketId',
-          );
-        }
-      } on Exception catch (e, st) {
-        if (_logger != null) {
-          _logger?.error(
-            '[NotificationService] Failed to delete reminder preferences for '
-            'ticket $ticketId',
-            e,
-            st,
-          );
         }
       }
     } on Exception catch (e, st) {
