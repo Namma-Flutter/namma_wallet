@@ -60,7 +60,7 @@ class _ImportViewState extends State<ImportView> {
       if (!mounted) return;
 
       if (ticket != null) {
-        await _openImportedTicket(ticket);
+        await _openImportedTicket(ticket, openedFromImport: true);
       } else {
         showSnackbar(
           context,
@@ -148,7 +148,7 @@ class _ImportViewState extends State<ImportView> {
         if (!mounted) return;
 
         if (ticket != null) {
-          await _openImportedTicket(ticket);
+          await _openImportedTicket(ticket, openedFromImport: true);
         } else {
           showSnackbar(
             context,
@@ -200,7 +200,7 @@ class _ImportViewState extends State<ImportView> {
 
         final ticketId = result.ticket?.ticketId;
         if (result.isSuccess && ticketId != null) {
-          await _openImportedTicket(result.ticket!);
+          await _openImportedTicket(result.ticket!, openedFromImport: true);
         } else {
           ClipboardResultHandler.showResultMessage(context, result);
         }

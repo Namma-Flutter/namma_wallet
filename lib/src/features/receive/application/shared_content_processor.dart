@@ -56,15 +56,23 @@ class SharedContentProcessor implements ISharedContentProcessor {
             error: 'Parser returned null',
           );
         }
-        final archived = shouldArchiveTicket(ticket);
+final archived = shouldArchiveTicket(ticket);
+        String? warning;
+        if (archived && result.warning != null && result.warning!.isNotEmpty) {
+          warning = '${result.warning}\n${archivedPastTicketMessage}';
+        } else if (archived) {
+          warning = archivedPastTicketMessage;
+        } else {
+          warning = result.warning;
+        }
         return TicketCreatedResult(
           pnrNumber: ticket.pnrOrId,
-          from: ticket.fromLocation,
+          from: ticket.toLocation,
           to: ticket.toLocation,
           fare: ticket.fare,
           date: ticket.date,
           ticketId: ticket.ticketId,
-          warning: archived ? archivedPastTicketMessage : result.warning,
+          warning: warning,
           isArchived: archived,
         );
       }

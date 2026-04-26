@@ -6,9 +6,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 /// ThemeProvider manages the app's theme mode and persists user preference
 class ThemeProvider extends ChangeNotifier {
   ThemeProvider() {
-    unawaited(_loadThemePreference());
+    _ready = _loadThemePreference();
   }
   static const String _themePreferenceKey = 'theme_mode';
+
+  /// Future that completes when the provider has finished loading saved preferences.
+  Future<void> get ready => _ready;
+  late final Future<void> _ready;
 
   ThemeMode _themeMode = ThemeMode.system;
 
