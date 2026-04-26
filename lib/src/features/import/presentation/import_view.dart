@@ -60,7 +60,7 @@ class _ImportViewState extends State<ImportView> {
       if (!mounted) return;
 
       if (ticket != null) {
-        await _openImportedTicket(ticket, openedFromImport: true);
+        await _openImportedTicket(ticket);
       } else {
         showSnackbar(
           context,
@@ -148,7 +148,7 @@ class _ImportViewState extends State<ImportView> {
         if (!mounted) return;
 
         if (ticket != null) {
-          await _openImportedTicket(ticket, openedFromImport: true);
+          await _openImportedTicket(ticket);
         } else {
           showSnackbar(
             context,
@@ -200,7 +200,7 @@ class _ImportViewState extends State<ImportView> {
 
         final ticketId = result.ticket?.ticketId;
         if (result.isSuccess && ticketId != null) {
-          await _openImportedTicket(result.ticket!, openedFromImport: true);
+          await _openImportedTicket(result.ticket!);
         } else {
           ClipboardResultHandler.showResultMessage(context, result);
         }
@@ -340,7 +340,6 @@ class _ImportViewState extends State<ImportView> {
               await _openImportedTicket(
                 ticket,
                 context: rootContext,
-                openedFromImport: true,
               );
             } else {
               showSnackbar(
@@ -402,7 +401,6 @@ class _ImportViewState extends State<ImportView> {
   Future<void> _openImportedTicket(
     Ticket ticket, {
     BuildContext? context,
-    bool openedFromImport = false,
   }) async {
     final targetContext = context ?? this.context;
     if (!targetContext.mounted) return;
@@ -421,7 +419,7 @@ class _ImportViewState extends State<ImportView> {
     await targetContext.pushNamed(
       AppRoute.ticketView.name,
       pathParameters: {'id': id},
-      queryParameters: openedFromImport ? {'fromImport': '1'} : const {},
+      queryParameters: {'fromImport': '1'},
     );
   }
 
