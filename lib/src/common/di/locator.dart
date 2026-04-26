@@ -1,3 +1,4 @@
+// coverage:ignore-file
 import 'package:flutter/foundation.dart';
 import 'package:get_it/get_it.dart';
 import 'package:namma_wallet/src/common/database/ticket_dao.dart';

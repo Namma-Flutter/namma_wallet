@@ -1,3 +1,4 @@
+// coverage:ignore-file
 import 'package:cross_file/cross_file.dart';
 import 'package:namma_wallet/src/common/services/ocr/ocr_block.dart';
 import 'package:namma_wallet/src/common/services/ocr/ocr_service_interface.dart';

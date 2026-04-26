@@ -1,3 +1,5 @@
+// coverage:ignore-file
+// Database initialization & migration plumbing — DAO tests cover query logic.
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';

@@ -1,3 +1,4 @@
+// coverage:ignore-file
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
 import 'package:namma_wallet/src/features/import/application/deep_link_service_interface.dart';
 

@@ -15,7 +15,9 @@ import 'package:namma_wallet/src/features/home/domain/ticket_extensions.dart';
 import 'package:namma_wallet/src/features/home/presentation/widgets/ticket_card_widget.dart';
 
 class AllTicketsView extends StatefulWidget {
-  const AllTicketsView({super.key});
+  const AllTicketsView({this.showArchived = false, super.key});
+
+  final bool showArchived;
 
   @override
   State<AllTicketsView> createState() => _AllTicketsViewState();
@@ -31,7 +33,18 @@ class _AllTicketsViewState extends State<AllTicketsView> {
   @override
   void initState() {
     super.initState();
+    _showingArchived = widget.showArchived;
     unawaited(_loadTicketData());
+  }
+
+  @override
+  void didUpdateWidget(covariant AllTicketsView oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.showArchived != widget.showArchived) {
+      setState(() {
+        _showingArchived = widget.showArchived;
+      });
+    }
   }
 
   Future<void> _loadTicketData() async {

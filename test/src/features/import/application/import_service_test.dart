@@ -421,5 +421,110 @@ void main() {
         expect(sourceExtra?.value, equals('API'));
       });
     });
+
+    group('importAndSavePDFFile', () {
+      const path = 'test/assets/some.pdf';
+
+      test('returns null when no OCR blocks are extracted', () async {
+        fakePDFService.extractedBlocks = [];
+
+        final result = await importService.importAndSavePDFFile(XFile(path));
+
+        expect(result, isNull);
+        expect(fakeTicketDAO.handledTicket, isNull);
+      });
+
+      test('returns null when parser cannot interpret the blocks', () async {
+        fakePDFService.extractedText = 'plain text';
+        fakeTravelParser.parsedTicket = null;
+
+        final result = await importService.importAndSavePDFFile(XFile(path));
+
+        expect(result, isNull);
+      });
+
+      test('saves and returns parsed ticket on success', () async {
+        fakePDFService.extractedText = 'plain text';
+        const parsed = Ticket(
+          ticketId: 'PDF001',
+          primaryText: 'A → B',
+          type: TicketType.bus,
+        );
+        fakeTravelParser.parsedTicket = parsed;
+
+        final result = await importService.importAndSavePDFFile(XFile(path));
+
+        expect(result, equals(parsed));
+        expect(fakeTicketDAO.handledTicket, equals(parsed));
+      });
+    });
+
+    group('importQRCode', () {
+      test('returns null for unsupported QR data', () async {
+        fakeIRCTCQRParser.isIRCTC = false;
+
+        final result = await importService.importQRCode('garbage');
+
+        expect(result, isNull);
+      });
+
+      test(
+        'returns null when scanner reports failure',
+        () async {
+          fakeIRCTCQRParser.isIRCTC = true;
+          fakeIRCTCScannerService.scanResult = IRCTCScannerResult.error(
+            'parse failed',
+          );
+
+          final result = await importService.importQRCode('PNR No.:1');
+
+          expect(result, isNull);
+        },
+      );
+
+      test('returns the saved travel ticket on success', () async {
+        fakeIRCTCQRParser.isIRCTC = true;
+        const parsed = Ticket(
+          ticketId: 'QR001',
+          primaryText: 'A → B',
+          type: TicketType.train,
+        );
+        fakeIRCTCScannerService.scanResult = IRCTCScannerResult.success(
+          IRCTCScannerContentType.irctcTicket,
+          'PNR No.:1',
+          travelTicket: parsed,
+          irctcTicket: testIrctcTicket,
+        );
+
+        final result = await importService.importQRCode('PNR No.:1');
+
+        expect(result, equals(parsed));
+      });
+
+      test('returns null and logs when scanner throws', () async {
+        fakeIRCTCQRParser.isIRCTC = true;
+        fakeIRCTCScannerService.shouldThrow = true;
+
+        final result = await importService.importQRCode('PNR No.:1');
+
+        expect(result, isNull);
+      });
+    });
+
+    group('misc', () {
+      test('supportedExtensions includes pdf and pkpass', () {
+        expect(
+          importService.supportedExtensions,
+          containsAll(['pdf', 'pkpass']),
+        );
+      });
+
+      test('isSupportedQRCode delegates to the QR parser', () {
+        fakeIRCTCQRParser.isIRCTC = true;
+        expect(importService.isSupportedQRCode('any'), isTrue);
+        fakeIRCTCQRParser.isIRCTC = false;
+        expect(importService.isSupportedQRCode('any'), isFalse);
+      });
+    });
   });
 }

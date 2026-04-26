@@ -4,6 +4,7 @@ import 'package:namma_wallet/src/common/database/ticket_dao_interface.dart';
 import 'package:namma_wallet/src/common/database/wallet_database_interface.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/domain/models/ticket.dart';
+import 'package:namma_wallet/src/common/services/archive/ticket_archive.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -101,8 +102,11 @@ class TicketDao implements ITicketDAO {
         );
       }
 
-      map['created_at'] = DateTime.now().toIso8601String();
-      map['updated_at'] = DateTime.now().toIso8601String();
+      final now = DateTime.now();
+      final nowIso = now.toIso8601String();
+      map['created_at'] = nowIso;
+      map['updated_at'] = nowIso;
+      map['archived_at'] = _archiveTimestampFor(ticket, now);
 
       final id = await db.insert(
         'tickets',
@@ -148,7 +152,11 @@ class TicketDao implements ITicketDAO {
         ..remove('created_at') // Never update creation time
         ..remove('tags')
         ..remove('extras');
-      updates['updated_at'] = DateTime.now().toIso8601String();
+      final now = DateTime.now();
+      updates['updated_at'] = now.toIso8601String();
+      // Always write archived_at so a ticket whose times shifted into the
+      // future is un-archived on update (clearing the column to NULL).
+      updates['archived_at'] = _archiveTimestampFor(ticket, now);
 
       // Handle JSON fields
 
@@ -457,5 +465,9 @@ class TicketDao implements ITicketDAO {
     };
 
     return TicketMapper.fromMap(decodedMap);
+  }
+
+  String? _archiveTimestampFor(Ticket ticket, DateTime now) {
+    return shouldArchiveTicket(ticket, now: now) ? now.toIso8601String() : null;
   }
 }

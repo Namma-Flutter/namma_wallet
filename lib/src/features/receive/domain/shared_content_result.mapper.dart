@@ -116,6 +116,13 @@ class TicketCreatedResultMapper extends ClassMapperBase<TicketCreatedResult> {
     _$warning,
     opt: true,
   );
+  static bool _$isArchived(TicketCreatedResult v) => v.isArchived;
+  static const Field<TicketCreatedResult, bool> _f$isArchived = Field(
+    'isArchived',
+    _$isArchived,
+    opt: true,
+    def: false,
+  );
 
   @override
   final MappableFields<TicketCreatedResult> fields = const {
@@ -126,6 +133,7 @@ class TicketCreatedResultMapper extends ClassMapperBase<TicketCreatedResult> {
     #date: _f$date,
     #ticketId: _f$ticketId,
     #warning: _f$warning,
+    #isArchived: _f$isArchived,
   };
 
   static TicketCreatedResult _instantiate(DecodingData data) {
@@ -137,6 +145,7 @@ class TicketCreatedResultMapper extends ClassMapperBase<TicketCreatedResult> {
       date: data.dec(_f$date),
       ticketId: data.dec(_f$ticketId),
       warning: data.dec(_f$warning),
+      isArchived: data.dec(_f$isArchived),
     );
   }
 
@@ -219,6 +228,7 @@ abstract class TicketCreatedResultCopyWith<
     String? date,
     String? ticketId,
     String? warning,
+    bool? isArchived,
   });
   TicketCreatedResultCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
     Then<$Out2, $R2> t,
@@ -242,6 +252,7 @@ class _TicketCreatedResultCopyWithImpl<$R, $Out>
     Object? date = $none,
     Object? ticketId = $none,
     Object? warning = $none,
+    bool? isArchived,
   }) => $apply(
     FieldCopyWithData({
       if (pnrNumber != $none) #pnrNumber: pnrNumber,
@@ -251,6 +262,7 @@ class _TicketCreatedResultCopyWithImpl<$R, $Out>
       if (date != $none) #date: date,
       if (ticketId != $none) #ticketId: ticketId,
       if (warning != $none) #warning: warning,
+      if (isArchived != null) #isArchived: isArchived,
     }),
   );
   @override
@@ -262,6 +274,7 @@ class _TicketCreatedResultCopyWithImpl<$R, $Out>
     date: data.get(#date, or: $value.date),
     ticketId: data.get(#ticketId, or: $value.ticketId),
     warning: data.get(#warning, or: $value.warning),
+    isArchived: data.get(#isArchived, or: $value.isArchived),
   );
 
   @override

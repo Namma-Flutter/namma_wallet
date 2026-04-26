@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:namma_wallet/src/common/routing/app_routes.dart';
+import 'package:namma_wallet/src/common/services/archive/ticket_archive.dart';
 import 'package:namma_wallet/src/features/receive/domain/shared_content_result.dart';
 
 /// Handles share result navigation and UI feedback
@@ -16,9 +17,17 @@ class ShareHandler {
   /// Handle the result of shared content processing
   Future<void> handleResult(SharedContentResult result) async {
     switch (result) {
-      case TicketCreatedResult(:final ticketId, :final warning):
+      case TicketCreatedResult(
+        :final ticketId,
+        :final warning,
+        :final isArchived,
+      ):
         if (warning != null) {
           handleWarning(warning);
+        }
+        if (isArchived) {
+          router.go(archivedTicketsLocation());
+          return;
         }
         if (ticketId != null) {
           router.go(AppRoute.home.path);
