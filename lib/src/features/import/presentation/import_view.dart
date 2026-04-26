@@ -409,7 +409,7 @@ class _ImportViewState extends State<ImportView> {
 
     if (shouldArchiveTicket(ticket)) {
       showSnackbar(targetContext, archivedPastTicketMessage);
-      targetContext.go(archivedTicketsLocation());
+      await targetContext.push(archivedTicketsLocation());
       return;
     }
 

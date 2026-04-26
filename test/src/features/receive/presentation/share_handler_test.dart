@@ -102,7 +102,7 @@ void main() {
 
       test(
         'Given archived TicketCreatedResult, When handleResult called, '
-        'Then navigates to archived tickets',
+        'Then pushes archived tickets over home',
         () async {
           const result = TicketCreatedResult(
             pnrNumber: 'T12345678',
@@ -117,7 +117,8 @@ void main() {
 
           await handler.handleResult(result);
 
-          verify(fakeRouter.go(archivedTicketsLocation())).called(1);
+          verify(fakeRouter.go('/')).called(1);
+          verify(fakeRouter.push(archivedTicketsLocation())).called(1);
           verifyNever(fakeRouter.push('/ticket/T12345678'));
         },
       );
@@ -125,7 +126,7 @@ void main() {
       test(
         'Given archived TicketCreatedResult without warning, '
         'When handleResult called, '
-        'Then still navigates to archived tickets',
+        'Then still pushes archived tickets over home',
         () async {
           const result = TicketCreatedResult(
             pnrNumber: 'T12345678',
@@ -139,7 +140,8 @@ void main() {
 
           await handler.handleResult(result);
 
-          verify(fakeRouter.go(archivedTicketsLocation())).called(1);
+          verify(fakeRouter.go('/')).called(1);
+          verify(fakeRouter.push(archivedTicketsLocation())).called(1);
           verifyNever(fakeRouter.push('/ticket/T12345678'));
         },
       );
@@ -158,9 +160,14 @@ void main() {
 
           await handler.handleResult(result);
 
-          final captured = verify(
-            fakeRouter.go('/share-success', extra: captureAnyNamed('extra')),
-          ).captured.first as Map<String, dynamic>;
+          final captured =
+              verify(
+                    fakeRouter.go(
+                      '/share-success',
+                      extra: captureAnyNamed('extra'),
+                    ),
+                  ).captured.first
+                  as Map<String, dynamic>;
           expect(captured['pnrNumber'], equals('T12345678'));
           expect(captured['to'], equals('Conductor Details'));
           expect(captured['from'], equals('Updated'));

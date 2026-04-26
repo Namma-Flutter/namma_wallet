@@ -26,7 +26,8 @@ class ShareHandler {
           handleWarning(warning);
         }
         if (isArchived) {
-          router.go(archivedTicketsLocation());
+          router.go(AppRoute.home.path);
+          await router.push(archivedTicketsLocation());
           return;
         }
         if (ticketId != null) {
