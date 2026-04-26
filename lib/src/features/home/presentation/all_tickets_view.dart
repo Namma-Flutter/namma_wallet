@@ -284,6 +284,7 @@ class _AllTicketsViewState extends State<AllTicketsView> {
             ? Theme.of(context).colorScheme.onTertiaryContainer
             : Theme.of(context).colorScheme.onSurface,
       ),
+      showCheckmark: false,
       label: Text(
         _archivedTickets.isNotEmpty
             ? 'Archived (${_archivedTickets.length})'
