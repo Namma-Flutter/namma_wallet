@@ -25,7 +25,7 @@ void main() {
         iconName: 'code',
         title: 'CodeCon',
         subtitle: 'Tech',
-        date: DateTime(2026, 6, 1),
+        date: DateTime(2026, 6),
         price: 'Free',
       );
 

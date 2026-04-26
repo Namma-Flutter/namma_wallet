@@ -10,7 +10,8 @@ class ThemeProvider extends ChangeNotifier {
   }
   static const String _themePreferenceKey = 'theme_mode';
 
-  /// Future that completes when the provider has finished loading saved preferences.
+  /// Future that completes when the provider has finished loading
+  ///  saved preferences.
   Future<void> get ready => _ready;
   late final Future<void> _ready;
 

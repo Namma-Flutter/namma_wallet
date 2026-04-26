@@ -182,6 +182,10 @@ class WalletDatabase implements IWalletDatabase {
       'CREATE INDEX IF NOT EXISTS idx_tickets_start_time ON tickets '
       '(start_time);',
     );
+    await db.execute(
+      'CREATE INDEX IF NOT EXISTS idx_tickets_archived_at ON tickets '
+      '(archived_at);',
+    );
   }
 
   /// Close the database connection

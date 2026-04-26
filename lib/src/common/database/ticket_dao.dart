@@ -102,7 +102,7 @@ class TicketDao implements ITicketDAO {
         );
       }
 
-      final now = DateTime.now();
+      final now = DateTime.now().toUtc();
       final nowIso = now.toIso8601String();
       map['created_at'] = nowIso;
       map['updated_at'] = nowIso;
@@ -152,7 +152,7 @@ class TicketDao implements ITicketDAO {
         ..remove('created_at') // Never update creation time
         ..remove('tags')
         ..remove('extras');
-      final now = DateTime.now();
+      final now = DateTime.now().toUtc();
       updates['updated_at'] = now.toIso8601String();
       // Always write archived_at so a ticket whose times shifted into the
       // future is un-archived on update (clearing the column to NULL).
@@ -373,7 +373,7 @@ class TicketDao implements ITicketDAO {
   @override
   Future<int> archivePastTickets() async {
     try {
-      final now = DateTime.now().toIso8601String();
+      final now = DateTime.now().toUtc().toIso8601String();
       _logger.logDatabase('Archive', 'Archiving past tickets (before $now)');
 
       final db = await _database.database;
@@ -416,6 +416,7 @@ class TicketDao implements ITicketDAO {
   Future<int> purgeOldArchivedTickets({int retentionDays = 30}) async {
     try {
       final cutoff = DateTime.now()
+          .toUtc()
           .subtract(Duration(days: retentionDays))
           .toIso8601String();
 
@@ -468,6 +469,8 @@ class TicketDao implements ITicketDAO {
   }
 
   String? _archiveTimestampFor(Ticket ticket, DateTime now) {
-    return shouldArchiveTicket(ticket, now: now) ? now.toIso8601String() : null;
+    return shouldArchiveTicket(ticket, now: now)
+        ? now.toUtc().toIso8601String()
+        : null;
   }
 }

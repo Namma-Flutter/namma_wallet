@@ -56,10 +56,10 @@ class SharedContentProcessor implements ISharedContentProcessor {
             error: 'Parser returned null',
           );
         }
-final archived = shouldArchiveTicket(ticket);
+        final archived = shouldArchiveTicket(ticket);
         String? warning;
         if (archived && result.warning != null && result.warning!.isNotEmpty) {
-          warning = '${result.warning}\n${archivedPastTicketMessage}';
+          warning = '${result.warning}\n$archivedPastTicketMessage';
         } else if (archived) {
           warning = archivedPastTicketMessage;
         } else {
