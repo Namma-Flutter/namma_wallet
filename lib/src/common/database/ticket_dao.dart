@@ -164,7 +164,8 @@ class TicketDao implements ITicketDAO {
         // Already archived and remains archivable - preserve existing
         updates.remove('archived_at');
       } else {
-        // Status transition: active -> archived, archived -> active, or staying active
+        // Status transition: active -> archived, archived -> active,
+        //or staying active
         updates['archived_at'] = newArchive;
       }
 
