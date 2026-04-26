@@ -67,7 +67,7 @@ class SharedContentProcessor implements ISharedContentProcessor {
         }
         return TicketCreatedResult(
           pnrNumber: ticket.pnrOrId,
-          from: ticket.toLocation,
+          from: ticket.fromLocation,
           to: ticket.toLocation,
           fare: ticket.fare,
           date: ticket.date,

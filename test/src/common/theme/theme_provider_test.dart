@@ -10,9 +10,15 @@ void main() {
     SharedPreferences.setMockInitialValues({});
   });
 
+  Future<ThemeProvider> createProvider() async {
+    final provider = ThemeProvider();
+    await provider.ready;
+    return provider;
+  }
+
   group('ThemeProvider defaults', () {
-    test('starts in system mode with the matching getters', () {
-      final provider = ThemeProvider();
+    test('starts in system mode with the matching getters', () async {
+      final provider = await createProvider();
 
       expect(provider.themeMode, ThemeMode.system);
       expect(provider.isSystemMode, isTrue);
@@ -23,7 +29,7 @@ void main() {
 
   group('ThemeProvider mode setters', () {
     test('setLightMode flips to light and notifies', () async {
-      final provider = ThemeProvider();
+      final provider = await createProvider();
       var notified = 0;
       provider.addListener(() => notified++);
 
@@ -36,7 +42,7 @@ void main() {
     });
 
     test('setDarkMode flips to dark', () async {
-      final provider = ThemeProvider();
+      final provider = await createProvider();
 
       await provider.setDarkMode();
 
@@ -46,7 +52,7 @@ void main() {
     });
 
     test('setSystemMode flips to system', () async {
-      final provider = ThemeProvider();
+      final provider = await createProvider();
       await provider.setLightMode();
 
       await provider.setSystemMode();
@@ -56,7 +62,7 @@ void main() {
     });
 
     test('setThemeMode accepts any ThemeMode', () async {
-      final provider = ThemeProvider();
+      final provider = await createProvider();
 
       await provider.setThemeMode(ThemeMode.dark);
       expect(provider.themeMode, ThemeMode.dark);
@@ -66,7 +72,7 @@ void main() {
     });
 
     test('toggleTheme: light → dark', () async {
-      final provider = ThemeProvider();
+      final provider = await createProvider();
       await provider.setLightMode();
 
       await provider.toggleTheme();
@@ -75,7 +81,7 @@ void main() {
     });
 
     test('toggleTheme: dark → light', () async {
-      final provider = ThemeProvider();
+      final provider = await createProvider();
       await provider.setDarkMode();
 
       await provider.toggleTheme();
@@ -86,7 +92,7 @@ void main() {
     test(
       'toggleTheme: system → light (anything not light goes to light)',
       () async {
-        final provider = ThemeProvider();
+        final provider = await createProvider();
 
         await provider.toggleTheme();
 
@@ -97,12 +103,10 @@ void main() {
 
   group('ThemeProvider persistence', () {
     test('persists the chosen mode across instances', () async {
-      final first = ThemeProvider();
+      final first = await createProvider();
       await first.setDarkMode();
 
-      final second = ThemeProvider();
-      // Allow the async _loadThemePreference to run.
-      await Future<void>.delayed(Duration.zero);
+      final second = await createProvider();
 
       expect(second.themeMode, ThemeMode.dark);
     });
@@ -110,8 +114,7 @@ void main() {
     test('falls back to default when stored index is out of range', () async {
       SharedPreferences.setMockInitialValues({'theme_mode': 99});
 
-      final provider = ThemeProvider();
-      await Future<void>.delayed(Duration.zero);
+      final provider = await createProvider();
 
       expect(provider.themeMode, ThemeMode.system);
     });

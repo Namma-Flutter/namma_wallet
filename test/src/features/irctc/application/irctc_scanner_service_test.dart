@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 import 'package:namma_wallet/src/features/irctc/application/irctc_qr_parser_interface.dart';
 import 'package:namma_wallet/src/features/irctc/application/irctc_scanner_service.dart';
 import 'package:namma_wallet/src/features/irctc/domain/irctc_ticket_model.dart';
@@ -20,7 +21,7 @@ class _StubQRParser implements IIRCTCQRParser {
 
 class _ThrowingTicketDao extends MockTicketDAO {
   @override
-  Future<int> insertTicket(_) async {
+  Future<int> insertTicket(Ticket ticket) async {
     throw Exception('db down');
   }
 }
