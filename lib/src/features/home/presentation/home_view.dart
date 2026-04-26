@@ -28,6 +28,7 @@ class HomeView extends StatefulWidget {
 
 class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
   bool _isLoading = true;
+  bool _hasArchivedTickets = false;
   List<Ticket> _travelTickets = [];
   List<Ticket> _eventTickets = [];
 
@@ -73,6 +74,7 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
       });
 
       final tickets = await getIt<ITicketDAO>().getActiveTickets();
+      final archivedTickets = await getIt<ITicketDAO>().getArchivedTickets();
 
       if (!mounted) return;
 
@@ -95,6 +97,7 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
       setState(() {
         _travelTickets = travelTickets;
         _eventTickets = eventTickets;
+        _hasArchivedTickets = archivedTickets.isNotEmpty;
         _isLoading = false;
       });
 
@@ -204,18 +207,18 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
                   const Center(child: CircularProgressIndicator())
                 else
                   _travelTickets.isEmpty
-                      ? const Padding(
-                          padding: EdgeInsets.all(32),
+                      ? Padding(
+                          padding: const EdgeInsets.all(32),
                           child: Center(
                             child: Column(
                               children: [
-                                Icon(
+                                const Icon(
                                   Icons.airplane_ticket_outlined,
                                   size: 64,
                                   color: Colors.grey,
                                 ),
-                                SizedBox(height: 16),
-                                Text(
+                                const SizedBox(height: 16),
+                                const Text(
                                   'No travel tickets found',
                                   style: TextStyle(
                                     fontSize: 18,
@@ -223,8 +226,8 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
                                     color: Colors.grey,
                                   ),
                                 ),
-                                SizedBox(height: 8),
-                                Text(
+                                const SizedBox(height: 8),
+                                const Text(
                                   'Paste travel SMS or add tickets manually',
                                   style: TextStyle(
                                     fontSize: 14,
@@ -232,6 +235,22 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
                                   ),
                                   textAlign: TextAlign.center,
                                 ),
+                                if (_hasArchivedTickets) ...[
+                                  const SizedBox(height: 24),
+                                  TextButton.icon(
+                                    onPressed: () async {
+                                      await context.pushNamed(
+                                        AppRoute.allTickets.name,
+                                        queryParameters: {'archive': '1'},
+                                      );
+                                      if (mounted) {
+                                        await _loadTicketData();
+                                      }
+                                    },
+                                    icon: const Icon(Icons.archive_outlined),
+                                    label: const Text('View Archived Tickets'),
+                                  ),
+                                ],
                               ],
                             ),
                           ),
