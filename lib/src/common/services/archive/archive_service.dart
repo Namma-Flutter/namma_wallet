@@ -45,6 +45,13 @@ class ArchiveService implements IArchiveService {
         e,
         stackTrace,
       );
+    } on Object catch (e, stackTrace) {
+      // Catch any other throwables (Error, etc.) to prevent crashes
+      _logger.error(
+        'Archive maintenance failed with a fatal-level error (non-fatal for app)',
+        e,
+        stackTrace,
+      );
     }
   }
 }
