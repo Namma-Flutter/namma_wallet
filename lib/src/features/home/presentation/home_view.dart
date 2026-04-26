@@ -61,9 +61,12 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      // Run archive maintenance in background on app resume
-      unawaited(getIt<IArchiveService>().runArchiveMaintenance());
-      unawaited(_loadTicketData());
+      // Run archive maintenance and wait for it to complete before loading data
+      // to avoid race conditions and UI flashes of stale data.
+      unawaited(() async {
+        await getIt<IArchiveService>().runArchiveMaintenance();
+        await _loadTicketData();
+      }());
     }
   }
 

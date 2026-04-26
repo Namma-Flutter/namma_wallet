@@ -185,8 +185,13 @@ Future<void> main() async {
 
   FlutterNativeSplash.remove();
 
-  // Run archive maintenance in the background (non-blocking)
-  unawaited(getIt<IArchiveService>().runArchiveMaintenance());
+  // Run archive maintenance to ensure up-to-date data on startup
+  try {
+    await getIt<IArchiveService>().runArchiveMaintenance();
+  } on Object catch (e, stackTrace) {
+    // Archive maintenance failures should not block app startup
+    logger?.error('Startup archive maintenance failed', e, stackTrace);
+  }
 
   // Restore system UI (status bar & navigation bar) after splash
   await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
