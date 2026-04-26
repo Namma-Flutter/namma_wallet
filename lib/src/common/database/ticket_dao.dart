@@ -154,9 +154,19 @@ class TicketDao implements ITicketDAO {
         ..remove('extras');
       final now = DateTime.now().toUtc();
       updates['updated_at'] = now.toIso8601String();
-      // Always write archived_at so a ticket whose times shifted into the
-      // future is un-archived on update (clearing the column to NULL).
-      updates['archived_at'] = _archiveTimestampFor(ticket, now);
+
+      // Only update archived_at if the archive status is changing.
+      // If the ticket is already archived and should remain archived,
+      // we preserve the original archived_at timestamp to ensure old
+      // archived tickets are eventually purged correctly.
+      final newArchive = _archiveTimestampFor(ticket, now);
+      if (ticket.archivedAt != null && newArchive != null) {
+        // Already archived and remains archivable - preserve existing
+        updates.remove('archived_at');
+      } else {
+        // Status transition: active -> archived, archived -> active, or staying active
+        updates['archived_at'] = newArchive;
+      }
 
       // Handle JSON fields
 
