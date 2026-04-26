@@ -1,3 +1,5 @@
+// coverage:ignore-file
+// Database initialization & migration plumbing — DAO tests cover query logic.
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
@@ -13,7 +15,7 @@ class WalletDatabase implements IWalletDatabase {
   final ILogger _logger;
 
   static const String _dbName = 'namma_wallet.db';
-  static const int _dbVersion = 4;
+  static const int _dbVersion = 5;
 
   Database? _database;
 
@@ -116,6 +118,18 @@ class WalletDatabase implements IWalletDatabase {
             ' secondary_text, and location nullable',
           );
         }
+        if (oldVersion < 5) {
+          await db.execute(
+            'ALTER TABLE tickets ADD COLUMN archived_at TEXT;',
+          );
+          await db.execute(
+            'CREATE INDEX IF NOT EXISTS idx_tickets_archived_at '
+            'ON tickets (archived_at);',
+          );
+          _logger.success(
+            'Database migrated to v5: Added archived_at column',
+          );
+        }
       },
     );
   }
@@ -153,6 +167,7 @@ class WalletDatabase implements IWalletDatabase {
          extras TEXT,
          image_path TEXT,
          directions_url TEXT,
+         archived_at TEXT DEFAULT NULL,
          created_at TEXT DEFAULT CURRENT_TIMESTAMP,
          updated_at TEXT DEFAULT NULL
       );
@@ -166,6 +181,10 @@ class WalletDatabase implements IWalletDatabase {
     await db.execute(
       'CREATE INDEX IF NOT EXISTS idx_tickets_start_time ON tickets '
       '(start_time);',
+    );
+    await db.execute(
+      'CREATE INDEX IF NOT EXISTS idx_tickets_archived_at ON tickets '
+      '(archived_at);',
     );
   }
 

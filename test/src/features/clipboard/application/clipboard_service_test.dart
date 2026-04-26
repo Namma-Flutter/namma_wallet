@@ -101,6 +101,18 @@ class MockTicketDao implements ITicketDAO {
 
   @override
   Future<int> deleteTicket(String id) async => 1;
+
+  @override
+  Future<List<Ticket>> getActiveTickets() async => [];
+
+  @override
+  Future<List<Ticket>> getArchivedTickets() async => [];
+
+  @override
+  Future<int> archivePastTickets() async => 0;
+
+  @override
+  Future<int> purgeOldArchivedTickets({int retentionDays = 30}) async => 0;
 }
 
 void main() {

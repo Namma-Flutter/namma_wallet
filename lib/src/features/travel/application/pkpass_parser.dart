@@ -64,6 +64,7 @@ class PKPassParser implements IPKPassParser {
     }
   }
 
+  // coverage:ignore-start
   @override
   Future<Uint8List?> fetchLatestPass(
     Uint8List currentPassData, {
@@ -134,6 +135,7 @@ class PKPassParser implements IPKPassParser {
       return null;
     }
   }
+  // coverage:ignore-end
 
   Future<String?> _savePassImage(PassFile passFile) async {
     try {

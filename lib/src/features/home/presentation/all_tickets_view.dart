@@ -15,7 +15,9 @@ import 'package:namma_wallet/src/features/home/domain/ticket_extensions.dart';
 import 'package:namma_wallet/src/features/home/presentation/widgets/ticket_card_widget.dart';
 
 class AllTicketsView extends StatefulWidget {
-  const AllTicketsView({super.key});
+  const AllTicketsView({this.showArchived = false, super.key});
+
+  final bool showArchived;
 
   @override
   State<AllTicketsView> createState() => _AllTicketsViewState();
@@ -23,13 +25,26 @@ class AllTicketsView extends StatefulWidget {
 
 class _AllTicketsViewState extends State<AllTicketsView> {
   bool _isLoading = true;
-  List<Ticket> _allTickets = [];
+  List<Ticket> _activeTickets = [];
+  List<Ticket> _archivedTickets = [];
   String _selectedFilter = 'All';
+  bool _showingArchived = false;
 
   @override
   void initState() {
     super.initState();
+    _showingArchived = widget.showArchived;
     unawaited(_loadTicketData());
+  }
+
+  @override
+  void didUpdateWidget(covariant AllTicketsView oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.showArchived != widget.showArchived) {
+      setState(() {
+        _showingArchived = widget.showArchived;
+      });
+    }
   }
 
   Future<void> _loadTicketData() async {
@@ -38,12 +53,14 @@ class _AllTicketsViewState extends State<AllTicketsView> {
         _isLoading = true;
       });
 
-      final tickets = await getIt<ITicketDAO>().getAllTickets();
+      final activeTickets = await getIt<ITicketDAO>().getActiveTickets();
+      final archivedTickets = await getIt<ITicketDAO>().getArchivedTickets();
 
       if (!mounted) return;
 
       setState(() {
-        _allTickets = tickets;
+        _activeTickets = activeTickets;
+        _archivedTickets = archivedTickets;
         _isLoading = false;
       });
     } on Object catch (e, stackTrace) {
@@ -62,11 +79,15 @@ class _AllTicketsViewState extends State<AllTicketsView> {
   }
 
   List<Ticket> get _filteredTickets {
-    if (_selectedFilter == 'All') {
-      return _allTickets;
+    if (_showingArchived) {
+      return _archivedTickets;
     }
 
-    return _allTickets.where((ticket) {
+    if (_selectedFilter == 'All') {
+      return _activeTickets;
+    }
+
+    return _activeTickets.where((ticket) {
       switch (_selectedFilter) {
         case 'Travel':
           return ticket.type == TicketType.bus ||
@@ -85,7 +106,7 @@ class _AllTicketsViewState extends State<AllTicketsView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('All Tickets'),
+        title: Text(_showingArchived ? 'Archived Tickets' : 'All Tickets'),
         elevation: 0,
       ),
       body: Column(
@@ -102,6 +123,8 @@ class _AllTicketsViewState extends State<AllTicketsView> {
                   _buildFilterChip('Travel'),
                   const SizedBox(width: 8),
                   _buildFilterChip('Events'),
+                  const SizedBox(width: 8),
+                  _buildArchiveChip(),
                 ],
               ),
             ),
@@ -139,7 +162,9 @@ class _AllTicketsViewState extends State<AllTicketsView> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Icon(
-                          Icons.airplane_ticket_outlined,
+                          _showingArchived
+                              ? Icons.archive_outlined
+                              : Icons.airplane_ticket_outlined,
                           size: 64,
                           color: Theme.of(
                             context,
@@ -147,7 +172,9 @@ class _AllTicketsViewState extends State<AllTicketsView> {
                         ),
                         const SizedBox(height: 16),
                         Text(
-                          'No tickets found',
+                          _showingArchived
+                              ? 'No archived tickets'
+                              : 'No tickets found',
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w500,
@@ -158,7 +185,9 @@ class _AllTicketsViewState extends State<AllTicketsView> {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          _selectedFilter == 'All'
+                          _showingArchived
+                              ? 'Past tickets will appear here'
+                              : _selectedFilter == 'All'
                               ? 'Add tickets to get started'
                               : 'No $_selectedFilter tickets available',
                           style: TextStyle(
@@ -202,6 +231,7 @@ class _AllTicketsViewState extends State<AllTicketsView> {
                               ? EventTicketCardWidget(ticket: ticket)
                               : TravelTicketListCardWidget(
                                   ticket: ticket,
+                                  isArchived: _showingArchived,
                                 ),
                         );
                       },
@@ -214,12 +244,13 @@ class _AllTicketsViewState extends State<AllTicketsView> {
   }
 
   Widget _buildFilterChip(String label) {
-    final isSelected = _selectedFilter == label;
+    final isSelected = !_showingArchived && _selectedFilter == label;
     return FilterChip(
       label: Text(label),
       selected: isSelected,
       onSelected: (selected) {
         setState(() {
+          _showingArchived = false;
           _selectedFilter = label;
         });
       },
@@ -243,16 +274,58 @@ class _AllTicketsViewState extends State<AllTicketsView> {
       elevation: isSelected ? 2 : 0,
     );
   }
+
+  Widget _buildArchiveChip() {
+    return FilterChip(
+      avatar: Icon(
+        Icons.archive_outlined,
+        size: 18,
+        color: _showingArchived
+            ? Theme.of(context).colorScheme.onTertiaryContainer
+            : Theme.of(context).colorScheme.onSurface,
+      ),
+      showCheckmark: false,
+      label: Text(
+        _archivedTickets.isNotEmpty
+            ? 'Archived (${_archivedTickets.length})'
+            : 'Archived',
+      ),
+      selected: _showingArchived,
+      onSelected: (selected) {
+        setState(() {
+          _showingArchived = selected;
+        });
+      },
+      selectedColor: Theme.of(context).colorScheme.tertiaryContainer,
+      checkmarkColor: Theme.of(context).colorScheme.onTertiaryContainer,
+      backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+      labelStyle: TextStyle(
+        color: _showingArchived
+            ? Theme.of(context).colorScheme.onTertiaryContainer
+            : Theme.of(context).colorScheme.onSurface,
+        fontWeight: _showingArchived ? FontWeight.w600 : FontWeight.w500,
+      ),
+      side: BorderSide(
+        color: _showingArchived
+            ? Theme.of(context).colorScheme.tertiary
+            : Theme.of(context).colorScheme.outline,
+        width: _showingArchived ? 2 : 1,
+      ),
+      elevation: _showingArchived ? 2 : 0,
+    );
+  }
 }
 
 // A compact card widget for travel tickets in list view
 class TravelTicketListCardWidget extends StatelessWidget {
   const TravelTicketListCardWidget({
     required this.ticket,
+    this.isArchived = false,
     super.key,
   });
 
   final Ticket ticket;
+  final bool isArchived;
 
   IconData _getTicketIcon() {
     return switch (ticket.type) {
@@ -289,152 +362,179 @@ class TravelTicketListCardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        color: Theme.of(context).colorScheme.surface,
-        boxShadow: [
-          BoxShadow(
-            color: Theme.of(
-              context,
-            ).colorScheme.primary.withValues(alpha: 0.08),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          // Icon container
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: _getTicketColor(context).withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(12),
+    return Opacity(
+      opacity: isArchived ? 0.7 : 1.0,
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+          color: Theme.of(context).colorScheme.surface,
+          boxShadow: [
+            BoxShadow(
+              color: Theme.of(
+                context,
+              ).colorScheme.primary.withValues(alpha: 0.08),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
             ),
-            child: Icon(
-              _getTicketIcon(),
-              color: _getTicketColor(context),
-              size: 28,
-            ),
-          ),
-
-          const SizedBox(width: 16),
-
-          // Ticket details
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+          ],
+        ),
+        child: Row(
+          children: [
+            // Icon container with optional archive badge
+            Stack(
+              clipBehavior: Clip.none,
               children: [
-                // From location
-                Row(
-                  children: [
-                    SizedBox(
-                      width: 12,
-                      child: Icon(
-                        Icons.trip_origin,
-                        size: 12,
-                        color: _getTicketColor(context),
-                      ),
-                    ),
-                    const SizedBox(width: 6),
-                    Expanded(
-                      child: Text(
-                        _getFromLocation(),
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: Theme.of(context).colorScheme.onSurface,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ],
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 1, bottom: 1),
-                  child: SizedBox(
-                    width: 12,
-                    child: Icon(
-                      Icons.more_vert,
-                      size: 12,
-                      color: _getTicketColor(context).withValues(alpha: 0.5),
-                    ),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: _getTicketColor(context).withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(
+                    _getTicketIcon(),
+                    color: _getTicketColor(context),
+                    size: 28,
                   ),
                 ),
-                // To location
-                Row(
-                  children: [
-                    SizedBox(
-                      width: 12,
+                if (isArchived)
+                  Positioned(
+                    right: -4,
+                    bottom: -4,
+                    child: Container(
+                      padding: const EdgeInsets.all(2),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.tertiaryContainer,
+                        shape: BoxShape.circle,
+                      ),
                       child: Icon(
-                        Icons.location_on,
+                        Icons.archive_rounded,
                         size: 12,
-                        color: _getTicketColor(context),
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onTertiaryContainer,
                       ),
-                    ),
-                    const SizedBox(width: 6),
-                    Expanded(
-                      child: Text(
-                        _getToLocation(),
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: Theme.of(context).colorScheme.onSurface,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                // Secondary info (train/bus number, etc.)
-                Text(
-                  ticket.secondaryText ?? '',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Theme.of(
-                      context,
-                    ).colorScheme.onSurface.withValues(alpha: 0.6),
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 4),
-                // Date and time
-                if (ticket.startTime != null)
-                  Text(
-                    '${DateTimeConverter.instance.formatDate(
-                      ticket.startTime!,
-                    )} • '
-                    '${DateTimeConverter.instance.formatTime(
-                      ticket.startTime!,
-                    )}',
-                    style: TextStyle(
-                      fontSize: 11,
-                      color: Theme.of(
-                        context,
-                      ).colorScheme.onSurface.withValues(alpha: 0.5),
                     ),
                   ),
               ],
             ),
-          ),
 
-          const SizedBox(width: 8),
+            const SizedBox(width: 16),
 
-          // Chevron icon
-          Icon(
-            Icons.chevron_right_rounded,
-            color: Theme.of(
-              context,
-            ).colorScheme.onSurface.withValues(alpha: 0.3),
-          ),
-        ],
+            // Ticket details
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // From location
+                  Row(
+                    children: [
+                      SizedBox(
+                        width: 12,
+                        child: Icon(
+                          Icons.trip_origin,
+                          size: 12,
+                          color: _getTicketColor(context),
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      Expanded(
+                        child: Text(
+                          _getFromLocation(),
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: Theme.of(context).colorScheme.onSurface,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 1, bottom: 1),
+                    child: SizedBox(
+                      width: 12,
+                      child: Icon(
+                        Icons.more_vert,
+                        size: 12,
+                        color: _getTicketColor(context).withValues(alpha: 0.5),
+                      ),
+                    ),
+                  ),
+                  // To location
+                  Row(
+                    children: [
+                      SizedBox(
+                        width: 12,
+                        child: Icon(
+                          Icons.location_on,
+                          size: 12,
+                          color: _getTicketColor(context),
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      Expanded(
+                        child: Text(
+                          _getToLocation(),
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: Theme.of(context).colorScheme.onSurface,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  // Secondary info (train/bus number, etc.)
+                  Text(
+                    ticket.secondaryText ?? '',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withValues(alpha: 0.6),
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 4),
+                  // Date and time
+                  if (ticket.startTime != null)
+                    Text(
+                      '${DateTimeConverter.instance.formatDate(
+                        ticket.startTime!,
+                      )} • '
+                      '${DateTimeConverter.instance.formatTime(
+                        ticket.startTime!,
+                      )}',
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onSurface.withValues(alpha: 0.5),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+
+            const SizedBox(width: 8),
+
+            // Chevron icon
+            Icon(
+              Icons.chevron_right_rounded,
+              color: Theme.of(
+                context,
+              ).colorScheme.onSurface.withValues(alpha: 0.3),
+            ),
+          ],
+        ),
       ),
     );
   }

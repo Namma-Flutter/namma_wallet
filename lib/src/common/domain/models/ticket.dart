@@ -26,6 +26,7 @@ class Ticket with TicketMappable {
     this.ticketId,
     this.imagePath,
     this.directionsUrl,
+    this.archivedAt,
   });
 
   factory Ticket.fromTNSTC(
@@ -321,6 +322,7 @@ class Ticket with TicketMappable {
       extras: _mergeExtras(existing.extras, incoming.extras),
       imagePath: incoming.imagePath ?? existing.imagePath,
       directionsUrl: incoming.directionsUrl ?? existing.directionsUrl,
+      archivedAt: incoming.archivedAt ?? existing.archivedAt,
     );
   }
 
@@ -502,6 +504,8 @@ class Ticket with TicketMappable {
   final String? imagePath;
   @MappableField(key: 'directions_url')
   final String? directionsUrl;
+  @MappableField(key: 'archived_at')
+  final DateTime? archivedAt;
 
   Map<String, Object?> toEntity() {
     final map = toMap()..removeWhere((key, value) => value == null);

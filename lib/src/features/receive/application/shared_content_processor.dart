@@ -3,6 +3,7 @@ import 'package:namma_wallet/src/common/database/ticket_dao_interface.dart';
 import 'package:namma_wallet/src/common/domain/models/extras_model.dart';
 import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 import 'package:namma_wallet/src/common/enums/source_type.dart';
+import 'package:namma_wallet/src/common/services/archive/ticket_archive.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
 import 'package:namma_wallet/src/features/home/domain/ticket_extensions.dart';
 import 'package:namma_wallet/src/features/import/application/import_service_interface.dart';
@@ -55,6 +56,15 @@ class SharedContentProcessor implements ISharedContentProcessor {
             error: 'Parser returned null',
           );
         }
+        final archived = shouldArchiveTicket(ticket);
+        String? warning;
+        if (archived && result.warning != null && result.warning!.isNotEmpty) {
+          warning = '${result.warning}\n$archivedPastTicketMessage';
+        } else if (archived) {
+          warning = archivedPastTicketMessage;
+        } else {
+          warning = result.warning;
+        }
         return TicketCreatedResult(
           pnrNumber: ticket.pnrOrId,
           from: ticket.fromLocation,
@@ -62,7 +72,8 @@ class SharedContentProcessor implements ISharedContentProcessor {
           fare: ticket.fare,
           date: ticket.date,
           ticketId: ticket.ticketId,
-          warning: result.warning,
+          warning: warning,
+          isArchived: archived,
         );
       }
 
@@ -165,6 +176,7 @@ class SharedContentProcessor implements ISharedContentProcessor {
         'PNR: ${ticket.ticketId}',
       );
 
+      final archived = shouldArchiveTicket(ticket);
       return TicketCreatedResult(
         pnrNumber: ticket.pnrOrId,
         from: ticket.fromLocation,
@@ -172,6 +184,8 @@ class SharedContentProcessor implements ISharedContentProcessor {
         fare: ticket.fare,
         date: ticket.date,
         ticketId: ticket.ticketId,
+        warning: archived ? archivedPastTicketMessage : null,
+        isArchived: archived,
       );
     } on Exception catch (e, stackTrace) {
       _logger.error(
