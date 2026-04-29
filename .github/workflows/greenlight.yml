@@ -31,30 +31,35 @@ jobs:
         id: results
         run: |
           if [ ! -f greenlight-report.json ]; then
-            echo "has_critical=false" >> $GITHUB_OUTPUT
-            echo "summary=Greenlight report not generated." >> $GITHUB_OUTPUT
+            echo "has_blocks=false" >> $GITHUB_OUTPUT
+            {
+              echo 'body<<GREENLIGHT_EOF'
+              echo "⚠️ **Greenlight report was not generated.** Check the scan step logs."
+              echo 'GREENLIGHT_EOF'
+            } >> $GITHUB_OUTPUT
             exit 0
           fi
 
-          critical=$(jq -r '.summary.critical // 0' greenlight-report.json)
-          warnings=$(jq -r '.summary.warnings // 0' greenlight-report.json)
-          errors=$(jq -r '.summary.errors // 0' greenlight-report.json)
+          passed=$(jq -r '.summary.passed' greenlight-report.json)
+          blocks=$(jq -r '.summary.blocks // 0' greenlight-report.json)
+          warns=$(jq -r '.summary.warns // 0' greenlight-report.json)
+          infos=$(jq -r '.summary.infos // 0' greenlight-report.json)
 
-          echo "has_critical=$([ "$critical" -gt 0 ] && echo true || echo false)" >> $GITHUB_OUTPUT
+          echo "has_blocks=$([ "$blocks" -gt 0 ] && echo true || echo false)" >> $GITHUB_OUTPUT
 
           {
             echo 'body<<GREENLIGHT_EOF'
-            if [ "$critical" -gt 0 ]; then
-              echo "❌ **Greenlight preflight found $critical critical issue(s)**"
+            if [ "$blocks" -gt 0 ]; then
+              echo "❌ **Greenlight preflight found $blocks blocking issue(s)**"
             else
-              echo "✅ **Greenlight preflight passed** — no critical issues found."
+              echo "✅ **Greenlight preflight passed** — no blocking issues found."
             fi
             echo ""
             echo "| Severity | Count |"
             echo "| --- | --- |"
-            echo "| Critical | $critical |"
-            echo "| Errors | $errors |"
-            echo "| Warnings | $warnings |"
+            echo "| Blocks | $blocks |"
+            echo "| Warns | $warns |"
+            echo "| Infos | $infos |"
             echo 'GREENLIGHT_EOF'
           } >> $GITHUB_OUTPUT
 
@@ -81,8 +86,19 @@ jobs:
           edit-mode: replace
           body: ${{ steps.results.outputs.body }}
 
-      - name: Fail on critical issues
-        if: steps.results.outputs.has_critical == 'true'
+      - name: Print blocking findings
+        if: steps.results.outputs.has_blocks == 'true'
         run: |
-          echo "Critical App Store compliance issues found. Fix before submitting."
+          echo "=== Greenlight Blocking Findings ==="
+          jq -r '
+            .findings[]
+            | select(.severity == "block")
+            | "------------------------------------------------------------",
+              "Guideline : \(.guideline)",
+              "Title     : \(.title)",
+              "Detail    : \(.detail)",
+              (if .fix != "" then "Fix       : \(.fix)" else empty end)
+          ' greenlight-report.json
+          echo "============================================================"
+          echo "Fix the above issues before submitting to the App Store."
           exit 1
