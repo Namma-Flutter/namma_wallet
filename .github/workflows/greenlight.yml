@@ -1,0 +1,88 @@
+name: greenlight
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  greenlight:
+    runs-on: macos-latest
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Install Greenlight
+        run: brew install revylai/tap/greenlight
+
+      - name: Run preflight scan
+        id: scan
+        run: |
+          set +e
+          greenlight preflight . --format json --output greenlight-report.json
+          echo "exit_code=$?" >> $GITHUB_OUTPUT
+          exit 0
+
+      - name: Parse scan results
+        id: results
+        run: |
+          if [ ! -f greenlight-report.json ]; then
+            echo "has_critical=false" >> $GITHUB_OUTPUT
+            echo "summary=Greenlight report not generated." >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          critical=$(jq -r '.summary.critical // 0' greenlight-report.json)
+          warnings=$(jq -r '.summary.warnings // 0' greenlight-report.json)
+          errors=$(jq -r '.summary.errors // 0' greenlight-report.json)
+
+          echo "has_critical=$([ "$critical" -gt 0 ] && echo true || echo false)" >> $GITHUB_OUTPUT
+
+          {
+            echo 'body<<GREENLIGHT_EOF'
+            if [ "$critical" -gt 0 ]; then
+              echo "❌ **Greenlight preflight found $critical critical issue(s)**"
+            else
+              echo "✅ **Greenlight preflight passed** — no critical issues found."
+            fi
+            echo ""
+            echo "| Severity | Count |"
+            echo "| --- | --- |"
+            echo "| Critical | $critical |"
+            echo "| Errors | $errors |"
+            echo "| Warnings | $warnings |"
+            echo 'GREENLIGHT_EOF'
+          } >> $GITHUB_OUTPUT
+
+      - name: Find previous Greenlight comment
+        id: find_comment
+        uses: peter-evans/find-comment@v4
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          comment-author: "github-actions[bot]"
+          body-includes: "Greenlight preflight"
+
+      - name: Create Greenlight comment
+        if: steps.find_comment.outputs.comment-id == ''
+        uses: peter-evans/create-or-update-comment@v5
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          body: ${{ steps.results.outputs.body }}
+
+      - name: Update existing Greenlight comment
+        if: steps.find_comment.outputs.comment-id != ''
+        uses: peter-evans/create-or-update-comment@v5
+        with:
+          comment-id: ${{ steps.find_comment.outputs.comment-id }}
+          edit-mode: replace
+          body: ${{ steps.results.outputs.body }}
+
+      - name: Fail on critical issues
+        if: steps.results.outputs.has_critical == 'true'
+        run: |
+          echo "Critical App Store compliance issues found. Fix before submitting."
+          exit 1
