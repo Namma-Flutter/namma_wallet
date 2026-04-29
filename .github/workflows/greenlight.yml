@@ -97,7 +97,7 @@ jobs:
               "Guideline : \(.guideline)",
               "Title     : \(.title)",
               "Detail    : \(.detail)",
-              (if .fix != "" then "Fix       : \(.fix)" else empty end)
+              (if (.fix // "") != "" then "Fix       : \(.fix)" else empty end)
           ' greenlight-report.json
           echo "============================================================"
           echo "Fix the above issues before submitting to the App Store."
