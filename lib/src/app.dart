@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
@@ -96,7 +97,7 @@ class _NammaWalletAppState extends State<NammaWalletApp> {
 
     // If the app was launched by tapping a notification from a terminated state
     // handle navigation after the first frame when the navigator is available.
-    if (Platform.isAndroid) {
+    if (!kIsWeb && Platform.isAndroid) {
       WidgetsBinding.instance.addPostFrameCallback((_) async {
         await getIt<INotificationService>()
             .handleInitialNotification()

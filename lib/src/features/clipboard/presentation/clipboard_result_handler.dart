@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/services/push_notification/notification_service_interface.dart';
@@ -40,6 +41,7 @@ class ClipboardResultHandler {
     if (result.ticket != null &&
         result.isSuccess &&
         result.type == ClipboardContentType.travelTicket &&
+        !kIsWeb &&
         Platform.isAndroid) {
       unawaited(
         getIt<INotificationService>().scheduleTicketReminderFor(result.ticket!),

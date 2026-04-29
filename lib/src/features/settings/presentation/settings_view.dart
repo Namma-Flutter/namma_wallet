@@ -73,7 +73,7 @@ class _SettingsViewState extends State<SettingsView> {
               const SizedBox(height: 8),
 
               // Reminder Settings Section
-              if (Platform.isAndroid)
+              if (!kIsWeb && Platform.isAndroid)
                 ProfileTile(
                   icon: Icons.notifications_active_outlined,
                   title: 'Reminder Settings',
