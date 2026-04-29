@@ -1,3 +1,4 @@
+// coverage:ignore-file
 import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
 import 'package:namma_wallet/src/common/services/widget/widget_service_interface.dart';

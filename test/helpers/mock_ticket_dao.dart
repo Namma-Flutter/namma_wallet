@@ -105,4 +105,28 @@ class MockTicketDAO implements ITicketDAO {
     insertedTickets.removeWhere((t) => t.ticketId == ticketId);
     return initialLength - insertedTickets.length;
   }
+
+  @override
+  Future<List<Ticket>> getActiveTickets() async {
+    if (shouldThrow) throw Exception('Mock get error');
+    return insertedTickets;
+  }
+
+  @override
+  Future<List<Ticket>> getArchivedTickets() async {
+    if (shouldThrow) throw Exception('Mock get error');
+    return [];
+  }
+
+  @override
+  Future<int> archivePastTickets() async {
+    if (shouldThrow) throw Exception('Mock archive error');
+    return 0;
+  }
+
+  @override
+  Future<int> purgeOldArchivedTickets({int retentionDays = 30}) async {
+    if (shouldThrow) throw Exception('Mock purge error');
+    return 0;
+  }
 }

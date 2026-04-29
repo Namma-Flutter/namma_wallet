@@ -13,6 +13,7 @@ import 'package:namma_wallet/src/app.dart';
 import 'package:namma_wallet/src/common/database/wallet_database_interface.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/platform_utils/platform_utils.dart';
+import 'package:namma_wallet/src/common/services/archive/archive_service_interface.dart';
 import 'package:namma_wallet/src/common/services/haptic/haptic_service_interface.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
 import 'package:namma_wallet/src/common/services/push_notification/notification_service_interface.dart';
@@ -195,7 +196,7 @@ Future<void> main() async {
   FlutterNativeSplash.remove();
 
   // Restore system UI (status bar & navigation bar) after splash
-  await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+  unawaited(SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge));
 
   // Optional: set colors for status & navigation bar
   SystemChrome.setSystemUIOverlayStyle(
@@ -214,4 +215,18 @@ Future<void> main() async {
       child: const NammaWalletApp(),
     ),
   );
+
+  // Run archive maintenance to ensure up-to-date data on startup.
+  // We do this after runApp to avoid delaying the first frame.
+  unawaited(() async {
+    try {
+      final archiveService = getIt<IArchiveService>();
+      await archiveService.runArchiveMaintenance();
+    } on Object catch (e, stackTrace) {
+      // Archive maintenance failures should not crash the app.
+      // Note: runArchiveMaintenance already handles its own internal errors,
+      // this block primarily catches potential resolution errors from getIt.
+      logger?.error('Startup archive maintenance failed', e, stackTrace);
+    }
+  }());
 }

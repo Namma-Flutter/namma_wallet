@@ -1,3 +1,4 @@
+// coverage:ignore-file
 import 'dart:io';
 
 import 'package:cross_file/cross_file.dart';

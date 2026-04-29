@@ -5,6 +5,7 @@ import 'package:namma_wallet/src/common/database/ticket_dao_interface.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 import 'package:namma_wallet/src/common/routing/app_routes.dart';
+import 'package:namma_wallet/src/common/services/archive/ticket_archive.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
 import 'package:namma_wallet/src/features/bottom_navigation/presentation/namma_navigation_bar.dart';
 import 'package:namma_wallet/src/features/calendar/presentation/calendar_view.dart';
@@ -100,7 +101,10 @@ final router = GoRouter(
     GoRoute(
       path: AppRoute.allTickets.path,
       name: AppRoute.allTickets.name,
-      builder: (context, state) => const AllTicketsView(),
+      builder: (context, state) => AllTicketsView(
+        showArchived:
+            state.uri.queryParameters[archiveQueryKey] == archiveQueryValue,
+      ),
     ),
     GoRoute(
       path: AppRoute.settings.path,

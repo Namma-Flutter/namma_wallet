@@ -28,21 +28,26 @@ class FakeDatabase implements IWalletDatabase {
           );
         ''');
 
-        // Create tickets table
+        // Create tickets table — matches production schema: primary_text,
+        // secondary_text, start_time, and location are nullable as of v4.
+        // image_path and directions_url added in v5 schema.
         await db.execute('''
           CREATE TABLE tickets (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             ticket_id TEXT NOT NULL UNIQUE,
-            primary_text TEXT NOT NULL,
-            secondary_text TEXT NOT NULL,
+            primary_text TEXT,
+            secondary_text TEXT,
             type TEXT NOT NULL,
-            start_time TEXT NOT NULL,
+            start_time TEXT,
             end_time TEXT,
-            location TEXT NOT NULL,
+            location TEXT,
             tags TEXT,
             extras TEXT,
+            image_path TEXT,
+            directions_url TEXT,
             created_at TEXT DEFAULT CURRENT_TIMESTAMP,
-            updated_at TEXT DEFAULT NULL
+            updated_at TEXT DEFAULT NULL,
+            archived_at TEXT DEFAULT NULL
           );
         ''');
 
@@ -56,6 +61,10 @@ class FakeDatabase implements IWalletDatabase {
         await db.execute(
           'CREATE INDEX IF NOT EXISTS idx_tickets_start_time ON tickets '
           '(start_time);',
+        );
+        await db.execute(
+          'CREATE INDEX IF NOT EXISTS idx_tickets_archived_at ON tickets '
+          '(archived_at);',
         );
       },
     );

@@ -1,3 +1,5 @@
+// coverage:ignore-file
+// Network integration glue — exercised via integration tests.
 import 'dart:async';
 
 import 'package:html/dom.dart';

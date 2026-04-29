@@ -10,6 +10,7 @@ import 'package:go_router/go_router.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 import 'package:namma_wallet/src/common/routing/app_routes.dart';
+import 'package:namma_wallet/src/common/services/archive/ticket_archive.dart';
 import 'package:namma_wallet/src/common/services/haptic/haptic_service_extension.dart';
 import 'package:namma_wallet/src/common/services/haptic/haptic_service_interface.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
@@ -75,14 +76,7 @@ class _ImportViewState extends State<ImportView> {
                 }),
           );
         }
-        final id = ticket.ticketId;
-        if (id != null) {
-          context.go(AppRoute.home.path);
-          await context.pushNamed(
-            AppRoute.ticketView.name,
-            pathParameters: {'id': id},
-          );
-        }
+        await _openImportedTicket(ticket);
       } else {
         showSnackbar(
           context,
@@ -182,14 +176,7 @@ class _ImportViewState extends State<ImportView> {
                   }),
             );
           }
-          final id = ticket.ticketId;
-          if (id != null) {
-            context.go(AppRoute.home.path);
-            await context.pushNamed(
-              AppRoute.ticketView.name,
-              pathParameters: {'id': id},
-            );
-          }
+          await _openImportedTicket(ticket);
         } else {
           showSnackbar(
             context,
@@ -241,11 +228,7 @@ class _ImportViewState extends State<ImportView> {
 
         final ticketId = result.ticket?.ticketId;
         if (result.isSuccess && ticketId != null) {
-          context.go(AppRoute.home.path);
-          await context.pushNamed(
-            AppRoute.ticketView.name,
-            pathParameters: {'id': ticketId},
-          );
+          await _openImportedTicket(result.ticket!);
         } else {
           ClipboardResultHandler.showResultMessage(context, result);
         }
@@ -382,11 +365,9 @@ class _ImportViewState extends State<ImportView> {
 
             final id = ticket.ticketId;
             if (id != null) {
-              rootContext.go(AppRoute.home.path);
-              await rootContext.pushNamed(
-                AppRoute.ticketView.name,
-                pathParameters: {'id': id},
-                queryParameters: {'fromImport': '1'},
+              await _openImportedTicket(
+                ticket,
+                context: rootContext,
               );
             } else {
               showSnackbar(
@@ -442,6 +423,31 @@ class _ImportViewState extends State<ImportView> {
           );
         },
       ),
+    );
+  }
+
+  Future<void> _openImportedTicket(
+    Ticket ticket, {
+    BuildContext? context,
+  }) async {
+    final targetContext = context ?? this.context;
+    if (!targetContext.mounted) return;
+
+    if (shouldArchiveTicket(ticket)) {
+      showSnackbar(targetContext, archivedPastTicketMessage);
+      targetContext.go(AppRoute.home.path);
+      await targetContext.push(archivedTicketsLocation());
+      return;
+    }
+
+    final id = ticket.ticketId;
+    if (id == null) return;
+
+    targetContext.go(AppRoute.home.path);
+    await targetContext.pushNamed(
+      AppRoute.ticketView.name,
+      pathParameters: {'id': id},
+      queryParameters: {'fromImport': '1'},
     );
   }
 

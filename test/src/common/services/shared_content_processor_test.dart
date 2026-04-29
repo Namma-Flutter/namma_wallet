@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 import 'package:namma_wallet/src/common/enums/ticket_type.dart';
+import 'package:namma_wallet/src/common/services/archive/ticket_archive.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
 import 'package:namma_wallet/src/features/receive/application/shared_content_processor.dart';
 import 'package:namma_wallet/src/features/receive/domain/shared_content_result.dart';
@@ -192,6 +193,110 @@ void main() {
       );
     });
 
+    group('processContent - Archive Flag', () {
+      test(
+        'Given a past ticket, When processing SMS content, '
+        'Then result has isArchived=true and archived warning',
+        () async {
+          final logger = getIt<ILogger>();
+          final pastTicket = Ticket(
+            ticketId: 'PAST_SMS_001',
+            primaryText: 'Chennai → Bangalore',
+            secondaryText: 'SETC',
+            startTime: DateTime.now().subtract(const Duration(days: 1)),
+            location: 'Chennai',
+            type: TicketType.bus,
+          );
+          final processor = SharedContentProcessor(
+            logger: logger,
+            travelParser: MockTravelParserService(
+              logger: logger,
+              mockTicket: pastTicket,
+            ),
+            ticketDao: MockTicketDAO(),
+            importService: MockImportService(),
+          );
+
+          final result = await processor.processContent(
+            'PNR NO. : PAST_SMS_001',
+            SharedContentType.sms,
+          );
+
+          expect(result, isA<TicketCreatedResult>());
+          final created = result as TicketCreatedResult;
+          expect(created.isArchived, isTrue);
+          expect(created.warning, equals(archivedPastTicketMessage));
+        },
+      );
+
+      test(
+        'Given a future ticket, When processing SMS content, '
+        'Then result has isArchived=false and no warning',
+        () async {
+          final logger = getIt<ILogger>();
+          final futureTicket = Ticket(
+            ticketId: 'FUTURE_SMS_001',
+            primaryText: 'Chennai → Bangalore',
+            secondaryText: 'SETC',
+            startTime: DateTime.now().add(const Duration(days: 7)),
+            location: 'Chennai',
+            type: TicketType.bus,
+          );
+          final processor = SharedContentProcessor(
+            logger: logger,
+            travelParser: MockTravelParserService(
+              logger: logger,
+              mockTicket: futureTicket,
+            ),
+            ticketDao: MockTicketDAO(),
+            importService: MockImportService(),
+          );
+
+          final result = await processor.processContent(
+            'PNR NO. : FUTURE_SMS_001',
+            SharedContentType.sms,
+          );
+
+          expect(result, isA<TicketCreatedResult>());
+          final created = result as TicketCreatedResult;
+          expect(created.isArchived, isFalse);
+          expect(created.warning, isNull);
+        },
+      );
+
+      test(
+        'Given a past PKPass ticket, When processing PKPass content, '
+        'Then result has isArchived=true',
+        () async {
+          final logger = getIt<ILogger>();
+          final pastPkpass = Ticket(
+            ticketId: 'PKPASS_PAST_001',
+            primaryText: 'Chennai → Bangalore',
+            secondaryText: 'SETC',
+            endTime: DateTime.now().subtract(const Duration(hours: 1)),
+            location: 'Chennai',
+            type: TicketType.bus,
+          );
+          final processor = SharedContentProcessor(
+            logger: logger,
+            travelParser: MockTravelParserService(logger: logger),
+            ticketDao: MockTicketDAO(),
+            importService: MockImportService(mockTicket: pastPkpass),
+          );
+
+          final result = await processor.processContent(
+            '/mock/path/ticket.pkpass',
+            SharedContentType.pkpass,
+          );
+
+          expect(result, isA<TicketCreatedResult>());
+          final created = result as TicketCreatedResult;
+          expect(created.isArchived, isTrue);
+          expect(created.warning, equals(archivedPastTicketMessage));
+        },
+      );
+    });
+
     group('processContent - Ticket Updates', () {
       test(
         'Given update SMS with conductor details, '
@@ -288,6 +393,110 @@ void main() {
           expect(result, isA<TicketNotFoundResult>());
           final notFoundResult = result as TicketNotFoundResult;
           expect(notFoundResult.pnrNumber, equals('T99999999'));
+        },
+      );
+
+      test(
+        'Given existing ticket but DAO update returns 0, '
+        'When processing update SMS, '
+        'Then returns TicketNotFoundResult',
+        () async {
+          final mockUpdateInfo = TicketUpdateInfo(
+            pnrNumber: 'T_NO_ROW',
+            providerName: 'TNSTC',
+            updates: {'conductorContact': '9876543210'},
+          );
+          final mockDao = MockTicketDAO(updateReturnCount: 0);
+          // Insert the ticket so getTicketById returns it...
+          await mockDao.insertTicket(
+            const Ticket(ticketId: 'T_NO_ROW', primaryText: 'A → B'),
+          );
+          final processor = SharedContentProcessor(
+            logger: getIt<ILogger>(),
+            travelParser: MockTravelParserService(
+              logger: getIt<ILogger>(),
+              mockUpdateInfo: mockUpdateInfo,
+            ),
+            ticketDao: mockDao,
+            importService: MockImportService(),
+          );
+
+          final result = await processor.processContent(
+            'PNR NO. : T_NO_ROW, Conductor: 9876543210',
+            SharedContentType.sms,
+          );
+
+          // ...but handleTicket → updateTicketById returns 0 →
+          // we should fall into the second TicketNotFoundResult branch.
+          expect(result, isA<TicketNotFoundResult>());
+        },
+      );
+
+      test(
+        'Given a PDF whose content only matches the update SMS pattern '
+        'and the original ticket exists, '
+        'Then returns TicketUpdatedResult via the secondary update path',
+        () async {
+          final mockUpdateInfo = TicketUpdateInfo(
+            pnrNumber: 'T_PDF_UPDATE',
+            providerName: 'TNSTC',
+            updates: {'conductorMobileNo': '9876543210'},
+          );
+          final mockDao = MockTicketDAO();
+          await mockDao.insertTicket(
+            const Ticket(ticketId: 'T_PDF_UPDATE', primaryText: 'A → B'),
+          );
+          final processor = SharedContentProcessor(
+            logger: getIt<ILogger>(),
+            travelParser: MockTravelParserService(
+              logger: getIt<ILogger>(),
+              mockUpdateInfo: mockUpdateInfo,
+            ),
+            ticketDao: mockDao,
+            importService: MockImportService(),
+          );
+
+          final result = await processor.processContent(
+            'random pdf text',
+            SharedContentType.pdf,
+          );
+
+          expect(result, isA<TicketUpdatedResult>());
+          final updated = result as TicketUpdatedResult;
+          expect(updated.pnrNumber, equals('T_PDF_UPDATE'));
+          expect(updated.updateType, equals('Conductor Details'));
+        },
+      );
+
+      test(
+        'Given a PDF whose update path finds no original ticket, '
+        'Then returns TicketNotFoundResult via the secondary update path',
+        () async {
+          final mockUpdateInfo = TicketUpdateInfo(
+            pnrNumber: 'T_PDF_MISSING',
+            providerName: 'TNSTC',
+            updates: {'busNumber': 'TN01AB1234'},
+          );
+          final processor = SharedContentProcessor(
+            logger: getIt<ILogger>(),
+            travelParser: MockTravelParserService(
+              logger: getIt<ILogger>(),
+              mockUpdateInfo: mockUpdateInfo,
+            ),
+            ticketDao: MockTicketDAO(),
+            importService: MockImportService(),
+          );
+
+          final result = await processor.processContent(
+            'random pdf text',
+            SharedContentType.pdf,
+          );
+
+          expect(result, isA<TicketNotFoundResult>());
+          expect(
+            (result as TicketNotFoundResult).pnrNumber,
+            equals('T_PDF_MISSING'),
+          );
         },
       );
 
