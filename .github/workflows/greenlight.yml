@@ -60,6 +60,27 @@ jobs:
             echo "| Blocks | $blocks |"
             echo "| Warns | $warns |"
             echo "| Infos | $infos |"
+
+            if [ "$warns" -gt 0 ]; then
+              echo ""
+              echo "### Warnings"
+              jq -r '
+                .findings[]
+                | select(.severity == "warn")
+                | "**\(.title)**  \n\(.detail)" + (if (.fix // "") != "" then "  \n_Fix: \(.fix)_" else "" end)
+              ' greenlight-report.json
+            fi
+
+            if [ "$infos" -gt 0 ]; then
+              echo ""
+              echo "### Info"
+              jq -r '
+                .findings[]
+                | select(.severity == "info")
+                | "**\(.title)**  \n\(.detail)" + (if (.fix // "") != "" then "  \n_Fix: \(.fix)_" else "" end)
+              ' greenlight-report.json
+            fi
+
             echo 'GREENLIGHT_EOF'
           } >> $GITHUB_OUTPUT
 
@@ -102,3 +123,23 @@ jobs:
           echo "============================================================"
           echo "Fix the above issues before submitting to the App Store."
           exit 1
+
+      - name: Print warn and info findings
+        if: always()
+        run: |
+          warns=$(jq -r '.summary.warns // 0' greenlight-report.json 2>/dev/null || echo 0)
+          infos=$(jq -r '.summary.infos // 0' greenlight-report.json 2>/dev/null || echo 0)
+          if [ "$warns" -gt 0 ] || [ "$infos" -gt 0 ]; then
+            echo "=== Greenlight Warn/Info Findings ==="
+            jq -r '
+              .findings[]
+              | select(.severity == "warn" or .severity == "info")
+              | "------------------------------------------------------------",
+                "Severity  : \(.severity)",
+                "Guideline : \(.guideline)",
+                "Title     : \(.title)",
+                "Detail    : \(.detail)",
+                (if (.fix // "") != "" then "Fix       : \(.fix)" else empty end)
+            ' greenlight-report.json
+            echo "============================================================"
+          fi
