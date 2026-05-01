@@ -13,11 +13,15 @@ import 'package:namma_wallet/src/common/services/haptic/haptic_service_interface
 import 'package:namma_wallet/src/common/services/haptic/haptic_services.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
 import 'package:namma_wallet/src/common/services/logger/namma_logger.dart';
+import 'package:namma_wallet/src/common/services/notification/reminder_preferences_service.dart';
 import 'package:namma_wallet/src/common/services/ocr/google_mlkit_ocr.dart';
 import 'package:namma_wallet/src/common/services/ocr/ocr_service_interface.dart';
 import 'package:namma_wallet/src/common/services/ocr/web_ocr_service.dart';
 import 'package:namma_wallet/src/common/services/pdf/pdf_service.dart';
 import 'package:namma_wallet/src/common/services/pdf/pdf_service_interface.dart';
+import 'package:namma_wallet/src/common/services/push_notification/notification_service.dart';
+import 'package:namma_wallet/src/common/services/push_notification/notification_service_interface.dart';
+import 'package:namma_wallet/src/common/services/push_notification/web_notification_service.dart';
 import 'package:namma_wallet/src/common/services/ticket_change_notifier.dart';
 import 'package:namma_wallet/src/common/services/widget/home_widget_service.dart';
 import 'package:namma_wallet/src/common/services/widget/web_widget_service.dart';
@@ -89,6 +93,12 @@ void setupLocator() {
       () => kIsWeb
           ? WebWidgetService(logger: getIt<ILogger>())
           : HomeWidgetService(logger: getIt<ILogger>()),
+    )
+    ..registerLazySingleton<IReminderPreferencesService>(
+      () => ReminderPreferencesService(logger: getIt<ILogger>()),
+    )
+    ..registerLazySingleton<INotificationService>(
+      () => kIsWeb ? WebNotificationService() : NotificationService(),
     )
     // Parsers
     ..registerLazySingleton<TNSTCSMSParser>(TNSTCSMSParser.new)

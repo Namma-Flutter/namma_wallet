@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:io';
+
 import 'package:ai_barcode_scanner/ai_barcode_scanner.dart';
 import 'package:cross_file/cross_file.dart';
 import 'package:file_picker/file_picker.dart';
@@ -11,6 +14,7 @@ import 'package:namma_wallet/src/common/services/archive/ticket_archive.dart';
 import 'package:namma_wallet/src/common/services/haptic/haptic_service_extension.dart';
 import 'package:namma_wallet/src/common/services/haptic/haptic_service_interface.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
+import 'package:namma_wallet/src/common/services/push_notification/notification_service_interface.dart';
 import 'package:namma_wallet/src/common/widgets/snackbar_widget.dart';
 import 'package:namma_wallet/src/features/clipboard/application/clipboard_service_interface.dart';
 import 'package:namma_wallet/src/features/clipboard/presentation/clipboard_result_handler.dart';
@@ -60,6 +64,18 @@ class _ImportViewState extends State<ImportView> {
       if (!mounted) return;
 
       if (ticket != null) {
+        if (!kIsWeb && Platform.isAndroid) {
+          unawaited(
+            getIt<INotificationService>()
+                .scheduleTicketReminderFor(ticket)
+                .catchError((
+                  Object e,
+                  StackTrace s,
+                ) {
+                  _logger.error('Error scheduling notification', e, s);
+                }),
+          );
+        }
         await _openImportedTicket(ticket);
       } else {
         showSnackbar(
@@ -148,6 +164,18 @@ class _ImportViewState extends State<ImportView> {
         if (!mounted) return;
 
         if (ticket != null) {
+          if (!kIsWeb && Platform.isAndroid) {
+            unawaited(
+              getIt<INotificationService>()
+                  .scheduleTicketReminderFor(ticket)
+                  .catchError((
+                    Object e,
+                    StackTrace s,
+                  ) {
+                    _logger.error('Error scheduling notification', e, s);
+                  }),
+            );
+          }
           await _openImportedTicket(ticket);
         } else {
           showSnackbar(

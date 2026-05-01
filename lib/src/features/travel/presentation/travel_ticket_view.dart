@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -13,11 +14,14 @@ import 'package:namma_wallet/src/common/helper/date_time_converter.dart';
 import 'package:namma_wallet/src/common/services/haptic/haptic_service_extension.dart';
 import 'package:namma_wallet/src/common/services/haptic/haptic_service_interface.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
+import 'package:namma_wallet/src/common/services/notification/reminder_preferences_service.dart';
+import 'package:namma_wallet/src/common/services/push_notification/notification_service_interface.dart';
 import 'package:namma_wallet/src/common/services/ticket_change_notifier.dart';
 import 'package:namma_wallet/src/common/services/widget/widget_service_interface.dart';
 import 'package:namma_wallet/src/common/theme/styles.dart';
 import 'package:namma_wallet/src/common/widgets/rounded_back_button.dart';
 import 'package:namma_wallet/src/common/widgets/snackbar_widget.dart';
+import 'package:namma_wallet/src/common/widgets/ticket_reminder_config_dialog.dart';
 import 'package:namma_wallet/src/features/home/domain/ticket_extensions.dart';
 import 'package:namma_wallet/src/features/travel/presentation/widgets/travel_row_widget.dart';
 import 'package:namma_wallet/src/features/travel/presentation/widgets/travel_ticket_shape_line.dart';
@@ -45,6 +49,10 @@ class _TravelTicketViewState extends State<TravelTicketView> {
   bool _isDeleting = false;
   bool _isSharing = false;
   final ScreenshotController _screenshotController = ScreenshotController();
+  bool _reminderEnabled = false;
+  bool _isLoadingReminder = true;
+
+  late IReminderPreferencesService _reminderPreferencesService;
 
   // Helper method to handle empty values
   String getValueOrDefault(String? value) {
@@ -181,6 +189,53 @@ class _TravelTicketViewState extends State<TravelTicketView> {
     }
   }
 
+  @override
+  void initState() {
+    super.initState();
+    _reminderPreferencesService = getIt<IReminderPreferencesService>();
+    unawaited(_loadReminderState());
+  }
+
+  Future<void> _loadReminderState() async {
+    try {
+      final prefs = await _reminderPreferencesService.getRemainderPreferences(
+        widget.ticket.ticketId ?? '',
+      );
+      if (mounted) {
+        setState(() {
+          _reminderEnabled = prefs.isEnabled;
+          _isLoadingReminder = false;
+        });
+      }
+    } on Exception catch (e, st) {
+      getIt<ILogger>().error(
+        '[TravelTicketView] Failed to load reminder state',
+        e,
+        st,
+      );
+      if (mounted) {
+        setState(() {
+          _isLoadingReminder = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _showReminderConfigDialog() async {
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (context) => TicketReminderConfigDialog(
+        ticket: widget.ticket,
+        context: context,
+      ),
+    );
+
+    if ((result ?? false) && mounted) {
+      // Reload reminder state to reflect the saved changes
+      await _loadReminderState();
+    }
+  }
+
   Future<void> _deleteTicket() async {
     if (widget.ticket.ticketId == null) return;
 
@@ -190,6 +245,13 @@ class _TravelTicketViewState extends State<TravelTicketView> {
 
     try {
       await getIt<ITicketDAO>().deleteTicket(widget.ticket.ticketId!);
+
+      // Cancel all scheduled reminders and delete preferences for this ticket
+      if (Platform.isAndroid) {
+        await getIt<INotificationService>().cancelAllRemindersForTicket(
+          widget.ticket,
+        );
+      }
 
       // Notify listeners that ticket data changed
       getIt<TicketChangeNotifier>().notifyTicketChanged();
@@ -333,6 +395,30 @@ class _TravelTicketViewState extends State<TravelTicketView> {
         leading: const RoundedBackButton(),
         title: const Text('Ticket View'),
         actions: [
+          if (!_isLoadingReminder &&
+              widget.ticket.startTime != null &&
+              widget.ticket.startTime!.isAfter(DateTime.now()) &&
+              Platform.isAndroid)
+            Center(
+              child: CircleAvatar(
+                radius: 24,
+                backgroundColor: _reminderEnabled
+                    ? Theme.of(context).colorScheme.primary
+                    : Theme.of(context).colorScheme.surfaceContainer,
+                child: IconButton(
+                  onPressed: _showReminderConfigDialog,
+                  icon: Icon(
+                    Icons.notifications_active_outlined,
+                    size: 20,
+                    color: _reminderEnabled
+                        ? Colors.white
+                        : Theme.of(context).colorScheme.onSurface,
+                  ),
+                  tooltip: 'Reminder settings',
+                ),
+              ),
+            ),
+          const SizedBox(width: 8),
           Center(
             child: CircleAvatar(
               radius: 24,
