@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:home_widget/home_widget.dart';
@@ -247,7 +248,7 @@ class _TravelTicketViewState extends State<TravelTicketView> {
       await getIt<ITicketDAO>().deleteTicket(widget.ticket.ticketId!);
 
       // Cancel all scheduled reminders and delete preferences for this ticket
-      if (Platform.isAndroid) {
+      if (!kIsWeb && (Platform.isAndroid || Platform.isIOS)) {
         await getIt<INotificationService>().cancelAllRemindersForTicket(
           widget.ticket,
         );
@@ -398,7 +399,8 @@ class _TravelTicketViewState extends State<TravelTicketView> {
           if (!_isLoadingReminder &&
               widget.ticket.startTime != null &&
               widget.ticket.startTime!.isAfter(DateTime.now()) &&
-              Platform.isAndroid)
+              !kIsWeb &&
+              (Platform.isAndroid || Platform.isIOS))
             Center(
               child: CircleAvatar(
                 radius: 24,

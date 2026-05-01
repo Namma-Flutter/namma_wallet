@@ -160,7 +160,7 @@ Future<void> main() async {
     await getIt<IWidgetService>().initialize();
     logger?.success('Widget service initialized');
 
-    if (Platform.isAndroid) {
+    if (!kIsWeb && (Platform.isAndroid || Platform.isIOS)) {
       logger?.info('Initializing notification service...');
       await getIt<INotificationService>().initialize();
       logger?.success('Notification service initialized');

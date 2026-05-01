@@ -42,7 +42,7 @@ class ClipboardResultHandler {
         result.isSuccess &&
         result.type == ClipboardContentType.travelTicket &&
         !kIsWeb &&
-        Platform.isAndroid) {
+        (Platform.isAndroid || Platform.isIOS)) {
       unawaited(
         getIt<INotificationService>().scheduleTicketReminderFor(result.ticket!),
       );

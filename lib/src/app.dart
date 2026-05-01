@@ -97,7 +97,7 @@ class _NammaWalletAppState extends State<NammaWalletApp> {
 
     // If the app was launched by tapping a notification from a terminated state
     // handle navigation after the first frame when the navigator is available.
-    if (!kIsWeb && Platform.isAndroid) {
+    if (!kIsWeb && (Platform.isAndroid || Platform.isIOS)) {
       WidgetsBinding.instance.addPostFrameCallback((_) async {
         await getIt<INotificationService>()
             .handleInitialNotification()

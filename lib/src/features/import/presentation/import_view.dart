@@ -64,7 +64,7 @@ class _ImportViewState extends State<ImportView> {
       if (!mounted) return;
 
       if (ticket != null) {
-        if (!kIsWeb && Platform.isAndroid) {
+        if (!kIsWeb && (Platform.isAndroid || Platform.isIOS)) {
           unawaited(
             getIt<INotificationService>()
                 .scheduleTicketReminderFor(ticket)
@@ -164,7 +164,7 @@ class _ImportViewState extends State<ImportView> {
         if (!mounted) return;
 
         if (ticket != null) {
-          if (!kIsWeb && Platform.isAndroid) {
+          if (!kIsWeb && (Platform.isAndroid || Platform.isIOS)) {
             unawaited(
               getIt<INotificationService>()
                   .scheduleTicketReminderFor(ticket)

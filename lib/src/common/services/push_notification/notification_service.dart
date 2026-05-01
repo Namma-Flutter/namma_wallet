@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -39,23 +38,12 @@ class NotificationService implements INotificationService {
     return info.identifier;
   }
 
-  /// Checks if the POST_NOTIFICATIONS permission is granted.
-  /// On Android 13+, this permission is required to post notifications.
-  /// On earlier Android versions and other platforms, returns true.
   Future<bool> _isNotificationPermissionGranted() async {
-    if (!Platform.isAndroid) return true; // iOS handles this differently
-
     final status = await Permission.notification.status;
     return status.isGranted;
   }
 
-  /// Requests POST_NOTIFICATIONS permission on Android 13+.
-  /// Returns true if permission is granted or not needed, false if denied.
-  /// Note: On Android < 13, this returns true automatically as the permission
-  /// is not required.
   Future<bool> _requestNotificationPermission() async {
-    if (!Platform.isAndroid) return true;
-
     final status = await Permission.notification.request();
 
     if (_logger != null) {
@@ -98,15 +86,12 @@ class NotificationService implements INotificationService {
     const androidSettings = AndroidInitializationSettings(
       '@drawable/ic_notification_small',
     );
-    if (Platform.isAndroid) {
-      // Request POST_NOTIFICATIONS permission on Android 13+
-      final permissionGranted = await _requestNotificationPermission();
-      if (!permissionGranted) {
-        if (_logger != null) {
-          _logger?.info('Notification permission denied by user');
-        } else {
-          debugPrint('Notification permission denied by user');
-        }
+    final permissionGranted = await _requestNotificationPermission();
+    if (!permissionGranted) {
+      if (_logger != null) {
+        _logger?.info('Notification permission denied by user');
+      } else {
+        debugPrint('Notification permission denied by user');
       }
     }
     const iosSettings = DarwinInitializationSettings();
@@ -209,7 +194,11 @@ class NotificationService implements INotificationService {
       priority: Priority.high,
     );
 
-    const iosDetails = DarwinNotificationDetails();
+    const iosDetails = DarwinNotificationDetails(
+      presentAlert: true,
+      presentBadge: true,
+      presentSound: true,
+    );
 
     return const NotificationDetails(
       android: androidDetails,
