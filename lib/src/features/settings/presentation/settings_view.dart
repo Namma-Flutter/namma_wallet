@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -70,6 +71,18 @@ class _SettingsViewState extends State<SettingsView> {
               ThemeSectionWidget(themeProvider: themeProvider),
 
               const SizedBox(height: 8),
+
+              // Reminder Settings Section
+              if (!kIsWeb && Platform.isAndroid)
+                ProfileTile(
+                  icon: Icons.notifications_active_outlined,
+                  title: 'Reminder Settings',
+                  subtitle: 'Configure notification reminder intervals',
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () async {
+                    await context.pushNamed(AppRoute.reminderSettings.name);
+                  },
+                ),
 
               // Contributors Section
               ProfileTile(
