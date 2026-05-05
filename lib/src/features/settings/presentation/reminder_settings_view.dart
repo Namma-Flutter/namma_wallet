@@ -42,7 +42,6 @@ class _ReminderSettingsViewState extends State<ReminderSettingsView> {
     24,
   ];
 
-
   @override
   void initState() {
     super.initState();
@@ -378,14 +377,20 @@ class _ReminderSettingsViewState extends State<ReminderSettingsView> {
                                 children: _selectedIntervals.map((hour) {
                                   return Container(
                                     decoration: BoxDecoration(
-                                      color: Theme.of(
-                                        context,
-                                      ).colorScheme.primary.withValues(alpha: 0.1),
+                                      color:
+                                          Theme.of(
+                                            context,
+                                          ).colorScheme.primary.withValues(
+                                            alpha: 0.1,
+                                          ),
                                       borderRadius: BorderRadius.circular(20),
                                       border: Border.all(
-                                        color: Theme.of(
-                                          context,
-                                        ).colorScheme.primary.withValues(alpha: 0.3),
+                                        color:
+                                            Theme.of(
+                                              context,
+                                            ).colorScheme.primary.withValues(
+                                              alpha: 0.3,
+                                            ),
                                       ),
                                     ),
                                     padding: const EdgeInsets.symmetric(
