@@ -42,7 +42,6 @@ class _ReminderSettingsViewState extends State<ReminderSettingsView> {
     24,
   ];
 
-
   @override
   void initState() {
     super.initState();
@@ -351,43 +350,77 @@ class _ReminderSettingsViewState extends State<ReminderSettingsView> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
-                                'Reminders will be sent at:',
-                                style: Paragraph02(
-                                  color: Theme.of(
-                                    context,
-                                  ).colorScheme.onSurface,
-                                ).semiBold,
-                              ),
-                              const SizedBox(height: 12),
-                              ..._selectedIntervals.map((hour) {
-                                return Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 4,
+                              Row(
+                                children: [
+                                  Icon(
+                                    Icons.notifications_none_outlined,
+                                    size: 20,
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.primary,
                                   ),
-                                  child: Row(
-                                    children: [
-                                      Icon(
-                                        Icons.check_circle,
-                                        size: 18,
-                                        color: Theme.of(
-                                          context,
-                                        ).colorScheme.primary,
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    'Reminders will be sent at:',
+                                    style: Paragraph02(
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.onSurface,
+                                    ).semiBold,
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 16),
+                              Wrap(
+                                spacing: 8,
+                                runSpacing: 8,
+                                children: _selectedIntervals.map((hour) {
+                                  return Container(
+                                    decoration: BoxDecoration(
+                                      color:
+                                          Theme.of(
+                                            context,
+                                          ).colorScheme.primary.withValues(
+                                            alpha: 0.1,
+                                          ),
+                                      borderRadius: BorderRadius.circular(20),
+                                      border: Border.all(
+                                        color:
+                                            Theme.of(
+                                              context,
+                                            ).colorScheme.primary.withValues(
+                                              alpha: 0.3,
+                                            ),
                                       ),
-                                      const SizedBox(width: 8),
-                                      Text(
-                                        '$hour ${hour == 1 ? "hour" : "hours"} '
-                                        'before journey start time',
-                                        style: Paragraph02(
+                                    ),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 12,
+                                      vertical: 6,
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(
+                                          Icons.check_circle_outline,
+                                          size: 16,
                                           color: Theme.of(
                                             context,
-                                          ).colorScheme.onSurface,
-                                        ).regular,
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              }),
+                                          ).colorScheme.primary,
+                                        ),
+                                        const SizedBox(width: 6),
+                                        Text(
+                                          '$hour${hour == 1 ? " hr" : " hrs"}',
+                                          style: Paragraph03(
+                                            color: Theme.of(
+                                              context,
+                                            ).colorScheme.onSurface,
+                                          ).semiBold,
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                }).toList(),
+                              ),
                             ],
                           ),
                         ),
