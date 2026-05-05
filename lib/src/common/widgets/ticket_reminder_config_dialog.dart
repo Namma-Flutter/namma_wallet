@@ -587,18 +587,27 @@ class _TicketReminderConfigDialogState
 
                       // Custom DateTime Section
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
-                            'Custom Date & Time',
-                            style: Paragraph02(
-                              color: Theme.of(context).colorScheme.onSurface,
-                            ).semiBold,
+                          Expanded(
+                            child: Text(
+                              'Custom Date & Time',
+                              style: Paragraph02(
+                                color: Theme.of(context).colorScheme.onSurface,
+                              ).semiBold,
+                            ),
                           ),
-                          TextButton.icon(
-                            onPressed: _addCustomDateTime,
-                            icon: const Icon(Icons.add),
-                            label: const Text('Add'),
+                          SizedBox(
+                            height: 36,
+                            child: TextButton.icon(
+                              onPressed: _addCustomDateTime,
+                              icon: const Icon(Icons.add, size: 18),
+                              label: const Text('Add'),
+                              style: TextButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                ),
+                              ),
+                            ),
                           ),
                         ],
                       ),
