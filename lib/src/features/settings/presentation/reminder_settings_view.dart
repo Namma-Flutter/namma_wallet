@@ -42,7 +42,6 @@ class _ReminderSettingsViewState extends State<ReminderSettingsView> {
     24,
   ];
 
-
   @override
   void initState() {
     super.initState();

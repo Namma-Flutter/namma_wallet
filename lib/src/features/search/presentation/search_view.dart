@@ -82,7 +82,11 @@ class _SearchViewState extends State<SearchView>
         _isLoading = false;
       });
     } on Object catch (e, stackTrace) {
-      getIt<ILogger>().error('Failed to load tickets for search', e, stackTrace);
+      getIt<ILogger>().error(
+        'Failed to load tickets for search',
+        e,
+        stackTrace,
+      );
 
       if (!mounted) return;
       setState(() {
@@ -121,7 +125,8 @@ class _SearchViewState extends State<SearchView>
       final ticketType = ticket.type?.name.toLowerCase() ?? '';
 
       // Also search in extras (PNR, fare, provider, etc.)
-      final extrasMatch = ticket.extras?.any(
+      final extrasMatch =
+          ticket.extras?.any(
             (extra) =>
                 (extra.title?.toLowerCase().contains(trimmedQuery) ?? false) ||
                 (extra.value?.toLowerCase().contains(trimmedQuery) ?? false),
@@ -173,8 +178,8 @@ class _SearchViewState extends State<SearchView>
               child: _isLoading
                   ? const Center(child: CircularProgressIndicator())
                   : _hasSearched
-                      ? _buildSearchResults(theme)
-                      : _buildSearchSuggestions(theme),
+                  ? _buildSearchResults(theme)
+                  : _buildSearchSuggestions(theme),
             ),
           ],
         ),
@@ -243,14 +248,12 @@ class _SearchViewState extends State<SearchView>
                   hintText: 'Search by from, to, transport...',
                   hintStyle: TextStyle(
                     fontSize: 15,
-                    color:
-                        theme.colorScheme.onSurface.withValues(alpha: 0.4),
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
                     fontWeight: FontWeight.w400,
                   ),
                   prefixIcon: Icon(
                     Icons.search_rounded,
-                    color:
-                        theme.colorScheme.onSurface.withValues(alpha: 0.4),
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
                     size: 22,
                   ),
                   suffixIcon: _searchController.text.isNotEmpty
@@ -258,8 +261,9 @@ class _SearchViewState extends State<SearchView>
                           onPressed: _clearSearch,
                           icon: Icon(
                             Icons.close_rounded,
-                            color: theme.colorScheme.onSurface
-                                .withValues(alpha: 0.4),
+                            color: theme.colorScheme.onSurface.withValues(
+                              alpha: 0.4,
+                            ),
                             size: 20,
                           ),
                           splashRadius: 20,
@@ -416,8 +420,7 @@ class _SearchViewState extends State<SearchView>
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
-                    color:
-                        theme.colorScheme.onSurface.withValues(alpha: 0.35),
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.35),
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -425,8 +428,7 @@ class _SearchViewState extends State<SearchView>
                   'Search by from, to, PNR, transport type...',
                   style: TextStyle(
                     fontSize: 13,
-                    color:
-                        theme.colorScheme.onSurface.withValues(alpha: 0.25),
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.25),
                   ),
                 ),
               ],

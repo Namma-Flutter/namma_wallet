@@ -283,29 +283,34 @@ void main() {
       expect(vehicleNo, equals('TN01AB1234'));
     });
 
-    test('should parse alternative TNSTC SMS format with Date and Route keywords', () {
-      const smsText =
-          'TNSTC E-Ticket\n'
-          'PNR: T87654321\n'
-          'Route: CHENNAI to MADURAI\n'
-          'Date: 25/11/2024\n'
-          'Time: 22:30\n'
-          'Passenger: JOHN DOE\n'
-          'Fare: 850.00';
+    test(
+      'should parse alternative TNSTC SMS format with Date and Route keywords',
+      () {
+        const smsText =
+            'TNSTC E-Ticket\n'
+            'PNR: T87654321\n'
+            'Route: CHENNAI to MADURAI\n'
+            'Date: 25/11/2024\n'
+            'Time: 22:30\n'
+            'Passenger: JOHN DOE\n'
+            'Fare: 850.00';
 
-      final ticket = parser.parseTicket(smsText);
+        final ticket = parser.parseTicket(smsText);
 
-      expect(ticket, isNotNull);
-      expect(ticket.primaryText, equals('CHENNAI → MADURAI'));
-      expect(ticket.startTime?.year, equals(2024));
-      expect(ticket.startTime?.month, equals(11));
-      expect(ticket.startTime?.day, equals(25));
-      expect(ticket.startTime?.hour, equals(22));
-      expect(ticket.startTime?.minute, equals(30));
+        expect(ticket, isNotNull);
+        expect(ticket.primaryText, equals('CHENNAI → MADURAI'));
+        expect(ticket.startTime?.year, equals(2024));
+        expect(ticket.startTime?.month, equals(11));
+        expect(ticket.startTime?.day, equals(25));
+        expect(ticket.startTime?.hour, equals(22));
+        expect(ticket.startTime?.minute, equals(30));
 
-      final pnrTag = ticket.tags?.firstWhere((t) => t.icon == 'qr_code').value;
-      expect(pnrTag, equals('T87654321'));
-    });
+        final pnrTag = ticket.tags
+            ?.firstWhere((t) => t.icon == 'qr_code')
+            .value;
+        expect(pnrTag, equals('T87654321'));
+      },
+    );
 
     test('should not show passenger name and age for SMS tickets', () {
       const smsText =

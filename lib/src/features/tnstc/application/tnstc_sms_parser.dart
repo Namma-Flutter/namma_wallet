@@ -65,7 +65,10 @@ class TNSTCSMSParser extends TravelSMSParser {
 
       // Fallback for Route: X to Y format
       if (from.isEmpty && to.isEmpty) {
-        final routeMatch = RegExp(r'Route\s*:\s*(.*?)\s+to\s+([^,\n]+)', caseSensitive: false).firstMatch(smsText);
+        final routeMatch = RegExp(
+          r'Route\s*:\s*(.*?)\s+to\s+([^,\n]+)',
+          caseSensitive: false,
+        ).firstMatch(smsText);
         if (routeMatch != null) {
           from = routeMatch.group(1)!.trim();
           to = routeMatch.group(2)!.trim();

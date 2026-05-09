@@ -29,7 +29,6 @@ class Ticket with TicketMappable {
     this.archivedAt,
   });
 
-
   factory Ticket.fromTNSTC(
     TNSTCTicketModel model, {
     String sourceType = 'PDF',

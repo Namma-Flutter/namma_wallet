@@ -172,17 +172,15 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
                         color: Theme.of(context).colorScheme.surface,
                         borderRadius: BorderRadius.circular(14),
                         border: Border.all(
-                          color: Theme.of(context)
-                              .colorScheme
-                              .outline
-                              .withValues(alpha: 0.15),
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.outline.withValues(alpha: 0.15),
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: Theme.of(context)
-                                .colorScheme
-                                .primary
-                                .withValues(alpha: 0.04),
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.primary.withValues(alpha: 0.04),
                             blurRadius: 6,
                             offset: const Offset(0, 2),
                           ),
@@ -192,10 +190,9 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
                         children: [
                           Icon(
                             Icons.search_rounded,
-                            color: Theme.of(context)
-                                .colorScheme
-                                .onSurface
-                                .withValues(alpha: 0.4),
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurface.withValues(alpha: 0.4),
                             size: 22,
                           ),
                           const SizedBox(width: 10),
@@ -204,20 +201,18 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
                               'Search tickets...',
                               style: TextStyle(
                                 fontSize: 15,
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .onSurface
-                                    .withValues(alpha: 0.4),
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.onSurface.withValues(alpha: 0.4),
                                 fontWeight: FontWeight.w400,
                               ),
                             ),
                           ),
                           Icon(
                             Icons.tune_rounded,
-                            color: Theme.of(context)
-                                .colorScheme
-                                .onSurface
-                                .withValues(alpha: 0.3),
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurface.withValues(alpha: 0.3),
                             size: 20,
                           ),
                         ],

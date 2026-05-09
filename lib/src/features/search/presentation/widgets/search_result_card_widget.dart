@@ -47,8 +47,9 @@ class SearchResultCardWidget extends StatelessWidget {
 
     // Transport type
     if (ticket.type != null) {
-      parts.add(ticket.type!.name[0].toUpperCase() +
-          ticket.type!.name.substring(1));
+      parts.add(
+        ticket.type!.name[0].toUpperCase() + ticket.type!.name.substring(1),
+      );
     }
 
     // Secondary text (train number, class, etc.)
@@ -118,8 +119,9 @@ class SearchResultCardWidget extends StatelessWidget {
                         fontWeight: FontWeight.w600,
                         color: theme.colorScheme.onSurface,
                       ),
-                      highlightColor: theme.colorScheme.primary
-                          .withValues(alpha: 0.15),
+                      highlightColor: theme.colorScheme.primary.withValues(
+                        alpha: 0.15,
+                      ),
                       maxLines: 1,
                     ),
 
@@ -130,11 +132,13 @@ class SearchResultCardWidget extends StatelessWidget {
                         query: searchQuery,
                         style: TextStyle(
                           fontSize: 13,
-                          color: theme.colorScheme.onSurface
-                              .withValues(alpha: 0.55),
+                          color: theme.colorScheme.onSurface.withValues(
+                            alpha: 0.55,
+                          ),
                         ),
-                        highlightColor: theme.colorScheme.primary
-                            .withValues(alpha: 0.1),
+                        highlightColor: theme.colorScheme.primary.withValues(
+                          alpha: 0.1,
+                        ),
                         maxLines: 1,
                       ),
                     ],
@@ -177,8 +181,12 @@ class _HighlightedText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (query.isEmpty) {
-      return Text(text, style: style, maxLines: maxLines,
-          overflow: TextOverflow.ellipsis);
+      return Text(
+        text,
+        style: style,
+        maxLines: maxLines,
+        overflow: TextOverflow.ellipsis,
+      );
     }
 
     final lowerText = text.toLowerCase();
