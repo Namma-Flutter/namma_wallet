@@ -23,6 +23,9 @@ enum AppRoute {
   license(path: '/license', name: 'license'),
   contributors(path: '/contributors', name: 'contributors'),
 
+  // Search
+  search(path: '/search', name: 'search'),
+
   // Debug routes
   dbViewer(path: '/db-viewer', name: 'dbViewer')
   ;

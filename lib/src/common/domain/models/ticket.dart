@@ -80,6 +80,7 @@ class Ticket with TicketMappable {
             )
           : null,
       location: model.boardingStation,
+      type: TicketType.train,
       tags: [
         TagModel(value: model.pnrNumber, icon: 'confirmation_number'),
         if (model.trainNumber.isNotNullOrEmpty)

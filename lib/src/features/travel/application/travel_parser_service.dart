@@ -353,6 +353,17 @@ class TravelParserService implements ITravelParser {
 
           final ticket = parser.parseTicket(text);
 
+          // The database schema strictly requires startTime and type.
+          // If the parser failed to extract these, we gracefully return null
+          // instead of causing a SQLite NOT NULL constraint crash.
+          if (ticket.startTime == null || ticket.type == null) {
+            _logger.warning(
+              '[TravelParserService] Parsed ticket missing required DB fields '
+              '(startTime or type). Treating as invalid.',
+            );
+            return null;
+          }
+
           _logger.info(
             '[TravelParserService] Successfully parsed ticket with '
             '${parser.providerName}',
@@ -383,16 +394,9 @@ class TravelParserService implements ITravelParser {
         '[TravelParserService] No parser could handle the text',
       );
       return null;
-    } on FormatException catch (e, stackTrace) {
+    } catch (e, stackTrace) {
       _logger.error(
-        '[TravelParserService] Format error during ticket parsing',
-        e,
-        stackTrace,
-      );
-      return null;
-    } on Exception catch (e, stackTrace) {
-      _logger.error(
-        '[TravelParserService] Unexpected error during ticket parsing',
+        '[TravelParserService] Error during ticket parsing: $e',
         e,
         stackTrace,
       );

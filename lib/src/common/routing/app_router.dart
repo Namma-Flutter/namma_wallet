@@ -17,6 +17,7 @@ import 'package:namma_wallet/src/features/profile/presentation/db_viewer_view.da
 import 'package:namma_wallet/src/features/profile/presentation/license_view.dart';
 import 'package:namma_wallet/src/features/profile/presentation/profile_view.dart';
 import 'package:namma_wallet/src/features/receive/presentation/share_success_view.dart';
+import 'package:namma_wallet/src/features/search/presentation/search_view.dart';
 import 'package:namma_wallet/src/features/travel/presentation/travel_ticket_view.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>(
@@ -120,6 +121,11 @@ final router = GoRouter(
               },
         );
       },
+    ),
+    GoRoute(
+      path: AppRoute.search.path,
+      name: AppRoute.search.name,
+      builder: (context, state) => const SearchView(),
     ),
     GoRoute(
       path: AppRoute.dbViewer.path,
