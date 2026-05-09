@@ -36,6 +36,18 @@ class StubTicketDAO implements ITicketDAO {
     String ticketId,
     Ticket ticket, // Updated from Map to Ticket
   ) async => 0;
+
+  @override
+  Future<List<Ticket>> getActiveTickets() async => tickets;
+
+  @override
+  Future<List<Ticket>> getArchivedTickets() async => [];
+
+  @override
+  Future<int> archivePastTickets() async => 0;
+
+  @override
+  Future<int> purgeOldArchivedTickets({int retentionDays = 30}) async => 0;
 }
 
 void main() {
@@ -140,4 +152,141 @@ void main() {
       },
     );
   });
+
+  group('CalendarProvider single-day operations', () {
+    Ticket ticketAt(String id, DateTime when) => Ticket(
+      ticketId: id,
+      primaryText: 'A → B',
+      secondaryText: 'Bus',
+      location: 'A',
+      startTime: when,
+    );
+
+    test('setSelectedDay updates the selected day and clears range', () {
+      provider
+        ..setSelectedRange(
+          DateTimeRange(
+            start: DateTime(2024),
+            end: DateTime(2024, 1, 5),
+          ),
+        )
+        ..setSelectedDay(DateTime(2024, 6, 15));
+
+      expect(provider.selectedDay, DateTime(2024, 6, 15));
+      expect(provider.selectedRange, isNull);
+    });
+
+    test('setSelectedRange aligns selectedDay to range start', () {
+      final range = DateTimeRange(
+        start: DateTime(2024, 6, 10),
+        end: DateTime(2024, 6, 20),
+      );
+
+      provider.setSelectedRange(range);
+
+      expect(provider.selectedRange, equals(range));
+      expect(provider.selectedDay, DateTime(2024, 6, 10));
+    });
+
+    test('setSelectedRange(null) leaves selectedDay alone', () {
+      provider
+        ..setSelectedDay(DateTime(2024, 6, 15))
+        ..setSelectedRange(null);
+
+      expect(provider.selectedRange, isNull);
+      expect(provider.selectedDay, DateTime(2024, 6, 15));
+    });
+
+    test('getTicketsForDay only returns tickets matching the day', () async {
+      final day = DateTime(2024, 6, 15);
+      stubTicketDao.tickets = [
+        ticketAt('A', DateTime(2024, 6, 15, 10)),
+        ticketAt('B', DateTime(2024, 6, 15, 23, 59)),
+        ticketAt('C', DateTime(2024, 6, 16)),
+      ];
+      await provider.loadTickets();
+
+      final hits = provider.getTicketsForDay(day);
+      expect(hits.map((t) => t.ticketId), containsAll(['A', 'B']));
+      expect(hits.map((t) => t.ticketId), isNot(contains('C')));
+    });
+
+    test('getTicketsForDay skips tickets without startTime', () async {
+      stubTicketDao.tickets = [
+        const Ticket(ticketId: 'NO_TIME', primaryText: 'No time'),
+      ];
+      await provider.loadTickets();
+
+      expect(provider.getTicketsForDay(DateTime(2024, 6, 15)), isEmpty);
+    });
+
+    test('hasTicketsOnDay reflects getTicketsForDay', () async {
+      stubTicketDao.tickets = [ticketAt('A', DateTime(2024, 6, 15))];
+      await provider.loadTickets();
+
+      expect(provider.hasTicketsOnDay(DateTime(2024, 6, 15)), isTrue);
+      expect(provider.hasTicketsOnDay(DateTime(2024, 6, 16)), isFalse);
+    });
+
+    test(
+      'getDatesWithTickets de-duplicates by date and skips null start times',
+      () async {
+        stubTicketDao.tickets = [
+          ticketAt('A', DateTime(2024, 6, 15, 10)),
+          ticketAt('B', DateTime(2024, 6, 15, 22)),
+          ticketAt('C', DateTime(2024, 6, 16)),
+          const Ticket(ticketId: 'NO_TIME'),
+        ];
+        await provider.loadTickets();
+
+        expect(
+          provider.getDatesWithTickets(),
+          unorderedEquals([DateTime(2024, 6, 15), DateTime(2024, 6, 16)]),
+        );
+      },
+    );
+
+    test(
+      'getEventsForDay / getEventsForRange return empty by default',
+      () async {
+        await provider.loadEvents();
+        expect(provider.events, isEmpty);
+        expect(provider.getEventsForDay(DateTime(2024, 6, 15)), isEmpty);
+        expect(
+          provider.getEventsForRange(
+            DateTimeRange(start: DateTime(2024), end: DateTime(2024, 12, 31)),
+          ),
+          isEmpty,
+        );
+      },
+    );
+  });
+
+  group('CalendarProvider error handling', () {
+    test(
+      'loadTickets sets errorMessage when DAO throws',
+      () async {
+        stubTicketDao.tickets = [];
+
+        final throwing = _ThrowingTicketDao();
+        await getIt.reset();
+        getIt
+          ..registerSingleton<ILogger>(fakeLogger)
+          ..registerSingleton<ITicketDAO>(throwing);
+        provider = CalendarProvider(logger: fakeLogger);
+
+        await provider.loadTickets();
+
+        expect(provider.errorMessage, contains('Failed to load tickets'));
+        expect(provider.tickets, isEmpty);
+      },
+    );
+  });
+}
+
+class _ThrowingTicketDao extends StubTicketDAO {
+  @override
+  Future<List<Ticket>> getAllTickets() async {
+    throw Exception('db down');
+  }
 }

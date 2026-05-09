@@ -1,3 +1,4 @@
+// coverage:ignore-file
 import 'package:flutter_gemma/core/api/flutter_gemma.dart';
 import 'package:flutter_gemma/core/model.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';

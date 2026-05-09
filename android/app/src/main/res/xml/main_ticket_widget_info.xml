@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:description="@string/app_name"
+    android:initialLayout="@layout/main_ticket_widget"
     android:minWidth="260dp"
     android:minHeight="180dp"
     android:minResizeWidth="200dp"
     android:minResizeHeight="200dp"
-    android:updatePeriodMillis="0"
-    android:resizeMode="vertical|horizontal"
-    android:widgetCategory="home_screen"
-    android:initialLayout="@layout/main_ticket_widget"
     android:previewImage="@drawable/ic_ticket"
-    android:description="@string/app_name" />
+    android:resizeMode="vertical|horizontal"
+    android:updatePeriodMillis="0"
+    android:widgetCategory="home_screen" />

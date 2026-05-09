@@ -17,14 +17,14 @@ class TicketListWidgetProvider : AppWidgetProvider() {
         private const val TAG = "TicketListWidget"
         const val ACTION_UNPIN = "com.nammaflutter.nammawallet.UNPIN_TICKET"
         const val EXTRA_TICKET_INDEX = "ticket_index"
-        
+
         fun updateWidget(
             context: Context,
             manager: AppWidgetManager,
             widgetId: Int
         ) {
             Log.d(TAG, "Updating widget $widgetId")
-            
+
             val views = RemoteViews(context.packageName, R.layout.ticket_list_widget)
 
             // Set RemoteViews adapter for ListView
@@ -53,9 +53,9 @@ class TicketListWidgetProvider : AppWidgetProvider() {
 
     override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context, intent)
-        
+
         Log.d(TAG, "onReceive: ${intent.action}")
-        
+
         // Handle UNPIN action
         if (intent.action == ACTION_UNPIN) {
             val index = intent.getIntExtra(EXTRA_TICKET_INDEX, -1)
@@ -64,16 +64,16 @@ class TicketListWidgetProvider : AppWidgetProvider() {
             }
             return
         }
-        
+
         // Handle custom UPDATE_TICKET_LIST action from Flutter
         if (intent.action == "com.nammaflutter.nammawallet.UPDATE_TICKET_LIST") {
             val manager = AppWidgetManager.getInstance(context)
             val widgetIds = manager.getAppWidgetIds(
                 ComponentName(context, TicketListWidgetProvider::class.java)
             )
-            
+
             Log.d(TAG, "Updating ${widgetIds.size} widget instances")
-            
+
             // Update all widget instances
             for (widgetId in widgetIds) {
                 updateWidget(context, manager, widgetId)
@@ -127,7 +127,7 @@ class TicketListWidgetProvider : AppWidgetProvider() {
         appWidgetIds: IntArray
     ) {
         Log.d(TAG, "onUpdate called for ${appWidgetIds.size} widgets")
-        
+
         // Update each widget instance
         for (widgetId in appWidgetIds) {
             updateWidget(context, appWidgetManager, widgetId)

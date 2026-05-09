@@ -510,7 +510,7 @@ void main() {
       group('parseInt - Error Scenarios', () {
         test(
           'Given empty string, When parsing int, '
-          'Then returns default value',
+          'Then returns null',
           () {
             // Arrange (Given)
             const value = '';
@@ -519,13 +519,13 @@ void main() {
             final result = TravelTextParserUtils.parseInt(value);
 
             // Assert (Then)
-            expect(result, equals(0));
+            expect(result, isNull);
           },
         );
 
         test(
           'Given invalid integer string, When parsing int, '
-          'Then returns default value',
+          'Then returns null',
           () {
             // Arrange (Given)
             const value = 'abc';
@@ -534,32 +534,13 @@ void main() {
             final result = TravelTextParserUtils.parseInt(value);
 
             // Assert (Then)
-            expect(result, equals(0));
-          },
-        );
-
-        test(
-          'Given invalid integer with custom default, When parsing int, '
-          'Then returns custom default value',
-          () {
-            // Arrange (Given)
-            const value = 'xyz';
-            const defaultValue = 999;
-
-            // Act (When)
-            final result = TravelTextParserUtils.parseInt(
-              value,
-              defaultValue: defaultValue,
-            );
-
-            // Assert (Then)
-            expect(result, equals(999));
+            expect(result, isNull);
           },
         );
 
         test(
           'Given double string, When parsing int, '
-          'Then returns default value',
+          'Then returns null',
           () {
             // Arrange (Given)
             const value = '12.34';
@@ -568,7 +549,7 @@ void main() {
             final result = TravelTextParserUtils.parseInt(value);
 
             // Assert (Then)
-            expect(result, equals(0));
+            expect(result, isNull);
           },
         );
       });
@@ -638,7 +619,7 @@ void main() {
       group('parseDouble - Error Scenarios', () {
         test(
           'Given empty string, When parsing double, '
-          'Then returns default value',
+          'Then returns null',
           () {
             // Arrange (Given)
             const value = '';
@@ -647,13 +628,13 @@ void main() {
             final result = TravelTextParserUtils.parseDouble(value);
 
             // Assert (Then)
-            expect(result, equals(0.0));
+            expect(result, isNull);
           },
         );
 
         test(
           'Given invalid double string, When parsing double, '
-          'Then returns default value',
+          'Then returns null',
           () {
             // Arrange (Given)
             const value = 'abc';
@@ -662,26 +643,7 @@ void main() {
             final result = TravelTextParserUtils.parseDouble(value);
 
             // Assert (Then)
-            expect(result, equals(0.0));
-          },
-        );
-
-        test(
-          'Given invalid double with custom default, When parsing double, '
-          'Then returns custom default value',
-          () {
-            // Arrange (Given)
-            const value = 'xyz';
-            const defaultValue = 99.9;
-
-            // Act (When)
-            final result = TravelTextParserUtils.parseDouble(
-              value,
-              defaultValue: defaultValue,
-            );
-
-            // Assert (Then)
-            expect(result, equals(99.9));
+            expect(result, isNull);
           },
         );
       });

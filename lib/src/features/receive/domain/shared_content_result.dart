@@ -25,7 +25,9 @@ class TicketCreatedResult extends SharedContentResult
     required this.to,
     required this.fare,
     required this.date,
+    this.ticketId,
     this.warning,
+    this.isArchived = false,
   });
 
   final String? pnrNumber;
@@ -33,7 +35,12 @@ class TicketCreatedResult extends SharedContentResult
   final String? to;
   final String? fare;
   final String? date;
+  final String? ticketId;
   final String? warning;
+  // Set when the parsed ticket's relevant time has already passed.
+  // Drives navigation to the archived list — independent of `warning` so
+  // that wording changes never break control flow.
+  final bool isArchived;
 }
 
 /// Result when an existing ticket is updated

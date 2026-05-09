@@ -6,6 +6,7 @@ import 'package:namma_wallet/src/features/clipboard/application/clipboard_servic
 import 'package:namma_wallet/src/features/clipboard/domain/clipboard_content_type.dart';
 import 'package:namma_wallet/src/features/clipboard/domain/clipboard_repository_interface.dart';
 import 'package:namma_wallet/src/features/travel/application/travel_parser_interface.dart';
+import 'package:namma_wallet/src/features/travel/domain/ticket_update_info.dart';
 
 import '../../../../helpers/fake_logger.dart';
 
@@ -100,6 +101,18 @@ class MockTicketDao implements ITicketDAO {
 
   @override
   Future<int> deleteTicket(String id) async => 1;
+
+  @override
+  Future<List<Ticket>> getActiveTickets() async => [];
+
+  @override
+  Future<List<Ticket>> getArchivedTickets() async => [];
+
+  @override
+  Future<int> archivePastTickets() async => 0;
+
+  @override
+  Future<int> purgeOldArchivedTickets({int retentionDays = 30}) async => 0;
 }
 
 void main() {

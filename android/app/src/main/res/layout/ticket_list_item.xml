@@ -9,9 +9,9 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@drawable/widget_background"
         android:orientation="horizontal"
-        android:padding="12dp"
-        android:background="@drawable/widget_background">
+        android:padding="12dp">
 
         <!-- TYPE ICON -->
         <ImageView
@@ -19,16 +19,16 @@
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_gravity="center_vertical"
-            android:src="@drawable/ic_ticket"
-            android:contentDescription="Ticket type icon" />
+            android:contentDescription="Ticket type icon"
+            android:src="@drawable/ic_ticket" />
 
         <!-- TICKET INFO CONTAINER -->
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:layout_marginStart="12dp"
             android:layout_marginEnd="8dp"
+            android:layout_weight="1"
             android:orientation="vertical">
 
             <!-- PRIMARY TEXT -->
@@ -36,12 +36,12 @@
                 android:id="@+id/primaryText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="IRCTC Train Ticket"
-                android:textSize="15sp"
-                android:textStyle="bold"
-                android:textColor="#222222"
+                android:ellipsize="end"
                 android:maxLines="1"
-                android:ellipsize="end" />
+                android:text="IRCTC Train Ticket"
+                android:textColor="#222222"
+                android:textSize="15sp"
+                android:textStyle="bold" />
 
             <!-- LOCATION TEXT -->
             <TextView
@@ -49,11 +49,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
+                android:ellipsize="end"
+                android:maxLines="1"
                 android:text="Chennai → Bangalore"
                 android:textColor="#666666"
-                android:textSize="13sp"
-                android:maxLines="1"
-                android:ellipsize="end" />
+                android:textSize="13sp" />
 
             <!-- START TIME -->
             <TextView
@@ -61,11 +61,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
+                android:ellipsize="end"
+                android:maxLines="1"
                 android:text="10:00 AM, Dec 25"
                 android:textColor="#444444"
-                android:textSize="12sp"
-                android:maxLines="1"
-                android:ellipsize="end" />
+                android:textSize="12sp" />
 
             <!-- PROVIDER TEXT -->
             <TextView
@@ -73,16 +73,16 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
+                android:background="#F0F0F0"
+                android:maxLines="1"
+                android:paddingStart="6dp"
+                android:paddingTop="2dp"
+                android:paddingEnd="6dp"
+                android:paddingBottom="2dp"
                 android:text="IRCTC"
                 android:textColor="#666666"
                 android:textSize="11sp"
-                android:textStyle="bold"
-                android:maxLines="1"
-                android:paddingStart="6dp"
-                android:paddingEnd="6dp"
-                android:paddingTop="2dp"
-                android:paddingBottom="2dp"
-                android:background="#F0F0F0" />
+                android:textStyle="bold" />
 
         </LinearLayout>
 
@@ -92,10 +92,10 @@
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:layout_gravity="center_vertical"
-            android:src="@drawable/ic_pin"
             android:clickable="true"
+            android:contentDescription="Unpin ticket"
             android:focusable="true"
-            android:contentDescription="Unpin ticket" />
+            android:src="@drawable/ic_pin" />
 
     </LinearLayout>
 

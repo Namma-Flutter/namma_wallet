@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:namma_wallet/src/common/routing/app_routes.dart';
+import 'package:namma_wallet/src/common/services/archive/ticket_archive.dart';
 import 'package:namma_wallet/src/features/receive/domain/shared_content_result.dart';
 
 /// Handles share result navigation and UI feedback
@@ -14,29 +15,27 @@ class ShareHandler {
   final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey;
 
   /// Handle the result of shared content processing
-  void handleResult(SharedContentResult result) {
+  Future<void> handleResult(SharedContentResult result) async {
     switch (result) {
       case TicketCreatedResult(
-        :final pnrNumber,
-        :final from,
-        :final to,
-        :final fare,
-        :final date,
+        :final ticketId,
         :final warning,
+        :final isArchived,
       ):
         if (warning != null) {
           handleWarning(warning);
         }
-        router.go(
-          AppRoute.shareSuccess.path,
-          extra: {
-            'pnrNumber': pnrNumber,
-            'from': from,
-            'to': to,
-            'fare': fare,
-            'date': date,
-          },
-        );
+        if (isArchived) {
+          router.go(AppRoute.home.path);
+          await router.push(archivedTicketsLocation());
+          return;
+        }
+        if (ticketId != null) {
+          router.go(AppRoute.home.path);
+          await router.push('/ticket/$ticketId');
+        } else {
+          router.go(AppRoute.home.path);
+        }
 
       case TicketUpdatedResult(:final pnrNumber, :final updateType):
         // Reuse share success screen with update-specific values

@@ -5,6 +5,7 @@ import 'package:namma_wallet/src/common/database/ticket_dao_interface.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 import 'package:namma_wallet/src/common/routing/app_routes.dart';
+import 'package:namma_wallet/src/common/services/archive/ticket_archive.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
 import 'package:namma_wallet/src/features/bottom_navigation/presentation/namma_navigation_bar.dart';
 import 'package:namma_wallet/src/features/calendar/presentation/calendar_view.dart';
@@ -12,15 +13,17 @@ import 'package:namma_wallet/src/features/export/presentation/export_view.dart';
 import 'package:namma_wallet/src/features/home/presentation/all_tickets_view.dart';
 import 'package:namma_wallet/src/features/home/presentation/home_view.dart';
 import 'package:namma_wallet/src/features/import/presentation/import_view.dart';
-import 'package:namma_wallet/src/features/profile/presentation/contributors_view.dart';
-import 'package:namma_wallet/src/features/profile/presentation/db_viewer_view.dart';
-import 'package:namma_wallet/src/features/profile/presentation/license_view.dart';
-import 'package:namma_wallet/src/features/profile/presentation/profile_view.dart';
 import 'package:namma_wallet/src/features/receive/presentation/share_success_view.dart';
 import 'package:namma_wallet/src/features/search/presentation/search_view.dart';
+import 'package:namma_wallet/src/features/settings/presentation/contributors_view.dart';
+import 'package:namma_wallet/src/features/settings/presentation/db_viewer_view.dart';
+import 'package:namma_wallet/src/features/settings/presentation/license_view.dart';
+import 'package:namma_wallet/src/features/settings/presentation/ocr_debug_view.dart';
+import 'package:namma_wallet/src/features/settings/presentation/reminder_settings_view.dart';
+import 'package:namma_wallet/src/features/settings/presentation/settings_view.dart';
 import 'package:namma_wallet/src/features/travel/presentation/travel_ticket_view.dart';
 
-final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>(
+final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>(
   debugLabel: 'root',
 );
 final GlobalKey<NavigatorState> _shellNavigatorKey = GlobalKey<NavigatorState>(
@@ -28,7 +31,7 @@ final GlobalKey<NavigatorState> _shellNavigatorKey = GlobalKey<NavigatorState>(
 );
 
 final router = GoRouter(
-  navigatorKey: _rootNavigatorKey,
+  navigatorKey: rootNavigatorKey,
   onException: (context, state, _) {
     getIt<ILogger>().error(
       'Navigation exception: ${state.uri}',
@@ -82,9 +85,13 @@ final router = GoRouter(
       name: AppRoute.ticketView.name,
       builder: (context, state) {
         final ticketId = state.pathParameters['id'];
+        final openedFromImport = state.uri.queryParameters['fromImport'] == '1';
 
         if (ticketId != null && ticketId.isNotEmpty) {
-          return _TicketViewLoader(ticketId: ticketId);
+          return _TicketViewLoader(
+            ticketId: ticketId,
+            openedFromImport: openedFromImport,
+          );
         }
 
         return const Scaffold(
@@ -95,12 +102,20 @@ final router = GoRouter(
     GoRoute(
       path: AppRoute.allTickets.path,
       name: AppRoute.allTickets.name,
-      builder: (context, state) => const AllTicketsView(),
+      builder: (context, state) => AllTicketsView(
+        showArchived:
+            state.uri.queryParameters[archiveQueryKey] == archiveQueryValue,
+      ),
     ),
     GoRoute(
-      path: AppRoute.profile.path,
-      name: AppRoute.profile.name,
-      builder: (context, state) => const ProfileView(),
+      path: AppRoute.settings.path,
+      name: AppRoute.settings.name,
+      builder: (context, state) => const SettingsView(),
+    ),
+    GoRoute(
+      path: AppRoute.reminderSettings.path,
+      name: AppRoute.reminderSettings.name,
+      builder: (context, state) => const ReminderSettingsView(),
     ),
     GoRoute(
       path: AppRoute.barcodeScanner.path,
@@ -131,6 +146,11 @@ final router = GoRouter(
       path: AppRoute.dbViewer.path,
       name: AppRoute.dbViewer.name,
       builder: (context, state) => const DbViewerView(),
+    ),
+    GoRoute(
+      path: AppRoute.ocrDebug.path,
+      name: AppRoute.ocrDebug.name,
+      builder: (context, state) => const OCRDebugView(),
     ),
     GoRoute(
       path: AppRoute.license.path,
@@ -166,9 +186,13 @@ final router = GoRouter(
 
 // Widget to load ticket by ID asynchronously
 class _TicketViewLoader extends StatelessWidget {
-  const _TicketViewLoader({required this.ticketId});
+  const _TicketViewLoader({
+    required this.ticketId,
+    required this.openedFromImport,
+  });
 
   final String ticketId;
+  final bool openedFromImport;
 
   @override
   Widget build(BuildContext context) {
@@ -196,7 +220,10 @@ class _TicketViewLoader extends StatelessWidget {
           );
         }
 
-        return TravelTicketView(ticket: ticket);
+        return TravelTicketView(
+          ticket: ticket,
+          openedFromImport: openedFromImport,
+        );
       },
     );
   }

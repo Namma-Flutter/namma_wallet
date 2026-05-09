@@ -1,0 +1,123 @@
+default_platform(:android)
+
+platform :android do
+  # Prevent Fastlane from regenerating README.md on every run
+  skip_docs
+
+  # Load environment variables from .env.local
+  if File.exist?('.env.local')
+    Dotenv.load('.env.local')
+  end
+
+  # Shared helpers
+
+  def pubspec_version_info
+    require 'yaml'
+    version_string = YAML.load_file("../../pubspec.yaml")['version']
+    UI.user_error!("Missing 'version' in pubspec.yaml") if version_string.nil? || version_string.empty?
+    parts = version_string.split('+')
+    UI.user_error!("pubspec.yaml version '#{version_string}' is missing build number (expected format: x.y.z+n)") unless parts.length == 2
+    { version: parts[0], version_code: parts[1].to_i }
+  end
+
+  def changelog(version, version_code)
+    changelog_path = "./metadata/en-US/release_notes.txt"
+    File.exist?(changelog_path) ? File.read(changelog_path) : "Beta build v#{version} (#{version_code})"
+  end
+
+  desc "Build and upload to namma-flutter-int-track"
+  lane :beta do
+    info = pubspec_version_info
+    version = info[:version]
+    version_code = info[:version_code]
+
+    UI.message("Using version from pubspec.yaml: #{version}+#{version_code}")
+
+    # Validate version (prevent duplicate uploads)
+    existing_versions = begin
+      google_play_track_version_codes(track: "namma-flutter-int-track")
+    rescue => e
+      UI.message("⚠️  Could not verify existing versions: #{e.message}. Proceeding with build...")
+      []
+    end
+
+    if existing_versions.include?(version_code)
+      UI.user_error!("❌ Version code #{version_code} already exists on namma-flutter-int-track. Please increment the build number in pubspec.yaml")
+    end
+    UI.success("✓ Version validation passed - #{version}+#{version_code}")
+
+    sh("cd ../.. && make release-appbundle")
+
+    # Write changelog to the path supply expects
+    dest_changelog_dir = "./metadata/android/en-US/changelogs"
+    FileUtils.mkdir_p(dest_changelog_dir)
+    File.write("#{dest_changelog_dir}/#{version_code}.txt", changelog(version, version_code))
+
+    upload_to_play_store(
+      track: "namma-flutter-int-track",
+      aab: "../build/app/outputs/bundle/release/app-release.aab",
+      skip_upload_metadata: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true
+    )
+
+    UI.success("Uploaded build #{version_code} (v#{version}) to namma-flutter-int-track")
+  end
+
+  desc "Promote namma-flutter-int-track to Open Testing"
+  lane :'release-candidate' do
+    info = pubspec_version_info
+    version = info[:version]
+    version_code = info[:version_code]
+
+    UI.message("Promoting v#{version} (#{version_code}) to Open Testing")
+
+    upload_to_play_store(
+      root_url: "https://androidpublisher.googleapis.com/",
+      track: 'namma-flutter-int-track',
+      track_promote_to: 'beta',
+      version_code: version_code,
+      skip_upload_aab: true,
+      skip_upload_metadata: true,
+      skip_upload_changelogs: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true,
+    )
+
+    UI.success("Promoted v#{version} (#{version_code}) to Open Testing (Release Candidate)")
+  end
+
+  desc "Promote to Production"
+  lane :production do |options|
+    info = pubspec_version_info
+    version = options[:version] || info[:version]
+    version_code = options[:build] ? options[:build].to_i : info[:version_code]
+
+    UI.message("Promoting: v#{version} (#{version_code})")
+
+    # Validate the build exists on the track
+    existing_versions = begin
+      google_play_track_version_codes(track: "namma-flutter-int-track")
+    rescue => e
+      UI.message("⚠️  Could not verify build on namma-flutter-int-track: #{e.message}. Proceeding...")
+      nil
+    end
+
+    if existing_versions && !existing_versions.include?(version_code)
+      UI.user_error!("Build #{version_code} not found on namma-flutter-int-track.")
+    end
+    UI.success("✓ Build #{version_code} verified")
+
+    upload_to_play_store(
+      track: "namma-flutter-int-track",
+      track_promote_to: "production",
+      version_code: version_code,
+      skip_upload_aab: true,
+      skip_upload_metadata: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true
+    )
+
+    UI.success("Successfully promoted build #{version_code} (v#{version}) to Production")
+  end
+end

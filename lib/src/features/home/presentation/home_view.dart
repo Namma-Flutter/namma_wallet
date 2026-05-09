@@ -10,8 +10,10 @@ import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 import 'package:namma_wallet/src/common/enums/ticket_type.dart';
 import 'package:namma_wallet/src/common/routing/app_routes.dart';
+import 'package:namma_wallet/src/common/services/archive/archive_service_interface.dart';
 import 'package:namma_wallet/src/common/services/haptic/haptic_service_extension.dart';
 import 'package:namma_wallet/src/common/services/haptic/haptic_service_interface.dart';
+import 'package:namma_wallet/src/common/services/ticket_change_notifier.dart';
 import 'package:namma_wallet/src/common/widgets/snackbar_widget.dart';
 import 'package:namma_wallet/src/features/home/presentation/widgets/header_widget.dart';
 import 'package:namma_wallet/src/features/home/presentation/widgets/ticket_card_widget.dart';
@@ -26,28 +28,45 @@ class HomeView extends StatefulWidget {
 
 class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
   bool _isLoading = true;
+  bool _hasArchivedTickets = false;
   List<Ticket> _travelTickets = [];
   List<Ticket> _eventTickets = [];
 
   late final IHapticService _hapticService;
+  late final TicketChangeNotifier _ticketChangeNotifier;
+
   @override
   void initState() {
     super.initState();
     _hapticService = getIt<IHapticService>();
+    _ticketChangeNotifier = getIt<TicketChangeNotifier>();
+    _ticketChangeNotifier.addListener(_onTicketChanged);
     WidgetsBinding.instance.addObserver(this);
     unawaited(_loadTicketData());
   }
 
   @override
   void dispose() {
+    _ticketChangeNotifier.removeListener(_onTicketChanged);
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
+  }
+
+  void _onTicketChanged() {
+    if (mounted) {
+      unawaited(_loadTicketData());
+    }
   }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      unawaited(_loadTicketData());
+      // Run archive maintenance and wait for it to complete before loading data
+      // to avoid race conditions and UI flashes of stale data.
+      unawaited(() async {
+        await getIt<IArchiveService>().runArchiveMaintenance();
+        await _loadTicketData();
+      }());
     }
   }
 
@@ -57,7 +76,8 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
         _isLoading = true;
       });
 
-      final tickets = await getIt<ITicketDAO>().getAllTickets();
+      final tickets = await getIt<ITicketDAO>().getActiveTickets();
+      final archivedTickets = await getIt<ITicketDAO>().getArchivedTickets();
 
       if (!mounted) return;
 
@@ -80,6 +100,7 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
       setState(() {
         _travelTickets = travelTickets;
         _eventTickets = eventTickets;
+        _hasArchivedTickets = archivedTickets.isNotEmpty;
         _isLoading = false;
       });
 
@@ -106,12 +127,12 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
             _hapticService.triggerHaptic(HapticType.selection);
             if (ticket.ticketId == null) return;
 
-            final wasDeleted = await context.pushNamed<bool>(
+            await context.pushNamed(
               AppRoute.ticketView.name,
               pathParameters: {'id': ticket.ticketId!},
             );
 
-            if (mounted && (wasDeleted ?? false)) {
+            if (mounted) {
               await _loadTicketData();
             }
           },
@@ -220,6 +241,9 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
                         TextButton(
                           onPressed: () async {
                             await context.pushNamed(AppRoute.allTickets.name);
+                            if (mounted) {
+                              await _loadTicketData();
+                            }
                           },
                           style: TextButton.styleFrom(
                             padding: const EdgeInsets.symmetric(
@@ -257,18 +281,18 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
                   const Center(child: CircularProgressIndicator())
                 else
                   _travelTickets.isEmpty
-                      ? const Padding(
-                          padding: EdgeInsets.all(32),
+                      ? Padding(
+                          padding: const EdgeInsets.all(32),
                           child: Center(
                             child: Column(
                               children: [
-                                Icon(
+                                const Icon(
                                   Icons.airplane_ticket_outlined,
                                   size: 64,
                                   color: Colors.grey,
                                 ),
-                                SizedBox(height: 16),
-                                Text(
+                                const SizedBox(height: 16),
+                                const Text(
                                   'No travel tickets found',
                                   style: TextStyle(
                                     fontSize: 18,
@@ -276,8 +300,8 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
                                     color: Colors.grey,
                                   ),
                                 ),
-                                SizedBox(height: 8),
-                                Text(
+                                const SizedBox(height: 8),
+                                const Text(
                                   'Paste travel SMS or add tickets manually',
                                   style: TextStyle(
                                     fontSize: 14,
@@ -285,6 +309,22 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
                                   ),
                                   textAlign: TextAlign.center,
                                 ),
+                                if (_hasArchivedTickets) ...[
+                                  const SizedBox(height: 24),
+                                  TextButton.icon(
+                                    onPressed: () async {
+                                      await context.pushNamed(
+                                        AppRoute.allTickets.name,
+                                        queryParameters: {'archive': '1'},
+                                      );
+                                      if (mounted) {
+                                        await _loadTicketData();
+                                      }
+                                    },
+                                    icon: const Icon(Icons.archive_outlined),
+                                    label: const Text('View Archived Tickets'),
+                                  ),
+                                ],
                               ],
                             ),
                           ),
@@ -349,15 +389,14 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
                               onTap: () async {
                                 if (eventTicket.ticketId == null) return;
 
-                                final wasDeleted = await context
-                                    .pushNamed<bool>(
-                                      AppRoute.ticketView.name,
-                                      pathParameters: {
-                                        'id': eventTicket.ticketId!,
-                                      },
-                                    );
+                                await context.pushNamed(
+                                  AppRoute.ticketView.name,
+                                  pathParameters: {
+                                    'id': eventTicket.ticketId!,
+                                  },
+                                );
 
-                                if (mounted && (wasDeleted ?? false)) {
+                                if (mounted) {
                                   await _loadTicketData();
                                 }
                               },

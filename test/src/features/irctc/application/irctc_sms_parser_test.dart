@@ -26,14 +26,8 @@ void main() {
 
       // Primary info validations
       expect(ticket.ticketId, equals('4321751237'));
-      expect(
-        ticket.primaryText,
-        equals('Unknown → Unknown'),
-      ); // No route available.
-      expect(
-        ticket.secondaryText,
-        equals('N/A'),
-      );
+      expect(ticket.primaryText, isNull); // No route available.
+      expect(ticket.secondaryText, isNull);
 
       // PNR Tag
       final pnrTag = ticket.tags?.firstWhere(
@@ -76,7 +70,7 @@ void main() {
         ticket.primaryText,
         equals('YESVANTPUR (YPR) → CHENNAI CENTRAL (MAS)'),
       );
-      expect(ticket.secondaryText, equals('Train 12291 • SL • MAGESH K'));
+      expect(ticket.secondaryText, equals('12291'));
 
       /// Validate parsed start time from DOJ + DP fields.
       expect(ticket.startTime?.year, equals(2025));
@@ -151,6 +145,7 @@ void main() {
         ticket.primaryText,
         equals('TIRUVALLUR (TRL) → BANGALORE CITY (SBC)'),
       );
+      expect(ticket.secondaryText, equals('16021'));
 
       // Status tag includes waitlist number
       final statusTag = ticket.tags?.firstWhere((t) => t.icon == 'info');
@@ -169,7 +164,7 @@ void main() {
         const smsText =
             'PNR:4621385568,TRN:12692,DOJ:23-11-24,SL,SMVB-MAS,DP:23:00,'
             'Boarding at SMVB only,\n'
-            'HARISH ANBALAGAN+2,S4 15,S4 16,S4 9,\n'
+            'TEST PASSENGER THREE+2,S4 15,S4 16,S4 9,\n'
             'Fare:780,C Fee:11.8+PG\n'
             'QR Code URL:https://qr.indianrail.gov.in?q=M60LCLB0 -IRCTC';
 
@@ -177,10 +172,10 @@ void main() {
 
         expect(ticket, isNotNull);
 
-        // Secondary text uses first passenger name correctly
+        // Primary text uses from → to format
         expect(
-          ticket.secondaryText,
-          equals('Train 12692 • SL • HARISH ANBALAGAN+2'),
+          ticket.primaryText,
+          equals('SMVB → CHENNAI CENTRAL (MAS)'),
         );
 
         // Fare tag
@@ -211,7 +206,7 @@ void main() {
         ticket.primaryText,
         equals('CHENNAI CENTRAL (MAS) → SALEM JUNCTION (SA)'),
       );
-      expect(ticket.secondaryText, contains('Train 12679 • 2S'));
+      expect(ticket.secondaryText, equals('12679'));
 
       // Class tag should correctly detect 2S
       final classTag = ticket.tags?.firstWhere((t) => t.icon == 'event_seat');

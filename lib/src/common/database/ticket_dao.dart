@@ -4,6 +4,7 @@ import 'package:namma_wallet/src/common/database/ticket_dao_interface.dart';
 import 'package:namma_wallet/src/common/database/wallet_database_interface.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/domain/models/ticket.dart';
+import 'package:namma_wallet/src/common/services/archive/ticket_archive.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -101,8 +102,11 @@ class TicketDao implements ITicketDAO {
         );
       }
 
-      map['created_at'] = DateTime.now().toIso8601String();
-      map['updated_at'] = DateTime.now().toIso8601String();
+      final now = DateTime.now().toUtc();
+      final nowIso = now.toIso8601String();
+      map['created_at'] = nowIso;
+      map['updated_at'] = nowIso;
+      map['archived_at'] = _archiveTimestampFor(ticket, now);
 
       final id = await db.insert(
         'tickets',
@@ -148,7 +152,22 @@ class TicketDao implements ITicketDAO {
         ..remove('created_at') // Never update creation time
         ..remove('tags')
         ..remove('extras');
-      updates['updated_at'] = DateTime.now().toIso8601String();
+      final now = DateTime.now().toUtc();
+      updates['updated_at'] = now.toIso8601String();
+
+      // Only update archived_at if the archive status is changing.
+      // If the ticket is already archived and should remain archived,
+      // we preserve the original archived_at timestamp to ensure old
+      // archived tickets are eventually purged correctly.
+      final newArchive = _archiveTimestampFor(ticket, now);
+      if (ticket.archivedAt != null && newArchive != null) {
+        // Already archived and remains archivable - preserve existing
+        updates.remove('archived_at');
+      } else {
+        // Status transition: active -> archived, archived -> active,
+        //or staying active
+        updates['archived_at'] = newArchive;
+      }
 
       // Handle JSON fields
 
@@ -304,6 +323,144 @@ class TicketDao implements ITicketDAO {
     }
   }
 
+  /// Get only active (non-archived) tickets
+  @override
+  Future<List<Ticket>> getActiveTickets() async {
+    try {
+      _logger.logDatabase('Query', 'Fetching active tickets');
+
+      final db = await _database.database;
+      final result = await db.query(
+        'tickets',
+        where: 'archived_at IS NULL',
+        orderBy: 'start_time DESC',
+      );
+
+      if (result.isEmpty) {
+        _logger.warning('No active tickets found in database');
+        return [];
+      }
+
+      return result.map(_mapToTicket).toList();
+    } catch (e, stackTrace) {
+      _logger.error(
+        'Failed to fetch active tickets from database',
+        e,
+        stackTrace,
+      );
+      rethrow;
+    }
+  }
+
+  /// Get only archived tickets
+  @override
+  Future<List<Ticket>> getArchivedTickets() async {
+    try {
+      _logger.logDatabase('Query', 'Fetching archived tickets');
+
+      final db = await _database.database;
+      final result = await db.query(
+        'tickets',
+        where: 'archived_at IS NOT NULL',
+        orderBy: 'archived_at DESC',
+      );
+
+      if (result.isEmpty) {
+        return [];
+      }
+
+      return result.map(_mapToTicket).toList();
+    } catch (e, stackTrace) {
+      _logger.error(
+        'Failed to fetch archived tickets from database',
+        e,
+        stackTrace,
+      );
+      rethrow;
+    }
+  }
+
+  /// Archive all tickets whose relevant time has passed
+  @override
+  Future<int> archivePastTickets() async {
+    try {
+      final now = DateTime.now().toUtc().toIso8601String();
+      _logger.logDatabase('Archive', 'Archiving past tickets (before $now)');
+
+      final db = await _database.database;
+
+      // Archive tickets where:
+      // - Not already archived
+      // - end_time has passed (if present), OR start_time has passed
+      // - Tickets with NULL start_time are NOT auto-archived
+      final count = await db.rawUpdate(
+        '''
+        UPDATE tickets
+        SET archived_at = ?
+        WHERE archived_at IS NULL
+          AND (
+            (end_time IS NOT NULL AND end_time < ?)
+            OR (end_time IS NULL AND start_time IS NOT NULL AND start_time < ?)
+          )
+        ''',
+        [now, now, now],
+      );
+
+      if (count > 0) {
+        _logger.logDatabase(
+          'Success',
+          'Archived $count past ticket(s)',
+        );
+      } else {
+        _logger.logDatabase('Info', 'No tickets to archive');
+      }
+
+      return count;
+    } catch (e, stackTrace) {
+      _logger.error('Failed to archive past tickets', e, stackTrace);
+      rethrow;
+    }
+  }
+
+  /// Delete archived tickets older than [retentionDays]
+  @override
+  Future<int> purgeOldArchivedTickets({int retentionDays = 30}) async {
+    try {
+      final cutoff = DateTime.now()
+          .toUtc()
+          .subtract(Duration(days: retentionDays))
+          .toIso8601String();
+
+      _logger.logDatabase(
+        'Purge',
+        'Purging archived tickets older than $retentionDays days '
+            '(before $cutoff)',
+      );
+
+      final db = await _database.database;
+
+      final count = await db.delete(
+        'tickets',
+        where: 'archived_at IS NOT NULL AND archived_at < ?',
+        whereArgs: [cutoff],
+      );
+
+      if (count > 0) {
+        _logger.logDatabase(
+          'Success',
+          'Purged $count old archived ticket(s)',
+        );
+      } else {
+        _logger.logDatabase('Info', 'No archived tickets to purge');
+      }
+
+      return count;
+    } catch (e, stackTrace) {
+      _logger.error('Failed to purge old archived tickets', e, stackTrace);
+      rethrow;
+    }
+  }
+
   /// Helper to convert DB Map to Ticket Object
   Ticket _mapToTicket(Map<String, Object?> map) {
     final tagsRaw = map['tags'];
@@ -320,5 +477,11 @@ class TicketDao implements ITicketDAO {
     };
 
     return TicketMapper.fromMap(decodedMap);
+  }
+
+  String? _archiveTimestampFor(Ticket ticket, DateTime now) {
+    return shouldArchiveTicket(ticket, now: now)
+        ? now.toUtc().toIso8601String()
+        : null;
   }
 }
