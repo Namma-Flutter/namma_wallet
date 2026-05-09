@@ -1,0 +1,867 @@
+﻿Resolving dependencies...
+Downloading packages...
+  _fe_analyzer_shared 92.0.0 (100.0.0 available)
+  analyzer 9.0.0 (13.0.0 available)
+  archive 4.0.7 (4.0.9 available)
+  async 2.13.0 (2.13.1 available)
+  background_downloader 9.5.1 (9.5.4 available)
+  build 4.0.3 (4.0.6 available)
+  build_config 1.2.0 (1.3.0 available)
+  build_runner 2.10.4 (2.15.0 available)
+  built_value 8.12.1 (8.12.6 available)
+  characters 1.4.0 (1.4.1 available)
+  cli_util 0.4.2 (0.5.1 available)
+  cross_file 0.3.5+1 (0.3.5+2 available)
+  cupertino_icons 1.0.8 (1.0.9 available)
+  dart_mappable 4.6.1 (4.8.0 available)
+  dart_mappable_builder 4.6.3 (4.8.0 available)
+  dart_style 3.1.3 (3.1.9 available)
+  dbus 0.7.11 (0.7.12 available)
+  dev_build 1.1.3+1 (1.1.5+3 available)
+  ffi 2.1.5 (2.2.0 available)
+  file_picker 10.3.8 (11.0.2 available)
+  flutter_gemma 0.12.4 (0.14.5 available)
+  flutter_gen_core 5.12.0 (5.14.1 available)
+  flutter_gen_runner 5.12.0 (5.14.1 available)
+  flutter_local_notifications 19.5.0 (21.0.0 available)
+  flutter_local_notifications_linux 6.0.0 (8.0.0 available)
+  flutter_local_notifications_platform_interface 9.1.0 (11.0.0 available)
+  flutter_local_notifications_windows 1.0.3 (3.0.0 available)
+  flutter_plugin_android_lifecycle 2.0.33 (2.0.34 available)
+  flutter_svg 2.2.4 (2.3.0 available)
+  flutter_timezone 5.0.1 (5.0.2 available)
+  gaimon 1.4.2 (1.4.3 available)
+  get_it 9.2.0 (9.2.1 available)
+  go_router 17.0.1 (17.2.3 available)
+  google_fonts 7.0.0 (8.1.0 available)
+  google_mlkit_commons 0.11.0 (0.11.1 available)
+  google_mlkit_text_recognition 0.15.0 (0.15.1 available)
+  googleapis_auth 2.0.0 (2.3.0 available)
+  home_widget 0.9.0 (0.9.1 available)
+  hooks 1.0.0 (1.0.3 available)
+  image 4.7.2 (4.8.0 available)
+  image_picker 1.2.1 (1.2.2 available)
+  image_picker_android 0.8.13+10 (0.8.13+17 available)
+  image_picker_ios 0.8.13+3 (0.8.13+6 available)
+  json_annotation 4.9.0 (4.11.0 available)
+  matcher 0.12.17 (0.12.20 available)
+  material_color_utilities 0.11.1 (0.13.0 available)
+  meta 1.17.0 (1.18.2 available)
+  mobile_scanner 7.1.4 (7.2.0 available)
+  mockito 5.6.1 (5.6.5 available)
+  native_toolchain_c 0.17.4 (0.18.0 available)
+  package_info_plus 9.0.0 (10.1.0 available)
+  package_info_plus_platform_interface 3.2.1 (4.1.0 available)
+  path_provider_android 2.2.22 (2.3.1 available)
+  path_provider_foundation 2.5.1 (2.6.0 available)
+  pdfium_dart 0.1.3 (0.2.0 available)
+  pdfium_flutter 0.1.9 (0.2.0 available)
+  pdfrx 2.2.24 (2.3.2 available)
+  pdfrx_engine 0.3.9 (0.4.1 available)
+  petitparser 7.0.1 (7.0.2 available)
+  posix 6.0.3 (6.5.0 available)
+  process_run 1.2.4 (1.3.2 available)
+  share_plus 12.0.1 (13.1.0 available)
+  share_plus_platform_interface 6.1.0 (7.1.0 available)
+  shared_preferences 2.5.4 (2.5.5 available)
+  shared_preferences_android 2.4.18 (2.4.23 available)
+  shared_preferences_platform_interface 2.4.1 (2.4.2 available)
+  source_gen 4.1.1 (4.2.3 available)
+  source_span 1.10.1 (1.10.2 available)
+  sqflite 2.4.2 (2.4.2+1 available)
+  sqflite_android 2.4.2+2 (2.4.2+3 available)
+  sqflite_common 2.5.6 (2.5.7 available)
+  sqflite_common_ffi 2.4.0+2 (2.4.0+3 available)
+  sqlite3 3.1.3 (3.3.1 available)
+  syncfusion_flutter_core 32.1.22 (33.2.5 available)
+  syncfusion_flutter_pdf 32.1.22 (33.2.5 available)
+  synchronized 3.4.0 (3.4.0+1 available)
+  talker 5.1.9 (5.1.17 available)
+  talker_flutter 5.1.9 (5.1.17 available)
+  talker_logger 5.1.9 (5.1.17 available)
+  test_api 0.7.7 (0.7.12 available)
+  timezone 0.10.1 (0.11.0 available)
+  url_launcher_android 6.3.28 (6.3.29 available)
+  url_launcher_ios 6.3.6 (6.4.1 available)
+  url_launcher_web 2.4.1 (2.4.3 available)
+  uuid 4.5.2 (4.5.3 available)
+  vector_graphics 1.1.21 (1.2.0 available)
+  vector_graphics_compiler 1.1.19 (1.2.1 available)
+  vector_math 2.2.0 (2.3.0 available)
+  very_good_analysis 10.0.0 (10.2.0 available)
+  vm_service 15.0.2 (15.2.0 available)
+  win32 5.15.0 (6.2.0 available)
+  xml 6.6.1 (7.0.1 available)
+Got dependencies!
+92 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+00:00 +0: loading C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/database/user_dao_test.dart
+00:00 +0: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/database/user_dao_test.dart: UserDao fetchAllUsers returns empty list when no rows
+00:00 +1: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/database/user_dao_test.dart: UserDao fetchAllUsers rethrows when row data does not match the User mapper
+00:00 +2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/database/user_dao_test.dart: UserDao fetchAllUsers rethrows when the database query fails
+00:01 +3: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/database/wallet_database_test.dart: WalletDatabase UNIQUE Constraint Tests Given duplicate ticket_id, When inserting, Then updates existing ticket instead of throwing exception
+00:01 +4: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/database/wallet_database_test.dart: WalletDatabase UNIQUE Constraint Tests Given multiple tickets with unique IDs, When inserting, Then creates separate records
+00:01 +5: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/database/wallet_database_test.dart: WalletDatabase handleTicket Merge Tests Given a past ticket, When handling it, Then stores it in archived tickets only
+00:01 +6: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/database/wallet_database_test.dart: WalletDatabase handleTicket Merge Tests Given an archived ticket whose end_time shifts to the future, When updated, Then the ticket is un-archived
+00:01 +7: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/database/wallet_database_test.dart: WalletDatabase handleTicket Merge Tests Given ticket with extras, When handling update with overlapping extras, Then merges by title key correctly
+00:01 +8: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/database/wallet_database_test.dart: WalletDatabase handleTicket Merge Tests Given ticket with tags, When handling update with overlapping tags, Then merges by icon key
+00:01 +9: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/database/wallet_database_test.dart: WalletDatabase Full CRUD Tests Given valid ticket, When creating (C), Then persists with all fields
+00:01 +10: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/database/wallet_database_test.dart: WalletDatabase Full CRUD Tests Given existing ticket, When updating (U) directly, Then persists updated values
+00:01 +11: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/database/wallet_database_test.dart: WalletDatabase Full CRUD Tests Given existing ticket, When deleting (D), Then removes from database
+00:01 +12: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/database/wallet_database_test.dart: WalletDatabase Full CRUD Tests Given multiple tickets, When reading all, Then returns ordered by start_time DESC
+00:01 +13: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/database/wallet_database_test.dart: WalletDatabase Edge Cases Given ticket, When updating with NULL extras (via handleTicket), Then preserves existing extras
+00:01 +14: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/database/wallet_database_test.dart: WalletDatabase Edge Cases Given ticket, When updating with large payload, Then handles successfully
+00:01 +15: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/database/wallet_database_test.dart: WalletDatabase Archive Tests Given a future ticket, When inserting, Then it lives in active list and not archived
+00:01 +16: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/database/wallet_database_test.dart: WalletDatabase Archive Tests Given a ticket with no start_time and no end_time, When inserting, Then it stays in active list
+00:01 +17: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/database/wallet_database_test.dart: WalletDatabase Archive Tests Given a mix of active tickets, When archivePastTickets runs, Then only past ones move to archived
+00:01 +18: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/database/wallet_database_test.dart: WalletDatabase Archive Tests Given an already-archived ticket, When archivePastTickets runs again, Then it is not re-archived
+00:01 +19: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/database/wallet_database_test.dart: WalletDatabase Archive Tests Given archived tickets older and newer than retention, When purgeOldArchivedTickets runs, Then only those older than retentionDays are deleted
+00:01 +20: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/database/wallet_database_test.dart: WalletDatabase Archive Tests Given retentionDays override, When purgeOldArchivedTickets runs, Then the override controls the cutoff
+00:01 +21: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/database/wallet_database_test.dart: WalletDatabase Secondary DAO methods handleTicket returns -1 when ticketId is null
+00:02 +22: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/database/wallet_database_test.dart: WalletDatabase Secondary DAO methods handleTicket returns -1 when ticketId is empty
+00:02 +23: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/database/wallet_database_test.dart: WalletDatabase Secondary DAO methods getTicketsByType returns matching tickets ordered by start_time DESC
+00:02 +24: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/database/wallet_database_test.dart: WalletDatabase Secondary DAO methods getTicketsByType returns empty list when type has no rows
+00:02 +25: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/database/wallet_database_test.dart: WalletDatabase Secondary DAO methods getAllTickets returns empty list when DB has no rows
+00:02 +26: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/database/wallet_database_test.dart: WalletDatabase Secondary DAO methods getActiveTickets returns empty list when no rows
+00:02 +27: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/database/wallet_database_test.dart: WalletDatabase Secondary DAO methods getArchivedTickets returns empty list when no rows
+00:02 +28: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/database/wallet_database_test.dart: WalletDatabase Secondary DAO methods deleteTicket returns 0 when no row matches
+00:02 +29: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/database/wallet_database_test.dart: WalletDatabase Secondary DAO methods getTicketById returns null and warns when no row matches
+00:02 +30: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/database/wallet_database_test.dart: WalletDatabase Exception rethrow paths getAllTickets rethrows when the underlying table is dropped
+00:02 +31: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/database/wallet_database_test.dart: WalletDatabase Exception rethrow paths getActiveTickets rethrows on a broken DB
+00:02 +32: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/database/wallet_database_test.dart: WalletDatabase Exception rethrow paths getArchivedTickets rethrows on a broken DB
+00:02 +33: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/database/wallet_database_test.dart: WalletDatabase Exception rethrow paths archivePastTickets rethrows on a broken DB
+00:02 +34: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/database/wallet_database_test.dart: WalletDatabase Exception rethrow paths purgeOldArchivedTickets rethrows on a broken DB
+00:02 +35: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/database/wallet_database_test.dart: WalletDatabase Exception rethrow paths getTicketsByType rethrows on a broken DB
+00:02 +36: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/database/wallet_database_test.dart: WalletDatabase Exception rethrow paths deleteTicket rethrows on a broken DB
+00:02 +37: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/database/wallet_database_test.dart: WalletDatabase Error Handling Tests Given invalid JSON in extras, When retrieving ticket, Then throws exception
+00:02 +38: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/domain/models/tag_model_test.dart: TagModel.iconData maps each known icon name to a Material icon
+00:02 +39: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/domain/models/tag_model_test.dart: TagModel.iconData falls back to help_outline for unknown / null icon
+00:05 +40: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/domain/models/ticket_from_tnstc_test.dart: Ticket.fromTNSTC - Time Parsing Error Handling should catch FormatException when serviceStartTime contains non-numeric characters
+00:05 +41: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/domain/models/ticket_from_tnstc_test.dart: Ticket.fromTNSTC - Time Parsing Error Handling should catch FormatException when serviceStartTime is completely invalid format
+00:05 +42: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/domain/models/ticket_from_tnstc_test.dart: Ticket.fromTNSTC - Time Parsing Error Handling should handle case where serviceStartTime has valid format but logic fails silently (e.g. out of range)
+00:06 +43: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/helper/date_time_converter_test.dart: DateTimeConverter Implementation Tests - formatTime - Given a DateTime at midnight, When formatTime is called, Then returns 12:00 am
+00:06 +44: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/helper/date_time_converter_test.dart: DateTimeConverter Implementation Tests - formatTime - Given a DateTime at noon, When formatTime is called, Then returns 12:00 AM
+00:06 +45: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/helper/date_time_converter_test.dart: DateTimeConverter Implementation Tests - formatTime - Given a DateTime in the morning, When formatTime is called, Then returns time with am in lowercase
+00:06 +46: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/helper/date_time_converter_test.dart: DateTimeConverter Implementation Tests - formatTime - Given a DateTime in the afternoon, When formatTime is called, Then returns time with pm in lowercase
+00:06 +47: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/helper/date_time_converter_test.dart: DateTimeConverter Implementation Tests - formatTime - Given a DateTime in the evening, When formatTime is called, Then returns time with pm in lowercase
+00:06 +48: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/helper/date_time_converter_test.dart: DateTimeConverter Implementation Tests - formatTime - Given a UTC DateTime, When formatTime is called, Then converts to local time before formatting
+00:06 +49: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/helper/date_time_converter_test.dart: DateTimeConverter Implementation Tests - formatTime - Given a DateTime with single-digit hour, When formatTime is called, Then pads hour with zero
+00:06 +50: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/helper/date_time_converter_test.dart: DateTimeConverter Implementation Tests - formatDate - Given a DateTime, When formatDate is called, Then returns date in DD/MM/YYYY format
+00:06 +51: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/helper/date_time_converter_test.dart: DateTimeConverter Implementation Tests - formatDate - Given a DateTime on first day of month, When formatDate is called, Then pads day with zero
+00:06 +52: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/helper/date_time_converter_test.dart: DateTimeConverter Implementation Tests - formatDate - Given a DateTime on last day of month, When formatDate is called, Then returns correct date
+00:06 +53: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/helper/date_time_converter_test.dart: DateTimeConverter Implementation Tests - formatDate - Given a DateTime in February leap year, When formatDate is called, Then returns correct date
+00:06 +54: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/helper/date_time_converter_test.dart: DateTimeConverter Implementation Tests - formatDate - Given a UTC DateTime, When formatDate is called, Then converts to local time before formatting
+00:06 +55: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/helper/date_time_converter_test.dart: DateTimeConverter Implementation Tests - formatFullDateTime - Given a DateTime, When formatFullDateTime is called, Then returns full date-time in DD-MM-YYYY hh:mm AM/PM format
+00:06 +56: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/helper/date_time_converter_test.dart: DateTimeConverter Implementation Tests - formatFullDateTime - Given a DateTime at midnight, When formatFullDateTime is called, Then returns date with 12:00 AM
+00:06 +57: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/helper/date_time_converter_test.dart: DateTimeConverter Implementation Tests - formatFullDateTime - Given a DateTime at noon, When formatFullDateTime is called, Then returns date with 12:00 PM
+00:06 +58: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/helper/date_time_converter_test.dart: DateTimeConverter Implementation Tests - formatFullDateTime - Given a DateTime with single-digit values, When formatFullDateTime is called, Then pads with zeros
+00:06 +59: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/helper/date_time_converter_test.dart: DateTimeConverter Implementation Tests - formatFullDateTime - Given a UTC DateTime, When formatFullDateTime is called, Then converts to local time before formatting
+00:06 +60: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/helper/date_time_converter_test.dart: DateTimeConverter Implementation Tests - formatFullDateTime - Given a DateTime on New Year's Eve, When formatFullDateTime is called, Then returns correct date-time
+00:06 +61: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/helper/date_time_converter_test.dart: DateTimeConverter Implementation Tests - formatTimeString - Given valid 24-hour time string, When formatTimeString is called, Then converts to 12-hour format with AM
+00:06 +62: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/helper/date_time_converter_test.dart: DateTimeConverter Implementation Tests - formatTimeString - Given valid 24-hour time string in afternoon, When formatTimeString is called, Then converts to 12-hour format with PM
+00:06 +63: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/helper/date_time_converter_test.dart: DateTimeConverter Implementation Tests - formatTimeString - Given midnight time string, When formatTimeString is called, Then returns 12:00 AM
+00:06 +64: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/helper/date_time_converter_test.dart: DateTimeConverter Implementation Tests - formatTimeString - Given noon time string, When formatTimeString is called, Then returns 12:00 PM
+00:06 +65: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/helper/date_time_converter_test.dart: DateTimeConverter Implementation Tests - formatTimeString - Given late evening time string, When formatTimeString is called, Then converts correctly
+00:06 +66: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/helper/date_time_converter_test.dart: DateTimeConverter Implementation Tests - formatTimeString - Given empty string, When formatTimeString is called, Then returns empty string
+00:06 +67: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/helper/date_time_converter_test.dart: DateTimeConverter Implementation Tests - formatTimeString - Given invalid format without colon, When formatTimeString is called, Then returns original string
+00:06 +68: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/helper/date_time_converter_test.dart: DateTimeConverter Implementation Tests - formatTimeString - Given invalid format with multiple colons, When formatTimeString is called, Then returns original string
+00:06 +69: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/helper/date_time_converter_test.dart: DateTimeConverter Implementation Tests - formatTimeString - Given non-numeric hour, When formatTimeString is called, Then returns original string
+00:06 +70: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/helper/date_time_converter_test.dart: DateTimeConverter Implementation Tests - formatTimeString - Given non-numeric minute, When formatTimeString is called, Then returns original string
+00:06 +71: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/helper/date_time_converter_test.dart: DateTimeConverter Implementation Tests - formatTimeString - Given hour out of range (negative), When formatTimeString is called, Then returns original string
+00:06 +72: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/helper/date_time_converter_test.dart: DateTimeConverter Implementation Tests - formatTimeString - Given hour out of range (>= 24), When formatTimeString is called, Then returns original string
+00:06 +73: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/helper/date_time_converter_test.dart: DateTimeConverter Implementation Tests - formatTimeString - Given minute out of range (negative), When formatTimeString is called, Then returns original string
+00:06 +74: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/helper/date_time_converter_test.dart: DateTimeConverter Implementation Tests - formatTimeString - Given minute out of range (>= 60), When formatTimeString is called, Then returns original string
+00:06 +75: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/helper/date_time_converter_test.dart: DateTimeConverter Implementation Tests - formatTimeString - Given boundary hour value 23, When formatTimeString is called, Then converts correctly
+00:06 +76: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/helper/date_time_converter_test.dart: DateTimeConverter Implementation Tests - formatTimeString - Given boundary minute value 59, When formatTimeString is called, Then converts correctly
+00:06 +77: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/helper/date_time_converter_test.dart: DateTimeConverter Implementation Tests - Singleton Pattern - Given multiple DateTimeConverter instantiations, When factory is called, Then returns same instance
+00:06 +78: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/helper/date_time_converter_test.dart: DateTimeConverter Implementation Tests - Singleton Pattern - Given DateTimeConverter.instance, When accessed, Then returns singleton instance
+00:06 +79: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/helper/date_time_converter_test.dart: Top-Level Function Backward Compatibility Tests - formatTime top-level function - Given a DateTime, When formatTime top-level function is called, Then returns same result as converter
+00:06 +80: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/helper/date_time_converter_test.dart: Top-Level Function Backward Compatibility Tests - formatTime top-level function - Given midnight DateTime, When formatTime top-level function is called, Then returns 12:00 am
+00:06 +81: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/helper/date_time_converter_test.dart: Top-Level Function Backward Compatibility Tests - formatDate top-level function - Given a DateTime, When formatDate top-level function is called, Then returns same result as converter
+00:06 +82: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/helper/date_time_converter_test.dart: Top-Level Function Backward Compatibility Tests - formatDate top-level function - Given first day of year, When formatDate top-level function is called, Then formats correctly
+00:06 +83: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/helper/date_time_converter_test.dart: Top-Level Function Backward Compatibility Tests - formatFullDateTime top-level function - Given a DateTime, When formatFullDateTime top-level function is called, Then returns same result as converter
+00:06 +84: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/helper/date_time_converter_test.dart: Top-Level Function Backward Compatibility Tests - formatFullDateTime top-level function - Given noon DateTime, When formatFullDateTime top-level function is called, Then formats correctly
+00:06 +85: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/helper/date_time_converter_test.dart: Top-Level Function Backward Compatibility Tests - formatTimeString top-level function - Given valid time string, When formatTimeString top-level function is called, Then returns same result as converter
+00:06 +86: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/helper/date_time_converter_test.dart: Top-Level Function Backward Compatibility Tests - formatTimeString top-level function - Given empty string, When formatTimeString top-level function is called, Then returns empty string
+00:06 +87: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/helper/date_time_converter_test.dart: Top-Level Function Backward Compatibility Tests - formatTimeString top-level function - Given invalid time string, When formatTimeString top-level function is called, Then returns original string
+00:06 +88: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/helper/date_time_converter_test.dart: Edge Cases and Boundary Tests - Given DateTime at year boundary (Dec 31 to Jan 1), When formatting, Then handles correctly
+00:06 +89: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/helper/date_time_converter_test.dart: Edge Cases and Boundary Tests - Given very old date, When formatting, Then handles correctly without errors
+00:06 +90: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/helper/date_time_converter_test.dart: Edge Cases and Boundary Tests - Given very far future date, When formatting, Then handles correctly without errors
+00:06 +91: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/helper/date_time_converter_test.dart: Edge Cases and Boundary Tests - Given time string with leading zeros, When formatTimeString is called, Then handles correctly
+00:06 +92: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/helper/date_time_converter_test.dart: Edge Cases and Boundary Tests - Given time string at hour boundary (11 to 12), When formatTimeString is called, Then converts correctly
+00:06 +93: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/services/archive/archive_service_test.dart: ArchiveService.runArchiveMaintenance calls archive then purge on the DAO
+00:06 +94: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/services/archive/archive_service_test.dart: ArchiveService.runArchiveMaintenance notifies listeners when work was performed
+00:06 +95: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/services/archive/archive_service_test.dart: ArchiveService.runArchiveMaintenance does not notify when nothing was archived or purged
+00:06 +96: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/services/archive/archive_service_test.dart: ArchiveService.runArchiveMaintenance also notifies when only purges happened
+00:06 +97: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/services/archive/archive_service_test.dart: ArchiveService.runArchiveMaintenance swallows DAO exceptions and never throws
+00:07 +98: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/services/archive/ticket_archive_test.dart: shouldArchiveTicket returns false when both startTime and endTime are null
+00:07 +99: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/services/archive/ticket_archive_test.dart: shouldArchiveTicket uses endTime when both times are present
+00:07 +100: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/services/archive/ticket_archive_test.dart: shouldArchiveTicket archives when endTime is in the past
+00:07 +101: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/services/archive/ticket_archive_test.dart: shouldArchiveTicket falls back to startTime when endTime is null
+00:07 +102: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/services/archive/ticket_archive_test.dart: shouldArchiveTicket returns false when relevant time equals now (strictly before)
+00:07 +103: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/services/archive/ticket_archive_test.dart: shouldArchiveTicket archives when both start and end are in the past
+00:07 +104: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/services/archive/ticket_archive_test.dart: shouldArchiveTicket archives when endTime is past but startTime is future (endTime takes precedence)
+00:07 +105: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/services/archive/ticket_archive_test.dart: shouldArchiveTicket uses current time when `now` is not provided
+00:07 +106: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/services/archive/ticket_archive_test.dart: archivedTicketsLocation returns the all-tickets path with archive query
+00:07 +107: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/services/namma_logger_test.dart: NammaLogger URL Sanitization strips all query parameters by default (secure by default)
+[38;5;4mΓöîΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ[0m
+[38;5;4mΓöé [info] | 23:08:00 496ms | Logger initialized successfully in DEBUG mode[0m
+[38;5;4mΓööΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ[0m
+[38;5;255mΓöîΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ[0m
+[38;5;255mΓöé [debug] | 23:08:00 519ms | [HTTP] GET https://api.example.com/data?[0m
+[38;5;255mΓööΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ[0m
+[38;5;255mΓöîΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ[0m
+[38;5;255mΓöé [debug] | 23:08:00 522ms | [HTTP] GET https://api.example.com/data? - Status: 200[0m
+[38;5;255mΓööΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ[0m
+00:07 +108: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/services/namma_logger_test.dart: NammaLogger URL Sanitization strips all query parameters including seemingly safe ones
+[38;5;4mΓöîΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ[0m
+[38;5;4mΓöé [info] | 23:08:00 544ms | Logger initialized successfully in DEBUG mode[0m
+[38;5;4mΓööΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ[0m
+[38;5;255mΓöîΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ[0m
+[38;5;255mΓöé [debug] | 23:08:00 545ms | [HTTP] POST https://api.example.com/user?[0m
+[38;5;255mΓööΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ[0m
+[38;5;255mΓöîΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ[0m
+[38;5;255mΓöé [debug] | 23:08:00 545ms | [HTTP] POST https://api.example.com/user? - Status: 201[0m
+[38;5;255mΓööΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ[0m
+00:08 +109: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/services/namma_logger_test.dart: NammaLogger URL Sanitization handles URL with no query parameters
+[38;5;4mΓöîΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ[0m
+[38;5;4mΓöé [info] | 23:08:00 553ms | Logger initialized successfully in DEBUG mode[0m
+[38;5;4mΓööΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ[0m
+[38;5;255mΓöîΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ[0m
+[38;5;255mΓöé [debug] | 23:08:00 553ms | [HTTP] GET https://api.example.com/users[0m
+[38;5;255mΓööΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ[0m
+[38;5;255mΓöîΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ[0m
+[38;5;255mΓöé [debug] | 23:08:00 554ms | [HTTP] GET https://api.example.com/users - Status: 200[0m
+[38;5;255mΓööΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ[0m
+00:08 +110: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/services/namma_logger_test.dart: NammaLogger URL Sanitization preserves only explicitly allowed query parameters
+[38;5;4mΓöîΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ[0m
+[38;5;4mΓöé [info] | 23:08:00 565ms | Logger initialized successfully in DEBUG mode[0m
+[38;5;4mΓööΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ[0m
+[38;5;255mΓöîΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ[0m
+[38;5;255mΓöé [debug] | 23:08:00 566ms | [HTTP] GET https://api.example.com/search?q=flutter&page=1[0m
+[38;5;255mΓööΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ[0m
+[38;5;255mΓöîΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ[0m
+[38;5;255mΓöé [debug] | 23:08:00 568ms | [HTTP] GET https://api.example.com/search?q=flutter&page=1 - Status: 200[0m
+[38;5;255mΓööΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ[0m
+00:08 +111: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/services/namma_logger_test.dart: NammaLogger URL Sanitization handles invalid URL gracefully
+[38;5;4mΓöîΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ[0m
+[38;5;4mΓöé [info] | 23:08:00 586ms | Logger initialized successfully in DEBUG mode[0m
+[38;5;4mΓööΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ[0m
+[38;5;255mΓöîΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ[0m
+[38;5;255mΓöé [debug] | 23:08:00 587ms | [HTTP] GET not a valid url[0m
+[38;5;255mΓööΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ[0m
+[38;5;255mΓöîΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ[0m
+[38;5;255mΓöé [debug] | 23:08:00 589ms | [HTTP] GET not a valid url - Status: 400[0m
+[38;5;255mΓööΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ[0m
+00:08 +112: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/services/namma_logger_test.dart: NammaLogger URL Sanitization strips all query params regardless of key names
+[38;5;4mΓöîΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ[0m
+[38;5;4mΓöé [info] | 23:08:00 601ms | Logger initialized successfully in DEBUG mode[0m
+[38;5;4mΓööΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ[0m
+[38;5;255mΓöîΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ[0m
+[38;5;255mΓöé [debug] | 23:08:00 601ms | [HTTP] GET https://api.example.com?[0m
+[38;5;255mΓööΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ[0m
+[38;5;255mΓöîΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ[0m
+[38;5;255mΓöé [debug] | 23:08:00 602ms | [HTTP] GET https://api.example.com? - Status: 200[0m
+[38;5;255mΓööΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ[0m
+[38;5;255mΓöîΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ[0m
+[38;5;255mΓöé [debug] | 23:08:00 602ms | [HTTP] GET https://api.example.com?[0m
+[38;5;255mΓööΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ[0m
+[38;5;255mΓöîΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ[0m
+[38;5;255mΓöé [debug] | 23:08:00 602ms | [HTTP] GET https://api.example.com? - Status: 200[0m
+[38;5;255mΓööΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ[0m
+[38;5;255mΓöîΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ[0m
+[38;5;255mΓöé [debug] | 23:08:00 604ms | [HTTP] GET https://api.example.com?[0m
+[38;5;255mΓööΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ[0m
+[38;5;255mΓöîΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ[0m
+[38;5;255mΓöé [debug] | 23:08:00 604ms | [HTTP] GET https://api.example.com? - Status: 200[0m
+[38;5;255mΓööΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ[0m
+[38;5;255mΓöîΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ[0m
+[38;5;255mΓöé [debug] | 23:08:00 604ms | [HTTP] GET https://api.example.com?[0m
+[38;5;255mΓööΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ[0m
+[38;5;255mΓöîΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ[0m
+[38;5;255mΓöé [debug] | 23:08:00 604ms | [HTTP] GET https://api.example.com? - Status: 200[0m
+[38;5;255mΓööΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ[0m
+[38;5;255mΓöîΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ[0m
+[38;5;255mΓöé [debug] | 23:08:00 604ms | [HTTP] GET https://api.example.com?[0m
+[38;5;255mΓööΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ[0m
+[38;5;255mΓöîΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ[0m
+[38;5;255mΓöé [debug] | 23:08:00 604ms | [HTTP] GET https://api.example.com? - Status: 200[0m
+[38;5;255mΓööΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ[0m
+[38;5;255mΓöîΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ[0m
+[38;5;255mΓöé [debug] | 23:08:00 605ms | [HTTP] GET https://api.example.com?[0m
+[38;5;255mΓööΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ[0m
+[38;5;255mΓöîΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ[0m
+[38;5;255mΓöé [debug] | 23:08:00 605ms | [HTTP] GET https://api.example.com? - Status: 200[0m
+[38;5;255mΓööΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ[0m
+[38;5;255mΓöîΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ[0m
+[38;5;255mΓöé [debug] | 23:08:00 605ms | [HTTP] GET https://api.example.com?[0m
+[38;5;255mΓööΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ[0m
+[38;5;255mΓöîΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ[0m
+[38;5;255mΓöé [debug] | 23:08:00 605ms | [HTTP] GET https://api.example.com? - Status: 200[0m
+[38;5;255mΓööΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ[0m
+[38;5;255mΓöîΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ[0m
+[38;5;255mΓöé [debug] | 23:08:00 605ms | [HTTP] GET https://api.example.com?[0m
+[38;5;255mΓööΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ[0m
+[38;5;255mΓöîΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ[0m
+[38;5;255mΓöé [debug] | 23:08:00 607ms | [HTTP] GET https://api.example.com? - Status: 200[0m
+[38;5;255mΓööΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ[0m
+00:08 +113: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/services/namma_logger_test.dart: NammaLogger URL Sanitization allowlist with empty set strips all params
+[38;5;4mΓöîΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ[0m
+[38;5;4mΓöé [info] | 23:08:00 636ms | Logger initialized successfully in DEBUG mode[0m
+[38;5;4mΓööΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ[0m
+[38;5;255mΓöîΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ[0m
+[38;5;255mΓöé [debug] | 23:08:00 638ms | [HTTP] GET https://api.example.com/data?[0m
+[38;5;255mΓööΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ[0m
+[38;5;255mΓöîΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ[0m
+[38;5;255mΓöé [debug] | 23:08:00 638ms | [HTTP] GET https://api.example.com/data? - Status: 200[0m
+[38;5;255mΓööΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ[0m
+00:08 +114: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/services/namma_logger_test.dart: NammaLogger URL Sanitization logger initialization completes successfully
+[38;5;4mΓöîΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ[0m
+[38;5;4mΓöé [info] | 23:08:00 648ms | Logger initialized successfully in DEBUG mode[0m
+[38;5;4mΓööΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ[0m
+00:08 +115: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/services/namma_logger_test.dart: NammaLogger URL Sanitization all logging methods work correctly
+[38;5;4mΓöîΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ[0m
+[38;5;4mΓöé [info] | 23:08:00 654ms | Logger initialized successfully in DEBUG mode[0m
+[38;5;4mΓööΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ[0m
+[38;5;4mΓöîΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ[0m
+[38;5;4mΓöé [info] | 23:08:00 655ms | Test info[0m
+[38;5;4mΓööΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ[0m
+[38;5;255mΓöîΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ[0m
+[38;5;255mΓöé [debug] | 23:08:00 655ms | Test debug[0m
+[38;5;255mΓööΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ[0m
+[38;5;3mΓöîΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ[0m
+[38;5;3mΓöé [warning] | 23:08:00 655ms | Test warning[0m
+[38;5;3mΓööΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ[0m
+[38;5;1mΓöîΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ[0m
+[38;5;1mΓöé [error] | 23:08:00 656ms | Test error[0m
+[38;5;1mΓööΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ[0m
+[38;5;1mΓöîΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ[0m
+[38;5;1mΓöé [critical] | 23:08:00 656ms | Test critical[0m
+[38;5;1mΓööΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ[0m
+[38;5;4mΓöîΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ[0m
+[38;5;4mΓöé [info] | 23:08:00 656ms | Test success[0m
+[38;5;4mΓööΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ[0m
+[38;5;255mΓöîΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ[0m
+[38;5;255mΓöé [debug] | 23:08:00 657ms | [DB] SELECT: tickets[0m
+[38;5;255mΓööΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ[0m
+[38;5;255mΓöîΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ[0m
+[38;5;255mΓöé [debug] | 23:08:00 657ms | [NAV] Navigating to: /home[0m
+[38;5;255mΓööΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ[0m
+[38;5;255mΓöîΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ[0m
+[38;5;255mΓöé [debug] | 23:08:00 658ms | [API] fetch[0m
+[38;5;255mΓööΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ[0m
+[38;5;255mΓöîΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ[0m
+[38;5;255mΓöé [debug] | 23:08:00 658ms | [TICKET] IRCTC: success[0m
+[38;5;255mΓööΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ[0m
+00:08 +116: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/services/ocr/layout_extractor_inline_test.dart: LayoutExtractor _extractInlineValue should extract only pickup point when combined with pickup time
+00:08 +117: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/services/ocr/layout_extractor_inline_test.dart: LayoutExtractor _extractInlineValue should handle single inline key-value pair
+00:08 +118: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/services/ocr/layout_extractor_inline_test.dart: LayoutExtractor _extractInlineValue should handle block with time value (contains colon)
+00:08 +119: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/services/ocr/layout_extractor_inline_test.dart: LayoutExtractor _extractInlineValue should handle empty inline value and not fall through to spatial search
+00:08 +120: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/services/ocr/layout_extractor_inline_test.dart: LayoutExtractor _extractInlineValue should not grab unrelated date/time field during spatial search fallback
+00:08 +121: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/services/ocr/layout_extractor_inline_test.dart: LayoutExtractor _extractInlineValue should handle split parenthesis value from OCR above the label (T75229209 fixture)
+00:09 +122: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/services/shared_content_processor_test.dart: SharedContentProcessor processContent - New Ticket Creation Given valid SMS content, When processing content, Then returns TicketCreatedResult with ticket details
+00:09 +123: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/services/shared_content_processor_test.dart: SharedContentProcessor processContent - New Ticket Creation Given empty content, When processing content, Then returns ProcessingErrorResult
+00:09 +124: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/services/shared_content_processor_test.dart: SharedContentProcessor processContent - New Ticket Creation Given malformed content, When processing content, Then handles gracefully and returns result
+00:09 +125: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/services/shared_content_processor_test.dart: SharedContentProcessor processContent - New Ticket Creation Given valid SMS content with extractable PNR, When processing content, Then TicketCreatedResult.ticketId equals the extracted PNR
+00:09 +126: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/services/shared_content_processor_test.dart: SharedContentProcessor processContent - New Ticket Creation Given a PKPass file path, When processing content, Then TicketCreatedResult.ticketId equals the imported ticket id
+00:09 +127: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/services/shared_content_processor_test.dart: SharedContentProcessor processContent - Archive Flag Given a past ticket, When processing SMS content, Then result has isArchived=true and archived warning
+00:09 +128: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/services/shared_content_processor_test.dart: SharedContentProcessor processContent - Archive Flag Given a future ticket, When processing SMS content, Then result has isArchived=false and no warning
+00:09 +129: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/services/shared_content_processor_test.dart: SharedContentProcessor processContent - Archive Flag Given a past PKPass ticket, When processing PKPass content, Then result has isArchived=true
+00:09 +130: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/services/shared_content_processor_test.dart: SharedContentProcessor processContent - Ticket Updates Given update SMS with conductor details, When processing content and ticket exists, Then returns TicketUpdatedResult
+00:09 +131: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/services/shared_content_processor_test.dart: SharedContentProcessor processContent - Ticket Updates Given update SMS but ticket not found, When processing content, Then returns TicketNotFoundResult
+00:09 +132: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/services/shared_content_processor_test.dart: SharedContentProcessor processContent - Ticket Updates Given existing ticket but DAO update returns 0, When processing update SMS, Then returns TicketNotFoundResult
+00:09 +133: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/services/shared_content_processor_test.dart: SharedContentProcessor processContent - Ticket Updates Given a PDF whose content only matches the update SMS pattern and the original ticket exists, Then returns TicketUpdatedResult via the secondary update path
+00:09 +134: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/services/shared_content_processor_test.dart: SharedContentProcessor processContent - Ticket Updates Given a PDF whose update path finds no original ticket, Then returns TicketNotFoundResult via the secondary update path
+00:09 +135: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/services/shared_content_processor_test.dart: SharedContentProcessor processContent - Ticket Updates Given update SMS with multiple updates, When processing content, Then all updates are passed to DAO
+00:09 +136: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/services/shared_content_processor_test.dart: SharedContentProcessor processContent - Error Handling Given DAO throws exception, When processing content, Then returns ProcessingErrorResult
+00:09 +137: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/services/shared_content_processor_test.dart: SharedContentProcessor processContent - Error Handling Given very long content, When processing content, Then processes without errors
+00:09 +138: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/services/shared_content_processor_test.dart: SharedContentProcessor processContent - Error Handling Given parsed ticket has missing ID, When processing content, Then returns ProcessingErrorResult
+00:09 +139: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/services/shared_content_processor_test.dart: SharedContentProcessor processContent - Result Types Given TicketCreatedResult, When checking fields, Then all required fields are present
+00:09 +140: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/services/shared_content_processor_test.dart: SharedContentProcessor processContent - Result Types Given TicketUpdatedResult, When checking fields, Then all required fields are present
+00:09 +141: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/services/shared_content_processor_test.dart: SharedContentProcessor processContent - Result Types Given ProcessingErrorResult, When checking fields, Then all required fields are present
+00:09 +142: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/services/shared_content_processor_test.dart: SharedContentProcessor processContent - Result Types Given TicketNotFoundResult, When checking fields, Then all required fields are present
+00:09 +143: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/services/shared_content_processor_test.dart: SharedContentProcessor processContent - Result Types Given all result types, When checking inheritance, Then all extend SharedContentResult
+00:09 +144: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/services/shared_content_processor_test.dart: SharedContentProcessor processContent - Result Types Given TicketCreatedResult with ticketId, When checking fields, Then ticketId is accessible
+00:09 +145: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/services/shared_content_processor_test.dart: SharedContentProcessor processContent - Integration Scenarios Given sequential ticket creation and update, When processing both, Then both operations succeed
+00:09 +146: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/services/shared_content_processor_test.dart: SharedContentProcessor processContent - Integration Scenarios Given multiple processors working concurrently, When processing different content, Then each processor works independently
+00:09 +147: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/theme/theme_provider_test.dart: ThemeProvider defaults starts in system mode with the matching getters
+00:09 +148: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/theme/theme_provider_test.dart: ThemeProvider mode setters setLightMode flips to light and notifies
+00:09 +149: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/theme/theme_provider_test.dart: ThemeProvider mode setters setDarkMode flips to dark
+00:09 +150: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/theme/theme_provider_test.dart: ThemeProvider mode setters setSystemMode flips to system
+00:09 +151: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/theme/theme_provider_test.dart: ThemeProvider mode setters setThemeMode accepts any ThemeMode
+00:09 +152: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/theme/theme_provider_test.dart: ThemeProvider mode setters toggleTheme: light ΓåÆ dark
+00:09 +153: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/theme/theme_provider_test.dart: ThemeProvider mode setters toggleTheme: dark ΓåÆ light
+00:09 +154: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/theme/theme_provider_test.dart: ThemeProvider mode setters toggleTheme: system ΓåÆ light (anything not light goes to light)
+00:09 +155: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/theme/theme_provider_test.dart: ThemeProvider persistence persists the chosen mode across instances
+00:09 +156: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/theme/theme_provider_test.dart: ThemeProvider persistence falls back to default when stored index is out of range
+00:10 +157: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/widgets/snackbar_widget_test.dart: CustomSnackBar creates success snackbar with correct styling
+00:10 +158: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/widgets/snackbar_widget_test.dart: CustomSnackBar creates success snackbar with correct styling
+00:10 +159: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/widgets/snackbar_widget_test.dart: CustomSnackBar creates success snackbar with correct styling
+00:10 +160: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/widgets/snackbar_widget_test.dart: CustomSnackBar creates success snackbar with correct styling
+00:10 +161: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/widgets/snackbar_widget_test.dart: CustomSnackBar creates success snackbar with correct styling
+00:11 +162: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/widgets/snackbar_widget_test.dart: CustomSnackBar creates success snackbar with correct styling
+00:11 +163: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/widgets/snackbar_widget_test.dart: CustomSnackBar creates success snackbar with correct styling
+00:11 +164: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/widgets/snackbar_widget_test.dart: CustomSnackBar creates success snackbar with correct styling
+00:11 +165: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/widgets/snackbar_widget_test.dart: CustomSnackBar creates success snackbar with correct styling
+00:11 +166: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/widgets/snackbar_widget_test.dart: CustomSnackBar creates success snackbar with correct styling
+00:11 +167: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/widgets/snackbar_widget_test.dart: CustomSnackBar creates success snackbar with correct styling
+00:11 +168: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/widgets/snackbar_widget_test.dart: CustomSnackBar creates error snackbar with correct styling
+00:11 +169: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/widgets/snackbar_widget_test.dart: CustomSnackBar uses correct icon for success message
+00:11 +170: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/widgets/snackbar_widget_test.dart: CustomSnackBar uses correct icon for success message
+00:11 +171: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/widgets/snackbar_widget_test.dart: CustomSnackBar uses correct icon for success message
+00:11 +172: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/widgets/snackbar_widget_test.dart: CustomSnackBar uses correct icon for success message
+00:11 +173: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/widgets/snackbar_widget_test.dart: CustomSnackBar uses correct icon for success message
+00:11 +174: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/widgets/snackbar_widget_test.dart: CustomSnackBar uses correct icon for success message
+00:11 +175: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/widgets/snackbar_widget_test.dart: CustomSnackBar uses correct icon for success message
+00:11 +176: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/widgets/snackbar_widget_test.dart: CustomSnackBar uses correct icon for success message
+00:11 +177: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/widgets/snackbar_widget_test.dart: CustomSnackBar uses correct icon for success message
+00:11 +178: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/widgets/snackbar_widget_test.dart: CustomSnackBar uses correct icon for success message
+00:11 +179: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/widgets/snackbar_widget_test.dart: CustomSnackBar uses correct icon for success message
+00:11 +180: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/widgets/snackbar_widget_test.dart: CustomSnackBar uses correct icon for success message
+00:11 +181: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/widgets/snackbar_widget_test.dart: CustomSnackBar uses correct icon for success message
+00:11 +182: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/widgets/snackbar_widget_test.dart: CustomSnackBar uses correct icon for success message
+00:11 +183: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/widgets/snackbar_widget_test.dart: CustomSnackBar uses correct icon for success message
+00:11 +184: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/widgets/snackbar_widget_test.dart: CustomSnackBar uses correct icon for success message
+00:11 +185: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/widgets/snackbar_widget_test.dart: CustomSnackBar uses correct icon for success message
+00:11 +186: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/widgets/snackbar_widget_test.dart: CustomSnackBar uses correct icon for error message
+00:12 +187: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/widgets/snackbar_widget_test.dart: CustomSnackBar displays message text correctly
+00:12 +188: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/widgets/snackbar_widget_test.dart: CustomSnackBar uses custom duration when provided
+00:12 +189: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/widgets/snackbar_widget_test.dart: CustomSnackBar uses default duration for success (2 seconds)
+00:12 +190: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/clipboard/data/clipboard_repository_test.dart: ClipboardRepository Data Layer Tests Interface Compliance Given ClipboardRepository, When checking type, Then implements IClipboardRepository interface
+00:12 +191: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/widgets/snackbar_widget_test.dart: CustomSnackBar uses default duration for error (3 seconds)
+00:12 +192: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/widgets/snackbar_widget_test.dart: CustomSnackBar uses default duration for error (3 seconds)
+00:12 +193: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/widgets/snackbar_widget_test.dart: CustomSnackBar uses default duration for error (3 seconds)
+00:12 +194: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/clipboard/data/clipboard_repository_test.dart: ClipboardRepository Data Layer Tests hasTextContent Method Given clipboard with text content, When checking hasTextContent, Then returns true
+00:12 +195: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/widgets/snackbar_widget_test.dart: CustomSnackBar has responsive margin above bottom navigation
+00:12 +196: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/widgets/snackbar_widget_test.dart: CustomSnackBar has responsive margin above bottom navigation
+00:12 +197: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/widgets/snackbar_widget_test.dart: CustomSnackBar has responsive margin above bottom navigation
+00:12 +198: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/widgets/snackbar_widget_test.dart: CustomSnackBar has responsive margin above bottom navigation
+00:12 +199: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/widgets/snackbar_widget_test.dart: CustomSnackBar has responsive margin above bottom navigation
+00:12 +200: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/clipboard/data/clipboard_repository_test.dart: ClipboardRepository Data Layer Tests readText Method Given clipboard with multiline text, When reading text, Then preserves newlines but trims edges
+00:12 +201: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/clipboard/data/clipboard_repository_test.dart: ClipboardRepository Data Layer Tests readText Method Given empty clipboard, When reading text, Then returns null
+00:12 +202: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/widgets/snackbar_widget_test.dart: CustomSnackBar has rounded corners
+00:12 +203: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/widgets/snackbar_widget_test.dart: CustomSnackBar has rounded corners
+00:12 +204: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/widgets/snackbar_widget_test.dart: CustomSnackBar has rounded corners
+00:12 +205: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/widgets/snackbar_widget_test.dart: CustomSnackBar has rounded corners
+00:12 +206: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/widgets/snackbar_widget_test.dart: CustomSnackBar has rounded corners
+00:12 +207: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/widgets/snackbar_widget_test.dart: CustomSnackBar has rounded corners
+00:12 +208: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/clipboard/data/clipboard_repository_test.dart: ClipboardRepository Data Layer Tests readText Method Given very long clipboard content, When reading text, Then returns full content
+00:12 +209: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/widgets/snackbar_widget_test.dart: CustomSnackBar icon has correct size and color
+00:12 +210: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/widgets/snackbar_widget_test.dart: CustomSnackBar icon has correct size and color
+00:12 +211: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/widgets/snackbar_widget_test.dart: CustomSnackBar icon has correct size and color
+00:12 +212: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/widgets/snackbar_widget_test.dart: CustomSnackBar icon has correct size and color
+00:12 +213: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/widgets/snackbar_widget_test.dart: CustomSnackBar icon has correct size and color
+00:12 +214: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/widgets/snackbar_widget_test.dart: CustomSnackBar message text has correct styling
+00:12 +215: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/widgets/snackbar_widget_test.dart: showSnackbar displays success snackbar
+00:12 +216: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/clipboard/domain/clipboard_result_test.dart: ClipboardResult Domain Model Tests Success Factory Constructor Given travel ticket content type with ticket, When creating success result, Then returns result with ticket data
+00:12 +217: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/widgets/snackbar_widget_test.dart: showSnackbar displays error snackbar
+00:12 +218: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/widgets/snackbar_widget_test.dart: showSnackbar displays error snackbar
+00:12 +219: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/widgets/snackbar_widget_test.dart: showSnackbar displays error snackbar
+00:12 +220: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/widgets/snackbar_widget_test.dart: showSnackbar displays error snackbar
+00:12 +221: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/widgets/snackbar_widget_test.dart: showSnackbar displays error snackbar
+00:12 +222: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/widgets/snackbar_widget_test.dart: showSnackbar displays error snackbar
+00:12 +223: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/widgets/snackbar_widget_test.dart: showSnackbar displays error snackbar
+00:12 +224: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/widgets/snackbar_widget_test.dart: showSnackbar displays error snackbar
+00:12 +225: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/widgets/snackbar_widget_test.dart: showSnackbar uses custom duration when provided
+00:13 +226: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/widgets/snackbar_widget_test.dart: showSnackbar handles long messages correctly
+00:13 +227: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/widgets/snackbar_widget_test.dart: showSnackbar snackbar appears above navigation bar position
+00:13 +228: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/widgets/snackbar_widget_test.dart: showSnackbar can dismiss snackbar by swiping up
+00:13 +229: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/common/application/travel_parser_service_test.dart: TravelParserService Tests should detect and parse SETC SMS
+00:13 +230: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/widgets/snackbar_widget_test.dart: showSnackbar multiple snack bars can be queued
+00:13 +231: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/common/application/travel_parser_service_test.dart: TravelParserService Tests should detect and parse TNSTC PDF text
+00:13 +232: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/common/application/travel_parser_service_test.dart: TravelParserService Tests should detect and parse TNSTC PDF text
+00:13 +233: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/widgets/snackbar_widget_test.dart: Snackbar Edge Cases handles special characters in message
+00:13 +234: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/widgets/snackbar_widget_test.dart: Snackbar Edge Cases handles special characters in message
+00:13 +235: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/common/application/travel_parser_service_test.dart: TravelParserService Tests should correctly identify SETC as SMS format
+00:13 +235 -1: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/widgets/snackbar_widget_test.dart: Snackbar Edge Cases handles unicode characters in message
+00:13 +235 -1: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/common/application/travel_parser_service_test.dart: TravelParserService Tests should correctly identify SETC as SMS format [E]
+  Expected: not null
+    Actual: <null>
+  
+  package:matcher                                                            expect
+  package:flutter_test/src/widget_tester.dart 473:18                         expect
+  test\src\features\common\application\travel_parser_service_test.dart 92:7  main.<fn>.<fn>
+  
+00:13 +236 -1: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/common/application/travel_parser_service_test.dart: TravelParserService Tests should correctly identify Service Start Place as PDF format
+00:13 +236 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/widgets/snackbar_widget_test.dart: Snackbar Edge Cases snackbar is floating behavior
+00:13 +236 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/common/application/travel_parser_service_test.dart: TravelParserService Tests should correctly identify Service Start Place as PDF format [E]
+  Expected: not null
+    Actual: <null>
+  
+  package:matcher                                                             expect
+  package:flutter_test/src/widget_tester.dart 473:18                          expect
+  test\src\features\common\application\travel_parser_service_test.dart 109:7  main.<fn>.<fn>
+  
+00:13 +237 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/widgets/snackbar_widget_test.dart: Snackbar Edge Cases snackbar is floating behavior
+00:13 +238 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/widgets/snackbar_widget_test.dart: Snackbar Edge Cases snackbar is floating behavior
+00:13 +239 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/widgets/snackbar_widget_test.dart: Snackbar Edge Cases snackbar is floating behavior
+00:13 +240 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/widgets/snackbar_widget_test.dart: Snackbar Edge Cases snackbar is floating behavior
+00:13 +241 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/widgets/snackbar_widget_test.dart: Snackbar Edge Cases snackbar is floating behavior
+00:13 +242 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/widgets/snackbar_widget_test.dart: Snackbar Edge Cases snackbar is floating behavior
+00:13 +243 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/widgets/snackbar_widget_test.dart: Snackbar Edge Cases snackbar is floating behavior
+00:13 +244 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/common/widgets/snackbar_widget_test.dart: Snackbar Edge Cases snackbar is floating behavior
+00:13 +245 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/events/domain/event_model_test.dart: Event.getIconData maps known icon names
+00:13 +246 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/events/domain/event_model_test.dart: Event.getIconData falls back to Icons.event for unknown names
+00:13 +247 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/events/domain/event_model_test.dart: Event.icon returns the IconData for the configured iconName
+00:14 +248 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/home/domain/ticket_mapping_test.dart: Ticket.fromTNSTC should combine journeyDate and serviceStartTime
+00:15 +249 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/home/domain/ticket_time_formatting_test.dart: Verify consistent time formatting between Departure Time and Pickup Time
+00:15 +250 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/import/application/import_service_test.dart: ImportService importAndSavePKPassFile should return empty result when ticket cannot be parsed
+00:15 +251 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/import/application/import_service_test.dart: ImportService importAndSavePKPassFile should return warning when provider is not Luma
+00:15 +252 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/import/application/import_service_test.dart: ImportService importAndSavePKPassFile should return no warning when provider contains Luma
+00:15 +253 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/import/application/import_service_test.dart: ImportService importAndSavePKPassFile should return warning when provider is missing
+00:15 +254 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/import/application/import_service_test.dart: ImportService importAndSavePKPassFile should return null ticket result when an exception occurs
+00:15 +255 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/import/application/import_service_test.dart: ImportService importTNSTCByPNR should successfully import and save TNSTC ticket
+00:15 +256 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/import/application/import_service_test.dart: ImportService importTNSTCByPNR should return null when PNR fetcher returns null
+00:15 +257 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/import/application/import_service_test.dart: ImportService importTNSTCByPNR should return null when PNR fetcher throws exception
+00:15 +258 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/import/application/import_service_test.dart: ImportService importTNSTCByPNR should return null when database operation fails
+00:15 +259 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/import/application/import_service_test.dart: ImportService importTNSTCByPNR should convert TNSTC ticket to generic Ticket model
+00:15 +260 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/import/application/import_service_test.dart: ImportService importAndSavePDFFile returns null when no OCR blocks are extracted
+00:15 +261 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/import/application/import_service_test.dart: ImportService importAndSavePDFFile returns null when parser cannot interpret the blocks
+00:15 +262 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/import/application/import_service_test.dart: ImportService importAndSavePDFFile saves and returns parsed ticket on success
+00:15 +263 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/import/application/import_service_test.dart: ImportService importQRCode returns null for unsupported QR data
+00:15 +264 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/import/application/import_service_test.dart: ImportService importQRCode returns null when scanner reports failure
+00:15 +265 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/import/application/import_service_test.dart: ImportService importQRCode returns the saved travel ticket on success
+00:15 +266 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/import/application/import_service_test.dart: ImportService importQRCode returns null and logs when scanner throws
+00:15 +267 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/import/application/import_service_test.dart: ImportService misc supportedExtensions includes pdf and pkpass
+00:15 +268 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/import/application/import_service_test.dart: ImportService misc isSupportedQRCode delegates to the QR parser
+00:16 +269 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/irctc/application/irctc_pdf_parser_test.dart: IRCTCLayoutParser with OCR Blocks should parse 4117608719 from OCR blocks
+00:16 +270 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/irctc/application/irctc_pdf_parser_test.dart: IRCTCLayoutParser with OCR Blocks should parse 4214465828 from OCR blocks
+00:16 +271 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/irctc/application/irctc_pdf_parser_test.dart: IRCTCLayoutParser with OCR Blocks should parse 4222116599 from OCR blocks
+00:16 +272 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/irctc/application/irctc_pdf_parser_test.dart: IRCTCLayoutParser with OCR Blocks should parse 4249001496 from OCR blocks
+00:16 +273 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/irctc/application/irctc_pdf_parser_test.dart: IRCTCLayoutParser with OCR Blocks should parse 4417448343 from OCR blocks
+00:16 +274 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/irctc/application/irctc_pdf_parser_test.dart: IRCTCLayoutParser with OCR Blocks should parse 4449000087 from OCR blocks
+00:16 +275 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/irctc/application/irctc_pdf_parser_test.dart: IRCTCLayoutParser with OCR Blocks should parse 4534937884 from OCR blocks
+00:16 +276 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/irctc/application/irctc_pdf_parser_test.dart: IRCTCLayoutParser with OCR Blocks should parse 4565194077 from OCR blocks
+00:16 +277 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/irctc/application/irctc_pdf_parser_test.dart: IRCTCLayoutParser with OCR Blocks should parse 4628586109 from OCR blocks
+00:16 +278 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/irctc/application/irctc_pdf_parser_test.dart: IRCTCLayoutParser with OCR Blocks should parse 4634845356 from OCR blocks
+00:16 +279 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/irctc/application/irctc_pdf_parser_test.dart: IRCTCLayoutParser with OCR Blocks should parse 4634847925 from OCR blocks
+00:16 +280 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/irctc/application/irctc_pdf_parser_test.dart: IRCTCLayoutParser with OCR Blocks should parse 4740095793 from OCR blocks
+00:16 +281 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/irctc/application/irctc_pdf_parser_test.dart: IRCTCLayoutParser with OCR Blocks should parse 4842082738 from OCR blocks
+00:16 +282 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/irctc/application/irctc_pdf_parser_test.dart: IRCTCLayoutParser with OCR Blocks should parse 4928088531 from OCR blocks
+00:16 +283 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/irctc/application/irctc_pdf_parser_test.dart: IRCTCLayoutParser with OCR Blocks should parse 4249001496_ecs from OCR blocks
+00:17 +284 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/irctc/application/irctc_qr_parser_test.dart: IRCTCQRParser.isIRCTCQRCode returns true when PNR marker is present
+00:17 +285 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/irctc/application/irctc_qr_parser_test.dart: IRCTCQRParser.isIRCTCQRCode returns true when PNR marker is present
+00:17 +286 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/irctc/application/irctc_pdf_parser_test.dart: IRCTCLayoutParser with OCR Blocks should parse 4537429538 from OCR blocks
+00:17 +287 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/irctc/application/irctc_pdf_parser_test.dart: IRCTCLayoutParser with OCR Blocks should parse 4537429538 from OCR blocks
+00:17 +288 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/irctc/application/irctc_pdf_parser_test.dart: IRCTCLayoutParser with OCR Blocks should parse 4537429538 from OCR blocks
+00:17 +289 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/irctc/application/irctc_pdf_parser_test.dart: IRCTCLayoutParser with OCR Blocks should parse 4537429538 from OCR blocks
+00:17 +290 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/irctc/application/irctc_pdf_parser_test.dart: IRCTCLayoutParser with OCR Blocks should parse 4537429538 from OCR blocks
+00:17 +291 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/irctc/application/irctc_pdf_parser_test.dart: IRCTCLayoutParser with OCR Blocks should parse 4537429538 from OCR blocks
+00:17 +292 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/irctc/application/irctc_pdf_parser_test.dart: IRCTCLayoutParser with OCR Blocks should parse 4537429538 from OCR blocks
+00:17 +293 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/irctc/application/irctc_pdf_parser_test.dart: IRCTCLayoutParser with OCR Blocks should parse 4537429538 from OCR blocks
+00:17 +294 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/irctc/application/irctc_qr_parser_test.dart: IRCTCQRParser.parseQRCode handles malformed datetime gracefully
+00:17 +295 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/irctc/application/irctc_pdf_parser_test.dart: IRCTCLayoutParser with OCR Blocks should parse 4328673018 from OCR blocks
+00:17 +296 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/irctc/application/irctc_pdf_parser_test.dart: IRCTCLayoutParser with OCR Blocks should parse 4328673018 from OCR blocks
+00:17 +297 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/irctc/application/irctc_pdf_parser_test.dart: IRCTCLayoutParser with OCR Blocks should parse 4937508934 from OCR blocks
+00:17 +298 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/irctc/application/irctc_pdf_parser_test.dart: IRCTCLayoutParser with OCR Blocks should parse 4846874185 from OCR blocks
+00:17 +299 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/irctc/application/irctc_pdf_parser_test.dart: IRCTCLayoutParser with OCR Blocks should parse 4565161618 from OCR blocks
+00:17 +300 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/irctc/application/irctc_scanner_service_test.dart: IRCTCScannerService.parseAndSaveIRCTCTicket returns error when the QR is not an IRCTC code
+00:17 +301 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/irctc/application/irctc_scanner_service_test.dart: IRCTCScannerService.parseAndSaveIRCTCTicket returns error when the parser cannot decode the QR
+00:17 +302 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/irctc/application/irctc_scanner_service_test.dart: IRCTCScannerService.parseAndSaveIRCTCTicket returns success and saves the ticket on the happy path
+00:17 +303 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/irctc/application/irctc_scanner_service_test.dart: IRCTCScannerService.parseAndSaveIRCTCTicket returns error when the DAO insert fails
+00:18 +304 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/irctc/application/irctc_sms_parser_test.dart: IRCTCParser SMS Parser should parse cancelled IRCTC ticket to Ticket model correctly
+00:18 +305 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/irctc/application/irctc_sms_parser_test.dart: IRCTCParser SMS Parser should parse standard IRCTC ticket to Ticket model correctly
+00:18 +306 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/irctc/application/irctc_sms_parser_test.dart: IRCTCParser SMS Parser should parse waitlisted IRCTC ticket to Ticket model correctly
+00:18 +307 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/irctc/application/irctc_sms_parser_test.dart: IRCTCParser SMS Parser should parse multi-passenger IRCTC ticket to Ticket model correctly
+00:18 +308 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/irctc/application/irctc_sms_parser_test.dart: IRCTCParser SMS Parser should parse old-format IRCTC SMS into Ticket model correctly
+00:18 +309 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/irctc/domain/irctc_ticket_model_test.dart: IRCTCTicket.toReadableString renders all populated fields
+00:18 +310 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/irctc/domain/irctc_ticket_model_test.dart: IRCTCTicket.toReadableString renders Unknown placeholders when nullable fields are missing
+00:18 +311 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/irctc/domain/irctc_ticket_model_test.dart: IRCTCTicket.toReadableString zero-pads day/month in journey and booking dates
+00:19 +312 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/receive/application/sharing_intent_provider_test.dart: SharingIntentProvider getInitialSharing calls correct platform method
+00:19 +313 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/receive/application/sharing_intent_provider_test.dart: SharingIntentProvider getInitialSharing returns null when no media
+00:19 +314 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/receive/application/sharing_intent_provider_test.dart: SharingIntentProvider getMediaStream returns stream
+00:19 +315 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/receive/application/sharing_intent_provider_test.dart: SharingIntentProvider getMediaStream emits shared media
+00:19 +316 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/receive/application/sharing_intent_service_test.dart: SharingIntentService Initialization should handle initial media when present
+00:19 +317 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/receive/application/sharing_intent_service_test.dart: SharingIntentService Initialization should handle stream events
+00:19 +318 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/receive/application/sharing_intent_service_test.dart: SharingIntentService Initialization should handle stream errors
+00:19 +319 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/receive/application/sharing_intent_service_test.dart: SharingIntentService File Handling should process PDF file correctly
+00:19 +320 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/receive/application/sharing_intent_service_test.dart: SharingIntentService File Handling should process Text file correctly
+00:19 +321 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/receive/application/sharing_intent_service_test.dart: SharingIntentService File Handling should handle unsupported file types
+00:19 +322 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/receive/application/sharing_intent_service_test.dart: SharingIntentService File Handling should handle text content (not a file path)
+00:19 +323 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/receive/application/sharing_intent_service_test.dart: SharingIntentService extractContentFromFile should extract text from PDF
+00:19 +324 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/receive/application/sharing_intent_service_test.dart: SharingIntentService extractContentFromFile should extract text from text file
+00:19 +325 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/receive/application/sharing_intent_service_test.dart: SharingIntentService extractContentFromFile should throw on unsupported file
+00:20 +326 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/receive/presentation/share_handler_test.dart: ShareHandler handleResult - TicketCreatedResult Given TicketCreatedResult with ticketId, When handleResult called, Then navigates to ticket view path
+00:20 +327 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/receive/presentation/share_handler_test.dart: ShareHandler handleResult - TicketCreatedResult Given TicketCreatedResult with null ticketId, When handleResult called, Then navigates to home
+00:20 +328 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/receive/presentation/share_handler_test.dart: ShareHandler handleResult - TicketCreatedResult Given TicketCreatedResult with ticketId and warning, When handleResult called, Then navigates to ticket view and shows warning
+00:20 +329 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/receive/presentation/share_handler_test.dart: ShareHandler handleResult - TicketCreatedResult Given archived TicketCreatedResult, When handleResult called, Then pushes archived tickets over home
+00:20 +330 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/receive/presentation/share_handler_test.dart: ShareHandler handleResult - TicketCreatedResult Given archived TicketCreatedResult without warning, When handleResult called, Then still pushes archived tickets over home
+00:20 +331 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/receive/presentation/share_handler_test.dart: ShareHandler handleResult - other branches Given TicketUpdatedResult, When handleResult called, Then navigates to share success with extras map
+00:20 +332 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/receive/presentation/share_handler_test.dart: ShareHandler handleResult - other branches Given TicketNotFoundResult, When handleResult called, Then navigates home
+00:20 +333 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/receive/presentation/share_handler_test.dart: ShareHandler handleResult - other branches Given ProcessingErrorResult, When handleResult called, Then navigates home
+00:20 +334 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/receive/presentation/share_handler_test.dart: ShareHandler handleError navigates home on error
+00:20 +335 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/settings/application/ai_service_status_test.dart: AIServiceStatus starts as supported with no error message
+00:20 +336 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/settings/application/ai_service_status_test.dart: AIServiceStatus setGemmaSupport(false, error) updates state and notifies
+00:20 +337 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/settings/application/ai_service_status_test.dart: AIServiceStatus setGemmaSupport(true) clears the error
+00:21 +338 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/tnstc/application/passenger_extraction_test.dart: TNSTCLayoutParser - Passenger Extraction should extract all 3 passengers from t73910447
+00:21 +339 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/tnstc/application/passenger_extraction_test.dart: TNSTCLayoutParser - Passenger Extraction should correctly assign seat numbers using column alignment
+00:21 +340 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/tnstc/application/pdf_service_test.dart: PDFService Text Cleaning Tests should not corrupt text with $1 literals
+00:22 +341 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/tnstc/application/sms_time_parsing_test.dart: TNSTCSMSParser Time Parsing Tests should parse SETC SMS with time correctly
+00:22 +342 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/tnstc/application/sms_time_parsing_test.dart: TNSTCSMSParser Time Parsing Tests should parse standard TNSTC SMS without SETC correctly
+00:22 +343 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/tnstc/application/sms_time_parsing_test.dart: TNSTCSMSParser Time Parsing Tests should handle SMS with missing time gracefully
+00:24 +344 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/tnstc/application/tnstc_api_ticket_parser_test.dart: TNSTCApiTicketParser should parse HH:mm:ss API time into ticket start time
+00:24 +345 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/tnstc/application/tnstc_api_ticket_parser_test.dart: TNSTCApiTicketParser should normalize API seat numbers before ticket mapping
+00:24 +346 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/tnstc/application/tnstc_api_ticket_parser_test.dart: TNSTCApiTicketParser should fallback location to from place when pickup point is missing
+00:24 +347 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/tnstc/application/tnstc_api_ticket_parser_test.dart: TNSTCApiTicketParser should preserve passenger name in extras
+00:25 +348 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/tnstc/application/tnstc_layout_parser_test.dart: TNSTCLayoutParser _formatTime should return null for null or empty input
+00:25 +349 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/tnstc/application/tnstc_layout_parser_test.dart: TNSTCLayoutParser _formatTime should return null for malformed time strings
+00:25 +350 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/tnstc/application/tnstc_layout_parser_test.dart: TNSTCLayoutParser _formatTime should return null for out-of-range values
+00:25 +351 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/tnstc/application/tnstc_layout_parser_test.dart: TNSTCLayoutParser _formatTime should correctly format valid 24-hour times to 12-hour format
+00:25 +352 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/tnstc/application/tnstc_layout_parser_test.dart: TNSTCLayoutParser _formatTime should handle single-digit hours correctly
+00:25 +353 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/tnstc/application/tnstc_layout_parser_test.dart: TNSTCLayoutParser parseTicket should parse ticket from plain text using pseudo-blocks
+00:25 +354 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/tnstc/application/tnstc_layout_parser_test.dart: TNSTCLayoutParser parseTicketFromBlocks should parse SETC ticket from OCR blocks with basic fields
+00:26 +355 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/tnstc/application/tnstc_layout_parser_test.dart: TNSTCLayoutParser parseTicketFromBlocks should parse Non-AC Lower Berth ticket from pseudo-blocks
+00:26 +356 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/tnstc/application/tnstc_layout_parser_test.dart: TNSTCLayoutParser parseTicketFromBlocks should parse SETC ticket from real OCR blocks with bounding boxes
+00:26 +357 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/tnstc/application/tnstc_layout_parser_test.dart: TNSTCLayoutParser parseTicketFromBlocks should parse multi-passenger SETC ticket from real OCR blocks
+00:26 +358 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/tnstc/application/tnstc_layout_parser_test.dart: TNSTCLayoutParser parseTicketFromBlocks should parse SETC ticket T75229209 from real OCR blocks
+00:26 +359 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/tnstc/application/tnstc_layout_parser_test.dart: TNSTCLayoutParser parseTicketFromBlocks should parse SETC ticket T75229210 from real OCR blocks
+00:26 +360 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/tnstc/application/tnstc_layout_parser_test.dart: TNSTCLayoutParser parseTicketFromBlocks should parse SETC ticket T76296907 from real OCR blocks
+00:26 +361 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/tnstc/application/tnstc_layout_parser_test.dart: TNSTCLayoutParser parseTicketFromBlocks should parse VILLUPURAM ticket Y74873047 from real OCR blocks
+00:26 +362 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/tnstc/application/tnstc_layout_parser_test.dart: TNSTCLayoutParser parseTicketFromBlocks should parse VILLUPURAM ticket Y74928831 from real OCR blocks
+00:26 +363 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/tnstc/application/tnstc_layout_parser_test.dart: TNSTCLayoutParser parseTicketFromBlocks should parse SETC ticket T73289589 from real OCR blocks
+00:27 +364 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/tnstc/application/tnstc_sms_parser_test.dart: TNSTCSMSParser Tests should parse standard SETC SMS correctly
+00:27 +365 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/tnstc/application/tnstc_sms_parser_test.dart: TNSTCSMSParser Tests should return ticket for empty or non-matching SMS text
+00:27 +366 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/tnstc/application/tnstc_sms_parser_test.dart: TNSTCSMSParser Tests should handle malformed seat numbers
+00:27 +367 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/tnstc/application/tnstc_sms_parser_test.dart: TNSTCSMSParser Tests should handle single seat number
+00:27 +368 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/tnstc/application/tnstc_sms_parser_test.dart: TNSTCSMSParser Tests should parse time with comma format correctly
+00:27 +369 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/tnstc/application/tnstc_sms_parser_test.dart: TNSTCSMSParser Tests should parse time without comma format correctly
+00:27 +370 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/tnstc/application/tnstc_sms_parser_test.dart: TNSTCSMSParser Tests should handle various seat number formats
+00:27 +371 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/tnstc/application/tnstc_sms_parser_test.dart: TNSTCSMSParser Tests should handle different class formats
+00:27 +372 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/tnstc/application/tnstc_sms_parser_test.dart: TNSTCSMSParser Tests should handle different boarding point formats
+00:27 +373 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/tnstc/application/tnstc_sms_parser_test.dart: TNSTCSMSParser Tests should handle seat numbers with spaces
+00:27 +374 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/tnstc/application/tnstc_sms_parser_test.dart: TNSTCSMSParser Tests should parse conductor SMS and store details
+00:27 +375 -2: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/tnstc/application/tnstc_sms_parser_test.dart: TNSTCSMSParser Tests should parse alternative TNSTC SMS format with Date and Route keywords
+00:27 +375 -3: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/tnstc/application/tnstc_sms_parser_test.dart: TNSTCSMSParser Tests should parse alternative TNSTC SMS format with Date and Route keywords [E]
+  Expected: 'CHENNAI ΓåÆ MADURAI'
+    Actual: <null>
+     Which: not an <Instance of 'String'>
+  
+  package:matcher                                                       expect
+  package:flutter_test/src/widget_tester.dart 473:18                    expect
+  test\src\features\tnstc\application\tnstc_sms_parser_test.dart 301:9  main.<fn>.<fn>
+  
+00:27 +375 -3: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/tnstc/application/tnstc_sms_parser_test.dart: TNSTCSMSParser Tests should not show passenger name and age for SMS tickets
+00:27 +376 -3: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/tnstc/application/tnstc_sms_parser_test.dart: TNSTCSMSParser Tests TNSTCSMSParser Seat Number Regex Edge Cases should handle seat numbers with special characters (#, -)
+00:27 +377 -3: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/tnstc/application/tnstc_sms_parser_test.dart: TNSTCSMSParser Tests TNSTCSMSParser Seat Number Regex Edge Cases should stop parsing at keywords (Negative Lookahead)
+00:27 +378 -3: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/tnstc/application/tnstc_sms_parser_test.dart: TNSTCSMSParser Tests TNSTCSMSParser Seat Number Regex Edge Cases should stop parsing at keywords even with trailing comma
+00:27 +379 -3: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/tnstc/application/tnstc_sms_parser_test.dart: TNSTCSMSParser Tests TNSTCSMSParser Seat Number Regex Edge Cases should handle seat numbers with multiple spaces
+00:27 +380 -3: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/tnstc/application/tnstc_sms_parser_test.dart: TNSTCSMSParser Tests TNSTCSMSParser Seat Number Regex Edge Cases should handle empty seat number field
+00:27 +381 -3: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/tnstc/application/tnstc_sms_parser_test.dart: TNSTCSMSParser Tests TNSTCSMSParser Seat Number Regex Edge Cases should handle seat number field missing completely
+00:27 +382 -3: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/tnstc/domain/tnstc_model_test.dart: PassengerInfo should instantiate correctly
+00:27 +383 -3: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/tnstc/domain/tnstc_model_test.dart: PassengerInfo should instantiate with null fields
+00:27 +384 -3: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/tnstc/domain/tnstc_model_test.dart: PassengerInfo toString should return a formatted string
+00:27 +385 -3: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/tnstc/domain/tnstc_model_test.dart: PassengerInfo toString should handle null fields
+00:27 +386 -3: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/tnstc/domain/tnstc_model_test.dart: PassengerInfo should support value equality
+00:28 +387 -3: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/tnstc/domain/tnstc_model_test.dart: PassengerInfo should serialize and deserialize correctly with dart_mappable
+00:28 +388 -3: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/tnstc/domain/tnstc_model_test.dart: TNSTCTicketModel should instantiate with minimal data
+00:28 +389 -3: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/tnstc/domain/tnstc_model_test.dart: TNSTCTicketModel should instantiate with full data
+00:28 +390 -3: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/tnstc/domain/tnstc_model_test.dart: TNSTCTicketModel Convenience Getters displayPnr should return PNR or "Unknown"
+00:28 +391 -3: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/tnstc/domain/tnstc_model_test.dart: TNSTCTicketModel Convenience Getters displayFrom should fallback correctly
+00:28 +392 -3: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/tnstc/domain/tnstc_model_test.dart: TNSTCTicketModel Convenience Getters displayTo should fallback correctly
+00:28 +393 -3: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/tnstc/domain/tnstc_model_test.dart: TNSTCTicketModel Convenience Getters displayClass should return class or "Unknown"
+00:28 +394 -3: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/tnstc/domain/tnstc_model_test.dart: TNSTCTicketModel Convenience Getters displayFare should return formatted fare or "Γé╣0.00"
+00:28 +395 -3: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/tnstc/domain/tnstc_model_test.dart: TNSTCTicketModel Convenience Getters displayDate should return formatted date or "Unknown"
+00:28 +396 -3: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/tnstc/domain/tnstc_model_test.dart: TNSTCTicketModel Convenience Getters seatNumbers should prioritize smsSeatNumbers
+00:28 +397 -3: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/tnstc/domain/tnstc_model_test.dart: TNSTCTicketModel Convenience Getters seatNumbers should use passenger seats as fallback
+00:28 +398 -3: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/tnstc/domain/tnstc_model_test.dart: TNSTCTicketModel toString should not throw
+00:28 +399 -3: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/tnstc/domain/tnstc_model_test.dart: TNSTCTicketModel should serialize and deserialize correctly with dart_mappable
+00:28 +400 -3: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/application/pkpass_parser_test.dart: PKPassParser should parse Flutter Devcon pkpass file correctly
+00:28 +401 -3: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/application/pkpass_parser_test.dart: PKPassParser should extract improved fields like location from real file
+00:28 +402 -3: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/application/pkpass_parser_test.dart: PKPassParser should return null when parsing invalid/malformed pkpass data
+00:28 +403 -3: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/application/pkpass_parser_test.dart: PKPassParser fetchLatestPass should return null given invalid pkpass data (not a zip)
+00:28 +404 -3: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/application/travel_parser_service_test.dart: (setUpAll)
+00:29 +404 -3: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/application/travel_parser_service_test.dart: TravelParserService Tests TNSTC Parser - PDF (Layout) Format Given SETC PDF OCR blocks, When parsing ticket, Then returns valid SETC ticket
+00:29 +405 -3: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/application/travel_parser_service_test.dart: TravelParserService Tests TNSTC Parser - SMS Format Given TNSTC SMS format text, When parsing ticket, Then returns valid TNSTC ticket
+00:29 +406 -3: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/application/travel_parser_service_test.dart: TravelParserService Tests TNSTC Parser - SMS Format Given SETC SMS format text, When parsing ticket, Then returns valid SETC ticket
+00:29 +407 -3: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/application/travel_parser_service_test.dart: TravelParserService Tests IRCTC Parser - Text Format Given IRCTC text with all details, When parsing ticket, Then returns valid IRCTC ticket
+00:29 +407 -4: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/application/travel_parser_service_test.dart: TravelParserService Tests IRCTC Parser - Text Format Given IRCTC text with all details, When parsing ticket, Then returns valid IRCTC ticket [E]
+  Expected: not null
+    Actual: <null>
+  
+  package:matcher                                                              expect
+  package:flutter_test/src/widget_tester.dart 473:18                           expect
+  test\src\features\travel\application\travel_parser_service_test.dart 152:11  main.<fn>.<fn>.<fn>
+  
+00:29 +407 -4: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/application/travel_parser_service_test.dart: TravelParserService Tests IRCTC Parser - Text Format Given IRCTC text with minimal details, When parsing ticket, Then returns ticket with unknown values
+00:29 +407 -5: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/application/travel_parser_service_test.dart: TravelParserService Tests IRCTC Parser - Text Format Given IRCTC text with minimal details, When parsing ticket, Then returns ticket with unknown values [E]
+  Expected: not null
+    Actual: <null>
+  
+  package:matcher                                                              expect
+  package:flutter_test/src/widget_tester.dart 473:18                           expect
+  test\src\features\travel\application\travel_parser_service_test.dart 172:11  main.<fn>.<fn>.<fn>
+  
+00:29 +407 -5: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/application/travel_parser_service_test.dart: TravelParserService Tests IRCTC Parser - Text Format Given IRCTC text with invalid journey date, When parsing ticket, Then uses sentinel value and logs warning
+00:29 +407 -6: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/application/travel_parser_service_test.dart: TravelParserService Tests IRCTC Parser - Text Format Given IRCTC text with invalid journey date, When parsing ticket, Then uses sentinel value and logs warning [E]
+  Expected: not null
+    Actual: <null>
+  
+  package:matcher                                                              expect
+  package:flutter_test/src/widget_tester.dart 473:18                           expect
+  test\src\features\travel\application\travel_parser_service_test.dart 195:11  main.<fn>.<fn>.<fn>
+  
+00:29 +407 -6: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/application/travel_parser_service_test.dart: TravelParserService Tests TNSTC Update SMS Parsing Given TNSTC update SMS with conductor details, When parsing update, Then returns ticket update info
+00:29 +408 -6: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/application/travel_parser_service_test.dart: TravelParserService Tests TNSTC Update SMS Parsing Given TNSTC update SMS with conductor and vehicle, When parsing update, Then returns update info with both details
+00:29 +409 -6: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/application/travel_parser_service_test.dart: TravelParserService Tests TNSTC Update SMS Parsing Given TNSTC update SMS with only vehicle no, When parsing update, Then returns update info with only vehicle
+00:29 +410 -6: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/application/travel_parser_service_test.dart: TravelParserService Tests TNSTC Update SMS Parsing Given update SMS without PNR, When parsing update, Then returns null
+00:29 +411 -6: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/application/travel_parser_service_test.dart: TravelParserService Tests TNSTC Update SMS Parsing Given update SMS without any update fields, When parsing update, Then returns null
+00:29 +412 -6: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/application/travel_parser_service_test.dart: TravelParserService Tests TNSTC Update SMS Parsing Given non-TNSTC update SMS, When parsing update, Then returns null
+00:29 +413 -6: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/application/travel_parser_service_test.dart: TravelParserService Tests Source Type Handling Given ticket text with source type, When parsing ticket, Then adds source type to extras
+00:29 +413 -7: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/application/travel_parser_service_test.dart: TravelParserService Tests Source Type Handling Given ticket text with source type, When parsing ticket, Then adds source type to extras [E]
+  Expected: not null
+    Actual: <null>
+  
+  package:matcher                                                              expect
+  package:flutter_test/src/widget_tester.dart 473:18                           expect
+  test\src\features\travel\application\travel_parser_service_test.dart 332:11  main.<fn>.<fn>.<fn>
+  
+00:29 +413 -7: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/application/travel_parser_service_test.dart: TravelParserService Tests Source Type Handling Given ticket text without source type, When parsing ticket, Then source type can be added via sourceType parameter
+00:29 +413 -8: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/application/travel_parser_service_test.dart: TravelParserService Tests Source Type Handling Given ticket text without source type, When parsing ticket, Then source type can be added via sourceType parameter [E]
+  Expected: not null
+    Actual: <null>
+  
+  package:matcher                                                              expect
+  package:flutter_test/src/widget_tester.dart 473:18                           expect
+  test\src\features\travel\application\travel_parser_service_test.dart 355:11  main.<fn>.<fn>.<fn>
+  
+00:29 +413 -8: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/application/travel_parser_service_test.dart: TravelParserService Tests Parser Selection Logic Given text with SETC and TNSTC keywords, When parsing ticket, Then prefers SETC parser
+00:29 +413 -9: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/application/travel_parser_service_test.dart: TravelParserService Tests Parser Selection Logic Given text with SETC and TNSTC keywords, When parsing ticket, Then prefers SETC parser [E]
+  Expected: not null
+    Actual: <null>
+  
+  package:matcher                                                              expect
+  package:flutter_test/src/widget_tester.dart 473:18                           expect
+  test\src\features\travel\application\travel_parser_service_test.dart 382:11  main.<fn>.<fn>.<fn>
+  
+00:29 +413 -9: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/application/travel_parser_service_test.dart: TravelParserService Tests Parser Selection Logic Given text with only TNSTC keywords, When parsing ticket, Then uses TNSTC parser
+00:29 +413 -10: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/application/travel_parser_service_test.dart: TravelParserService Tests Parser Selection Logic Given text with only TNSTC keywords, When parsing ticket, Then uses TNSTC parser [E]
+  Expected: not null
+    Actual: <null>
+  
+  package:matcher                                                              expect
+  package:flutter_test/src/widget_tester.dart 473:18                           expect
+  test\src\features\travel\application\travel_parser_service_test.dart 406:11  main.<fn>.<fn>.<fn>
+  
+00:29 +413 -10: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/application/travel_parser_service_test.dart: TravelParserService Tests Parser Selection Logic Given text with no matching patterns, When parsing ticket, Then returns null
+00:29 +414 -10: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/application/travel_parser_service_test.dart: TravelParserService Tests Error Handling Given malformed text that matches pattern, When parsing fails, Then returns ticket with null ticketId
+00:29 +414 -11: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/application/travel_parser_service_test.dart: TravelParserService Tests Error Handling Given malformed text that matches pattern, When parsing fails, Then returns ticket with null ticketId [E]
+  Expected: not null
+    Actual: <null>
+  
+  package:matcher                                                              expect
+  package:flutter_test/src/widget_tester.dart 473:18                           expect
+  test\src\features\travel\application\travel_parser_service_test.dart 443:11  main.<fn>.<fn>.<fn>
+  
+00:29 +414 -11: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/application/travel_parser_service_test.dart: TravelParserService Tests Error Handling Given empty text, When parsing ticket, Then returns null
+00:29 +415 -11: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/application/travel_parser_service_test.dart: TravelParserService Tests Error Handling Given whitespace-only text, When parsing ticket, Then returns null
+00:29 +416 -11: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/application/travel_parser_service_test.dart: TravelParserService Tests Service Helper Methods Given service, When getting supported providers, Then returns list of all parser provider names
+00:29 +417 -11: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/application/travel_pdf_parser_test.dart: TravelPDFParser extractMatch should return the matched group for a valid regex
+00:29 +418 -11: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/application/travel_pdf_parser_test.dart: TravelPDFParser extractMatch should return the matched group for a valid regex
+00:29 +419 -11: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/application/travel_pdf_parser_test.dart: TravelPDFParser extractMatch should return the matched group for a valid regex
+00:29 +420 -11: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/application/travel_pdf_parser_test.dart: TravelPDFParser extractMatch should return the matched group for a valid regex
+00:29 +421 -11: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/application/travel_parser_service_test.dart: TravelParserService Tests Edge Cases and Boundary Conditions Given very long text with ticket pattern, When parsing ticket, Then successfully extracts ticket information
+00:29 +422 -11: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/application/travel_parser_service_test.dart: TravelParserService Tests Edge Cases and Boundary Conditions Given very long text with ticket pattern, When parsing ticket, Then successfully extracts ticket information
+00:29 +423 -11: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/application/travel_parser_service_test.dart: TravelParserService Tests Edge Cases and Boundary Conditions Given very long text with ticket pattern, When parsing ticket, Then successfully extracts ticket information
+00:29 +424 -11: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/application/travel_parser_service_test.dart: TravelParserService Tests Edge Cases and Boundary Conditions Given very long text with ticket pattern, When parsing ticket, Then successfully extracts ticket information
+00:29 +424 -12: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/application/travel_parser_service_test.dart: TravelParserService Tests Edge Cases and Boundary Conditions Given very long text with ticket pattern, When parsing ticket, Then successfully extracts ticket information [E]
+  Expected: not null
+    Actual: <null>
+  
+  package:matcher                                                              expect
+  package:flutter_test/src/widget_tester.dart 473:18                           expect
+  test\src\features\travel\application\travel_parser_service_test.dart 560:11  main.<fn>.<fn>.<fn>
+  
+00:29 +424 -12: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/application/travel_parser_service_test.dart: TravelParserService Tests Edge Cases and Boundary Conditions Given text with Unicode characters, When parsing ticket, Then handles Unicode correctly
+00:29 +424 -13: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/application/travel_parser_service_test.dart: TravelParserService Tests Edge Cases and Boundary Conditions Given text with Unicode characters, When parsing ticket, Then handles Unicode correctly [E]
+  Expected: not null
+    Actual: <null>
+  
+  package:matcher                                                              expect
+  package:flutter_test/src/widget_tester.dart 473:18                           expect
+  test\src\features\travel\application\travel_parser_service_test.dart 581:11  main.<fn>.<fn>.<fn>
+  
+00:29 +424 -13: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/application/travel_parser_service_test.dart: TravelParserService Tests Edge Cases and Boundary Conditions Given text with special characters in PNR, When parsing ticket, Then extracts PNR correctly
+00:29 +424 -14: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/application/travel_parser_service_test.dart: TravelParserService Tests Edge Cases and Boundary Conditions Given text with special characters in PNR, When parsing ticket, Then extracts PNR correctly [E]
+  Expected: not null
+    Actual: <null>
+  
+  package:matcher                                                              expect
+  package:flutter_test/src/widget_tester.dart 473:18                           expect
+  test\src\features\travel\application\travel_parser_service_test.dart 600:11  main.<fn>.<fn>.<fn>
+  
+00:29 +424 -14: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/application/travel_parser_service_test.dart: TravelParserService Tests TNSTCBusParser Format Detection Given TNSTC PDF format text, When parsing, Then detects PDF format correctly
+00:29 +425 -14: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/application/travel_parser_service_test.dart: TravelParserService Tests TNSTCBusParser Format Detection Given TNSTC SMS format text, When parsing, Then detects SMS format correctly
+00:29 +426 -14: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/application/travel_parser_service_test.dart: TravelParserService Tests PNR Masking in Logs Given update SMS with long PNR, When parsing, Then masks PNR in logs
+00:29 +427 -14: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/application/travel_parser_service_test.dart: TravelParserService Tests PNR Masking in Logs Given update SMS with short PNR, When parsing, Then handles masking for short PNR
+00:29 +428 -14: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/application/travel_parser_service_test.dart: (tearDownAll)
+00:30 +428 -14: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/application/travel_sms_parser_test.dart: TravelSMSParser parseInt should return the parsed integer for a valid string
+00:30 +429 -14: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/application/travel_sms_parser_test.dart: TravelSMSParser parseInt should return null for an invalid string
+00:30 +430 -14: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/application/travel_sms_parser_test.dart: TravelSMSParser parseInt should parse negative integers
+00:30 +431 -14: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/application/travel_sms_parser_test.dart: TravelSMSParser parseInt should handle whitespace
+00:30 +432 -14: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/application/travel_sms_parser_test.dart: TravelSMSParser parseDouble should return the parsed double for a valid string
+00:30 +433 -14: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/application/travel_sms_parser_test.dart: TravelSMSParser parseDouble should return null for an invalid string
+00:30 +434 -14: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/application/travel_sms_parser_test.dart: TravelSMSParser parseDouble should parse negative doubles
+00:30 +435 -14: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/application/travel_sms_parser_test.dart: TravelSMSParser parseDouble should parse scientific notation if supported
+00:30 +436 -14: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/application/travel_sms_parser_test.dart: TravelSMSParser parseDate should return null for an invalid date string (FormatException)
+00:30 +437 -14: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/application/travel_sms_parser_test.dart: TravelSMSParser parseDate should return null for a date string with incorrect parts count
+00:30 +438 -14: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/application/travel_sms_parser_test.dart: TravelSMSParser parseDate should return null for an empty date string
+00:30 +439 -14: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/application/travel_sms_parser_test.dart: TravelSMSParser parseDate should return a valid DateTime for a valid date string (DD/MM/YYYY)
+00:30 +440 -14: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/application/travel_sms_parser_test.dart: TravelSMSParser parseDate should return a valid DateTime for a valid date string with single digit month/day
+00:30 +441 -14: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/application/travel_sms_parser_test.dart: TravelSMSParser parseDate should handle leap year dates
+00:30 +442 -14: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/application/travel_text_parser_utils_test.dart: TravelTextParserUtils Tests extractMatch - Success Scenarios Given valid pattern and input with match, When extracting match, Then returns matched group
+00:30 +443 -14: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/application/travel_text_parser_utils_test.dart: TravelTextParserUtils Tests extractMatch - Success Scenarios Given pattern with multiple groups, When extracting specific group, Then returns correct group
+00:30 +444 -14: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/application/travel_text_parser_utils_test.dart: TravelTextParserUtils Tests extractMatch - Success Scenarios Given case-insensitive pattern, When extracting match, Then matches regardless of case
+00:30 +445 -14: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/application/travel_text_parser_utils_test.dart: TravelTextParserUtils Tests extractMatch - Success Scenarios Given multiline input, When extracting match, Then finds match across lines
+00:30 +446 -14: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/application/travel_text_parser_utils_test.dart: TravelTextParserUtils Tests extractMatch - Success Scenarios Given match with whitespace, When extracting match, Then trims whitespace
+00:30 +447 -14: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/application/travel_text_parser_utils_test.dart: TravelTextParserUtils Tests extractMatch - Error Scenarios Given pattern with no match, When extracting match, Then returns empty string
+00:30 +448 -14: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/application/travel_text_parser_utils_test.dart: TravelTextParserUtils Tests extractMatch - Error Scenarios Given invalid group index, When extracting match, Then returns empty string
+00:30 +449 -14: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/application/travel_text_parser_utils_test.dart: TravelTextParserUtils Tests extractMatch - Error Scenarios Given empty input, When extracting match, Then returns empty string
+00:30 +450 -14: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/application/travel_text_parser_utils_test.dart: TravelTextParserUtils Tests parseDate - Success Scenarios Given date in DD/MM/YYYY format, When parsing date, Then returns correct DateTime
+00:30 +451 -14: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/application/travel_text_parser_utils_test.dart: TravelTextParserUtils Tests parseDate - Success Scenarios Given date in DD-MM-YYYY format, When parsing date, Then returns correct DateTime
+00:30 +452 -14: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/application/travel_text_parser_utils_test.dart: TravelTextParserUtils Tests parseDate - Success Scenarios Given date with single digit day and month, When parsing date, Then returns correct DateTime
+00:30 +453 -14: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/application/travel_text_parser_utils_test.dart: TravelTextParserUtils Tests parseDate - Error Scenarios Given empty date string, When parsing date, Then returns null
+00:30 +454 -14: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/application/travel_text_parser_utils_test.dart: TravelTextParserUtils Tests parseDate - Error Scenarios Given invalid date format, When parsing date, Then returns null
+00:30 +455 -14: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/application/travel_text_parser_utils_test.dart: TravelTextParserUtils Tests parseDate - Error Scenarios Given date with invalid parts, When parsing date, Then returns null
+00:30 +456 -14: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/application/travel_text_parser_utils_test.dart: TravelTextParserUtils Tests parseDate - Error Scenarios Given date with only two parts, When parsing date, Then returns null
+00:30 +457 -14: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/application/travel_text_parser_utils_test.dart: TravelTextParserUtils Tests parseDate - Error Scenarios parseDateTime - Success Scenarios Given datetime in DD/MM/YYYY HH:mm format, When parsing datetime, Then returns correct DateTime
+00:30 +458 -14: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/domain/travel_model_test.dart: TravelModel Tests Model Creation - Success Scenarios Given all valid parameters, When creating TravelModel, Then creates model with all fields correctly
+00:30 +459 -14: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/domain/travel_model_test.dart: TravelModel Tests Model Creation - Success Scenarios Given all valid parameters, When creating TravelModel, Then creates model with all fields correctly
+00:30 +460 -14: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/domain/travel_model_test.dart: TravelModel Tests Model Creation - Success Scenarios Given all valid parameters, When creating TravelModel, Then creates model with all fields correctly
+00:30 +461 -14: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/domain/travel_model_test.dart: TravelModel Tests Model Creation - Success Scenarios Given all valid parameters, When creating TravelModel, Then creates model with all fields correctly
+00:30 +462 -14: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/domain/travel_model_test.dart: TravelModel Tests Model Creation - Success Scenarios Given all valid parameters, When creating TravelModel, Then creates model with all fields correctly
+00:30 +463 -14: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/domain/travel_model_test.dart: TravelModel Tests Model Creation - Success Scenarios Given all valid parameters, When creating TravelModel, Then creates model with all fields correctly
+00:30 +464 -14: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/domain/travel_model_test.dart: TravelModel Tests Model Creation - Success Scenarios Given all valid parameters, When creating TravelModel, Then creates model with all fields correctly
+00:30 +465 -14: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/domain/travel_model_test.dart: TravelModel Tests Model Creation - Success Scenarios Given all valid parameters, When creating TravelModel, Then creates model with all fields correctly
+00:30 +466 -14: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/application/travel_text_parser_utils_test.dart: TravelTextParserUtils Tests parseDate - Error Scenarios parseInt - Success Scenarios Given valid integer string, When parsing int, Then returns correct integer
+00:30 +467 -14: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/domain/travel_model_test.dart: TravelModel Tests Model Creation - Success Scenarios Given model with single seat, When creating TravelModel, Then creates model with single seat in list
+00:30 +468 -14: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/application/travel_text_parser_utils_test.dart: TravelTextParserUtils Tests parseDate - Error Scenarios parseInt - Success Scenarios Given negative integer string, When parsing int, Then returns correct negative integer
+00:30 +469 -14: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/domain/travel_model_test.dart: TravelModel Tests Model Creation - Success Scenarios Given model with multiple seats, When creating TravelModel, Then creates model with all seats in list
+00:30 +470 -14: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/domain/travel_model_test.dart: TravelModel Tests Model Creation - Success Scenarios Given model with multiple seats, When creating TravelModel, Then creates model with all seats in list
+00:30 +471 -14: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/application/travel_text_parser_utils_test.dart: TravelTextParserUtils Tests parseDate - Error Scenarios parseInt - Error Scenarios Given empty string, When parsing int, Then returns null
+00:30 +472 -14: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/domain/travel_model_test.dart: TravelModel Tests Model Creation - Success Scenarios Given model with empty strings, When creating TravelModel, Then creates model with empty string values
+00:30 +473 -14: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/application/travel_text_parser_utils_test.dart: TravelTextParserUtils Tests parseDate - Error Scenarios parseInt - Error Scenarios Given invalid integer string, When parsing int, Then returns null
+00:30 +474 -14: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/domain/travel_model_test.dart: TravelModel Tests Model Serialization - JSON Mapping Given TravelModel, When converting to JSON, Then creates JSON string
+00:30 +475 -14: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/domain/travel_model_test.dart: TravelModel Tests Model Serialization - JSON Mapping Given TravelModel, When converting to JSON, Then creates JSON string
+00:30 +476 -14: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/domain/travel_model_test.dart: TravelModel Tests Model Serialization - JSON Mapping Given TravelModel, When converting to JSON, Then creates JSON string
+00:30 +477 -14: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/domain/travel_model_test.dart: TravelModel Tests Model Serialization - JSON Mapping Given TravelModel, When converting to JSON, Then creates JSON string
+00:30 +478 -14: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/domain/travel_model_test.dart: TravelModel Tests Model Serialization - JSON Mapping Given TravelModel, When converting to JSON, Then creates JSON string
+00:30 +479 -14: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/domain/travel_model_test.dart: TravelModel Tests Model Serialization - JSON Mapping Given TravelModel, When converting to JSON, Then creates JSON string
+00:30 +480 -14: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/domain/travel_model_test.dart: TravelModel Tests Model Serialization - JSON Mapping Given TravelModel, When converting to JSON, Then creates JSON string
+00:30 +481 -14: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/domain/travel_model_test.dart: TravelModel Tests Model Serialization - JSON Mapping Given TravelModel, When converting to JSON, Then creates JSON string
+00:30 +482 -14: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/domain/travel_model_test.dart: TravelModel Tests Model Serialization - JSON Mapping Given TravelModel, When converting to JSON, Then creates JSON string
+00:30 +483 -14: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/domain/travel_model_test.dart: TravelModel Tests Model Serialization - JSON Mapping Given TravelModel, When converting to JSON, Then creates JSON string
+00:30 +484 -14: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/domain/travel_model_test.dart: TravelModel Tests Model Serialization - JSON Mapping Given TravelModel, When converting to JSON, Then creates JSON string
+00:30 +485 -14: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/domain/travel_model_test.dart: TravelModel Tests Model Serialization - JSON Mapping Given TravelModel, When converting to JSON, Then creates JSON string
+00:30 +486 -14: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/domain/travel_model_test.dart: TravelModel Tests Model Serialization - JSON Mapping Given JSON string, When creating TravelModel from JSON, Then creates correct model instance
+00:30 +487 -14: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/domain/travel_model_test.dart: TravelModel Tests Model Serialization - JSON Mapping Given model, When round-trip JSON conversion, Then maintains all data correctly
+00:30 +488 -14: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/domain/travel_model_test.dart: TravelModel Tests Model Equality and Comparison Given two identical models, When comparing, Then models are equal
+00:30 +489 -14: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/domain/travel_model_test.dart: TravelModel Tests Model Equality and Comparison Given two different models, When comparing, Then models are not equal
+00:30 +490 -14: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/domain/travel_model_test.dart: TravelModel Tests Model Equality and Comparison Given models differing only in one field, When comparing, Then models are not equal
+00:30 +491 -14: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/domain/travel_model_test.dart: TravelModel Tests Edge Cases and Boundary Conditions Given model with very long strings, When creating TravelModel, Then creates model successfully
+00:30 +492 -14: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/domain/travel_model_test.dart: TravelModel Tests Edge Cases and Boundary Conditions Given model with special characters, When creating TravelModel, Then creates model successfully
+00:30 +493 -14: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/domain/travel_model_test.dart: TravelModel Tests Edge Cases and Boundary Conditions Given model with Unicode characters, When creating TravelModel, Then creates model successfully
+00:30 +494 -14: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/domain/travel_model_test.dart: TravelModel Tests Edge Cases and Boundary Conditions Given model with empty seat numbers list, When creating TravelModel, Then creates model with empty list
+00:30 +495 -14: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/domain/travel_model_test.dart: TravelModel Tests Edge Cases and Boundary Conditions Given model with many seat numbers, When creating TravelModel, Then creates model with all seats
+00:30 +496 -14: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/domain/travel_model_test.dart: TravelModel Tests Field-Specific Tests Given different time formats, When creating TravelModel, Then accepts various time formats
+00:30 +497 -14: C:/Users/SYED AASHIQ AHMED/namma_wallet/test/src/features/travel/domain/travel_model_test.dart: TravelModel Tests Field-Specific Tests Given different date formats, When creating TravelModel, Then accepts various date formats
+00:30 +498 -14: Some tests failed.

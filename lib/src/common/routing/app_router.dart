@@ -14,6 +14,7 @@ import 'package:namma_wallet/src/features/home/presentation/all_tickets_view.dar
 import 'package:namma_wallet/src/features/home/presentation/home_view.dart';
 import 'package:namma_wallet/src/features/import/presentation/import_view.dart';
 import 'package:namma_wallet/src/features/receive/presentation/share_success_view.dart';
+import 'package:namma_wallet/src/features/search/presentation/search_view.dart';
 import 'package:namma_wallet/src/features/settings/presentation/contributors_view.dart';
 import 'package:namma_wallet/src/features/settings/presentation/db_viewer_view.dart';
 import 'package:namma_wallet/src/features/settings/presentation/license_view.dart';
@@ -135,6 +136,11 @@ final router = GoRouter(
               },
         );
       },
+    ),
+    GoRoute(
+      path: AppRoute.search.path,
+      name: AppRoute.search.name,
+      builder: (context, state) => const SearchView(),
     ),
     GoRoute(
       path: AppRoute.dbViewer.path,

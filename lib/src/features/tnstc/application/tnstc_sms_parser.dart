@@ -26,7 +26,7 @@ class TNSTCSMSParser extends TravelSMSParser {
     // Parse journey date - falls back to null if date is missing or malformed.
     final journeyDate = parseDate(
       extractMatch(
-        r'(?:Journey Date|DOJ)\s*:\s*(\d{2}/\d{2}/\d{4})',
+        r'(?:Journey Date|DOJ|Date)\s*:\s*(\d{2}[/-]\d{2}[/-]\d{4})',
         smsText,
       ),
     );
@@ -60,8 +60,21 @@ class TNSTCSMSParser extends TravelSMSParser {
         r'Corporation\s*:\s*(.*?)(?=\s*,)',
         smsText,
       );
-      final from = extractMatch(r'From\s*:\s*(.*?)(?=\s+To)', smsText);
-      final to = extractMatch(r'To\s+([^,]+)', smsText);
+      var from = extractMatch(r'From\s*:\s*(.*?)(?=\s+To)', smsText);
+      var to = extractMatch(r'To\s+([^,]+)', smsText);
+
+      // Fallback for Route: X to Y format
+      if (from.isEmpty && to.isEmpty) {
+        final routeMatch = RegExp(
+          r'Route\s*:\s*(.*?)\s+to\s+([^,\n]+)',
+          caseSensitive: false,
+        ).firstMatch(smsText);
+        if (routeMatch != null) {
+          from = routeMatch.group(1)!.trim();
+          to = routeMatch.group(2)!.trim();
+        }
+      }
+
       final tripCode = extractMatch(r'Trip Code\s*:\s*(\S+)', smsText);
       final departureTime = extractMatch(
         r'Time\s*:\s*(?:\d{2}/\d{2}/\d{4},)?\s*,?\s*(\d{2}:\d{2})',

@@ -96,16 +96,22 @@ jobs:
         if: steps.find_comment.outputs.comment-id == ''
         uses: peter-evans/create-or-update-comment@v5
         with:
+          token: ${{ secrets.GITHUB_TOKEN }}
           issue-number: ${{ github.event.pull_request.number }}
           body: ${{ steps.results.outputs.body }}
+          reactions-edit-mode: append
+          append-separator: newline
 
       - name: Update existing Greenlight comment
         if: steps.find_comment.outputs.comment-id != ''
         uses: peter-evans/create-or-update-comment@v5
         with:
+          token: ${{ secrets.GITHUB_TOKEN }}
           comment-id: ${{ steps.find_comment.outputs.comment-id }}
           edit-mode: replace
           body: ${{ steps.results.outputs.body }}
+          reactions-edit-mode: append
+          append-separator: newline
 
       - name: Print blocking findings
         if: steps.results.outputs.has_blocks == 'true'
