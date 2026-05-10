@@ -61,6 +61,7 @@ class ImportMethodCardWidget extends StatelessWidget {
             ],
           ),
           child: Stack(
+            alignment: .center,
             children: [
               // Main content
               Padding(
