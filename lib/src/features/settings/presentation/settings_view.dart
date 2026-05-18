@@ -70,9 +70,9 @@ class _SettingsViewState extends State<SettingsView> {
                 const SizedBox(height: 8),
                 // Theme Settings Section
                 ThemeSectionWidget(themeProvider: themeProvider),
-        
+
                 const SizedBox(height: 8),
-        
+
                 // Reminder Settings Section
                 if (!kIsWeb && Platform.isAndroid)
                   ProfileTile(
@@ -84,7 +84,7 @@ class _SettingsViewState extends State<SettingsView> {
                       await context.pushNamed(AppRoute.reminderSettings.name);
                     },
                   ),
-        
+
                 // Contributors Section
                 ProfileTile(
                   icon: Icons.people_outline,
@@ -95,7 +95,7 @@ class _SettingsViewState extends State<SettingsView> {
                     await context.pushNamed(AppRoute.contributors.name);
                   },
                 ),
-        
+
                 // Licenses Section
                 ProfileTile(
                   icon: Icons.article_outlined,
@@ -106,7 +106,7 @@ class _SettingsViewState extends State<SettingsView> {
                     await context.pushNamed(AppRoute.license.name);
                   },
                 ),
-        
+
                 // Contact Us Section
                 ProfileTile(
                   icon: Icons.contact_mail_outlined,
@@ -118,13 +118,13 @@ class _SettingsViewState extends State<SettingsView> {
                       scheme: 'mailto',
                       path: 'support@nammawallet.com',
                     );
-        
+
                     try {
                       final response = await launchUrl(
                         uri,
                         mode: LaunchMode.externalApplication,
                       );
-        
+
                       if (!response && context.mounted) {
                         showSnackbar(
                           context,
@@ -143,7 +143,7 @@ class _SettingsViewState extends State<SettingsView> {
                     }
                   },
                 ),
-        
+
                 // Haptics Enabled
                 ProfileTile(
                   title: 'Haptics Enabled',
@@ -160,18 +160,20 @@ class _SettingsViewState extends State<SettingsView> {
                         if (!mounted) return;
                         messenger.showSnackBar(
                           SnackBar(
-                            content: Text('Failed to save haptic preference: $e'),
+                            content: Text(
+                              'Failed to save haptic preference: $e',
+                            ),
                           ),
                         );
                         return;
                       }
                       if (!mounted) return;
-        
+
                       // Update UI
                       setState(() {
                         _isHapticEnabled = value;
                       });
-        
+
                       // Optional: give immediate feedback only when enabling.
                       if (value) {
                         hapticService.triggerHaptic(HapticType.selection);
@@ -180,7 +182,7 @@ class _SettingsViewState extends State<SettingsView> {
                   ),
                   trailingIsInteractive: true,
                 ),
-        
+
                 // Debug Section (only in debug mode)
                 if (kDebugMode) ...[
                   const SizedBox(height: 8),

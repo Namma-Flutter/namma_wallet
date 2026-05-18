@@ -203,7 +203,7 @@ class _ContributorsViewState extends State<ContributorsView> {
                 ),
               );
             }
-        
+
             final contributors = snapshot.data!;
             return ListView.builder(
               padding: const EdgeInsets.all(16),
