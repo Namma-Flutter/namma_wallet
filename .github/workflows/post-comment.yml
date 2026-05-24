@@ -1,0 +1,187 @@
+name: Post PR Comments
+
+on:
+  workflow_run:
+    workflows: ["flutter-format-and-analyze", "Upload coverage reports to Codecov", "greenlight"]
+    types:
+      - completed
+
+jobs:
+  post-comments:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      issues: write
+    steps:
+      - name: Download comment artifacts
+        uses: actions/download-artifact@v4
+        with:
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: pr-comments
+
+      - name: Post or update comments
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+
+            const prCommentsDir = path.join(process.env.GITHUB_WORKSPACE, 'pr-comments');
+            if (!fs.existsSync(prCommentsDir)) {
+              console.log('No comments directory found.');
+              return;
+            }
+
+            const subdirs = fs.readdirSync(prCommentsDir).filter(f => {
+              return fs.statSync(path.join(prCommentsDir, f)).isDirectory();
+            });
+
+            if (subdirs.length === 0) {
+              console.log('No comment artifacts found.');
+              return;
+            }
+
+            for (const subdir of subdirs) {
+              const dirPath = path.join(prCommentsDir, subdir);
+              const prNumberPath = path.join(dirPath, 'pr_number');
+              if (!fs.existsSync(prNumberPath)) {
+                console.log(`No pr_number file found in ${subdir}`);
+                continue;
+              }
+              const prNumber = parseInt(fs.readFileSync(prNumberPath, 'utf8').trim(), 10);
+              if (isNaN(prNumber)) {
+                console.log(`Invalid PR number in ${subdir}`);
+                continue;
+              }
+
+              console.log(`Processing comments for PR #${prNumber} from ${subdir}`);
+
+              const findComment = async (includesText) => {
+                const comments = await github.rest.issues.listComments({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: prNumber,
+                  per_page: 100
+                });
+                return comments.data.find(c => 
+                  c.user.login === 'github-actions[bot]' && c.body.includes(includesText)
+                );
+              };
+
+              // 1. Format comment
+              const formatCommentPath = path.join(dirPath, 'format_comment.txt');
+              if (fs.existsSync(formatCommentPath)) {
+                const body = fs.readFileSync(formatCommentPath, 'utf8').trim();
+                const existing = await findComment('Formatting check failed');
+                
+                if (body === 'DELETE') {
+                  if (existing) {
+                    await github.rest.issues.deleteComment({
+                      owner: context.repo.owner,
+                      repo: context.repo.repo,
+                      comment_id: existing.id,
+                    });
+                    console.log('Deleted format comment');
+                  } else {
+                    console.log('No format comment to delete');
+                  }
+                } else if (body) {
+                  if (existing) {
+                    await github.rest.issues.updateComment({
+                      owner: context.repo.owner,
+                      repo: context.repo.repo,
+                      comment_id: existing.id,
+                      body: body,
+                    });
+                    console.log('Updated format comment');
+                  } else {
+                    await github.rest.issues.createComment({
+                      owner: context.repo.owner,
+                      repo: context.repo.repo,
+                      issue_number: prNumber,
+                      body: body,
+                    });
+                    console.log('Created format comment');
+                  }
+                }
+              }
+
+              // 2. Analyze comment
+              const analyzeCommentPath = path.join(dirPath, 'analyze_comment.txt');
+              if (fs.existsSync(analyzeCommentPath)) {
+                const body = fs.readFileSync(analyzeCommentPath, 'utf8').trim();
+                if (body) {
+                  const existing = await findComment('Flutter analysis');
+                  if (existing) {
+                    await github.rest.issues.updateComment({
+                      owner: context.repo.owner,
+                      repo: context.repo.repo,
+                      comment_id: existing.id,
+                      body: body,
+                    });
+                    console.log('Updated analyze comment');
+                  } else {
+                    await github.rest.issues.createComment({
+                      owner: context.repo.owner,
+                      repo: context.repo.repo,
+                      issue_number: prNumber,
+                      body: body,
+                    });
+                    console.log('Created analyze comment');
+                  }
+                }
+              }
+
+              // 3. Test comment
+              const testCommentPath = path.join(dirPath, 'test_comment.txt');
+              if (fs.existsSync(testCommentPath)) {
+                const body = fs.readFileSync(testCommentPath, 'utf8').trim();
+                if (body) {
+                  const existing = await findComment('Test run failed');
+                  if (existing) {
+                    await github.rest.issues.updateComment({
+                      owner: context.repo.owner,
+                      repo: context.repo.repo,
+                      comment_id: existing.id,
+                      body: body,
+                    });
+                    console.log('Updated test comment');
+                  } else {
+                    await github.rest.issues.createComment({
+                      owner: context.repo.owner,
+                      repo: context.repo.repo,
+                      issue_number: prNumber,
+                      body: body,
+                    });
+                    console.log('Created test comment');
+                  }
+                }
+              }
+
+              // 4. Greenlight comment
+              const greenlightCommentPath = path.join(dirPath, 'greenlight_comment.txt');
+              if (fs.existsSync(greenlightCommentPath)) {
+                const body = fs.readFileSync(greenlightCommentPath, 'utf8').trim();
+                if (body) {
+                  const existing = await findComment('Greenlight preflight');
+                  if (existing) {
+                    await github.rest.issues.updateComment({
+                      owner: context.repo.owner,
+                      repo: context.repo.repo,
+                      comment_id: existing.id,
+                      body: body,
+                    });
+                    console.log('Updated greenlight comment');
+                  } else {
+                    await github.rest.issues.createComment({
+                      owner: context.repo.owner,
+                      repo: context.repo.repo,
+                      issue_number: prNumber,
+                      body: body,
+                    });
+                    console.log('Created greenlight comment');
+                  }
+                }
+              }
+            }
