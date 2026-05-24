@@ -365,6 +365,9 @@ class _ReminderSettingsViewState extends State<ReminderSettingsView> {
                                 ),
                                 const SizedBox(height: 12),
                                 ..._selectedIntervals.map((hour) {
+                                  final reminderText =
+                                      '$hour ${hour == 1 ? "hour" : "hours"} '
+                                      'before journey start time';
                                   return Padding(
                                     padding: const EdgeInsets.symmetric(
                                       vertical: 4,
@@ -380,8 +383,7 @@ class _ReminderSettingsViewState extends State<ReminderSettingsView> {
                                         ),
                                         const SizedBox(width: 8),
                                         Text(
-                                          '$hour ${hour == 1 ? "hour" : "hours"} '
-                                          'before journey start time',
+                                          reminderText,
                                           style: Paragraph02(
                                             color: Theme.of(
                                               context,
