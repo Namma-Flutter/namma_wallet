@@ -30,13 +30,12 @@ jobs:
       - name: Parse scan results
         id: results
         run: |
+          mkdir -p pr-comments
+          echo "${{ github.event.pull_request.number }}" > pr-comments/pr_number
+
           if [ ! -f greenlight-report.json ]; then
             echo "has_blocks=false" >> $GITHUB_OUTPUT
-            {
-              echo 'body<<GREENLIGHT_EOF'
-              echo "⚠️ **Greenlight report was not generated.** Check the scan step logs."
-              echo 'GREENLIGHT_EOF'
-            } >> $GITHUB_OUTPUT
+            echo "⚠️ **Greenlight report was not generated.** Check the scan step logs." > pr-comments/greenlight_comment.txt
             exit 0
           fi
 
@@ -48,7 +47,6 @@ jobs:
           echo "has_blocks=$([ "$blocks" -gt 0 ] && echo true || echo false)" >> $GITHUB_OUTPUT
 
           {
-            echo 'body<<GREENLIGHT_EOF'
             if [ "$blocks" -gt 0 ]; then
               echo "❌ **Greenlight preflight found $blocks blocking issue(s)**"
             else
@@ -80,32 +78,14 @@ jobs:
                 | "**\(.title)**  \n\(.detail)" + (if (.fix // "") != "" then "  \n_Fix: \(.fix)_" else "" end)
               ' greenlight-report.json
             fi
+          } > pr-comments/greenlight_comment.txt
 
-            echo 'GREENLIGHT_EOF'
-          } >> $GITHUB_OUTPUT
-
-      - name: Find previous Greenlight comment
-        id: find_comment
-        uses: peter-evans/find-comment@v4
+      - name: Upload PR comments artifact
+        if: always()
+        uses: actions/upload-artifact@v4
         with:
-          issue-number: ${{ github.event.pull_request.number }}
-          comment-author: "github-actions[bot]"
-          body-includes: "Greenlight preflight"
-
-      - name: Create Greenlight comment
-        if: steps.find_comment.outputs.comment-id == ''
-        uses: peter-evans/create-or-update-comment@v5
-        with:
-          issue-number: ${{ github.event.pull_request.number }}
-          body: ${{ steps.results.outputs.body }}
-
-      - name: Update existing Greenlight comment
-        if: steps.find_comment.outputs.comment-id != ''
-        uses: peter-evans/create-or-update-comment@v5
-        with:
-          comment-id: ${{ steps.find_comment.outputs.comment-id }}
-          edit-mode: replace
-          body: ${{ steps.results.outputs.body }}
+          name: pr-comments-greenlight
+          path: pr-comments/
 
       - name: Print blocking findings
         if: steps.results.outputs.has_blocks == 'true'
