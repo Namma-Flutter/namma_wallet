@@ -2,7 +2,7 @@ import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 import 'package:namma_wallet/src/common/services/push_notification/notification_service_interface.dart';
 
 /// Web implementation of INotificationService.
-/// 
+///
 /// Provides a no-op implementation for all notification methods,
 /// as web platform does not support native push notifications.
 class WebNotificationService implements INotificationService {
