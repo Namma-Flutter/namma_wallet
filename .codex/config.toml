@@ -1,0 +1,7 @@
+[mcp_servers.dart]
+args = [
+    "mcp-server",
+    "--flutter-sdk",
+    ".fvm/flutter_sdk",
+]
+command = "dart"

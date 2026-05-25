@@ -41,95 +41,57 @@ jobs:
           echo "exit_code=$?" >> $GITHUB_OUTPUT
           exit 0
 
-      # Try to find an existing test-failure comment created by the bot
-      - name: Find previous test-failure comment
+      - name: Prepare PR comments
         if: always()
-        id: find_test_comment
-        uses: peter-evans/find-comment@v3
-        with:
-          issue-number: ${{ github.event.pull_request.number }}
-          comment-author: "github-actions[bot]"
-          body-includes: "Test run failed"
-
-      # If tests failed -> extract failure details and create a comment
-      - name: Extract test failures
-        if: ${{ steps.test_run.outputs.exit_code != '0' }}
-        id: extract_failures
         run: |
-          # Extract failed test information from the log
-          if [ -f test_output.log ]; then
-            # Get the summary section which shows which tests failed
-            FAILURES=$(grep -A 50 "Some tests failed" test_output.log || grep -A 50 "FAILED" test_output.log || tail -n 30 test_output.log)
+          mkdir -p pr-comments
+          echo "${{ github.event.pull_request.number }}" > pr-comments/pr_number
 
-            # Create a truncated version if too long (max 5000 chars for GitHub comments)
-            if [ ${#FAILURES} -gt 4500 ]; then
-              FAILURES="${FAILURES:0:4500}... (truncated)"
+          if [ "${{ steps.test_run.outputs.exit_code }}" != "0" ]; then
+            # Extract failures
+            if [ -f test_output.log ]; then
+              FAILURES=$(grep -A 50 "Some tests failed" test_output.log || grep -A 50 "FAILED" test_output.log || tail -n 30 test_output.log)
+              if [ ${#FAILURES} -gt 4500 ]; then
+                FAILURES="${FAILURES:0:4500}... (truncated)"
+              fi
+            else
+              FAILURES="Could not find test output log"
             fi
-
-            # Escape for GitHub Actions output
-            echo "failures<<EOF" >> $GITHUB_OUTPUT
-            echo "$FAILURES" >> $GITHUB_OUTPUT
-            echo "EOF" >> $GITHUB_OUTPUT
+            
+            {
+              echo "❌ **Test run failed**"
+              echo ""
+              echo "Some tests did not pass. Please review the failures below:"
+              echo ""
+              echo "```"
+              echo "$FAILURES"
+              echo "```"
+              echo ""
+              echo "Please fix the failing tests and push the updated code."
+            } > pr-comments/test_comment.txt
           else
-            echo "failures=Could not find test output log" >> $GITHUB_OUTPUT
+            {
+              echo "✅ **All tests passed!**"
+              echo ""
+              echo "The previously failing tests are now fixed."
+            } > pr-comments/test_comment.txt
           fi
 
-      # If tests failed -> create a new comment (only when find_comment returned empty)
-      - name: Create test-failure comment
-        if: ${{ steps.test_run.outputs.exit_code != '0' && steps.find_test_comment.outputs.comment-id == '' }}
-        uses: peter-evans/create-or-update-comment@v5
+      - name: Upload PR comments artifact
+        if: always()
+        uses: actions/upload-artifact@v4
         with:
-          issue-number: ${{ github.event.pull_request.number }}
-          body: |
-            ❌ **Test run failed**
-
-            Some tests did not pass. Please review the failures below:
-
-            ```
-            ${{ steps.extract_failures.outputs.failures }}
-            ```
-
-            Please fix the failing tests and push the updated code.
-
-      # If tests failed and a comment already exists -> update that comment
-      - name: Update existing test-failure comment
-        if: ${{ steps.test_run.outputs.exit_code != '0' && steps.find_test_comment.outputs.comment-id != '' }}
-        uses: peter-evans/create-or-update-comment@v5
-        with:
-          comment-id: ${{ steps.find_test_comment.outputs.comment-id }}
-          issue-number: ${{ github.event.pull_request.number }}
-          edit-mode: replace
-          body: |
-            ❌ **Test run failed**
-            (updated)
-
-            Some tests did not pass. Please review the failures below:
-
-            ```
-            ${{ steps.extract_failures.outputs.failures }}
-            ```
-
-            Please fix the failing tests and push the updated code.
-
-      # If tests passed and there was a previous failure comment -> delete or update it
-      - name: Delete previous test-failure comment
-        if: ${{ steps.test_run.outputs.exit_code == '0' && steps.find_test_comment.outputs.comment-id != '' }}
-        uses: peter-evans/create-or-update-comment@v5
-        with:
-          comment-id: ${{ steps.find_test_comment.outputs.comment-id }}
-          issue-number: ${{ github.event.pull_request.number }}
-          edit-mode: replace
-          body: |
-            ✅ **All tests passed!**
-
-            The previously failing tests are now fixed.
+          name: pr-comments-coverage
+          path: pr-comments/
 
       # Fail the workflow if tests failed
       - name: Check test results
-        if: ${{ steps.test_run.outputs.exit_code != '0' }}
+        if: always()
         run: |
-          echo "Tests failed with exit code ${{ steps.test_run.outputs.exit_code }}"
-          exit 1
+          if [ "${{ steps.test_run.outputs.exit_code }}" != "0" ]; then
+            echo "Tests failed with exit code ${{ steps.test_run.outputs.exit_code }}"
+            exit 1
+          fi
 
       - name: Install lcov
         if: ${{ steps.test_run.outputs.exit_code == '0' }}
