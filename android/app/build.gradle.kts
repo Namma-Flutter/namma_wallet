@@ -16,7 +16,7 @@ if (keystorePropertiesFile.exists()) {
 
 android {
     namespace = "com.nammaflutter.nammawallet"
-    compileSdk = 36
+    compileSdk = 37
     ndkVersion = "28.2.13676358"
 
     compileOptions {
@@ -67,6 +67,7 @@ android {
 
     buildFeatures {
         viewBinding = true
+        resValues = true
     }
 
     lint {
