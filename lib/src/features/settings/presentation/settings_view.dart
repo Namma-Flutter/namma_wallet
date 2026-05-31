@@ -59,167 +59,171 @@ class _SettingsViewState extends State<SettingsView> {
         leading: const RoundedBackButton(),
         title: const Text('Settings'),
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            spacing: 8,
-            children: [
-              const AIStatusWidget(),
-              const SizedBox(height: 8),
-              // Theme Settings Section
-              ThemeSectionWidget(themeProvider: themeProvider),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              spacing: 8,
+              children: [
+                const AIStatusWidget(),
+                const SizedBox(height: 8),
+                // Theme Settings Section
+                ThemeSectionWidget(themeProvider: themeProvider),
 
-              const SizedBox(height: 8),
+                const SizedBox(height: 8),
 
-              // Reminder Settings Section
-              if (!kIsWeb && Platform.isAndroid)
+                // Reminder Settings Section
+                if (!kIsWeb && Platform.isAndroid)
+                  ProfileTile(
+                    icon: Icons.notifications_active_outlined,
+                    title: 'Reminder Settings',
+                    subtitle: 'Configure notification reminder intervals',
+                    trailing: const Icon(Icons.chevron_right),
+                    onTap: () async {
+                      await context.pushNamed(AppRoute.reminderSettings.name);
+                    },
+                  ),
+
+                // Contributors Section
                 ProfileTile(
-                  icon: Icons.notifications_active_outlined,
-                  title: 'Reminder Settings',
-                  subtitle: 'Configure notification reminder intervals',
+                  icon: Icons.people_outline,
+                  title: 'Contributors',
+                  subtitle: 'View project contributors',
                   trailing: const Icon(Icons.chevron_right),
                   onTap: () async {
-                    await context.pushNamed(AppRoute.reminderSettings.name);
+                    await context.pushNamed(AppRoute.contributors.name);
                   },
                 ),
 
-              // Contributors Section
-              ProfileTile(
-                icon: Icons.people_outline,
-                title: 'Contributors',
-                subtitle: 'View project contributors',
-                trailing: const Icon(Icons.chevron_right),
-                onTap: () async {
-                  await context.pushNamed(AppRoute.contributors.name);
-                },
-              ),
+                // Licenses Section
+                ProfileTile(
+                  icon: Icons.article_outlined,
+                  title: 'Licenses',
+                  subtitle: 'View open source licenses',
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () async {
+                    await context.pushNamed(AppRoute.license.name);
+                  },
+                ),
 
-              // Licenses Section
-              ProfileTile(
-                icon: Icons.article_outlined,
-                title: 'Licenses',
-                subtitle: 'View open source licenses',
-                trailing: const Icon(Icons.chevron_right),
-                onTap: () async {
-                  await context.pushNamed(AppRoute.license.name);
-                },
-              ),
-
-              // Contact Us Section
-              ProfileTile(
-                icon: Icons.contact_mail_outlined,
-                title: 'Contact Us',
-                subtitle: 'Get support or send feedback',
-                trailing: const Icon(Icons.chevron_right),
-                onTap: () async {
-                  final uri = Uri(
-                    scheme: 'mailto',
-                    path: 'support@nammawallet.com',
-                  );
-
-                  try {
-                    final response = await launchUrl(
-                      uri,
-                      mode: LaunchMode.externalApplication,
+                // Contact Us Section
+                ProfileTile(
+                  icon: Icons.contact_mail_outlined,
+                  title: 'Contact Us',
+                  subtitle: 'Get support or send feedback',
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () async {
+                    final uri = Uri(
+                      scheme: 'mailto',
+                      path: 'support@nammawallet.com',
                     );
 
-                    if (!response && context.mounted) {
-                      showSnackbar(
-                        context,
-                        'Failed to open email app. Please try again.',
-                        isError: true,
-                      );
-                    }
-                  } on Exception {
-                    if (context.mounted) {
-                      showSnackbar(
-                        context,
-                        'Failed to open email app. Please try again.',
-                        isError: true,
-                      );
-                    }
-                  }
-                },
-              ),
-
-              // Haptics Enabled
-              ProfileTile(
-                title: 'Haptics Enabled',
-                icon: Icons.vibration_outlined,
-                trailing: Switch(
-                  value: _isHapticEnabled,
-                  onChanged: (value) async {
-                    final messenger = ScaffoldMessenger.of(context);
                     try {
-                      // Persist via service
-                      // (updates in-memory and SharedPreferences)
-                      await _saveFlag(value);
-                    } on Exception catch (e) {
-                      if (!mounted) return;
-                      messenger.showSnackBar(
-                        SnackBar(
-                          content: Text('Failed to save haptic preference: $e'),
-                        ),
+                      final response = await launchUrl(
+                        uri,
+                        mode: LaunchMode.externalApplication,
                       );
-                      return;
-                    }
-                    if (!mounted) return;
 
-                    // Update UI
-                    setState(() {
-                      _isHapticEnabled = value;
-                    });
-
-                    // Optional: give immediate feedback only when enabling.
-                    if (value) {
-                      hapticService.triggerHaptic(HapticType.selection);
+                      if (!response && context.mounted) {
+                        showSnackbar(
+                          context,
+                          'Failed to open email app. Please try again.',
+                          isError: true,
+                        );
+                      }
+                    } on Exception {
+                      if (context.mounted) {
+                        showSnackbar(
+                          context,
+                          'Failed to open email app. Please try again.',
+                          isError: true,
+                        );
+                      }
                     }
                   },
                 ),
-                trailingIsInteractive: true,
-              ),
 
-              // Debug Section (only in debug mode)
-              if (kDebugMode) ...[
-                const SizedBox(height: 8),
-                const Divider(),
-                const Padding(
-                  padding: EdgeInsets.all(16),
-                  child: Row(
-                    children: [
-                      Icon(Icons.bug_report, size: 20),
-                      SizedBox(width: 8),
-                      Text(
-                        'Debug Tools',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
+                // Haptics Enabled
+                ProfileTile(
+                  title: 'Haptics Enabled',
+                  icon: Icons.vibration_outlined,
+                  trailing: Switch(
+                    value: _isHapticEnabled,
+                    onChanged: (value) async {
+                      final messenger = ScaffoldMessenger.of(context);
+                      try {
+                        // Persist via service
+                        // (updates in-memory and SharedPreferences)
+                        await _saveFlag(value);
+                      } on Exception catch (e) {
+                        if (!mounted) return;
+                        messenger.showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              'Failed to save haptic preference: $e',
+                            ),
+                          ),
+                        );
+                        return;
+                      }
+                      if (!mounted) return;
+
+                      // Update UI
+                      setState(() {
+                        _isHapticEnabled = value;
+                      });
+
+                      // Optional: give immediate feedback only when enabling.
+                      if (value) {
+                        hapticService.triggerHaptic(HapticType.selection);
+                      }
+                    },
                   ),
+                  trailingIsInteractive: true,
                 ),
-                ProfileTile(
-                  icon: Icons.storage_outlined,
-                  title: 'Database Viewer',
-                  subtitle: 'View stored users and tickets',
-                  trailing: const Icon(Icons.chevron_right),
-                  onTap: () async {
-                    await context.pushNamed(AppRoute.dbViewer.name);
-                  },
-                ),
-                ProfileTile(
-                  icon: Icons.document_scanner_outlined,
-                  title: 'OCR Debug Viewer',
-                  subtitle: 'Extract OCR blocks from PDFs',
-                  trailing: const Icon(Icons.chevron_right),
-                  onTap: () async {
-                    await context.pushNamed(AppRoute.ocrDebug.name);
-                  },
-                ),
+
+                // Debug Section (only in debug mode)
+                if (kDebugMode) ...[
+                  const SizedBox(height: 8),
+                  const Divider(),
+                  const Padding(
+                    padding: EdgeInsets.all(16),
+                    child: Row(
+                      children: [
+                        Icon(Icons.bug_report, size: 20),
+                        SizedBox(width: 8),
+                        Text(
+                          'Debug Tools',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  ProfileTile(
+                    icon: Icons.storage_outlined,
+                    title: 'Database Viewer',
+                    subtitle: 'View stored users and tickets',
+                    trailing: const Icon(Icons.chevron_right),
+                    onTap: () async {
+                      await context.pushNamed(AppRoute.dbViewer.name);
+                    },
+                  ),
+                  ProfileTile(
+                    icon: Icons.document_scanner_outlined,
+                    title: 'OCR Debug Viewer',
+                    subtitle: 'Extract OCR blocks from PDFs',
+                    trailing: const Icon(Icons.chevron_right),
+                    onTap: () async {
+                      await context.pushNamed(AppRoute.ocrDebug.name);
+                    },
+                  ),
+                ],
               ],
-            ],
+            ),
           ),
         ),
       ),
