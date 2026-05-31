@@ -209,41 +209,73 @@ class _ReminderSettingsViewState extends State<ReminderSettingsView> {
                               Row(
                                 children: [
                                   Icon(
-                                    Icons.notifications_active_outlined,
-                                    size: 24,
+                                    Icons.notifications_none_outlined,
+                                    size: 20,
                                     color: Theme.of(
                                       context,
                                     ).colorScheme.primary,
                                   ),
-                                  const SizedBox(width: 12),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    'Reminders will be sent at:',
+                                    style: Paragraph02(
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.onSurface,
+                                    ).semiBold,
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 16),
+                              Wrap(
+                                spacing: 8,
+                                runSpacing: 8,
+                                children: _selectedIntervals.map((hour) {
+                                  return Container(
+                                    decoration: BoxDecoration(
+                                      color:
+                                          Theme.of(
+                                            context,
+                                          ).colorScheme.primary.withValues(
+                                            alpha: 0.1,
+                                          ),
+                                      borderRadius: BorderRadius.circular(20),
+                                      border: Border.all(
+                                        color:
+                                            Theme.of(
+                                              context,
+                                            ).colorScheme.primary.withValues(
+                                              alpha: 0.3,
+                                            ),
+                                      ),
+                                    ),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 12,
+                                      vertical: 6,
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
                                       children: [
+                                        Icon(
+                                          Icons.check_circle_outline,
+                                          size: 16,
+                                          color: Theme.of(
+                                            context,
+                                          ).colorScheme.primary,
+                                        ),
+                                        const SizedBox(width: 6),
                                         Text(
-                                          'Default Reminder Intervals',
-                                          style: Paragraph01(
+                                          '$hour${hour == 1 ? " hr" : " hrs"}',
+                                          style: Paragraph03(
                                             color: Theme.of(
                                               context,
                                             ).colorScheme.onSurface,
                                           ).semiBold,
                                         ),
-                                        const SizedBox(height: 4),
-                                        Text(
-                                          'Select when you want to be reminded '
-                                          'before your journey starts',
-                                          style: Paragraph03(
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .onSurface
-                                                .withValues(alpha: 0.7),
-                                          ).regular,
-                                        ),
                                       ],
                                     ),
-                                  ),
-                                ],
+                                  );
+                                }).toList(),
                               ),
                             ],
                           ),
