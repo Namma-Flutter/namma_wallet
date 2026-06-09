@@ -97,6 +97,13 @@ class TicketMapper extends ClassMapperBase<Ticket> {
     key: r'directions_url',
     opt: true,
   );
+  static DateTime? _$archivedAt(Ticket v) => v.archivedAt;
+  static const Field<Ticket, DateTime> _f$archivedAt = Field(
+    'archivedAt',
+    _$archivedAt,
+    key: r'archived_at',
+    opt: true,
+  );
 
   @override
   final MappableFields<Ticket> fields = const {
@@ -111,6 +118,7 @@ class TicketMapper extends ClassMapperBase<Ticket> {
     #ticketId: _f$ticketId,
     #imagePath: _f$imagePath,
     #directionsUrl: _f$directionsUrl,
+    #archivedAt: _f$archivedAt,
   };
 
   static Ticket _instantiate(DecodingData data) {
@@ -126,6 +134,7 @@ class TicketMapper extends ClassMapperBase<Ticket> {
       ticketId: data.dec(_f$ticketId),
       imagePath: data.dec(_f$imagePath),
       directionsUrl: data.dec(_f$directionsUrl),
+      archivedAt: data.dec(_f$archivedAt),
     );
   }
 
@@ -195,6 +204,7 @@ abstract class TicketCopyWith<$R, $In extends Ticket, $Out>
     String? ticketId,
     String? imagePath,
     String? directionsUrl,
+    DateTime? archivedAt,
   });
   TicketCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
@@ -240,6 +250,7 @@ class _TicketCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Ticket, $Out>
     Object? ticketId = $none,
     Object? imagePath = $none,
     Object? directionsUrl = $none,
+    Object? archivedAt = $none,
   }) => $apply(
     FieldCopyWithData({
       if (primaryText != $none) #primaryText: primaryText,
@@ -253,6 +264,7 @@ class _TicketCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Ticket, $Out>
       if (ticketId != $none) #ticketId: ticketId,
       if (imagePath != $none) #imagePath: imagePath,
       if (directionsUrl != $none) #directionsUrl: directionsUrl,
+      if (archivedAt != $none) #archivedAt: archivedAt,
     }),
   );
   @override
@@ -268,6 +280,7 @@ class _TicketCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Ticket, $Out>
     ticketId: data.get(#ticketId, or: $value.ticketId),
     imagePath: data.get(#imagePath, or: $value.imagePath),
     directionsUrl: data.get(#directionsUrl, or: $value.directionsUrl),
+    archivedAt: data.get(#archivedAt, or: $value.archivedAt),
   );
 
   @override
