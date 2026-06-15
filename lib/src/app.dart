@@ -13,6 +13,7 @@ import 'package:namma_wallet/src/common/theme/theme_provider.dart';
 import 'package:namma_wallet/src/features/import/application/deep_link_service_interface.dart';
 import 'package:namma_wallet/src/features/receive/application/shared_content_processor_interface.dart';
 import 'package:namma_wallet/src/features/receive/domain/sharing_intent_service_interface.dart';
+import 'package:namma_wallet/src/features/receive/domain/sms_queue_service_interface.dart';
 import 'package:namma_wallet/src/features/receive/presentation/share_handler.dart';
 import 'package:provider/provider.dart';
 
@@ -31,6 +32,7 @@ class _NammaWalletAppState extends State<NammaWalletApp> {
       getIt<ISharedContentProcessor>();
   late final IDeepLinkService _deepLinkService = getIt<IDeepLinkService>();
   late final ILogger _logger = getIt<ILogger>();
+  late final ISMSQueueService _smsQueueService = getIt<ISMSQueueService>();
   final GlobalKey<ScaffoldMessengerState> _scaffoldMessengerKey =
       GlobalKey<ScaffoldMessengerState>();
   late final ShareHandler _shareHandler = ShareHandler(
@@ -102,12 +104,26 @@ class _NammaWalletAppState extends State<NammaWalletApp> {
         await getIt<INotificationService>()
             .handleInitialNotification()
             .catchError((
-              Object e,
-              StackTrace s,
-            ) {
-              _logger.error('Error handling initial notification', e, s);
-            });
+          Object e,
+          StackTrace s,
+        ) {
+          _logger.error('Error handling initial notification', e, s);
+        });
       });
+    }
+
+    // iOS SMS queue: initialise notifications and drain any queued SMS
+    // entries that were written by iOS Shortcuts while the app was closed.
+    if (!kIsWeb && Platform.isIOS) {
+      WidgetsBinding.instance.addObserver(_smsQueueService);
+      unawaited(
+        _smsQueueService
+            .initialize()
+            .then((_) => _smsQueueService.drainQueue())
+            .catchError((Object e, StackTrace st) {
+          _logger.error('SMSQueueService init/drain error', e, st);
+        }),
+      );
     }
   }
 
@@ -142,6 +158,10 @@ class _NammaWalletAppState extends State<NammaWalletApp> {
     try {
       await _sharingService.dispose();
       await _deepLinkService.dispose();
+      if (!kIsWeb && Platform.isIOS) {
+        WidgetsBinding.instance.removeObserver(_smsQueueService);
+        await _smsQueueService.dispose();
+      }
     } on Object catch (e, st) {
       _logger.error('Error disposing sharing service', e, st);
     }
