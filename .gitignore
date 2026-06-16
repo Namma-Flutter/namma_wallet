@@ -63,6 +63,7 @@ config.json
 
 # Environment variables
 android/fastlane/.env.local
+.env
 .env.local
 .env.*.local
 ios/fastlane/report.xml
