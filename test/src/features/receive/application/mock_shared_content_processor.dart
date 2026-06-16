@@ -2,10 +2,11 @@ import 'package:namma_wallet/src/features/receive/application/shared_content_pro
 import 'package:namma_wallet/src/features/receive/domain/shared_content_result.dart';
 import 'package:namma_wallet/src/features/receive/domain/shared_content_type.dart';
 
-typedef ProcessContentCallback = Future<SharedContentResult> Function(
-  String content,
-  SharedContentType type,
-);
+typedef ProcessContentCallback =
+    Future<SharedContentResult> Function(
+      String content,
+      SharedContentType type,
+    );
 
 /// A simple mock for [ISharedContentProcessor] used in unit tests.
 class MockSharedContentProcessor implements ISharedContentProcessor {

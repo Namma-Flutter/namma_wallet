@@ -10,25 +10,25 @@ parsed the next time you open the app.
 
 1. A TNSTC SMS arrives on your iPhone.
 2. Your Shortcut fires automatically (via a Messaging automation trigger).
-3. The Shortcut passes the SMS body to Namma Wallet via a URL scheme.
+3. The Shortcut passes the SMS body to Namma Wallet via the **Add SMS to Namma Wallet** App Intent action.
 4. Namma Wallet stores the SMS in the shared App Group storage on your device.
-5. The next time you open (or bring to foreground) Namma Wallet, it reads the
-   queue, parses all pending SMS entries, saves the tickets, and shows you a
-   notification confirming how many tickets were added.
+5. The Shortcut opens the app so the queue is drained immediately.
+6. Namma Wallet parses all pending SMS entries, saves the tickets, and shows
+   a notification confirming how many tickets were added.
 
 > **No internet required.** The entire pipeline is on-device.
 
 ---
 
-## Recommended Approach — "Add SMS to Namma Wallet" Action
+## Setup — "Add SMS to Namma Wallet" Action
 
-This is the simplest and native approach. Namma Wallet provides a custom Shortcuts action that natively accepts the SMS text and saves it to the queue without launching the app.
+Namma Wallet provides a custom Shortcuts action that natively accepts the SMS text and saves it to the queue.
 
 ### Step-by-step
 
 1. Open the **Shortcuts** app → tap **Automation** tab → tap **+** (New Automation).
-2. Choose trigger: **Message received** → Filter by sender containing `VK-TNSTC` 
-   (repeat for `VK-SETCTC`, `JD-TNSTC`, etc. — create one automation per sender 
+2. Choose trigger: **Message received** → Filter by sender containing `VK-TNSTC`
+   (repeat for `VK-SETCTC`, `JD-TNSTC`, etc. — create one automation per sender
    pattern, or use "Message contains" with key terms like `PNR` or `TNSTC`).
 3. Tap **New Blank Automation** → choose **Run Immediately** (no confirmation needed).
 4. Tap **Add Action**.
@@ -36,20 +36,10 @@ This is the simplest and native approach. Namma Wallet provides a custom Shortcu
 6. Tap the faint `SMS Text` parameter in the action block, and select **Shortcut Input** (this passes the received message).
 7. Tap **Done**.
 
-> **Note:** Because this uses a native App Intent, the automation runs completely silently in the background. Namma Wallet will not momentarily open.
-
----
-
-## Alternative Approach — URL Scheme (Fallback)
-
-If you are on an older version of iOS (pre-iOS 16) that doesn't support App Intents, you can use the URL scheme.
-
-1. Follow steps 1-3 above.
-2. Add action: **Text** → assign `Shortcut Input` to a variable named `SMSBody`.
-3. Add action: **URL** → type `nammawallet://enqueue?sms=` and append the `SMSBody` variable.
-4. Add action: **Open URLs** → select the URL.
-5. Tap **Done**. 
-*(This will briefly flash the app open).*
+> **Note:** Because this uses a native App Intent with `openAppWhenRun`, the
+> automation saves the SMS and immediately opens Namma Wallet so the queue is
+> drained. The app opens briefly, processes the queue, and can be left in the
+> background.
 
 ---
 
@@ -89,7 +79,6 @@ Keychain.set(groupId + "." + key, JSON.stringify(queue));
 
 | Symptom | Fix |
 |---|---|
-| App opens briefly when Shortcut runs | Normal — the URL scheme triggers a brief app activation. The app returns to background automatically. |
 | No notification after opening the app | Check notification permissions: **Settings → Namma Wallet → Notifications → Allow**. |
 | Ticket not parsed correctly | Ensure the full SMS body is passed (not just a fragment). Test by manually sharing the SMS text to Namma Wallet via the Share Sheet. |
 | Multiple tickets queued but only some parsed | Each SMS is processed independently. Check app logs via **Settings → Debug Logs** in Namma Wallet. |
@@ -105,4 +94,4 @@ The following TNSTC/SETC SMS sender IDs are recognised by the parser:
 - Update SMS (conductor details) from the same senders
 
 > Messages from other senders will be queued but may not parse into tickets.
-> They are cleared from the queue after one processing attempt.
+> Failed entries are preserved in the queue for later inspection.

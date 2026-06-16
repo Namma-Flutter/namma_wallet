@@ -12,6 +12,12 @@ class WebNotificationService implements INotificationService {
   }
 
   @override
+  Future<bool> requestPermission() async {
+    // No-op for web
+    return false;
+  }
+
+  @override
   Future<void> handleInitialNotification() async {
     // No-op: Web platform doesn't support native notifications
   }

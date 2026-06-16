@@ -6,6 +6,10 @@ abstract class INotificationService {
   /// Initializes the notification service.
   Future<void> initialize();
 
+  /// Requests notification permission from the user.
+  /// Must be called after the UI is attached.
+  Future<bool> requestPermission();
+
   /// If the app was launched from a terminated state by tapping a
   /// notification, navigate to the appropriate page once the UI is ready.
   Future<void> handleInitialNotification();

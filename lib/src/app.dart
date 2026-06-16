@@ -99,16 +99,27 @@ class _NammaWalletAppState extends State<NammaWalletApp> {
 
     // If the app was launched by tapping a notification from a terminated state
     // handle navigation after the first frame when the navigator is available.
-    if (!kIsWeb && Platform.isAndroid) {
+    // We also safely request notification permissions here after the UI
+    // is attached.
+    if (!kIsWeb) {
       WidgetsBinding.instance.addPostFrameCallback((_) async {
-        await getIt<INotificationService>()
-            .handleInitialNotification()
-            .catchError((
+        final notificationService = getIt<INotificationService>();
+        await notificationService.requestPermission().catchError((
           Object e,
           StackTrace s,
         ) {
-          _logger.error('Error handling initial notification', e, s);
+          _logger.error('Error requesting notification permission', e, s);
+          return false;
         });
+
+        if (Platform.isAndroid) {
+          await notificationService.handleInitialNotification().catchError((
+            Object e,
+            StackTrace s,
+          ) {
+            _logger.error('Error handling initial notification', e, s);
+          });
+        }
       });
     }
 
@@ -121,8 +132,8 @@ class _NammaWalletAppState extends State<NammaWalletApp> {
             .initialize()
             .then((_) => _smsQueueService.drainQueue())
             .catchError((Object e, StackTrace st) {
-          _logger.error('SMSQueueService init/drain error', e, st);
-        }),
+              _logger.error('SMSQueueService init/drain error', e, st);
+            }),
       );
     }
   }

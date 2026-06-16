@@ -26,11 +26,10 @@ class SMSQueueService extends ISMSQueueService with WidgetsBindingObserver {
     ILocalNotificationHelper? notificationHelper,
     // Set to true in tests to bypass Platform.isIOS check
     bool forceEnabled = false,
-  })  : _logger = logger,
-        _contentProcessor = contentProcessor,
-        _notificationHelper =
-            notificationHelper ?? LocalNotificationHelper(),
-        _isEnabled = forceEnabled || Platform.isIOS;
+  }) : _logger = logger,
+       _contentProcessor = contentProcessor,
+       _notificationHelper = notificationHelper ?? LocalNotificationHelper(),
+       _isEnabled = forceEnabled || Platform.isIOS;
 
   // ── Channel ───────────────────────────────────────────────────────────────
 
@@ -50,10 +49,13 @@ class SMSQueueService extends ISMSQueueService with WidgetsBindingObserver {
   // ── State ─────────────────────────────────────────────────────────────────
 
   bool _isDraining = false;
+  final ValueNotifier<bool> _isParsing = ValueNotifier(false);
   bool _notificationsInitialized = false;
-  bool _permissionRequested = false;
 
   // ── ISMSQueueService ──────────────────────────────────────────────────────
+
+  @override
+  ValueNotifier<bool> get isParsing => _isParsing;
 
   @override
   Future<void> initialize() async {
@@ -80,7 +82,9 @@ class SMSQueueService extends ISMSQueueService with WidgetsBindingObserver {
       _logger.info(
         'SMSQueueService: draining ${queue.length} SMS entry(ies)',
       );
+      _isParsing.value = true;
       var successCount = 0;
+      final failedEntries = <String>[];
 
       for (final smsText in queue) {
         try {
@@ -92,20 +96,22 @@ class SMSQueueService extends ISMSQueueService with WidgetsBindingObserver {
             successCount++;
             _logger.info('SMSQueueService: processed entry successfully');
           } else {
+            failedEntries.add(smsText);
             _logger.warning(
               'SMSQueueService: entry failed — ${result.error}',
             );
           }
         } on Object catch (e, st) {
+          failedEntries.add(smsText);
           _logger.error('SMSQueueService: error processing entry', e, st);
         }
       }
 
-      // Clear queue regardless of success/fail to avoid reprocessing
-      await _clearSMSQueue();
+      // Preserve failed entries so malformed or unsupported Shortcut input is
+      // not silently dropped.
+      await _replaceSMSQueue(failedEntries);
 
       if (successCount > 0) {
-        await _requestPermissionIfNeeded();
         await _showSuccessNotification(successCount);
       }
 
@@ -113,16 +119,24 @@ class SMSQueueService extends ISMSQueueService with WidgetsBindingObserver {
         'SMSQueueService: drain complete '
         '— $successCount/${queue.length} parsed',
       );
+      if (failedEntries.isNotEmpty) {
+        _logger.warning(
+          'SMSQueueService: preserved ${failedEntries.length} failed '
+          'SMS entry(ies) in queue',
+        );
+      }
     } on Object catch (e, st) {
       _logger.error('SMSQueueService: unexpected error during drain', e, st);
     } finally {
       _isDraining = false;
+      _isParsing.value = false;
     }
   }
 
   @override
   Future<void> dispose() async {
     _logger.info('SMSQueueService: disposed');
+    _isParsing.dispose();
   }
 
   // ── WidgetsBindingObserver ────────────────────────────────────────────────
@@ -151,26 +165,15 @@ class SMSQueueService extends ISMSQueueService with WidgetsBindingObserver {
     }
   }
 
-  /// Removes all entries from the App Group queue.
-  Future<void> _clearSMSQueue() async {
+  /// Replaces App Group queue with [entries].
+  Future<void> _replaceSMSQueue(List<String> entries) async {
     try {
       _logger.debug(
-        'SMSQueueService: invoking clearSMSQueue via MethodChannel',
+        'SMSQueueService: invoking replaceSMSQueue via MethodChannel',
       );
-      await _channel.invokeMethod<void>('clearSMSQueue');
+      await _channel.invokeMethod<void>('replaceSMSQueue', entries);
     } on PlatformException catch (e, st) {
-      _logger.error('SMSQueueService: clearSMSQueue failed', e, st);
-    }
-  }
-
-  /// Appends [text] to the App Group SMS queue (used in tests / power users).
-  Future<void> enqueueSMS(String text) async {
-    if (!_isEnabled) return;
-    try {
-      _logger.debug('SMSQueueService: invoking enqueueSMS via MethodChannel');
-      await _channel.invokeMethod<void>('enqueueSMS', text);
-    } on PlatformException catch (e, st) {
-      _logger.error('SMSQueueService: enqueueSMS failed', e, st);
+      _logger.error('SMSQueueService: replaceSMSQueue failed', e, st);
     }
   }
 
@@ -181,20 +184,6 @@ class SMSQueueService extends ISMSQueueService with WidgetsBindingObserver {
     await _notificationHelper.initialize();
     _notificationsInitialized = true;
     _logger.debug('SMSQueueService: notifications initialised');
-  }
-
-  Future<void> _requestPermissionIfNeeded() async {
-    if (_permissionRequested) return;
-    _permissionRequested = true;
-    try {
-      await _notificationHelper.requestPermissions();
-    } on Object catch (e, st) {
-      _logger.error(
-        'SMSQueueService: notification permission request failed',
-        e,
-        st,
-      );
-    }
   }
 
   Future<void> _showSuccessNotification(int count) async {

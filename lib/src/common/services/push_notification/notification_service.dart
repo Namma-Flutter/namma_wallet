@@ -52,7 +52,8 @@ class NotificationService implements INotificationService {
   /// Requests POST_NOTIFICATIONS permission on Android 13+
   /// and notification permission on iOS.
   /// Returns true if permission is granted or not needed, false if denied.
-  Future<bool> _requestNotificationPermission() async {
+  @override
+  Future<bool> requestPermission() async {
     final status = await Permission.notification.request();
 
     if (_logger != null) {
@@ -95,15 +96,6 @@ class NotificationService implements INotificationService {
     const androidSettings = AndroidInitializationSettings(
       '@drawable/ic_notification_small',
     );
-    // Request notification permission on iOS and Android
-    final permissionGranted = await _requestNotificationPermission();
-    if (!permissionGranted) {
-      if (_logger != null) {
-        _logger?.info('Notification permission denied by user');
-      } else {
-        debugPrint('Notification permission denied by user');
-      }
-    }
 
     const iosSettings = DarwinInitializationSettings(
       requestAlertPermission: false,
@@ -309,7 +301,7 @@ class NotificationService implements INotificationService {
   Future<void> scheduleTicketReminderFor(Ticket ticket) async {
     try {
       // Request permission before attempting to schedule
-      final permissionGranted = await _requestNotificationPermission();
+      final permissionGranted = await requestPermission();
       if (!permissionGranted) {
         if (_logger != null) {
           _logger?.info(

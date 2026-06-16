@@ -47,20 +47,20 @@ void main() {
       // Set up mock MethodChannel handler
       TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
           .setMockMethodCallHandler(channel, (call) async {
-        methodCallLog.add(call);
-        switch (call.method) {
-          case 'readSMSQueue':
-            return fakeQueue;
-          case 'clearSMSQueue':
-            fakeQueue.clear();
-            return null;
-          case 'enqueueSMS':
-            fakeQueue.add(call.arguments as String);
-            return null;
-          default:
-            throw MissingPluginException();
-        }
-      });
+            methodCallLog.add(call);
+            switch (call.method) {
+              case 'readSMSQueue':
+                return fakeQueue;
+              case 'clearSMSQueue':
+                fakeQueue.clear();
+                return null;
+              case 'replaceSMSQueue':
+                fakeQueue = List<String>.from(call.arguments as List<Object?>);
+                return null;
+              default:
+                throw MissingPluginException();
+            }
+          });
     });
 
     tearDown(() async {
@@ -95,7 +95,7 @@ void main() {
         );
       });
 
-      test('clears queue after processing', () async {
+      test('clears queue after successful processing', () async {
         fakeQueue = ['SMS text 1'];
         mockProcessor.resultToReturn = const TicketCreatedResult(
           pnrNumber: '12345',
@@ -107,10 +107,10 @@ void main() {
 
         await service.drainQueue();
 
-        final clearCalls = methodCallLog
-            .where((c) => c.method == 'clearSMSQueue')
+        final replaceCalls = methodCallLog
+            .where((c) => c.method == 'replaceSMSQueue')
             .toList();
-        expect(clearCalls, hasLength(1));
+        expect(replaceCalls, hasLength(1));
         expect(fakeQueue, isEmpty);
       });
 
@@ -124,17 +124,45 @@ void main() {
 
       // ── Task 6.3: No notification when all entries fail to parse ─────────
 
-      test('does not post notification when all entries fail to parse',
-          () async {
-        fakeQueue = ['invalid SMS'];
-        mockProcessor.resultToReturn = const ProcessingErrorResult(
-          message: 'Failed',
-          error: 'No parser matched',
-        );
+      test(
+        'does not post notification when all entries fail to parse',
+        () async {
+          fakeQueue = ['invalid SMS'];
+          mockProcessor.resultToReturn = const ProcessingErrorResult(
+            message: 'Failed',
+            error: 'No parser matched',
+          );
+
+          await service.drainQueue();
+
+          expect(mockNotifications.showCallCount, 0);
+          expect(fakeQueue, ['invalid SMS']);
+        },
+      );
+
+      test('preserves only failed entries after partial success', () async {
+        fakeQueue = ['valid SMS', 'invalid SMS'];
+        mockProcessor.onProcessContent = (content, type) async {
+          if (content == 'valid SMS') {
+            return const TicketCreatedResult(
+              pnrNumber: '99999',
+              from: 'A',
+              to: 'B',
+              fare: '50',
+              date: '2026-06-15',
+            );
+          }
+
+          return const ProcessingErrorResult(
+            message: 'Failed',
+            error: 'No parser matched',
+          );
+        };
 
         await service.drainQueue();
 
-        expect(mockNotifications.showCallCount, 0);
+        expect(mockNotifications.showCallCount, 1);
+        expect(fakeQueue, ['invalid SMS']);
       });
 
       test('posts notification when at least one entry succeeds', () async {
@@ -199,8 +227,9 @@ void main() {
           date: '2026-06-15',
         );
 
-        (service as SMSQueueService)
-            .didChangeAppLifecycleState(AppLifecycleState.resumed);
+        (service as SMSQueueService).didChangeAppLifecycleState(
+          AppLifecycleState.resumed,
+        );
 
         // Allow the async drain to complete
         await Future<void>.delayed(const Duration(milliseconds: 50));
@@ -211,8 +240,9 @@ void main() {
       test('does not call drainQueue for paused state', () async {
         fakeQueue = ['SMS'];
 
-        (service as SMSQueueService)
-            .didChangeAppLifecycleState(AppLifecycleState.paused);
+        (service as SMSQueueService).didChangeAppLifecycleState(
+          AppLifecycleState.paused,
+        );
 
         await Future<void>.delayed(const Duration(milliseconds: 50));
 
@@ -222,8 +252,9 @@ void main() {
       test('does not call drainQueue for inactive state', () async {
         fakeQueue = ['SMS'];
 
-        (service as SMSQueueService)
-            .didChangeAppLifecycleState(AppLifecycleState.inactive);
+        (service as SMSQueueService).didChangeAppLifecycleState(
+          AppLifecycleState.inactive,
+        );
 
         await Future<void>.delayed(const Duration(milliseconds: 50));
 

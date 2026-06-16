@@ -22,4 +22,7 @@ abstract class ISMSQueueService implements WidgetsBindingObserver {
 
   /// Disposes any resources held by the service.
   Future<void> dispose();
+
+  /// A notifier that is true while the queue is being drained/parsed.
+  ValueNotifier<bool> get isParsing;
 }

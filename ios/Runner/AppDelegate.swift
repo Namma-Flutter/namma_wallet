@@ -1,70 +1,23 @@
 import Flutter
-import home_widget
 import UIKit
+import home_widget
 import os
 
 @main
 @objc class AppDelegate: FlutterAppDelegate, FlutterImplicitEngineDelegate {
-
-  // MARK: - SMS Queue MethodChannel
-
-  /// App Group suite name shared across Runner, Share Extension and TicketWidget targets.
   private static let appGroupSuite = "group.com.nammaflutter.nammawallet"
-  /// UserDefaults key for the pending SMS queue (JSON-encoded [String]).
   private static let smsQueueKey = "sms_queue"
-  /// Logger for SMS Queue operations
-  private let queueLog = OSLog(subsystem: "com.nammaflutter.nammawallet", category: "SMSQueue")
 
-  // MARK: - URL Scheme / Deep Link
-
-  override func application(
-    _ app: UIApplication,
-    open url: URL,
-    options: [UIApplication.OpenURLOptionsKey: Any] = [:]
-  ) -> Bool {
-    // Handle deep links from widgets
-    if url.scheme == "nammawallet" {
-      let components = url.pathComponents
-
-      // nammawallet://ticket/{ticketId}
-      if components.count >= 3, components[1] == "ticket" {
-        let ticketId = components[2]
-        if let controller = window?.rootViewController as? FlutterViewController {
-          let channel = FlutterMethodChannel(
-            name: "com.nammaflutter.nammawallet/deeplink",
-            binaryMessenger: controller.binaryMessenger
-          )
-          channel.invokeMethod("openTicket", arguments: ["ticketId": ticketId])
-        }
-        return true
-      }
-
-      // nammawallet://enqueue?sms=<text>
-      // Recommended Shortcut action: Open URL with this scheme so Shortcuts can
-      // enqueue an SMS without needing Scriptable or a script action.
-      if components.count >= 2, components[1] == "enqueue",
-        let queryItems = URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems,
-        let smsText = queryItems.first(where: { $0.name == "sms" })?.value,
-        !smsText.isEmpty
-      {
-        enqueueSMS(smsText)
-        return true
-      }
-    }
-
-    return super.application(app, open: url, options: options)
-  }
+  private let queueLog = OSLog(
+    subsystem: "com.nammaflutter.nammawallet",
+    category: "SMSQueue"
+  )
 
   override func application(
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
   ) -> Bool {
-
-    if #available(iOS 17.0, *) {
-      HomeWidgetPlugin.setConfigurationLookup(to: [
-        "TicketWidget": ConfigurationAppIntent.self
-      ])
-    }
+    configureHomeWidget()
 
     if let controller = window?.rootViewController as? FlutterViewController {
       setupMethodChannels(binaryMessenger: controller.binaryMessenger)
@@ -73,17 +26,64 @@ import os
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
 
+  override func application(
+    _ app: UIApplication,
+    open url: URL,
+    options: [UIApplication.OpenURLOptionsKey: Any] = [:]
+  ) -> Bool {
+    if handleIncomingURL(url) {
+      return true
+    }
+
+    return super.application(app, open: url, options: options)
+  }
+
   func didInitializeImplicitFlutterEngine(_ engineBridge: FlutterImplicitEngineBridge) {
     GeneratedPluginRegistrant.register(with: engineBridge.pluginRegistry)
+    configureHomeWidget()
 
+    let registrar = engineBridge.pluginRegistry.registrar(forPlugin: "SMSQueue")
+    if let messenger = registrar?.messenger() {
+      setupMethodChannels(binaryMessenger: messenger)
+    }
+  }
+
+  func handleIncomingURL(
+    _ url: URL,
+    rootViewController: UIViewController? = nil
+  ) -> Bool {
+    guard url.scheme == "nammawallet" else {
+      return false
+    }
+
+    let components = url.pathComponents
+    guard components.count >= 3, components[1] == "ticket" else {
+      return false
+    }
+
+    let ticketId = components[2]
+    guard !ticketId.isEmpty else {
+      return false
+    }
+
+    let controller = rootViewController ?? window?.rootViewController
+    guard let flutterController = controller as? FlutterViewController else {
+      return false
+    }
+
+    let channel = FlutterMethodChannel(
+      name: "com.nammaflutter.nammawallet/deeplink",
+      binaryMessenger: flutterController.binaryMessenger
+    )
+    channel.invokeMethod("openTicket", arguments: ["ticketId": ticketId])
+    return true
+  }
+
+  private func configureHomeWidget() {
     if #available(iOS 17.0, *) {
       HomeWidgetPlugin.setConfigurationLookup(to: [
         "TicketWidget": ConfigurationAppIntent.self
       ])
-    }
-
-    if let messenger = engineBridge.pluginRegistry.registrar(forPlugin: "SMSQueue")?.messenger() {
-      setupMethodChannels(binaryMessenger: messenger)
     }
   }
 
@@ -92,23 +92,37 @@ import os
       name: "com.nammaflutter.nammawallet/sms_queue",
       binaryMessenger: binaryMessenger
     )
+
     smsQueueChannel.setMethodCallHandler { [weak self] call, result in
-      guard let self = self else { return }
+      guard let self else {
+        return
+      }
+
       switch call.method {
       case "readSMSQueue":
         result(self.readSMSQueue())
       case "clearSMSQueue":
         self.clearSMSQueue()
         result(nil)
-      case "enqueueSMS":
-        if let text = call.arguments as? String, !text.isEmpty {
-          self.enqueueSMS(text)
+      case "replaceSMSQueue":
+        guard let texts = call.arguments as? [String] else {
+          result(
+            FlutterError(
+              code: "INVALID_ARGUMENT",
+              message: "replaceSMSQueue requires a String array argument",
+              details: nil
+            )
+          )
+          return
+        }
+
+        if self.replaceSMSQueue(texts) {
           result(nil)
         } else {
           result(
             FlutterError(
-              code: "INVALID_ARGUMENT",
-              message: "enqueueSMS requires a non-empty String argument",
+              code: "QUEUE_WRITE_FAILED",
+              message: "Failed to replace SMS queue",
               details: nil
             )
           )
@@ -119,12 +133,9 @@ import os
     }
   }
 
-  // MARK: - Queue Helpers
-
-  /// Returns all pending SMS texts from the App Group UserDefaults queue.
-  /// Returns an empty array if the queue is empty or unreadable.
   private func readSMSQueue() -> [String] {
-    os_log("Attempting to read SMS queue from App Group", log: queueLog, type: .info)
+    os_log("Reading SMS queue from App Group", log: queueLog, type: .info)
+
     guard
       let defaults = UserDefaults(suiteName: AppDelegate.appGroupSuite),
       let data = defaults.data(forKey: AppDelegate.smsQueueKey),
@@ -133,40 +144,57 @@ import os
       os_log("SMS queue is empty or unreadable", log: queueLog, type: .info)
       return []
     }
-    os_log("Successfully read %d items from SMS queue", log: queueLog, type: .info, queue.count)
+
+    os_log(
+      "Read %d SMS queue item(s)",
+      log: queueLog,
+      type: .info,
+      queue.count
+    )
     return queue
   }
 
-  /// Removes the SMS queue key from the App Group UserDefaults.
   private func clearSMSQueue() {
-    os_log("Clearing SMS queue from App Group", log: queueLog, type: .info)
-    UserDefaults(suiteName: AppDelegate.appGroupSuite)?.removeObject(
-      forKey: AppDelegate.smsQueueKey
-    )
+    os_log("Clearing SMS queue", log: queueLog, type: .info)
+    UserDefaults(suiteName: AppDelegate.appGroupSuite)?
+      .removeObject(forKey: AppDelegate.smsQueueKey)
   }
 
-  /// Appends `text` to the SMS queue in App Group UserDefaults.
-  /// Creates the queue if it does not yet exist.
   @discardableResult
-  private func enqueueSMS(_ text: String) -> Bool {
-    os_log("Enqueuing new SMS text", log: queueLog, type: .info)
+  private func replaceSMSQueue(_ queue: [String]) -> Bool {
+    if queue.isEmpty {
+      clearSMSQueue()
+      return true
+    }
+
+    return writeSMSQueue(queue)
+  }
+
+  @discardableResult
+  func enqueueSMS(_ text: String) -> Bool {
+    var queue = readSMSQueue()
+    queue.append(text)
+    return writeSMSQueue(queue)
+  }
+
+  private func writeSMSQueue(_ queue: [String]) -> Bool {
     guard let defaults = UserDefaults(suiteName: AppDelegate.appGroupSuite) else {
       os_log("Failed to access App Group UserDefaults", log: queueLog, type: .error)
       return false
     }
-    var queue: [String] = []
-    if let data = defaults.data(forKey: AppDelegate.smsQueueKey),
-      let existing = try? JSONDecoder().decode([String].self, from: data)
-    {
-      queue = existing
-    }
-    queue.append(text)
+
     guard let encoded = try? JSONEncoder().encode(queue) else {
       os_log("Failed to encode SMS queue", log: queueLog, type: .error)
       return false
     }
+
     defaults.set(encoded, forKey: AppDelegate.smsQueueKey)
-    os_log("Successfully enqueued SMS. Total items in queue: %d", log: queueLog, type: .info, queue.count)
+    os_log(
+      "Stored %d SMS queue item(s)",
+      log: queueLog,
+      type: .info,
+      queue.count
+    )
     return true
   }
 }
