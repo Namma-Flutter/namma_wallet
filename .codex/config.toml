@@ -1,7 +1,10 @@
 [mcp_servers.dart]
 args = [
-    "mcp-server",
-    "--flutter-sdk",
-    ".fvm/flutter_sdk",
+  "mcp-server",
+  "--flutter-sdk",
+  ".fvm/flutter_sdk",
 ]
 command = "dart"
+
+[mcp_servers.dart.tools.add_roots]
+approval_mode = "approve"
