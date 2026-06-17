@@ -9,8 +9,8 @@ import 'package:namma_wallet/src/features/receive/domain/shared_content_type.dar
 import 'package:namma_wallet/src/features/receive/domain/sms_queue_service_interface.dart';
 
 import '../../../../helpers/fake_logger.dart';
-import 'mock_shared_content_processor.dart';
 import 'mock_notifications_plugin.dart';
+import 'mock_shared_content_processor.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -26,7 +26,7 @@ void main() {
     // Tracks the list of method calls received by the mock channel
     final methodCallLog = <MethodCall>[];
     // Backing queue used by the mock channel
-    List<String> fakeQueue = [];
+    var fakeQueue = <String>[];
 
     setUp(() async {
       fakeQueue = [];
