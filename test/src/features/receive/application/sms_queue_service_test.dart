@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -263,9 +261,3 @@ void main() {
     });
   });
 }
-
-// ── Helpers ──────────────────────────────────────────────────────────────────
-
-/// Helper to encode a list of SMS strings the same way Swift does,
-/// for low-level channel testing if needed.
-String encodeSMSQueue(List<String> entries) => jsonEncode(entries);
