@@ -43,12 +43,12 @@ class WalletDatabase implements IWalletDatabase {
     return openDatabase(
       path,
       version: _dbVersion,
-      onCreate: (Database db, int version) async {
+      onCreate: (db, version) async {
         _logger.logDatabase('Create', 'Creating database schema v$version');
         await _createSchema(db);
         _logger.success('Database schema created successfully');
       },
-      onUpgrade: (Database db, int oldVersion, int newVersion) async {
+      onUpgrade: (db, oldVersion, newVersion) async {
         _logger.logDatabase(
           'Upgrade',
           'Upgrading from v$oldVersion to v$newVersion',

@@ -107,7 +107,7 @@ Future<void> main() async {
 
   // Set up global error handling
   // ignore: no-empty-block
-  FlutterError.onError = (FlutterErrorDetails details) {
+  FlutterError.onError = (details) {
     if (logger != null) {
       logger.error(
         'Flutter Error: ${details.exceptionAsString()}',

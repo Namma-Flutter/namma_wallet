@@ -15,7 +15,7 @@ class FakeDatabase implements IWalletDatabase {
     return openDatabase(
       inMemoryDatabasePath,
       version: 1,
-      onCreate: (Database db, int version) async {
+      onCreate: (db, version) async {
         // Create users table
         await db.execute('''
           CREATE TABLE users (

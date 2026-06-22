@@ -6,7 +6,7 @@ import 'package:namma_wallet/src/features/ai/fallback_parser/application/ai_serv
 
 /// Service class to interact with Gemma AI chat
 class GemmaService implements IAIService {
-  GemmaService({required ILogger logger}) : _logger = logger;
+  GemmaService({required this._logger});
   final ILogger _logger;
   int? _lastLoggedProgress;
   //https://huggingface.co/litert-community/Gemma3-1B-IT/resolve/main/Gemma3-1B-IT_multi-prefill-seq_q4_block128_ekv4096.task

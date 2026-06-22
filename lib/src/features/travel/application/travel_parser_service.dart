@@ -38,7 +38,7 @@ abstract class TravelTicketParser {
 }
 
 class TNSTCBusParser extends TravelTicketParser {
-  TNSTCBusParser({required ILogger logger}) : _logger = logger;
+  TNSTCBusParser({required this._logger});
   final ILogger _logger;
 
   @override
@@ -209,7 +209,7 @@ class TNSTCBusParser extends TravelTicketParser {
 ///
 /// Uses layout-based extraction for PDF parsing and SMS parser for SMS format.
 class IRCTCTrainParser extends TravelTicketParser {
-  IRCTCTrainParser({required ILogger logger}) : _logger = logger;
+  IRCTCTrainParser({required this._logger});
   final ILogger _logger;
 
   @override
@@ -288,7 +288,7 @@ class IRCTCTrainParser extends TravelTicketParser {
 
 /// SETC bus ticket parser.
 class SETCBusParser extends TravelTicketParser {
-  SETCBusParser({required ILogger logger}) : _logger = logger;
+  SETCBusParser({required this._logger});
   final ILogger _logger;
   @override
   String get providerName => 'SETC';

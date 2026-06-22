@@ -75,7 +75,7 @@ void main() {
           TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
               .setMockMethodCallHandler(
                 SystemChannels.platform,
-                (MethodCall methodCall) async {
+                (methodCall) async {
                   if (methodCall.method == 'Clipboard.hasStrings') {
                     return <String, dynamic>{'value': true};
                   }
@@ -99,7 +99,7 @@ void main() {
           TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
               .setMockMethodCallHandler(
                 SystemChannels.platform,
-                (MethodCall methodCall) async {
+                (methodCall) async {
                   if (methodCall.method == 'Clipboard.hasStrings') {
                     return <String, dynamic>{'value': false};
                   }
@@ -123,7 +123,7 @@ void main() {
           TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
               .setMockMethodCallHandler(
                 SystemChannels.platform,
-                (MethodCall methodCall) async {
+                (methodCall) async {
                   if (methodCall.method == 'Clipboard.hasStrings') {
                     throw PlatformException(
                       code: 'CLIPBOARD_ERROR',
@@ -150,7 +150,7 @@ void main() {
           TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
               .setMockMethodCallHandler(
                 SystemChannels.platform,
-                (MethodCall methodCall) async {
+                (methodCall) async {
                   if (methodCall.method == 'Clipboard.hasStrings') {
                     throw Exception('Unexpected error');
                   }
@@ -177,7 +177,7 @@ void main() {
           TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
               .setMockMethodCallHandler(
                 SystemChannels.platform,
-                (MethodCall methodCall) async {
+                (methodCall) async {
                   if (methodCall.method == 'Clipboard.getData') {
                     return <String, dynamic>{'text': clipboardText};
                   }
@@ -204,7 +204,7 @@ void main() {
           TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
               .setMockMethodCallHandler(
                 SystemChannels.platform,
-                (MethodCall methodCall) async {
+                (methodCall) async {
                   if (methodCall.method == 'Clipboard.getData') {
                     return <String, dynamic>{'text': clipboardText};
                   }
@@ -231,7 +231,7 @@ void main() {
           TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
               .setMockMethodCallHandler(
                 SystemChannels.platform,
-                (MethodCall methodCall) async {
+                (methodCall) async {
                   if (methodCall.method == 'Clipboard.getData') {
                     return null; // Null for empty clipboard
                   }
@@ -256,7 +256,7 @@ void main() {
           TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
               .setMockMethodCallHandler(
                 SystemChannels.platform,
-                (MethodCall methodCall) async {
+                (methodCall) async {
                   if (methodCall.method == 'Clipboard.getData') {
                     return <String, dynamic>{'text': clipboardText};
                   }
@@ -280,7 +280,7 @@ void main() {
           TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
               .setMockMethodCallHandler(
                 SystemChannels.platform,
-                (MethodCall methodCall) async {
+                (methodCall) async {
                   if (methodCall.method == 'Clipboard.getData') {
                     throw PlatformException(
                       code: 'CLIPBOARD_ERROR',
@@ -307,7 +307,7 @@ void main() {
           TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
               .setMockMethodCallHandler(
                 SystemChannels.platform,
-                (MethodCall methodCall) async {
+                (methodCall) async {
                   if (methodCall.method == 'Clipboard.getData') {
                     throw Exception('Network error');
                   }
@@ -332,7 +332,7 @@ void main() {
           TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
               .setMockMethodCallHandler(
                 SystemChannels.platform,
-                (MethodCall methodCall) async {
+                (methodCall) async {
                   if (methodCall.method == 'Clipboard.getData') {
                     return <String, dynamic>{'text': clipboardText};
                   }
@@ -359,7 +359,7 @@ void main() {
           TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
               .setMockMethodCallHandler(
                 SystemChannels.platform,
-                (MethodCall methodCall) async {
+                (methodCall) async {
                   if (methodCall.method == 'Clipboard.getData') {
                     return <String, dynamic>{'text': clipboardText};
                   }
@@ -386,7 +386,7 @@ void main() {
           TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
               .setMockMethodCallHandler(
                 SystemChannels.platform,
-                (MethodCall methodCall) async {
+                (methodCall) async {
                   if (methodCall.method == 'Clipboard.getData') {
                     return <String, dynamic>{'text': clipboardText};
                   }
@@ -413,7 +413,7 @@ void main() {
           TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
               .setMockMethodCallHandler(
                 SystemChannels.platform,
-                (MethodCall methodCall) async {
+                (methodCall) async {
                   throw PlatformException(
                     code: 'ACCESS_DENIED',
                     message: 'Clipboard access denied',
@@ -439,7 +439,7 @@ void main() {
           TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
               .setMockMethodCallHandler(
                 SystemChannels.platform,
-                (MethodCall methodCall) async {
+                (methodCall) async {
                   return null;
                 },
               );

@@ -10,10 +10,9 @@ import 'package:syncfusion_flutter_pdf/pdf.dart';
 
 class PDFService implements IPDFService {
   PDFService({
-    required IOCRService ocrService,
-    required ILogger logger,
-  }) : _ocrService = ocrService,
-       _logger = logger;
+    required this._ocrService,
+    required this._logger,
+  });
 
   final IOCRService _ocrService;
   final ILogger _logger;

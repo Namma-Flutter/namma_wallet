@@ -22,7 +22,7 @@ import 'package:namma_wallet/src/features/tnstc/domain/tnstc_model.dart';
 /// - Returns null on any error (network, parsing, invalid PNR)
 /// - Logs all errors internally using ILogger
 class TNSTCPNRFetcher implements ITNSTCPNRFetcher {
-  TNSTCPNRFetcher({required ILogger logger}) : _logger = logger;
+  TNSTCPNRFetcher({required this._logger});
 
   final ILogger _logger;
 

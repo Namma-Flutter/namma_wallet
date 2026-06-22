@@ -86,11 +86,11 @@ class _NammaWalletAppState extends State<NammaWalletApp> {
     // Initialize deep link service for .pkpass files
     unawaited(
       _deepLinkService.initialize(
-        onError: (Object error) {
+        onError: (error) {
           _logger.error('Deep link error: $error');
           _shareHandler.handleError(error.toString());
         },
-        onWarning: (String message) {
+        onWarning: (message) {
           _logger.warning('Deep link warning: $message');
           _shareHandler.handleWarning(message);
         },
