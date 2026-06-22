@@ -49,13 +49,11 @@ class NotificationService implements INotificationService {
     return status.isGranted;
   }
 
-  /// Requests POST_NOTIFICATIONS permission on Android 13+.
+  /// Requests POST_NOTIFICATIONS permission on Android 13+
+  /// and notification permission on iOS.
   /// Returns true if permission is granted or not needed, false if denied.
-  /// Note: On Android < 13, this returns true automatically as the permission
-  /// is not required.
-  Future<bool> _requestNotificationPermission() async {
-    if (!Platform.isAndroid) return true;
-
+  @override
+  Future<bool> requestPermission() async {
     final status = await Permission.notification.request();
 
     if (_logger != null) {
@@ -98,18 +96,12 @@ class NotificationService implements INotificationService {
     const androidSettings = AndroidInitializationSettings(
       '@drawable/ic_notification_small',
     );
-    if (Platform.isAndroid) {
-      // Request POST_NOTIFICATIONS permission on Android 13+
-      final permissionGranted = await _requestNotificationPermission();
-      if (!permissionGranted) {
-        if (_logger != null) {
-          _logger?.info('Notification permission denied by user');
-        } else {
-          debugPrint('Notification permission denied by user');
-        }
-      }
-    }
-    const iosSettings = DarwinInitializationSettings();
+
+    const iosSettings = DarwinInitializationSettings(
+      requestAlertPermission: false,
+      requestBadgePermission: false,
+      requestSoundPermission: false,
+    );
     const initSettings = InitializationSettings(
       android: androidSettings,
       iOS: iosSettings,
@@ -309,7 +301,7 @@ class NotificationService implements INotificationService {
   Future<void> scheduleTicketReminderFor(Ticket ticket) async {
     try {
       // Request permission before attempting to schedule
-      final permissionGranted = await _requestNotificationPermission();
+      final permissionGranted = await requestPermission();
       if (!permissionGranted) {
         if (_logger != null) {
           _logger?.info(

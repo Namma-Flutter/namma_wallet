@@ -68,7 +68,7 @@ dev_dependencies:
   mockito: ^5.6.1
   path_provider_platform_interface: ^2.1.2
   plugin_platform_interface: ^2.1.8
-  sqflite_common_ffi: ^2.4.0+2
+  sqflite_common_ffi: ^2.3.5
   very_good_analysis: ^10.0.0
 
 flutter:

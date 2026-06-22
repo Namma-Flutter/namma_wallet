@@ -1,8 +1,6 @@
 // import 'dart:convert';
 
 import 'dart:async';
-import 'dart:io';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -160,7 +158,7 @@ Future<void> main() async {
     await getIt<IWidgetService>().initialize();
     logger?.success('Widget service initialized');
 
-    if (Platform.isAndroid) {
+    if (!kIsWeb) {
       logger?.info('Initializing notification service...');
       await getIt<INotificationService>().initialize();
       logger?.success('Notification service initialized');
