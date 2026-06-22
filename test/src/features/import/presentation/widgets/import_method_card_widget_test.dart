@@ -40,12 +40,14 @@ void main() {
         expect(find.text('PDF File'), findsOneWidget);
         // Verify the title text is left-aligned (core alignment requirement)
         final align = tester.widget<Align>(
-          find.descendant(
-            of: find.byType(ImportMethodCardWidget),
-            matching: find.byWidgetPredicate(
-              (w) => w is Align && w.alignment == Alignment.centerLeft,
-            ),
-          ).first,
+          find
+              .descendant(
+                of: find.byType(ImportMethodCardWidget),
+                matching: find.byWidgetPredicate(
+                  (w) => w is Align && w.alignment == Alignment.centerLeft,
+                ),
+              )
+              .first,
         );
         expect(align.alignment, equals(Alignment.centerLeft));
       },
