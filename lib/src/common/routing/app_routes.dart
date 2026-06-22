@@ -25,8 +25,7 @@ enum AppRoute {
 
   // Debug routes
   dbViewer(path: '/db-viewer', name: 'dbViewer'),
-  ocrDebug(path: '/ocr-debug', name: 'ocrDebug')
-  ;
+  ocrDebug(path: '/ocr-debug', name: 'ocrDebug');
 
   const AppRoute({required this.path, required this.name});
 

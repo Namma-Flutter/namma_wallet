@@ -19,11 +19,17 @@ jobs:
           distribution: "temurin"
           java-version: "17"
 
+      - name: Read Flutter version from pubspec.yaml
+        id: flutter_version
+        run: |
+          VERSION=$(grep '^  flutter:' pubspec.yaml | awk -F'"' '{print $2}')
+          echo "flutter_version=$VERSION" >> $GITHUB_OUTPUT
+
       - name: Set up Flutter
-        uses: subosito/flutter-action@v2
+        uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2
         with:
           channel: stable
-          flutter-version: '3.38.6'
+          flutter-version: ${{ steps.flutter_version.outputs.flutter_version }}
           cache: true
 
       - name: Get dependencies

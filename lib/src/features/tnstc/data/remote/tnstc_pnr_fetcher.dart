@@ -5,7 +5,9 @@ import 'dart:async';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart' as html_parser;
 import 'package:http/http.dart' as http;
+import 'package:http/testing.dart' show MockClient;
 import 'package:intl/intl.dart';
+import 'package:meta/meta.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
 import 'package:namma_wallet/src/features/tnstc/data/remote/tnstc_pnr_fetcher_interface.dart';
 import 'package:namma_wallet/src/features/tnstc/domain/tnstc_model.dart';
@@ -22,9 +24,13 @@ import 'package:namma_wallet/src/features/tnstc/domain/tnstc_model.dart';
 /// - Returns null on any error (network, parsing, invalid PNR)
 /// - Logs all errors internally using ILogger
 class TNSTCPNRFetcher implements ITNSTCPNRFetcher {
-  TNSTCPNRFetcher({required this._logger});
+  TNSTCPNRFetcher({required this._logger, this._httpClient});
 
   final ILogger _logger;
+
+  /// Optional injected HTTP client. When null, a fresh [http.Client] is
+  /// created per request. Inject a [MockClient] in tests.
+  final http.Client? _httpClient;
 
   static const String _baseUrl = 'https://www.tnstc.in/OTRSOnline';
   static const String _formUrl = '$_baseUrl/preKnowYourConductor.do';
@@ -51,7 +57,8 @@ class TNSTCPNRFetcher implements ITNSTCPNRFetcher {
       }
 
       // Step 1: Establish session by visiting the form page
-      final client = http.Client();
+      final client = _httpClient ?? http.Client();
+      final ownsClient = _httpClient == null;
       try {
         _logger.logHttpRequest('GET', _formUrl);
         http.Response formResponse;
@@ -129,7 +136,9 @@ class TNSTCPNRFetcher implements ITNSTCPNRFetcher {
         }
         return ticket;
       } finally {
-        client.close();
+        // Only close the client if we created it; injected clients are managed
+        // by the caller.
+        if (ownsClient) client.close();
       }
     } on Exception catch (e, stackTrace) {
       _logger.error('Error fetching PNR: $pnr', e, stackTrace);
@@ -143,7 +152,16 @@ class TNSTCPNRFetcher implements ITNSTCPNRFetcher {
     return match?.group(1);
   }
 
-  /// Parses HTML response and extracts ticket information
+  /// Parses HTML response and extracts ticket information.
+  ///
+  /// Exposed for unit-testing via HTML fixtures.
+  @visibleForTesting
+  TNSTCTicketModel? parseHtmlResponseForTesting(
+    String html,
+    String pnr,
+    String phoneNumber,
+  ) => _parseHtmlResponse(html, pnr, phoneNumber);
+
   TNSTCTicketModel? _parseHtmlResponse(
     String html,
     String pnr,
@@ -189,14 +207,19 @@ class TNSTCPNRFetcher implements ITNSTCPNRFetcher {
         return null;
       }
 
-      // Parse journey date
+      // Parse journey date — prefer the travel date over the booking date.
+      // The TNSTC response labels the travel date as "Journey Date"; some
+      // response variants label it "Date of Journey". "Booking Date" is the
+      // ticket-purchase date and must NOT be used as the journey date.
       DateTime? journeyDate;
-      final bookingDateStr = data['Booking Date'];
-      if (bookingDateStr != null && bookingDateStr.isNotEmpty) {
+      final journeyDateStr = data['Journey Date'] ?? data['Date of Journey'];
+      if (journeyDateStr != null && journeyDateStr.isNotEmpty) {
         try {
-          journeyDate = DateFormat('dd/MM/yyyy').parse(bookingDateStr);
+          journeyDate = DateFormat('dd/MM/yyyy').parse(journeyDateStr);
         } on FormatException catch (e) {
-          _logger.warning('Failed to parse journey date: $bookingDateStr - $e');
+          _logger.warning(
+            'Failed to parse journey date: $journeyDateStr - $e',
+          );
         }
       }
 
@@ -240,7 +263,7 @@ class TNSTCPNRFetcher implements ITNSTCPNRFetcher {
         final cols = row.querySelectorAll('.col-6, .col-md-3');
 
         for (var i = 0; i < cols.length - 1; i += 2) {
-          final label = cols[i].text.trim().replaceAll(':', '');
+          final label = cols[i].text.trim().replaceAll(':', '').trim();
           final value = cols[i + 1].text.trim();
 
           if (label.isNotEmpty && value.isNotEmpty) {
