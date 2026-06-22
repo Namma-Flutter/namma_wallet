@@ -41,7 +41,7 @@ class _OCRDebugViewState extends State<OCRDebugView> {
     });
 
     try {
-      final result = await FilePicker.platform.pickFiles(
+      final result = await FilePicker.pickFiles(
         type: FileType.custom,
         allowedExtensions: ['pdf'],
         withData: kIsWeb, // Load bytes only on web

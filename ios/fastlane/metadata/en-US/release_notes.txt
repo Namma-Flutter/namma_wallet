@@ -1,4 +1,4 @@
-- Added ticket archiving system
-- Added ticket reminders via push notifications
-- Share tickets as an image
-- UI improvements and bug fixes
+- Improved SMS ticket processing for TNSTC buses
+- Enhanced notifications and automation features
+- Better ticket archiving system
+- Bug fixes and stability improvements

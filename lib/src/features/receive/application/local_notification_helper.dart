@@ -37,7 +37,7 @@ class LocalNotificationHelper implements ILocalNotificationHelper {
       android: androidSettings,
       iOS: iosSettings,
     );
-    await _plugin.initialize(settings);
+    await _plugin.initialize(settings: settings);
   }
 
   @override
@@ -63,6 +63,11 @@ class LocalNotificationHelper implements ILocalNotificationHelper {
       android: androidDetails,
       iOS: iosDetails,
     );
-    await _plugin.show(id, title, body, details);
+    await _plugin.show(
+      id: id,
+      title: title,
+      body: body,
+      notificationDetails: details,
+    );
   }
 }
