@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		0091D9DF131C1C84961390C4 /* Pods_RunnerTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A77D0CD2FA047C1ABAB0FF9 /* Pods_RunnerTests.framework */; };
+		13340B1B6785CDA3EBD60070 /* EnqueueSMSIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEEDB139EFD99C3BEEDF003F /* EnqueueSMSIntent.swift */; };
+		2D1E7B6E2F1A4E9BB7A0C401 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D1E7B6D2F1A4E9BB7A0C401 /* SceneDelegate.swift */; };
 		1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */ = {isa = PBXBuildFile; fileRef = 1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */; };
 		331C808B294A63AB00263BE5 /* RunnerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 331C807B294A618700263BE5 /* RunnerTests.swift */; };
 		3B20D0F4C6579CBDC505DF98 /* Pods_Runner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EF2CDA501A0E5FEA4080752A /* Pods_Runner.framework */; };
@@ -21,6 +23,7 @@
 		97C146FC1CF9000F007C117D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FA1CF9000F007C117D /* Main.storyboard */; };
 		97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FD1CF9000F007C117D /* Assets.xcassets */; };
 		97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */; };
+		B1FD1D9A83535D9456650A0C /* NammaWalletShortcuts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71FFA98896DDF0D391964521 /* NammaWalletShortcuts.swift */; };
 		C456731C7ADCD0CDF8F2FBBB /* Pods_Share_Extension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AB45728C5A152FD39B0E276D /* Pods_Share_Extension.framework */; };
 /* End PBXBuildFile section */
 
@@ -90,6 +93,8 @@
 		68B263732F176F2A00743DE6 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		68B263752F176F2A00743DE6 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 		68B263892F17706300743DE6 /* TicketWidgetExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TicketWidgetExtension.entitlements; sourceTree = "<group>"; };
+		71FFA98896DDF0D391964521 /* NammaWalletShortcuts.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NammaWalletShortcuts.swift; sourceTree = "<group>"; };
+		2D1E7B6D2F1A4E9BB7A0C401 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		74858FAD1ED2DC5600515810 /* Runner-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Runner-Bridging-Header.h"; sourceTree = "<group>"; };
 		74858FAE1ED2DC5600515810 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		7AFA3C8E1D35360C0083082E /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = Release.xcconfig; path = Flutter/Release.xcconfig; sourceTree = "<group>"; };
@@ -106,6 +111,7 @@
 		B2EF849D627D09828B828CE6 /* Pods-Runner.profile.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.profile.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.profile.xcconfig"; sourceTree = "<group>"; };
 		C2C8CBA7D8188E0AE62D5079 /* Pods-Share Extension.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Share Extension.debug.xcconfig"; path = "Target Support Files/Pods-Share Extension/Pods-Share Extension.debug.xcconfig"; sourceTree = "<group>"; };
 		D17D4F356A832F59B90AD14A /* Pods-RunnerTests.profile.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RunnerTests.profile.xcconfig"; path = "Target Support Files/Pods-RunnerTests/Pods-RunnerTests.profile.xcconfig"; sourceTree = "<group>"; };
+		DEEDB139EFD99C3BEEDF003F /* EnqueueSMSIntent.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = EnqueueSMSIntent.swift; sourceTree = "<group>"; };
 		E21839F17B9A1CE40E326D37 /* Pods-Runner.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.release.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.release.xcconfig"; sourceTree = "<group>"; };
 		EF2CDA501A0E5FEA4080752A /* Pods_Runner.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Runner.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		FC21F0EFC885950230A199C1 /* Pods-RunnerTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RunnerTests.release.xcconfig"; path = "Target Support Files/Pods-RunnerTests/Pods-RunnerTests.release.xcconfig"; sourceTree = "<group>"; };
@@ -270,7 +276,10 @@
 				1498D2321E8E86230040F4C2 /* GeneratedPluginRegistrant.h */,
 				1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */,
 				74858FAE1ED2DC5600515810 /* AppDelegate.swift */,
+				2D1E7B6D2F1A4E9BB7A0C401 /* SceneDelegate.swift */,
 				74858FAD1ED2DC5600515810 /* Runner-Bridging-Header.h */,
+				DEEDB139EFD99C3BEEDF003F /* EnqueueSMSIntent.swift */,
+				71FFA98896DDF0D391964521 /* NammaWalletShortcuts.swift */,
 			);
 			path = Runner;
 			sourceTree = "<group>";
@@ -645,7 +654,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */,
+				2D1E7B6E2F1A4E9BB7A0C401 /* SceneDelegate.swift in Sources */,
 				1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */,
+				13340B1B6785CDA3EBD60070 /* EnqueueSMSIntent.swift in Sources */,
+				B1FD1D9A83535D9456650A0C /* NammaWalletShortcuts.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -46,8 +46,10 @@ import 'package:namma_wallet/src/features/irctc/application/irctc_scanner_servic
 import 'package:namma_wallet/src/features/receive/application/shared_content_processor.dart';
 import 'package:namma_wallet/src/features/receive/application/shared_content_processor_interface.dart';
 import 'package:namma_wallet/src/features/receive/application/sharing_intent_service.dart';
+import 'package:namma_wallet/src/features/receive/application/sms_queue_service.dart';
 import 'package:namma_wallet/src/features/receive/application/web_sharing_intent_service.dart';
 import 'package:namma_wallet/src/features/receive/domain/sharing_intent_service_interface.dart';
+import 'package:namma_wallet/src/features/receive/domain/sms_queue_service_interface.dart';
 import 'package:namma_wallet/src/features/settings/application/ai_service_status.dart';
 import 'package:namma_wallet/src/features/tnstc/application/tnstc_api_ticket_parser.dart';
 import 'package:namma_wallet/src/features/tnstc/application/tnstc_sms_parser.dart';
@@ -119,6 +121,12 @@ void setupLocator() {
         travelParser: getIt<ITravelParser>(),
         ticketDao: getIt<ITicketDAO>(),
         importService: getIt<IImportService>(),
+      ),
+    )
+    ..registerLazySingleton<ISMSQueueService>(
+      () => SMSQueueService(
+        logger: getIt<ILogger>(),
+        contentProcessor: getIt<ISharedContentProcessor>(),
       ),
     )
     ..registerLazySingleton<IHapticService>(HapticService.new)

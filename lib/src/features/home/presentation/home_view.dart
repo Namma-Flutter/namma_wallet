@@ -17,6 +17,7 @@ import 'package:namma_wallet/src/common/services/ticket_change_notifier.dart';
 import 'package:namma_wallet/src/common/widgets/snackbar_widget.dart';
 import 'package:namma_wallet/src/features/home/presentation/widgets/header_widget.dart';
 import 'package:namma_wallet/src/features/home/presentation/widgets/ticket_card_widget.dart';
+import 'package:namma_wallet/src/features/receive/domain/sms_queue_service_interface.dart';
 import 'package:namma_wallet/src/features/travel/presentation/widgets/travel_ticket_card_widget.dart';
 
 class HomeView extends StatefulWidget {
@@ -153,6 +154,13 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                ValueListenableBuilder<bool>(
+                  valueListenable: getIt<ISMSQueueService>().isParsing,
+                  builder: (context, isParsing, child) {
+                    if (!isParsing) return const SizedBox.shrink();
+                    return const LinearProgressIndicator();
+                  },
+                ),
                 UserProfileWidget(),
                 Padding(
                   padding: const EdgeInsets.all(16),

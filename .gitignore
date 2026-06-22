@@ -75,3 +75,4 @@ ios/Runner.ipa
 android/fastlane/report.xml
 coverage/
 android/build/
+node_modules
