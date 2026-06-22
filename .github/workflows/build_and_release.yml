@@ -30,7 +30,7 @@ jobs:
       - name: Read Flutter version from pubspec.yaml
         id: flutter_version
         run: |
-          VERSION=$(grep '^  flutter:' pubspec.yaml | sed 's/.*flutter: "\([^"]*\)".*/\1/')
+          VERSION=$(grep '^  flutter:' pubspec.yaml | awk -F'"' '{print $2}')
           echo "flutter_version=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Set up Flutter
