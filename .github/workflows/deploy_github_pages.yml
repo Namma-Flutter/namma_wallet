@@ -26,11 +26,17 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Read Flutter version from pubspec.yaml
+        id: flutter_version
+        run: |
+          VERSION=$(grep '^  flutter:' pubspec.yaml | awk -F'"' '{print $2}')
+          echo "flutter_version=$VERSION" >> $GITHUB_OUTPUT
+
       - name: Set up Flutter
-        uses: subosito/flutter-action@v2.21.0
+        uses: subosito/flutter-action@fd55f4c5af5b953cc57a2be44cb082c8f6635e8e # v2.21.0
         with:
           channel: stable
-          flutter-version: '3.38.6'
+          flutter-version: ${{ steps.flutter_version.outputs.flutter_version }}
           cache: true
 
       - name: Get dependencies
