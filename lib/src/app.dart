@@ -168,13 +168,21 @@ class _NammaWalletAppState extends State<NammaWalletApp> {
   Future<void> _disposeSharingService() async {
     try {
       await _sharingService.dispose();
-      await _deepLinkService.dispose();
-      if (!kIsWeb && Platform.isIOS) {
-        WidgetsBinding.instance.removeObserver(_smsQueueService);
-        await _smsQueueService.dispose();
-      }
     } on Object catch (e, st) {
       _logger.error('Error disposing sharing service', e, st);
+    }
+    try {
+      await _deepLinkService.dispose();
+    } on Object catch (e, st) {
+      _logger.error('Error disposing deep link service', e, st);
+    }
+    if (!kIsWeb && Platform.isIOS) {
+      WidgetsBinding.instance.removeObserver(_smsQueueService);
+      try {
+        await _smsQueueService.dispose();
+      } on Object catch (e, st) {
+        _logger.error('Error disposing SMS queue service', e, st);
+      }
     }
   }
 

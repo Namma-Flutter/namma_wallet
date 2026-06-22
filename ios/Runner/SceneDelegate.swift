@@ -9,8 +9,7 @@ class SceneDelegate: FlutterSceneDelegate {
     }
 
     if let appDelegate = UIApplication.shared.delegate as? AppDelegate,
-      appDelegate.handleIncomingURL(url, rootViewController: window?.rootViewController)
-    {
+      appDelegate.handleIncomingURL(url, rootViewController: window?.rootViewController) {
       return
     }
 

@@ -24,7 +24,19 @@ class LocalNotificationHelper implements ILocalNotificationHelper {
   static const _channelName = 'SMS Automation';
 
   @override
-  Future<void> initialize() async {}
+  Future<void> initialize() async {
+    const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
+    const iosSettings = DarwinInitializationSettings(
+      requestAlertPermission: false,
+      requestBadgePermission: false,
+      requestSoundPermission: false,
+    );
+    const settings = InitializationSettings(
+      android: androidSettings,
+      iOS: iosSettings,
+    );
+    await _plugin.initialize(settings);
+  }
 
   @override
   Future<void> requestPermissions() async {

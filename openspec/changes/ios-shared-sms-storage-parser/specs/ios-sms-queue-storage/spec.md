@@ -13,7 +13,7 @@ The system SHALL maintain a persistent JSON-encoded queue of raw SMS text string
 
 #### Scenario: Queue is cleared after processing
 - **WHEN** all queued entries have been successfully processed by the app
-- **THEN** `clearSMSQueue()` SHALL remove all entries from the queue key in UserDefaults
+- **THEN** `replaceSMSQueue()` SHALL replace the queue with only the failed entries (entries that failed parsing), removing successfully processed entries. If all entries succeeded, the queue is cleared entirely.
 
 ### Requirement: MethodChannel exposes queue operations to Flutter
 The system SHALL expose a `FlutterMethodChannel` named `com.nammaflutter.nammawallet/sms_queue` in `AppDelegate.swift` providing three methods: `readSMSQueue`, `clearSMSQueue`, and `enqueueSMS`.

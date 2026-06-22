@@ -6,7 +6,7 @@ The system SHALL read the SMS queue from App Group UserDefaults on every cold st
 #### Scenario: App launched with pending SMS in queue
 - **WHEN** the app is launched cold (not resumed from background)
 - **AND** one or more SMS texts are present in the App Group queue
-- **THEN** `SMSQueueService` SHALL read all entries, process each through `SharedContentProcessor`, and call `clearSMSQueue` after all entries are processed
+- **THEN** `SMSQueueService` SHALL read all entries, process each through `SharedContentProcessor`, clear successfully processed entries from the queue, and retain any failed entries for later retry
 
 #### Scenario: App launched with empty queue
 - **WHEN** the app is launched cold and the queue is empty
@@ -18,7 +18,7 @@ The system SHALL read and drain the SMS queue every time `AppLifecycleState.resu
 #### Scenario: App resumes with new SMS in queue
 - **WHEN** the app transitions from background to foreground (`AppLifecycleState.resumed`)
 - **AND** one or more SMS texts have been added to the queue since the last drain
-- **THEN** `SMSQueueService` SHALL process all new entries and clear the queue
+- **THEN** `SMSQueueService` SHALL process all new entries, clear successfully processed entries, and retain any failed entries for later retry
 
 #### Scenario: Concurrent resume events do not trigger double processing
 - **WHEN** `AppLifecycleState.resumed` fires multiple times in rapid succession

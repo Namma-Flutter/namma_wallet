@@ -13,6 +13,8 @@ import os
     category: "SMSQueue"
   )
 
+  private let queueLock = NSLock()
+
   override func application(
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
@@ -155,6 +157,8 @@ import os
   }
 
   private func clearSMSQueue() {
+    queueLock.lock()
+    defer { queueLock.unlock() }
     os_log("Clearing SMS queue", log: queueLog, type: .info)
     UserDefaults(suiteName: AppDelegate.appGroupSuite)?
       .removeObject(forKey: AppDelegate.smsQueueKey)
@@ -162,8 +166,11 @@ import os
 
   @discardableResult
   private func replaceSMSQueue(_ queue: [String]) -> Bool {
+    queueLock.lock()
+    defer { queueLock.unlock() }
     if queue.isEmpty {
-      clearSMSQueue()
+      UserDefaults(suiteName: AppDelegate.appGroupSuite)?
+        .removeObject(forKey: AppDelegate.smsQueueKey)
       return true
     }
 
@@ -172,6 +179,8 @@ import os
 
   @discardableResult
   func enqueueSMS(_ text: String) -> Bool {
+    queueLock.lock()
+    defer { queueLock.unlock() }
     var queue = readSMSQueue()
     queue.append(text)
     return writeSMSQueue(queue)

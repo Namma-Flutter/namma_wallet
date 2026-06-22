@@ -69,8 +69,8 @@ Keychain.set(groupId + "." + key, JSON.stringify(queue));
 ```
 
 > **Note:** `Keychain` in Scriptable does not share with `UserDefaults` App
-> Groups directly. For production use, the **URL scheme approach above is
-> recommended** as it uses the same native `UserDefaults` suite that Namma
+> Groups directly. For production use, the **App Intent action flow described
+> above is recommended** as it uses the native `UserDefaults` suite that Namma
 > Wallet reads from.
 
 ---

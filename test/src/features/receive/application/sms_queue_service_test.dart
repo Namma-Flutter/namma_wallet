@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -7,8 +9,8 @@ import 'package:namma_wallet/src/features/receive/domain/shared_content_type.dar
 import 'package:namma_wallet/src/features/receive/domain/sms_queue_service_interface.dart';
 
 import '../../../../helpers/fake_logger.dart';
-import 'mock_notifications_plugin.dart';
-import 'mock_shared_content_processor.dart';
+import 'fake_notifications_plugin.dart';
+import 'fake_shared_content_processor.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -16,33 +18,29 @@ void main() {
   const channel = MethodChannel('com.nammaflutter.nammawallet/sms_queue');
 
   group('SMSQueueService', () {
-    late MockSharedContentProcessor mockProcessor;
-    late MockNotificationsPlugin mockNotifications;
+    late FakeSharedContentProcessor fakeProcessor;
+    late FakeNotificationsPlugin fakeNotifications;
     late FakeLogger fakeLogger;
     late ISMSQueueService service;
 
-    // Tracks the list of method calls received by the mock channel
     final methodCallLog = <MethodCall>[];
-    // Backing queue used by the mock channel
     var fakeQueue = <String>[];
 
     setUp(() async {
       fakeQueue = [];
       methodCallLog.clear();
-      mockProcessor = MockSharedContentProcessor();
-      mockNotifications = MockNotificationsPlugin();
+      fakeProcessor = FakeSharedContentProcessor();
+      fakeNotifications = FakeNotificationsPlugin();
       fakeLogger = FakeLogger();
 
       service = SMSQueueService(
         logger: fakeLogger,
-        contentProcessor: mockProcessor,
-        notificationHelper: mockNotifications,
+        contentProcessor: fakeProcessor,
+        notificationHelper: fakeNotifications,
         forceEnabled: true,
       );
-      // Initialize notifications so _notificationsInitialized=true
       await service.initialize();
 
-      // Set up mock MethodChannel handler
       TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
           .setMockMethodCallHandler(channel, (call) async {
             methodCallLog.add(call);
@@ -72,7 +70,7 @@ void main() {
     group('drainQueue()', () {
       test('calls processContent for each SMS entry in queue', () async {
         fakeQueue = ['SMS text 1', 'SMS text 2'];
-        mockProcessor.resultToReturn = const TicketCreatedResult(
+        fakeProcessor.resultToReturn = const TicketCreatedResult(
           pnrNumber: '12345',
           from: 'Chennai',
           to: 'Madurai',
@@ -82,20 +80,20 @@ void main() {
 
         await service.drainQueue();
 
-        expect(mockProcessor.callCount, 2);
+        expect(fakeProcessor.callCount, 2);
         expect(
-          mockProcessor.receivedContents,
+          fakeProcessor.receivedContents,
           containsAll(['SMS text 1', 'SMS text 2']),
         );
         expect(
-          mockProcessor.receivedTypes,
+          fakeProcessor.receivedTypes,
           everyElement(equals(SharedContentType.sms)),
         );
       });
 
       test('clears queue after successful processing', () async {
         fakeQueue = ['SMS text 1'];
-        mockProcessor.resultToReturn = const TicketCreatedResult(
+        fakeProcessor.resultToReturn = const TicketCreatedResult(
           pnrNumber: '12345',
           from: 'A',
           to: 'B',
@@ -116,8 +114,8 @@ void main() {
         fakeQueue = [];
         await service.drainQueue();
 
-        expect(mockProcessor.callCount, 0);
-        expect(mockNotifications.showCallCount, 0);
+        expect(fakeProcessor.callCount, 0);
+        expect(fakeNotifications.showCallCount, 0);
       });
 
       // ── Task 6.3: No notification when all entries fail to parse ─────────
@@ -126,21 +124,21 @@ void main() {
         'does not post notification when all entries fail to parse',
         () async {
           fakeQueue = ['invalid SMS'];
-          mockProcessor.resultToReturn = const ProcessingErrorResult(
+          fakeProcessor.resultToReturn = const ProcessingErrorResult(
             message: 'Failed',
             error: 'No parser matched',
           );
 
           await service.drainQueue();
 
-          expect(mockNotifications.showCallCount, 0);
+          expect(fakeNotifications.showCallCount, 0);
           expect(fakeQueue, ['invalid SMS']);
         },
       );
 
       test('preserves only failed entries after partial success', () async {
         fakeQueue = ['valid SMS', 'invalid SMS'];
-        mockProcessor.onProcessContent = (content, type) async {
+        fakeProcessor.onProcessContent = (content, type) async {
           if (content == 'valid SMS') {
             return const TicketCreatedResult(
               pnrNumber: '99999',
@@ -159,13 +157,13 @@ void main() {
 
         await service.drainQueue();
 
-        expect(mockNotifications.showCallCount, 1);
+        expect(fakeNotifications.showCallCount, 1);
         expect(fakeQueue, ['invalid SMS']);
       });
 
       test('posts notification when at least one entry succeeds', () async {
         fakeQueue = ['valid SMS'];
-        mockProcessor.resultToReturn = const TicketCreatedResult(
+        fakeProcessor.resultToReturn = const TicketCreatedResult(
           pnrNumber: '99999',
           from: 'A',
           to: 'B',
@@ -175,9 +173,9 @@ void main() {
 
         await service.drainQueue();
 
-        expect(mockNotifications.showCallCount, 1);
-        expect(mockNotifications.lastBody, contains('1 new ticket'));
-        expect(mockNotifications.lastTitle, 'Namma Wallet');
+        expect(fakeNotifications.showCallCount, 1);
+        expect(fakeNotifications.lastBody, contains('1 new ticket'));
+        expect(fakeNotifications.lastTitle, 'Namma Wallet');
       });
     });
 
@@ -188,7 +186,7 @@ void main() {
       final initialQueueLength = fakeQueue.length;
       // Artificially slow processor
       var callCount = 0;
-      mockProcessor.onProcessContent = (content, type) async {
+      fakeProcessor.onProcessContent = (content, type) async {
         callCount++;
         // Simulate async work
         await Future<void>.delayed(const Duration(milliseconds: 10));
@@ -217,7 +215,7 @@ void main() {
     group('didChangeAppLifecycleState', () {
       test('calls drainQueue when state is resumed', () async {
         fakeQueue = ['SMS'];
-        mockProcessor.resultToReturn = const TicketCreatedResult(
+        fakeProcessor.resultToReturn = const TicketCreatedResult(
           pnrNumber: '1',
           from: 'A',
           to: 'B',
@@ -225,14 +223,23 @@ void main() {
           date: '2026-06-15',
         );
 
+        // Use a Completer to know when the async drain finishes
+        final completer = Completer<void>();
+        fakeProcessor.onProcessContent = (content, type) async {
+          final result = fakeProcessor.resultToReturn!;
+          if (!completer.isCompleted) completer.complete();
+          return result;
+        };
+
         (service as SMSQueueService).didChangeAppLifecycleState(
           AppLifecycleState.resumed,
         );
 
-        // Allow the async drain to complete
-        await Future<void>.delayed(const Duration(milliseconds: 50));
+        // Wait for the actual async operation to complete
+        await completer.future;
+        await Future<void>.delayed(Duration.zero);
 
-        expect(mockProcessor.callCount, greaterThan(0));
+        expect(fakeProcessor.callCount, greaterThan(0));
       });
 
       test('does not call drainQueue for paused state', () async {
@@ -242,9 +249,9 @@ void main() {
           AppLifecycleState.paused,
         );
 
-        await Future<void>.delayed(const Duration(milliseconds: 50));
+        await Future<void>.delayed(Duration.zero);
 
-        expect(mockProcessor.callCount, 0);
+        expect(fakeProcessor.callCount, 0);
       });
 
       test('does not call drainQueue for inactive state', () async {
@@ -254,9 +261,9 @@ void main() {
           AppLifecycleState.inactive,
         );
 
-        await Future<void>.delayed(const Duration(milliseconds: 50));
+        await Future<void>.delayed(Duration.zero);
 
-        expect(mockProcessor.callCount, 0);
+        expect(fakeProcessor.callCount, 0);
       });
     });
   });

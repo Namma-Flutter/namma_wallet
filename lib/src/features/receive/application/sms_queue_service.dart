@@ -1,6 +1,7 @@
 // coverage:ignore-file
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
@@ -29,7 +30,7 @@ class SMSQueueService extends ISMSQueueService with WidgetsBindingObserver {
   }) : _logger = logger,
        _contentProcessor = contentProcessor,
        _notificationHelper = notificationHelper ?? LocalNotificationHelper(),
-       _isEnabled = forceEnabled || Platform.isIOS;
+       _isEnabled = forceEnabled || (!kIsWeb && Platform.isIOS);
 
   // ── Channel ───────────────────────────────────────────────────────────────
 
@@ -107,8 +108,9 @@ class SMSQueueService extends ISMSQueueService with WidgetsBindingObserver {
         }
       }
 
-      // Preserve failed entries so malformed or unsupported Shortcut input is
-      // not silently dropped.
+      // Replace queue with only failed entries so successfully processed
+      // entries are not re-processed on next drain. Failures must be fatal
+      // to prevent duplicate SMS imports.
       await _replaceSMSQueue(failedEntries);
 
       if (successCount > 0) {
@@ -166,15 +168,12 @@ class SMSQueueService extends ISMSQueueService with WidgetsBindingObserver {
   }
 
   /// Replaces App Group queue with [entries].
+  /// Throws on failure to prevent duplicate SMS imports on next drain.
   Future<void> _replaceSMSQueue(List<String> entries) async {
-    try {
-      _logger.debug(
-        'SMSQueueService: invoking replaceSMSQueue via MethodChannel',
-      );
-      await _channel.invokeMethod<void>('replaceSMSQueue', entries);
-    } on PlatformException catch (e, st) {
-      _logger.error('SMSQueueService: replaceSMSQueue failed', e, st);
-    }
+    _logger.debug(
+      'SMSQueueService: invoking replaceSMSQueue via MethodChannel',
+    );
+    await _channel.invokeMethod<void>('replaceSMSQueue', entries);
   }
 
   // ── Notification helpers ──────────────────────────────────────────────────

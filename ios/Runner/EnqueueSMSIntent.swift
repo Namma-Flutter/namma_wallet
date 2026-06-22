@@ -1,6 +1,7 @@
 import AppIntents
 import Foundation
 import os
+import UIKit
 
 @available(iOS 16.0, *)
 struct EnqueueSMSIntent: AppIntent {

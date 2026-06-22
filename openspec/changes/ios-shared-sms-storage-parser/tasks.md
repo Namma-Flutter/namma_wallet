@@ -11,7 +11,7 @@
 - [x] 2.1 Create `lib/src/features/receive/domain/sms_queue_service_interface.dart` defining `ISMSQueueService` with methods: `initialize()`, `drainQueue()`, and `dispose()`
 - [x] 2.2 Create `lib/src/features/receive/application/sms_queue_service.dart` implementing `ISMSQueueService` and `WidgetsBindingObserver`
 - [x] 2.3 In `SMSQueueService`, define the `MethodChannel` constant `com.nammaflutter.nammawallet/sms_queue` and implement `readSMSQueue()`, `clearSMSQueue()`, and `enqueueSMS()` thin wrappers around `MethodChannel.invokeMethod`
-- [x] 2.4 Implement `drainQueue()`: call `readSMSQueue()`, skip if empty or `_isDraining` is true, set `_isDraining = true`, process each SMS via `SharedContentProcessor.processContent(sms, SharedContentType.sms)`, collect success count, call `clearSMSQueue()`, then reset `_isDraining = false`
+- [x] 2.4 Implement `drainQueue()`: call `readSMSQueue()`, skip if empty or `_isDraining` is true, set `_isDraining = true`, process each SMS via `SharedContentProcessor.processContent(sms, SharedContentType.sms)`, collect success count and failed entries, call `replaceSMSQueue(failedEntries)` to clear successful entries while retaining failed ones for retry, then reset `_isDraining = false`
 - [x] 2.5 Implement `didChangeAppLifecycleState`: call `drainQueue()` when state is `AppLifecycleState.resumed`
 - [x] 2.6 Guard against non-iOS platforms: wrap all MethodChannel calls in a `Platform.isIOS` check; on non-iOS the service is a no-op
 
