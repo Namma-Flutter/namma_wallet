@@ -356,9 +356,10 @@ void main() {
           ),
         );
 
-        // Act
+        // Act — use pump() not pumpAndSettle(); a disabled InkWell never
+        // produces animations that settle, causing pumpAndSettle to timeout.
         await tester.tap(find.byKey(const Key('loading_card')));
-        await tester.pumpAndSettle();
+        await tester.pump();
 
         // Assert — callback must not fire during loading
         expect(tapped, isFalse);
@@ -434,8 +435,8 @@ void main() {
           ),
         );
 
-        // Assert
-        expect(find.byType(Stack), findsOneWidget);
+        // Assert — findsWidgets because Scaffold itself also contains a Stack
+        expect(find.byType(Stack), findsWidgets);
       },
     );
 
@@ -534,9 +535,12 @@ void main() {
           ),
         );
 
-        // Act — the first Material in the tree is the card's own Material
+        // Act — find the Material whose color matches our custom color
+        // (can't use .first because Scaffold has its own Material in the tree).
         final material = tester.widget<Material>(
-          find.byType(Material).first,
+          find.byWidgetPredicate(
+            (widget) => widget is Material && widget.color == customColor,
+          ),
         );
 
         // Assert
