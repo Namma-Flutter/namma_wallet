@@ -5,14 +5,16 @@
 // Verified by live fetch on 22/06/2026.
 //
 // Key findings from the real TNSTC API:
-//   • There is NO "Journey Date" field — the API does NOT return the travel date.
+//   • There is NO "Journey Date" field — the API does NOT return the travel
+// date.
 //   • "Booking Date" = ticket-purchase date (NOT journey date).
 //   • The journey date is absent from the API response and must remain null.
 //   • Phone field label is "Mobile no" (lowercase "no").
 //   • Each row has 4 cols (col-6 col-md-3): label, value, label, value.
 //   • Labels sometimes lack the trailing colon (e.g. "Trip Code" has no colon,
 //     "PNR No:" has one) — the parser must trim after stripping colons.
-//   • Departure time field is misspelled: "Depaturue Time" (original TNSTC typo).
+//   • Departure time field is misspelled: "Depaturue Time" (original TNSTC
+// typo).
 
 /// Successful HTML response matching the real TNSTC layout for T82111889.
 /// Phone 9566863531 matches → returns a valid TNSTCTicketModel.

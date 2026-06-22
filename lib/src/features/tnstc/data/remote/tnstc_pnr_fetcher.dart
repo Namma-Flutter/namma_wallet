@@ -5,6 +5,7 @@ import 'dart:async';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart' as html_parser;
 import 'package:http/http.dart' as http;
+import 'package:http/testing.dart' show MockClient;
 import 'package:intl/intl.dart';
 import 'package:meta/meta.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
@@ -23,9 +24,7 @@ import 'package:namma_wallet/src/features/tnstc/domain/tnstc_model.dart';
 /// - Returns null on any error (network, parsing, invalid PNR)
 /// - Logs all errors internally using ILogger
 class TNSTCPNRFetcher implements ITNSTCPNRFetcher {
-  TNSTCPNRFetcher({required ILogger logger, http.Client? httpClient})
-      : _logger = logger,
-        _httpClient = httpClient;
+  TNSTCPNRFetcher({required this._logger, this._httpClient});
 
   final ILogger _logger;
 
@@ -213,8 +212,7 @@ class TNSTCPNRFetcher implements ITNSTCPNRFetcher {
       // response variants label it "Date of Journey". "Booking Date" is the
       // ticket-purchase date and must NOT be used as the journey date.
       DateTime? journeyDate;
-      final journeyDateStr =
-          data['Journey Date'] ?? data['Date of Journey'];
+      final journeyDateStr = data['Journey Date'] ?? data['Date of Journey'];
       if (journeyDateStr != null && journeyDateStr.isNotEmpty) {
         try {
           journeyDate = DateFormat('dd/MM/yyyy').parse(journeyDateStr);

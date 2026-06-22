@@ -1,5 +1,3 @@
-// ignore_for_file: lines_longer_than_80_chars
-
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
@@ -22,7 +20,7 @@ MockClient _mockClientWith({
     if (request.method == 'GET') {
       return http.Response(
         '<html><body>'
-        '<form action="/OTRSOnline/manageKnowYourConductor.do;jsessionid=AABBCC"></form>'
+        '<form action="/OTRSOnline/manageKnowYourConductor.do;jsessionid=AABBCC"></form> '
         '</body></html>',
         formStatusCode,
       );
@@ -157,8 +155,11 @@ void main() {
           phone,
         );
 
-        expect(result, isNotNull,
-            reason: '"Mobile no" label must match via key normalisation');
+        expect(
+          result,
+          isNotNull,
+          reason: '"Mobile no" label must match via key normalisation',
+        );
       },
     );
 
@@ -361,7 +362,9 @@ void main() {
     });
 
     test('never throws — returns null on network exception', () async {
-      final throwingClient = MockClient((_) async => throw Exception('timeout'));
+      final throwingClient = MockClient(
+        (_) async => throw Exception('timeout'),
+      );
 
       fetcher = TNSTCPNRFetcher(
         logger: fakeLogger,
