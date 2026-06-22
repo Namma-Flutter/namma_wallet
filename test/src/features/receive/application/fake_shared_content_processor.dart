@@ -6,7 +6,7 @@ import 'package:namma_wallet/src/features/receive/domain/shared_content_type.dar
 class FakeSharedContentProcessor implements ISharedContentProcessor {
   SharedContentResult? resultToReturn;
   Future<SharedContentResult> Function(String, SharedContentType)?
-      onProcessContent;
+  onProcessContent;
 
   int callCount = 0;
   final List<String> receivedContents = [];
@@ -23,9 +23,10 @@ class FakeSharedContentProcessor implements ISharedContentProcessor {
     if (onProcessContent != null) {
       return onProcessContent!(content, contentType);
     }
-    return resultToReturn ?? const ProcessingErrorResult(
-      message: 'No result configured',
-      error: 'No fake result set',
-    );
+    return resultToReturn ??
+        const ProcessingErrorResult(
+          message: 'No result configured',
+          error: 'No fake result set',
+        );
   }
 }
