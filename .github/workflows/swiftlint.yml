@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - .github/workflows/swiftlint.yml
+      - .swiftlint-version
       - ios/**
 
 jobs:
@@ -15,7 +16,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Read SwiftLint version
+        id: swiftlint_version
+        run: echo "version=$(cat .swiftlint-version)" >> "$GITHUB_OUTPUT"
+
       - name: Run SwiftLint
-        uses: norio-nomura/action-swiftlint@3.2.1
+        uses: cirruslabs/swiftlint-action@v1
         with:
+          version: ${{ steps.swiftlint_version.outputs.version }}
           args: --strict ios
