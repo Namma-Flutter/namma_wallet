@@ -4,5 +4,10 @@
     "dart": {
       "command": ["fvm", "dart", "language-server"]
     }
+  },
+  "formatter": {
+    "dart": {
+      "command": ["fvm", "dart", "format", "$FILE"]
+    }
   }
 }

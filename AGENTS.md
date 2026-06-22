@@ -2,8 +2,25 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working
 with code in this repository. Never run the app. Tell the user to run it.
-You don't need to listen to logs. Let the user do it. Use dart mcp as
-much as possible.
+You don't need to listen to logs. Let the user do it.
+
+## MCP Server
+
+Dart MCP server configured for Flutter/Dart analysis. Use `dart_*` tools
+for code analysis, navigation, diagnostics, refactoring.
+
+Available tools:
+
+- `dart_diagnostics` - Get errors/warnings for files
+- `dart_outline` - Get file structure (classes, methods, etc)
+- `dart_completion` - Get code completions
+- `dart_hover` - Get hover information
+- `dart_references` - Find references to symbols
+- `dart_rename` - Rename symbols across codebase
+- `dart_format` - Format Dart/Flutter code
+- `dart_fix` - Apply quick fixes
+
+Always prefer MCP tools over manual file analysis.
 
 ## Development Commands
 
@@ -13,7 +30,7 @@ Always use `fvm flutter` instead of `flutter` commands.
 # Install dependencies
 fvm flutter pub get
 
-# Analyze code (prefer dart mcp server)
+# Analyze code (prefer dart mcp tools)
 fvm flutter analyze
 
 # Run tests
@@ -27,8 +44,6 @@ make release-apk
 make release-appbundle
 make release-ipa
 ```
-
-Always use dart mcp server to analyze code.
 
 ### Development Setup
 
