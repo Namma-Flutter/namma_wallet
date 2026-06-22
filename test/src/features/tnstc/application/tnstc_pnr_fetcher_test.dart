@@ -371,10 +371,9 @@ void main() {
         httpClient: throwingClient,
       );
 
-      expect(
-        () => fetcher.fetchTicketByPNR(pnr, phone),
-        returnsNormally,
-      );
+      final result = await fetcher.fetchTicketByPNR(pnr, phone);
+
+      expect(result, isNull);
     });
   });
 }

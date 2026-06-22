@@ -31,10 +31,14 @@ jobs:
         id: flutter_version
         run: |
           VERSION=$(grep '^  flutter:' pubspec.yaml | awk -F'"' '{print $2}')
+          if [ -z "$VERSION" ]; then
+            echo "::error::Failed to extract Flutter version from pubspec.yaml. Check the sdk constraint format."
+            exit 1
+          fi
           echo "flutter_version=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Set up Flutter
-        uses: subosito/flutter-action@v2.21.0
+        uses: subosito/flutter-action@fd55f4c5af5b953cc57a2be44cb082c8f6635e8e # v2.21.0
         with:
           channel: stable
           flutter-version: ${{ steps.flutter_version.outputs.flutter_version }}

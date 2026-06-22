@@ -26,7 +26,7 @@ jobs:
           echo "flutter_version=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Set up Flutter
-        uses: subosito/flutter-action@v2
+        uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2
         with:
           channel: stable
           flutter-version: ${{ steps.flutter_version.outputs.flutter_version }}
