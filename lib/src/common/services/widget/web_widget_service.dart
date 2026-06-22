@@ -4,7 +4,7 @@ import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
 import 'package:namma_wallet/src/common/services/widget/widget_service_interface.dart';
 
 class WebWidgetService implements IWidgetService {
-  WebWidgetService({required ILogger logger}) : _logger = logger;
+  WebWidgetService({required this._logger});
 
   final ILogger _logger;
 

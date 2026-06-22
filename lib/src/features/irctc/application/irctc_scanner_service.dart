@@ -53,12 +53,10 @@ class IRCTCScannerResult {
 
 class IRCTCScannerService implements IIRCTCScannerService {
   IRCTCScannerService({
-    required ILogger logger,
-    required IIRCTCQRParser qrParser,
-    required ITicketDAO ticketDao,
-  }) : _logger = logger,
-       _qrParser = qrParser,
-       _ticketDao = ticketDao;
+    required this._logger,
+    required this._qrParser,
+    required this._ticketDao,
+  });
 
   final ILogger _logger;
   final IIRCTCQRParser _qrParser;

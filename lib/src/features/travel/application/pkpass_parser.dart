@@ -17,8 +17,8 @@ import 'package:uuid/uuid.dart';
 
 class PKPassParser implements IPKPassParser {
   PKPassParser({
-    required ILogger logger,
-  }) : _logger = logger;
+    required this._logger,
+  });
 
   final ILogger _logger;
 

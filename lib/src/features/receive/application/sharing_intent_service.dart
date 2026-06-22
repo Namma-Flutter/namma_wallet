@@ -14,12 +14,10 @@ import 'package:share_handler/share_handler.dart';
 /// Service to handle sharing intents from other apps
 class SharingIntentService implements ISharingIntentService {
   SharingIntentService({
-    required ILogger logger,
-    required IPDFService pdfService,
+    required this._logger,
+    required this._pdfService,
     ISharingIntentProvider? sharingIntentProvider,
-  }) : _logger = logger,
-       _pdfService = pdfService,
-       _sharingIntentProvider =
+  }) : _sharingIntentProvider =
            sharingIntentProvider ?? SharingIntentProvider();
 
   final ILogger _logger;

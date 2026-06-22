@@ -28,7 +28,7 @@ abstract interface class IReminderPreferencesService {
 
 /// Service for managing reminder preferences with SharedPreferences
 class ReminderPreferencesService implements IReminderPreferencesService {
-  ReminderPreferencesService({required ILogger logger}) : _logger = logger {
+  ReminderPreferencesService({required this._logger}) {
     _initFuture = _init();
   }
 

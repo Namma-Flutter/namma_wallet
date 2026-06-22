@@ -107,7 +107,7 @@ class NotificationService implements INotificationService {
       iOS: iosSettings,
     );
     await _plugin.initialize(
-      initSettings,
+      settings: initSettings,
       onDidReceiveNotificationResponse: (details) {
         final payload = details.payload;
         if (payload == null || payload.isEmpty) {
@@ -271,11 +271,11 @@ class NotificationService implements INotificationService {
 
     try {
       await _plugin.zonedSchedule(
-        id,
-        title,
-        body,
-        tz.TZDateTime.from(dateTime, tz.local),
-        details,
+        id: id,
+        title: title,
+        body: body,
+        scheduledDate: tz.TZDateTime.from(dateTime, tz.local),
+        notificationDetails: details,
         payload: payload,
         androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
       );
@@ -292,7 +292,7 @@ class NotificationService implements INotificationService {
 
   @override
   Future<void> cancelTicketReminder(int id) async {
-    await _plugin.cancel(id);
+    await _plugin.cancel(id: id);
   }
 
   /// Schedules multiple reminders for a ticket at predefined intervals.
@@ -510,10 +510,10 @@ class NotificationService implements INotificationService {
     final details = await notificatioDetails();
 
     await _plugin.show(
-      id,
-      title,
-      body,
-      details,
+      id: id,
+      title: title,
+      body: body,
+      notificationDetails: details,
       payload: payload,
     );
   }

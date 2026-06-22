@@ -10,10 +10,9 @@ import 'package:share_handler/share_handler.dart' as sh;
 
 class DeepLinkService implements IDeepLinkService {
   DeepLinkService({
-    required IImportService importService,
-    required ILogger logger,
-  }) : _importService = importService,
-       _logger = logger;
+    required this._importService,
+    required this._logger,
+  });
 
   final IImportService _importService;
   final ILogger _logger;

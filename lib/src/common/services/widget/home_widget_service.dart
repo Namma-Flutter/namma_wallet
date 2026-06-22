@@ -22,13 +22,11 @@ Future<void> interactiveCallback(Uri? data) async {
 
 /// Implementation of widget service using home_widget package
 // Used via dependency injection, not directly called from entry points
-// ignore: unreachable_from_main
 class HomeWidgetService implements IWidgetService {
   // Constructor is called via GetIt dependency injection
-  // ignore: unreachable_from_main
   HomeWidgetService({
-    required ILogger logger,
-  }) : _logger = logger;
+    required this._logger,
+  });
 
   final ILogger _logger;
 

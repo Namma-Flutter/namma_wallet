@@ -120,7 +120,7 @@ class _ImportViewState extends State<ImportView> {
     if (_isProcessingPDF) return;
 
     try {
-      final result = await FilePicker.platform.pickFiles(
+      final result = await FilePicker.pickFiles(
         type: FileType.custom,
         allowedExtensions: ['pdf'],
         withData: kIsWeb, // Ensure bytes are loaded on web

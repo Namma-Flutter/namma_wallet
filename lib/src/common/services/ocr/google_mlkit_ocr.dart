@@ -12,7 +12,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:pdfrx/pdfrx.dart';
 
 class GoogleMLKitOCR implements IOCRService {
-  GoogleMLKitOCR({required ILogger logger}) : _logger = logger;
+  GoogleMLKitOCR({required this._logger});
 
   final ILogger _logger;
 

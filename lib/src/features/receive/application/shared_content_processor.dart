@@ -22,14 +22,11 @@ import 'package:namma_wallet/src/features/travel/domain/ticket_update_info.dart'
 /// - Creating new tickets in database
 class SharedContentProcessor implements ISharedContentProcessor {
   SharedContentProcessor({
-    required ILogger logger,
+    required this._logger,
     required ITravelParser travelParser,
-    required ITicketDAO ticketDao,
-    required IImportService importService,
-  }) : _logger = logger,
-       _travelParserService = travelParser,
-       _ticketDao = ticketDao,
-       _importService = importService;
+    required this._ticketDao,
+    required this._importService,
+  }) : _travelParserService = travelParser;
 
   final ILogger _logger;
   final ITravelParser _travelParserService;

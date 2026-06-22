@@ -18,19 +18,16 @@ import 'package:namma_wallet/src/features/travel/application/travel_parser_inter
 class ClipboardService implements IClipboardService {
   /// Creates a clipboard service.
   ///
-  /// [repository] - Repository for clipboard access
-  /// [logger] - Logger for debugging
-  /// [parserService] - Service for parsing travel tickets
-  /// [ticketDao] - DAO for ticket database operations
+  /// [_repository] - Repository for clipboard access
+  /// [_logger] - Logger for debugging
+  /// [_parserService] - Service for parsing travel tickets
+  /// [_ticketDao] - DAO for ticket database operations
   ClipboardService({
-    required IClipboardRepository repository,
-    required ILogger logger,
-    required ITravelParser parserService,
-    required ITicketDAO ticketDao,
-  }) : _repository = repository,
-       _logger = logger,
-       _parserService = parserService,
-       _ticketDao = ticketDao;
+    required this._repository,
+    required this._logger,
+    required this._parserService,
+    required this._ticketDao,
+  });
 
   final IClipboardRepository _repository;
   final ILogger _logger;

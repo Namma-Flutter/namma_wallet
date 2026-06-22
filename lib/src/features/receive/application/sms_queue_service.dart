@@ -22,14 +22,12 @@ import 'package:namma_wallet/src/features/receive/domain/sms_queue_service_inter
 /// how many tickets were parsed.
 class SMSQueueService extends ISMSQueueService with WidgetsBindingObserver {
   SMSQueueService({
-    required ILogger logger,
-    required ISharedContentProcessor contentProcessor,
+    required this._logger,
+    required this._contentProcessor,
     ILocalNotificationHelper? notificationHelper,
     // Set to true in tests to bypass Platform.isIOS check
     bool forceEnabled = false,
-  }) : _logger = logger,
-       _contentProcessor = contentProcessor,
-       _notificationHelper = notificationHelper ?? LocalNotificationHelper(),
+  }) : _notificationHelper = notificationHelper ?? LocalNotificationHelper(),
        _isEnabled = forceEnabled || (!kIsWeb && Platform.isIOS);
 
   // ── Channel ───────────────────────────────────────────────────────────────

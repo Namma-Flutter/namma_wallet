@@ -15,24 +15,16 @@ import 'package:namma_wallet/src/features/travel/application/travel_parser_inter
 
 class ImportService implements IImportService {
   ImportService({
-    required ILogger logger,
-    required IPDFService pdfService,
-    required ITravelParser travelParser,
-    required IIRCTCQRParser qrParser,
-    required IIRCTCScannerService irctcScannerService,
-    required IPKPassParser pkpassParser,
-    required ITNSTCPNRFetcher tnstcPnrFetcher,
-    required TNSTCApiTicketParser tnstcApiTicketParser,
-    required ITicketDAO ticketDao,
-  }) : _logger = logger,
-       _pdfService = pdfService,
-       _travelParser = travelParser,
-       _qrParser = qrParser,
-       _irctcScannerService = irctcScannerService,
-       _pkpassParser = pkpassParser,
-       _tnstcPnrFetcher = tnstcPnrFetcher,
-       _tnstcApiTicketParser = tnstcApiTicketParser,
-       _ticketDao = ticketDao;
+    required this._logger,
+    required this._pdfService,
+    required this._travelParser,
+    required this._qrParser,
+    required this._irctcScannerService,
+    required this._pkpassParser,
+    required this._tnstcPnrFetcher,
+    required this._tnstcApiTicketParser,
+    required this._ticketDao,
+  });
 
   final ILogger _logger;
   final IPDFService _pdfService;

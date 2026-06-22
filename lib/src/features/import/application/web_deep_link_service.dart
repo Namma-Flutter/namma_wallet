@@ -3,7 +3,7 @@ import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
 import 'package:namma_wallet/src/features/import/application/deep_link_service_interface.dart';
 
 class WebDeepLinkService implements IDeepLinkService {
-  WebDeepLinkService({required ILogger logger}) : _logger = logger;
+  WebDeepLinkService({required this._logger});
 
   final ILogger _logger;
 

@@ -8,7 +8,7 @@ import 'package:namma_wallet/src/features/travel/application/travel_text_parser_
 /// from PDF text. Subclasses should implement [ITicketParser.parseTicket]
 /// with provider-specific logic.
 abstract class TravelPDFParser implements ITicketParser {
-  TravelPDFParser({required ILogger logger}) : _logger = logger;
+  TravelPDFParser({required this._logger});
 
   final ILogger _logger;
 
