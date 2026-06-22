@@ -3,7 +3,7 @@ FLUTTER ?= fvm flutter
 # Dart command - use 'fvm dart' if using FVM, otherwise 'dart'
 DART ?= fvm dart
 
-.PHONY: help clean get codegen release-android release-ios release-apk release-appbundle release-ipa ios-test ios-beta ios-release-candidate ios-production android-release-candidate
+.PHONY: help clean get codegen release-android release-ios release-apk release-appbundle release-ipa ios-test ios-beta ios-release-candidate ios-production android-release-candidate setup-hooks uninstall-hooks
 
 help:
 	@echo "Available targets:"
@@ -20,6 +20,10 @@ help:
 	@echo "  ios-test           - Run tests via fastlane"
 	@echo "  ios-beta           - Build and deploy to TestFlight"
 	@echo "  ios-production     - Promote TestFlight build to App Store"
+	@echo ""
+	@echo "Dev setup:"
+	@echo "  setup-hooks        - Install git pre-commit hook (dart format)"
+	@echo "  uninstall-hooks    - Remove the installed pre-commit hook"
 
 clean:
 	$(FLUTTER) clean
@@ -74,6 +78,16 @@ deploy-release-candidate: ios-release-candidate android-release-candidate
 
 # Production: Promote both iOS and Android to production
 deploy-production: ios-production android-production
+
+# Git hooks — install/remove the shared pre-commit script
+setup-hooks:
+	@cp scripts/pre-commit .git/hooks/pre-commit
+	@chmod +x .git/hooks/pre-commit
+	@echo "pre-commit hook installed (.git/hooks/pre-commit)"
+
+uninstall-hooks:
+	@rm -f .git/hooks/pre-commit
+	@echo "pre-commit hook removed"
 
 # Runs tests with coverage and generates HTML coverage report,
 # excluding all generated *.g.dart files (Riverpod, Freezed, JSON, etc.)

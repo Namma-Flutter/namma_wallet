@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+# scripts/pre-commit
+# Git pre-commit hook: formats staged Dart files with fvm dart format.
+#
+# Install via:  make setup-hooks
+# Uninstall via: make uninstall-hooks
+
+set -euo pipefail
+
+# Collect staged .dart files (added, copied, modified — not deleted).
+STAGED=$(git diff --cached --name-only --diff-filter=ACM | grep '\.dart$' || true)
+
+if [ -z "$STAGED" ]; then
+  exit 0
+fi
+
+echo "🎨  dart format — formatting staged Dart files…"
+
+# Format only the staged files (faster than formatting the whole project).
+# shellcheck disable=SC2086
+fvm dart format $STAGED
+
+# Re-stage formatted files so the commit always contains clean code.
+# shellcheck disable=SC2086
+git add $STAGED
+
+echo "dart format complete."
