@@ -42,37 +42,20 @@ struct MainTicketHomeWidgetEntryView: View {
         Group {
             if entry.data.ticketId != nil {
                 VStack(alignment: .leading, spacing: 0) {
-                    HStack {
-                        Text("Namma Wallet")
-                            .font(.system(size: 12.0, weight: .bold)).foregroundColor(Color.secondary)
-                        Spacer()
-                        Text(entry.data.type ?? "")
-                            .font(.system(size: 11.0, weight: .bold)).foregroundColor(Color.accentColor)
-                            .padding(.horizontal, 6)
-                            .padding(.vertical, 2)
-                            .background(Color.accentColor.opacity(0.15))
-                            .cornerRadius(4)
-                    }
+                    Text(entry.data.type ?? "")
+                        .font(.system(size: 14.0, weight: .bold)).foregroundColor(Color.accentColor)
                     Text(entry.data.primaryText ?? "")
-                        .font(.system(size: 20.0, weight: .bold)).foregroundColor(Color.primary)
-                        .padding(.top, 8)
-                    Text(entry.data.secondaryText ?? "")
-                        .font(.system(size: 13.0)).foregroundColor(Color.secondary)
+                        .font(.system(size: 22.0, weight: .bold)).foregroundColor(Color.primary)
                         .padding(.top, 4)
-                    HStack {
-                        Text("Departure  ")
-                            .font(.system(size: 10.0)).foregroundColor(Color.secondary)
-                        Text(entry.data.startTime ?? "")
-                            .font(.system(size: 13.0, weight: .bold)).foregroundColor(Color.primary)
-                    }
-                    .padding(.top, 12)
-                    HStack {
-                        Text("Location  ")
-                            .font(.system(size: 10.0)).foregroundColor(Color.secondary)
-                        Text(entry.data.location ?? "")
-                            .font(.system(size: 13.0, weight: .bold)).foregroundColor(Color.primary)
-                    }
-                    .padding(.top, 8)
+                    Text(entry.data.secondaryText ?? "")
+                        .font(.system(size: 14.0)).foregroundColor(Color.secondary)
+                        .padding(.top, 2)
+                    Text(entry.data.startTime ?? "")
+                        .font(.system(size: 14.0, weight: .bold)).foregroundColor(Color.primary)
+                        .padding(.top, 12)
+                    Text(entry.data.location ?? "")
+                        .font(.system(size: 13.0)).foregroundColor(Color.secondary)
+                        .padding(.top, 2)
                 }
             } else {
                 VStack(alignment: .center) {

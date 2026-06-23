@@ -19,13 +19,12 @@ import es.antonborri.home_widget.HomeWidgetGlanceState
 import es.antonborri.home_widget.HomeWidgetGlanceStateDefinition
 import androidx.glance.layout.Column
 import androidx.glance.layout.Alignment
-import androidx.glance.layout.Spacer
-import androidx.glance.layout.Row
 import androidx.glance.text.TextStyle
 import androidx.glance.color.ColorProvider
 import androidx.glance.GlanceTheme
 import androidx.compose.ui.unit.sp
 import androidx.glance.text.FontWeight
+import androidx.glance.layout.Spacer
 import androidx.compose.ui.unit.dp
 import androidx.glance.layout.padding
 
@@ -44,21 +43,11 @@ class MainTicketHomeWidget : GlanceAppWidget() {
             Box(modifier = GlanceModifier.background(GlanceTheme.colors.widgetBackground).padding(16.dp).fillMaxSize(), contentAlignment = Alignment.Center) {
                 if (widgetData.ticketId != null) {
                     Column(modifier = GlanceModifier.fillMaxSize().padding(start = 16.0.dp, top = 16.0.dp, end = 16.0.dp, bottom = 16.0.dp), horizontalAlignment = Alignment.Start) {
-                        Row {
-                            Text(text = "Namma Wallet", style = TextStyle(color = GlanceTheme.colors.onSurfaceVariant, fontSize = 12.sp, fontWeight = FontWeight.Bold))
-                            Spacer(modifier = GlanceModifier.defaultWeight())
-                            Text(text = widgetData.type ?: "", modifier = GlanceModifier.padding(6.dp, 2.dp, 6.dp, 2.dp), style = TextStyle(color = GlanceTheme.colors.primaryContainer, fontSize = 11.sp, fontWeight = FontWeight.Bold))
-                        }
-                        Text(text = widgetData.primaryText ?: "", modifier = GlanceModifier.padding(top = 8.dp), style = TextStyle(color = GlanceTheme.colors.onSurface, fontSize = 20.sp, fontWeight = FontWeight.Bold))
-                        Text(text = widgetData.secondaryText ?: "", modifier = GlanceModifier.padding(top = 4.dp), style = TextStyle(color = GlanceTheme.colors.onSurfaceVariant, fontSize = 13.sp))
-                        Row(modifier = GlanceModifier.padding(top = 12.dp)) {
-                            Text(text = "Departure  ", style = TextStyle(color = GlanceTheme.colors.outline, fontSize = 10.sp))
-                            Text(text = widgetData.startTime ?: "", style = TextStyle(color = GlanceTheme.colors.onSurface, fontSize = 13.sp, fontWeight = FontWeight.Bold))
-                        }
-                        Row(modifier = GlanceModifier.padding(top = 8.dp)) {
-                            Text(text = "Location  ", style = TextStyle(color = GlanceTheme.colors.outline, fontSize = 10.sp))
-                            Text(text = widgetData.location ?: "", style = TextStyle(color = GlanceTheme.colors.onSurface, fontSize = 13.sp, fontWeight = FontWeight.Bold))
-                        }
+                        Text(text = widgetData.type ?: "", style = TextStyle(color = GlanceTheme.colors.primaryContainer, fontSize = 14.sp, fontWeight = FontWeight.Bold))
+                        Text(text = widgetData.primaryText ?: "", modifier = GlanceModifier.padding(top = 4.dp), style = TextStyle(color = GlanceTheme.colors.onSurface, fontSize = 22.sp, fontWeight = FontWeight.Bold))
+                        Text(text = widgetData.secondaryText ?: "", modifier = GlanceModifier.padding(top = 2.dp), style = TextStyle(color = GlanceTheme.colors.onSurfaceVariant, fontSize = 14.sp))
+                        Text(text = widgetData.startTime ?: "", modifier = GlanceModifier.padding(top = 12.dp), style = TextStyle(color = GlanceTheme.colors.onSurface, fontSize = 14.sp, fontWeight = FontWeight.Bold))
+                        Text(text = widgetData.location ?: "", modifier = GlanceModifier.padding(top = 2.dp), style = TextStyle(color = GlanceTheme.colors.onSurfaceVariant, fontSize = 13.sp))
                     }
                 } else {
                     Column(modifier = GlanceModifier.fillMaxSize().padding(start = 16.0.dp, top = 16.0.dp, end = 16.0.dp, bottom = 16.0.dp), horizontalAlignment = Alignment.CenterHorizontally) {
