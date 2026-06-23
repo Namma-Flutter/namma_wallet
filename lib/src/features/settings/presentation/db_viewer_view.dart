@@ -1,10 +1,8 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:home_widget/home_widget.dart';
 import 'package:namma_wallet/src/common/database/ticket_dao_interface.dart';
 import 'package:namma_wallet/src/common/database/user_dao_interface.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
@@ -172,24 +170,7 @@ class _DbViewerViewState extends State<DbViewerView>
               if (!kIsWeb)
                 ElevatedButton(
                   onPressed: () async {
-                    if (Platform.isIOS) {
-                      const iOSWidgetName = 'TicketWidget';
-                      const androidWidgetName = 'TicketHomeWidget';
-                      const dataKey = 'ticket_data';
-                      // toJson() already returns a JSON string
-                      await HomeWidget.saveWidgetData(dataKey, t.toJson());
-                      await HomeWidget.updateWidget(
-                        androidName: androidWidgetName,
-                        iOSName: iOSWidgetName,
-                      );
-                    } else if (Platform.isAndroid) {
-                      await _widgetService.updateWidgetWithTicket(t);
-                    } else {
-                      // Unsupported platform
-                      throw UnsupportedError(
-                        'Pin to Home Screen not supported on this platform.',
-                      );
-                    }
+                    await _widgetService.updateWidgetWithTicket(t);
 
                     if (context.mounted) {
                       context.pop();

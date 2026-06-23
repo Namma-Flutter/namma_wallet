@@ -19,6 +19,11 @@ class WebWidgetService implements IWidgetService {
   }
 
   @override
+  Future<void> clearWidgetData() async {
+    return;
+  }
+
+  @override
   Future<Uri?> getInitialWidgetLaunchUri() async {
     return null;
   }

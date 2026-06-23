@@ -2,6 +2,7 @@ import java.util.Properties
 import java.io.FileInputStream
 
 plugins {
+    id("org.jetbrains.kotlin.plugin.compose") version "2.2.20"
     id("com.android.application")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
@@ -65,6 +66,7 @@ android {
     }
 
     buildFeatures {
+        compose = true
         viewBinding = true
     }
 
@@ -74,6 +76,7 @@ android {
 }
 
 dependencies {
+    implementation("androidx.glance:glance-appwidget:1.1.1")
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
 }
 

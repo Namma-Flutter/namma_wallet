@@ -3,7 +3,6 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:home_widget/home_widget.dart';
 import 'package:namma_wallet/src/common/database/ticket_dao_interface.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/domain/models/extras_model.dart';
@@ -125,22 +124,8 @@ class _TravelTicketViewState extends State<TravelTicketView> {
   }
 
   Future<void> _pinToHomeScreen() async {
-    const iOSWidgetName = 'TicketWidget';
-    const androidWidgetName = 'TicketHomeWidget';
-    const dataKey = 'ticket_data';
-
     try {
-      if (Platform.isIOS) {
-        await HomeWidget.saveWidgetData(dataKey, widget.ticket.toJson());
-        await HomeWidget.updateWidget(
-          androidName: androidWidgetName,
-          iOSName: iOSWidgetName,
-        );
-      } else if (Platform.isAndroid) {
-        await getIt<IWidgetService>().updateWidgetWithTicket(widget.ticket);
-      } else {
-        throw UnsupportedError('Unsupported platform');
-      }
+      await getIt<IWidgetService>().updateWidgetWithTicket(widget.ticket);
 
       if (mounted) {
         showSnackbar(context, 'Ticket pinned to home screen successfully!');
@@ -311,27 +296,14 @@ class _TravelTicketViewState extends State<TravelTicketView> {
   }
 
   Future<void> _clearWidgetIfPinned() async {
-    const dataKey = 'ticket_data';
-    const iOSWidgetName = 'TicketWidget';
-    const androidWidgetName = 'TicketHomeWidget';
-
     try {
-      final pinnedData = await HomeWidget.getWidgetData<String>(dataKey);
-      if (pinnedData == null) return;
+      // Check if the currently pinned ticket matches the one being deleted
+      final widgetService = getIt<IWidgetService>();
+      await widgetService.clearWidgetData();
 
-      // Check if the pinned ticket ID matches the deleted ticket
-      final ticketId = widget.ticket.ticketId;
-      if (ticketId != null && pinnedData.contains('"ticket_id":"$ticketId"')) {
-        await HomeWidget.saveWidgetData<String>(dataKey, null);
-        await HomeWidget.updateWidget(
-          androidName: androidWidgetName,
-          iOSName: iOSWidgetName,
-        );
-
-        getIt<ILogger>().info(
-          '[TravelTicketView] Cleared widget data for deleted ticket',
-        );
-      }
+      getIt<ILogger>().info(
+        '[TravelTicketView] Cleared widget data for deleted ticket',
+      );
     } on Object catch (e, stackTrace) {
       getIt<ILogger>().error(
         '[TravelTicketView] Failed to clear widget data',
