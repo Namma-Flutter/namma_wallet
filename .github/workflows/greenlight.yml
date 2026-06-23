@@ -64,9 +64,9 @@ jobs:
               echo "### Warnings"
               jq -r '
                 .findings[]
-                | select(.severity == "warn")
+                | select(.severity | ascii_downcase == "warn")
                 | "**\(.title)**  \n\(.detail)" + (if (.fix // "") != "" then "  \n_Fix: \(.fix)_" else "" end)
-              ' greenlight-report.json
+              ' greenlight-report.json 2>&1
             fi
 
             if [ "$infos" -gt 0 ]; then
@@ -74,9 +74,9 @@ jobs:
               echo "### Info"
               jq -r '
                 .findings[]
-                | select(.severity == "info")
+                | select(.severity | ascii_downcase == "info")
                 | "**\(.title)**  \n\(.detail)" + (if (.fix // "") != "" then "  \n_Fix: \(.fix)_" else "" end)
-              ' greenlight-report.json
+              ' greenlight-report.json 2>&1
             fi
           } > pr-comments/greenlight_comment.txt
 
@@ -93,7 +93,7 @@ jobs:
           echo "=== Greenlight Blocking Findings ==="
           jq -r '
             .findings[]
-            | select(.severity == "block")
+            | select(.severity | ascii_downcase == "block" or ascii_downcase == "critical")
             | "------------------------------------------------------------",
               "Guideline : \(.guideline)",
               "Title     : \(.title)",
@@ -113,7 +113,7 @@ jobs:
             echo "=== Greenlight Warn/Info Findings ==="
             jq -r '
               .findings[]
-              | select(.severity == "warn" or .severity == "info")
+              | select(.severity | ascii_downcase | . == "warn" or . == "info")
               | "------------------------------------------------------------",
                 "Severity  : \(.severity)",
                 "Guideline : \(.guideline)",
