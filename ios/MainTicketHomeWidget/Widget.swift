@@ -34,7 +34,6 @@ struct MainTicketHomeWidgetEntry: TimelineEntry {
   let data: MainTicketData
 }
 
-
 struct MainTicketHomeWidgetEntryView: View {
   var entry: Provider.Entry
 
@@ -120,4 +119,3 @@ struct MainTicketData {
     )
   }
 }
-
