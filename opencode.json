@@ -2,12 +2,50 @@
   "$schema": "https://opencode.ai/config.json",
   "lsp": {
     "dart": {
-      "command": ["fvm", "dart", "language-server"]
+      "command": [
+        "fvm",
+        "dart",
+        "language-server"
+      ]
     }
   },
   "formatter": {
     "dart": {
-      "command": ["fvm", "dart", "format", "$FILE"]
+      "command": [
+        "fvm",
+        "dart",
+        "format",
+        "$FILE"
+      ]
+    },
+    "gofmt": {
+      "disabled": true
+    },
+    "swift": {
+      "command": [
+        "swiftformat",
+        "$FILE"
+      ]
+    },
+    "ktlint": {
+      "command": [
+        "ktlint",
+        "-F",
+        "$FILE"
+      ]
+    }
+  },
+  "mcp": {
+    "dart": {
+      "type": "local",
+      "command": [
+        "fvm",
+        "dart",
+        "mcp-server",
+        "--flutter-sdk",
+        ".fvm/flutter_sdk"
+      ],
+      "enabled": true
     }
   }
 }
