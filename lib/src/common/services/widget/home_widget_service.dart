@@ -1,5 +1,4 @@
 // coverage:ignore-file
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
@@ -8,46 +7,33 @@ import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 import 'package:namma_wallet/src/common/helper/date_time_converter.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
 import 'package:namma_wallet/src/common/services/widget/widget_service_interface.dart';
+import 'package:namma_wallet/src/home_widget/main_ticket.home_widget.dart';
 import 'package:workmanager/workmanager.dart';
 
 /// Callback for interactive widget clicks
 @pragma('vm:entry-point')
 Future<void> interactiveCallback(Uri? data) async {
-  // Handle widget interactions here
-  // For now, just log the interaction
   if (kDebugMode) {
     print('[HomeWidgetService] Widget interaction: $data');
   }
 }
 
 /// Implementation of widget service using home_widget package
-// Used via dependency injection, not directly called from entry points
+/// with generated MainTicketHomeWidget helper.
 class HomeWidgetService implements IWidgetService {
-  // Constructor is called via GetIt dependency injection
   HomeWidgetService({
     required this._logger,
   });
 
   final ILogger _logger;
+  final DateTimeConverter _dateTimeCon = DateTimeConverter.instance;
 
-  final String _androidWidgetName = 'TicketListWidgetProvider';
-  final String _iOSWidgetName = 'TicketListWidgetProvider';
-  final String _dataKey = 'ticket_list';
-
-  // Android qualified name for the widget receiver
-  final String _androidListWidgetName =
-      'com.nammaflutter.nammawallet.TicketListWidgetProvider';
-  final String _androidMainWidgetName =
-      'com.nammaflutter.nammawallet.MainTicketWidgetProvider';
-  // work manager variables
   final String _backgroundTaskName = 'widgetBackgroundUpdate';
   final String _backgroundTaskId = 'ticket_widget_update';
-  final DateTimeConverter _dateTimeCon = DateTimeConverter.instance;
 
   @override
   Future<void> initialize() async {
     try {
-      // Register interactivity callback for handling widget clicks
       await HomeWidget.registerInteractivityCallback(
         interactiveCallback,
       );
@@ -66,65 +52,26 @@ class HomeWidgetService implements IWidgetService {
   Future<void> updateWidgetWithTicket(Ticket t) async {
     try {
       _logger.debug(
-        'NEW ticket (raw): ${jsonEncode(t.toMap())}',
+        'Saving ticket to widget: ${t.ticketId}',
       );
-
-      // Convert Ticket model to map
-      final ticketMap = Map<String, dynamic>.from(t.toMap());
 
       // Format dates
+      String? formattedStart;
       if (t.startTime != null) {
-        ticketMap['start_time'] = _dateTimeCon.formatFullDateTime(
-          t.startTime!,
-        );
-      }
-      if (t.endTime != null) {
-        ticketMap['end_time'] = _dateTimeCon.formatFullDateTime(
-          t.endTime!,
-        );
+        formattedStart = _dateTimeCon.formatFullDateTime(t.startTime!);
       }
 
-      _logger.debug('Processed ticket map: $ticketMap');
-
-      // --- LOAD EXISTING LIST ---
-      final existingJson = await HomeWidget.getWidgetData<String>(_dataKey);
-
-      var ticketList = <Map<String, dynamic>>[];
-      if (existingJson != null && existingJson.isNotEmpty) {
-        try {
-          final decoded = jsonDecode(existingJson);
-
-          if (decoded is List) {
-            ticketList = List<Map<String, dynamic>>.from(
-              decoded.whereType<Map<String, dynamic>>(),
-            );
-          }
-        } on Object catch (e, stackTrace) {
-          _logger.error(
-            '[HomeWidgetService] Failed to parse widget JSON data. '
-            'Malformed JSON: $existingJson',
-            e,
-            stackTrace,
-          );
-          rethrow;
-        }
-      }
-
-      // --- Prevent duplicates by ticket_id ---
-      ticketList
-        ..removeWhere((element) {
-          return element['ticket_id'] == ticketMap['ticket_id'];
-        })
-        // Add new ticket
-        ..add(ticketMap);
-
-      // Save updated list
-      await HomeWidget.saveWidgetData(
-        _dataKey,
-        jsonEncode(ticketList),
+      // Save individual fields using generated helper
+      await MainTicketHomeWidget.saveData(
+        ticketId: t.ticketId,
+        type: t.type?.name.toUpperCase(),
+        primaryText: t.primaryText,
+        secondaryText: t.secondaryText,
+        startTime: formattedStart,
+        location: t.location,
       );
 
-      await _updateWidget();
+      await MainTicketHomeWidget.updateWidget();
 
       _logger.info('[HomeWidgetService] Widget updated successfully');
     } on Object catch (e, stackTrace) {
@@ -134,6 +81,30 @@ class HomeWidgetService implements IWidgetService {
         stackTrace,
       );
       rethrow;
+    }
+  }
+
+  @override
+  Future<void> clearWidgetData() async {
+    try {
+      await MainTicketHomeWidget.deleteData(
+        ticketId: true,
+        type: true,
+        primaryText: true,
+        secondaryText: true,
+        startTime: true,
+        location: true,
+      );
+
+      await MainTicketHomeWidget.updateWidget();
+
+      _logger.info('[HomeWidgetService] Widget data cleared');
+    } on Object catch (e, stackTrace) {
+      _logger.error(
+        '[HomeWidgetService] Failed to clear widget data',
+        e,
+        stackTrace,
+      );
     }
   }
 
@@ -223,7 +194,8 @@ class HomeWidgetService implements IWidgetService {
 
     try {
       await HomeWidget.requestPinWidget(
-        qualifiedAndroidName: _androidListWidgetName,
+        qualifiedAndroidName:
+            'com.nammaflutter.nammawallet.MainTicketHomeWidgetReceiver',
       );
       _logger.info('[HomeWidgetService] Widget pin requested');
     } on Object catch (e, stackTrace) {
@@ -235,24 +207,6 @@ class HomeWidgetService implements IWidgetService {
       rethrow;
     }
   }
-
-  /// Internal method to update widget on all platforms
-  Future<void> _updateWidget() async {
-    await Future.wait([
-      HomeWidget.updateWidget(
-        androidName: _androidWidgetName,
-        iOSName: _iOSWidgetName,
-      ),
-      if (Platform.isAndroid) ...[
-        HomeWidget.updateWidget(
-          qualifiedAndroidName: _androidListWidgetName,
-        ),
-        HomeWidget.updateWidget(
-          qualifiedAndroidName: _androidMainWidgetName,
-        ),
-      ],
-    ]);
-  }
 }
 
 /// Background callback for periodic widget updates
@@ -260,35 +214,7 @@ class HomeWidgetService implements IWidgetService {
 void _callbackDispatcher() {
   Workmanager().executeTask((taskName, inputData) async {
     try {
-      // In a real implementation, you would:
-      // 1. Get the latest ticket from the database
-      // 2. Update the widget with that ticket data
-
-      // For now, just update with timestamp
-      final now = DateTime.now();
-      await HomeWidget.saveWidgetData<String>(
-        'last_update',
-        now.toIso8601String(),
-      );
-
-      // Update the widget
-      await Future.wait([
-        HomeWidget.updateWidget(
-          androidName: 'TicketListWidgetProvider',
-          iOSName: 'TicketListWidgetProvider',
-        ),
-        if (Platform.isAndroid) ...[
-          HomeWidget.updateWidget(
-            qualifiedAndroidName:
-                'com.nammaflutter.nammawallet.TicketListWidgetProvider',
-          ),
-          HomeWidget.updateWidget(
-            qualifiedAndroidName:
-                'com.nammaflutter.nammawallet.MainTicketWidgetProvider',
-          ),
-        ],
-      ]);
-
+      await MainTicketHomeWidget.updateWidget();
       return true;
     } on Object catch (e) {
       if (kDebugMode) {

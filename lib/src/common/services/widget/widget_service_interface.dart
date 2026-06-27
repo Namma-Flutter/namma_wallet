@@ -8,6 +8,9 @@ abstract interface class IWidgetService {
   /// Update the widget with the given ticket data
   Future<void> updateWidgetWithTicket(Ticket ticket);
 
+  /// Clear all widget data (used when deleting a pinned ticket)
+  Future<void> clearWidgetData();
+
   /// Check if the app was launched from a widget
   Future<Uri?> getInitialWidgetLaunchUri();
 

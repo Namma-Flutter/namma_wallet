@@ -25,6 +25,9 @@
 		97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */; };
 		B1FD1D9A83535D9456650A0C /* NammaWalletShortcuts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71FFA98896DDF0D391964521 /* NammaWalletShortcuts.swift */; };
 		C456731C7ADCD0CDF8F2FBBB /* Pods_Share_Extension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AB45728C5A152FD39B0E276D /* Pods_Share_Extension.framework */; };
+		FAF445759D762B06B68E58EF /* MainTicketHomeWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 9C2D1008AA345117E9A698BE /* MainTicketHomeWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		4E9F2F0250D0D9E5757B2F84 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E0BB40092E6984CAB20B04F7 /* WidgetKit.framework */; };
+		F6434329E72A49D2EBE40ABB /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 70AF13A695CB72419FE270E4 /* SwiftUI.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -49,6 +52,13 @@
 			remoteGlobalIDString = 68B263712F176F2A00743DE6;
 			remoteInfo = TicketWidgetExtension;
 		};
+		D6EA638ED1DC56C9239842E8 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 97C146E61CF9000F007C117D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 21EA34C93120C7A030CA447F;
+			remoteInfo = MainTicketHomeWidget;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -72,6 +82,17 @@
 			files = (
 			);
 			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		014432C0DFB2ECA9CD2E73EE /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				FAF445759D762B06B68E58EF /* MainTicketHomeWidget.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
@@ -115,6 +136,10 @@
 		E21839F17B9A1CE40E326D37 /* Pods-Runner.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.release.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.release.xcconfig"; sourceTree = "<group>"; };
 		EF2CDA501A0E5FEA4080752A /* Pods_Runner.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Runner.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		FC21F0EFC885950230A199C1 /* Pods-RunnerTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RunnerTests.release.xcconfig"; path = "Target Support Files/Pods-RunnerTests/Pods-RunnerTests.release.xcconfig"; sourceTree = "<group>"; };
+		9C2D1008AA345117E9A698BE /* MainTicketHomeWidget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = MainTicketHomeWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		E0BB40092E6984CAB20B04F7 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
+		70AF13A695CB72419FE270E4 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
+		6A959E1B8DC622FA03DA7835 /* MainTicketHomeWidget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MainTicketHomeWidget.entitlements; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -138,6 +163,13 @@
 				AppIntent.swift,
 			);
 			target = 97C146ED1CF9000F007C117D /* Runner */;
+		};
+		1C7D50308DEA5F99BE85FD16 /* Exceptions for "MainTicketHomeWidget" folder in "MainTicketHomeWidget" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 21EA34C93120C7A030CA447F /* MainTicketHomeWidget */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
@@ -165,6 +197,18 @@
 			explicitFolders = (
 			);
 			path = TicketWidget;
+			sourceTree = "<group>";
+		};
+		31B99994179530278DBEEA52 /* MainTicketHomeWidget */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				1C7D50308DEA5F99BE85FD16 /* Exceptions for "MainTicketHomeWidget" folder in "MainTicketHomeWidget" target */,
+			);
+			explicitFileTypes = {
+			};
+			explicitFolders = (
+			);
+			path = MainTicketHomeWidget;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -200,6 +244,15 @@
 			buildActionMask = 2147483647;
 			files = (
 				3B20D0F4C6579CBDC505DF98 /* Pods_Runner.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		168E4E846100CD119E41A6D6 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F6434329E72A49D2EBE40ABB /* SwiftUI.framework in Frameworks */,
+				4E9F2F0250D0D9E5757B2F84 /* WidgetKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -251,6 +304,8 @@
 				6829A7182EE02BA300CE86DA /* nammaWallet.icon */,
 				103A3D6F4D75E35139393B1C /* Frameworks */,
 				218391B1B9270293D41D257D /* ShareViewController.swift */,
+				6A959E1B8DC622FA03DA7835 /* MainTicketHomeWidget.entitlements */,
+				31B99994179530278DBEEA52 /* MainTicketHomeWidget */,
 			);
 			sourceTree = "<group>";
 		};
@@ -375,20 +430,43 @@
 				97C146EB1CF9000F007C117D /* Frameworks */,
 				97C146EC1CF9000F007C117D /* Resources */,
 				9705A1C41CF9048500538489 /* Embed Frameworks */,
-				3B06AD1E1E4923F5004D2608 /* Thin Binary */,
+				014432C0DFB2ECA9CD2E73EE /* Embed Foundation Extensions */,
 				EF4004FD2EDF50A6FA1ED82B /* [CP] Embed Pods Frameworks */,
 				BAB33EA463978C8F952254E1 /* [CP] Copy Pods Resources */,
+				3B06AD1E1E4923F5004D2608 /* Thin Binary */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 				6811CF6D2F166243009E977E /* PBXTargetDependency */,
 				68B263822F176F2B00743DE6 /* PBXTargetDependency */,
+				EE7744F561206A1E219AB897 /* PBXTargetDependency */,
 			);
 			name = Runner;
 			productName = Runner;
 			productReference = 97C146EE1CF9000F007C117D /* Runner.app */;
 			productType = "com.apple.product-type.application";
+		};
+		21EA34C93120C7A030CA447F /* MainTicketHomeWidget */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 85829BF058C744D3553A8962 /* Build configuration list for PBXNativeTarget "MainTicketHomeWidget" */;
+			buildPhases = (
+				75D49C539E0194E071856311 /* Sources */,
+				168E4E846100CD119E41A6D6 /* Frameworks */,
+				9CE8D60E15C5FEF5A5460948 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+						fileSystemSynchronizedGroups = (
+				31B99994179530278DBEEA52 /* MainTicketHomeWidget */,
+			);
+
+			name = MainTicketHomeWidget;
+			productName = MainTicketHomeWidget;
+			productReference = 9C2D1008AA345117E9A698BE /* MainTicketHomeWidget.appex */;
+			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
 
@@ -434,6 +512,7 @@
 				331C8080294A63A400263BE5 /* RunnerTests */,
 				6811CF632F166243009E977E /* Share Extension */,
 				68B263712F176F2A00743DE6 /* TicketWidgetExtension */,
+				21EA34C93120C7A030CA447F /* MainTicketHomeWidget */,
 			);
 		};
 /* End PBXProject section */
@@ -469,6 +548,13 @@
 				3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */,
 				97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */,
 				97C146FC1CF9000F007C117D /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9CE8D60E15C5FEF5A5460948 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -661,6 +747,15 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		75D49C539E0194E071856311 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				
+				
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -678,6 +773,11 @@
 			isa = PBXTargetDependency;
 			target = 68B263712F176F2A00743DE6 /* TicketWidgetExtension */;
 			targetProxy = 68B263812F176F2B00743DE6 /* PBXContainerItemProxy */;
+		};
+		EE7744F561206A1E219AB897 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 21EA34C93120C7A030CA447F /* MainTicketHomeWidget */;
+			targetProxy = D6EA638ED1DC56C9239842E8 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -1314,6 +1414,84 @@
 			};
 			name = Release;
 		};
+		8370DD1F31D733F4517FE639 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_ENTITLEMENTS = MainTicketHomeWidget.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = TG8RN284Q4;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				INFOPLIST_FILE = MainTicketHomeWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = MainTicketHomeWidget;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.nammaflutter.nammawallet.MainTicketHomeWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		4F4BC4E5A230D79ACE71FDB7 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_ENTITLEMENTS = MainTicketHomeWidget.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = TG8RN284Q4;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				INFOPLIST_FILE = MainTicketHomeWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = MainTicketHomeWidget;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.nammaflutter.nammawallet.MainTicketHomeWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		2E40B2E1A8C073AA83D7787F /* Profile */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_ENTITLEMENTS = MainTicketHomeWidget.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = TG8RN284Q4;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				INFOPLIST_FILE = MainTicketHomeWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = MainTicketHomeWidget;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.nammaflutter.nammawallet.MainTicketHomeWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Profile;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -1363,6 +1541,16 @@
 				97C147061CF9000F007C117D /* Debug */,
 				97C147071CF9000F007C117D /* Release */,
 				249021D4217E4FDB00AE95B9 /* Profile */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		85829BF058C744D3553A8962 /* Build configuration list for PBXNativeTarget "MainTicketHomeWidget" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8370DD1F31D733F4517FE639 /* Debug */,
+				4F4BC4E5A230D79ACE71FDB7 /* Release */,
+				2E40B2E1A8C073AA83D7787F /* Profile */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
