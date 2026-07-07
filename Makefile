@@ -6,9 +6,11 @@ DART ?= fvm dart
 .PHONY: help clean get codegen release-android release-ios release-apk release-appbundle release-ipa ios-test ios-beta ios-release-candidate ios-production android-release-candidate setup-hooks uninstall-hooks
 
 help:
+	@echo ""
 	@echo "Available targets:"
 	@echo "  clean              - Clean the project"
 	@echo "  get                - Get dependencies"
+	@echo "  run                - Run the application"
 	@echo "  codegen            - Run code generation"
 	@echo "  release-android    - Build Android release APK"
 	@echo "  release-ios        - Build iOS release app"
@@ -24,9 +26,13 @@ help:
 	@echo "Dev setup:"
 	@echo "  setup-hooks        - Install git pre-commit hook (dart format)"
 	@echo "  uninstall-hooks    - Remove the installed pre-commit hook"
+	@echo ""
 
 clean:
 	$(FLUTTER) clean
+
+run:
+	$(FLUTTER) run
 
 get:
 	$(FLUTTER) pub get

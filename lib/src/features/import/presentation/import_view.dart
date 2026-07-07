@@ -6,6 +6,7 @@ import 'package:cross_file/cross_file.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/domain/models/ticket.dart';
@@ -33,6 +34,7 @@ class _ImportViewState extends State<ImportView> {
   late final ILogger _logger = getIt<ILogger>();
   final TextEditingController _pnrController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
+  final GlobalKey<FormState> _form = GlobalKey<FormState>();
   bool _isPasting = false;
   bool _isScanning = false;
   bool _isProcessingPDF = false;
@@ -346,6 +348,10 @@ class _ImportViewState extends State<ImportView> {
       builder: (dialogContext) => StatefulBuilder(
         builder: (context, setDialogState) {
           Future<void> submit() async {
+            if (!(_form.currentState?.validate() ?? false)) return;
+
+            FocusManager.instance.primaryFocus?.unfocus();
+
             if (isFetchingDialog) return;
             setDialogState(() => isFetchingDialog = true);
 
@@ -379,30 +385,48 @@ class _ImportViewState extends State<ImportView> {
 
           return AlertDialog(
             title: const Text('Enter PNR and Phone Number'),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  controller: _pnrController,
-                  decoration: const InputDecoration(
-                    labelText: 'PNR Number',
-                    hintText: 'e.g., T76296906',
+            content: Form(
+              key: _form,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextFormField(
+                    controller: _pnrController,
+                    decoration: const InputDecoration(
+                      labelText: 'PNR Number',
+                      hintText: 'e.g., T76296906',
+                    ),
+                    autofocus: true,
+                    textInputAction: TextInputAction.next,
+                    validator: (number) {
+                      if (number == null || number.isEmpty) {
+                        return 'Please enter a PNR number';
+                      }
+                      return null;
+                    },
                   ),
-                  autofocus: true,
-                  textInputAction: TextInputAction.next,
-                ),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: _phoneController,
-                  decoration: const InputDecoration(
-                    labelText: 'Phone Number',
-                    hintText: 'e.g., 9876543210',
+                  const SizedBox(height: 12),
+                  TextFormField(
+                    controller: _phoneController,
+                    decoration: const InputDecoration(
+                      labelText: 'Phone Number',
+                      hintText: 'e.g., 9876543210',
+                    ),
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                    keyboardType: TextInputType.phone,
+                    textInputAction: TextInputAction.done,
+                    validator: (phoneNumber) {
+                      if (phoneNumber == null || phoneNumber.isEmpty) {
+                        return 'Please enter your phone number';
+                      } else if (phoneNumber.length < 10) {
+                        return 'Please enter 10 digit phone number';
+                      }
+                      return null;
+                    },
+                    onFieldSubmitted: (_) async => submit(),
                   ),
-                  keyboardType: TextInputType.phone,
-                  textInputAction: TextInputAction.done,
-                  onSubmitted: (_) async => submit(),
-                ),
-              ],
+                ],
+              ),
             ),
             actions: [
               TextButton(

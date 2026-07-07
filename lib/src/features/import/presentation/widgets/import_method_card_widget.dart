@@ -80,7 +80,7 @@ class ImportMethodCardWidget extends StatelessWidget {
                           ),
                           const SizedBox(height: 12),
                           Align(
-                            alignment: Alignment.centerLeft,
+                            alignment: Alignment.center,
                             child: Text(
                               title,
                               style: Paragraph02(
@@ -88,6 +88,7 @@ class ImportMethodCardWidget extends StatelessWidget {
                                     ? Colors.white
                                     : textColor,
                               ).semiBold,
+                              textAlign: TextAlign.center,
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -95,7 +96,7 @@ class ImportMethodCardWidget extends StatelessWidget {
                           if (subtitle != null) ...[
                             const SizedBox(height: 4),
                             Align(
-                              alignment: Alignment.centerLeft,
+                              alignment: Alignment.center,
                               child: Text(
                                 subtitle!,
                                 style: Caption(
