@@ -8,6 +8,7 @@ import 'package:namma_wallet/src/common/domain/models/extras_model.dart';
 import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 import 'package:namma_wallet/src/common/enums/source_type.dart';
 import 'package:namma_wallet/src/common/enums/ticket_type.dart';
+import 'package:namma_wallet/src/common/helper/original_file_storage.dart';
 import 'package:namma_wallet/src/common/services/ocr/ocr_block.dart';
 import 'package:namma_wallet/src/common/services/pdf/pdf_service_interface.dart';
 import 'package:namma_wallet/src/features/import/application/import_service.dart';
@@ -505,11 +506,11 @@ void main() {
 
           expect(result, isNotNull);
           expect(result!.originalFilePath, isNotNull);
-          expect(File(result.originalFilePath!).existsSync(), isTrue);
-          expect(
-            File(result.originalFilePath!).readAsBytesSync(),
-            equals([1, 2, 3]),
+          final resolvedPath = await resolveOriginalFilePath(
+            result.originalFilePath!,
           );
+          expect(File(resolvedPath).existsSync(), isTrue);
+          expect(File(resolvedPath).readAsBytesSync(), equals([1, 2, 3]));
           expect(fakeTicketDAO.handledTicket, equals(result));
         },
       );

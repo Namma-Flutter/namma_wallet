@@ -6,6 +6,7 @@ import 'package:namma_wallet/src/common/database/ticket_dao_interface.dart';
 import 'package:namma_wallet/src/common/domain/models/extras_model.dart';
 import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 import 'package:namma_wallet/src/common/enums/source_type.dart';
+import 'package:namma_wallet/src/common/helper/original_file_storage.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
 import 'package:namma_wallet/src/common/services/pdf/pdf_service_interface.dart';
 import 'package:namma_wallet/src/features/import/application/import_service_interface.dart';
@@ -80,13 +81,21 @@ class ImportService implements IImportService {
       }
 
       // Keep a copy of the original PDF so the user can view it later.
-      final originalFilePath = await _saveOriginalFile(pdfFile);
-      final ticketToSave = originalFilePath == null
+      // Only the filename is stored (see _saveOriginalFile).
+      final originalFileName = await _saveOriginalFile(pdfFile);
+      final ticketToSave = originalFileName == null
           ? parsedTicket
-          : parsedTicket.copyWith(originalFilePath: originalFilePath);
+          : parsedTicket.copyWith(originalFilePath: originalFileName);
 
       // Save the parsed ticket to the database
-      await _ticketDao.handleTicket(ticketToSave);
+      final result = await _ticketDao.handleTicket(ticketToSave);
+      if (result < 0) {
+        _logger.warning('Failed to save imported PDF ticket to database');
+        if (originalFileName != null) {
+          await _deleteSavedOriginalFile(originalFileName);
+        }
+        return null;
+      }
 
       _logger.success(
         'Successfully imported and saved PDF ticket: ${parsedTicket.ticketId}',
@@ -208,15 +217,17 @@ class ImportService implements IImportService {
 
   /// Copies the imported file into the app's document directory so it can
   /// be viewed again later, even after the picker's temp/cache file is
-  /// cleared. Returns `null` on web, since `dart:io` file storage isn't
-  /// available there.
+  /// cleared. Returns the generated *filename* (not the full path), since
+  /// the document directory's absolute path can change between app
+  /// updates/reinstalls. Returns `null` on web, since `dart:io` file
+  /// storage isn't available there.
   Future<String?> _saveOriginalFile(XFile file) async {
     if (kIsWeb) return null;
 
     try {
       final appDocDir = await getApplicationDocumentsDirectory();
       final originalsDir = Directory(
-        p.join(appDocDir.path, 'ticket_originals'),
+        p.join(appDocDir.path, originalFilesDirName),
       );
       if (!originalsDir.existsSync()) {
         await originalsDir.create(recursive: true);
@@ -227,7 +238,7 @@ class ImportService implements IImportService {
       final filePath = p.join(originalsDir.path, fileName);
 
       await File(file.path).copy(filePath);
-      return filePath;
+      return fileName;
     } on Object catch (e, stackTrace) {
       _logger.error(
         'Failed to save original file: ${file.name}',
@@ -235,6 +246,24 @@ class ImportService implements IImportService {
         stackTrace,
       );
       return null;
+    }
+  }
+
+  /// Best-effort deletion of a file previously saved by [_saveOriginalFile],
+  /// used to avoid leaking a copied file when the DB write fails.
+  Future<void> _deleteSavedOriginalFile(String fileName) async {
+    try {
+      final filePath = await resolveOriginalFilePath(fileName);
+      final file = File(filePath);
+      if (file.existsSync()) {
+        await file.delete();
+      }
+    } on Object catch (e, stackTrace) {
+      _logger.error(
+        'Failed to clean up original file after DB error: $fileName',
+        e,
+        stackTrace,
+      );
     }
   }
 }

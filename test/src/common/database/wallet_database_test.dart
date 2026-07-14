@@ -9,14 +9,26 @@ import 'package:namma_wallet/src/common/domain/models/extras_model.dart';
 import 'package:namma_wallet/src/common/domain/models/tag_model.dart';
 import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 import 'package:namma_wallet/src/common/enums/ticket_type.dart';
+import 'package:namma_wallet/src/common/helper/original_file_storage.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
+import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
+import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
 import '../../../helpers/fake_database.dart';
 import '../../../helpers/fake_logger.dart';
 import '../../../helpers/fake_wallet_database.dart';
 
+class FakePathProvider extends PathProviderPlatform
+    with MockPlatformInterfaceMixin {
+  @override
+  Future<String?> getApplicationDocumentsPath() async {
+    return 'test/temp_dao_docs';
+  }
+}
+
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
+  PathProviderPlatform.instance = FakePathProvider();
 
   group('WalletDatabase', () {
     final getIt = GetIt.instance;
@@ -409,7 +421,9 @@ void main() {
 
       test('Given ticket with an original file, When deleting, '
           'Then removes the file from disk', () async {
-        final originalFile = File('test/temp_dao_docs/CRUD005_original.pdf')
+        const fileName = 'CRUD005_original.pdf';
+        final originalFilePath = await resolveOriginalFilePath(fileName);
+        final originalFile = File(originalFilePath)
           ..createSync(recursive: true)
           ..writeAsBytesSync([1, 2, 3]);
 
@@ -418,13 +432,46 @@ void main() {
           primaryText: 'Kolkata → Siliguri',
           startTime: DateTime(2024, 12, 18, 13, 30),
           type: TicketType.bus,
-          originalFilePath: originalFile.path,
+          originalFilePath: fileName,
         );
         await ticketDao.insertTicket(ticket);
 
         await ticketDao.deleteTicket('CRUD005');
 
         expect(originalFile.existsSync(), isFalse);
+      });
+
+      test('Given ticket with an original file, When updating with a '
+          'different original file, Then removes the superseded file '
+          'from disk', () async {
+        const oldFileName = 'CRUD006_old.pdf';
+        const newFileName = 'CRUD006_new.pdf';
+        final oldFilePath = await resolveOriginalFilePath(oldFileName);
+        final newFilePath = await resolveOriginalFilePath(newFileName);
+        final oldFile = File(oldFilePath)
+          ..createSync(recursive: true)
+          ..writeAsBytesSync([1, 2, 3]);
+        final newFile = File(newFilePath)
+          ..createSync(recursive: true)
+          ..writeAsBytesSync([4, 5, 6]);
+
+        final ticket = Ticket(
+          ticketId: 'CRUD006',
+          primaryText: 'Kolkata → Siliguri',
+          startTime: DateTime(2024, 12, 18, 13, 30),
+          type: TicketType.bus,
+          originalFilePath: oldFileName,
+        );
+        await ticketDao.insertTicket(ticket);
+
+        final updatePayload = ticket.copyWith(originalFilePath: newFileName);
+        await ticketDao.updateTicketById('CRUD006', updatePayload);
+
+        expect(oldFile.existsSync(), isFalse);
+        expect(newFile.existsSync(), isTrue);
+
+        final retrieved = await ticketDao.getTicketById('CRUD006');
+        expect(retrieved!.originalFilePath, equals(newFileName));
       });
 
       test('Given multiple tickets, When reading all, '

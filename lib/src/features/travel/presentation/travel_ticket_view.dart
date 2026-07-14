@@ -23,7 +23,7 @@ import 'package:namma_wallet/src/common/widgets/rounded_back_button.dart';
 import 'package:namma_wallet/src/common/widgets/snackbar_widget.dart';
 import 'package:namma_wallet/src/common/widgets/ticket_reminder_config_dialog.dart';
 import 'package:namma_wallet/src/features/home/domain/ticket_extensions.dart';
-import 'package:namma_wallet/src/features/travel/presentation/widgets/original_file_viewer.dart';
+import 'package:namma_wallet/src/features/travel/presentation/widgets/original_file_viewer_widget.dart';
 import 'package:namma_wallet/src/features/travel/presentation/widgets/travel_row_widget.dart';
 import 'package:namma_wallet/src/features/travel/presentation/widgets/travel_ticket_shape_line.dart';
 import 'package:path_provider/path_provider.dart';
@@ -453,8 +453,7 @@ class _TravelTicketViewState extends State<TravelTicketView> {
             ),
           ),
           const SizedBox(width: 8),
-          if (widget.ticket.originalFilePath != null &&
-              File(widget.ticket.originalFilePath!).existsSync())
+          if (widget.ticket.originalFilePath != null)
             Center(
               child: CircleAvatar(
                 radius: 24,
@@ -462,8 +461,8 @@ class _TravelTicketViewState extends State<TravelTicketView> {
                 child: IconButton(
                   onPressed: () => Navigator.of(context).push(
                     MaterialPageRoute<void>(
-                      builder: (_) => OriginalFileViewer(
-                        filePath: widget.ticket.originalFilePath!,
+                      builder: (_) => OriginalFileViewerWidget(
+                        fileName: widget.ticket.originalFilePath!,
                       ),
                     ),
                   ),

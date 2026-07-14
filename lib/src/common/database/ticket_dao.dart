@@ -6,6 +6,7 @@ import 'package:namma_wallet/src/common/database/ticket_dao_interface.dart';
 import 'package:namma_wallet/src/common/database/wallet_database_interface.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/domain/models/ticket.dart';
+import 'package:namma_wallet/src/common/helper/original_file_storage.dart';
 import 'package:namma_wallet/src/common/services/archive/ticket_archive.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
 import 'package:sqflite/sqflite.dart';
@@ -144,6 +145,18 @@ class TicketDao implements ITicketDAO {
 
       final db = await _database.database;
 
+      // Read the currently-stored original file path so we can clean it up
+      // below if this update supersedes it with a different one.
+      final existingRows = await db.query(
+        'tickets',
+        columns: ['original_file_path'],
+        where: 'ticket_id = ?',
+        whereArgs: [ticketId],
+      );
+      final previousOriginalFilePath = existingRows.isNotEmpty
+          ? existingRows.first['original_file_path'] as String?
+          : null;
+
       // Prepare updates map from the Ticket object
       final updates = ticket.toEntity()
         // Remove fields we don't strictly want to overwrite blindly
@@ -197,6 +210,13 @@ class TicketDao implements ITicketDAO {
           'Success',
           'Updated ticket with ID: ${_maskTicketId(ticketId)}',
         );
+
+        // If the update replaced the original file with a different one
+        // (or removed it), delete the now-orphaned file from disk.
+        if (previousOriginalFilePath != null &&
+            previousOriginalFilePath != ticket.originalFilePath) {
+          await _deleteOriginalFile(previousOriginalFilePath);
+        }
       } else {
         _logger.warning('No ticket found with ID: ${_maskTicketId(ticketId)}');
       }
@@ -495,10 +515,13 @@ class TicketDao implements ITicketDAO {
   }
 
   /// Removes the original PDF/image file stored alongside a deleted ticket.
-  Future<void> _deleteOriginalFile(String? path) async {
-    if (path == null || path.isEmpty || kIsWeb) return;
+  /// [fileName] is the relative filename stored in the database (see
+  /// [resolveOriginalFilePath] for why the full path isn't stored).
+  Future<void> _deleteOriginalFile(String? fileName) async {
+    if (fileName == null || fileName.isEmpty || kIsWeb) return;
 
     try {
+      final path = await resolveOriginalFilePath(fileName);
       final file = File(path);
       if (file.existsSync()) {
         await file.delete();
