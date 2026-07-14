@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:cross_file/cross_file.dart';
+import 'package:flutter/foundation.dart';
 import 'package:namma_wallet/src/common/database/ticket_dao_interface.dart';
 import 'package:namma_wallet/src/common/domain/models/extras_model.dart';
 import 'package:namma_wallet/src/common/domain/models/ticket.dart';
@@ -12,6 +15,9 @@ import 'package:namma_wallet/src/features/tnstc/application/tnstc_api_ticket_par
 import 'package:namma_wallet/src/features/tnstc/data/remote/tnstc_pnr_fetcher_interface.dart';
 import 'package:namma_wallet/src/features/travel/application/pkpass_parser_interface.dart';
 import 'package:namma_wallet/src/features/travel/application/travel_parser_interface.dart';
+import 'package:path/path.dart' as p;
+import 'package:path_provider/path_provider.dart';
+import 'package:uuid/uuid.dart';
 
 class ImportService implements IImportService {
   ImportService({
@@ -73,13 +79,19 @@ class ImportService implements IImportService {
         return null;
       }
 
+      // Keep a copy of the original PDF so the user can view it later.
+      final originalFilePath = await _saveOriginalFile(pdfFile);
+      final ticketToSave = originalFilePath == null
+          ? parsedTicket
+          : parsedTicket.copyWith(originalFilePath: originalFilePath);
+
       // Save the parsed ticket to the database
-      await _ticketDao.handleTicket(parsedTicket);
+      await _ticketDao.handleTicket(ticketToSave);
 
       _logger.success(
         'Successfully imported and saved PDF ticket: ${parsedTicket.ticketId}',
       );
-      return parsedTicket;
+      return ticketToSave;
     } on Object catch (e, stackTrace) {
       if (e is UnsupportedError) {
         _logger.warning(
@@ -190,6 +202,38 @@ class ImportService implements IImportService {
       return ticket;
     } on Exception catch (e, stackTrace) {
       _logger.error('Error importing TNSTC ticket by PNR', e, stackTrace);
+      return null;
+    }
+  }
+
+  /// Copies the imported file into the app's document directory so it can
+  /// be viewed again later, even after the picker's temp/cache file is
+  /// cleared. Returns `null` on web, since `dart:io` file storage isn't
+  /// available there.
+  Future<String?> _saveOriginalFile(XFile file) async {
+    if (kIsWeb) return null;
+
+    try {
+      final appDocDir = await getApplicationDocumentsDirectory();
+      final originalsDir = Directory(
+        p.join(appDocDir.path, 'ticket_originals'),
+      );
+      if (!originalsDir.existsSync()) {
+        await originalsDir.create(recursive: true);
+      }
+
+      final extension = p.extension(file.name);
+      final fileName = '${const Uuid().v4()}$extension';
+      final filePath = p.join(originalsDir.path, fileName);
+
+      await File(file.path).copy(filePath);
+      return filePath;
+    } on Object catch (e, stackTrace) {
+      _logger.error(
+        'Failed to save original file: ${file.name}',
+        e,
+        stackTrace,
+      );
       return null;
     }
   }

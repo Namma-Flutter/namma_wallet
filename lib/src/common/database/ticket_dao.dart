@@ -1,5 +1,7 @@
 import 'dart:convert';
+import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:namma_wallet/src/common/database/ticket_dao_interface.dart';
 import 'package:namma_wallet/src/common/database/wallet_database_interface.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
@@ -300,6 +302,18 @@ class TicketDao implements ITicketDAO {
 
       final db = await _database.database;
 
+      // Read only the original_file_path column so corrupted JSON in
+      // other columns (tags/extras) can't block deletion.
+      final rows = await db.query(
+        'tickets',
+        columns: ['original_file_path'],
+        where: 'ticket_id = ?',
+        whereArgs: [id],
+      );
+      final originalFilePath = rows.isNotEmpty
+          ? rows.first['original_file_path'] as String?
+          : null;
+
       final count = await db.delete(
         'tickets',
         where: 'ticket_id = ?',
@@ -311,6 +325,7 @@ class TicketDao implements ITicketDAO {
           'Success',
           'Deleted ticket with ID: ${_maskTicketId(id)}',
         );
+        await _deleteOriginalFile(originalFilePath);
       }
       return count;
     } catch (e, stackTrace) {
@@ -407,10 +422,7 @@ class TicketDao implements ITicketDAO {
       );
 
       if (count > 0) {
-        _logger.logDatabase(
-          'Success',
-          'Archived $count past ticket(s)',
-        );
+        _logger.logDatabase('Success', 'Archived $count past ticket(s)');
       } else {
         _logger.logDatabase('Info', 'No tickets to archive');
       }
@@ -446,10 +458,7 @@ class TicketDao implements ITicketDAO {
       );
 
       if (count > 0) {
-        _logger.logDatabase(
-          'Success',
-          'Purged $count old archived ticket(s)',
-        );
+        _logger.logDatabase('Success', 'Purged $count old archived ticket(s)');
       } else {
         _logger.logDatabase('Info', 'No archived tickets to purge');
       }
@@ -483,5 +492,19 @@ class TicketDao implements ITicketDAO {
     return shouldArchiveTicket(ticket, now: now)
         ? now.toUtc().toIso8601String()
         : null;
+  }
+
+  /// Removes the original PDF/image file stored alongside a deleted ticket.
+  Future<void> _deleteOriginalFile(String? path) async {
+    if (path == null || path.isEmpty || kIsWeb) return;
+
+    try {
+      final file = File(path);
+      if (file.existsSync()) {
+        await file.delete();
+      }
+    } on Exception catch (e, stackTrace) {
+      _logger.error('Failed to delete original ticket file', e, stackTrace);
+    }
   }
 }

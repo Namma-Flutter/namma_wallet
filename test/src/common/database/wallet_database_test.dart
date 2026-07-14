@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:namma_wallet/src/common/database/ticket_dao.dart';
@@ -37,6 +39,10 @@ void main() {
     });
 
     tearDown(() async {
+      final tempDocs = Directory('test/temp_dao_docs');
+      if (tempDocs.existsSync()) {
+        tempDocs.deleteSync(recursive: true);
+      }
       try {
         final db = await fakeDb.database;
         await db.delete('tickets');
@@ -100,185 +106,168 @@ void main() {
         },
       );
 
-      test(
-        'Given multiple tickets with unique IDs, When inserting, '
-        'Then creates separate records',
-        () async {
-          final tickets = [
-            Ticket(
-              ticketId: 'TICKET001',
-              primaryText: 'Chennai → Bangalore',
-              secondaryText: 'TNSTC',
-              startTime: DateTime(2024, 12, 15, 10, 30),
-              location: 'Koyambedu',
-              type: TicketType.bus,
-            ),
-            Ticket(
-              ticketId: 'TICKET002',
-              primaryText: 'Mumbai → Pune',
-              secondaryText: 'MSRTC',
-              startTime: DateTime(2024, 12, 16, 11, 30),
-              location: 'Mumbai Central',
-              type: TicketType.bus,
-            ),
-            Ticket(
-              ticketId: 'TICKET003',
-              primaryText: 'Delhi → Agra',
-              secondaryText: 'UPSRTC',
-              startTime: DateTime(2024, 12, 17, 12, 30),
-              location: 'ISBT',
-              type: TicketType.bus,
-            ),
-          ];
+      test('Given multiple tickets with unique IDs, When inserting, '
+          'Then creates separate records', () async {
+        final tickets = [
+          Ticket(
+            ticketId: 'TICKET001',
+            primaryText: 'Chennai → Bangalore',
+            secondaryText: 'TNSTC',
+            startTime: DateTime(2024, 12, 15, 10, 30),
+            location: 'Koyambedu',
+            type: TicketType.bus,
+          ),
+          Ticket(
+            ticketId: 'TICKET002',
+            primaryText: 'Mumbai → Pune',
+            secondaryText: 'MSRTC',
+            startTime: DateTime(2024, 12, 16, 11, 30),
+            location: 'Mumbai Central',
+            type: TicketType.bus,
+          ),
+          Ticket(
+            ticketId: 'TICKET003',
+            primaryText: 'Delhi → Agra',
+            secondaryText: 'UPSRTC',
+            startTime: DateTime(2024, 12, 17, 12, 30),
+            location: 'ISBT',
+            type: TicketType.bus,
+          ),
+        ];
 
-          final ids = <int>[];
-          for (final ticket in tickets) {
-            ids.add(await ticketDao.insertTicket(ticket));
-          }
+        final ids = <int>[];
+        for (final ticket in tickets) {
+          ids.add(await ticketDao.insertTicket(ticket));
+        }
 
-          expect(ids.toSet().length, equals(3));
-          final allTickets = await ticketDao.getAllTickets();
-          expect(allTickets.length, greaterThanOrEqualTo(3));
-        },
-      );
+        expect(ids.toSet().length, equals(3));
+        final allTickets = await ticketDao.getAllTickets();
+        expect(allTickets.length, greaterThanOrEqualTo(3));
+      });
     });
 
     // -----------------------------------------------------------------------
     // 2. MERGE LOGIC TESTS (Using handleTicket)
     // -----------------------------------------------------------------------
     group('handleTicket Merge Tests', () {
-      test(
-        'Given a past ticket, When handling it, '
-        'Then stores it in archived tickets only',
-        () async {
-          final ticket = Ticket(
-            ticketId: 'PAST001',
-            primaryText: 'Chennai → Bangalore',
-            secondaryText: 'TNSTC',
-            startTime: DateTime.now().subtract(const Duration(days: 1)),
-            location: 'Koyambedu',
-            type: TicketType.bus,
-          );
+      test('Given a past ticket, When handling it, '
+          'Then stores it in archived tickets only', () async {
+        final ticket = Ticket(
+          ticketId: 'PAST001',
+          primaryText: 'Chennai → Bangalore',
+          secondaryText: 'TNSTC',
+          startTime: DateTime.now().subtract(const Duration(days: 1)),
+          location: 'Koyambedu',
+          type: TicketType.bus,
+        );
 
-          await ticketDao.handleTicket(ticket);
+        await ticketDao.handleTicket(ticket);
 
-          final activeTickets = await ticketDao.getActiveTickets();
-          final archivedTickets = await ticketDao.getArchivedTickets();
+        final activeTickets = await ticketDao.getActiveTickets();
+        final archivedTickets = await ticketDao.getArchivedTickets();
 
-          expect(
-            activeTickets.where((t) => t.ticketId == 'PAST001'),
-            isEmpty,
-          );
-          expect(
-            archivedTickets.where((t) => t.ticketId == 'PAST001'),
-            hasLength(1),
-          );
-        },
-      );
+        expect(activeTickets.where((t) => t.ticketId == 'PAST001'), isEmpty);
+        expect(
+          archivedTickets.where((t) => t.ticketId == 'PAST001'),
+          hasLength(1),
+        );
+      });
 
-      test(
-        'Given an archived ticket whose end_time shifts to the future, '
-        'When updated, Then the ticket is un-archived',
-        () async {
-          // Insert a ticket already in the past (archives on insert).
-          final pastTicket = Ticket(
-            ticketId: 'UNARCHIVE001',
-            primaryText: 'Chennai → Bangalore',
-            secondaryText: 'TNSTC',
-            startTime: DateTime.now().subtract(const Duration(days: 2)),
-            endTime: DateTime.now().subtract(const Duration(days: 1)),
-            location: 'Koyambedu',
-            type: TicketType.bus,
-          );
-          await ticketDao.insertTicket(pastTicket);
+      test('Given an archived ticket whose end_time shifts to the future, '
+          'When updated, Then the ticket is un-archived', () async {
+        // Insert a ticket already in the past (archives on insert).
+        final pastTicket = Ticket(
+          ticketId: 'UNARCHIVE001',
+          primaryText: 'Chennai → Bangalore',
+          secondaryText: 'TNSTC',
+          startTime: DateTime.now().subtract(const Duration(days: 2)),
+          endTime: DateTime.now().subtract(const Duration(days: 1)),
+          location: 'Koyambedu',
+          type: TicketType.bus,
+        );
+        await ticketDao.insertTicket(pastTicket);
 
-          expect(
-            (await ticketDao.getArchivedTickets()).where(
-              (t) => t.ticketId == 'UNARCHIVE001',
-            ),
-            hasLength(1),
-          );
+        expect(
+          (await ticketDao.getArchivedTickets()).where(
+            (t) => t.ticketId == 'UNARCHIVE001',
+          ),
+          hasLength(1),
+        );
 
-          // Reschedule into the future via direct update.
-          final rescheduled = Ticket(
-            ticketId: 'UNARCHIVE001',
-            primaryText: 'Chennai → Bangalore',
-            secondaryText: 'TNSTC',
-            startTime: DateTime.now().add(const Duration(days: 1)),
-            endTime: DateTime.now().add(const Duration(days: 2)),
-            location: 'Koyambedu',
-            type: TicketType.bus,
-          );
-          await ticketDao.updateTicketById('UNARCHIVE001', rescheduled);
+        // Reschedule into the future via direct update.
+        final rescheduled = Ticket(
+          ticketId: 'UNARCHIVE001',
+          primaryText: 'Chennai → Bangalore',
+          secondaryText: 'TNSTC',
+          startTime: DateTime.now().add(const Duration(days: 1)),
+          endTime: DateTime.now().add(const Duration(days: 2)),
+          location: 'Koyambedu',
+          type: TicketType.bus,
+        );
+        await ticketDao.updateTicketById('UNARCHIVE001', rescheduled);
 
-          expect(
-            (await ticketDao.getArchivedTickets()).where(
-              (t) => t.ticketId == 'UNARCHIVE001',
-            ),
-            isEmpty,
-          );
-          expect(
-            (await ticketDao.getActiveTickets()).where(
-              (t) => t.ticketId == 'UNARCHIVE001',
-            ),
-            hasLength(1),
-          );
-        },
-      );
+        expect(
+          (await ticketDao.getArchivedTickets()).where(
+            (t) => t.ticketId == 'UNARCHIVE001',
+          ),
+          isEmpty,
+        );
+        expect(
+          (await ticketDao.getActiveTickets()).where(
+            (t) => t.ticketId == 'UNARCHIVE001',
+          ),
+          hasLength(1),
+        );
+      });
 
-      test(
-        'Given ticket with extras, '
-        'When handling update with overlapping extras, '
-        'Then merges by title key correctly',
-        () async {
-          // Arrange - 1. Initial State in DB
-          final initialTicket = Ticket(
-            ticketId: 'MERGE001',
-            primaryText: 'Chennai → Bangalore',
-            secondaryText: 'TNSTC',
-            startTime: DateTime(2024, 12, 15, 10, 30),
-            location: 'Koyambedu',
-            type: TicketType.bus,
-            extras: [
-              ExtrasModel(title: 'Passenger', value: 'John Doe'),
-              ExtrasModel(title: 'Age', value: '25'),
-              ExtrasModel(title: 'Gender', value: 'M'),
-            ],
-          );
-          await ticketDao.insertTicket(initialTicket);
+      test('Given ticket with extras, '
+          'When handling update with overlapping extras, '
+          'Then merges by title key correctly', () async {
+        // Arrange - 1. Initial State in DB
+        final initialTicket = Ticket(
+          ticketId: 'MERGE001',
+          primaryText: 'Chennai → Bangalore',
+          secondaryText: 'TNSTC',
+          startTime: DateTime(2024, 12, 15, 10, 30),
+          location: 'Koyambedu',
+          type: TicketType.bus,
+          extras: [
+            ExtrasModel(title: 'Passenger', value: 'John Doe'),
+            ExtrasModel(title: 'Age', value: '25'),
+            ExtrasModel(title: 'Gender', value: 'M'),
+          ],
+        );
+        await ticketDao.insertTicket(initialTicket);
 
-          // Act - 2. Incoming Sparse Update (e.g. from SMS)
-          final updateTicket = Ticket(
-            ticketId: 'MERGE001',
-            primaryText: '',
-            // Empty - should be ignored
-            secondaryText: '',
-            location: '',
-            type: TicketType.bus,
-            extras: [
-              ExtrasModel(title: 'Age', value: '26'), // UPDATE existing
-              ExtrasModel(title: 'Seat', value: '12A'), // INSERT new
-              // 'Passenger' is missing here, should be PRESERVED
-            ],
-          );
+        // Act - 2. Incoming Sparse Update (e.g. from SMS)
+        final updateTicket = Ticket(
+          ticketId: 'MERGE001',
+          primaryText: '',
+          // Empty - should be ignored
+          secondaryText: '',
+          location: '',
+          type: TicketType.bus,
+          extras: [
+            ExtrasModel(title: 'Age', value: '26'), // UPDATE existing
+            ExtrasModel(title: 'Seat', value: '12A'), // INSERT new
+            // 'Passenger' is missing here, should be PRESERVED
+          ],
+        );
 
-          // We use handleTicket because that's where the Merge Logic lives
-          await ticketDao.handleTicket(updateTicket);
+        // We use handleTicket because that's where the Merge Logic lives
+        await ticketDao.handleTicket(updateTicket);
 
-          // Assert
-          final retrieved = await ticketDao.getTicketById('MERGE001');
-          expect(retrieved, isNotNull);
-          expect(retrieved!.extras!.length, equals(4));
+        // Assert
+        final retrieved = await ticketDao.getTicketById('MERGE001');
+        expect(retrieved, isNotNull);
+        expect(retrieved!.extras!.length, equals(4));
 
-          final extrasMap = {
-            for (final e in retrieved.extras!) e.title: e.value,
-          };
-          expect(extrasMap['Passenger'], equals('John Doe')); // Preserved
-          expect(extrasMap['Age'], equals('26')); // Updated
-          expect(extrasMap['Gender'], equals('M')); // Preserved
-          expect(extrasMap['Seat'], equals('12A')); // New
-        },
-      );
+        final extrasMap = {for (final e in retrieved.extras!) e.title: e.value};
+        expect(extrasMap['Passenger'], equals('John Doe')); // Preserved
+        expect(extrasMap['Age'], equals('26')); // Updated
+        expect(extrasMap['Gender'], equals('M')); // Preserved
+        expect(extrasMap['Seat'], equals('12A')); // New
+      });
 
       test(
         'Given ticket with tags, When handling update with overlapping tags, '
@@ -366,40 +355,37 @@ void main() {
         },
       );
 
-      test(
-        'Given existing ticket, When updating (U) directly, '
-        'Then persists updated values',
-        () async {
-          // Arrange
-          final ticket = Ticket(
-            ticketId: 'CRUD003',
-            primaryText: 'Delhi → Agra',
-            secondaryText: 'UPSRTC',
-            startTime: DateTime(2024, 12, 17, 12, 30),
-            location: 'ISBT',
-            type: TicketType.bus,
-          );
-          await ticketDao.insertTicket(ticket);
+      test('Given existing ticket, When updating (U) directly, '
+          'Then persists updated values', () async {
+        // Arrange
+        final ticket = Ticket(
+          ticketId: 'CRUD003',
+          primaryText: 'Delhi → Agra',
+          secondaryText: 'UPSRTC',
+          startTime: DateTime(2024, 12, 17, 12, 30),
+          location: 'ISBT',
+          type: TicketType.bus,
+        );
+        await ticketDao.insertTicket(ticket);
 
-          // Act - Direct update via updateTicketById replaces
-          // specified fields in DB
-          // NOTE: In the new DAO, we pass a Ticket object.
-          const updatePayload = Ticket(
-            ticketId: 'CRUD003',
-            primaryText: 'Delhi → Jaipur', // Changed
-            secondaryText: 'UPSRTC', // Kept same
-            location: 'Kashmere Gate', // Changed
-            type: TicketType.bus,
-          );
+        // Act - Direct update via updateTicketById replaces
+        // specified fields in DB
+        // NOTE: In the new DAO, we pass a Ticket object.
+        const updatePayload = Ticket(
+          ticketId: 'CRUD003',
+          primaryText: 'Delhi → Jaipur', // Changed
+          secondaryText: 'UPSRTC', // Kept same
+          location: 'Kashmere Gate', // Changed
+          type: TicketType.bus,
+        );
 
-          await ticketDao.updateTicketById('CRUD003', updatePayload);
+        await ticketDao.updateTicketById('CRUD003', updatePayload);
 
-          // Assert
-          final retrieved = await ticketDao.getTicketById('CRUD003');
-          expect(retrieved!.primaryText, equals('Delhi → Jaipur'));
-          expect(retrieved.location, equals('Kashmere Gate'));
-        },
-      );
+        // Assert
+        final retrieved = await ticketDao.getTicketById('CRUD003');
+        expect(retrieved!.primaryText, equals('Delhi → Jaipur'));
+        expect(retrieved.location, equals('Kashmere Gate'));
+      });
 
       test(
         'Given existing ticket, When deleting (D), Then removes from database',
@@ -421,309 +407,302 @@ void main() {
         },
       );
 
-      test(
-        'Given multiple tickets, When reading all, '
-        'Then returns ordered by start_time DESC',
-        () async {
-          final tickets = [
-            Ticket(
-              ticketId: 'CRUD005',
-              primaryText: 'A',
-              secondaryText: '',
-              location: '',
-              startTime: DateTime(2024, 12, 15, 10),
-              type: TicketType.bus,
-            ),
-            Ticket(
-              ticketId: 'CRUD006',
-              primaryText: 'B',
-              secondaryText: '',
-              location: '',
-              startTime: DateTime(2024, 12, 16, 10),
-              type: TicketType.bus,
-            ), // Latest
-            Ticket(
-              ticketId: 'CRUD007',
-              primaryText: 'C',
-              secondaryText: '',
-              location: '',
-              startTime: DateTime(2024, 12, 14, 10),
-              type: TicketType.bus,
-            ),
-          ];
+      test('Given ticket with an original file, When deleting, '
+          'Then removes the file from disk', () async {
+        final originalFile = File('test/temp_dao_docs/CRUD005_original.pdf')
+          ..createSync(recursive: true)
+          ..writeAsBytesSync([1, 2, 3]);
 
-          for (final t in tickets) {
-            await ticketDao.insertTicket(t);
-          }
+        final ticket = Ticket(
+          ticketId: 'CRUD005',
+          primaryText: 'Kolkata → Siliguri',
+          startTime: DateTime(2024, 12, 18, 13, 30),
+          type: TicketType.bus,
+          originalFilePath: originalFile.path,
+        );
+        await ticketDao.insertTicket(ticket);
 
-          final allTickets = await ticketDao.getAllTickets();
-          final testTickets = allTickets
-              .where(
-                (t) => ['CRUD005', 'CRUD006', 'CRUD007'].contains(t.ticketId),
-              )
-              .toList();
+        await ticketDao.deleteTicket('CRUD005');
 
-          // Expect: Latest date first
-          expect(testTickets[0].ticketId, 'CRUD006');
-          expect(testTickets[1].ticketId, 'CRUD005');
-          expect(testTickets[2].ticketId, 'CRUD007');
-        },
-      );
+        expect(originalFile.existsSync(), isFalse);
+      });
+
+      test('Given multiple tickets, When reading all, '
+          'Then returns ordered by start_time DESC', () async {
+        final tickets = [
+          Ticket(
+            ticketId: 'CRUD005',
+            primaryText: 'A',
+            secondaryText: '',
+            location: '',
+            startTime: DateTime(2024, 12, 15, 10),
+            type: TicketType.bus,
+          ),
+          Ticket(
+            ticketId: 'CRUD006',
+            primaryText: 'B',
+            secondaryText: '',
+            location: '',
+            startTime: DateTime(2024, 12, 16, 10),
+            type: TicketType.bus,
+          ), // Latest
+          Ticket(
+            ticketId: 'CRUD007',
+            primaryText: 'C',
+            secondaryText: '',
+            location: '',
+            startTime: DateTime(2024, 12, 14, 10),
+            type: TicketType.bus,
+          ),
+        ];
+
+        for (final t in tickets) {
+          await ticketDao.insertTicket(t);
+        }
+
+        final allTickets = await ticketDao.getAllTickets();
+        final testTickets = allTickets
+            .where(
+              (t) => ['CRUD005', 'CRUD006', 'CRUD007'].contains(t.ticketId),
+            )
+            .toList();
+
+        // Expect: Latest date first
+        expect(testTickets[0].ticketId, 'CRUD006');
+        expect(testTickets[1].ticketId, 'CRUD005');
+        expect(testTickets[2].ticketId, 'CRUD007');
+      });
     });
 
     // -----------------------------------------------------------------------
     // 4. EDGE CASE TESTS
     // -----------------------------------------------------------------------
     group('Edge Cases', () {
-      test(
-        'Given ticket, When updating with NULL extras (via handleTicket),'
-        ' Then preserves existing extras',
-        () async {
-          // Arrange
-          final ticket = Ticket(
-            ticketId: 'EDGE001',
-            primaryText: 'Main',
-            secondaryText: '',
-            startTime: DateTime(2024, 12, 15, 10, 30),
-            location: '',
-            type: TicketType.bus,
-            extras: [ExtrasModel(title: 'Passenger', value: 'John Doe')],
-          );
-          await ticketDao.insertTicket(ticket);
+      test('Given ticket, When updating with NULL extras (via handleTicket),'
+          ' Then preserves existing extras', () async {
+        // Arrange
+        final ticket = Ticket(
+          ticketId: 'EDGE001',
+          primaryText: 'Main',
+          secondaryText: '',
+          startTime: DateTime(2024, 12, 15, 10, 30),
+          location: '',
+          type: TicketType.bus,
+          extras: [ExtrasModel(title: 'Passenger', value: 'John Doe')],
+        );
+        await ticketDao.insertTicket(ticket);
 
-          // Act - Update coming in with NO extras
-          const update = Ticket(
-            ticketId: 'EDGE001',
-            primaryText: '',
-            secondaryText: '',
-            location: 'Kashmere Gate',
-            type: TicketType.bus,
-          );
+        // Act - Update coming in with NO extras
+        const update = Ticket(
+          ticketId: 'EDGE001',
+          primaryText: '',
+          secondaryText: '',
+          location: 'Kashmere Gate',
+          type: TicketType.bus,
+        );
 
-          await ticketDao.handleTicket(update);
+        await ticketDao.handleTicket(update);
 
-          // Assert - Old extra remains
-          final retrieved = await ticketDao.getTicketById('EDGE001');
-          expect(retrieved!.extras!.length, equals(1));
-          expect(retrieved.extras!.first.value, 'John Doe');
-        },
-      );
+        // Assert - Old extra remains
+        final retrieved = await ticketDao.getTicketById('EDGE001');
+        expect(retrieved!.extras!.length, equals(1));
+        expect(retrieved.extras!.first.value, 'John Doe');
+      });
 
-      test(
-        'Given ticket, When updating with large payload, '
-        'Then handles successfully',
-        () async {
-          final ticket = Ticket(
-            ticketId: 'EDGE004',
-            primaryText: 'Large',
-            secondaryText: '',
-            startTime: DateTime(2024, 12, 15, 10, 30),
-            location: '',
-            type: TicketType.bus,
-          );
-          await ticketDao.insertTicket(ticket);
+      test('Given ticket, When updating with large payload, '
+          'Then handles successfully', () async {
+        final ticket = Ticket(
+          ticketId: 'EDGE004',
+          primaryText: 'Large',
+          secondaryText: '',
+          startTime: DateTime(2024, 12, 15, 10, 30),
+          location: '',
+          type: TicketType.bus,
+        );
+        await ticketDao.insertTicket(ticket);
 
-          // Act - Update with large object
-          final largeExtras = List.generate(
-            50,
-            (i) => ExtrasModel(title: 'Field$i', value: 'Value$i' * 10),
-          );
+        // Act - Update with large object
+        final largeExtras = List.generate(
+          50,
+          (i) => ExtrasModel(title: 'Field$i', value: 'Value$i' * 10),
+        );
 
-          // Use direct update to force writing this massive payload
-          final updatePayload = Ticket(
-            ticketId: 'EDGE004',
-            primaryText: 'Large',
-            secondaryText: '',
-            location: '',
-            type: TicketType.bus,
-            extras: largeExtras,
-          );
+        // Use direct update to force writing this massive payload
+        final updatePayload = Ticket(
+          ticketId: 'EDGE004',
+          primaryText: 'Large',
+          secondaryText: '',
+          location: '',
+          type: TicketType.bus,
+          extras: largeExtras,
+        );
 
-          await ticketDao.updateTicketById('EDGE004', updatePayload);
+        await ticketDao.updateTicketById('EDGE004', updatePayload);
 
-          // Assert
-          final retrieved = await ticketDao.getTicketById('EDGE004');
-          expect(retrieved!.extras!.length, equals(50));
-        },
-      );
+        // Assert
+        final retrieved = await ticketDao.getTicketById('EDGE004');
+        expect(retrieved!.extras!.length, equals(50));
+      });
     });
 
     // -----------------------------------------------------------------------
     // 5. ARCHIVE TESTS
     // -----------------------------------------------------------------------
     group('Archive Tests', () {
-      test(
-        'Given a future ticket, When inserting, '
-        'Then it lives in active list and not archived',
-        () async {
-          final ticket = Ticket(
-            ticketId: 'FUTURE001',
-            primaryText: 'A → B',
-            type: TicketType.bus,
-            startTime: DateTime.now().add(const Duration(days: 2)),
-          );
-          await ticketDao.insertTicket(ticket);
+      test('Given a future ticket, When inserting, '
+          'Then it lives in active list and not archived', () async {
+        final ticket = Ticket(
+          ticketId: 'FUTURE001',
+          primaryText: 'A → B',
+          type: TicketType.bus,
+          startTime: DateTime.now().add(const Duration(days: 2)),
+        );
+        await ticketDao.insertTicket(ticket);
 
-          expect(
-            (await ticketDao.getActiveTickets()).where(
-              (t) => t.ticketId == 'FUTURE001',
-            ),
-            hasLength(1),
-          );
-          expect(
-            (await ticketDao.getArchivedTickets()).where(
-              (t) => t.ticketId == 'FUTURE001',
-            ),
-            isEmpty,
-          );
-        },
-      );
+        expect(
+          (await ticketDao.getActiveTickets()).where(
+            (t) => t.ticketId == 'FUTURE001',
+          ),
+          hasLength(1),
+        );
+        expect(
+          (await ticketDao.getArchivedTickets()).where(
+            (t) => t.ticketId == 'FUTURE001',
+          ),
+          isEmpty,
+        );
+      });
 
-      test(
-        'Given a ticket with no start_time and no end_time, '
-        'When inserting, Then it stays in active list',
-        () async {
-          const ticket = Ticket(
-            ticketId: 'NO_TIME_001',
-            primaryText: 'A → B',
-            type: TicketType.bus,
-          );
-          await ticketDao.insertTicket(ticket);
+      test('Given a ticket with no start_time and no end_time, '
+          'When inserting, Then it stays in active list', () async {
+        const ticket = Ticket(
+          ticketId: 'NO_TIME_001',
+          primaryText: 'A → B',
+          type: TicketType.bus,
+        );
+        await ticketDao.insertTicket(ticket);
 
-          expect(
-            (await ticketDao.getActiveTickets()).where(
-              (t) => t.ticketId == 'NO_TIME_001',
-            ),
-            hasLength(1),
-          );
-          expect(
-            (await ticketDao.getArchivedTickets()).where(
-              (t) => t.ticketId == 'NO_TIME_001',
-            ),
-            isEmpty,
-          );
-        },
-      );
+        expect(
+          (await ticketDao.getActiveTickets()).where(
+            (t) => t.ticketId == 'NO_TIME_001',
+          ),
+          hasLength(1),
+        );
+        expect(
+          (await ticketDao.getArchivedTickets()).where(
+            (t) => t.ticketId == 'NO_TIME_001',
+          ),
+          isEmpty,
+        );
+      });
 
-      test(
-        'Given a mix of active tickets, '
-        'When archivePastTickets runs, '
-        'Then only past ones move to archived',
-        () async {
-          // Bypass auto-archive on insert by writing rows directly.
-          final db = await database.database;
-          final twoDaysAgo = DateTime.now()
-              .subtract(const Duration(days: 2))
-              .toIso8601String();
-          final inTwoDays = DateTime.now()
-              .add(const Duration(days: 2))
-              .toIso8601String();
+      test('Given a mix of active tickets, '
+          'When archivePastTickets runs, '
+          'Then only past ones move to archived', () async {
+        // Bypass auto-archive on insert by writing rows directly.
+        final db = await database.database;
+        final twoDaysAgo = DateTime.now()
+            .subtract(const Duration(days: 2))
+            .toIso8601String();
+        final inTwoDays = DateTime.now()
+            .add(const Duration(days: 2))
+            .toIso8601String();
 
-          await db.insert('tickets', {
-            'ticket_id': 'PAST_BULK_001',
-            'type': 'BUS',
-            'start_time': twoDaysAgo,
-          });
-          await db.insert('tickets', {
-            'ticket_id': 'FUTURE_BULK_001',
-            'type': 'BUS',
-            'start_time': inTwoDays,
-          });
-          await db.insert('tickets', {
-            'ticket_id': 'NULL_TIME_BULK_001',
-            'type': 'BUS',
-            // Intentionally null start_time / end_time.
-          });
+        await db.insert('tickets', {
+          'ticket_id': 'PAST_BULK_001',
+          'type': 'BUS',
+          'start_time': twoDaysAgo,
+        });
+        await db.insert('tickets', {
+          'ticket_id': 'FUTURE_BULK_001',
+          'type': 'BUS',
+          'start_time': inTwoDays,
+        });
+        await db.insert('tickets', {
+          'ticket_id': 'NULL_TIME_BULK_001',
+          'type': 'BUS',
+          // Intentionally null start_time / end_time.
+        });
 
-          final archivedCount = await ticketDao.archivePastTickets();
+        final archivedCount = await ticketDao.archivePastTickets();
 
-          expect(archivedCount, equals(1));
-          final archivedIds = (await ticketDao.getArchivedTickets())
-              .map((t) => t.ticketId)
-              .toSet();
-          expect(archivedIds, contains('PAST_BULK_001'));
-          expect(archivedIds, isNot(contains('FUTURE_BULK_001')));
-          expect(archivedIds, isNot(contains('NULL_TIME_BULK_001')));
-        },
-      );
+        expect(archivedCount, equals(1));
+        final archivedIds = (await ticketDao.getArchivedTickets())
+            .map((t) => t.ticketId)
+            .toSet();
+        expect(archivedIds, contains('PAST_BULK_001'));
+        expect(archivedIds, isNot(contains('FUTURE_BULK_001')));
+        expect(archivedIds, isNot(contains('NULL_TIME_BULK_001')));
+      });
 
-      test(
-        'Given an already-archived ticket, '
-        'When archivePastTickets runs again, '
-        'Then it is not re-archived',
-        () async {
-          final ticket = Ticket(
-            ticketId: 'PAST_IDEMPOTENT_001',
-            primaryText: 'A → B',
-            type: TicketType.bus,
-            startTime: DateTime.now().subtract(const Duration(days: 1)),
-          );
-          await ticketDao.insertTicket(ticket); // auto-archives
+      test('Given an already-archived ticket, '
+          'When archivePastTickets runs again, '
+          'Then it is not re-archived', () async {
+        final ticket = Ticket(
+          ticketId: 'PAST_IDEMPOTENT_001',
+          primaryText: 'A → B',
+          type: TicketType.bus,
+          startTime: DateTime.now().subtract(const Duration(days: 1)),
+        );
+        await ticketDao.insertTicket(ticket); // auto-archives
 
-          final secondRun = await ticketDao.archivePastTickets();
+        final secondRun = await ticketDao.archivePastTickets();
 
-          expect(secondRun, equals(0));
-        },
-      );
+        expect(secondRun, equals(0));
+      });
 
-      test(
-        'Given archived tickets older and newer than retention, '
-        'When purgeOldArchivedTickets runs, '
-        'Then only those older than retentionDays are deleted',
-        () async {
-          final db = await database.database;
-          // Old archive: 60 days ago.
-          await db.insert('tickets', {
-            'ticket_id': 'OLD_ARCHIVED_001',
-            'type': 'BUS',
-            'archived_at': DateTime.now()
-                .subtract(const Duration(days: 60))
-                .toIso8601String(),
-          });
-          // Recent archive: 5 days ago.
-          await db.insert('tickets', {
-            'ticket_id': 'RECENT_ARCHIVED_001',
-            'type': 'BUS',
-            'archived_at': DateTime.now()
-                .subtract(const Duration(days: 5))
-                .toIso8601String(),
-          });
+      test('Given archived tickets older and newer than retention, '
+          'When purgeOldArchivedTickets runs, '
+          'Then only those older than retentionDays are deleted', () async {
+        final db = await database.database;
+        // Old archive: 60 days ago.
+        await db.insert('tickets', {
+          'ticket_id': 'OLD_ARCHIVED_001',
+          'type': 'BUS',
+          'archived_at': DateTime.now()
+              .subtract(const Duration(days: 60))
+              .toIso8601String(),
+        });
+        // Recent archive: 5 days ago.
+        await db.insert('tickets', {
+          'ticket_id': 'RECENT_ARCHIVED_001',
+          'type': 'BUS',
+          'archived_at': DateTime.now()
+              .subtract(const Duration(days: 5))
+              .toIso8601String(),
+        });
 
-          final purged = await ticketDao.purgeOldArchivedTickets();
+        final purged = await ticketDao.purgeOldArchivedTickets();
 
-          expect(purged, equals(1));
-          final remaining = (await ticketDao.getArchivedTickets())
-              .map((t) => t.ticketId)
-              .toSet();
-          expect(remaining, contains('RECENT_ARCHIVED_001'));
-          expect(remaining, isNot(contains('OLD_ARCHIVED_001')));
-        },
-      );
+        expect(purged, equals(1));
+        final remaining = (await ticketDao.getArchivedTickets())
+            .map((t) => t.ticketId)
+            .toSet();
+        expect(remaining, contains('RECENT_ARCHIVED_001'));
+        expect(remaining, isNot(contains('OLD_ARCHIVED_001')));
+      });
 
-      test(
-        'Given retentionDays override, '
-        'When purgeOldArchivedTickets runs, '
-        'Then the override controls the cutoff',
-        () async {
-          final db = await database.database;
-          await db.insert('tickets', {
-            'ticket_id': 'TIGHT_RETENTION_001',
-            'type': 'BUS',
-            'archived_at': DateTime.now()
-                .subtract(const Duration(days: 3))
-                .toIso8601String(),
-          });
+      test('Given retentionDays override, '
+          'When purgeOldArchivedTickets runs, '
+          'Then the override controls the cutoff', () async {
+        final db = await database.database;
+        await db.insert('tickets', {
+          'ticket_id': 'TIGHT_RETENTION_001',
+          'type': 'BUS',
+          'archived_at': DateTime.now()
+              .subtract(const Duration(days: 3))
+              .toIso8601String(),
+        });
 
-          // Default 30-day retention should NOT purge a 3-day-old archive.
-          expect(await ticketDao.purgeOldArchivedTickets(), equals(0));
+        // Default 30-day retention should NOT purge a 3-day-old archive.
+        expect(await ticketDao.purgeOldArchivedTickets(), equals(0));
 
-          // 1-day retention SHOULD purge a 3-day-old archive.
-          expect(
-            await ticketDao.purgeOldArchivedTickets(retentionDays: 1),
-            equals(1),
-          );
-        },
-      );
+        // 1-day retention SHOULD purge a 3-day-old archive.
+        expect(
+          await ticketDao.purgeOldArchivedTickets(retentionDays: 1),
+          equals(1),
+        );
+      });
     });
 
     // -----------------------------------------------------------------------
@@ -738,20 +717,17 @@ void main() {
         expect(result, equals(-1));
       });
 
-      test(
-        'handleTicket returns -1 when ticketId is empty',
-        () async {
-          const orphan = Ticket(
-            ticketId: '',
-            primaryText: 'empty id',
-            type: TicketType.bus,
-          );
+      test('handleTicket returns -1 when ticketId is empty', () async {
+        const orphan = Ticket(
+          ticketId: '',
+          primaryText: 'empty id',
+          type: TicketType.bus,
+        );
 
-          final result = await ticketDao.handleTicket(orphan);
+        final result = await ticketDao.handleTicket(orphan);
 
-          expect(result, equals(-1));
-        },
-      );
+        expect(result, equals(-1));
+      });
 
       test(
         'getTicketsByType returns matching tickets ordered by start_time DESC',
@@ -883,10 +859,7 @@ void main() {
         final db = await database.database;
         await db.execute('DROP TABLE tickets;');
 
-        await expectLater(
-          ticketDao.deleteTicket('X'),
-          throwsA(isA<Object>()),
-        );
+        await expectLater(ticketDao.deleteTicket('X'), throwsA(isA<Object>()));
       });
     });
 
@@ -894,38 +867,35 @@ void main() {
     // 8. ERROR HANDLING
     // -----------------------------------------------------------------------
     group('Error Handling Tests', () {
-      test(
-        'Given invalid JSON in extras, When retrieving ticket, '
-        'Then throws exception',
-        () async {
-          // Arrange
-          final ticket = Ticket(
-            ticketId: 'ERROR001',
-            primaryText: 'Chennai',
-            secondaryText: '',
-            startTime: DateTime(2024, 12, 15, 10, 30),
-            location: '',
-            type: TicketType.bus,
-          );
-          await ticketDao.insertTicket(ticket);
+      test('Given invalid JSON in extras, When retrieving ticket, '
+          'Then throws exception', () async {
+        // Arrange
+        final ticket = Ticket(
+          ticketId: 'ERROR001',
+          primaryText: 'Chennai',
+          secondaryText: '',
+          startTime: DateTime(2024, 12, 15, 10, 30),
+          location: '',
+          type: TicketType.bus,
+        );
+        await ticketDao.insertTicket(ticket);
 
-          // Act - Manually corrupt DB
-          final db = await database.database;
-          await db.rawUpdate(
-            'UPDATE tickets SET extras = ? WHERE ticket_id = ?',
-            ['invalid json {', 'ERROR001'],
-          );
+        // Act - Manually corrupt DB
+        final db = await database.database;
+        await db.rawUpdate(
+          'UPDATE tickets SET extras = ? WHERE ticket_id = ?',
+          ['invalid json {', 'ERROR001'],
+        );
 
-          // Assert
-          await expectLater(
-            ticketDao.getTicketById('ERROR001'),
-            throwsA(isA<FormatException>()),
-          );
+        // Assert
+        await expectLater(
+          ticketDao.getTicketById('ERROR001'),
+          throwsA(isA<FormatException>()),
+        );
 
-          // Cleanup
-          await ticketDao.deleteTicket('ERROR001');
-        },
-      );
+        // Cleanup
+        await ticketDao.deleteTicket('ERROR001');
+      });
     });
   });
 }
