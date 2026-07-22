@@ -11,6 +11,7 @@ import 'package:namma_wallet/src/common/domain/models/tag_model.dart';
 import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 import 'package:namma_wallet/src/common/enums/ticket_type.dart';
 import 'package:namma_wallet/src/common/helper/date_time_converter.dart';
+import 'package:namma_wallet/src/common/helper/original_file_storage.dart';
 import 'package:namma_wallet/src/common/services/haptic/haptic_service_extension.dart';
 import 'package:namma_wallet/src/common/services/haptic/haptic_service_interface.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
@@ -334,6 +335,16 @@ class _TravelTicketViewState extends State<TravelTicketView> {
     }
   }
 
+  Future<void> _openOriginalFile(String fileName) async {
+    final filePath = await resolveOriginalFilePath(fileName);
+    if (!mounted) return;
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => OriginalFileViewerWidget(filePath: filePath),
+      ),
+    );
+  }
+
   Future<void> _shareTicket() async {
     setState(() {
       _isSharing = true;
@@ -459,13 +470,8 @@ class _TravelTicketViewState extends State<TravelTicketView> {
                 radius: 24,
                 backgroundColor: Theme.of(context).colorScheme.primary,
                 child: IconButton(
-                  onPressed: () => Navigator.of(context).push(
-                    MaterialPageRoute<void>(
-                      builder: (_) => OriginalFileViewerWidget(
-                        fileName: widget.ticket.originalFilePath!,
-                      ),
-                    ),
-                  ),
+                  onPressed: () =>
+                      _openOriginalFile(widget.ticket.originalFilePath!),
                   icon: const Icon(
                     Icons.description_outlined,
                     size: 20,
