@@ -120,7 +120,7 @@ class ImportService implements IImportService {
       // Parse using OCR blocks (preserves geometry for layout extraction)
       final parsedTicket = _travelParser.parseTicketFromBlocks(
         extractedBlocks,
-        sourceType: SourceType.pdf,
+        sourceType: SourceType.image,
       );
 
       if (parsedTicket == null) {
