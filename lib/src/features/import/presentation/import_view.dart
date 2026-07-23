@@ -36,6 +36,7 @@ class _ImportViewState extends State<ImportView> {
   bool _isPasting = false;
   bool _isScanning = false;
   bool _isProcessingPDF = false;
+  bool _isProcessingIMG = false;
   bool _isOpeningScanner = false;
   bool _isFetchingPNR = false;
 
@@ -202,6 +203,98 @@ class _ImportViewState extends State<ImportView> {
       if (mounted) {
         setState(() {
           _isProcessingPDF = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _handleIMGPick() async {
+    if (_isProcessingIMG) return;
+
+    try {
+      final result = await FilePicker.pickFiles(
+        type: FileType.image,
+        allowedExtensions: ['jpg', 'jpeg', 'png'],
+        withData: kIsWeb, // Ensure bytes are loaded on web
+      );
+
+      XFile? xFile;
+      if (result != null) {
+        setState(() {
+          _isProcessingIMG = true;
+        });
+
+        final platformFile = result.files.single;
+        if (kIsWeb && platformFile.bytes != null) {
+          xFile = XFile.fromData(
+            platformFile.bytes!,
+            name: platformFile.name,
+          );
+        } else if (platformFile.path != null) {
+          xFile = XFile(platformFile.path!);
+        } else {
+          _logger.warning('File picked but no bytes or path available');
+          if (mounted) {
+            showSnackbar(
+              context,
+              'Could not read the selected file. Please try again.',
+              isError: true,
+            );
+          }
+          return;
+        }
+      }
+
+      if (xFile != null) {
+        getIt<IHapticService>().triggerHaptic(
+          HapticType.selection,
+        );
+
+        // Use import service to handle PDF
+        // TODO: Implement image import handling in the import service
+        final ticket = await _importService.importAndSavePDFFile(xFile);
+
+        if (!mounted) return;
+
+        if (ticket != null) {
+          if (!kIsWeb && Platform.isAndroid) {
+            unawaited(
+              getIt<INotificationService>()
+                  .scheduleTicketReminderFor(ticket)
+                  .catchError((
+                    Object e,
+                    StackTrace s,
+                  ) {
+                    _logger.error('Error scheduling notification', e, s);
+                  }),
+            );
+          }
+          await _openImportedTicket(ticket);
+        } else {
+          showSnackbar(
+            context,
+            kIsWeb
+                ? 'PDF import is not supported on web for scanned/image-only '
+                      'tickets. Web currently supports SMS extraction only.'
+                : 'Unable to read text from this Image or content does'
+                      ' not match any supported ticket format.',
+            isError: true,
+          );
+        }
+      }
+    } on Exception catch (e) {
+      if (mounted) {
+        showSnackbar(
+          context,
+          'Error processing Image. Please try again.',
+          isError: true,
+        );
+      }
+      _logger.error('Image import error: $e');
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isProcessingIMG = false;
         });
       }
     }
@@ -472,6 +565,13 @@ class _ImportViewState extends State<ImportView> {
                 subtitle: 'Import from file',
                 onTap: _handlePDFPick,
                 isLoading: _isProcessingPDF,
+              ),
+              ImportMethodCardWidget(
+                icon: Icons.image_search,
+                title: 'Upload Image',
+                subtitle: 'Import from Device',
+                onTap: _handleIMGPick,
+                isLoading: _isProcessingIMG,
               ),
               ImportMethodCardWidget(
                 icon: Icons.qr_code_scanner,
