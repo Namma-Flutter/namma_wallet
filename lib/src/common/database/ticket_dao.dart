@@ -471,6 +471,19 @@ class TicketDao implements ITicketDAO {
 
       final db = await _database.database;
 
+      // Read the original file names for the rows about to be purged so
+      // their files can be cleaned up after the rows are deleted.
+      final purgedRows = await db.query(
+        'tickets',
+        columns: ['original_file_path'],
+        where: 'archived_at IS NOT NULL AND archived_at < ?',
+        whereArgs: [cutoff],
+      );
+      final originalFilePaths = purgedRows
+          .map((row) => row['original_file_path'] as String?)
+          .whereType<String>()
+          .toList();
+
       final count = await db.delete(
         'tickets',
         where: 'archived_at IS NOT NULL AND archived_at < ?',
@@ -479,6 +492,9 @@ class TicketDao implements ITicketDAO {
 
       if (count > 0) {
         _logger.logDatabase('Success', 'Purged $count old archived ticket(s)');
+        for (final fileName in originalFilePaths) {
+          await _deleteOriginalFile(fileName);
+        }
       } else {
         _logger.logDatabase('Info', 'No archived tickets to purge');
       }

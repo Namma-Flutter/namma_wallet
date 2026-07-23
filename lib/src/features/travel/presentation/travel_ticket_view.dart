@@ -338,7 +338,7 @@ class _TravelTicketViewState extends State<TravelTicketView> {
   Future<void> _openOriginalFile(String fileName) async {
     final filePath = await resolveOriginalFilePath(fileName);
     if (!mounted) return;
-    Navigator.of(context).push(
+    await Navigator.of(context).push(
       MaterialPageRoute<void>(
         builder: (_) => OriginalFileViewerWidget(filePath: filePath),
       ),
@@ -470,8 +470,9 @@ class _TravelTicketViewState extends State<TravelTicketView> {
                 radius: 24,
                 backgroundColor: Theme.of(context).colorScheme.primary,
                 child: IconButton(
-                  onPressed: () =>
-                      _openOriginalFile(widget.ticket.originalFilePath!),
+                  onPressed: () => unawaited(
+                    _openOriginalFile(widget.ticket.originalFilePath!),
+                  ),
                   icon: const Icon(
                     Icons.description_outlined,
                     size: 20,

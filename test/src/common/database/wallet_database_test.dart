@@ -750,6 +750,31 @@ void main() {
           equals(1),
         );
       });
+
+      test('Given an archived ticket with an original file, '
+          'When purgeOldArchivedTickets runs, '
+          'Then the file is removed from disk', () async {
+        const fileName = 'PURGE_ORIGINAL_001.pdf';
+        final originalFilePath = await resolveOriginalFilePath(fileName);
+        final originalFile = File(originalFilePath)
+          ..createSync(recursive: true)
+          ..writeAsBytesSync([1, 2, 3]);
+
+        final db = await database.database;
+        await db.insert('tickets', {
+          'ticket_id': 'PURGE_ORIGINAL_001',
+          'type': 'BUS',
+          'original_file_path': fileName,
+          'archived_at': DateTime.now()
+              .subtract(const Duration(days: 60))
+              .toIso8601String(),
+        });
+
+        final purged = await ticketDao.purgeOldArchivedTickets();
+
+        expect(purged, equals(1));
+        expect(originalFile.existsSync(), isFalse);
+      });
     });
 
     // -----------------------------------------------------------------------
