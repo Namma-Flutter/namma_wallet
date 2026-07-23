@@ -3,6 +3,7 @@ import 'package:namma_wallet/src/common/database/ticket_dao_interface.dart';
 import 'package:namma_wallet/src/common/domain/models/extras_model.dart';
 import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 import 'package:namma_wallet/src/common/enums/source_type.dart';
+import 'package:namma_wallet/src/common/services/image/image_service_interface.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
 import 'package:namma_wallet/src/common/services/pdf/pdf_service_interface.dart';
 import 'package:namma_wallet/src/features/import/application/import_service_interface.dart';
@@ -17,6 +18,7 @@ class ImportService implements IImportService {
   ImportService({
     required this._logger,
     required this._pdfService,
+    required this._imageService,
     required this._travelParser,
     required this._qrParser,
     required this._irctcScannerService,
@@ -28,6 +30,7 @@ class ImportService implements IImportService {
 
   final ILogger _logger;
   final IPDFService _pdfService;
+  final IImageService _imageService;
   final ITravelParser _travelParser;
   final IIRCTCQRParser _qrParser;
   final IIRCTCScannerService _irctcScannerService;
@@ -37,7 +40,11 @@ class ImportService implements IImportService {
   final ITicketDAO _ticketDao;
 
   @override
-  List<String> get supportedExtensions => const ['pdf', 'pkpass'];
+  List<String> get supportedExtensions => const [
+    'pdf',
+    'pkpass',
+    'jpg', 'jpeg', 'png',
+  ];
 
   @override
   bool isSupportedQRCode(String qrData) {
@@ -90,6 +97,58 @@ class ImportService implements IImportService {
       }
 
       _logger.error('Error importing PDF file', e, stackTrace);
+      return null;
+    }
+  }
+
+  @override
+  Future<Ticket?> importAndSaveImageFile(XFile imgFile) async {
+    // Use basename to avoid logging full path with sensitive directory info
+    final filename = imgFile.name;
+
+    try {
+      _logger.info('Importing Image file: $filename');
+
+      // Extract OCR blocks with geometry from Image
+      final extractedBlocks = await _imageService.extractBlocks(imgFile);
+
+      if (extractedBlocks.isEmpty) {
+        _logger.warning('No OCR blocks extracted from Image: $filename');
+        return null;
+      }
+
+      // Parse using OCR blocks (preserves geometry for layout extraction)
+      final parsedTicket = _travelParser.parseTicketFromBlocks(
+        extractedBlocks,
+        sourceType: SourceType.pdf,
+      );
+
+      if (parsedTicket == null) {
+        _logger.warning(
+          'Image content does not match any supported ticket format',
+        );
+        return null;
+      }
+
+      // Save the parsed ticket to the database
+      await _ticketDao.handleTicket(parsedTicket);
+
+      _logger.success(
+       'Successfully imported and saved Image ticket: ${parsedTicket.ticketId}',
+      );
+      return parsedTicket;
+    } on Object catch (e, stackTrace) {
+      // TODO(sreeram): check edge cases of image in web and mobile
+      // and handle accordingly
+      if (e is UnsupportedError) {
+        _logger.warning(
+          'Image import is not supported on web for this file: $filename. '
+          'Web currently supports SMS extraction only.',
+        );
+        return null;
+      }
+
+      _logger.error('Error importing Image file', e, stackTrace);
       return null;
     }
   }

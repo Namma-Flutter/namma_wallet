@@ -2,11 +2,11 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:ai_barcode_scanner/ai_barcode_scanner.dart';
-import 'package:cross_file/cross_file.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 import 'package:namma_wallet/src/common/routing/app_routes.dart';
@@ -36,7 +36,7 @@ class _ImportViewState extends State<ImportView> {
   bool _isPasting = false;
   bool _isScanning = false;
   bool _isProcessingPDF = false;
-  bool _isProcessingIMG = false;
+  bool _isProcessingImage = false;
   bool _isOpeningScanner = false;
   bool _isFetchingPNR = false;
 
@@ -208,79 +208,57 @@ class _ImportViewState extends State<ImportView> {
     }
   }
 
-  Future<void> _handleIMGPick() async {
-    if (_isProcessingIMG) return;
+  Future<void> _handleImagePick() async {
+    if (_isProcessingImage) return;
 
     try {
-      final result = await FilePicker.pickFiles(
-        type: FileType.image,
-        allowedExtensions: ['jpg', 'jpeg', 'png'],
-        withData: kIsWeb, // Ensure bytes are loaded on web
+
+      // Returns XFile Natively
+      final result = await ImagePicker().pickImage(
+        source: ImageSource.gallery,
       );
 
-      XFile? xFile;
-      if (result != null) {
-        setState(() {
-          _isProcessingIMG = true;
-        });
-
-        final platformFile = result.files.single;
-        if (kIsWeb && platformFile.bytes != null) {
-          xFile = XFile.fromData(
-            platformFile.bytes!,
-            name: platformFile.name,
-          );
-        } else if (platformFile.path != null) {
-          xFile = XFile(platformFile.path!);
-        } else {
-          _logger.warning('File picked but no bytes or path available');
-          if (mounted) {
-            showSnackbar(
-              context,
-              'Could not read the selected file. Please try again.',
-              isError: true,
-            );
-          }
-          return;
-        }
+      if (result == null) {
+        _logger.info('No Image selected');
+        return;
       }
 
-      if (xFile != null) {
-        getIt<IHapticService>().triggerHaptic(
-          HapticType.selection,
-        );
+      setState(() {
+        _isProcessingImage = true;
+      });
 
-        // Use import service to handle PDF
-        // TODO: Implement image import handling in the import service
-        final ticket = await _importService.importAndSavePDFFile(xFile);
+      getIt<IHapticService>().triggerHaptic(
+        HapticType.selection,
+      );
 
-        if (!mounted) return;
+      // Use import service to handle Image
+      final ticket = await _importService.importAndSaveImageFile(result);
 
-        if (ticket != null) {
-          if (!kIsWeb && Platform.isAndroid) {
-            unawaited(
-              getIt<INotificationService>()
-                  .scheduleTicketReminderFor(ticket)
-                  .catchError((
-                    Object e,
-                    StackTrace s,
-                  ) {
-                    _logger.error('Error scheduling notification', e, s);
-                  }),
-            );
-          }
-          await _openImportedTicket(ticket);
-        } else {
-          showSnackbar(
-            context,
-            kIsWeb
-                ? 'PDF import is not supported on web for scanned/image-only '
-                      'tickets. Web currently supports SMS extraction only.'
-                : 'Unable to read text from this Image or content does'
-                      ' not match any supported ticket format.',
-            isError: true,
+      if (!mounted) return;
+
+      if (ticket != null) {
+        if (!kIsWeb && Platform.isAndroid) {
+          unawaited(
+            getIt<INotificationService>()
+                .scheduleTicketReminderFor(ticket)
+                .catchError((Object e, StackTrace s) {
+              _logger.error('Error scheduling notification', e, s);
+            }),
           );
         }
+        await _openImportedTicket(ticket);
+      } else {
+        // TODO(sreeram): check the edge cases of image in web and mobile,
+        // and handle accordingly
+        showSnackbar(
+          context,
+          kIsWeb
+              ? 'Image import is not supported on web for scanned/image-only '
+                    'tickets. Web currently supports SMS extraction only.'
+              : 'Unable to read text from this Image or content does'
+                    ' not match any supported ticket format.',
+          isError: true,
+        );
       }
     } on Exception catch (e) {
       if (mounted) {
@@ -294,7 +272,7 @@ class _ImportViewState extends State<ImportView> {
     } finally {
       if (mounted) {
         setState(() {
-          _isProcessingIMG = false;
+          _isProcessingImage = false;
         });
       }
     }
@@ -570,8 +548,8 @@ class _ImportViewState extends State<ImportView> {
                 icon: Icons.image_search,
                 title: 'Upload Image',
                 subtitle: 'Import from Device',
-                onTap: _handleIMGPick,
-                isLoading: _isProcessingIMG,
+                onTap: _handleImagePick,
+                isLoading: _isProcessingImage,
               ),
               ImportMethodCardWidget(
                 icon: Icons.qr_code_scanner,
