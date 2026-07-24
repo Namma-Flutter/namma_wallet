@@ -31,4 +31,15 @@ abstract interface class IOCRService {
   ///
   /// Throws an exception if OCR extraction fails.
   Future<String> extractTextFromPDF(XFile pdfFile);
+
+  /// Extracts text blocks with geometric information directly from an Image.
+  ///
+  /// The raw image is fed directly into the vision engine while 
+  /// preserving spatial relationships (bounding boxes).
+  ///
+  /// Returns a list of [OCRBlock] objects ordered typically top-to-bottom,
+  /// left-to-right.
+  ///
+  /// Throws an exception if OCR extraction fails.
+  Future<List<OCRBlock>> extractBlocksFromImage(XFile image);
 }

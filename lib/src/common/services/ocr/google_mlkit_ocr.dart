@@ -38,7 +38,7 @@ class GoogleMLKitOCR implements IOCRService {
       for (var pageNum = 0; pageNum < doc.pages.length; pageNum++) {
         _logger.debug('[OCRService] Processing page ${pageNum + 1}...');
 
-        File? tempImageFile;
+        File? tempImage;
         try {
           // Get the page
           final page = doc.pages[pageNum];
@@ -66,20 +66,20 @@ class GoogleMLKitOCR implements IOCRService {
 
           // Save temporarily for ML Kit processing
           // Use timestamp to avoid conflicts between concurrent calls
-          tempImageFile = File(
+          tempImage = File(
             '${tempDir.path}/ocr_${DateTime.timestamp().microsecondsSinceEpoch}_'
             'page_${pageNum + 1}.png',
           );
 
-          await tempImageFile.writeAsBytes(pngBytes);
+          await tempImage.writeAsBytes(pngBytes);
 
           _logger.debug(
             '[OCRService] Page ${pageNum + 1} rendered to image: '
-            '${tempImageFile.path} (${pngBytes.length} bytes)',
+            '${tempImage.path} (${pngBytes.length} bytes)',
           );
 
           // Perform OCR on the image
-          final inputImage = InputImage.fromFile(tempImageFile);
+          final inputImage = InputImage.fromFile(tempImage);
           final recognizedText = await textRecognizer.processImage(inputImage);
 
           final startIndex = allBlocks.length;
@@ -114,9 +114,9 @@ class GoogleMLKitOCR implements IOCRService {
           );
         } finally {
           // Always clean up temporary file, even if an exception occurred
-          if (tempImageFile != null && tempImageFile.existsSync()) {
+          if (tempImage != null && tempImage.existsSync()) {
             try {
-              await tempImageFile.delete();
+              await tempImage.delete();
             } on Object catch (e) {
               _logger.debug('[OCRService] Failed to delete temp file: $e');
             }
@@ -162,5 +162,61 @@ class GoogleMLKitOCR implements IOCRService {
         .join('\n\n');
 
     return combinedText;
+  }
+
+  @override
+  Future<List<OCRBlock>> extractBlocksFromImage(XFile image) async {
+    TextRecognizer? textRecognizer;
+
+    try {
+      _logger.debug('[OCRService] Starting OCR extraction from Image');
+
+      textRecognizer = TextRecognizer();
+      final allBlocks = <OCRBlock>[];
+
+      // Convert XFile path directly to a native File for ML Kit
+      final file = File(image.path);
+      
+      if (!file.existsSync()) {
+        _logger.warning(
+          '[OCRService] Image file does not exist at path: ${image.path}'
+        );
+        return const [];
+      }
+
+      // Feed directly into Google ML Kit
+      final inputImage = InputImage.fromFile(file);
+      final recognizedText = await textRecognizer.processImage(inputImage);
+
+      // Extract blocks with geometry at the line level (matching PDF behavior)
+      for (final textBlock in recognizedText.blocks) {
+        for (final line in textBlock.lines) {
+          if (line.text.trim().isEmpty) continue;
+
+          allBlocks.add(
+            OCRBlock(
+              text: line.text.trim(),
+              boundingBox: line.boundingBox,
+              page: 0, // Always page 0 for a single image
+              confidence: line.confidence,
+            ),
+          );
+        }
+      }
+
+      _logger.debug(
+        '[OCRService] Image OCR complete: ${allBlocks.length} blocks extracted',
+      );
+
+      return allBlocks;
+    } on Object catch (e, stackTrace) {
+      _logger.error('[OCRService] Image OCR extraction failed', e, stackTrace);
+      rethrow;
+    } finally {
+      // Clean up the ML Kit text recognizer resource
+      if (textRecognizer != null) {
+        await textRecognizer.close();
+      }
+    }
   }
 }
