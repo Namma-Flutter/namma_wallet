@@ -112,6 +112,23 @@ class SharingIntentService implements ISharingIntentService {
           // Determine content type based on file extension
           final fileExtension = path.extension(filePath).toLowerCase();
 
+          if (attachment.type == SharedAttachmentType.image){
+            if (!_isSupportedImageFile(fileExtension)) {
+              _logger.warning(
+                'Skipping unsupported image file type: $fileExtension',
+              );
+              onError(
+                'Image file type $fileExtension is not supported. '
+                'Please share JPG, JPEG, or PNG images.',
+              );
+              continue;
+            }
+            // For images, pass the file path for OCR processing later
+            final content = filePath;
+            onContentReceived(content, SharedContentType.image);
+            continue;
+          }
+
           // Check if file type is supported
           if (fileExtension != '.pdf' &&
               fileExtension != '.pkpass' &&
@@ -153,6 +170,18 @@ class SharingIntentService implements ISharingIntentService {
     }
 
     _logger.info('END SHARING INTENT ANALYSIS');
+  }
+
+  /// Supported image file extensions (case-insensitive)
+  static const _supportedImageExtensions = {
+    '.jpg',
+    '.jpeg',
+    '.png',
+  };
+
+  /// Check if a file extension is a supported image type
+  bool _isSupportedImageFile(String extension) {
+    return _supportedImageExtensions.contains(extension.toLowerCase());
   }
 
   /// Supported text file extensions (case-insensitive)

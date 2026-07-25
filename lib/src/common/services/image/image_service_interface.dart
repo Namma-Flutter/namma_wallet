@@ -17,7 +17,7 @@ abstract interface class IImageService {
   /// Returns a list of [OCRBlock] objects containing text and bounding boxes.
   ///
   /// Throws an exception if extraction fails.
-  Future<List<OCRBlock>> extractBlocks(XFile img);
+  Future<List<OCRBlock>> extractBlocks(XFile image);
 
   /// Extracts structured data from an Image file.
   ///
@@ -28,5 +28,5 @@ abstract interface class IImageService {
   /// The exact fields depend on the document type.
   ///
   /// Throws an exception if extraction fails.
-  Future<Map<String, dynamic>> extractStructuredData(XFile img);
+  Future<Map<String, dynamic>> extractStructuredData(XFile image);
 }

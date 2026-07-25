@@ -121,6 +121,31 @@ class SharedContentProcessor implements ISharedContentProcessor {
         }
       }
 
+      if (contentType == SharedContentType.image) {
+        _logger.info('Processing Image file via SharedContentProcessor');
+        final ticket = await _importService.importAndSaveImageFile(
+          XFile(content),
+        );
+        if (ticket == null) {
+          return const ProcessingErrorResult(
+            message: 'Failed to process Image file',
+            error: 'Parser returned null',
+          );
+        }
+        final archived = shouldArchiveTicket(ticket);
+        // TODO(sreeram): check the ticket logic
+        return TicketCreatedResult(
+          pnrNumber: ticket.pnrOrId,
+          from: ticket.fromLocation,
+          to: ticket.toLocation,
+          fare: ticket.fare,
+          date: ticket.date,
+          ticketId: ticket.ticketId,
+          warning: archived ? archivedPastTicketMessage : null,
+          isArchived: archived,
+        );
+      }
+
       final sourceType = contentType == SharedContentType.pdf
           ? SourceType.pdf
           : SourceType.sms;
