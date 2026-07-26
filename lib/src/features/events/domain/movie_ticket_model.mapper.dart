@@ -34,6 +34,12 @@ class MovieTicketModelMapper extends ClassMapperBase<MovieTicketModel> {
     _$movieName,
     opt: true,
   );
+  static String? _$certificate(MovieTicketModel v) => v.certificate;
+  static const Field<MovieTicketModel, String> _f$certificate = Field(
+    'certificate',
+    _$certificate,
+    opt: true,
+  );
   static String? _$theatreName(MovieTicketModel v) => v.theatreName;
   static const Field<MovieTicketModel, String> _f$theatreName = Field(
     'theatreName',
@@ -93,6 +99,7 @@ class MovieTicketModelMapper extends ClassMapperBase<MovieTicketModel> {
   final MappableFields<MovieTicketModel> fields = const {
     #bookingId: _f$bookingId,
     #movieName: _f$movieName,
+    #certificate: _f$certificate,
     #theatreName: _f$theatreName,
     #screen: _f$screen,
     #seats: _f$seats,
@@ -108,6 +115,7 @@ class MovieTicketModelMapper extends ClassMapperBase<MovieTicketModel> {
     return MovieTicketModel(
       bookingId: data.dec(_f$bookingId),
       movieName: data.dec(_f$movieName),
+      certificate: data.dec(_f$certificate),
       theatreName: data.dec(_f$theatreName),
       screen: data.dec(_f$screen),
       seats: data.dec(_f$seats),
@@ -185,6 +193,7 @@ abstract class MovieTicketModelCopyWith<$R, $In extends MovieTicketModel, $Out>
   $R call({
     String? bookingId,
     String? movieName,
+    String? certificate,
     String? theatreName,
     String? screen,
     String? seats,
@@ -212,6 +221,7 @@ class _MovieTicketModelCopyWithImpl<$R, $Out>
   $R call({
     Object? bookingId = $none,
     Object? movieName = $none,
+    Object? certificate = $none,
     Object? theatreName = $none,
     Object? screen = $none,
     Object? seats = $none,
@@ -225,6 +235,7 @@ class _MovieTicketModelCopyWithImpl<$R, $Out>
     FieldCopyWithData({
       if (bookingId != $none) #bookingId: bookingId,
       if (movieName != $none) #movieName: movieName,
+      if (certificate != $none) #certificate: certificate,
       if (theatreName != $none) #theatreName: theatreName,
       if (screen != $none) #screen: screen,
       if (seats != $none) #seats: seats,
@@ -240,6 +251,7 @@ class _MovieTicketModelCopyWithImpl<$R, $Out>
   MovieTicketModel $make(CopyWithData data) => MovieTicketModel(
     bookingId: data.get(#bookingId, or: $value.bookingId),
     movieName: data.get(#movieName, or: $value.movieName),
+    certificate: data.get(#certificate, or: $value.certificate),
     theatreName: data.get(#theatreName, or: $value.theatreName),
     screen: data.get(#screen, or: $value.screen),
     seats: data.get(#seats, or: $value.seats),
