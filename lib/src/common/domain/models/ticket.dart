@@ -38,7 +38,9 @@ class Ticket with TicketMappable {
       ticketId: model.bookingId,
       primaryText: model.movieName,
       secondaryText: [
-        if (model.theatreName != null) model.theatreName,
+        if (model.theatreName != null) 
+          model.theatreName!.split(',').first.trim(),
+
         if (model.screen != null) 'Screen ${model.screen}',
       ].whereType<String>().join(' · '),
       startTime: model.showDateTime,
@@ -49,6 +51,8 @@ class Ticket with TicketMappable {
           TagModel(value: model.seats, icon: 'event_seat'),
         if (model.language.isNotNullOrEmpty)
           TagModel(value: model.language, icon: 'language'),
+        if (model.certificate.isNotNullOrEmpty)
+          TagModel(value: model.certificate, icon: 'grade'),
         if (model.format.isNotNullOrEmpty)
           TagModel(value: model.format, icon: 'movie'),
         if (model.price != null)
@@ -62,8 +66,12 @@ class Ticket with TicketMappable {
       extras: [
         if (model.bookingId.isNotNullOrEmpty)
           ExtrasModel(title: 'Booking ID', value: model.bookingId),
+        if (model.certificate.isNotNullOrEmpty)
+          ExtrasModel(title: 'Certificate', value: model.certificate),
         if (model.screen.isNotNullOrEmpty)
           ExtrasModel(title: 'Screen', value: model.screen),
+        if (model.seats.isNotNullOrEmpty)
+          ExtrasModel(title: 'Seats', value: model.seats),
         if (model.qrData.isNotNullOrEmpty)
           ExtrasModel(title: 'QR Data', value: model.qrData),
         ExtrasModel(title: 'Source Type', value: sourceType),

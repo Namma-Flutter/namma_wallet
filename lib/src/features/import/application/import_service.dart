@@ -6,6 +6,7 @@ import 'package:namma_wallet/src/common/enums/source_type.dart';
 import 'package:namma_wallet/src/common/services/image/image_service_interface.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
 import 'package:namma_wallet/src/common/services/pdf/pdf_service_interface.dart';
+import 'package:namma_wallet/src/features/events/application/event_parser_service.dart';
 import 'package:namma_wallet/src/features/import/application/import_service_interface.dart';
 import 'package:namma_wallet/src/features/irctc/application/irctc_qr_parser_interface.dart';
 import 'package:namma_wallet/src/features/irctc/application/irctc_scanner_service_interface.dart';
@@ -20,6 +21,7 @@ class ImportService implements IImportService {
     required this._pdfService,
     required this._imageService,
     required this._travelParser,
+    required this._eventParser,
     required this._qrParser,
     required this._irctcScannerService,
     required this._pkpassParser,
@@ -32,6 +34,7 @@ class ImportService implements IImportService {
   final IPDFService _pdfService;
   final IImageService _imageService;
   final ITravelParser _travelParser;
+  final EventParserService _eventParser;
   final IIRCTCQRParser _qrParser;
   final IIRCTCScannerService _irctcScannerService;
   final IPKPassParser _pkpassParser;
@@ -118,6 +121,13 @@ class ImportService implements IImportService {
       }
 
       // Parse using OCR blocks (preserves geometry for layout extraction)
+      final ticket = _eventParser.parseTicketFromBlocks(extractedBlocks);
+
+      if (ticket != null) {
+        await _ticketDao.handleTicket(ticket);
+        return ticket;
+      }
+
       final parsedTicket = _travelParser.parseTicketFromBlocks(
         extractedBlocks,
         sourceType: SourceType.image,

@@ -36,6 +36,7 @@ import 'package:namma_wallet/src/features/clipboard/application/clipboard_servic
 import 'package:namma_wallet/src/features/clipboard/application/clipboard_service_interface.dart';
 import 'package:namma_wallet/src/features/clipboard/data/clipboard_repository.dart';
 import 'package:namma_wallet/src/features/clipboard/domain/clipboard_repository_interface.dart';
+import 'package:namma_wallet/src/features/events/application/event_parser_service.dart';
 import 'package:namma_wallet/src/features/import/application/deep_link_service.dart';
 import 'package:namma_wallet/src/features/import/application/deep_link_service_interface.dart';
 import 'package:namma_wallet/src/features/import/application/import_service.dart';
@@ -115,6 +116,9 @@ void setupLocator() {
     ..registerLazySingleton<ITravelParser>(
       () => TravelParserService(logger: getIt<ILogger>()),
     )
+    ..registerLazySingleton<EventParserService>(
+      () => EventParserService(logger: getIt<ILogger>()),
+    )
     ..registerLazySingleton<ISharingIntentService>(
       () => kIsWeb
           ? WebSharingIntentService()
@@ -160,6 +164,7 @@ void setupLocator() {
         pdfService: getIt<IPDFService>(),
         imageService: getIt<IImageService>(),
         travelParser: getIt<ITravelParser>(),
+        eventParser: getIt<EventParserService>(),
         qrParser: getIt<IIRCTCQRParser>(),
         irctcScannerService: getIt<IIRCTCScannerService>(),
         pkpassParser: getIt<IPKPassParser>(),

@@ -7,22 +7,24 @@ class MovieTicketModel with MovieTicketModelMappable {
   const MovieTicketModel({
     this.bookingId,
     this.movieName,
+    this.certificate,
     this.theatreName,
     this.screen,
     this.seats,
     this.showDateTime,
     this.language,
-    this.format,        // 2D / 3D / IMAX
+    this.format,
     this.price,
-    this.provider,      // BookMyShow, PVR, INOX, District…
+    this.provider,
     this.qrData,
   });
 
   final String? bookingId;
   final String? movieName;
+  final String? certificate;
   final String? theatreName;
   final String? screen;
-  final String? seats;          // "A12, A13" or "F7"
+  final String? seats;
   final DateTime? showDateTime;
   final String? language;
   final String? format;
