@@ -18,6 +18,7 @@ Unlike Apple Wallet or Google Wallet, which support only specific formats, **Nam
 
 * **SMS Parsing** – Automatically extract tickets from TNSTC, IRCTC, and SETC SMS messages
 * **PDF Processing** – Parse TNSTC bus tickets from PDF files using Syncfusion PDF library
+* **Image Processing** - Parse District movie tickets from Images
 * **QR Code Scanning** – Scan IRCTC train ticket QR codes with full metadata extraction
 * **Clipboard Processing** – Read and parse travel ticket text from the clipboard
 
@@ -79,7 +80,7 @@ Passes that include a `webServiceURL` (e.g. Luma event passes) are automatically
 
 ### Prerequisites
 
-* **Flutter SDK** - 3.38.6 (managed via FVM)
+* **Flutter SDK** - 3.44.2 (managed via FVM)
 * **Android Studio** / **Xcode** - For mobile app development
 * **Xcode** - 16.4.0 (for iOS development)
 * **FVM** - Flutter Version Management (recommended)
@@ -123,8 +124,8 @@ cd namma_wallet
 # Install FVM (if not already installed)
 dart pub global activate fvm
 
-# Use Flutter 3.38.6 via FVM
-fvm use 3.38.6
+# Use Flutter 3.44.2 via FVM
+fvm use 3.44.2
 
 # Get dependencies
 fvm flutter pub get
