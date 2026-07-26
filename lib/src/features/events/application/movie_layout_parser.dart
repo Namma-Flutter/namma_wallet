@@ -15,34 +15,44 @@ abstract class MovieTicketParser {
     String imagePath
   );
 
-  Future<String?> extractQrFromImage(String imagePath) async {
-  final controller = MobileScannerController(
-    formats: [BarcodeFormat.qrCode], // District tickets are QR
-    autoStart: false,                // no camera needed
-  );
+  Future<String?> extractQrFromImage(String imagePath, ILogger logger) async {
 
-  try {
-    final capture = await controller.analyzeImage(
-      imagePath,
-      formats: [BarcodeFormat.qrCode],
+    if (imagePath.trim().isEmpty) {
+      logger.warning(
+        '[DistrictMovieParser] Empty image path for QR extraction'
+      );
+      return null;
+    }
+
+    final controller = MobileScannerController(
+      formats: [BarcodeFormat.qrCode], 
+      autoStart: false,                // no camera needed
     );
 
-    if (capture == null || capture.barcodes.isEmpty) return null;
+    try {
+      final capture = await controller.analyzeImage(
+        imagePath,
+        formats: [BarcodeFormat.qrCode],
+      );
 
-    for (final barcode in capture.barcodes) {
-      final raw = barcode.rawValue;
-      if (raw != null && raw.trim().isNotEmpty) {
-        return raw.trim();
+      if (capture == null || capture.barcodes.isEmpty) return null;
+
+      for (final barcode in capture.barcodes) {
+        final raw = barcode.rawValue;
+        if (raw != null && raw.trim().isNotEmpty) {
+          return raw.trim();
+        }
       }
+      return null;
+    } on Object {
+      logger.warning(
+        '[DistrictMovieParser] Failed to extract QR from image: $imagePath'
+      );
+      return null;
+    } finally {
+      await controller.dispose();
     }
-    return null;
-  } on Object {
-    // unsupported platform, bad file, no code found, etc.
-    return null;
-  } finally {
-    await controller.dispose();
   }
-}
 
   String get providerName;
 
@@ -83,7 +93,7 @@ class DistrictMovieParser extends MovieTicketParser {
     final language = _extractLanguage(plain);
     final format = _extractFormat(plain);
     final certificate = _extractCertificate(plain);
-    final qrData = await extractQrFromImage(imagePath);
+    final qrData = await extractQrFromImage(imagePath, logger);
 
     // Critical fields – never invent data
     if (movieName == null || showDateTime == null) {

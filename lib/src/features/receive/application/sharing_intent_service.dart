@@ -112,33 +112,17 @@ class SharingIntentService implements ISharingIntentService {
           // Determine content type based on file extension
           final fileExtension = path.extension(filePath).toLowerCase();
 
-          if (attachment.type == SharedAttachmentType.image){
-            if (!_isSupportedImageFile(fileExtension)) {
-              _logger.warning(
-                'Skipping unsupported image file type: $fileExtension',
-              );
-              onError(
-                'Image file type $fileExtension is not supported. '
-                'Please share JPG, JPEG, or PNG images.',
-              );
-              continue;
-            }
-            // For images, pass the file path for OCR processing later
-            final content = filePath;
-            onContentReceived(content, SharedContentType.image);
-            continue;
-          }
-
           // Check if file type is supported
           if (fileExtension != '.pdf' &&
               fileExtension != '.pkpass' &&
-              !_isSupportedTextFile(fileExtension)) {
+              !_isSupportedTextFile(fileExtension) &&
+              !_isSupportedImageFile(fileExtension)) {
             _logger.warning(
               'Skipping unsupported file type: $fileExtension',
             );
             onError(
               'File type $fileExtension is not supported. '
-              'Please share PDF, PKPASS or text files.',
+              'Please share PDF, PKPASS, text or image(PNG, JPG, JPEG) files.',
             );
             continue;
           }
@@ -147,7 +131,9 @@ class SharingIntentService implements ISharingIntentService {
               ? SharedContentType.pdf
               : (fileExtension == '.pkpass'
                     ? SharedContentType.pkpass
-                    : SharedContentType.sms);
+                    : ( _isSupportedImageFile(fileExtension)
+                          ? SharedContentType.image
+                          : SharedContentType.sms));
 
           final content = await extractContentFromFile(XFile(filePath));
           onContentReceived(content, contentType);
@@ -209,6 +195,10 @@ class SharingIntentService implements ISharingIntentService {
       final content = await _pdfService.extractTextForDisplay(file);
       _logger.info('Successfully extracted text from PDF');
       return content;
+    } else if (_isSupportedImageFile(fileExtension)) {
+      // For image files, return the file path (OCR would happen downstream)
+      _logger.info('Returning file path for image: ${file.path}');
+      return file.path;
     } else if (_isSupportedTextFile(fileExtension)) {
       // Read as text file
       _logger.info('Reading text file: ${file.path}');
@@ -226,7 +216,7 @@ class SharingIntentService implements ISharingIntentService {
       );
       throw UnsupportedError(
         'File type $fileExtension is not supported. '
-        'Supported types: PDF, TXT, SMS',
+        'Supported types: PDF, TXT, SMS, Image (JPG, JPEG, PNG) and PKPASS.',
       );
     }
   }
