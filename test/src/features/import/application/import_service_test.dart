@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+import 'dart:ui';
 
 import 'package:cross_file/cross_file.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -7,8 +8,10 @@ import 'package:namma_wallet/src/common/domain/models/extras_model.dart';
 import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 import 'package:namma_wallet/src/common/enums/source_type.dart';
 import 'package:namma_wallet/src/common/enums/ticket_type.dart';
+import 'package:namma_wallet/src/common/services/image/image_service.dart';
 import 'package:namma_wallet/src/common/services/ocr/ocr_block.dart';
 import 'package:namma_wallet/src/common/services/pdf/pdf_service_interface.dart';
+import 'package:namma_wallet/src/features/events/application/event_parser_service.dart';
 import 'package:namma_wallet/src/features/import/application/import_service.dart';
 import 'package:namma_wallet/src/features/irctc/application/irctc_qr_parser_interface.dart';
 import 'package:namma_wallet/src/features/irctc/application/irctc_scanner_service.dart';
@@ -47,6 +50,29 @@ class FakePDFService implements IPDFService {
   @override
   Future<Map<String, dynamic>> extractStructuredData(XFile file) async {
     return {};
+  }
+}
+
+class FakeImageService implements ImageService {
+  List<OCRBlock>? extractedBlocks;
+
+  @override
+  Future<List<OCRBlock>> extractBlocks(XFile image) async {
+    return extractedBlocks ?? [];
+  }
+
+}
+
+class FakeEventParser implements EventParserService {
+  Ticket? parsedTicket;
+
+  @override
+  Future<Ticket?> parseTicketFromBlocks(
+    List<OCRBlock> blocks,
+    String imagePath, {
+    SourceType? sourceType,
+  }) {
+    return Future.value(parsedTicket);
   }
 }
 
@@ -203,6 +229,8 @@ void main() {
     late ImportService importService;
     late FakeLogger fakeLogger;
     late FakePDFService fakePDFService;
+    late FakeImageService fakeImageService;
+    late FakeEventParser fakeEventParser;
     late FakeTravelParser fakeTravelParser;
     late FakeIRCTCQRParser fakeIRCTCQRParser;
     late FakeIRCTCScannerService fakeIRCTCScannerService;
@@ -214,6 +242,8 @@ void main() {
     setUp(() {
       fakeLogger = FakeLogger();
       fakePDFService = FakePDFService();
+      fakeImageService = FakeImageService();
+      fakeEventParser = FakeEventParser();
       fakeTravelParser = FakeTravelParser();
       fakeIRCTCQRParser = FakeIRCTCQRParser();
       fakeIRCTCScannerService = FakeIRCTCScannerService();
@@ -224,6 +254,8 @@ void main() {
       importService = ImportService(
         logger: fakeLogger,
         pdfService: fakePDFService,
+        imageService: fakeImageService,
+        eventParser: fakeEventParser,
         travelParser: fakeTravelParser,
         qrParser: fakeIRCTCQRParser,
         irctcScannerService: fakeIRCTCScannerService,
@@ -453,6 +485,55 @@ void main() {
         fakeTravelParser.parsedTicket = parsed;
 
         final result = await importService.importAndSavePDFFile(XFile(path));
+
+        expect(result, equals(parsed));
+        expect(fakeTicketDAO.handledTicket, equals(parsed));
+      });
+    });
+
+    group('importAndSaveImageFile', () {
+      const path = 'test/assets/some.jpg';
+
+      test('returns null when no OCR blocks are extracted', () async {
+        fakeImageService.extractedBlocks = [];
+
+        final result = await importService.importAndSaveImageFile(XFile(path));
+
+        expect(result, isNull);
+        expect(fakeTicketDAO.handledTicket, isNull);
+      });
+
+      test('returns null when parser cannot interpret the blocks', () async {
+        fakeImageService.extractedBlocks = [
+          OCRBlock(
+            text: 'some text', 
+            boundingBox: const Rect.fromLTRB(0, 0, 100, 100), 
+            page: 0
+          ),
+        ];
+        fakeEventParser.parsedTicket = null;
+
+        final result = await importService.importAndSaveImageFile(XFile(path));
+
+        expect(result, isNull);
+      });
+
+      test('saves and returns parsed ticket on success', () async {
+        fakeImageService.extractedBlocks = [
+          OCRBlock(
+            text: 'some text', 
+            boundingBox: const Rect.fromLTRB(0, 0, 100, 100), 
+            page: 0
+          ),
+        ];
+        const parsed = Ticket(
+          ticketId: 'NWBYNF',
+          primaryText: 'Movie',
+          type: TicketType.event,
+        );
+        fakeEventParser.parsedTicket = parsed;
+
+        final result = await importService.importAndSaveImageFile(XFile(path));
 
         expect(result, equals(parsed));
         expect(fakeTicketDAO.handledTicket, equals(parsed));

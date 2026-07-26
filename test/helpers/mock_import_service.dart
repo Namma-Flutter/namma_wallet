@@ -14,6 +14,11 @@ class MockImportService implements IImportService {
   }
 
   @override
+  Future<Ticket?> importAndSaveImageFile(XFile imageFile) async {
+    return null;
+  }
+
+  @override
   Future<TicketImportResult> importAndSavePKPassFile(XFile pkpassFile) async {
     importedFiles.add(pkpassFile);
     return TicketImportResult(ticket: mockTicket);
@@ -35,5 +40,9 @@ class MockImportService implements IImportService {
   }
 
   @override
-  List<String> get supportedExtensions => ['pdf', 'pkpass'];
+  List<String> get supportedExtensions => [
+    'pdf',
+    'pkpass',
+    'jpg', 'jpeg', 'png',
+  ];
 }
