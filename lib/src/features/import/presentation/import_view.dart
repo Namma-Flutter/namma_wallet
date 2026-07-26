@@ -248,14 +248,10 @@ class _ImportViewState extends State<ImportView> {
         }
         await _openImportedTicket(ticket);
       } else {
-        // TODO(sreeram): check the edge cases of image in web and mobile,
         // and handle accordingly
         showSnackbar(
           context,
-          kIsWeb
-              ? 'Image import is not supported on web for scanned/image-only '
-                    'tickets. Web currently supports SMS extraction only.'
-              : 'Unable to read text from this Image or content does'
+          'Unable to read text from this Image or content does'
                     ' not match any supported ticket format.',
           isError: true,
         );
@@ -544,7 +540,7 @@ class _ImportViewState extends State<ImportView> {
                 onTap: _handlePDFPick,
                 isLoading: _isProcessingPDF,
               ),
-              ImportMethodCardWidget(
+              if (!kIsWeb) ImportMethodCardWidget(
                 icon: Icons.image_search,
                 title: 'Upload Image',
                 subtitle: 'Import from Device',

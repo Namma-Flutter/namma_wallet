@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
-import 'package:namma_wallet/src/common/services/image/image_service_interface.dart';
+import 'package:namma_wallet/src/common/services/image/image_service.dart';
 import 'package:namma_wallet/src/common/services/ocr/ocr_block.dart';
 import 'package:namma_wallet/src/common/services/pdf/pdf_service_interface.dart';
 import 'package:namma_wallet/src/common/widgets/rounded_back_button.dart';
@@ -30,7 +30,7 @@ class OCRDebugView extends StatefulWidget {
 
 class _OCRDebugViewState extends State<OCRDebugView> {
   final IPDFService _pdfService = getIt<IPDFService>();
-  final IImageService _imageService = getIt<IImageService>();
+  final ImageService _imageService = getIt<ImageService>();
   List<OCRBlock>? _ocrBlocks;
   bool _isLoadingPDF = false;
   bool _isLoadingImage = false;

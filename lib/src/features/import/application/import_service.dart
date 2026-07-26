@@ -3,7 +3,7 @@ import 'package:namma_wallet/src/common/database/ticket_dao_interface.dart';
 import 'package:namma_wallet/src/common/domain/models/extras_model.dart';
 import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 import 'package:namma_wallet/src/common/enums/source_type.dart';
-import 'package:namma_wallet/src/common/services/image/image_service_interface.dart';
+import 'package:namma_wallet/src/common/services/image/image_service.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
 import 'package:namma_wallet/src/common/services/pdf/pdf_service_interface.dart';
 import 'package:namma_wallet/src/features/events/application/event_parser_service.dart';
@@ -32,7 +32,7 @@ class ImportService implements IImportService {
 
   final ILogger _logger;
   final IPDFService _pdfService;
-  final IImageService _imageService;
+  final ImageService _imageService;
   final ITravelParser _travelParser;
   final EventParserService _eventParser;
   final IIRCTCQRParser _qrParser;
@@ -148,16 +148,6 @@ class ImportService implements IImportService {
       );
       return parsedTicket;
     } on Object catch (e, stackTrace) {
-      // TODO(sreeram): check edge cases of image in web and mobile
-      // and handle accordingly
-      if (e is UnsupportedError) {
-        _logger.warning(
-          'Image import is not supported on web for this file: $filename. '
-          'Web currently supports SMS extraction only.',
-        );
-        return null;
-      }
-
       _logger.error('Error importing Image file', e, stackTrace);
       return null;
     }

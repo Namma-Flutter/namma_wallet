@@ -12,7 +12,6 @@ import 'package:namma_wallet/src/common/services/archive/archive_service_interfa
 import 'package:namma_wallet/src/common/services/haptic/haptic_service_interface.dart';
 import 'package:namma_wallet/src/common/services/haptic/haptic_services.dart';
 import 'package:namma_wallet/src/common/services/image/image_service.dart';
-import 'package:namma_wallet/src/common/services/image/image_service_interface.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
 import 'package:namma_wallet/src/common/services/logger/namma_logger.dart';
 import 'package:namma_wallet/src/common/services/notification/reminder_preferences_service.dart';
@@ -91,7 +90,7 @@ void setupLocator() {
         logger: getIt<ILogger>(),
       ),
     )
-    ..registerLazySingleton<IImageService>(
+    ..registerLazySingleton<ImageService>(
       () => ImageService(
         ocrService: getIt<IOCRService>(),
         logger: getIt<ILogger>(),
@@ -162,7 +161,7 @@ void setupLocator() {
       () => ImportService(
         logger: getIt<ILogger>(),
         pdfService: getIt<IPDFService>(),
-        imageService: getIt<IImageService>(),
+        imageService: getIt<ImageService>(),
         travelParser: getIt<ITravelParser>(),
         eventParser: getIt<EventParserService>(),
         qrParser: getIt<IIRCTCQRParser>(),
