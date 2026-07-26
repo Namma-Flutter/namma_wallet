@@ -15,7 +15,6 @@ class EventParserService {
   final ILogger _logger;
   final List<MovieTicketParser> _parsers;
 
-
   Future<Ticket?> parseTicketFromBlocks(
     List<OCRBlock> blocks,
     String imagePath, {

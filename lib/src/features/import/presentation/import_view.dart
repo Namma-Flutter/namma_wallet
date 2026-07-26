@@ -212,7 +212,6 @@ class _ImportViewState extends State<ImportView> {
     if (_isProcessingImage) return;
 
     try {
-
       // Returns XFile Natively
       final result = await ImagePicker().pickImage(
         source: ImageSource.gallery,
@@ -242,8 +241,8 @@ class _ImportViewState extends State<ImportView> {
             getIt<INotificationService>()
                 .scheduleTicketReminderFor(ticket)
                 .catchError((Object e, StackTrace s) {
-              _logger.error('Error scheduling notification', e, s);
-            }),
+                  _logger.error('Error scheduling notification', e, s);
+                }),
           );
         }
         await _openImportedTicket(ticket);
@@ -252,7 +251,7 @@ class _ImportViewState extends State<ImportView> {
         showSnackbar(
           context,
           'Unable to read text from this Image or content does'
-                    ' not match any supported ticket format.',
+          ' not match any supported ticket format.',
           isError: true,
         );
       }
@@ -540,13 +539,14 @@ class _ImportViewState extends State<ImportView> {
                 onTap: _handlePDFPick,
                 isLoading: _isProcessingPDF,
               ),
-              if (!kIsWeb) ImportMethodCardWidget(
-                icon: Icons.image_search,
-                title: 'Upload Image',
-                subtitle: 'Import from Device',
-                onTap: _handleImagePick,
-                isLoading: _isProcessingImage,
-              ),
+              if (!kIsWeb)
+                ImportMethodCardWidget(
+                  icon: Icons.image_search,
+                  title: 'Upload Image',
+                  subtitle: 'Import from Device',
+                  onTap: _handleImagePick,
+                  isLoading: _isProcessingImage,
+                ),
               ImportMethodCardWidget(
                 icon: Icons.qr_code_scanner,
                 title: 'Scan QR',

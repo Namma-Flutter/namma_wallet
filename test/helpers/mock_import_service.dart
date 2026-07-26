@@ -43,6 +43,8 @@ class MockImportService implements IImportService {
   List<String> get supportedExtensions => [
     'pdf',
     'pkpass',
-    'jpg', 'jpeg', 'png',
+    'jpg',
+    'jpeg',
+    'png',
   ];
 }

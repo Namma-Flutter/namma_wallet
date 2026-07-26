@@ -46,7 +46,9 @@ class ImportService implements IImportService {
   List<String> get supportedExtensions => const [
     'pdf',
     'pkpass',
-    'jpg', 'jpeg', 'png',
+    'jpg',
+    'jpeg',
+    'png',
   ];
 
   @override
@@ -123,7 +125,7 @@ class ImportService implements IImportService {
       // Parse using OCR blocks (preserves geometry for layout extraction)
       final ticket = await _eventParser.parseTicketFromBlocks(
         extractedBlocks,
-        imgFile.path
+        imgFile.path,
       );
 
       if (ticket != null) {
@@ -147,7 +149,8 @@ class ImportService implements IImportService {
       await _ticketDao.handleTicket(parsedTicket);
 
       _logger.success(
-       'Successfully imported and saved Image ticket: ${parsedTicket.ticketId}',
+        'Successfully imported and saved '
+        'Image ticket: ${parsedTicket.ticketId}',
       );
       return parsedTicket;
     } on Object catch (e, stackTrace) {

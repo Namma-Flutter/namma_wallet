@@ -131,7 +131,7 @@ class SharingIntentService implements ISharingIntentService {
               ? SharedContentType.pdf
               : (fileExtension == '.pkpass'
                     ? SharedContentType.pkpass
-                    : ( _isSupportedImageFile(fileExtension)
+                    : (_isSupportedImageFile(fileExtension)
                           ? SharedContentType.image
                           : SharedContentType.sms));
 

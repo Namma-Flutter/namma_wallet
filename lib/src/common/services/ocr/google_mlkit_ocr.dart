@@ -176,10 +176,10 @@ class GoogleMLKitOCR implements IOCRService {
 
       // Convert XFile path directly to a native File for ML Kit
       final file = File(image.path);
-      
+
       if (!file.existsSync()) {
         _logger.warning(
-          '[OCRService] Image file does not exist at path: ${image.path}'
+          '[OCRService] Image file does not exist at path: ${image.path}',
         );
         return const [];
       }

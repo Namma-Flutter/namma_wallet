@@ -278,7 +278,7 @@ class _OCRDebugViewState extends State<OCRDebugView> {
                   onPressed: _isLoadingImage ? null : _pickAndProcessImage,
                   icon: const Icon(Icons.image_search),
                   label: Text(
-                    _isLoadingImage ? 'Processing...' : 'Upload Image'
+                    _isLoadingImage ? 'Processing...' : 'Upload Image',
                   ),
                 ),
                 if (_fileName != null)

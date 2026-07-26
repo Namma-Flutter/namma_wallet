@@ -60,7 +60,6 @@ class FakeImageService implements ImageService {
   Future<List<OCRBlock>> extractBlocks(XFile image) async {
     return extractedBlocks ?? [];
   }
-
 }
 
 class FakeEventParser implements EventParserService {
@@ -506,9 +505,9 @@ void main() {
       test('returns null when parser cannot interpret the blocks', () async {
         fakeImageService.extractedBlocks = [
           OCRBlock(
-            text: 'some text', 
-            boundingBox: const Rect.fromLTRB(0, 0, 100, 100), 
-            page: 0
+            text: 'some text',
+            boundingBox: const Rect.fromLTRB(0, 0, 100, 100),
+            page: 0,
           ),
         ];
         fakeEventParser.parsedTicket = null;
@@ -521,9 +520,9 @@ void main() {
       test('saves and returns parsed ticket on success', () async {
         fakeImageService.extractedBlocks = [
           OCRBlock(
-            text: 'some text', 
-            boundingBox: const Rect.fromLTRB(0, 0, 100, 100), 
-            page: 0
+            text: 'some text',
+            boundingBox: const Rect.fromLTRB(0, 0, 100, 100),
+            page: 0,
           ),
         ];
         const parsed = Ticket(

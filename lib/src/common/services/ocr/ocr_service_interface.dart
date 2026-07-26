@@ -34,7 +34,7 @@ abstract interface class IOCRService {
 
   /// Extracts text blocks with geometric information directly from an Image.
   ///
-  /// The raw image is fed directly into the vision engine while 
+  /// The raw image is fed directly into the vision engine while
   /// preserving spatial relationships (bounding boxes).
   ///
   /// Returns a list of [OCRBlock] objects ordered typically top-to-bottom,

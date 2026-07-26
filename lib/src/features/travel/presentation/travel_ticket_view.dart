@@ -938,9 +938,10 @@ class _TravelTicketViewState extends State<TravelTicketView> {
                   ),
                   child: Center(
                     child: QrImageView(
-                      data: qrPayload(widget.ticket) 
-                        ?? widget.ticket.pnrOrId 
-                        ?? 'xxx',
+                      data:
+                          qrPayload(widget.ticket) ??
+                          widget.ticket.pnrOrId ??
+                          'xxx',
                       size: 200,
                       eyeStyle: QrEyeStyle(
                         eyeShape: QrEyeShape.square,

@@ -8,7 +8,6 @@ import 'district/trahkmr.dart' as trahkmr_fixture;
 /// Barrel class providing access to all District layout fixtures.
 /// Each fixture is split into its own file under the district/ directory.
 class DistrictLayoutFixtures {
-
   static final List<OCRBlock> trahkmr = trahkmr_fixture.trahkmr;
   static const Map<String, Object?> trahkmrExpected =
       trahkmr_fixture.trahkmrExpected;
@@ -16,5 +15,4 @@ class DistrictLayoutFixtures {
   static final List<OCRBlock> tdahhpy = tdahhpy_fixture.tdahhpy;
   static const Map<String, Object?> tdahhpyExpected =
       tdahhpy_fixture.tdahhpyExpected;
-  
-} 
+}

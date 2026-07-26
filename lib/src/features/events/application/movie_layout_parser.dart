@@ -6,27 +6,25 @@ import 'package:namma_wallet/src/common/services/ocr/ocr_block.dart';
 import 'package:namma_wallet/src/features/events/domain/movie_ticket_model.dart';
 
 abstract class MovieTicketParser {
-  
   bool canParse(String text);
 
   /// Parse ticket from OCR blocks
   Future<Ticket?> parseTicketFromBlocks(
-    List<OCRBlock> blocks, 
-    String imagePath
+    List<OCRBlock> blocks,
+    String imagePath,
   );
 
   Future<String?> extractQrFromImage(String imagePath, ILogger logger) async {
-
     if (imagePath.trim().isEmpty) {
       logger.warning(
-        '[DistrictMovieParser] Empty image path for QR extraction'
+        '[DistrictMovieParser] Empty image path for QR extraction',
       );
       return null;
     }
 
     final controller = MobileScannerController(
-      formats: [BarcodeFormat.qrCode], 
-      autoStart: false,                // no camera needed
+      formats: [BarcodeFormat.qrCode],
+      autoStart: false, // no camera needed
     );
 
     try {
@@ -46,7 +44,7 @@ abstract class MovieTicketParser {
       return null;
     } on Object {
       logger.warning(
-        '[DistrictMovieParser] Failed to extract QR from image: $imagePath'
+        '[DistrictMovieParser] Failed to extract QR from image: $imagePath',
       );
       return null;
     } finally {
@@ -55,7 +53,6 @@ abstract class MovieTicketParser {
   }
 
   String get providerName;
-
 }
 
 /// Parses District (by Zomato) movie ticket screenshots / images.
@@ -70,14 +67,13 @@ class DistrictMovieParser extends MovieTicketParser {
   bool canParse(String text) {
     final lower = text.toLowerCase();
     return lower.contains('district') &&
-        (lower.contains('zomato') ||
-            lower.contains('#seeyouthere'));
+        (lower.contains('zomato') || lower.contains('#seeyouthere'));
   }
 
   @override
   Future<Ticket?> parseTicketFromBlocks(
     List<OCRBlock> blocks,
-    String imagePath
+    String imagePath,
   ) async {
     final extractor = LayoutExtractor(blocks);
     final plain = extractor.toPlainText();
@@ -126,7 +122,8 @@ class DistrictMovieParser extends MovieTicketParser {
 
   String? _extractBookingId(LayoutExtractor extractor, String plain) {
     // Layout: "Booking ID: TRAHKMR"
-    final fromKey = extractor.findValueForKey('Booking ID') ??
+    final fromKey =
+        extractor.findValueForKey('Booking ID') ??
         extractor.findValueForKey('Booking Id');
     if (fromKey != null && fromKey.trim().isNotEmpty) {
       return fromKey.trim().replaceAll(RegExp(r'\s'), '');
@@ -172,8 +169,10 @@ class DistrictMovieParser extends MovieTicketParser {
         r'\b(English|Hindi|Tamil|Telugu|Malayalam|Kannada|Marathi)\b',
         caseSensitive: false,
       ).hasMatch(t);
-      final isFormat = RegExp(r'\b(2D|3D|IMAX|4DX)\b', caseSensitive: false)
-          .hasMatch(t);
+      final isFormat = RegExp(
+        r'\b(2D|3D|IMAX|4DX)\b',
+        caseSensitive: false,
+      ).hasMatch(t);
 
       if (isCertificate || isLang || isFormat || lower.contains('|')) {
         if (certificateBlock == null ||
@@ -197,17 +196,18 @@ class DistrictMovieParser extends MovieTicketParser {
     }
 
     // ── 3. Collect all blocks strictly between header and certificate ───────
-    final titleBlocks = blocks.where((b) {
-      final cy = b.centerY;
-      // Strictly below header, strictly above certificate row
-      return cy > headerBottom && cy < certificateTop;
-    }).toList()
-      // Reading order: top → bottom, then left → right
-      ..sort((a, b) {
-        final y = a.boundingBox.top.compareTo(b.boundingBox.top);
-        if (y != 0) return y;
-        return a.boundingBox.left.compareTo(b.boundingBox.left);
-      });
+    final titleBlocks =
+        blocks.where((b) {
+            final cy = b.centerY;
+            // Strictly below header, strictly above certificate row
+            return cy > headerBottom && cy < certificateTop;
+          }).toList()
+          // Reading order: top → bottom, then left → right
+          ..sort((a, b) {
+            final y = a.boundingBox.top.compareTo(b.boundingBox.top);
+            if (y != 0) return y;
+            return a.boundingBox.left.compareTo(b.boundingBox.left);
+          });
 
     if (titleBlocks.isEmpty) {
       return _extractMovieNameFallback(blocks);
@@ -233,7 +233,8 @@ class DistrictMovieParser extends MovieTicketParser {
   String? _extractTheatre(LayoutExtractor extractor, String plain) {
     // Often appears as a full address line near the bottom:
     // "PVR VR Mall, Anna Nagar, Chennai"
-    final fromKey = extractor.findValueForKey('Cinema') ??
+    final fromKey =
+        extractor.findValueForKey('Cinema') ??
         extractor.findValueForKey('Theatre') ??
         extractor.findValueForKey('Theater');
     if (fromKey != null && fromKey.trim().isNotEmpty) return fromKey.trim();
@@ -248,11 +249,14 @@ class DistrictMovieParser extends MovieTicketParser {
 
   String? _extractScreen(LayoutExtractor extractor, String plain) {
     // District always uses "AUDI 02" style – match that first
-    final audi = RegExp(r'\bAUDI\s*0*(\d+)\b', caseSensitive: false)
-        .firstMatch(plain);
+    final audi = RegExp(
+      r'\bAUDI\s*0*(\d+)\b',
+      caseSensitive: false,
+    ).firstMatch(plain);
     if (audi != null) return 'AUDI ${audi.group(1)}';
 
-    final fromKey = extractor.findValueForKey('Screen') ??
+    final fromKey =
+        extractor.findValueForKey('Screen') ??
         extractor.findValueForKey('Audi') ??
         extractor.findValueForKey('AUDI');
     if (fromKey != null) {
@@ -268,8 +272,8 @@ class DistrictMovieParser extends MovieTicketParser {
 
   String? _extractSeats(LayoutExtractor extractor, String plain) {
     // "PR - F1, F2, F3"  (class + seat list)
-    final fromKey = extractor.findValueForKey('Seat') ??
-        extractor.findValueForKey('Seats');
+    final fromKey =
+        extractor.findValueForKey('Seat') ?? extractor.findValueForKey('Seats');
     if (fromKey != null && fromKey.trim().isNotEmpty) return fromKey.trim();
 
     // Pattern: optional class (PR/CL/…) then seat codes
@@ -356,18 +360,29 @@ class DistrictMovieParser extends MovieTicketParser {
 
   int? _monthFromName(String name) {
     const map = {
-      'jan': 1, 'january': 1,
-      'feb': 2, 'february': 2,
-      'mar': 3, 'march': 3,
-      'apr': 4, 'april': 4,
+      'jan': 1,
+      'january': 1,
+      'feb': 2,
+      'february': 2,
+      'mar': 3,
+      'march': 3,
+      'apr': 4,
+      'april': 4,
       'may': 5,
-      'jun': 6, 'june': 6,
-      'jul': 7, 'july': 7,
-      'aug': 8, 'august': 8,
-      'sep': 9, 'september': 9,
-      'oct': 10, 'october': 10,
-      'nov': 11, 'november': 11,
-      'dec': 12, 'december': 12,
+      'jun': 6,
+      'june': 6,
+      'jul': 7,
+      'july': 7,
+      'aug': 8,
+      'august': 8,
+      'sep': 9,
+      'september': 9,
+      'oct': 10,
+      'october': 10,
+      'nov': 11,
+      'november': 11,
+      'dec': 12,
+      'december': 12,
     };
     return map[name.toLowerCase()];
   }
@@ -426,5 +441,4 @@ class DistrictMovieParser extends MovieTicketParser {
   bool _looksLikeTitle(String t) {
     return RegExp(r"^[A-Za-z0-9][A-Za-z0-9\s\-:&'.]+$").hasMatch(t);
   }
-
 }

@@ -133,7 +133,7 @@ class SharedContentProcessor implements ISharedContentProcessor {
           );
         }
         final archived = shouldArchiveTicket(ticket);
-        // TODO(sreeram): check the ticket logic
+        // TODO(sreeram): Create a new result format for Event tickets
         return TicketCreatedResult(
           pnrNumber: ticket.pnrOrId,
           from: ticket.fromLocation,

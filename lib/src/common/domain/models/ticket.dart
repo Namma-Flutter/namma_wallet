@@ -32,13 +32,13 @@ class Ticket with TicketMappable {
 
   factory Ticket.fromMovie(
     MovieTicketModel model, {
-      String sourceType = 'IMAGE',
+    String sourceType = 'IMAGE',
   }) {
     return Ticket(
       ticketId: model.bookingId,
       primaryText: model.movieName,
       secondaryText: [
-        if (model.theatreName != null) 
+        if (model.theatreName != null)
           model.theatreName!.split(',').first.trim(),
 
         if (model.screen != null) 'Screen ${model.screen}',
