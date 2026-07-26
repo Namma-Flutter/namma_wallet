@@ -16,10 +16,11 @@ class EventParserService {
   final List<MovieTicketParser> _parsers;
 
 
-  Ticket? parseTicketFromBlocks(
-    List<OCRBlock> blocks, {
+  Future<Ticket?> parseTicketFromBlocks(
+    List<OCRBlock> blocks,
+    String imagePath, {
     SourceType? sourceType,
-  }) {
+  }) async {
     try {
       // Convert blocks to text for canParse check
       final extractor = LayoutExtractor(blocks);
@@ -38,7 +39,7 @@ class EventParserService {
               '${parser.providerName} parser (layout-based)',
             );
 
-          final ticket = parser.parseTicketFromBlocks(blocks);
+          final ticket = await parser.parseTicketFromBlocks(blocks, imagePath);
           if (ticket == null) {
             _logger.warning(
               '[EventParserService] ${parser.providerName} parser '

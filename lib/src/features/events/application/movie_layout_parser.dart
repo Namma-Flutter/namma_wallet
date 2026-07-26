@@ -1,3 +1,4 @@
+import 'package:ai_barcode_scanner/ai_barcode_scanner.dart';
 import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
 import 'package:namma_wallet/src/common/services/ocr/layout_extractor.dart';
@@ -9,7 +10,39 @@ abstract class MovieTicketParser {
   bool canParse(String text);
 
   /// Parse ticket from OCR blocks
-  Ticket? parseTicketFromBlocks(List<OCRBlock> blocks);
+  Future<Ticket?> parseTicketFromBlocks(
+    List<OCRBlock> blocks, 
+    String imagePath
+  );
+
+  Future<String?> extractQrFromImage(String imagePath) async {
+  final controller = MobileScannerController(
+    formats: [BarcodeFormat.qrCode], // District tickets are QR
+    autoStart: false,                // no camera needed
+  );
+
+  try {
+    final capture = await controller.analyzeImage(
+      imagePath,
+      formats: [BarcodeFormat.qrCode],
+    );
+
+    if (capture == null || capture.barcodes.isEmpty) return null;
+
+    for (final barcode in capture.barcodes) {
+      final raw = barcode.rawValue;
+      if (raw != null && raw.trim().isNotEmpty) {
+        return raw.trim();
+      }
+    }
+    return null;
+  } on Object {
+    // unsupported platform, bad file, no code found, etc.
+    return null;
+  } finally {
+    await controller.dispose();
+  }
+}
 
   String get providerName;
 
@@ -32,7 +65,10 @@ class DistrictMovieParser extends MovieTicketParser {
   }
 
   @override
-  Ticket? parseTicketFromBlocks(List<OCRBlock> blocks) {
+  Future<Ticket?> parseTicketFromBlocks(
+    List<OCRBlock> blocks,
+    String imagePath
+  ) async {
     final extractor = LayoutExtractor(blocks);
     final plain = extractor.toPlainText();
 
@@ -47,6 +83,7 @@ class DistrictMovieParser extends MovieTicketParser {
     final language = _extractLanguage(plain);
     final format = _extractFormat(plain);
     final certificate = _extractCertificate(plain);
+    final qrData = await extractQrFromImage(imagePath);
 
     // Critical fields – never invent data
     if (movieName == null || showDateTime == null) {
@@ -67,7 +104,7 @@ class DistrictMovieParser extends MovieTicketParser {
       language: language,
       format: format,
       provider: providerName,
-      
+      qrData: qrData,
     );
 
     return Ticket.fromMovie(

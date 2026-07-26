@@ -97,6 +97,16 @@ class _TravelTicketViewState extends State<TravelTicketView> {
     return cleaned;
   }
 
+  String? qrPayload(Ticket ticket) {
+    return ticket.extras
+        ?.where((e) => e.title == 'QR Data')
+        .map((e) => e.value)
+        .firstWhere(
+          (v) => v != null && v.trim().isNotEmpty,
+          orElse: () => null,
+        );
+  }
+
   Future<void> _callConductor(String phoneNumber) async {
     final dialable = phoneNumber.replaceAll(RegExp(r'[^\d+]'), '');
     if (dialable.isEmpty) {
@@ -928,7 +938,9 @@ class _TravelTicketViewState extends State<TravelTicketView> {
                   ),
                   child: Center(
                     child: QrImageView(
-                      data: widget.ticket.pnrOrId ?? 'xxx',
+                      data: qrPayload(widget.ticket) 
+                        ?? widget.ticket.pnrOrId 
+                        ?? 'xxx',
                       size: 200,
                       eyeStyle: QrEyeStyle(
                         eyeShape: QrEyeShape.square,

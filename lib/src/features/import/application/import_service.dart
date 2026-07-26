@@ -121,7 +121,10 @@ class ImportService implements IImportService {
       }
 
       // Parse using OCR blocks (preserves geometry for layout extraction)
-      final ticket = _eventParser.parseTicketFromBlocks(extractedBlocks);
+      final ticket = await _eventParser.parseTicketFromBlocks(
+        extractedBlocks,
+        imgFile.path
+      );
 
       if (ticket != null) {
         await _ticketDao.handleTicket(ticket);
