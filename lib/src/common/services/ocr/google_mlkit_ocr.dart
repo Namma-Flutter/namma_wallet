@@ -181,10 +181,7 @@ class GoogleMLKitOCR implements IOCRService {
         _logger.warning(
           '[OCRService] Image file does not exist at path: ${image.path}',
         );
-        throw FileSystemException(
-          'Image file does not exist',
-          image.path,
-        );
+        throw FileSystemException('Image file does not exist');
       }
 
       // Feed directly into Google ML Kit
