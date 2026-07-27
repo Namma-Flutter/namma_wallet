@@ -108,11 +108,7 @@ void main() {
         ];
         // If your parser requires movieName, this should be null
         final ticket = await parser.parseTicketFromBlocks(blocks, '');
-        // Adjust expectation to match your failure policy
-        if (ticket != null) {
-          expect(ticket.primaryText, isNot('district'));
-          expect(ticket.primaryText, isNot('distrizt'));
-        }
+        expect(ticket, isNull);
       });
     });
   });

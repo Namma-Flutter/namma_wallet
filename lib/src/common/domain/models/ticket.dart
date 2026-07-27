@@ -37,12 +37,14 @@ class Ticket with TicketMappable {
     return Ticket(
       ticketId: model.bookingId,
       primaryText: model.movieName,
-      secondaryText: [
-        if (model.theatreName != null)
-          model.theatreName!.split(',').first.trim(),
-
-        if (model.screen != null) 'Screen ${model.screen}',
-      ].whereType<String>().join(' · '),
+      secondaryText: () {
+        final parts = [
+          if (model.theatreName != null)
+            model.theatreName!.split(',').first.trim(),
+          if (model.screen != null) 'Screen ${model.screen}',
+        ].whereType<String>().join(' · ');
+        return parts.isEmpty ? null : parts;
+      }(),
       startTime: model.showDateTime,
       location: model.theatreName,
       type: TicketType.event,
