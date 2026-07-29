@@ -11,6 +11,7 @@ import 'package:namma_wallet/src/common/domain/models/tag_model.dart';
 import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 import 'package:namma_wallet/src/common/enums/ticket_type.dart';
 import 'package:namma_wallet/src/common/helper/date_time_converter.dart';
+import 'package:namma_wallet/src/common/helper/original_file_storage.dart';
 import 'package:namma_wallet/src/common/services/haptic/haptic_service_extension.dart';
 import 'package:namma_wallet/src/common/services/haptic/haptic_service_interface.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
@@ -23,6 +24,7 @@ import 'package:namma_wallet/src/common/widgets/rounded_back_button.dart';
 import 'package:namma_wallet/src/common/widgets/snackbar_widget.dart';
 import 'package:namma_wallet/src/common/widgets/ticket_reminder_config_dialog.dart';
 import 'package:namma_wallet/src/features/home/domain/ticket_extensions.dart';
+import 'package:namma_wallet/src/features/travel/presentation/widgets/original_file_viewer_widget.dart';
 import 'package:namma_wallet/src/features/travel/presentation/widgets/travel_row_widget.dart';
 import 'package:namma_wallet/src/features/travel/presentation/widgets/travel_ticket_shape_line.dart';
 import 'package:path_provider/path_provider.dart';
@@ -182,9 +184,7 @@ class _TravelTicketViewState extends State<TravelTicketView> {
     );
 
     if (mounted && (confirmed ?? false)) {
-      getIt<IHapticService>().triggerHaptic(
-        HapticType.selection,
-      );
+      getIt<IHapticService>().triggerHaptic(HapticType.selection);
       await _deleteTicket();
     }
   }
@@ -224,10 +224,8 @@ class _TravelTicketViewState extends State<TravelTicketView> {
   Future<void> _showReminderConfigDialog() async {
     final result = await showDialog<bool>(
       context: context,
-      builder: (context) => TicketReminderConfigDialog(
-        ticket: widget.ticket,
-        context: context,
-      ),
+      builder: (context) =>
+          TicketReminderConfigDialog(ticket: widget.ticket, context: context),
     );
 
     if ((result ?? false) && mounted) {
@@ -268,9 +266,7 @@ class _TravelTicketViewState extends State<TravelTicketView> {
         final hapticService = getIt<IHapticService>();
 
         showSnackbar(context, 'Ticket deleted successfully');
-        hapticService.triggerHaptic(
-          HapticType.success,
-        );
+        hapticService.triggerHaptic(HapticType.success);
 
         // Check if we can pop (normal navigation) or need to
         // go home (deep link)
@@ -297,9 +293,7 @@ class _TravelTicketViewState extends State<TravelTicketView> {
 
         showSnackbar(context, 'Failed to delete ticket: $e', isError: true);
 
-        hapticService.triggerHaptic(
-          HapticType.error,
-        );
+        hapticService.triggerHaptic(HapticType.error);
       }
     } finally {
       if (mounted) {
@@ -339,6 +333,16 @@ class _TravelTicketViewState extends State<TravelTicketView> {
         stackTrace,
       );
     }
+  }
+
+  Future<void> _openOriginalFile(String fileName) async {
+    final filePath = await resolveOriginalFilePath(fileName);
+    if (!mounted) return;
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => OriginalFileViewerWidget(filePath: filePath),
+      ),
+    );
   }
 
   Future<void> _shareTicket() async {
@@ -460,6 +464,25 @@ class _TravelTicketViewState extends State<TravelTicketView> {
             ),
           ),
           const SizedBox(width: 8),
+          if (widget.ticket.originalFilePath != null)
+            Center(
+              child: CircleAvatar(
+                radius: 24,
+                backgroundColor: Theme.of(context).colorScheme.primary,
+                child: IconButton(
+                  onPressed: () => unawaited(
+                    _openOriginalFile(widget.ticket.originalFilePath!),
+                  ),
+                  icon: const Icon(
+                    Icons.description_outlined,
+                    size: 20,
+                    color: Colors.white,
+                  ),
+                  tooltip: 'View original file',
+                ),
+              ),
+            ),
+          const SizedBox(width: 8),
           if (widget.ticket.ticketId != null)
             Center(
               child: CircleAvatar(
@@ -573,9 +596,7 @@ class _TravelTicketViewState extends State<TravelTicketView> {
                             child: Text(
                               widget.ticket.secondaryText ?? '',
                               style: Paragraph03(
-                                color: Theme.of(
-                                  context,
-                                ).colorScheme.onSurface,
+                                color: Theme.of(context).colorScheme.onSurface,
                               ).regular,
                               overflow: TextOverflow.ellipsis,
                               maxLines: 2,
@@ -610,9 +631,7 @@ class _TravelTicketViewState extends State<TravelTicketView> {
                               ),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.black.withValues(
-                                    alpha: 0.05,
-                                  ),
+                                  color: Colors.black.withValues(alpha: 0.05),
                                   blurRadius: 4,
                                   offset: const Offset(0, 2),
                                 ),
@@ -623,9 +642,7 @@ class _TravelTicketViewState extends State<TravelTicketView> {
                                 Icon(
                                   Icons.trip_origin,
                                   size: 20,
-                                  color: Theme.of(
-                                    context,
-                                  ).colorScheme.primary,
+                                  color: Theme.of(context).colorScheme.primary,
                                 ),
                                 const SizedBox(width: 12),
                                 Expanded(
@@ -647,18 +664,13 @@ class _TravelTicketViewState extends State<TravelTicketView> {
                           // Arrow
                           Center(
                             child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 8,
-                              ),
+                              padding: const EdgeInsets.symmetric(vertical: 8),
                               child: Icon(
                                 Icons.arrow_downward_rounded,
                                 size: 24,
-                                color:
-                                    Theme.of(
-                                      context,
-                                    ).colorScheme.primary.withValues(
-                                      alpha: 0.6,
-                                    ),
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.primary.withValues(alpha: 0.6),
                               ),
                             ),
                           ),
@@ -680,9 +692,7 @@ class _TravelTicketViewState extends State<TravelTicketView> {
                               ),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.black.withValues(
-                                    alpha: 0.05,
-                                  ),
+                                  color: Colors.black.withValues(alpha: 0.05),
                                   blurRadius: 4,
                                   offset: const Offset(0, 2),
                                 ),
@@ -693,9 +703,7 @@ class _TravelTicketViewState extends State<TravelTicketView> {
                                 Icon(
                                   Icons.location_on,
                                   size: 20,
-                                  color: Theme.of(
-                                    context,
-                                  ).colorScheme.primary,
+                                  color: Theme.of(context).colorScheme.primary,
                                 ),
                                 const SizedBox(width: 12),
                                 Expanded(
@@ -725,9 +733,7 @@ class _TravelTicketViewState extends State<TravelTicketView> {
                           Text(
                             widget.ticket.primaryText ?? '',
                             style: Paragraph01(
-                              color: Theme.of(
-                                context,
-                              ).colorScheme.onSurface,
+                              color: Theme.of(context).colorScheme.onSurface,
                             ).semiBold,
                             overflow: TextOverflow.ellipsis,
                             maxLines: 3,
@@ -803,9 +809,7 @@ class _TravelTicketViewState extends State<TravelTicketView> {
                     ],
 
                     ...() {
-                      final filteredExtras = getFilteredExtras(
-                        widget.ticket,
-                      );
+                      final filteredExtras = getFilteredExtras(widget.ticket);
                       if (filteredExtras.isEmpty) return <Widget>[];
 
                       return <Widget>[
@@ -826,13 +830,10 @@ class _TravelTicketViewState extends State<TravelTicketView> {
                                       Text(
                                         filteredExtras[i].title ?? '-',
                                         style: Paragraph03(
-                                          color:
-                                              Theme.of(
-                                                    context,
-                                                  ).colorScheme.onSurface
-                                                  .withValues(
-                                                    alpha: 0.7,
-                                                  ),
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSurface
+                                              .withValues(alpha: 0.7),
                                         ).regular,
                                       ),
                                       const SizedBox(height: 4),
@@ -859,13 +860,10 @@ class _TravelTicketViewState extends State<TravelTicketView> {
                                         Text(
                                           filteredExtras[i + 1].title ?? '-',
                                           style: Paragraph03(
-                                            color:
-                                                Theme.of(
-                                                      context,
-                                                    ).colorScheme.onSurface
-                                                    .withValues(
-                                                      alpha: 0.7,
-                                                    ),
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .onSurface
+                                                .withValues(alpha: 0.7),
                                           ).regular,
                                         ),
                                         const SizedBox(height: 4),
@@ -897,10 +895,9 @@ class _TravelTicketViewState extends State<TravelTicketView> {
                 size: Size(MediaQuery.of(context).size.width * 0.95, 40),
                 painter: TravelTicketShapeLine(
                   backgroundColor: Theme.of(context).colorScheme.surface,
-                  dashedLineColor: Theme.of(context).colorScheme.onSurface
-                      .withValues(
-                        alpha: 0.3,
-                      ),
+                  dashedLineColor: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withValues(alpha: 0.3),
                 ),
               ),
               if (widget.ticket.hasPnrOrId)
