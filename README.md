@@ -1,7 +1,7 @@
 # 👜 Namma Wallet
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-11-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-12-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 **Namma Wallet** is an open-source Flutter mobile application for managing digital travel tickets and passes. The app provides a unified interface to save, organise, and view tickets from multiple sources, including SMS, PDFs, QR codes, and clipboard text. It features intelligent parsing for Indian transport providers and generates beautiful digital ticket designs.
@@ -343,6 +343,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/KeerthiVasan-ai"><img src="https://avatars.githubusercontent.com/u/97495357?v=4?s=100" width="100px;" alt="Keerthivasan S"/><br /><sub><b>Keerthivasan S</b></sub></a><br /><a href="https://github.com/Namma-Flutter/namma_wallet/commits?author=KeerthiVasan-ai" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/prasanna6801"><img src="https://avatars.githubusercontent.com/u/59863680?v=4?s=100" width="100px;" alt="Soma Prasanna M"/><br /><sub><b>Soma Prasanna M</b></sub></a><br /><a href="https://github.com/Namma-Flutter/namma_wallet/commits?author=prasanna6801" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/vsaravananc"><img src="https://avatars.githubusercontent.com/u/227516234?v=4?s=100" width="100px;" alt="Saravanan v"/><br /><sub><b>Saravanan v</b></sub></a><br /><a href="https://github.com/Namma-Flutter/namma_wallet/commits?author=vsaravananc" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/iashok22"><img src="https://avatars.githubusercontent.com/u/2089695?v=4?s=100" width="100px;" alt="Ashokkumar"/><br /><sub><b>Ashokkumar</b></sub></a><br /><a href="https://github.com/Namma-Flutter/namma_wallet/commits?author=iashok22" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>
