@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui';
 
@@ -8,6 +9,7 @@ import 'package:namma_wallet/src/common/domain/models/extras_model.dart';
 import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 import 'package:namma_wallet/src/common/enums/source_type.dart';
 import 'package:namma_wallet/src/common/enums/ticket_type.dart';
+import 'package:namma_wallet/src/common/helper/original_file_storage.dart';
 import 'package:namma_wallet/src/common/services/image/image_service.dart';
 import 'package:namma_wallet/src/common/services/ocr/ocr_block.dart';
 import 'package:namma_wallet/src/common/services/pdf/pdf_service_interface.dart';
@@ -23,8 +25,18 @@ import 'package:namma_wallet/src/features/tnstc/domain/tnstc_model.dart';
 import 'package:namma_wallet/src/features/travel/application/pkpass_parser_interface.dart';
 import 'package:namma_wallet/src/features/travel/application/travel_parser_interface.dart';
 import 'package:namma_wallet/src/features/travel/domain/ticket_update_info.dart';
+import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
+import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
 import '../../../../helpers/fake_logger.dart';
+
+class FakePathProvider extends PathProviderPlatform
+    with MockPlatformInterfaceMixin {
+  @override
+  Future<String?> getApplicationDocumentsPath() async {
+    return 'test/temp_import_docs';
+  }
+}
 
 class FakePDFService implements IPDFService {
   String? extractedText;
@@ -224,6 +236,8 @@ class FakeTNSTCApiTicketParser extends TNSTCApiTicketParser {
 }
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
   group('ImportService', () {
     late ImportService importService;
     late FakeLogger fakeLogger;
@@ -237,8 +251,15 @@ void main() {
     late FakeTNSTCPNRFetcher fakeTNSTCPNRFetcher;
     late FakeTNSTCApiTicketParser fakeTNSTCApiTicketParser;
     late FakeTicketDAO fakeTicketDAO;
+    late Directory tempDocs;
 
     setUp(() {
+      PathProviderPlatform.instance = FakePathProvider();
+      tempDocs = Directory('test/temp_import_docs');
+      if (!tempDocs.existsSync()) {
+        tempDocs.createSync(recursive: true);
+      }
+
       fakeLogger = FakeLogger();
       fakePDFService = FakePDFService();
       fakeImageService = FakeImageService();
@@ -263,6 +284,12 @@ void main() {
         tnstcApiTicketParser: fakeTNSTCApiTicketParser,
         ticketDao: fakeTicketDAO,
       );
+    });
+
+    tearDown(() {
+      if (tempDocs.existsSync()) {
+        tempDocs.deleteSync(recursive: true);
+      }
     });
 
     final testIrctcTicket = IRCTCTicket(
@@ -488,6 +515,36 @@ void main() {
         expect(result, equals(parsed));
         expect(fakeTicketDAO.handledTicket, equals(parsed));
       });
+
+      test(
+        'persists a copy of the original file and attaches its path',
+        () async {
+          final sourceFile = File('test/temp_import_docs/source.pdf')
+            ..createSync(recursive: true)
+            ..writeAsBytesSync([1, 2, 3]);
+
+          fakePDFService.extractedText = 'plain text';
+          const parsed = Ticket(
+            ticketId: 'PDF002',
+            primaryText: 'A → B',
+            type: TicketType.bus,
+          );
+          fakeTravelParser.parsedTicket = parsed;
+
+          final result = await importService.importAndSavePDFFile(
+            XFile(sourceFile.path),
+          );
+
+          expect(result, isNotNull);
+          expect(result!.originalFilePath, isNotNull);
+          final resolvedPath = await resolveOriginalFilePath(
+            result.originalFilePath!,
+          );
+          expect(File(resolvedPath).existsSync(), isTrue);
+          expect(File(resolvedPath).readAsBytesSync(), equals([1, 2, 3]));
+          expect(fakeTicketDAO.handledTicket, equals(result));
+        },
+      );
     });
 
     group('importAndSaveImageFile', () {
@@ -548,19 +605,16 @@ void main() {
         expect(result, isNull);
       });
 
-      test(
-        'returns null when scanner reports failure',
-        () async {
-          fakeIRCTCQRParser.isIRCTC = true;
-          fakeIRCTCScannerService.scanResult = IRCTCScannerResult.error(
-            'parse failed',
-          );
+      test('returns null when scanner reports failure', () async {
+        fakeIRCTCQRParser.isIRCTC = true;
+        fakeIRCTCScannerService.scanResult = IRCTCScannerResult.error(
+          'parse failed',
+        );
 
-          final result = await importService.importQRCode('PNR No.:1');
+        final result = await importService.importQRCode('PNR No.:1');
 
-          expect(result, isNull);
-        },
-      );
+        expect(result, isNull);
+      });
 
       test('returns the saved travel ticket on success', () async {
         fakeIRCTCQRParser.isIRCTC = true;
