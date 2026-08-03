@@ -162,17 +162,12 @@ class ImportService implements IImportService {
       }
 
       // Parse using OCR blocks (preserves geometry for layout extraction)
-      final ticket = await _eventParser.parseTicketFromBlocks(
+      var parsedTicket = await _eventParser.parseTicketFromBlocks(
         extractedBlocks,
         imgFile.path,
       );
 
-      if (ticket != null) {
-        await _ticketDao.handleTicket(ticket);
-        return ticket;
-      }
-
-      final parsedTicket = _travelParser.parseTicketFromBlocks(
+      parsedTicket ??= _travelParser.parseTicketFromBlocks(
         extractedBlocks,
         sourceType: SourceType.image,
       );
@@ -184,14 +179,26 @@ class ImportService implements IImportService {
         return null;
       }
 
+      final originalFileName = await _saveOriginalFile(imgFile);
+      final ticketToSave = originalFileName == null
+          ? parsedTicket
+          : parsedTicket.copyWith(originalFilePath: originalFileName);
+
       // Save the parsed ticket to the database
-      await _ticketDao.handleTicket(parsedTicket);
+      final result = await _ticketDao.handleTicket(ticketToSave);
+      if (result < 0) {
+        _logger.warning('Failed to save imported image ticket to database');
+        if (originalFileName != null) {
+          await _deleteSavedOriginalFile(originalFileName);
+        }
+        return null;
+      }
 
       _logger.success(
         'Successfully imported and saved '
-        'Image ticket: ${parsedTicket.ticketId}',
+        'Image ticket: ${ticketToSave.ticketId}',
       );
-      return parsedTicket;
+      return ticketToSave;
     } on Object catch (e, stackTrace) {
       _logger.error('Error importing Image file', e, stackTrace);
       return null;
@@ -321,6 +328,7 @@ class ImportService implements IImportService {
       final filePath = p.join(originalsDir.path, fileName);
 
       await File(file.path).copy(filePath);
+      _logger.info('Saved original file: ${file.name}');
       return fileName;
     } on Object catch (e, stackTrace) {
       _logger.error(

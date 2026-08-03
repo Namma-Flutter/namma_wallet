@@ -517,7 +517,7 @@ void main() {
       });
 
       test(
-        'persists a copy of the original file and attaches its path',
+        'persists a copy of the original PDF file and attaches its path',
         () async {
           final sourceFile = File('test/temp_import_docs/source.pdf')
             ..createSync(recursive: true)
@@ -594,6 +594,42 @@ void main() {
         expect(result, equals(parsed));
         expect(fakeTicketDAO.handledTicket, equals(parsed));
       });
+
+      test(
+        'persists a copy of the original Image file and attaches its path',
+        () async {
+          final sourceFile = File('test/temp_import_docs/source.jpg')
+            ..createSync(recursive: true)
+            ..writeAsBytesSync([1, 2, 3]);
+
+          fakeImageService.extractedBlocks = [
+            OCRBlock(
+              text: 'some text',
+              boundingBox: const Rect.fromLTRB(0, 0, 100, 100),
+              page: 0,
+            ),
+          ];
+          const parsed = Ticket(
+            ticketId: 'NWBYNF',
+            primaryText: 'Movie',
+            type: TicketType.event,
+          );
+          fakeEventParser.parsedTicket = parsed;
+
+          final result = await importService.importAndSaveImageFile(
+            XFile(sourceFile.path),
+          );
+
+          expect(result, isNotNull);
+          expect(result!.originalFilePath, isNotNull);
+          final resolvedPath = await resolveOriginalFilePath(
+            result.originalFilePath!,
+          );
+          expect(File(resolvedPath).existsSync(), isTrue);
+          expect(File(resolvedPath).readAsBytesSync(), equals([1, 2, 3]));
+          expect(fakeTicketDAO.handledTicket, equals(result));
+        },
+      );
     });
 
     group('importQRCode', () {

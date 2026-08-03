@@ -294,10 +294,7 @@ class _TicketCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Ticket, $Out>
     imagePath: data.get(#imagePath, or: $value.imagePath),
     directionsUrl: data.get(#directionsUrl, or: $value.directionsUrl),
     archivedAt: data.get(#archivedAt, or: $value.archivedAt),
-    originalFilePath: data.get(
-      #originalFilePath,
-      or: $value.originalFilePath,
-    ),
+    originalFilePath: data.get(#originalFilePath, or: $value.originalFilePath),
   );
 
   @override
