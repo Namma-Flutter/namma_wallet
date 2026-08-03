@@ -42,6 +42,19 @@ class ImportService implements IImportService {
   final TNSTCApiTicketParser _tnstcApiTicketParser;
   final ITicketDAO _ticketDao;
 
+  String _maskFilename(String filename) {
+    final parts = filename.split('.');
+    final extension = parts.last;
+    parts.removeLast();
+
+    final name = parts.join('.');
+    if (name.length <= 3) return filename;
+
+    final maskLength = name.length - 3;
+    final maskedName = name.substring(name.length - 3);
+    return '${'*' * maskLength}$maskedName.$extension';
+  }
+
   @override
   List<String> get supportedExtensions => const [
     'pdf',
@@ -62,13 +75,15 @@ class ImportService implements IImportService {
     final filename = pdfFile.name;
 
     try {
-      _logger.info('Importing PDF file: $filename');
+      _logger.info('Importing PDF file: ${_maskFilename(filename)}');
 
       // Extract OCR blocks with geometry from PDF
       final extractedBlocks = await _pdfService.extractBlocks(pdfFile);
 
       if (extractedBlocks.isEmpty) {
-        _logger.warning('No OCR blocks extracted from PDF: $filename');
+        _logger.warning(
+          'No OCR blocks extracted from PDF: ${_maskFilename(filename)}'
+        );
         return null;
       }
 
@@ -95,7 +110,8 @@ class ImportService implements IImportService {
     } on Object catch (e, stackTrace) {
       if (e is UnsupportedError) {
         _logger.warning(
-          'PDF import is not supported on web for this file: $filename. '
+          'PDF import is not supported on web for this file: '
+          '${_maskFilename(filename)}.\n'
           'Web currently supports SMS extraction only.',
         );
         return null;
@@ -112,13 +128,15 @@ class ImportService implements IImportService {
     final filename = imgFile.name;
 
     try {
-      _logger.info('Importing Image file: $filename');
+      _logger.info('Importing Image file: ${_maskFilename(filename)}');
 
       // Extract OCR blocks with geometry from Image
       final extractedBlocks = await _imageService.extractBlocks(imgFile);
 
       if (extractedBlocks.isEmpty) {
-        _logger.warning('No OCR blocks extracted from Image: $filename');
+        _logger.warning(
+          'No OCR blocks extracted from Image: ${_maskFilename(filename)}'
+        );
         return null;
       }
 
@@ -163,13 +181,13 @@ class ImportService implements IImportService {
   Future<TicketImportResult> importAndSavePKPassFile(XFile pkpassFile) async {
     try {
       final filename = pkpassFile.name;
-      _logger.info('Importing pkpass file: $filename');
+      _logger.info('Importing pkpass file: ${_maskFilename(filename)}');
 
       final bytes = await pkpassFile.readAsBytes();
       final parsedTicket = await _pkpassParser.parsePKPass(bytes);
 
       if (parsedTicket == null) {
-        _logger.warning('Failed to parse pkpass: $filename');
+        _logger.warning('Failed to parse pkpass: ${_maskFilename(filename)}');
         return const TicketImportResult();
       }
 

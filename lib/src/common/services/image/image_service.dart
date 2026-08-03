@@ -27,7 +27,7 @@ class ImageService {
       }
 
       _logger.debug(
-        '[ImageService] Starting OCR block extraction for image: ${image.name}',
+        '[ImageService] Starting Image OCR block extraction',
       );
 
       // Extract blocks directly via the OCR vision engine
@@ -35,7 +35,7 @@ class ImageService {
 
       if (blocks.isEmpty) {
         _logger.warning(
-          '[ImageService] OCR extraction yielded 0 blocks for image: '
+          '[ImageService] OCR extraction has yielded 0 blocks for this image'
           '${image.name}',
         );
       } else {
