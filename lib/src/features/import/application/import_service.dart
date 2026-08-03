@@ -82,7 +82,7 @@ class ImportService implements IImportService {
 
       if (extractedBlocks.isEmpty) {
         _logger.warning(
-          'No OCR blocks extracted from PDF: ${_maskFilename(filename)}'
+          'No OCR blocks extracted from PDF: ${_maskFilename(filename)}',
         );
         return null;
       }
@@ -135,7 +135,7 @@ class ImportService implements IImportService {
 
       if (extractedBlocks.isEmpty) {
         _logger.warning(
-          'No OCR blocks extracted from Image: ${_maskFilename(filename)}'
+          'No OCR blocks extracted from Image: ${_maskFilename(filename)}',
         );
         return null;
       }
