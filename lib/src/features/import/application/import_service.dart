@@ -129,7 +129,6 @@ class ImportService implements IImportService {
         'Successfully imported and saved PDF ticket: ${parsedTicket.ticketId}',
       );
       return ticketToSave;
-
     } on Object catch (e, stackTrace) {
       // Clean up the saved original file if the DB write failed
       if (ticketToSave?.originalFilePath != null) {
