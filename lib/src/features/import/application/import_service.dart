@@ -80,6 +80,7 @@ class ImportService implements IImportService {
   Future<Ticket?> importAndSavePDFFile(XFile pdfFile) async {
     // Use basename to avoid logging full path with sensitive directory info
     final filename = pdfFile.name;
+    Ticket? ticketToSave;
 
     try {
       _logger.info('Importing PDF file: ${_maskFilename(filename)}');
@@ -110,7 +111,7 @@ class ImportService implements IImportService {
       // Keep a copy of the original PDF so the user can view it later.
       // Only the filename is stored (see _saveOriginalFile).
       final originalFileName = await _saveOriginalFile(pdfFile);
-      final ticketToSave = originalFileName == null
+      ticketToSave = originalFileName == null
           ? parsedTicket
           : parsedTicket.copyWith(originalFilePath: originalFileName);
 
@@ -128,7 +129,13 @@ class ImportService implements IImportService {
         'Successfully imported and saved PDF ticket: ${parsedTicket.ticketId}',
       );
       return ticketToSave;
+
     } on Object catch (e, stackTrace) {
+      // Clean up the saved original file if the DB write failed
+      if (ticketToSave?.originalFilePath != null) {
+        await _deleteSavedOriginalFile(ticketToSave!.originalFilePath!);
+      }
+
       if (e is UnsupportedError) {
         _logger.warning(
           'PDF import is not supported on web for this file: '
@@ -147,6 +154,7 @@ class ImportService implements IImportService {
   Future<Ticket?> importAndSaveImageFile(XFile imgFile) async {
     // Use basename to avoid logging full path with sensitive directory info
     final filename = imgFile.name;
+    Ticket? ticketToSave;
 
     try {
       _logger.info('Importing Image file: ${_maskFilename(filename)}');
@@ -180,7 +188,7 @@ class ImportService implements IImportService {
       }
 
       final originalFileName = await _saveOriginalFile(imgFile);
-      final ticketToSave = originalFileName == null
+      ticketToSave = originalFileName == null
           ? parsedTicket
           : parsedTicket.copyWith(originalFilePath: originalFileName);
 
@@ -200,6 +208,10 @@ class ImportService implements IImportService {
       );
       return ticketToSave;
     } on Object catch (e, stackTrace) {
+      // Clean up the saved original file if the DB write failed
+      if (ticketToSave?.originalFilePath != null) {
+        await _deleteSavedOriginalFile(ticketToSave!.originalFilePath!);
+      }
       _logger.error('Error importing Image file', e, stackTrace);
       return null;
     }
@@ -328,11 +340,11 @@ class ImportService implements IImportService {
       final filePath = p.join(originalsDir.path, fileName);
 
       await File(file.path).copy(filePath);
-      _logger.info('Saved original file: ${file.name}');
+      _logger.info('Saved original file: ${_maskFilename(file.name)}');
       return fileName;
     } on Object catch (e, stackTrace) {
       _logger.error(
-        'Failed to save original file: ${file.name}',
+        'Failed to save original file: ${_maskFilename(file.name)}',
         e,
         stackTrace,
       );
