@@ -153,10 +153,8 @@ void main() {
         await tempDir.delete(recursive: true);
       });
 
-      test('should handle unsupported file types', () async {
-        final tempDir = await Directory.systemTemp.createTemp(
-          'test_unsupported',
-        );
+      test('should handle image file correctly', () async {
+        final tempDir = await Directory.systemTemp.createTemp('test_image');
         final imgFile = File('${tempDir.path}/image.jpg');
         await imgFile.writeAsString('image data');
 
@@ -165,6 +163,38 @@ void main() {
             SharedAttachment(
               path: imgFile.path,
               type: SharedAttachmentType.image,
+            ),
+          ],
+        );
+        mockProvider.initialMedia = media;
+
+        var contentReceived = false;
+        await service.initialize(
+          onContentReceived: (content, type) {
+            contentReceived = true;
+            // Image path is passed through; OCR happens downstream
+            expect(content, contains(imgFile.path));
+            expect(type, equals(SharedContentType.image));
+          },
+          onError: (error) => fail('Should not error: $error'),
+        );
+
+        expect(contentReceived, isTrue);
+        await tempDir.delete(recursive: true);
+      });
+
+      test('should handle unsupported file types', () async {
+        final tempDir = await Directory.systemTemp.createTemp(
+          'test_unsupported',
+        );
+        final imgFile = File('${tempDir.path}/image.docx');
+        await imgFile.writeAsString('document data');
+
+        final media = SharedMedia(
+          attachments: [
+            SharedAttachment(
+              path: imgFile.path,
+              type: SharedAttachmentType.file,
             ),
           ],
         );
@@ -234,11 +264,26 @@ void main() {
         await tempDir.delete(recursive: true);
       });
 
+      test('should return path for image file', () async {
+        final tempDir = await Directory.systemTemp.createTemp(
+          'test_image_extract',
+        );
+        final imgFile = File('${tempDir.path}/image.jpg');
+        await imgFile.writeAsString('image data');
+
+        final content = await service.extractContentFromFile(
+          XFile(imgFile.path),
+        );
+        expect(content, equals(imgFile.path));
+
+        await tempDir.delete(recursive: true);
+      });
+
       test('should throw on unsupported file', () async {
         final tempDir = await Directory.systemTemp.createTemp(
           'test_bad_extract',
         );
-        final badFile = File('${tempDir.path}/test.jpg');
+        final badFile = File('${tempDir.path}/test.docx');
         await badFile.writeAsString('dummy');
 
         expect(

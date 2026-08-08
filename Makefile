@@ -40,17 +40,14 @@ get:
 codegen:
 	$(DART) run build_runner build --delete-conflicting-outputs
 
-# Release builds (with WASM module removal for pdfrx)
+# Release builds
 release-apk: get codegen
-	$(DART) run pdfrx:remove_wasm_modules
 	$(FLUTTER) build apk --release
 
 release-appbundle: get codegen
-	$(DART) run pdfrx:remove_wasm_modules
 	$(FLUTTER) build appbundle --release
 
 release-ipa: get codegen
-	$(DART) run pdfrx:remove_wasm_modules
 	$(FLUTTER) build ipa --release
 
 # Fastlane android targets

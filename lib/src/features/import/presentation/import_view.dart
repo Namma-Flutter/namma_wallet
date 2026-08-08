@@ -2,12 +2,12 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:ai_barcode_scanner/ai_barcode_scanner.dart';
-import 'package:cross_file/cross_file.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 import 'package:namma_wallet/src/common/routing/app_routes.dart';
@@ -38,6 +38,7 @@ class _ImportViewState extends State<ImportView> {
   bool _isPasting = false;
   bool _isScanning = false;
   bool _isProcessingPDF = false;
+  bool _isProcessingImage = false;
   bool _isOpeningScanner = false;
   bool _isFetchingPNR = false;
 
@@ -204,6 +205,71 @@ class _ImportViewState extends State<ImportView> {
       if (mounted) {
         setState(() {
           _isProcessingPDF = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _handleImagePick() async {
+    if (_isProcessingImage) return;
+
+    try {
+      // Returns XFile Natively
+      final result = await ImagePicker().pickImage(
+        source: ImageSource.gallery,
+      );
+
+      if (result == null) {
+        _logger.info('No Image selected');
+        return;
+      }
+
+      setState(() {
+        _isProcessingImage = true;
+      });
+
+      getIt<IHapticService>().triggerHaptic(
+        HapticType.selection,
+      );
+
+      // Use import service to handle Image
+      final ticket = await _importService.importAndSaveImageFile(result);
+
+      if (!mounted) return;
+
+      if (ticket != null) {
+        if (!kIsWeb && Platform.isAndroid) {
+          unawaited(
+            getIt<INotificationService>()
+                .scheduleTicketReminderFor(ticket)
+                .catchError((Object e, StackTrace s) {
+                  _logger.error('Error scheduling notification', e, s);
+                }),
+          );
+        }
+        await _openImportedTicket(ticket);
+      } else {
+        // and handle accordingly
+        showSnackbar(
+          context,
+          'Unable to read text from this Image or content does'
+          ' not match any supported ticket format.',
+          isError: true,
+        );
+      }
+    } on Exception catch (e) {
+      if (mounted) {
+        showSnackbar(
+          context,
+          'Error processing Image. Please try again.',
+          isError: true,
+        );
+      }
+      _logger.error('Image import error: $e');
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isProcessingImage = false;
         });
       }
     }
@@ -497,6 +563,14 @@ class _ImportViewState extends State<ImportView> {
                 onTap: _handlePDFPick,
                 isLoading: _isProcessingPDF,
               ),
+              if (!kIsWeb)
+                ImportMethodCardWidget(
+                  icon: Icons.image_search,
+                  title: 'Upload Image',
+                  subtitle: 'Import from Device',
+                  onTap: _handleImagePick,
+                  isLoading: _isProcessingImage,
+                ),
               ImportMethodCardWidget(
                 icon: Icons.qr_code_scanner,
                 title: 'Scan QR',
