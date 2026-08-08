@@ -27,6 +27,7 @@ class Ticket with TicketMappable {
     this.imagePath,
     this.directionsUrl,
     this.archivedAt,
+    this.originalFilePath,
   });
 
   factory Ticket.fromTNSTC(
@@ -211,10 +212,7 @@ class Ticket with TicketMappable {
         if (model.busIdNumber?.trim().isNotNullOrEmpty ?? false)
           ExtrasModel(title: 'Bus ID', value: model.busIdNumber!.trim()),
         if (model.vehicleNumber?.trim().isNotNullOrEmpty ?? false)
-          ExtrasModel(
-            title: 'Bus Number',
-            value: model.vehicleNumber!.trim(),
-          ),
+          ExtrasModel(title: 'Bus Number', value: model.vehicleNumber!.trim()),
         if (model.obReferenceNumber != null &&
             model.obReferenceNumber!.trim().isNotNullOrEmpty)
           ExtrasModel(
@@ -265,10 +263,7 @@ class Ticket with TicketMappable {
         if (seatNumber != null && seatNumber.isNotNullOrEmpty)
           ExtrasModel(title: 'Seat Number', value: seatNumber),
         if (model.numberOfSeats != null)
-          ExtrasModel(
-            title: 'Seats',
-            value: model.numberOfSeats.toString(),
-          ),
+          ExtrasModel(title: 'Seats', value: model.numberOfSeats.toString()),
         if (model.conductorMobileNo != null &&
             model.conductorMobileNo!.isNotNullOrEmpty)
           ExtrasModel(
@@ -281,10 +276,7 @@ class Ticket with TicketMappable {
             value: '₹${model.totalFare!.toStringAsFixed(2)}',
           ),
         if (model.corporation != null && model.corporation!.isNotNullOrEmpty)
-          ExtrasModel(
-            title: 'Provider',
-            value: model.corporation,
-          ),
+          ExtrasModel(title: 'Provider', value: model.corporation),
         if (model.tripCode != null && model.tripCode!.isNotNullOrEmpty)
           ExtrasModel(title: 'Trip Code', value: model.tripCode),
         if (model.routeNo != null && model.routeNo!.trim().isNotNullOrEmpty)
@@ -323,13 +315,11 @@ class Ticket with TicketMappable {
       imagePath: incoming.imagePath ?? existing.imagePath,
       directionsUrl: incoming.directionsUrl ?? existing.directionsUrl,
       archivedAt: incoming.archivedAt ?? existing.archivedAt,
+      originalFilePath: incoming.originalFilePath ?? existing.originalFilePath,
     );
   }
 
-  factory Ticket.fromIRCTC(
-    IRCTCTicket model, {
-    bool isUpdate = false,
-  }) {
+  factory Ticket.fromIRCTC(IRCTCTicket model, {bool isUpdate = false}) {
     // If dateOfJourney or scheduledDeparture are null,startTime will be null
     final hasValidDateTime =
         model.dateOfJourney != null && model.scheduledDeparture != null;
@@ -506,6 +496,8 @@ class Ticket with TicketMappable {
   final String? directionsUrl;
   @MappableField(key: 'archived_at')
   final DateTime? archivedAt;
+  @MappableField(key: 'original_file_path')
+  final String? originalFilePath;
 
   Map<String, Object?> toEntity() {
     final map = toMap()..removeWhere((key, value) => value == null);
