@@ -11,6 +11,7 @@ import 'package:namma_wallet/src/common/services/archive/archive_service.dart';
 import 'package:namma_wallet/src/common/services/archive/archive_service_interface.dart';
 import 'package:namma_wallet/src/common/services/haptic/haptic_service_interface.dart';
 import 'package:namma_wallet/src/common/services/haptic/haptic_services.dart';
+import 'package:namma_wallet/src/common/services/image/image_service.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
 import 'package:namma_wallet/src/common/services/logger/namma_logger.dart';
 import 'package:namma_wallet/src/common/services/notification/reminder_preferences_service.dart';
@@ -34,6 +35,7 @@ import 'package:namma_wallet/src/features/clipboard/application/clipboard_servic
 import 'package:namma_wallet/src/features/clipboard/application/clipboard_service_interface.dart';
 import 'package:namma_wallet/src/features/clipboard/data/clipboard_repository.dart';
 import 'package:namma_wallet/src/features/clipboard/domain/clipboard_repository_interface.dart';
+import 'package:namma_wallet/src/features/events/application/event_parser_service.dart';
 import 'package:namma_wallet/src/features/import/application/deep_link_service.dart';
 import 'package:namma_wallet/src/features/import/application/deep_link_service_interface.dart';
 import 'package:namma_wallet/src/features/import/application/import_service.dart';
@@ -88,6 +90,12 @@ void setupLocator() {
         logger: getIt<ILogger>(),
       ),
     )
+    ..registerLazySingleton<ImageService>(
+      () => ImageService(
+        ocrService: getIt<IOCRService>(),
+        logger: getIt<ILogger>(),
+      ),
+    )
     ..registerLazySingleton<IAIService>(
       () => kIsWeb ? WebGemmaService() : GemmaService(logger: getIt<ILogger>()),
     )
@@ -106,6 +114,9 @@ void setupLocator() {
     ..registerLazySingleton<TNSTCSMSParser>(TNSTCSMSParser.new)
     ..registerLazySingleton<ITravelParser>(
       () => TravelParserService(logger: getIt<ILogger>()),
+    )
+    ..registerLazySingleton<EventParserService>(
+      () => EventParserService(logger: getIt<ILogger>()),
     )
     ..registerLazySingleton<ISharingIntentService>(
       () => kIsWeb
@@ -150,7 +161,9 @@ void setupLocator() {
       () => ImportService(
         logger: getIt<ILogger>(),
         pdfService: getIt<IPDFService>(),
+        imageService: getIt<ImageService>(),
         travelParser: getIt<ITravelParser>(),
+        eventParser: getIt<EventParserService>(),
         qrParser: getIt<IIRCTCQRParser>(),
         irctcScannerService: getIt<IIRCTCScannerService>(),
         pkpassParser: getIt<IPKPassParser>(),
