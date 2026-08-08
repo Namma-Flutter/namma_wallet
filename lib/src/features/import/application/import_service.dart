@@ -1,10 +1,16 @@
+import 'dart:io';
+
 import 'package:cross_file/cross_file.dart';
+import 'package:flutter/foundation.dart';
 import 'package:namma_wallet/src/common/database/ticket_dao_interface.dart';
 import 'package:namma_wallet/src/common/domain/models/extras_model.dart';
 import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 import 'package:namma_wallet/src/common/enums/source_type.dart';
+import 'package:namma_wallet/src/common/helper/original_file_storage.dart';
+import 'package:namma_wallet/src/common/services/image/image_service.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
 import 'package:namma_wallet/src/common/services/pdf/pdf_service_interface.dart';
+import 'package:namma_wallet/src/features/events/application/event_parser_service.dart';
 import 'package:namma_wallet/src/features/import/application/import_service_interface.dart';
 import 'package:namma_wallet/src/features/irctc/application/irctc_qr_parser_interface.dart';
 import 'package:namma_wallet/src/features/irctc/application/irctc_scanner_service_interface.dart';
@@ -12,12 +18,17 @@ import 'package:namma_wallet/src/features/tnstc/application/tnstc_api_ticket_par
 import 'package:namma_wallet/src/features/tnstc/data/remote/tnstc_pnr_fetcher_interface.dart';
 import 'package:namma_wallet/src/features/travel/application/pkpass_parser_interface.dart';
 import 'package:namma_wallet/src/features/travel/application/travel_parser_interface.dart';
+import 'package:path/path.dart' as p;
+import 'package:path_provider/path_provider.dart';
+import 'package:uuid/uuid.dart';
 
 class ImportService implements IImportService {
   ImportService({
     required this._logger,
     required this._pdfService,
+    required this._imageService,
     required this._travelParser,
+    required this._eventParser,
     required this._qrParser,
     required this._irctcScannerService,
     required this._pkpassParser,
@@ -28,7 +39,9 @@ class ImportService implements IImportService {
 
   final ILogger _logger;
   final IPDFService _pdfService;
+  final ImageService _imageService;
   final ITravelParser _travelParser;
+  final EventParserService _eventParser;
   final IIRCTCQRParser _qrParser;
   final IIRCTCScannerService _irctcScannerService;
   final IPKPassParser _pkpassParser;
@@ -36,8 +49,27 @@ class ImportService implements IImportService {
   final TNSTCApiTicketParser _tnstcApiTicketParser;
   final ITicketDAO _ticketDao;
 
+  String _maskFilename(String filename) {
+    final parts = filename.split('.');
+    final extension = parts.last;
+    parts.removeLast();
+
+    final name = parts.join('.');
+    if (name.length <= 3) return filename;
+
+    final maskLength = name.length - 3;
+    final maskedName = name.substring(name.length - 3);
+    return '${'*' * maskLength}$maskedName.$extension';
+  }
+
   @override
-  List<String> get supportedExtensions => const ['pdf', 'pkpass'];
+  List<String> get supportedExtensions => const [
+    'pdf',
+    'pkpass',
+    'jpg',
+    'jpeg',
+    'png',
+  ];
 
   @override
   bool isSupportedQRCode(String qrData) {
@@ -48,15 +80,18 @@ class ImportService implements IImportService {
   Future<Ticket?> importAndSavePDFFile(XFile pdfFile) async {
     // Use basename to avoid logging full path with sensitive directory info
     final filename = pdfFile.name;
+    Ticket? ticketToSave;
 
     try {
-      _logger.info('Importing PDF file: $filename');
+      _logger.info('Importing PDF file: ${_maskFilename(filename)}');
 
       // Extract OCR blocks with geometry from PDF
       final extractedBlocks = await _pdfService.extractBlocks(pdfFile);
 
       if (extractedBlocks.isEmpty) {
-        _logger.warning('No OCR blocks extracted from PDF: $filename');
+        _logger.warning(
+          'No OCR blocks extracted from PDF: ${_maskFilename(filename)}',
+        );
         return null;
       }
 
@@ -73,17 +108,37 @@ class ImportService implements IImportService {
         return null;
       }
 
+      // Keep a copy of the original PDF so the user can view it later.
+      // Only the filename is stored (see _saveOriginalFile).
+      final originalFileName = await _saveOriginalFile(pdfFile);
+      ticketToSave = originalFileName == null
+          ? parsedTicket
+          : parsedTicket.copyWith(originalFilePath: originalFileName);
+
       // Save the parsed ticket to the database
-      await _ticketDao.handleTicket(parsedTicket);
+      final result = await _ticketDao.handleTicket(ticketToSave);
+      if (result < 0) {
+        _logger.warning('Failed to save imported PDF ticket to database');
+        if (originalFileName != null) {
+          await _deleteSavedOriginalFile(originalFileName);
+        }
+        return null;
+      }
 
       _logger.success(
         'Successfully imported and saved PDF ticket: ${parsedTicket.ticketId}',
       );
-      return parsedTicket;
+      return ticketToSave;
     } on Object catch (e, stackTrace) {
+      // Clean up the saved original file if the DB write failed
+      if (ticketToSave?.originalFilePath != null) {
+        await _deleteSavedOriginalFile(ticketToSave!.originalFilePath!);
+      }
+
       if (e is UnsupportedError) {
         _logger.warning(
-          'PDF import is not supported on web for this file: $filename. '
+          'PDF import is not supported on web for this file: '
+          '${_maskFilename(filename)}.\n'
           'Web currently supports SMS extraction only.',
         );
         return null;
@@ -95,16 +150,83 @@ class ImportService implements IImportService {
   }
 
   @override
+  Future<Ticket?> importAndSaveImageFile(XFile imgFile) async {
+    // Use basename to avoid logging full path with sensitive directory info
+    final filename = imgFile.name;
+    Ticket? ticketToSave;
+
+    try {
+      _logger.info('Importing Image file: ${_maskFilename(filename)}');
+
+      // Extract OCR blocks with geometry from Image
+      final extractedBlocks = await _imageService.extractBlocks(imgFile);
+
+      if (extractedBlocks.isEmpty) {
+        _logger.warning(
+          'No OCR blocks extracted from Image: ${_maskFilename(filename)}',
+        );
+        return null;
+      }
+
+      // Parse using OCR blocks (preserves geometry for layout extraction)
+      var parsedTicket = await _eventParser.parseTicketFromBlocks(
+        extractedBlocks,
+        imgFile.path,
+      );
+
+      parsedTicket ??= _travelParser.parseTicketFromBlocks(
+        extractedBlocks,
+        sourceType: SourceType.image,
+      );
+
+      if (parsedTicket == null) {
+        _logger.warning(
+          'Image content does not match any supported ticket format',
+        );
+        return null;
+      }
+
+      final originalFileName = await _saveOriginalFile(imgFile);
+      ticketToSave = originalFileName == null
+          ? parsedTicket
+          : parsedTicket.copyWith(originalFilePath: originalFileName);
+
+      // Save the parsed ticket to the database
+      final result = await _ticketDao.handleTicket(ticketToSave);
+      if (result < 0) {
+        _logger.warning('Failed to save imported image ticket to database');
+        if (originalFileName != null) {
+          await _deleteSavedOriginalFile(originalFileName);
+        }
+        return null;
+      }
+
+      _logger.success(
+        'Successfully imported and saved '
+        'Image ticket: ${ticketToSave.ticketId}',
+      );
+      return ticketToSave;
+    } on Object catch (e, stackTrace) {
+      // Clean up the saved original file if the DB write failed
+      if (ticketToSave?.originalFilePath != null) {
+        await _deleteSavedOriginalFile(ticketToSave!.originalFilePath!);
+      }
+      _logger.error('Error importing Image file', e, stackTrace);
+      return null;
+    }
+  }
+
+  @override
   Future<TicketImportResult> importAndSavePKPassFile(XFile pkpassFile) async {
     try {
       final filename = pkpassFile.name;
-      _logger.info('Importing pkpass file: $filename');
+      _logger.info('Importing pkpass file: ${_maskFilename(filename)}');
 
       final bytes = await pkpassFile.readAsBytes();
       final parsedTicket = await _pkpassParser.parsePKPass(bytes);
 
       if (parsedTicket == null) {
-        _logger.warning('Failed to parse pkpass: $filename');
+        _logger.warning('Failed to parse pkpass: ${_maskFilename(filename)}');
         return const TicketImportResult();
       }
 
@@ -191,6 +313,59 @@ class ImportService implements IImportService {
     } on Exception catch (e, stackTrace) {
       _logger.error('Error importing TNSTC ticket by PNR', e, stackTrace);
       return null;
+    }
+  }
+
+  /// Copies the imported file into the app's document directory so it can
+  /// be viewed again later, even after the picker's temp/cache file is
+  /// cleared. Returns the generated *filename* (not the full path), since
+  /// the document directory's absolute path can change between app
+  /// updates/reinstalls. Returns `null` on web, since `dart:io` file
+  /// storage isn't available there.
+  Future<String?> _saveOriginalFile(XFile file) async {
+    if (kIsWeb) return null;
+
+    try {
+      final appDocDir = await getApplicationDocumentsDirectory();
+      final originalsDir = Directory(
+        p.join(appDocDir.path, originalFilesDirName),
+      );
+      if (!originalsDir.existsSync()) {
+        await originalsDir.create(recursive: true);
+      }
+
+      final extension = p.extension(file.name);
+      final fileName = '${const Uuid().v4()}$extension';
+      final filePath = p.join(originalsDir.path, fileName);
+
+      await File(file.path).copy(filePath);
+      _logger.info('Saved original file: ${_maskFilename(file.name)}');
+      return fileName;
+    } on Object catch (e, stackTrace) {
+      _logger.error(
+        'Failed to save original file: ${_maskFilename(file.name)}',
+        e,
+        stackTrace,
+      );
+      return null;
+    }
+  }
+
+  /// Best-effort deletion of a file previously saved by [_saveOriginalFile],
+  /// used to avoid leaking a copied file when the DB write fails.
+  Future<void> _deleteSavedOriginalFile(String fileName) async {
+    try {
+      final filePath = await resolveOriginalFilePath(fileName);
+      final file = File(filePath);
+      if (file.existsSync()) {
+        await file.delete();
+      }
+    } on Object catch (e, stackTrace) {
+      _logger.error(
+        'Failed to clean up original file after DB error: $fileName',
+        e,
+        stackTrace,
+      );
     }
   }
 }

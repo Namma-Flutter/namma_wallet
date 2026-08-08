@@ -15,7 +15,7 @@ class WalletDatabase implements IWalletDatabase {
   final ILogger _logger;
 
   static const String _dbName = 'namma_wallet.db';
-  static const int _dbVersion = 5;
+  static const int _dbVersion = 6;
 
   Database? _database;
 
@@ -54,9 +54,7 @@ class WalletDatabase implements IWalletDatabase {
           'Upgrading from v$oldVersion to v$newVersion',
         );
         if (oldVersion < 2) {
-          await db.execute(
-            'ALTER TABLE tickets ADD COLUMN image_path TEXT;',
-          );
+          await db.execute('ALTER TABLE tickets ADD COLUMN image_path TEXT;');
           _logger.success('Database migrated to v2: Added image_path');
         }
         if (oldVersion < 3) {
@@ -119,15 +117,19 @@ class WalletDatabase implements IWalletDatabase {
           );
         }
         if (oldVersion < 5) {
-          await db.execute(
-            'ALTER TABLE tickets ADD COLUMN archived_at TEXT;',
-          );
+          await db.execute('ALTER TABLE tickets ADD COLUMN archived_at TEXT;');
           await db.execute(
             'CREATE INDEX IF NOT EXISTS idx_tickets_archived_at '
             'ON tickets (archived_at);',
           );
+          _logger.success('Database migrated to v5: Added archived_at column');
+        }
+        if (oldVersion < 6) {
+          await db.execute(
+            'ALTER TABLE tickets ADD COLUMN original_file_path TEXT;',
+          );
           _logger.success(
-            'Database migrated to v5: Added archived_at column',
+            'Database migrated to v6: Added original_file_path column',
           );
         }
       },
@@ -168,6 +170,7 @@ class WalletDatabase implements IWalletDatabase {
          image_path TEXT,
          directions_url TEXT,
          archived_at TEXT DEFAULT NULL,
+         original_file_path TEXT,
          created_at TEXT DEFAULT CURRENT_TIMESTAMP,
          updated_at TEXT DEFAULT NULL
       );

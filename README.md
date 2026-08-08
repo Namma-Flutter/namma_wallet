@@ -1,7 +1,7 @@
 # 👜 Namma Wallet
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-11-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-12-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 **Namma Wallet** is an open-source Flutter mobile application for managing digital travel tickets and passes. The app provides a unified interface to save, organise, and view tickets from multiple sources, including SMS, PDFs, QR codes, and clipboard text. It features intelligent parsing for Indian transport providers and generates beautiful digital ticket designs.
@@ -18,6 +18,7 @@ Unlike Apple Wallet or Google Wallet, which support only specific formats, **Nam
 
 * **SMS Parsing** – Automatically extract tickets from TNSTC, IRCTC, and SETC SMS messages
 * **PDF Processing** – Parse TNSTC bus tickets from PDF files using Syncfusion PDF library
+* **Image Processing** - Parse District movie tickets from Images
 * **QR Code Scanning** – Scan IRCTC train ticket QR codes with full metadata extraction
 * **Clipboard Processing** – Read and parse travel ticket text from the clipboard
 
@@ -79,7 +80,7 @@ Passes that include a `webServiceURL` (e.g. Luma event passes) are automatically
 
 ### Prerequisites
 
-* **Flutter SDK** - 3.38.6 (managed via FVM)
+* **Flutter SDK** - 3.44.2 (managed via FVM)
 * **Android Studio** / **Xcode** - For mobile app development
 * **Xcode** - 16.4.0 (for iOS development)
 * **FVM** - Flutter Version Management (recommended)
@@ -123,8 +124,8 @@ cd namma_wallet
 # Install FVM (if not already installed)
 dart pub global activate fvm
 
-# Use Flutter 3.38.6 via FVM
-fvm use 3.38.6
+# Use Flutter 3.44.2 via FVM
+fvm use 3.44.2
 
 # Get dependencies
 fvm flutter pub get
@@ -343,6 +344,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/KeerthiVasan-ai"><img src="https://avatars.githubusercontent.com/u/97495357?v=4?s=100" width="100px;" alt="Keerthivasan S"/><br /><sub><b>Keerthivasan S</b></sub></a><br /><a href="https://github.com/Namma-Flutter/namma_wallet/commits?author=KeerthiVasan-ai" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/prasanna6801"><img src="https://avatars.githubusercontent.com/u/59863680?v=4?s=100" width="100px;" alt="Soma Prasanna M"/><br /><sub><b>Soma Prasanna M</b></sub></a><br /><a href="https://github.com/Namma-Flutter/namma_wallet/commits?author=prasanna6801" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/vsaravananc"><img src="https://avatars.githubusercontent.com/u/227516234?v=4?s=100" width="100px;" alt="Saravanan v"/><br /><sub><b>Saravanan v</b></sub></a><br /><a href="https://github.com/Namma-Flutter/namma_wallet/commits?author=vsaravananc" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/iashok22"><img src="https://avatars.githubusercontent.com/u/2089695?v=4?s=100" width="100px;" alt="Ashokkumar"/><br /><sub><b>Ashokkumar</b></sub></a><br /><a href="https://github.com/Namma-Flutter/namma_wallet/commits?author=iashok22" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>

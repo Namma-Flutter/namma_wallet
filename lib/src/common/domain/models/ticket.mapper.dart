@@ -2,6 +2,7 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // dart format off
 // ignore_for_file: type=lint
+// ignore_for_file: invalid_use_of_protected_member
 // ignore_for_file: unused_element, unnecessary_cast, override_on_non_overriding_member
 // ignore_for_file: strict_raw_type, inference_failure_on_untyped_parameter
 
@@ -104,6 +105,13 @@ class TicketMapper extends ClassMapperBase<Ticket> {
     key: r'archived_at',
     opt: true,
   );
+  static String? _$originalFilePath(Ticket v) => v.originalFilePath;
+  static const Field<Ticket, String> _f$originalFilePath = Field(
+    'originalFilePath',
+    _$originalFilePath,
+    key: r'original_file_path',
+    opt: true,
+  );
 
   @override
   final MappableFields<Ticket> fields = const {
@@ -119,6 +127,7 @@ class TicketMapper extends ClassMapperBase<Ticket> {
     #imagePath: _f$imagePath,
     #directionsUrl: _f$directionsUrl,
     #archivedAt: _f$archivedAt,
+    #originalFilePath: _f$originalFilePath,
   };
 
   static Ticket _instantiate(DecodingData data) {
@@ -135,6 +144,7 @@ class TicketMapper extends ClassMapperBase<Ticket> {
       imagePath: data.dec(_f$imagePath),
       directionsUrl: data.dec(_f$directionsUrl),
       archivedAt: data.dec(_f$archivedAt),
+      originalFilePath: data.dec(_f$originalFilePath),
     );
   }
 
@@ -205,6 +215,7 @@ abstract class TicketCopyWith<$R, $In extends Ticket, $Out>
     String? imagePath,
     String? directionsUrl,
     DateTime? archivedAt,
+    String? originalFilePath,
   });
   TicketCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
@@ -251,6 +262,7 @@ class _TicketCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Ticket, $Out>
     Object? imagePath = $none,
     Object? directionsUrl = $none,
     Object? archivedAt = $none,
+    Object? originalFilePath = $none,
   }) => $apply(
     FieldCopyWithData({
       if (primaryText != $none) #primaryText: primaryText,
@@ -265,6 +277,7 @@ class _TicketCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Ticket, $Out>
       if (imagePath != $none) #imagePath: imagePath,
       if (directionsUrl != $none) #directionsUrl: directionsUrl,
       if (archivedAt != $none) #archivedAt: archivedAt,
+      if (originalFilePath != $none) #originalFilePath: originalFilePath,
     }),
   );
   @override
@@ -281,6 +294,7 @@ class _TicketCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Ticket, $Out>
     imagePath: data.get(#imagePath, or: $value.imagePath),
     directionsUrl: data.get(#directionsUrl, or: $value.directionsUrl),
     archivedAt: data.get(#archivedAt, or: $value.archivedAt),
+    originalFilePath: data.get(#originalFilePath, or: $value.originalFilePath),
   );
 
   @override
