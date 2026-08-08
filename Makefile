@@ -3,7 +3,7 @@ FLUTTER ?= fvm flutter
 # Dart command - use 'fvm dart' if using FVM, otherwise 'dart'
 DART ?= fvm dart
 
-.PHONY: help clean get codegen release-android release-ios release-apk release-appbundle release-ipa ios-test ios-beta ios-release-candidate ios-production android-release-candidate setup-hooks uninstall-hooks
+.PHONY: help clean get run codegen release-android release-ios release-apk release-appbundle release-ipa ios-test ios-beta ios-release-candidate ios-production android-release-candidate setup-hooks uninstall-hooks
 
 help:
 	@echo ""

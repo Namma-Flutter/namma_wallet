@@ -80,7 +80,6 @@ class ImportMethodCardWidget extends StatelessWidget {
                           ),
                           const SizedBox(height: 12),
                           Align(
-                            alignment: Alignment.center,
                             child: Text(
                               title,
                               style: Paragraph02(
@@ -96,7 +95,6 @@ class ImportMethodCardWidget extends StatelessWidget {
                           if (subtitle != null) ...[
                             const SizedBox(height: 4),
                             Align(
-                              alignment: Alignment.center,
                               child: Text(
                                 subtitle!,
                                 style: Caption(
