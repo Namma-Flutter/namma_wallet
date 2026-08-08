@@ -1,5 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:namma_wallet/src/common/services/haptic/haptic_service_extension.dart';
+import 'package:namma_wallet/src/common/services/haptic/haptic_service_interface.dart';
+import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/features/calendar/application/calendar_provider.dart';
+import 'package:namma_wallet/src/features/calendar/presentation/widgets/booking_reminder/booking_reminder_popup.dart';
 import 'package:namma_wallet/src/features/calendar/presentation/widgets/themed_day_cell.dart';
 import 'package:namma_wallet/src/features/events/domain/event_model.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -26,7 +32,26 @@ class CalendarWidget extends StatelessWidget {
       focusedDay: selectedDay,
       calendarFormat: calendarFormat,
       selectedDayPredicate: (day) => isSameDay(selectedDay, day),
-      onDaySelected: onDaySelected,
+      onDaySelected: (day, focusedDay) {
+        onDaySelected(day, focusedDay);
+        final bookingTickets = provider.getBookingWindowTicketsForDay(day);
+        if (bookingTickets != null) {
+          final all = [
+            ...bookingTickets.normal,
+            ...bookingTickets.tatkal,
+          ];
+          if (all.isNotEmpty && context.mounted) {
+            getIt<IHapticService>().triggerHaptic(HapticType.selection);
+            unawaited(
+              BookingReminderPopup.show(
+                context: context,
+                tickets: all,
+                date: day,
+              ),
+            );
+          }
+        }
+      },
       eventLoader: (day) {
         final events = provider.getEventsForDay(day);
         final tickets = provider.getTicketsForDay(day);

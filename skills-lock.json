@@ -1,6 +1,12 @@
 {
   "version": 1,
   "skills": {
+    "app-store-screenshots": {
+      "source": "ParthJadhav/app-store-screenshots",
+      "sourceType": "github",
+      "skillPath": "skills/app-store-screenshots/SKILL.md",
+      "computedHash": "31fe3ed0d459bf3bab2a4fa9432599a46a66a8f134131c74e4b70addae6dfde4"
+    },
     "cavecrew": {
       "source": "JuliusBrussee/caveman",
       "sourceType": "github",

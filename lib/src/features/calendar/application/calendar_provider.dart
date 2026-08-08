@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:namma_wallet/src/common/database/ticket_dao_interface.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/domain/models/ticket.dart';
+import 'package:namma_wallet/src/common/services/booking_reminder/booking_reminder_service.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
 import 'package:namma_wallet/src/features/events/domain/event_model.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -34,6 +35,9 @@ class CalendarProvider extends ChangeNotifier {
   List<Ticket> _tickets = [];
   DateTimeRange? _selectedRange;
   String? _errorMessage;
+
+  Map<DateTime, ({List<Ticket> normal, List<Ticket> tatkal})> _bookingWindows =
+      {};
 
   DateTime get selectedDay => _selectedDay;
   List<Event> get events => _events;
@@ -68,12 +72,59 @@ class CalendarProvider extends ChangeNotifier {
     _errorMessage = null; // Clear any previous error
     try {
       _tickets = await _ticketDao.getAllTickets();
+      _computeBookingWindows();
       notifyListeners();
     } on Exception catch (e, st) {
       _logger.error('Error loading tickets: $e\n$st');
       _errorMessage = 'Failed to load tickets: $e';
       notifyListeners();
     }
+  }
+
+  void _computeBookingWindows() {
+    final windows = <DateTime, ({List<Ticket> normal, List<Ticket> tatkal})>{};
+
+    for (final ticket in _tickets) {
+      final dates = getIt<BookingReminderService>().computeBookingOpenDates(
+        ticket,
+      );
+      if (dates == null) continue;
+
+      final (normal, tatkal) = dates;
+
+      final normalDate = _normalizeToDateOnly(normal);
+      windows.putIfAbsent(
+        normalDate,
+        () => (normal: [], tatkal: []),
+      );
+      windows[normalDate]!.normal.add(ticket);
+
+      if (tatkal != null) {
+        final tatkalDate = _normalizeToDateOnly(tatkal);
+        windows.putIfAbsent(
+          tatkalDate,
+          () => (normal: [], tatkal: []),
+        );
+        windows[tatkalDate]!.tatkal.add(ticket);
+      }
+    }
+
+    _bookingWindows = windows;
+  }
+
+  Map<DateTime, ({List<Ticket> normal, List<Ticket> tatkal})>
+  getDatesWithBookingWindows() => _bookingWindows;
+
+  bool hasBookingWindowOnDay(DateTime day) {
+    final dateOnly = _normalizeToDateOnly(day);
+    return _bookingWindows.containsKey(dateOnly);
+  }
+
+  ({List<Ticket> normal, List<Ticket> tatkal})? getBookingWindowTicketsForDay(
+    DateTime day,
+  ) {
+    final dateOnly = _normalizeToDateOnly(day);
+    return _bookingWindows[dateOnly];
   }
 
   List<Event> getEventsForDay(DateTime day) {

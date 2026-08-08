@@ -21,6 +21,7 @@ class ThemedDayCell extends StatelessWidget {
   Widget build(BuildContext context) {
     final tickets = provider.getTicketsForDay(day);
     final events = provider.getEventsForDay(day);
+    final bookingWindows = provider.getBookingWindowTicketsForDay(day);
 
     var primaryIcon = Icons.directions_bus;
     if (tickets.isNotEmpty) {
@@ -68,7 +69,33 @@ class ThemedDayCell extends StatelessWidget {
               color: Colors.white,
             ),
           ),
+          if (bookingWindows != null)
+            Positioned(
+              bottom: 2,
+              right: 2,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (bookingWindows.normal.isNotEmpty)
+                    _dot(Colors.lightBlueAccent),
+                  if (bookingWindows.tatkal.isNotEmpty)
+                    _dot(Colors.deepOrangeAccent),
+                ],
+              ),
+            ),
         ],
+      ),
+    );
+  }
+
+  Widget _dot(Color color) {
+    return Container(
+      width: 5,
+      height: 5,
+      margin: const EdgeInsets.only(left: 1),
+      decoration: BoxDecoration(
+        color: color,
+        shape: BoxShape.circle,
       ),
     );
   }
