@@ -50,7 +50,8 @@ class CalendarView extends StatelessWidget {
                     const SnackBar(content: Text('Booking reminder set')),
                   );
                 }
-              },            ),
+              },
+            ),
           ],
         ),
         body: const CalendarContent(),
