@@ -12,12 +12,27 @@ void main() {
       );
     });
 
-    test('Tatkal opens one day before origin-station departure', () {
+    test('Tatkal opens at 10:00 the day before for AC classes', () {
       final originDeparture = DateTime(2026, 9, 15, 18, 30);
 
       expect(
-        BookingReminderSchedule.tatkalBookingOpens(originDeparture),
-        DateTime(2026, 9, 14, 18, 30),
+        BookingReminderSchedule.tatkalBookingOpens(
+          originDeparture,
+          TatkalClass.ac,
+        ),
+        DateTime(2026, 9, 14, 10),
+      );
+    });
+
+    test('Tatkal opens at 11:00 the day before for non-AC classes', () {
+      final originDeparture = DateTime(2026, 9, 15, 18, 30);
+
+      expect(
+        BookingReminderSchedule.tatkalBookingOpens(
+          originDeparture,
+          TatkalClass.nonAc,
+        ),
+        DateTime(2026, 9, 14, 11),
       );
     });
   });

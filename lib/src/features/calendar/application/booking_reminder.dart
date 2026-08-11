@@ -3,6 +3,9 @@ import 'package:flutter/foundation.dart';
 /// The booking window a calendar reminder is for.
 enum BookingWindow { normal, tatkal }
 
+/// IRCTC Tatkal booking class, which determines when booking opens.
+enum TatkalClass { ac, nonAc }
+
 /// A user-created reminder to make a travel booking.
 @immutable
 class BookingReminder {
@@ -36,7 +39,7 @@ class BookingReminder {
     'window': window.name,
     'journeyDeparture': journeyDeparture.millisecondsSinceEpoch,
     'remindAt': remindAt.millisecondsSinceEpoch,
-    if (notificationId != null) 'notificationId': notificationId,
+    'notificationId': ?notificationId,
   };
 
   factory BookingReminder.fromMap(Map<String, Object?> map) {
@@ -84,6 +87,17 @@ abstract final class BookingReminderSchedule {
   static DateTime normalBookingOpens(DateTime journeyDeparture) =>
       journeyDeparture.subtract(const Duration(days: 60));
 
-  static DateTime tatkalBookingOpens(DateTime originDeparture) =>
-      originDeparture.subtract(const Duration(days: 1));
+  static DateTime tatkalBookingOpens(
+    DateTime originDeparture,
+    TatkalClass tatkalClass,
+  ) {
+    final dayBefore = originDeparture.subtract(const Duration(days: 1));
+    final openingHour = tatkalClass == TatkalClass.ac ? 10 : 11;
+    return DateTime(
+      dayBefore.year,
+      dayBefore.month,
+      dayBefore.day,
+      openingHour,
+    );
+  }
 }

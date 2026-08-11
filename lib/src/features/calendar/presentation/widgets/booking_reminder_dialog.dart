@@ -19,6 +19,7 @@ class _BookingReminderDialogState extends State<BookingReminderDialog> {
   TimeOfDay _departureTime = const TimeOfDay(hour: 8, minute: 0);
   String _provider = 'TNSTC';
   BookingWindow _window = BookingWindow.normal;
+  TatkalClass _tatkalClass = TatkalClass.nonAc;
   bool _isSaving = false;
 
   @override
@@ -36,7 +37,10 @@ class _BookingReminderDialogState extends State<BookingReminderDialog> {
   );
 
   DateTime get _remindAt => _window == BookingWindow.tatkal
-      ? BookingReminderSchedule.tatkalBookingOpens(_journeyDeparture)
+      ? BookingReminderSchedule.tatkalBookingOpens(
+          _journeyDate,
+          _tatkalClass,
+        )
       : BookingReminderSchedule.normalBookingOpens(_journeyDeparture);
 
   Future<void> _pickJourneyDate() async {
@@ -99,6 +103,7 @@ class _BookingReminderDialogState extends State<BookingReminderDialog> {
       return;
     }
     if (mounted) Navigator.of(context).pop(true);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -129,6 +134,19 @@ class _BookingReminderDialogState extends State<BookingReminderDialog> {
               }),
             ),
             const SizedBox(height: 16),
+            if (isTatkal)
+              SegmentedButton<TatkalClass>(
+                segments: const [
+                  ButtonSegment(value: TatkalClass.ac, label: Text('AC')),
+                  ButtonSegment(
+                    value: TatkalClass.nonAc,
+                    label: Text('Non-AC'),
+                  ),
+                ],
+                selected: {_tatkalClass},
+                onSelectionChanged: (selection) =>
+                    setState(() => _tatkalClass = selection.first),
+              ),
             if (!isTatkal)
               DropdownButtonFormField<String>(
                 value: _provider,
