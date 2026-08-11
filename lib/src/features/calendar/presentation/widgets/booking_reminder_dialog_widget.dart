@@ -5,16 +5,21 @@ import 'package:namma_wallet/src/common/services/push_notification/notification_
 import 'package:namma_wallet/src/features/calendar/application/booking_reminder.dart';
 import 'package:namma_wallet/src/features/calendar/application/booking_reminder_service.dart';
 
-class BookingReminderDialog extends StatefulWidget {
-  const BookingReminderDialog({required this.initialJourneyDate, super.key});
+class BookingReminderDialogWidget extends StatefulWidget {
+  const BookingReminderDialogWidget({
+    required this.initialJourneyDate,
+    super.key,
+  });
 
   final DateTime initialJourneyDate;
 
   @override
-  State<BookingReminderDialog> createState() => _BookingReminderDialogState();
+  State<BookingReminderDialogWidget> createState() =>
+      _BookingReminderDialogWidgetState();
 }
 
-class _BookingReminderDialogState extends State<BookingReminderDialog> {
+class _BookingReminderDialogWidgetState
+    extends State<BookingReminderDialogWidget> {
   late DateTime _journeyDate;
   TimeOfDay _departureTime = const TimeOfDay(hour: 8, minute: 0);
   String _provider = 'TNSTC';

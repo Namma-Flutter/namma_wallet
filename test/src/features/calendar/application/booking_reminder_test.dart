@@ -47,6 +47,37 @@ void main() {
       notificationId: -1,
     );
 
-    expect(BookingReminder.fromMap(reminder.toMap()).notificationId, -1);
+    expect(BookingReminder.fromMap(reminder.toMap())!.notificationId, -1);
+  });
+
+  test('fromMap returns null for invalid records', () {
+    expect(
+      BookingReminder.fromMap({'id': '', 'provider': 'TNSTC'}),
+      isNull,
+    );
+    expect(
+      BookingReminder.fromMap({'id': 'x', 'provider': ''}),
+      isNull,
+    );
+    expect(
+      BookingReminder.fromMap({
+        'id': 'x',
+        'provider': 'TNSTC',
+        'window': 'bogus',
+        'journeyDeparture': 0,
+        'remindAt': 0,
+      }),
+      isNull,
+    );
+    expect(
+      BookingReminder.fromMap({
+        'id': 'x',
+        'provider': 'TNSTC',
+        'window': 'normal',
+        'journeyDeparture': 'bad',
+        'remindAt': 0,
+      }),
+      isNull,
+    );
   });
 }

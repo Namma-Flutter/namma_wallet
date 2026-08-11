@@ -7,7 +7,7 @@ import 'package:namma_wallet/src/common/services/haptic/haptic_service_extension
 import 'package:namma_wallet/src/common/services/haptic/haptic_service_interface.dart';
 import 'package:namma_wallet/src/common/theme/app_theme.dart';
 import 'package:namma_wallet/src/features/calendar/application/calendar_provider.dart';
-import 'package:namma_wallet/src/features/calendar/presentation/widgets/booking_reminder_dialog.dart';
+import 'package:namma_wallet/src/features/calendar/presentation/widgets/booking_reminder_dialog_widget.dart';
 import 'package:namma_wallet/src/features/calendar/presentation/widgets/calendar_list.dart';
 import 'package:namma_wallet/src/features/calendar/presentation/widgets/calendar_toggle_buttons.dart';
 import 'package:namma_wallet/src/features/calendar/presentation/widgets/calendar_widget.dart';
@@ -41,7 +41,7 @@ class CalendarView extends StatelessWidget {
                 final now = DateTime.now();
                 final result = await showDialog<bool>(
                   context: context,
-                  builder: (_) => BookingReminderDialog(
+                  builder: (_) => BookingReminderDialogWidget(
                     initialJourneyDate: DateTime(now.year, now.month, now.day),
                   ),
                 );
