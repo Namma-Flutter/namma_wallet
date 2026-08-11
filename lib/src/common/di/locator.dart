@@ -31,6 +31,7 @@ import 'package:namma_wallet/src/common/theme/theme_provider.dart';
 import 'package:namma_wallet/src/features/ai/fallback_parser/application/ai_service_interface.dart';
 import 'package:namma_wallet/src/features/ai/fallback_parser/application/gemma_service.dart';
 import 'package:namma_wallet/src/features/ai/fallback_parser/application/web_gemma_service.dart';
+import 'package:namma_wallet/src/features/calendar/application/booking_reminder_service.dart';
 import 'package:namma_wallet/src/features/clipboard/application/clipboard_service.dart';
 import 'package:namma_wallet/src/features/clipboard/application/clipboard_service_interface.dart';
 import 'package:namma_wallet/src/features/clipboard/data/clipboard_repository.dart';
@@ -109,6 +110,11 @@ void setupLocator() {
     )
     ..registerLazySingleton<INotificationService>(
       () => kIsWeb ? WebNotificationService() : NotificationService(),
+    )
+    ..registerLazySingleton<IBookingReminderService>(
+      () => BookingReminderService(
+        notificationService: getIt<INotificationService>(),
+      ),
     )
     // Parsers
     ..registerLazySingleton<TNSTCSMSParser>(TNSTCSMSParser.new)

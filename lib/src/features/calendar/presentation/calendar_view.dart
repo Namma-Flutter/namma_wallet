@@ -7,6 +7,7 @@ import 'package:namma_wallet/src/common/services/haptic/haptic_service_extension
 import 'package:namma_wallet/src/common/services/haptic/haptic_service_interface.dart';
 import 'package:namma_wallet/src/common/theme/app_theme.dart';
 import 'package:namma_wallet/src/features/calendar/application/calendar_provider.dart';
+import 'package:namma_wallet/src/features/calendar/presentation/widgets/booking_reminder_dialog.dart';
 import 'package:namma_wallet/src/features/calendar/presentation/widgets/calendar_list.dart';
 import 'package:namma_wallet/src/features/calendar/presentation/widgets/calendar_toggle_buttons.dart';
 import 'package:namma_wallet/src/features/calendar/presentation/widgets/calendar_widget.dart';
@@ -31,6 +32,26 @@ class CalendarView extends StatelessWidget {
             child: Text('Calendar'),
           ),
           centerTitle: false,
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.add_alert_outlined),
+              tooltip: 'Set booking reminder',
+              onPressed: () async {
+                final now = DateTime.now();
+                final result = await showDialog<bool>(
+                  context: context,
+                  builder: (_) => BookingReminderDialog(
+                    initialJourneyDate: DateTime(now.year, now.month, now.day),
+                  ),
+                );
+                if (result ?? false) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Booking reminder set')),
+                  );
+                }
+              },
+            ),
+          ],
         ),
         body: const CalendarContent(),
       ),
