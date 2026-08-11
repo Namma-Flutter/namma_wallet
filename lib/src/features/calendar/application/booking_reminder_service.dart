@@ -25,9 +25,10 @@ class BookingReminderService implements IBookingReminderService {
     for (final item in stored) {
       try {
         final decoded = jsonDecode(item);
-        if (decoded is Map<String, dynamic>)
+        if (decoded is Map<String, dynamic>) {
           reminders.add(BookingReminder.fromMap(decoded));
-      } on FormatException {
+        }
+      } on Object {
         // Ignore malformed stored entries while preserving valid reminders.
       }
     }
@@ -35,44 +36,81 @@ class BookingReminderService implements IBookingReminderService {
     return reminders;
   }
 
-  @override
-  Future<void> saveReminder(BookingReminder reminder) async {
-    final reminders = await getReminders();
-    final index = reminders.indexWhere((item) => item.id == reminder.id);
-    if (index >= 0) {
-      await _notificationService.cancelTicketReminder(
-        _notificationId(reminders[index]),
-      );
-      reminders[index] = reminder;
-    } else {
-      reminders.add(reminder);
-    }
+  Future<void> _persist(List<BookingReminder> reminders) async {
     final preferences = await SharedPreferences.getInstance();
     await preferences.setStringList(
       _storageKey,
       reminders.map((item) => jsonEncode(item.toMap())).toList(),
     );
+  }
+
+  @override
+  Future<void> saveReminder(BookingReminder reminder) async {
+    final reminders = await getReminders();
+    final index = reminders.indexWhere((item) => item.id == reminder.id);
+    final notificationId = _resolveNotificationId(
+      reminder: reminder,
+      existingReminder: index >= 0 ? reminders[index] : null,
+      reminders: reminders,
+    );
+    final storedReminder = reminder.withNotificationId(notificationId);
+    if (index >= 0) {
+      final previousNotificationId = reminders[index].notificationId;
+      if (previousNotificationId != null) {
+        await _notificationService.cancelTicketReminder(previousNotificationId);
+      }
+      reminders[index] = storedReminder;
+    } else {
+      reminders.add(storedReminder);
+    }
+    await _persist(reminders);
     await _notificationService.scheduleTicketReminder(
-      id: _notificationId(reminder),
-      dateTime: reminder.remindAt,
-      title: reminder.title,
-      body: reminder.description,
-      payload: 'booking-reminder:${reminder.id}',
+      id: storedReminder.notificationId!,
+      dateTime: storedReminder.remindAt,
+      title: storedReminder.title,
+      body: storedReminder.description,
+      payload: 'booking-reminder:${storedReminder.id}',
     );
   }
 
   @override
   Future<void> deleteReminder(BookingReminder reminder) async {
     final reminders = await getReminders();
+    final index = reminders.indexWhere((item) => item.id == reminder.id);
+    final storedReminder = index >= 0 ? reminders[index] : null;
     reminders.removeWhere((item) => item.id == reminder.id);
-    final preferences = await SharedPreferences.getInstance();
-    await preferences.setStringList(
-      _storageKey,
-      reminders.map((item) => jsonEncode(item.toMap())).toList(),
-    );
-    await _notificationService.cancelTicketReminder(_notificationId(reminder));
+    await _persist(reminders);
+    if (storedReminder?.notificationId case final notificationId?) {
+      await _notificationService.cancelTicketReminder(notificationId);
+    }
   }
 
-  int _notificationId(BookingReminder reminder) =>
-      1000000000 + (reminder.id.hashCode.abs() % 1000000000);
+  int _resolveNotificationId({
+    required BookingReminder reminder,
+    required BookingReminder? existingReminder,
+    required List<BookingReminder> reminders,
+  }) {
+    if (existingReminder?.notificationId case final existingId?) {
+      return existingId;
+    }
+    final requestedId = reminder.notificationId;
+    final isUnused = !reminders.any(
+      (stored) => stored.notificationId == requestedId,
+    );
+    if (requestedId != null && isUnused) return requestedId;
+    return _nextNotificationId(reminders);
+  }
+
+  /// Booking reminders use a reserved negative range, while ticket reminders
+  /// use non-negative IDs. The value is persisted with the reminder.
+  int _nextNotificationId(List<BookingReminder> reminders) {
+    final usedIds = reminders
+        .map((reminder) => reminder.notificationId)
+        .whereType<int>()
+        .toSet();
+    for (var candidate = -1; candidate > -1000000000; candidate--) {
+      if (!usedIds.contains(candidate)) return candidate;
+    }
+    throw StateError('No notification IDs remain for booking reminders.');
+  }
 }

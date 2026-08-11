@@ -88,9 +88,17 @@ class _BookingReminderDialogState extends State<BookingReminderDialog> {
       journeyDeparture: _journeyDeparture,
       remindAt: remindAt,
     );
-    await getIt<IBookingReminderService>().saveReminder(reminder);
+    try {
+      await getIt<IBookingReminderService>().saveReminder(reminder);
+    } on Object {
+      if (!mounted) return;
+      setState(() => _isSaving = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Could not set the reminder.')),
+      );
+      return;
+    }
     if (mounted) Navigator.of(context).pop(true);
-  }
 
   @override
   Widget build(BuildContext context) {

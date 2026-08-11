@@ -12,6 +12,7 @@ class BookingReminder {
     required this.window,
     required this.journeyDeparture,
     required this.remindAt,
+    this.notificationId,
   });
 
   final String id;
@@ -19,6 +20,7 @@ class BookingReminder {
   final BookingWindow window;
   final DateTime journeyDeparture;
   final DateTime remindAt;
+  final int? notificationId;
 
   String get title => window == BookingWindow.tatkal
       ? 'Book IRCTC Tatkal ticket'
@@ -34,23 +36,47 @@ class BookingReminder {
     'window': window.name,
     'journeyDeparture': journeyDeparture.millisecondsSinceEpoch,
     'remindAt': remindAt.millisecondsSinceEpoch,
+    if (notificationId != null) 'notificationId': notificationId,
   };
 
   factory BookingReminder.fromMap(Map<String, Object?> map) {
+    final id = map['id'] as String?;
+    final provider = map['provider'] as String?;
     final windowName = map['window'] as String?;
     final journeyMillis = map['journeyDeparture'] as int?;
     final reminderMillis = map['remindAt'] as int?;
-    if (windowName == null || journeyMillis == null || reminderMillis == null) {
+    if (id == null ||
+        id.isEmpty ||
+        provider == null ||
+        windowName == null ||
+        journeyMillis == null ||
+        reminderMillis == null) {
       throw const FormatException('Incomplete booking reminder');
     }
+    final window = BookingWindow.values
+        .where((value) => value.name == windowName)
+        .firstOrNull;
+    if (window == null) {
+      throw FormatException('Unknown booking window: $windowName');
+    }
     return BookingReminder(
-      id: map['id'] as String? ?? '',
-      provider: map['provider'] as String? ?? '',
-      window: BookingWindow.values.byName(windowName),
+      id: id,
+      provider: provider,
+      window: window,
       journeyDeparture: DateTime.fromMillisecondsSinceEpoch(journeyMillis),
       remindAt: DateTime.fromMillisecondsSinceEpoch(reminderMillis),
+      notificationId: map['notificationId'] as int?,
     );
   }
+
+  BookingReminder withNotificationId(int value) => BookingReminder(
+    id: id,
+    provider: provider,
+    window: window,
+    journeyDeparture: journeyDeparture,
+    remindAt: remindAt,
+    notificationId: value,
+  );
 }
 
 /// Calculates booking-window opening times from the journey departure.
