@@ -21,4 +21,17 @@ void main() {
       );
     });
   });
+
+  test('persists the notification ID with the reminder', () {
+    final reminder = BookingReminder(
+      id: 'IRCTC_normal_1789459200000',
+      provider: 'IRCTC',
+      window: BookingWindow.normal,
+      journeyDeparture: DateTime(2026, 9, 15, 8),
+      remindAt: DateTime(2026, 7, 17, 8),
+      notificationId: -1,
+    );
+
+    expect(BookingReminder.fromMap(reminder.toMap()).notificationId, -1);
+  });
 }

@@ -37,6 +37,7 @@ class CalendarView extends StatelessWidget {
               icon: const Icon(Icons.add_alert_outlined),
               tooltip: 'Set booking reminder',
               onPressed: () async {
+                final messenger = ScaffoldMessenger.of(context);
                 final now = DateTime.now();
                 final result = await showDialog<bool>(
                   context: context,
@@ -45,12 +46,11 @@ class CalendarView extends StatelessWidget {
                   ),
                 );
                 if (result ?? false) {
-                  ScaffoldMessenger.of(context).showSnackBar(
+                  messenger.showSnackBar(
                     const SnackBar(content: Text('Booking reminder set')),
                   );
                 }
-              },
-            ),
+              },            ),
           ],
         ),
         body: const CalendarContent(),
