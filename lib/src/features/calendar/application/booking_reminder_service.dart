@@ -26,7 +26,10 @@ class BookingReminderService implements IBookingReminderService {
       try {
         final decoded = jsonDecode(item);
         if (decoded is Map<String, dynamic>) {
-          reminders.add(BookingReminder.fromMap(decoded));
+          final reminder = BookingReminder.fromMap(decoded);
+          if (reminder != null) {
+            reminders.add(reminder);
+          }
         }
       } on Object {
         // Ignore malformed stored entries while preserving valid reminders.
@@ -38,10 +41,13 @@ class BookingReminderService implements IBookingReminderService {
 
   Future<void> _persist(List<BookingReminder> reminders) async {
     final preferences = await SharedPreferences.getInstance();
-    await preferences.setStringList(
+    final saved = await preferences.setStringList(
       _storageKey,
       reminders.map((item) => jsonEncode(item.toMap())).toList(),
     );
+    if (!saved) {
+      throw StateError('Failed to persist booking reminders.');
+    }
   }
 
   @override
@@ -54,16 +60,18 @@ class BookingReminderService implements IBookingReminderService {
       reminders: reminders,
     );
     final storedReminder = reminder.withNotificationId(notificationId);
+    final previousNotificationId = index >= 0
+        ? reminders[index].notificationId
+        : null;
     if (index >= 0) {
-      final previousNotificationId = reminders[index].notificationId;
-      if (previousNotificationId != null) {
-        await _notificationService.cancelTicketReminder(previousNotificationId);
-      }
       reminders[index] = storedReminder;
     } else {
       reminders.add(storedReminder);
     }
     await _persist(reminders);
+    if (previousNotificationId != null) {
+      await _notificationService.cancelTicketReminder(previousNotificationId);
+    }
     await _notificationService.scheduleTicketReminder(
       id: storedReminder.notificationId!,
       dateTime: storedReminder.remindAt,

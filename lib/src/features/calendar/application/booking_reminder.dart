@@ -42,33 +42,35 @@ class BookingReminder {
     'notificationId': ?notificationId,
   };
 
-  factory BookingReminder.fromMap(Map<String, Object?> map) {
-    final id = map['id'] as String?;
-    final provider = map['provider'] as String?;
-    final windowName = map['window'] as String?;
-    final journeyMillis = map['journeyDeparture'] as int?;
-    final reminderMillis = map['remindAt'] as int?;
-    if (id == null ||
+  static BookingReminder? fromMap(Map<String, Object?> map) {
+    final id = map['id'];
+    final provider = map['provider'];
+    final windowName = map['window'];
+    final journeyMillis = map['journeyDeparture'];
+    final reminderMillis = map['remindAt'];
+    if (id is! String ||
         id.isEmpty ||
-        provider == null ||
-        windowName == null ||
-        journeyMillis == null ||
-        reminderMillis == null) {
-      throw const FormatException('Incomplete booking reminder');
+        provider is! String ||
+        provider.isEmpty ||
+        windowName is! String ||
+        journeyMillis is! int ||
+        reminderMillis is! int) {
+      return null;
     }
     final window = BookingWindow.values
         .where((value) => value.name == windowName)
         .firstOrNull;
     if (window == null) {
-      throw FormatException('Unknown booking window: $windowName');
+      return null;
     }
+    final notificationId = map['notificationId'];
     return BookingReminder(
       id: id,
       provider: provider,
       window: window,
       journeyDeparture: DateTime.fromMillisecondsSinceEpoch(journeyMillis),
       remindAt: DateTime.fromMillisecondsSinceEpoch(reminderMillis),
-      notificationId: map['notificationId'] as int?,
+      notificationId: notificationId is int ? notificationId : null,
     );
   }
 

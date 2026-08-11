@@ -80,7 +80,7 @@ Passes that include a `webServiceURL` (e.g. Luma event passes) are automatically
 
 ### Prerequisites
 
-* **Flutter SDK** - 3.44.2 (managed via FVM)
+* **Flutter SDK** - 3.44.9 (managed via FVM)
 * **Android Studio** / **Xcode** - For mobile app development
 * **Xcode** - 16.4.0 (for iOS development)
 * **FVM** - Flutter Version Management (recommended)
@@ -124,8 +124,8 @@ cd namma_wallet
 # Install FVM (if not already installed)
 dart pub global activate fvm
 
-# Use Flutter 3.44.2 via FVM
-fvm use 3.44.2
+# Use Flutter 3.44.9 via FVM
+fvm use 3.44.9
 
 # Get dependencies
 fvm flutter pub get
