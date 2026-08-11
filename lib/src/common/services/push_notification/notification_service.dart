@@ -120,6 +120,7 @@ class NotificationService implements INotificationService {
           }
           return;
         }
+        if (payload.startsWith('booking-reminder:')) return;
         if (rootNavigatorKey.currentContext != null) {
           rootNavigatorKey.currentContext?.goNamed(
             AppRoute.ticketView.name,
@@ -163,6 +164,10 @@ class NotificationService implements INotificationService {
   Future<void> handleInitialNotification() async {
     final payload = _initialNotificationPayload;
     if (payload == null || payload.isEmpty) return;
+    if (payload.startsWith('booking-reminder:')) {
+      _initialNotificationPayload = null;
+      return;
+    }
 
     // Try immediate navigation if context is ready
     if (rootNavigatorKey.currentContext != null) {
