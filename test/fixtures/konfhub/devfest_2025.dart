@@ -77,5 +77,5 @@ const Map<String, Object> devfest2025Expected = {
   'ticketName': 'Early Bird Professional',
   'location':
       'IIT Madras Research Park, MGR Film City Road, Kanagam, Tharamani, '
-          'Chennai, Tamil Nadu, India',
+      'Chennai, Tamil Nadu, India',
 };

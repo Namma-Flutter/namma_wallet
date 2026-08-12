@@ -56,19 +56,19 @@ class KonfHubLayoutParser extends EventLayoutParser {
         // Simple heuristic: if there are blocks directly
         // below the location block,
         // with similar left alignment, append them.
-        final belowBlocks = blocks.where((b) {
-          return b != locBlock &&
-              b.page == locBlock.page &&
-              b.boundingBox.top >= locBlock.boundingBox.bottom - 5 &&
-              b.boundingBox.top <
-                  locBlock.boundingBox.bottom + 100 && // within next few lines
-              (b.boundingBox.left - locBlock.boundingBox.left).abs() <
-                  20; // roughly aligned
-        }).toList()
-
-        ..sort(
-          (a, b) => a.boundingBox.top.compareTo(b.boundingBox.top),
-        );
+        final belowBlocks =
+            blocks.where((b) {
+              return b != locBlock &&
+                  b.page == locBlock.page &&
+                  b.boundingBox.top >= locBlock.boundingBox.bottom - 5 &&
+                  b.boundingBox.top <
+                      locBlock.boundingBox.bottom +
+                          100 && // within next few lines
+                  (b.boundingBox.left - locBlock.boundingBox.left).abs() <
+                      20; // roughly aligned
+            }).toList()..sort(
+              (a, b) => a.boundingBox.top.compareTo(b.boundingBox.top),
+            );
         final buffer = StringBuffer(location);
         for (final b in belowBlocks) {
           buffer.write(' ${b.text}');
@@ -172,15 +172,14 @@ class KonfHubLayoutParser extends EventLayoutParser {
 
     if (attendeeDetailsBlock.text.isNotEmpty &&
         eventNameBlock.text.isNotEmpty) {
-      final betweenBlocks = blocks.where((b) {
-        return b.page == attendeeDetailsBlock.page &&
-            b.boundingBox.top > attendeeDetailsBlock.boundingBox.bottom &&
-            b.boundingBox.top < eventNameBlock.boundingBox.top;
-      }).toList()
-
-      ..sort(
-        (a, b) => a.boundingBox.top.compareTo(b.boundingBox.top),
-      );
+      final betweenBlocks =
+          blocks.where((b) {
+            return b.page == attendeeDetailsBlock.page &&
+                b.boundingBox.top > attendeeDetailsBlock.boundingBox.bottom &&
+                b.boundingBox.top < eventNameBlock.boundingBox.top;
+          }).toList()..sort(
+            (a, b) => a.boundingBox.top.compareTo(b.boundingBox.top),
+          );
 
       if (betweenBlocks.isNotEmpty) {
         attendeeName = betweenBlocks[0].text.trim();
