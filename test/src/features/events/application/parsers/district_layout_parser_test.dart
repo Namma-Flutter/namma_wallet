@@ -3,9 +3,9 @@ import 'package:get_it/get_it.dart';
 import 'package:namma_wallet/src/common/domain/models/extras_model.dart';
 import 'package:namma_wallet/src/common/enums/ticket_type.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
-import 'package:namma_wallet/src/features/events/application/movie_layout_parser.dart';
-import '../../../../fixtures/district_layout_fixtures.dart';
-import '../../../../helpers/fake_logger.dart';
+import 'package:namma_wallet/src/features/events/application/parsers/district_layout_parser.dart';
+import '../../../../../fixtures/district_layout_fixtures.dart';
+import '../../../../../helpers/fake_logger.dart';
 
 void main() {
   group('DistrictMovieParser', () {

@@ -4,16 +4,19 @@ import 'package:namma_wallet/src/common/enums/source_type.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
 import 'package:namma_wallet/src/common/services/ocr/layout_extractor.dart';
 import 'package:namma_wallet/src/common/services/ocr/ocr_block.dart';
-import 'package:namma_wallet/src/features/events/application/movie_layout_parser.dart';
+import 'package:namma_wallet/src/features/events/application/event_layout_parser.dart';
+import 'package:namma_wallet/src/features/events/application/parsers/district_layout_parser.dart';
+import 'package:namma_wallet/src/features/events/application/parsers/konfhub_layout_parser.dart';
 
 class EventParserService {
   EventParserService({required ILogger logger})
     : _logger = logger,
       _parsers = [
         DistrictMovieParser(logger: logger),
+        KonfHubLayoutParser(logger: logger),
       ];
   final ILogger _logger;
-  final List<MovieTicketParser> _parsers;
+  final List<EventLayoutParser> _parsers;
 
   Future<Ticket?> parseTicketFromBlocks(
     List<OCRBlock> blocks,
@@ -81,6 +84,15 @@ class EventParserService {
       );
       return null;
     }
+  }
+
+  /// Attempts to parse ticket from OCR blocks specifically for PDFs
+  /// where an image path is not applicable/needed for QR extraction.
+  Future<Ticket?> parseTicketFromBlocksForPDF(
+    List<OCRBlock> blocks, {
+    SourceType? sourceType,
+  }) async {
+    return parseTicketFromBlocks(blocks, '', sourceType: sourceType);
   }
 
   /// Adds "Provider" and "Source Type" extras if not already present.
