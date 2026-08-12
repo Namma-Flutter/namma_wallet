@@ -6,6 +6,7 @@ import 'package:namma_wallet/src/common/domain/models/tag_model.dart';
 import 'package:namma_wallet/src/common/enums/ticket_type.dart';
 import 'package:namma_wallet/src/common/helper/date_time_converter.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
+import 'package:namma_wallet/src/features/events/domain/konfhub_ticket_model.dart';
 import 'package:namma_wallet/src/features/events/domain/movie_ticket_model.dart';
 import 'package:namma_wallet/src/features/irctc/domain/irctc_ticket_model.dart';
 import 'package:namma_wallet/src/features/tnstc/domain/tnstc_model.dart';
@@ -77,6 +78,46 @@ class Ticket with TicketMappable {
           ExtrasModel(title: 'Seats', value: model.seats),
         if (model.qrData.isNotNullOrEmpty)
           ExtrasModel(title: 'QR Data', value: model.qrData),
+        ExtrasModel(title: 'Source Type', value: sourceType),
+      ],
+    );
+  }
+
+  factory Ticket.fromKonfHub(
+    KonfHubTicketModel model, {
+    String sourceType = 'PDF',
+  }) {
+    return Ticket(
+      ticketId: model.bookingId,
+      primaryText: model.eventName,
+      secondaryText: model.ticketName,
+      startTime: model.eventStartTime,
+      endTime: model.eventEndTime,
+      location: model.location,
+      type: TicketType.event,
+      tags: [
+        if (model.attendeeName.isNotNullOrEmpty)
+          TagModel(value: model.attendeeName, icon: 'person'),
+        if (model.ticketName.isNotNullOrEmpty)
+          TagModel(value: model.ticketName, icon: 'confirmation_number'),
+      ],
+      extras: [
+        if (model.bookingId.isNotNullOrEmpty)
+          ExtrasModel(title: 'Booking ID', value: model.bookingId),
+        if (model.attendeeName.isNotNullOrEmpty)
+          ExtrasModel(title: 'Attendee', value: model.attendeeName),
+        if (model.organization.isNotNullOrEmpty)
+          ExtrasModel(title: 'Organization', value: model.organization),
+        if (model.ticketName.isNotNullOrEmpty)
+          ExtrasModel(title: 'Ticket Type', value: model.ticketName),
+        if (model.bookingDate != null)
+          ExtrasModel(
+            title: 'Booking Date',
+            value: DateTimeConverter.instance.formatDate(model.bookingDate!),
+          ),
+        ...?model.additionalDetails?.entries.map(
+          (e) => ExtrasModel(title: e.key, value: e.value),
+        ),
         ExtrasModel(title: 'Source Type', value: sourceType),
       ],
     );
