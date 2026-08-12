@@ -85,6 +85,14 @@ class FakeEventParser implements EventParserService {
   }) {
     return Future.value(parsedTicket);
   }
+
+  @override
+  Future<Ticket?> parseTicketFromBlocksForPDF(
+    List<OCRBlock> blocks, {
+    SourceType? sourceType,
+  }) {
+    return Future.value(parsedTicket);
+  }
 }
 
 class FakeTravelParser implements ITravelParser {

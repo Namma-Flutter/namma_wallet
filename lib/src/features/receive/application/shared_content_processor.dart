@@ -146,13 +146,33 @@ class SharedContentProcessor implements ISharedContentProcessor {
         );
       }
 
-      final sourceType = contentType == SharedContentType.pdf
-          ? SourceType.pdf
-          : SourceType.sms;
+      if (contentType == SharedContentType.pdf) {
+        _logger.info('Processing PDF file via SharedContentProcessor');
+        final ticket = await _importService.importAndSavePDFFile(
+          XFile(content),
+        );
+        if (ticket == null) {
+          return const ProcessingErrorResult(
+            message: 'Failed to process PDF file',
+            error: 'Parser returned null',
+          );
+        }
+        final archived = shouldArchiveTicket(ticket);
+        return TicketCreatedResult(
+          pnrNumber: ticket.pnrOrId,
+          from: ticket.fromLocation,
+          to: ticket.toLocation,
+          fare: ticket.fare,
+          date: ticket.date,
+          ticketId: ticket.ticketId,
+          warning: archived ? archivedPastTicketMessage : null,
+          isArchived: archived,
+        );
+      }
 
       final ticket = _travelParserService.parseTicketFromText(
         content,
-        sourceType: sourceType,
+        sourceType: SourceType.sms,
       );
 
       if (ticket == null) {

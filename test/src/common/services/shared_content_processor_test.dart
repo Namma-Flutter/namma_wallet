@@ -433,7 +433,7 @@ void main() {
       );
 
       test(
-        'Given a PDF whose content only matches the update SMS pattern '
+        'Given SMS content that only matches the update SMS pattern '
         'and the original ticket exists, '
         'Then returns TicketUpdatedResult via the secondary update path',
         () async {
@@ -458,7 +458,7 @@ void main() {
 
           final result = await processor.processContent(
             'random pdf text',
-            SharedContentType.pdf,
+            SharedContentType.sms,
           );
 
           expect(result, isA<TicketUpdatedResult>());
@@ -469,7 +469,7 @@ void main() {
       );
 
       test(
-        'Given a PDF whose update path finds no original ticket, '
+        'Given SMS content whose update path finds no original ticket, '
         'Then returns TicketNotFoundResult via the secondary update path',
         () async {
           final mockUpdateInfo = TicketUpdateInfo(
@@ -489,7 +489,7 @@ void main() {
 
           final result = await processor.processContent(
             'random pdf text',
-            SharedContentType.pdf,
+            SharedContentType.sms,
           );
 
           expect(result, isA<TicketNotFoundResult>());
