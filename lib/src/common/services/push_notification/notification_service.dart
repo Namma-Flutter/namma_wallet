@@ -80,10 +80,27 @@ class NotificationService implements INotificationService {
   Future<void> initTimezone() async {
     tz.initializeTimeZones();
 
-    final timeZoneId = await getLocalTimezoneId();
-    final location = tz.getLocation(timeZoneId);
+    var timeZoneId = await getLocalTimezoneId();
+    // Handle IANA timezone renames that might not be in the database
+    if (timeZoneId == 'Asia/Calcutta') {
+      timeZoneId = 'Asia/Kolkata';
+    }
 
-    tz.setLocalLocation(location);
+    try {
+      final location = tz.getLocation(timeZoneId);
+      tz.setLocalLocation(location);
+    } on Exception catch (e) {
+      // Fallback to UTC if timezone is not found to prevent app crash
+      tz.setLocalLocation(tz.getLocation('UTC'));
+      if (_logger != null) {
+        _logger?.error(
+          'Timezone not found: $timeZoneId, falling back to UTC',
+          e,
+        );
+      } else {
+        debugPrint('Timezone not found: $timeZoneId, falling back to UTC: $e');
+      }
+    }
   }
 
   /// Initializes the notification service.
