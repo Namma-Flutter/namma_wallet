@@ -52,8 +52,8 @@ class TNSTCBusParser extends TravelTicketParser {
     // Must have at least one TNSTC-specific keyword
     final tnstcKeywords = [
       'TNSTC',
-      'Tamil Nadu',
-      'Corporation',
+      'Tamil Nadu State Transport',
+      'State Express Transport Corporation',
       'Service Start Place',
       'Trip Code',
     ];
@@ -301,7 +301,7 @@ class SETCBusParser extends TravelTicketParser {
     // SETC-specific patterns (without TNSTC)
     final setcPatterns = [
       'SETC',
-      'South Tamil Nadu',
+      'State Express Transport Corporation',
     ];
 
     // Check if it contains SETC but not TNSTC
