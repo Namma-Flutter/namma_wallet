@@ -161,6 +161,11 @@ final router = GoRouter(
       path: AppRoute.shareSuccess.path,
       name: AppRoute.shareSuccess.name,
       builder: (context, state) {
+        if (state.extra != null && state.extra is! TicketCreatedResult) {
+          return const Scaffold(
+            body: Center(child: Text('Invalid share data')),
+          );
+        }
         final result = state.extra as TicketCreatedResult?;
         if (result == null) {
           return const Scaffold(
