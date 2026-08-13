@@ -334,20 +334,24 @@ void main() {
         expect(result.warning, isNull);
       });
 
-      test('should return warning when provider is not Luma', () async {
-        final nonLumaTicket = testTicket.copyWith(
-          extras: [ExtrasModel(title: 'Provider', value: 'Other')],
-        );
-        fakePKPassParser.parsedTicket = nonLumaTicket;
+      test(
+        'should return no warning when provider is not Luma but type is known',
+        () async {
+          final nonLumaTicket = testTicket.copyWith(
+            extras: [ExtrasModel(title: 'Provider', value: 'Other')],
+          );
+          fakePKPassParser.parsedTicket = nonLumaTicket;
 
-        final result = await importService.importAndSavePKPassFile(
-          XFile(testPKPassPath),
-        );
+          final result = await importService.importAndSavePKPassFile(
+            XFile(testPKPassPath),
+          );
 
-        expect(result.ticket, nonLumaTicket);
-        expect(result.warning, equals('Imported pass is not from Luma'));
-        expect(fakeTicketDAO.handledTicket, nonLumaTicket);
-      });
+          expect(result.ticket, nonLumaTicket);
+          // No warning because the ticket type is known (train)
+          expect(result.warning, isNull);
+          expect(fakeTicketDAO.handledTicket, nonLumaTicket);
+        },
+      );
 
       test('should return no warning when provider contains Luma', () async {
         final lumaTicket = testTicket.copyWith(
@@ -364,7 +368,8 @@ void main() {
         expect(fakeTicketDAO.handledTicket, lumaTicket);
       });
 
-      test('should return warning when provider is missing', () async {
+      test('should return no warning when provider is missing but type is known',
+          () async {
         final noProviderTicket = testTicket.copyWith(extras: []);
         fakePKPassParser.parsedTicket = noProviderTicket;
 
@@ -373,8 +378,28 @@ void main() {
         );
 
         expect(result.ticket, noProviderTicket);
-        expect(result.warning, equals('Imported pass is not from Luma'));
+        // No warning because the ticket type is known (train)
+        expect(result.warning, isNull);
       });
+
+      test(
+        'should return warning when ticket type is null (unsupported pass)',
+        () async {
+          // Create a ticket with null type to trigger the new warning
+          final unknownTypeTicket = testTicket.copyWith(type: null);
+          fakePKPassParser.parsedTicket = unknownTypeTicket;
+
+          final result = await importService.importAndSavePKPassFile(
+            XFile(testPKPassPath),
+          );
+
+          expect(result.ticket, unknownTypeTicket);
+          expect(
+            result.warning,
+            equals('Imported pass type may not be fully supported'),
+          );
+        },
+      );
 
       test(
         'should return null ticket result when an exception occurs',

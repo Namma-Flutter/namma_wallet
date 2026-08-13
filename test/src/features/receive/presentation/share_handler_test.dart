@@ -6,6 +6,7 @@ import 'package:namma_wallet/src/features/receive/domain/shared_content_result.d
 import 'package:namma_wallet/src/features/receive/presentation/share_handler.dart';
 
 import '../../../../helpers/fake_go_router.dart';
+import 'package:namma_wallet/src/common/enums/ticket_type.dart';
 
 void main() {
   // Required because GlobalKey.currentState accesses WidgetsBinding.instance
@@ -36,20 +37,19 @@ void main() {
         () async {
           // Arrange (Given)
           const result = TicketCreatedResult(
-            pnrNumber: 'T12345678',
-            from: 'Chennai',
-            to: 'Bangalore',
-            fare: '500',
-            date: '15/12/2024',
             ticketId: 'T12345678',
+            ticketType: TicketType.bus,
+            title: 'Chennai → Bangalore',
+            subtitle: 'SETC',
+            date: '15/12/2024',
           );
 
           // Act (When)
           await handler.handleResult(result);
 
           // Assert (Then)
-          verify(fakeRouter.go('/')).called(1);
-          verify(fakeRouter.push('/ticket/T12345678')).called(1);
+          verify(fakeRouter.go('/share-success', extra: result)).called(1);
+          verifyNever(fakeRouter.go('/'));
         },
       );
 
@@ -60,10 +60,9 @@ void main() {
         () async {
           // Arrange (Given)
           const result = TicketCreatedResult(
-            pnrNumber: 'T12345678',
-            from: 'Chennai',
-            to: 'Bangalore',
-            fare: '500',
+            ticketId: null,
+            ticketType: TicketType.bus,
+            title: 'Chennai → Bangalore',
             date: '15/12/2024',
           );
 
@@ -71,7 +70,7 @@ void main() {
           await handler.handleResult(result);
 
           // Assert (Then)
-          verify(fakeRouter.go('/')).called(1);
+          verify(fakeRouter.go('/share-success', extra: result)).called(1);
         },
       );
 
@@ -82,12 +81,10 @@ void main() {
         () async {
           // Arrange (Given)
           const result = TicketCreatedResult(
-            pnrNumber: 'T12345678',
-            from: 'Chennai',
-            to: 'Bangalore',
-            fare: '500',
-            date: '15/12/2024',
             ticketId: 'T12345678',
+            ticketType: TicketType.bus,
+            title: 'Chennai → Bangalore',
+            date: '15/12/2024',
             warning: 'Some warning',
           );
 
@@ -95,8 +92,8 @@ void main() {
           await handler.handleResult(result);
 
           // Assert (Then)
-          verify(fakeRouter.go('/')).called(1);
-          verify(fakeRouter.push('/ticket/T12345678')).called(1);
+          verify(fakeRouter.go('/share-success', extra: result)).called(1);
+          verifyNever(fakeRouter.go('/'));
         },
       );
 
@@ -105,12 +102,10 @@ void main() {
         'Then pushes archived tickets over home',
         () async {
           const result = TicketCreatedResult(
-            pnrNumber: 'T12345678',
-            from: 'Chennai',
-            to: 'Bangalore',
-            fare: '500',
-            date: '15/12/2024',
             ticketId: 'T12345678',
+            ticketType: TicketType.bus,
+            title: 'Chennai → Bangalore',
+            date: '15/12/2024',
             warning: archivedPastTicketMessage,
             isArchived: true,
           );
@@ -129,12 +124,10 @@ void main() {
         'Then still pushes archived tickets over home',
         () async {
           const result = TicketCreatedResult(
-            pnrNumber: 'T12345678',
-            from: 'Chennai',
-            to: 'Bangalore',
-            fare: '500',
-            date: '15/12/2024',
             ticketId: 'T12345678',
+            ticketType: TicketType.bus,
+            title: 'Chennai → Bangalore',
+            date: '15/12/2024',
             isArchived: true,
           );
 
@@ -167,10 +160,10 @@ void main() {
                       extra: captureAnyNamed('extra'),
                     ),
                   ).captured.first
-                  as Map<String, dynamic>;
-          expect(captured['pnrNumber'], equals('T12345678'));
-          expect(captured['to'], equals('Conductor Details'));
-          expect(captured['from'], equals('Updated'));
+                  as TicketCreatedResult;
+          expect(captured.ticketId, equals('T12345678'));
+          expect(captured.subtitle, equals('Conductor Details'));
+          expect(captured.title, equals('Ticket Updated'));
         },
       );
 

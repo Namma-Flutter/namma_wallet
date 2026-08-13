@@ -18,7 +18,6 @@ class ShareHandler {
   Future<void> handleResult(SharedContentResult result) async {
     switch (result) {
       case TicketCreatedResult(
-        :final ticketId,
         :final warning,
         :final isArchived,
       ):
@@ -30,26 +29,22 @@ class ShareHandler {
           await router.push(archivedTicketsLocation());
           return;
         }
-        if (ticketId != null) {
-          router.go(AppRoute.home.path);
-          await router.push('/ticket/$ticketId');
-        } else {
-          router.go(AppRoute.home.path);
-        }
-
-      case TicketUpdatedResult(:final pnrNumber, :final updateType):
-        // Reuse share success screen with update-specific values
-        // 'to' field displays the update type (e.g., 'Seat', 'Platform')
-        // to provide user feedback about what was updated
+        // Navigate to success screen for user confirmation
         router.go(
           AppRoute.shareSuccess.path,
-          extra: {
-            'pnrNumber': pnrNumber,
-            'from': 'Updated',
-            'to': updateType,
-            'fare': 'Updated',
-            'date': 'Just Now',
-          },
+          extra: result,
+        );
+
+      case TicketUpdatedResult(:final pnrNumber, :final updateType):
+        router.go(
+          AppRoute.shareSuccess.path,
+          extra: TicketCreatedResult(
+            ticketId: pnrNumber,
+            ticketType: null,
+            title: 'Ticket Updated',
+            subtitle: updateType,
+            date: 'Just Now',
+          ),
         );
 
       case TicketNotFoundResult():

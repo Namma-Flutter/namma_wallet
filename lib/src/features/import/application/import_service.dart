@@ -244,13 +244,8 @@ class ImportService implements IImportService {
 
       // Check provider for warning
       String? warning;
-      final provider = parsedTicket.extras?.firstWhere(
-        (e) => e.title?.toLowerCase() == 'provider',
-        orElse: () => ExtrasModel(title: '', value: ''),
-      );
-
-      if (provider?.value?.toLowerCase().contains('luma') != true) {
-        warning = 'Imported pass is not from Luma';
+      if (parsedTicket.type == null) {
+        warning = 'Imported pass type may not be fully supported';
       }
 
       return TicketImportResult(ticket: parsedTicket, warning: warning);
