@@ -368,19 +368,21 @@ void main() {
         expect(fakeTicketDAO.handledTicket, lumaTicket);
       });
 
-      test('should return no warning when provider is missing but type is known',
-          () async {
-        final noProviderTicket = testTicket.copyWith(extras: []);
-        fakePKPassParser.parsedTicket = noProviderTicket;
+      test(
+        'should return no warning when provider is missing but type is known',
+        () async {
+          final noProviderTicket = testTicket.copyWith(extras: []);
+          fakePKPassParser.parsedTicket = noProviderTicket;
 
-        final result = await importService.importAndSavePKPassFile(
-          XFile(testPKPassPath),
-        );
+          final result = await importService.importAndSavePKPassFile(
+            XFile(testPKPassPath),
+          );
 
-        expect(result.ticket, noProviderTicket);
-        // No warning because the ticket type is known (train)
-        expect(result.warning, isNull);
-      });
+          expect(result.ticket, noProviderTicket);
+          // No warning because the ticket type is known (train)
+          expect(result.warning, isNull);
+        },
+      );
 
       test(
         'should return warning when ticket type is null (unsupported pass)',

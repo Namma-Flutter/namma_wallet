@@ -50,7 +50,6 @@ class TicketCreatedResult extends SharedContentResult
   final bool isArchived;
 }
 
-
 /// Result when an existing ticket is updated
 ///
 /// Consider using an enum for updateType:

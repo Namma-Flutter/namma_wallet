@@ -99,7 +99,8 @@ class KonfHubLayoutParser extends EventLayoutParser {
 
         if (month != null && day != null) {
           // Require explicit year from eventDateRaw or eventName (e.g. 2025)
-          final yearMatch = RegExp(r'(20\d{2})').firstMatch(eventDateRaw) ??
+          final yearMatch =
+              RegExp(r'(20\d{2})').firstMatch(eventDateRaw) ??
               RegExp(r'(20\d{2})').firstMatch(eventName ?? '');
           if (yearMatch != null) {
             final year = int.parse(yearMatch.group(1)!);
