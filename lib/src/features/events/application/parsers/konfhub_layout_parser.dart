@@ -104,7 +104,12 @@ class KonfHubLayoutParser extends EventLayoutParser {
               RegExp(r'(20\d{2})').firstMatch(eventName ?? '');
           if (yearMatch != null) {
             final year = int.parse(yearMatch.group(1)!);
-            eventDate = DateTime(year, month, day);
+            final parsedDate = DateTime(year, month, day);
+            if (parsedDate.year == year &&
+                parsedDate.month == month &&
+                parsedDate.day == day) {
+              eventDate = parsedDate;
+            }
           }
         }
       }

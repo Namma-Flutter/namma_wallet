@@ -168,6 +168,23 @@ void main() {
           expect(ticket.endTime, isNull);
         },
       );
+
+      test(
+        'returns null when calendar date is invalid',
+        () async {
+          final blocks = KonfHubLayoutFixtures.devfest2025.map((b) {
+            if (b.text.contains('Event Date:')) {
+              return b.copyWith(
+                text: 'Event Date: February 31 2025 (09:00 AM to 06:00 PM)',
+              );
+            }
+            return b;
+          }).toList();
+
+          final ticket = await parser.parseTicketFromBlocks(blocks, '');
+          expect(ticket, isNull);
+        },
+      );
     });
   });
 }
