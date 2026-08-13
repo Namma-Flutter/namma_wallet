@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
+import 'package:namma_wallet/src/common/enums/ticket_type.dart';
 import 'package:namma_wallet/src/common/services/archive/ticket_archive.dart';
 import 'package:namma_wallet/src/features/receive/domain/shared_content_result.dart';
 import 'package:namma_wallet/src/features/receive/presentation/share_handler.dart';
 
 import '../../../../helpers/fake_go_router.dart';
-import 'package:namma_wallet/src/common/enums/ticket_type.dart';
 
 void main() {
   // Required because GlobalKey.currentState accesses WidgetsBinding.instance

@@ -3,10 +3,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:namma_wallet/src/common/enums/ticket_type.dart';
 import 'package:namma_wallet/src/features/receive/application/sms_queue_service.dart';
 import 'package:namma_wallet/src/features/receive/domain/shared_content_result.dart';
 import 'package:namma_wallet/src/features/receive/domain/shared_content_type.dart';
-import 'package:namma_wallet/src/common/enums/ticket_type.dart';
 import 'package:namma_wallet/src/features/receive/domain/sms_queue_service_interface.dart';
 
 import '../../../../helpers/fake_logger.dart';
