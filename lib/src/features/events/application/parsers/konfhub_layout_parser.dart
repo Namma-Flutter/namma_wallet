@@ -89,7 +89,6 @@ class KonfHubLayoutParser extends EventLayoutParser {
 
     if (eventDateRaw != null) {
       // Try to parse "November 08" or similar.
-      // Year might be missing, assume current year or next year if past.
       final dateMatch = RegExp(
         r'([A-Za-z]+)\s+(\d{1,2})',
       ).firstMatch(eventDateRaw);
@@ -99,14 +98,13 @@ class KonfHubLayoutParser extends EventLayoutParser {
         final month = _monthFromName(monthStr);
 
         if (month != null && day != null) {
-          final now = DateTime.now();
-          // Often year is mentioned in the event name (e.g. DevFest 2025)
-          final yearMatch = RegExp(r'(20\d{2})').firstMatch(eventName ?? '');
-          final year = yearMatch != null
-              ? int.parse(yearMatch.group(1)!)
-              : now.year;
-
-          eventDate = DateTime(year, month, day);
+          // Require explicit year from eventDateRaw or eventName (e.g. 2025)
+          final yearMatch = RegExp(r'(20\d{2})').firstMatch(eventDateRaw) ??
+              RegExp(r'(20\d{2})').firstMatch(eventName ?? '');
+          if (yearMatch != null) {
+            final year = int.parse(yearMatch.group(1)!);
+            eventDate = DateTime(year, month, day);
+          }
         }
       }
 
@@ -143,8 +141,6 @@ class KonfHubLayoutParser extends EventLayoutParser {
           endHour,
           endMinute,
         );
-      } else {
-        eventStartTime = eventDate; // fallback
       }
     }
 

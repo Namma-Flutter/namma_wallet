@@ -91,6 +91,64 @@ void main() {
         final ticket = await parser.parseTicketFromBlocks(blocks, '');
         expect(ticket, isNull);
       });
+
+      test(
+        'returns null when explicit year is missing in date and event name',
+        () async {
+          final blocks = KonfHubLayoutFixtures.devfest2025.map((b) {
+            if (b.text.contains('Event Name:')) {
+              return b.copyWith(text: 'Event Name: DevFest');
+            }
+            if (b.text.contains('Event Date:')) {
+              return b.copyWith(
+                text: 'Event Date: November 08 (09:00 AM to 06:00 PM)',
+              );
+            }
+            return b;
+          }).toList();
+
+          final ticket = await parser.parseTicketFromBlocks(blocks, '');
+          expect(ticket, isNull);
+        },
+      );
+
+      test(
+        'parses explicit year from eventDateRaw when absent in event name',
+        () async {
+          final blocks = KonfHubLayoutFixtures.devfest2025.map((b) {
+            if (b.text.contains('Event Name:')) {
+              return b.copyWith(text: 'Event Name: DevFest');
+            }
+            if (b.text.contains('Event Date:')) {
+              return b.copyWith(
+                text: 'Event Date: November 08 2026 (09:00 AM to 06:00 PM)',
+              );
+            }
+            return b;
+          }).toList();
+
+          final ticket = await parser.parseTicketFromBlocks(blocks, '');
+          expect(ticket, isNotNull);
+          expect(ticket!.startTime?.year, equals(2026));
+        },
+      );
+
+      test(
+        'leaves startTime and endTime null when time range is missing',
+        () async {
+          final blocks = KonfHubLayoutFixtures.devfest2025.map((b) {
+            if (b.text.contains('Event Date:')) {
+              return b.copyWith(text: 'Event Date: November 08 2025');
+            }
+            return b;
+          }).toList();
+
+          final ticket = await parser.parseTicketFromBlocks(blocks, '');
+          expect(ticket, isNotNull);
+          expect(ticket!.startTime, isNull);
+          expect(ticket.endTime, isNull);
+        },
+      );
     });
   });
 }
