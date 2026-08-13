@@ -188,7 +188,6 @@ class SharingIntentService implements ISharingIntentService {
 
     if (fileExtension == '.pdf') {
       // For PDF, we pass the file path as the content
-      _logger.info('Returning file path for PDF: ${file.path}');
       return file.path;
     } else if (_isSupportedImageFile(fileExtension)) {
       // For image files, return the file path (OCR would happen downstream)
