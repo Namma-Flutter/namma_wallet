@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:go_router/go_router.dart';
@@ -22,8 +22,9 @@ import 'package:timezone/timezone.dart' as tz;
 
 class NotificationService implements INotificationService {
   factory NotificationService() => _instance;
-  NotificationService._internal();
-  static final NotificationService _instance = NotificationService._internal();
+  @visibleForTesting
+  NotificationService.internal();
+  static final NotificationService _instance = NotificationService.internal();
 
   final FlutterLocalNotificationsPlugin _plugin =
       FlutterLocalNotificationsPlugin();
@@ -80,24 +81,25 @@ class NotificationService implements INotificationService {
   Future<void> initTimezone() async {
     tz.initializeTimeZones();
 
-    var timeZoneId = await getLocalTimezoneId();
-    // Handle IANA timezone renames that might not be in the database
-    if (timeZoneId == 'Asia/Calcutta') {
-      timeZoneId = 'Asia/Kolkata';
-    }
-
+    String? timeZoneId;
     try {
+      timeZoneId = await getLocalTimezoneId();
+      // Handle IANA timezone renames that might not be in the database
+      if (timeZoneId == 'Asia/Calcutta') {
+        timeZoneId = 'Asia/Kolkata';
+      }
+
       final location = tz.getLocation(timeZoneId);
       tz.setLocalLocation(location);
-    } on Exception catch (e) {
+    } on Object catch (e) {
       // Fallback to UTC if timezone is not found to prevent app crash
-      tz.setLocalLocation(tz.getLocation('UTC'));
+      tz.setLocalLocation(tz.UTC);
       if (_logger != null) {
         _logger?.error(
           'Timezone not found: $timeZoneId, falling back to UTC',
           e,
         );
-      } else {
+      } else if (kDebugMode) {
         debugPrint('Timezone not found: $timeZoneId, falling back to UTC: $e');
       }
     }
