@@ -149,6 +149,25 @@ void main() {
           expect(ticket.endTime, isNull);
         },
       );
+
+      test(
+        'leaves startTime and endTime null when time range is invalid',
+        () async {
+          final blocks = KonfHubLayoutFixtures.devfest2025.map((b) {
+            if (b.text.contains('Event Date:')) {
+              return b.copyWith(
+                text: 'Event Date: November 08 2025 (invalid-time)',
+              );
+            }
+            return b;
+          }).toList();
+
+          final ticket = await parser.parseTicketFromBlocks(blocks, '');
+          expect(ticket, isNotNull);
+          expect(ticket!.startTime, isNull);
+          expect(ticket.endTime, isNull);
+        },
+      );
     });
   });
 }
