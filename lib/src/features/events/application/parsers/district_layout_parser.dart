@@ -270,7 +270,7 @@ class DistrictMovieParser extends EventLayoutParser {
       return null;
     } on Object {
       logger.warning(
-        '[DistrictMovieParser] Failed to extract QR from image: $imagePath',
+        '[DistrictMovieParser] Failed to extract QR from image',
       );
       return null;
     } finally {
