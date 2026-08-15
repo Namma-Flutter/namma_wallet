@@ -107,8 +107,7 @@ class _TravelTicketViewState extends State<TravelTicketView> {
     return ticket.tags!;
   }
 
-  bool get _isEvent =>
-      widget.ticket.type == TicketType.event;
+  bool get _isEvent => widget.ticket.type == TicketType.event;
 
   IconData get _ticketIcon {
     switch (widget.ticket.type) {
@@ -796,9 +795,7 @@ class _TravelTicketViewState extends State<TravelTicketView> {
 
                     //* Date - Time
                     TravelRowWidget(
-                      title1: _isEvent
-                          ? 'Event Date'
-                          : 'Journey Date',
+                      title1: _isEvent ? 'Event Date' : 'Journey Date',
                       title2: 'Time',
                       value1: widget.ticket.startTime != null
                           ? DateTimeConverter.instance.formatDate(
@@ -952,8 +949,7 @@ class _TravelTicketViewState extends State<TravelTicketView> {
                   ).colorScheme.onSurface.withValues(alpha: 0.3),
                 ),
               ),
-              if (widget.ticket.hasPnrOrId ||
-                  qrPayload(widget.ticket) != null)
+              if (widget.ticket.hasPnrOrId || qrPayload(widget.ticket) != null)
                 Container(
                   margin: const EdgeInsets.only(
                     bottom: 16,
