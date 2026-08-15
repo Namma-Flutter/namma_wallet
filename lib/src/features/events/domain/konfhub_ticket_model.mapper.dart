@@ -90,6 +90,12 @@ class KonfHubTicketModelMapper extends ClassMapperBase<KonfHubTicketModel> {
     _$additionalDetails,
     opt: true,
   );
+  static String? _$qrData(KonfHubTicketModel v) => v.qrData;
+  static const Field<KonfHubTicketModel, String> _f$qrData = Field(
+    'qrData',
+    _$qrData,
+    opt: true,
+  );
 
   @override
   final MappableFields<KonfHubTicketModel> fields = const {
@@ -104,6 +110,7 @@ class KonfHubTicketModelMapper extends ClassMapperBase<KonfHubTicketModel> {
     #ticketName: _f$ticketName,
     #location: _f$location,
     #additionalDetails: _f$additionalDetails,
+    #qrData: _f$qrData,
   };
 
   static KonfHubTicketModel _instantiate(DecodingData data) {
@@ -119,6 +126,7 @@ class KonfHubTicketModelMapper extends ClassMapperBase<KonfHubTicketModel> {
       ticketName: data.dec(_f$ticketName),
       location: data.dec(_f$location),
       additionalDetails: data.dec(_f$additionalDetails),
+      qrData: data.dec(_f$qrData),
     );
   }
 
@@ -207,6 +215,7 @@ abstract class KonfHubTicketModelCopyWith<
     String? ticketName,
     String? location,
     Map<String, String>? additionalDetails,
+    String? qrData,
   });
   KonfHubTicketModelCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
     Then<$Out2, $R2> t,
@@ -243,6 +252,7 @@ class _KonfHubTicketModelCopyWithImpl<$R, $Out>
     Object? ticketName = $none,
     Object? location = $none,
     Object? additionalDetails = $none,
+    Object? qrData = $none,
   }) => $apply(
     FieldCopyWithData({
       if (bookingId != $none) #bookingId: bookingId,
@@ -256,6 +266,7 @@ class _KonfHubTicketModelCopyWithImpl<$R, $Out>
       if (ticketName != $none) #ticketName: ticketName,
       if (location != $none) #location: location,
       if (additionalDetails != $none) #additionalDetails: additionalDetails,
+      if (qrData != $none) #qrData: qrData,
     }),
   );
   @override
@@ -274,6 +285,7 @@ class _KonfHubTicketModelCopyWithImpl<$R, $Out>
       #additionalDetails,
       or: $value.additionalDetails,
     ),
+    qrData: data.get(#qrData, or: $value.qrData),
   );
 
   @override

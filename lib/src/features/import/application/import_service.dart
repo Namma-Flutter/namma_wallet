@@ -103,6 +103,7 @@ class ImportService implements IImportService {
       parsedTicket ??= await _eventParser.parseTicketFromBlocksForPDF(
         extractedBlocks,
         sourceType: SourceType.pdf,
+        filePath: pdfFile.path,
       );
 
       if (parsedTicket == null) {

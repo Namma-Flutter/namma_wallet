@@ -16,6 +16,7 @@ class KonfHubTicketModel with KonfHubTicketModelMappable {
     this.ticketName,
     this.location,
     this.additionalDetails,
+    this.qrData,
   });
 
   final String? bookingId;
@@ -29,4 +30,5 @@ class KonfHubTicketModel with KonfHubTicketModelMappable {
   final String? ticketName;
   final String? location;
   final Map<String, String>? additionalDetails;
+  final String? qrData;
 }

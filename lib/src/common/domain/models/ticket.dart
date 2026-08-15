@@ -118,6 +118,8 @@ class Ticket with TicketMappable {
         ...?model.additionalDetails?.entries.map(
           (e) => ExtrasModel(title: e.key, value: e.value),
         ),
+        if (model.qrData.isNotNullOrEmpty)
+          ExtrasModel(title: 'QR Data', value: model.qrData),
         ExtrasModel(title: 'Source Type', value: sourceType),
       ],
     );

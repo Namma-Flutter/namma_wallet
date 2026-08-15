@@ -90,6 +90,7 @@ class FakeEventParser implements EventParserService {
   Future<Ticket?> parseTicketFromBlocksForPDF(
     List<OCRBlock> blocks, {
     SourceType? sourceType,
+    String? filePath,
   }) {
     return Future.value(parsedTicket);
   }

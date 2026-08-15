@@ -38,6 +38,7 @@ dependencies:
   package_info_plus: ^9.0.1
   path: ^1.9.1
   path_provider: ^2.1.6
+  pdf_barcode_decoder: ^0.0.1
   pdfrx: ^2.4.4
   permission_handler: ^12.0.3
   pkpass: ^2.2.0

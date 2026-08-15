@@ -86,13 +86,18 @@ class EventParserService {
     }
   }
 
-  /// Attempts to parse ticket from OCR blocks specifically for PDFs
-  /// where an image path is not applicable/needed for QR extraction.
+  /// Attempts to parse ticket from OCR blocks specifically for PDFs.
+  /// If provided, [filePath] is passed to parsers for barcode/QR extraction.
   Future<Ticket?> parseTicketFromBlocksForPDF(
     List<OCRBlock> blocks, {
     SourceType? sourceType,
+    String? filePath,
   }) async {
-    return parseTicketFromBlocks(blocks, '', sourceType: sourceType);
+    return parseTicketFromBlocks(
+      blocks,
+      filePath ?? '',
+      sourceType: sourceType,
+    );
   }
 
   /// Adds "Provider" and "Source Type" extras if not already present.

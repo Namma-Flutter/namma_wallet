@@ -1,4 +1,6 @@
+import 'dart:io';
 import 'dart:ui';
+import 'package:flutter/foundation.dart';
 import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
 import 'package:namma_wallet/src/common/services/ocr/layout_extractor.dart';
@@ -6,6 +8,7 @@ import 'package:namma_wallet/src/common/services/ocr/ocr_block.dart';
 import 'package:namma_wallet/src/features/events/application/event_layout_parser.dart';
 import 'package:namma_wallet/src/features/events/domain/konfhub_ticket_model.dart';
 import 'package:namma_wallet/src/features/travel/application/travel_text_parser_utils.dart';
+import 'package:pdf_barcode_decoder/pdf_barcode_decoder.dart';
 
 /// Parses KonfHub event ticket PDFs.
 class KonfHubLayoutParser extends EventLayoutParser {
@@ -229,9 +232,7 @@ class KonfHubLayoutParser extends EventLayoutParser {
       }
     }
 
-    // TODO(KV): We skip QR code extraction from the PDF for now as
-    //  it requires rendering the PDF page as an image first.
-    // The QR likely contains the booking ID, which we extract anyway.
+    final qrData = await _extractQrFromPdf(imagePath);
 
     final model = KonfHubTicketModel(
       bookingId: bookingId,
@@ -248,9 +249,47 @@ class KonfHubLayoutParser extends EventLayoutParser {
       ticketName: ticketName,
       location: location,
       additionalDetails: additionalDetails.isEmpty ? null : additionalDetails,
+      qrData: qrData,
     );
 
     return Ticket.fromKonfHub(model);
+  }
+
+  Future<String?> _extractQrFromPdf(String filePath) async {
+    if (kIsWeb || filePath.trim().isEmpty) return null;
+
+    try {
+      final file = File(filePath);
+      if (!file.existsSync()) {
+        logger.warning(
+          '[KonfHubLayoutParser] PDF file does not exist for QR extraction',
+        );
+        return null;
+      }
+
+      final barcodes = await PdfBarcodeDecoder.decodeFile(
+        file,
+        config: const DecoderConfig(
+          formats: [BarcodeFormat.qr],
+          firstPageOnly: true,
+          stopAfterFirst: true,
+        ),
+      );
+
+      if (barcodes.isNotEmpty) {
+        final raw = barcodes.first.value;
+        if (raw.trim().isNotEmpty) {
+          logger.info('[KonfHubLayoutParser] Extracted QR code from PDF');
+          return raw.trim();
+        }
+      }
+      return null;
+    } on Object catch (e) {
+      logger.warning(
+        '[KonfHubLayoutParser] Failed to extract QR from PDF: $e',
+      );
+      return null;
+    }
   }
 
   int? _monthFromName(String name) {

@@ -936,6 +936,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.3.0"
+  pdf_barcode_decoder:
+    dependency: "direct main"
+    description:
+      name: pdf_barcode_decoder
+      sha256: a7ea20d40e7a8c358bba4c1fcd47f54c6bd9b1b0e07a30b574f7087e52de0f24
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.1"
   pdfium_dart:
     dependency: transitive
     description:
