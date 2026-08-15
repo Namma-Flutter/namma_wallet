@@ -63,26 +63,68 @@ class _TravelTicketViewState extends State<TravelTicketView> {
 
   // Helper methods moved to TicketExtrasExtension in ticket_extensions.dart
 
+  /// Regex that matches clean label titles
+  /// (alphabetic with spaces/hyphens, no digits).
+  static final _validExtraTitleRegex = RegExp(
+    r'^[A-Za-z][A-Za-z\s\-_/]+$',
+  );
+
   List<ExtrasModel> getFilteredExtras(Ticket ticket) {
     if (ticket.extras == null) return [];
 
-    // Filter out From and To if both exist
     final from = ticket.fromLocation;
     final to = ticket.toLocation;
 
-    if (from != null && to != null) {
-      return ticket.extras!.where((extra) {
-        final title = extra.title?.toLowerCase();
-        return title != 'from' && title != 'to';
-      }).toList();
-    }
+    return ticket.extras!.where((extra) {
+      final title = extra.title?.trim();
+      if (title == null || title.isEmpty) return false;
 
-    return ticket.extras!;
+      final lowerTitle = title.toLowerCase();
+
+      // Always filter out QR Data from UI text grid
+      // (rendered visually as QR code)
+      if (lowerTitle == 'qr data') return false;
+
+      // Filter out From and To if both exist
+      if (from != null &&
+          to != null &&
+          (lowerTitle == 'from' || lowerTitle == 'to')) {
+        return false;
+      }
+
+      // Filter out bogus date/time fragment titles
+      // (e.g. "November 08 (09" from OCR colon-splits)
+      if (!_validExtraTitleRegex.hasMatch(title)) {
+        return false;
+      }
+
+      return true;
+    }).toList();
   }
 
   List<TagModel> getFilteredTags(Ticket ticket) {
     if (ticket.tags == null) return [];
     return ticket.tags!;
+  }
+
+  bool get _isEvent =>
+      widget.ticket.type == TicketType.event;
+
+  IconData get _ticketIcon {
+    switch (widget.ticket.type) {
+      case TicketType.bus:
+        return Icons.airport_shuttle_outlined;
+      case TicketType.train:
+        return Icons.tram_outlined;
+      case TicketType.event:
+        return Icons.event_outlined;
+      case TicketType.flight:
+        return Icons.flight_outlined;
+      case TicketType.metro:
+        return Icons.subway_outlined;
+      case null:
+        return Icons.confirmation_number_outlined;
+    }
   }
 
   String? get _conductorPhoneNumber {
@@ -592,9 +634,7 @@ class _TravelTicketViewState extends State<TravelTicketView> {
                             context,
                           ).colorScheme.primary.withValues(alpha: 0.1),
                           child: Icon(
-                            widget.ticket.type == TicketType.bus
-                                ? Icons.airport_shuttle_outlined
-                                : Icons.tram_outlined,
+                            _ticketIcon,
                             size: 18,
                             color: Theme.of(context).colorScheme.primary,
                           ),
@@ -756,7 +796,9 @@ class _TravelTicketViewState extends State<TravelTicketView> {
 
                     //* Date - Time
                     TravelRowWidget(
-                      title1: 'Journey Date',
+                      title1: _isEvent
+                          ? 'Event Date'
+                          : 'Journey Date',
                       title2: 'Time',
                       value1: widget.ticket.startTime != null
                           ? DateTimeConverter.instance.formatDate(
@@ -910,7 +952,8 @@ class _TravelTicketViewState extends State<TravelTicketView> {
                   ).colorScheme.onSurface.withValues(alpha: 0.3),
                 ),
               ),
-              if (widget.ticket.hasPnrOrId)
+              if (widget.ticket.hasPnrOrId ||
+                  qrPayload(widget.ticket) != null)
                 Container(
                   margin: const EdgeInsets.only(
                     bottom: 16,

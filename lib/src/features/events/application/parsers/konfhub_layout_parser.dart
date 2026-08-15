@@ -212,21 +212,45 @@ class KonfHubLayoutParser extends EventLayoutParser {
       'location',
       'event date',
       'attendee details',
+      'attendee',
+      'organization',
+      'date',
+      'time',
     ];
+    // Valid keys are alphabetic labels like "Food Preference",
+    // never time/date fragments like "November 08 (09"
+    final validKeyRegex = RegExp(
+      r'^[A-Za-z][A-Za-z\s\-_/]{1,30}$',
+    );
 
     for (final b in blocks) {
       final text = b.text.trim();
-      if (text.contains(':')) {
-        final parts = text.split(':');
-        if (parts.length >= 2) {
-          final key = parts[0].trim();
-          final value = parts.sublist(1).join(':').trim();
 
-          if (key.isNotEmpty && value.isNotEmpty) {
-            final isKnown = knownKeys.any((k) => key.toLowerCase().contains(k));
-            if (!isKnown) {
-              additionalDetails[key] = value;
-            }
+      // Skip blocks already parsed as main fields
+      if (eventDateRaw != null &&
+          (text.contains(eventDateRaw) || eventDateRaw.contains(text))) {
+        continue;
+      }
+      if (location != null &&
+          (location.contains(text) || text.contains(location))) {
+        continue;
+      }
+      if (attendeeName != null && text.contains(attendeeName)) {
+        continue;
+      }
+      if (organization != null && text.contains(organization)) {
+        continue;
+      }
+
+      if (text.contains(':')) {
+        final colonIndex = text.indexOf(':');
+        final key = text.substring(0, colonIndex).trim();
+        final value = text.substring(colonIndex + 1).trim();
+
+        if (key.isNotEmpty && value.isNotEmpty && validKeyRegex.hasMatch(key)) {
+          final isKnown = knownKeys.any((k) => key.toLowerCase().contains(k));
+          if (!isKnown) {
+            additionalDetails[key] = value;
           }
         }
       }
