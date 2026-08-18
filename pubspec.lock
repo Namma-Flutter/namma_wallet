@@ -940,10 +940,10 @@ packages:
     dependency: "direct main"
     description:
       name: pdf_barcode_decoder
-      sha256: a7ea20d40e7a8c358bba4c1fcd47f54c6bd9b1b0e07a30b574f7087e52de0f24
+      sha256: "50f1021b36c85030240555dda93b18c7ff7484eafc07877e29c8adf77b7d5fa7"
       url: "https://pub.dev"
     source: hosted
-    version: "0.0.1"
+    version: "0.0.2"
   pdfium_dart:
     dependency: transitive
     description:

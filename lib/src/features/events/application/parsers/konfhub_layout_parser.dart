@@ -308,9 +308,9 @@ class KonfHubLayoutParser extends EventLayoutParser {
         }
       }
       return null;
-    } on Object catch (e) {
+    } on Object {
       logger.warning(
-        '[KonfHubLayoutParser] Failed to extract QR from PDF: $e',
+        '[KonfHubLayoutParser] Failed to extract QR from PDF',
       );
       return null;
     }
