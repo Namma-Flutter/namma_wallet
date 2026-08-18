@@ -8,24 +8,20 @@ import 'package:namma_wallet/src/features/receive/domain/sharing_intent_service_
 import 'package:share_handler/share_handler.dart';
 
 import '../../../../helpers/fake_logger.dart';
-import '../../../../helpers/mock_pdf_service.dart';
 import '../../../../helpers/mock_sharing_intent_provider.dart';
 
 void main() {
   group('SharingIntentService', () {
     late ISharingIntentService service;
     late MockSharingIntentProvider mockProvider;
-    late MockPDFService mockPdfService;
     late FakeLogger fakeLogger;
 
     setUp(() {
       mockProvider = MockSharingIntentProvider();
-      mockPdfService = MockPDFService();
       fakeLogger = FakeLogger();
 
       service = SharingIntentService(
         logger: fakeLogger,
-        pdfService: mockPdfService,
         sharingIntentProvider: mockProvider,
       );
     });
@@ -98,8 +94,6 @@ void main() {
         final pdfFile = File('${tempDir.path}/test.pdf');
         await pdfFile.writeAsString('dummy content');
 
-        mockPdfService.mockPdfText = 'Extracted PDF Text';
-
         final media = SharedMedia(
           attachments: [
             SharedAttachment(
@@ -114,7 +108,8 @@ void main() {
         await service.initialize(
           onContentReceived: (content, type) {
             contentReceived = true;
-            expect(content, equals('Extracted PDF Text'));
+            // PDF file path is passed through; extraction happens downstream
+            expect(content, equals(pdfFile.path));
             expect(type, equals(SharedContentType.pdf));
           },
           onError: (error) => fail('Should not error: $error'),
@@ -232,19 +227,18 @@ void main() {
     });
 
     group('extractContentFromFile', () {
-      test('should extract text from PDF', () async {
+      test('should return file path for PDF', () async {
         final tempDir = await Directory.systemTemp.createTemp(
           'test_pdf_extract',
         );
         final pdfFile = File('${tempDir.path}/test.pdf');
         await pdfFile.writeAsString('dummy');
 
-        mockPdfService.mockPdfText = 'PDF Content';
-
         final content = await service.extractContentFromFile(
           XFile(pdfFile.path),
         );
-        expect(content, equals('PDF Content'));
+        // PDF file path is passed through; extraction happens downstream
+        expect(content, equals(pdfFile.path));
 
         await tempDir.delete(recursive: true);
       });

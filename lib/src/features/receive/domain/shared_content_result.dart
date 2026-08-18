@@ -1,4 +1,5 @@
 import 'package:dart_mappable/dart_mappable.dart';
+import 'package:namma_wallet/src/common/enums/ticket_type.dart';
 
 part 'shared_content_result.mapper.dart';
 
@@ -8,35 +9,41 @@ sealed class SharedContentResult with SharedContentResultMappable {
   const SharedContentResult();
 }
 
-/// Result when a new ticket is successfully processed
+/// Result when a new ticket is successfully processed.
 ///
-/// Consider stronger domain types for fields:
-/// - fare: Could be numeric type (double/int) instead of String
-/// - date: Could be DateTime instead of String
-/// This would align with domain models and reduce parsing/validation errors.
-/// Currently kept as Strings to match Ticket model's extras structure
-/// and simplify UI display.
+/// Uses generic display-ready fields that work across all ticket types
+/// (travel, event, etc.). The [ticketType] field allows the UI to adapt
+/// its labels and layout per type.
 @MappableClass()
 class TicketCreatedResult extends SharedContentResult
     with TicketCreatedResultMappable {
   const TicketCreatedResult({
-    required this.pnrNumber,
-    required this.from,
-    required this.to,
-    required this.fare,
-    required this.date,
-    this.ticketId,
+    required this.ticketId,
+    required this.ticketType,
+    required this.title,
+    this.subtitle,
+    this.date,
     this.warning,
     this.isArchived = false,
   });
 
-  final String? pnrNumber;
-  final String? from;
-  final String? to;
-  final String? fare;
-  final String? date;
+  /// The unique ticket identifier used for navigation.
   final String? ticketId;
+
+  /// Ticket type — drives adaptive label display on the success screen.
+  final TicketType? ticketType;
+
+  /// Primary display text (e.g. "Chennai → Madurai" or "DevFest 2025").
+  final String? title;
+
+  /// Secondary display text (e.g. "SETC Sleeper" or "KonfHub").
+  final String? subtitle;
+
+  /// Formatted date string for display.
+  final String? date;
+
   final String? warning;
+
   // Set when the parsed ticket's relevant time has already passed.
   // Drives navigation to the archived list — independent of `warning` so
   // that wording changes never break control flow.

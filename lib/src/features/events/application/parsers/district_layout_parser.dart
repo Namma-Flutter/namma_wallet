@@ -3,60 +3,11 @@ import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
 import 'package:namma_wallet/src/common/services/ocr/layout_extractor.dart';
 import 'package:namma_wallet/src/common/services/ocr/ocr_block.dart';
+import 'package:namma_wallet/src/features/events/application/event_layout_parser.dart';
 import 'package:namma_wallet/src/features/events/domain/movie_ticket_model.dart';
 
-abstract class MovieTicketParser {
-  bool canParse(String text);
-
-  /// Parse ticket from OCR blocks
-  Future<Ticket?> parseTicketFromBlocks(
-    List<OCRBlock> blocks,
-    String imagePath,
-  );
-
-  Future<String?> extractQrFromImage(String imagePath, ILogger logger) async {
-    if (imagePath.trim().isEmpty) {
-      logger.warning(
-        '[DistrictMovieParser] Empty image path for QR extraction',
-      );
-      return null;
-    }
-
-    final controller = MobileScannerController(
-      formats: [BarcodeFormat.qrCode],
-      autoStart: false, // no camera needed
-    );
-
-    try {
-      final capture = await controller.analyzeImage(
-        imagePath,
-        formats: [BarcodeFormat.qrCode],
-      );
-
-      if (capture == null || capture.barcodes.isEmpty) return null;
-
-      for (final barcode in capture.barcodes) {
-        final raw = barcode.rawValue;
-        if (raw != null && raw.trim().isNotEmpty) {
-          return raw.trim();
-        }
-      }
-      return null;
-    } on Object {
-      logger.warning(
-        '[DistrictMovieParser] Failed to extract QR from image: $imagePath',
-      );
-      return null;
-    } finally {
-      await controller.dispose();
-    }
-  }
-
-  String get providerName;
-}
-
 /// Parses District (by Zomato) movie ticket screenshots / images.
-class DistrictMovieParser extends MovieTicketParser {
+class DistrictMovieParser extends EventLayoutParser {
   DistrictMovieParser({required this.logger});
   final ILogger logger;
 
@@ -89,7 +40,7 @@ class DistrictMovieParser extends MovieTicketParser {
     final language = _extractLanguage(plain);
     final format = _extractFormat(plain);
     final certificate = _extractCertificate(plain);
-    final qrData = await extractQrFromImage(imagePath, logger);
+    final qrData = await _extractQrFromImage(imagePath, logger);
 
     // Critical fields – never invent data
     if (movieName == null || showDateTime == null) {
@@ -287,6 +238,44 @@ class DistrictMovieParser extends MovieTicketParser {
       return m.group(0)?.trim();
     }
     return null;
+  }
+
+  Future<String?> _extractQrFromImage(String imagePath, ILogger logger) async {
+    if (imagePath.trim().isEmpty) {
+      logger.warning(
+        '[DistrictMovieParser] Empty image path for QR extraction',
+      );
+      return null;
+    }
+
+    final controller = MobileScannerController(
+      formats: [BarcodeFormat.qrCode],
+      autoStart: false, // no camera needed
+    );
+
+    try {
+      final capture = await controller.analyzeImage(
+        imagePath,
+        formats: [BarcodeFormat.qrCode],
+      );
+
+      if (capture == null || capture.barcodes.isEmpty) return null;
+
+      for (final barcode in capture.barcodes) {
+        final raw = barcode.rawValue;
+        if (raw != null && raw.trim().isNotEmpty) {
+          return raw.trim();
+        }
+      }
+      return null;
+    } on Object {
+      logger.warning(
+        '[DistrictMovieParser] Failed to extract QR from image',
+      );
+      return null;
+    } finally {
+      await controller.dispose();
+    }
   }
 
   DateTime? _extractShowDateTime(LayoutExtractor extractor, String plain) {
