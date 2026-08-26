@@ -3,6 +3,7 @@ import 'package:namma_wallet/src/common/database/ticket_dao_interface.dart';
 import 'package:namma_wallet/src/common/domain/models/extras_model.dart';
 import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 import 'package:namma_wallet/src/common/enums/source_type.dart';
+import 'package:namma_wallet/src/common/helper/date_time_converter.dart';
 import 'package:namma_wallet/src/common/services/archive/ticket_archive.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
 import 'package:namma_wallet/src/features/home/domain/ticket_extensions.dart';
@@ -62,13 +63,8 @@ class SharedContentProcessor implements ISharedContentProcessor {
         } else {
           warning = result.warning;
         }
-        return TicketCreatedResult(
-          pnrNumber: ticket.pnrOrId,
-          from: ticket.fromLocation,
-          to: ticket.toLocation,
-          fare: ticket.fare,
-          date: ticket.date,
-          ticketId: ticket.ticketId,
+        return _ticketToResult(
+          ticket,
           warning: warning,
           isArchived: archived,
         );
@@ -133,26 +129,35 @@ class SharedContentProcessor implements ISharedContentProcessor {
           );
         }
         final archived = shouldArchiveTicket(ticket);
-        // TODO(sreeram): Create a new result format for Event tickets
-        return TicketCreatedResult(
-          pnrNumber: ticket.pnrOrId,
-          from: ticket.fromLocation,
-          to: ticket.toLocation,
-          fare: ticket.fare,
-          date: ticket.date,
-          ticketId: ticket.ticketId,
+        return _ticketToResult(
+          ticket,
           warning: archived ? archivedPastTicketMessage : null,
           isArchived: archived,
         );
       }
 
-      final sourceType = contentType == SharedContentType.pdf
-          ? SourceType.pdf
-          : SourceType.sms;
+      if (contentType == SharedContentType.pdf) {
+        _logger.info('Processing PDF file via SharedContentProcessor');
+        final ticket = await _importService.importAndSavePDFFile(
+          XFile(content),
+        );
+        if (ticket == null) {
+          return const ProcessingErrorResult(
+            message: 'Failed to process PDF file',
+            error: 'Parser returned null',
+          );
+        }
+        final archived = shouldArchiveTicket(ticket);
+        return _ticketToResult(
+          ticket,
+          warning: archived ? archivedPastTicketMessage : null,
+          isArchived: archived,
+        );
+      }
 
       final ticket = _travelParserService.parseTicketFromText(
         content,
-        sourceType: sourceType,
+        sourceType: SourceType.sms,
       );
 
       if (ticket == null) {
@@ -199,13 +204,8 @@ class SharedContentProcessor implements ISharedContentProcessor {
       );
 
       final archived = shouldArchiveTicket(ticket);
-      return TicketCreatedResult(
-        pnrNumber: ticket.pnrOrId,
-        from: ticket.fromLocation,
-        to: ticket.toLocation,
-        fare: ticket.fare,
-        date: ticket.date,
-        ticketId: ticket.ticketId,
+      return _ticketToResult(
+        ticket,
         warning: archived ? archivedPastTicketMessage : null,
         isArchived: archived,
       );
@@ -221,6 +221,27 @@ class SharedContentProcessor implements ISharedContentProcessor {
         error: e.toString(),
       );
     }
+  }
+
+  /// Maps a [Ticket] to a [TicketCreatedResult] with generic display fields.
+  TicketCreatedResult _ticketToResult(
+    Ticket ticket, {
+    String? warning,
+    bool isArchived = false,
+  }) {
+    final dateStr = ticket.startTime != null
+        ? DateTimeConverter.instance.formatDate(ticket.startTime!)
+        : null;
+
+    return TicketCreatedResult(
+      ticketId: ticket.ticketId,
+      ticketType: ticket.type,
+      title: ticket.primaryText,
+      subtitle: ticket.secondaryText,
+      date: dateStr,
+      warning: warning,
+      isArchived: isArchived,
+    );
   }
 
   /// Insert or update a ticket in the database

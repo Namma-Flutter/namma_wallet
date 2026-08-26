@@ -1,27 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:namma_wallet/src/common/enums/ticket_type.dart';
 import 'package:namma_wallet/src/common/routing/app_routes.dart';
 import 'package:namma_wallet/src/common/theme/styles.dart';
+import 'package:namma_wallet/src/features/receive/domain/shared_content_result.dart';
 
 /// Success screen displayed when data is successfully shared to the application
 class ShareSuccessView extends StatelessWidget {
   const ShareSuccessView({
-    required this.pnrNumber,
-    required this.from,
-    required this.to,
-    required this.fare,
-    required this.date,
+    required this.result,
     super.key,
   });
 
-  final String? pnrNumber;
-  final String? from;
-  final String? to;
-  final String? fare;
-  final String? date;
+  final TicketCreatedResult result;
 
   /// Determine if this is an update operation
-  bool get isUpdate => from == 'Updated' || to == 'Conductor Details';
+  // TODO(KV): This `isUpdate` is only specified for TNSTC, need to work on this
+  bool get isUpdate =>
+      result.title == 'Ticket Updated' ||
+      result.subtitle == 'Conductor Details';
 
   @override
   Widget build(BuildContext context) {
@@ -95,33 +92,34 @@ class ShareSuccessView extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      if (result.ticketId != null) ...[
+                        _DetailRow(
+                          label: 'Ticket ID',
+                          value: result.ticketId,
+                          theme: theme,
+                        ),
+                        const SizedBox(height: 16),
+                      ],
                       _DetailRow(
-                        label: 'PNR Number',
-                        value: pnrNumber,
+                        label: _getTitleLabel(result.ticketType),
+                        value: result.title,
                         theme: theme,
                       ),
                       const SizedBox(height: 16),
-
                       _DetailRow(
-                        label: 'Route',
-                        value: '${from ?? 'Unknown'} → ${to ?? 'Unknown'}',
+                        label: _getDateLabel(result.ticketType),
+                        value: result.date,
                         theme: theme,
                       ),
-                      const SizedBox(height: 16),
-
-                      _DetailRow(
-                        label: 'Journey Date',
-                        value: date,
-                        theme: theme,
-                      ),
-                      const SizedBox(height: 16),
-
-                      _DetailRow(
-                        label: 'Total Fare',
-                        value: fare,
-                        theme: theme,
-                        isHighlighted: true,
-                      ),
+                      if (result.subtitle != null) ...[
+                        const SizedBox(height: 16),
+                        _DetailRow(
+                          label: _getSubtitleLabel(result.ticketType),
+                          value: result.subtitle,
+                          theme: theme,
+                          isHighlighted: true,
+                        ),
+                      ],
                     ],
                   ),
                 ),
@@ -145,22 +143,22 @@ class ShareSuccessView extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       _DetailRow(
-                        label: 'PNR Number',
-                        value: pnrNumber,
+                        label: 'Ticket ID',
+                        value: result.ticketId,
                         theme: theme,
                       ),
                       const SizedBox(height: 16),
 
                       _DetailRow(
                         label: 'Update Type',
-                        value: 'Conductor Details',
+                        value: result.subtitle,
                         theme: theme,
                       ),
                       const SizedBox(height: 16),
 
                       _DetailRow(
                         label: 'Updated',
-                        value: date,
+                        value: result.date,
                         theme: theme,
                       ),
                     ],
@@ -224,6 +222,23 @@ class ShareSuccessView extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  String _getTitleLabel(TicketType? type) {
+    if (type == TicketType.event) return 'Event';
+    if (type == TicketType.flight) return 'Flight';
+    return 'Route';
+  }
+
+  String _getDateLabel(TicketType? type) {
+    if (type == TicketType.event) return 'Date';
+    return 'Journey Date';
+  }
+
+  String _getSubtitleLabel(TicketType? type) {
+    if (type == TicketType.event) return 'Venue / Details';
+    if (type == TicketType.flight) return 'Class / Seats';
+    return 'Bus / Train Info';
   }
 }
 

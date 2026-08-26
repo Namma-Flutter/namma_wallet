@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:cross_file/cross_file.dart';
 import 'package:flutter/foundation.dart';
 import 'package:namma_wallet/src/common/database/ticket_dao_interface.dart';
-import 'package:namma_wallet/src/common/domain/models/extras_model.dart';
 import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 import 'package:namma_wallet/src/common/enums/source_type.dart';
 import 'package:namma_wallet/src/common/helper/original_file_storage.dart';
@@ -96,9 +95,15 @@ class ImportService implements IImportService {
       }
 
       // Parse using OCR blocks (preserves geometry for layout extraction)
-      final parsedTicket = _travelParser.parseTicketFromBlocks(
+      var parsedTicket = _travelParser.parseTicketFromBlocks(
         extractedBlocks,
         sourceType: SourceType.pdf,
+      );
+
+      parsedTicket ??= await _eventParser.parseTicketFromBlocksForPDF(
+        extractedBlocks,
+        sourceType: SourceType.pdf,
+        filePath: pdfFile.path,
       );
 
       if (parsedTicket == null) {
@@ -239,13 +244,8 @@ class ImportService implements IImportService {
 
       // Check provider for warning
       String? warning;
-      final provider = parsedTicket.extras?.firstWhere(
-        (e) => e.title?.toLowerCase() == 'provider',
-        orElse: () => ExtrasModel(title: '', value: ''),
-      );
-
-      if (provider?.value?.toLowerCase().contains('luma') != true) {
-        warning = 'Imported pass is not from Luma';
+      if (parsedTicket.type == null) {
+        warning = 'Imported pass type may not be fully supported';
       }
 
       return TicketImportResult(ticket: parsedTicket, warning: warning);

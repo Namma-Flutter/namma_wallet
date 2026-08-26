@@ -76,6 +76,7 @@ class TicketCreatedResultMapper extends ClassMapperBase<TicketCreatedResult> {
     if (_instance == null) {
       MapperContainer.globals.use(_instance = TicketCreatedResultMapper._());
       SharedContentResultMapper.ensureInitialized();
+      TicketTypeMapper.ensureInitialized();
     }
     return _instance!;
   }
@@ -83,32 +84,31 @@ class TicketCreatedResultMapper extends ClassMapperBase<TicketCreatedResult> {
   @override
   final String id = 'TicketCreatedResult';
 
-  static String? _$pnrNumber(TicketCreatedResult v) => v.pnrNumber;
-  static const Field<TicketCreatedResult, String> _f$pnrNumber = Field(
-    'pnrNumber',
-    _$pnrNumber,
+  static String? _$ticketId(TicketCreatedResult v) => v.ticketId;
+  static const Field<TicketCreatedResult, String> _f$ticketId = Field(
+    'ticketId',
+    _$ticketId,
   );
-  static String? _$from(TicketCreatedResult v) => v.from;
-  static const Field<TicketCreatedResult, String> _f$from = Field(
-    'from',
-    _$from,
+  static TicketType? _$ticketType(TicketCreatedResult v) => v.ticketType;
+  static const Field<TicketCreatedResult, TicketType> _f$ticketType = Field(
+    'ticketType',
+    _$ticketType,
   );
-  static String? _$to(TicketCreatedResult v) => v.to;
-  static const Field<TicketCreatedResult, String> _f$to = Field('to', _$to);
-  static String? _$fare(TicketCreatedResult v) => v.fare;
-  static const Field<TicketCreatedResult, String> _f$fare = Field(
-    'fare',
-    _$fare,
+  static String? _$title(TicketCreatedResult v) => v.title;
+  static const Field<TicketCreatedResult, String> _f$title = Field(
+    'title',
+    _$title,
+  );
+  static String? _$subtitle(TicketCreatedResult v) => v.subtitle;
+  static const Field<TicketCreatedResult, String> _f$subtitle = Field(
+    'subtitle',
+    _$subtitle,
+    opt: true,
   );
   static String? _$date(TicketCreatedResult v) => v.date;
   static const Field<TicketCreatedResult, String> _f$date = Field(
     'date',
     _$date,
-  );
-  static String? _$ticketId(TicketCreatedResult v) => v.ticketId;
-  static const Field<TicketCreatedResult, String> _f$ticketId = Field(
-    'ticketId',
-    _$ticketId,
     opt: true,
   );
   static String? _$warning(TicketCreatedResult v) => v.warning;
@@ -127,24 +127,22 @@ class TicketCreatedResultMapper extends ClassMapperBase<TicketCreatedResult> {
 
   @override
   final MappableFields<TicketCreatedResult> fields = const {
-    #pnrNumber: _f$pnrNumber,
-    #from: _f$from,
-    #to: _f$to,
-    #fare: _f$fare,
-    #date: _f$date,
     #ticketId: _f$ticketId,
+    #ticketType: _f$ticketType,
+    #title: _f$title,
+    #subtitle: _f$subtitle,
+    #date: _f$date,
     #warning: _f$warning,
     #isArchived: _f$isArchived,
   };
 
   static TicketCreatedResult _instantiate(DecodingData data) {
     return TicketCreatedResult(
-      pnrNumber: data.dec(_f$pnrNumber),
-      from: data.dec(_f$from),
-      to: data.dec(_f$to),
-      fare: data.dec(_f$fare),
-      date: data.dec(_f$date),
       ticketId: data.dec(_f$ticketId),
+      ticketType: data.dec(_f$ticketType),
+      title: data.dec(_f$title),
+      subtitle: data.dec(_f$subtitle),
+      date: data.dec(_f$date),
       warning: data.dec(_f$warning),
       isArchived: data.dec(_f$isArchived),
     );
@@ -222,12 +220,11 @@ abstract class TicketCreatedResultCopyWith<
     implements SharedContentResultCopyWith<$R, $In, $Out> {
   @override
   $R call({
-    String? pnrNumber,
-    String? from,
-    String? to,
-    String? fare,
-    String? date,
     String? ticketId,
+    TicketType? ticketType,
+    String? title,
+    String? subtitle,
+    String? date,
     String? warning,
     bool? isArchived,
   });
@@ -246,34 +243,31 @@ class _TicketCreatedResultCopyWithImpl<$R, $Out>
       TicketCreatedResultMapper.ensureInitialized();
   @override
   $R call({
-    Object? pnrNumber = $none,
-    Object? from = $none,
-    Object? to = $none,
-    Object? fare = $none,
-    Object? date = $none,
     Object? ticketId = $none,
+    Object? ticketType = $none,
+    Object? title = $none,
+    Object? subtitle = $none,
+    Object? date = $none,
     Object? warning = $none,
     bool? isArchived,
   }) => $apply(
     FieldCopyWithData({
-      if (pnrNumber != $none) #pnrNumber: pnrNumber,
-      if (from != $none) #from: from,
-      if (to != $none) #to: to,
-      if (fare != $none) #fare: fare,
-      if (date != $none) #date: date,
       if (ticketId != $none) #ticketId: ticketId,
+      if (ticketType != $none) #ticketType: ticketType,
+      if (title != $none) #title: title,
+      if (subtitle != $none) #subtitle: subtitle,
+      if (date != $none) #date: date,
       if (warning != $none) #warning: warning,
       if (isArchived != null) #isArchived: isArchived,
     }),
   );
   @override
   TicketCreatedResult $make(CopyWithData data) => TicketCreatedResult(
-    pnrNumber: data.get(#pnrNumber, or: $value.pnrNumber),
-    from: data.get(#from, or: $value.from),
-    to: data.get(#to, or: $value.to),
-    fare: data.get(#fare, or: $value.fare),
-    date: data.get(#date, or: $value.date),
     ticketId: data.get(#ticketId, or: $value.ticketId),
+    ticketType: data.get(#ticketType, or: $value.ticketType),
+    title: data.get(#title, or: $value.title),
+    subtitle: data.get(#subtitle, or: $value.subtitle),
+    date: data.get(#date, or: $value.date),
     warning: data.get(#warning, or: $value.warning),
     isArchived: data.get(#isArchived, or: $value.isArchived),
   );

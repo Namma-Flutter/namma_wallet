@@ -4,7 +4,6 @@ import 'dart:io';
 
 import 'package:cross_file/cross_file.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
-import 'package:namma_wallet/src/common/services/pdf/pdf_service_interface.dart';
 import 'package:namma_wallet/src/features/receive/application/sharing_intent_provider.dart';
 import 'package:namma_wallet/src/features/receive/domain/shared_content_type.dart';
 import 'package:namma_wallet/src/features/receive/domain/sharing_intent_service_interface.dart';
@@ -15,13 +14,11 @@ import 'package:share_handler/share_handler.dart';
 class SharingIntentService implements ISharingIntentService {
   SharingIntentService({
     required this._logger,
-    required this._pdfService,
     ISharingIntentProvider? sharingIntentProvider,
   }) : _sharingIntentProvider =
            sharingIntentProvider ?? SharingIntentProvider();
 
   final ILogger _logger;
-  final IPDFService _pdfService;
   final ISharingIntentProvider _sharingIntentProvider;
 
   StreamSubscription<void>? _intentDataStreamSubscription;
@@ -190,11 +187,8 @@ class SharingIntentService implements ISharingIntentService {
     final fileExtension = path.extension(file.path).toLowerCase();
 
     if (fileExtension == '.pdf') {
-      // Extract text from PDF using PDFService
-      _logger.info('Extracting text from PDF: ${file.path}');
-      final content = await _pdfService.extractTextForDisplay(file);
-      _logger.info('Successfully extracted text from PDF');
-      return content;
+      // For PDF, we pass the file path as the content
+      return file.path;
     } else if (_isSupportedImageFile(fileExtension)) {
       // For image files, return the file path (OCR would happen downstream)
       _logger.info('Returning file path for image: ${file.path}');

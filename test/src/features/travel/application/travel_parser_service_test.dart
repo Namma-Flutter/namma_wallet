@@ -93,26 +93,31 @@ void main() {
       );
     });
 
-    group('TNSTC Parser - SMS Format', () {
+    group('TNSTC / SETC Parser - SMS Format', () {
       test(
         'Given TNSTC SMS format text, When parsing ticket, '
-        'Then returns valid TNSTC ticket',
+        'Then returns valid TNSTC ticket with TNSTC provider',
         () {
-          // Arrange (Given) - Using real TNSTC SMS data
-          const smsText = TnstcSmsFixtures.setcKumbakonamToChennai;
+          const smsText = '''
+TNSTC Corporation:TNSTC , PNR NO.:U70109781 , From:MADURAI To CHENNAI , Trip Code:0400MADCHE , Journey Date:30/08/2025 , Time:,04:00 , Seat No.:24 .Class:DELUXE 3X2 , Boarding at:MADURAI
+''';
 
           // Act (When)
           final ticket = service.parseTicketFromText(smsText);
 
           // Assert (Then)
           expect(ticket, isNotNull);
-          expect(ticket!.ticketId, equals('T73309927'));
+          expect(ticket!.ticketId, equals('U70109781'));
+          final providerExtra = ticket.extras?.firstWhere(
+            (e) => e.title == 'Provider',
+          );
+          expect(providerExtra?.value, equals('TNSTC'));
         },
       );
 
       test(
         'Given SETC SMS format text, When parsing ticket, '
-        'Then returns valid SETC ticket',
+        'Then returns valid SETC ticket with SETC provider',
         () {
           // Arrange (Given) - Using real SETC SMS data
           const smsText = TnstcSmsFixtures.setcChennaiToKumbakonam;
@@ -123,6 +128,33 @@ void main() {
           // Assert (Then)
           expect(ticket, isNotNull);
           expect(ticket!.ticketId, equals('T69704790'));
+          final providerExtra = ticket.extras?.firstWhere(
+            (e) => e.title == 'Provider',
+          );
+          expect(providerExtra?.value, equals('SETC'));
+        },
+      );
+
+      test(
+        'Given text with State Express Transport Corporation, '
+        'When parsing ticket, '
+        'Then classifies provider as SETC',
+        () {
+          const text = '''
+State Express Transport Corporation
+PNR NO. : T12345678
+From : CHENNAI To MADURAI
+Time : 22:00
+DOJ : 20/08/2025
+''';
+
+          final ticket = service.parseTicketFromText(text);
+
+          expect(ticket, isNotNull);
+          final providerExtra = ticket!.extras?.firstWhere(
+            (e) => e.title == 'Provider',
+          );
+          expect(providerExtra?.value, equals('SETC'));
         },
       );
     });

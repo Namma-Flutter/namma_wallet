@@ -129,7 +129,6 @@ void setupLocator() {
           ? WebSharingIntentService()
           : SharingIntentService(
               logger: getIt<ILogger>(),
-              pdfService: getIt<IPDFService>(),
             ),
     )
     ..registerLazySingleton<ISharedContentProcessor>(
