@@ -38,6 +38,29 @@ platform :ios do
     File.exist?(path) ? File.read(path) : "Beta build v#{version} (#{build_number})"
   end
 
+  def flutter_cmd
+    ENV.fetch("FLUTTER_CMD", "fvm flutter")
+  end
+
+  private_lane :build_signed_ipa do
+    info = pubspec_version_info
+    UI.message("Building signed IPA v#{info[:version]}+#{info[:build_number]}")
+
+    sh("cd ../.. && make release-ipa FLUTTER=#{flutter_cmd}")
+
+    update_code_signing_settings(use_automatic_signing: true)
+
+    build_app(
+      clean: false,
+      scheme: "Runner",
+      workspace: "Runner.xcworkspace",
+      export_method: "app-store",
+      skip_build_archive: true,
+      archive_path: "../build/ios/archive/Runner.xcarchive",
+      xcargs: "-allowProvisioningUpdates"
+    )
+  end
+
   error do |lane, exception|
     UI.error("#{lane} failed: #{exception.message}")
   end
@@ -69,19 +92,7 @@ platform :ios do
 
     UI.success("✓ Version validation passed - #{version}+#{build_number} (TestFlight latest for v#{version}: #{latest_build || 'none'})")
 
-    sh("cd ../.. && make release-ipa")
-
-    update_code_signing_settings(use_automatic_signing: true)
-
-    build_app(
-      clean: false,
-      scheme: "Runner",
-      workspace: "Runner.xcworkspace",
-      export_method: "app-store",
-      skip_build_archive: true,
-      archive_path: "../build/ios/archive/Runner.xcarchive",
-      xcargs: "-allowProvisioningUpdates"
-    )
+    build_signed_ipa
 
     testflight(
       api_key: api_key,
@@ -90,6 +101,12 @@ platform :ios do
     )
 
     UI.success("Uploaded build #{build_number} (v#{version}) to TestFlight")
+  end
+
+  desc "Build a signed IPA without uploading"
+  lane :build_ipa do
+    build_signed_ipa
+    UI.success("Signed IPA build complete")
   end
 
   desc "Promote TestFlight to NammaFlutter and External groups"

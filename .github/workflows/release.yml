@@ -1,0 +1,298 @@
+name: Release Pipeline
+
+# Ships Namma Wallet to the stores and publishes GitHub release artifacts.
+#
+# Branch semantics (matches the Fastlane 3-stage pipeline):
+#   beta    -> build + upload to TestFlight and Play internal track,
+#              attach signed APK/IPA to a GitHub pre-release tagged v{version}
+#   release -> promote the already-uploaded build to App Store / Play
+#              production, attach signed APK/IPA to a stable GitHub release
+#
+# Prerequisites:
+#   * This file must exist on both `beta` and `release` branches —
+#     GitHub evaluates workflows from the pushed ref.
+#   * Required repository secrets:
+#       ANDROID_KEYSTORE_BASE64, ANDROID_KEYSTORE_PASSWORD,
+#       ANDROID_KEY_ALIAS, ANDROID_KEY_PASSWORD,
+#       PLAY_STORE_JSON_BASE64,
+#       APP_STORE_CONNECT_KEY_ID, APP_STORE_CONNECT_ISSUER_ID,
+#       APP_STORE_CONNECT_P8_BASE64
+#   * Replaces the old build_and_release.yml on the `release` branch
+#     (delete that file when merging).
+
+on:
+  push:
+    branches: [beta, release]
+  workflow_dispatch:
+    inputs:
+      stage:
+        description: Deployment stage
+        type: choice
+        options: [beta, release]
+        default: beta
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  STAGE: ${{ github.event_name == 'push' && github.ref_name || inputs.stage }}
+  APP_IDENTIFIER: com.nammaflutter.nammawallet
+  PACKAGE_NAME: com.nammaflutter.nammawallet
+
+jobs:
+  gate:
+    name: Analyze & Test
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version-file: pubspec.yaml
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Generate code files
+        run: dart run build_runner build --delete-conflicting-outputs
+
+      - name: Analyze
+        run: flutter analyze
+
+      - name: Test
+        run: flutter test
+
+  android:
+    name: Build & Ship Android
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    needs: gate
+    env:
+      ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+      ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+      ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+      PLAY_STORE_JSON_PATH: ${{ github.workspace }}/play-store-key.json
+      FLUTTER_CMD: flutter
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version-file: pubspec.yaml
+          cache: true
+
+      - uses: burrunan/gradle-cache-action@v3
+        with:
+          build-root-directory: ${{ github.workspace }}/android
+
+      - name: Decode signing keystore
+        run: echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode > android/app/namma-wallet.keystore
+
+      - name: Decode Play Store service account
+        run: echo "${{ secrets.PLAY_STORE_JSON_BASE64 }}" | base64 --decode > play-store-key.json
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Generate code files
+        run: dart run build_runner build --delete-conflicting-outputs
+
+      - name: Remove WASM modules for mobile build
+        run: dart run pdfrx:remove_wasm_modules
+
+      - name: Set up Ruby for fastlane
+        if: env.STAGE == 'beta'
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.4.7"
+          bundler-cache: true
+          working-directory: android
+
+      - name: Upload AAB to Play internal track
+        if: env.STAGE == 'beta'
+        working-directory: android
+        run: bundle exec fastlane beta
+
+      - name: Build signed release APK
+        run: flutter build apk --release
+
+      - name: Version APK artifact
+        run: |
+          VERSION="$(awk '/^version:/ {print $2}' pubspec.yaml)"
+          mv build/app/outputs/flutter-apk/app-release.apk "namma-wallet-v${VERSION}.apk"
+
+      - name: Upload APK workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: namma-wallet-apk
+          path: namma-wallet-v*.apk
+          if-no-files-found: error
+
+  ios:
+    name: Build & Ship iOS
+    runs-on: macos-latest
+    timeout-minutes: 90
+    needs: gate
+    env:
+      APP_STORE_CONNECT_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+      APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+      APP_STORE_CONNECT_KEY_PATH: ./AuthKey.p8
+      FLUTTER_CMD: flutter
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version-file: pubspec.yaml
+          cache: true
+
+      - name: Set up Ruby for fastlane
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.3.10"
+          bundler-cache: true
+          working-directory: ios
+
+      - name: Decode App Store Connect API key
+        run: echo "${{ secrets.APP_STORE_CONNECT_P8_BASE64 }}" | base64 --decode > ios/fastlane/AuthKey.p8
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Generate code files
+        run: dart run build_runner build --delete-conflicting-outputs
+
+      - name: Remove WASM modules for mobile build
+        run: dart run pdfrx:remove_wasm_modules
+
+      - name: Build and upload to TestFlight
+        if: env.STAGE == 'beta'
+        working-directory: ios
+        run: bundle exec fastlane beta
+
+      - name: Build signed IPA only
+        if: env.STAGE == 'release'
+        working-directory: ios
+        run: bundle exec fastlane build_ipa
+
+      - name: Version IPA artifact
+        run: |
+          VERSION="$(awk '/^version:/ {print $2}' pubspec.yaml)"
+          mv build/ios/ipa/*.ipa "namma-wallet-v${VERSION}.ipa"
+
+      - name: Upload IPA workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: namma-wallet-ipa
+          path: namma-wallet-v*.ipa
+          if-no-files-found: error
+
+  promote:
+    name: Promote to Production
+    if: env.STAGE == 'release'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs: [android, ios]
+    env:
+      PLAY_STORE_JSON_PATH: ${{ github.workspace }}/play-store-key.json
+      APP_STORE_CONNECT_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+      APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+      APP_STORE_CONNECT_KEY_PATH: ./AuthKey.p8
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Decode Play Store service account
+        run: echo "${{ secrets.PLAY_STORE_JSON_BASE64 }}" | base64 --decode > play-store-key.json
+
+      - name: Decode App Store Connect API key
+        run: echo "${{ secrets.APP_STORE_CONNECT_P8_BASE64 }}" | base64 --decode > ios/fastlane/AuthKey.p8
+
+      - name: Set up Ruby for Android fastlane
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.4.7"
+          bundler-cache: true
+          working-directory: android
+
+      - name: Promote Android build to Production
+        working-directory: android
+        run: bundle exec fastlane production
+
+      - name: Set up Ruby for iOS fastlane
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.3.10"
+          bundler-cache: true
+          working-directory: ios
+
+      - name: Promote iOS build to App Store
+        working-directory: ios
+        run: bundle exec fastlane production
+
+  github-release:
+    name: Publish GitHub Release
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: [android, ios, promote]
+    if: ${{ !cancelled() && needs.android.result == 'success' && needs.ios.result == 'success' && (needs.promote.result == 'success' || needs.promote.result == 'skipped') }}
+    permissions:
+      contents: write
+      id-token: write
+      attestations: write
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: namma-wallet-*
+          merge-multiple: true
+          path: dist
+
+      - name: Resolve version
+        id: meta
+        run: |
+          VERSION="$(awk '/^version:/ {print $2}' pubspec.yaml)"
+          PRERELEASE="true"
+          [ "$STAGE" = "release" ] && PRERELEASE="false"
+          {
+            echo "version=${VERSION}"
+            echo "prerelease=${PRERELEASE}"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Attest APK provenance
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: dist/namma-wallet-v*.apk
+
+      - name: Attest IPA provenance
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: dist/namma-wallet-v*.ipa
+
+      - name: Prepare release notes
+        run: cat ios/fastlane/metadata/en-US/release_notes.txt > release_body.md
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.meta.outputs.version }}
+          name: Namma Wallet v${{ steps.meta.outputs.version }}
+          body_path: release_body.md
+          prerelease: ${{ steps.meta.outputs.prerelease }}
+          files: dist/namma-wallet-v*
+          fail_on_unmatched_files: true
