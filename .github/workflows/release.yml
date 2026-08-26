@@ -35,6 +35,7 @@ on:
 
 permissions:
   contents: read
+  actions: read
 
 concurrency:
   group: release-${{ github.ref }}
@@ -166,23 +167,28 @@ jobs:
       - name: Decode F-Droid repo keystore
         run: echo "${{ secrets.FDROID_KEYSTORE_BASE64 }}" | base64 --decode > fdroid/fdroid.keystore
 
+      - name: Prepare F-Droid repo structure
+        run: |
+          mkdir -p fdroid/metadata
+          touch fdroid/metadata/icon.png
+
       - name: Write fdroid config
         run: |
-          cat > fdroid/fdroid-config.yml <<'EOF'
-          repo_url: "${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/fdroid/repo"
+          cat > fdroid/config.yml <<'EOF'
+          repo_url: "https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/fdroid/repo"
           repo_name: "Namma Wallet F-Droid Repo"
-          repo_icon: "fdroid-icon.png"
+          repo_icon: "icon.png"
           keystore: fdroid.keystore
           repo_keyalias: ${{ secrets.FDROID_KEY_ALIAS }}
-          keystore_pass: ${{ secrets.FDROID_KEYSTORE_PASS }}
+          keystorepass: ${{ secrets.FDROID_KEYSTORE_PASS }}
           keypass: ${{ secrets.FDROID_KEY_PASS }}
           archive_older: 100
           EOF
-          sed -i 's/^          //' fdroid/fdroid-config.yml
+          sed -i 's/^          //' fdroid/config.yml
 
       - name: Build F-Droid repo index
         working-directory: fdroid
-        run: fdroid update --config=fdroid-config.yml
+        run: fdroid update --create-metadata
 
       - uses: actions/upload-artifact@v4
         with:
@@ -251,7 +257,7 @@ jobs:
 
   promote:
     name: Promote to Production
-    if: env.STAGE == 'release'
+    if: ${{ (github.event_name == 'push' && github.ref_name == 'release') || (github.event_name == 'workflow_dispatch' && inputs.stage == 'release') }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     needs: [android, ios]

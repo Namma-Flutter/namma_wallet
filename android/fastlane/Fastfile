@@ -46,7 +46,7 @@ platform :android do
     end
     UI.success("✓ Version validation passed - #{version}+#{version_code}")
 
-    sh("cd ../.. && make release-appbundle FLUTTER=#{ENV.fetch('FLUTTER_CMD', 'fvm flutter')}")
+    sh("cd ../.. && make release-appbundle FLUTTER='#{ENV.fetch('FLUTTER_CMD', 'fvm flutter')}'")
 
     # Write changelog to the path supply expects
     dest_changelog_dir = "./metadata/android/en-US/changelogs"

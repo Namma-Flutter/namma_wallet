@@ -46,7 +46,7 @@ platform :ios do
     info = pubspec_version_info
     UI.message("Building signed IPA v#{info[:version]}+#{info[:build_number]}")
 
-    sh("cd ../.. && make release-ipa FLUTTER=#{flutter_cmd}")
+    sh("cd ../.. && make release-ipa FLUTTER='#{flutter_cmd}'")
 
     update_code_signing_settings(use_automatic_signing: true)
 
@@ -55,6 +55,7 @@ platform :ios do
       scheme: "Runner",
       workspace: "Runner.xcworkspace",
       export_method: "app-store",
+      output_directory: "../build/ios/ipa",
       skip_build_archive: true,
       archive_path: "../build/ios/archive/Runner.xcarchive",
       xcargs: "-allowProvisioningUpdates"
