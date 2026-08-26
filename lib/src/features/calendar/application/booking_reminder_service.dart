@@ -11,11 +11,10 @@ abstract interface class IBookingReminderService {
 }
 
 class BookingReminderService implements IBookingReminderService {
-  BookingReminderService({required INotificationService notificationService})
-    : _notificationService = notificationService;
+  BookingReminderService({required this.notificationService});
 
   static const _storageKey = 'calendar_booking_reminders';
-  final INotificationService _notificationService;
+  final INotificationService notificationService;
 
   @override
   Future<List<BookingReminder>> getReminders() async {
@@ -70,9 +69,9 @@ class BookingReminderService implements IBookingReminderService {
     }
     await _persist(reminders);
     if (previousNotificationId != null) {
-      await _notificationService.cancelTicketReminder(previousNotificationId);
+      await notificationService.cancelTicketReminder(previousNotificationId);
     }
-    await _notificationService.scheduleTicketReminder(
+    await notificationService.scheduleTicketReminder(
       id: storedReminder.notificationId!,
       dateTime: storedReminder.remindAt,
       title: storedReminder.title,
@@ -89,7 +88,7 @@ class BookingReminderService implements IBookingReminderService {
     reminders.removeWhere((item) => item.id == reminder.id);
     await _persist(reminders);
     if (storedReminder?.notificationId case final notificationId?) {
-      await _notificationService.cancelTicketReminder(notificationId);
+      await notificationService.cancelTicketReminder(notificationId);
     }
   }
 

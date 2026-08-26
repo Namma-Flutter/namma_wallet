@@ -91,7 +91,9 @@ class _BookingReminderDialogWidgetState
       return;
     }
     final reminder = BookingReminder(
-      id: '${_provider}_${_window.name}_${_journeyDeparture.millisecondsSinceEpoch}',
+      id:
+          '${_provider}_${_window.name}_'
+          '${_journeyDeparture.millisecondsSinceEpoch}',
       provider: _provider,
       window: _window,
       journeyDeparture: _journeyDeparture,
@@ -113,6 +115,7 @@ class _BookingReminderDialogWidgetState
   @override
   Widget build(BuildContext context) {
     final dateFormat = DateFormat('EEE, dd MMM yyyy');
+    final reminderFormat = DateFormat('EEE, dd MMM yyyy, h:mm a');
     final isTatkal = _window == BookingWindow.tatkal;
     return AlertDialog(
       title: const Text('Booking reminder'),
@@ -154,7 +157,7 @@ class _BookingReminderDialogWidgetState
               ),
             if (!isTatkal)
               DropdownButtonFormField<String>(
-                value: _provider,
+                initialValue: _provider,
                 decoration: const InputDecoration(labelText: 'Provider'),
                 items: const [
                   DropdownMenuItem(value: 'TNSTC', child: Text('TNSTC')),
@@ -183,15 +186,18 @@ class _BookingReminderDialogWidgetState
             const SizedBox(height: 8),
             Text(
               isTatkal
-                  ? 'Tatkal reminder: ${DateFormat('EEE, dd MMM yyyy, h:mm a').format(_remindAt)}'
-                  : 'Normal booking reminder: ${DateFormat('EEE, dd MMM yyyy, h:mm a').format(_remindAt)}',
+                  ? 'Tatkal reminder: ${reminderFormat.format(_remindAt)}'
+                  : 'Normal booking reminder: '
+                        '${reminderFormat.format(_remindAt)}',
               style: TextStyle(color: Theme.of(context).colorScheme.primary),
             ),
             const SizedBox(height: 8),
             Text(
               isTatkal
-                  ? 'Tatkal opens one day before the train departs from its originating station.'
-                  : 'TNSTC and IRCTC normal booking opens 60 days before travel.',
+                  ? 'Tatkal opens one day before the train departs from its '
+                        'originating station.'
+                  : 'TNSTC and IRCTC normal booking opens 60 days before '
+                        'travel.',
               style: Theme.of(context).textTheme.bodySmall,
             ),
           ],
