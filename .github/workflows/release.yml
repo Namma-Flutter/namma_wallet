@@ -21,7 +21,8 @@ name: Release Pipeline
 #     (delete that file when merging).
 
 on:
-  push:
+  pull_request:
+    types: [closed]
     branches: [beta, release]
   workflow_dispatch:
     inputs:
@@ -39,13 +40,14 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  STAGE: ${{ github.event_name == 'push' && github.ref_name || inputs.stage }}
+  STAGE: ${{ (github.event_name == 'pull_request' && github.base_ref) || inputs.stage }}
   APP_IDENTIFIER: com.nammaflutter.nammawallet
   PACKAGE_NAME: com.nammaflutter.nammawallet
 
 jobs:
   gate:
     name: Analyze & Test
+    if: github.event.pull_request.merged == true || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -197,7 +199,7 @@ jobs:
 
   promote:
     name: Promote to Production
-    if: ${{ (github.event_name == 'push' && github.ref_name == 'release') || (github.event_name == 'workflow_dispatch' && inputs.stage == 'release') }}
+    if: ${{ (github.event_name == 'pull_request' && github.base_ref == 'release') || (github.event_name == 'workflow_dispatch' && inputs.stage == 'release') }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     needs: [android, ios]
