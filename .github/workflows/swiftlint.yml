@@ -7,7 +7,8 @@ on:
     paths:
       - .github/workflows/swiftlint.yml
       - .swiftlint-version
-      - ios/**
+      - 'ios/**/*.swift'
+      - 'ios/**/.swiftlint.yml'
 
 jobs:
   swiftlint:
