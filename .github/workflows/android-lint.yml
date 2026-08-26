@@ -6,7 +6,10 @@ on:
       - main
     paths:
       - .github/workflows/android-lint.yml
-      - android/**
+      - android/app/src/**
+      - android/app/build.gradle*
+      - android/build.gradle*
+      - android/settings.gradle*
 
 jobs:
   android-lint:
