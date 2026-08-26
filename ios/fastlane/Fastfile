@@ -48,9 +48,10 @@ platform :ios do
 
   private_lane :build_signed_ipa do
     info = pubspec_version_info
+    flutter = ENV.fetch("FLUTTER_CMD", "flutter")
     UI.message("Building signed IPA v#{info[:version]}+#{info[:build_number]}")
 
-    sh("cd ../.. && make release-ipa FLUTTER='#{flutter_cmd}' DART='#{dart_cmd}'")
+    sh("cd ../.. && #{flutter} build ipa --release")
 
     update_code_signing_settings(use_automatic_signing: true)
 

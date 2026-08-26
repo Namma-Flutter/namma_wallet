@@ -36,8 +36,8 @@ permissions:
   contents: read
 
 concurrency:
-  group: release-${{ github.ref }}
-  cancel-in-progress: false
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 env:
   STAGE: ${{ (github.event_name == 'pull_request' && github.base_ref) || inputs.stage }}
@@ -45,9 +45,59 @@ env:
   PACKAGE_NAME: com.nammaflutter.nammawallet
 
 jobs:
+  changes:
+    name: Detect Changes
+    if: github.event.pull_request.merged == true || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: read
+    outputs:
+      code: ${{ steps.filter.outputs.code }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: dorny/paths-filter@v4
+        id: filter
+        with:
+          filters: |
+            code:
+              - 'lib/**'
+              - 'android/**'
+              - 'ios/**'
+              - 'pubspec.yaml'
+              - 'pubspec.lock'
+              - '.github/workflows/**'
+
+  warm-cache:
+    name: Warm Cache
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.pub-cache
+            .dart_tool
+            build
+          key: gate-${{ runner.os }}-${{ hashFiles('pubspec.lock') }}
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version-file: pubspec.yaml
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Generate code files
+        run: dart run build_runner build --delete-conflicting-outputs
+
   gate:
     name: Analyze & Test
-    if: github.event.pull_request.merged == true || github.event_name == 'workflow_dispatch'
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -85,7 +135,8 @@ jobs:
     name: Build & Ship Android
     runs-on: ubuntu-latest
     timeout-minutes: 60
-    needs: gate
+    needs: [changes, gate]
+    if: needs.changes.outputs.code == 'true'
     env:
       ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
       ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
@@ -159,13 +210,15 @@ jobs:
         with:
           name: namma-wallet-apk
           path: namma-wallet-v*.apk
+          retention-days: 7
           if-no-files-found: error
 
   ios:
     name: Build & Ship iOS
-    runs-on: macos-latest
+    runs-on: macos-latest-xlarge
     timeout-minutes: 90
-    needs: gate
+    needs: [changes, gate]
+    if: needs.changes.outputs.code == 'true'
     env:
       APP_STORE_CONNECT_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
       APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
@@ -184,6 +237,15 @@ jobs:
           restore-keys: |
             ios-${{ runner.os }}-
             gate-${{ runner.os }}-
+
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ios/Pods
+            ~/Library/Caches/CocoaPods
+          key: ${{ runner.os }}-pods-${{ hashFiles('ios/Podfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pods-
 
       - uses: subosito/flutter-action@v2
         with:
@@ -227,6 +289,7 @@ jobs:
         with:
           name: namma-wallet-ipa
           path: namma-wallet-v*.ipa
+          retention-days: 7
           if-no-files-found: error
 
   promote:
@@ -234,7 +297,7 @@ jobs:
     if: ${{ (github.event_name == 'pull_request' && github.base_ref == 'release') || (github.event_name == 'workflow_dispatch' && inputs.stage == 'release') }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
-    needs: [android, ios]
+    needs: [changes, android, ios]
     env:
       PLAY_STORE_JSON_PATH: ${{ github.workspace }}/play-store-key.json
       APP_STORE_CONNECT_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
@@ -275,8 +338,8 @@ jobs:
     name: Publish GitHub Release
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    needs: [android, ios, promote]
-    if: ${{ !cancelled() && needs.android.result == 'success' && needs.ios.result == 'success' && (needs.promote.result == 'success' || needs.promote.result == 'skipped') }}
+    needs: [changes, android, ios, promote]
+    if: ${{ !cancelled() && needs.changes.outputs.code == 'true' && needs.android.result == 'success' && needs.ios.result == 'success' && (needs.promote.result == 'success' || needs.promote.result == 'skipped') }}
     permissions:
       contents: write
       id-token: write
@@ -324,3 +387,26 @@ jobs:
           prerelease: ${{ steps.meta.outputs.prerelease }}
           files: dist/namma-wallet-v*
           fail_on_unmatched_files: true
+
+  ci-ok:
+    name: CI Status
+    if: always()
+    needs: [changes, gate, android, ios, promote]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check all jobs
+        run: |
+          echo "changes: ${{ needs.changes.result }}"
+          echo "gate: ${{ needs.gate.result }}"
+          echo "android: ${{ needs.android.result }}"
+          echo "ios: ${{ needs.ios.result }}"
+          echo "promote: ${{ needs.promote.result }}"
+          if [[ "${{ needs.gate.result }}" == "failure" || "${{ needs.android.result }}" == "failure" || "${{ needs.ios.result }}" == "failure" || "${{ needs.promote.result }}" == "failure" ]]; then
+            echo "One or more jobs failed"
+            exit 1
+          fi
+          if [[ "${{ needs.gate.result }}" == "cancelled" || "${{ needs.android.result }}" == "cancelled" || "${{ needs.ios.result }}" == "cancelled" ]]; then
+            echo "One or more jobs was cancelled"
+            exit 1
+          fi
+          echo "All checks passed or were skipped"
