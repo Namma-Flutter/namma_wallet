@@ -42,11 +42,15 @@ platform :ios do
     ENV.fetch("FLUTTER_CMD", "fvm flutter")
   end
 
+  def dart_cmd
+    flutter_cmd.end_with?("flutter") ? flutter_cmd.sub(/flutter$/, "dart") : flutter_cmd
+  end
+
   private_lane :build_signed_ipa do
     info = pubspec_version_info
     UI.message("Building signed IPA v#{info[:version]}+#{info[:build_number]}")
 
-    sh("cd ../.. && make release-ipa FLUTTER='#{flutter_cmd}'")
+    sh("cd ../.. && make release-ipa FLUTTER='#{flutter_cmd}' DART='#{dart_cmd}'")
 
     update_code_signing_settings(use_automatic_signing: true)
 
