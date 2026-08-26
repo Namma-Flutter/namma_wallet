@@ -16,7 +16,9 @@ name: Release Pipeline
 #       ANDROID_KEY_ALIAS, ANDROID_KEY_PASSWORD,
 #       PLAY_STORE_JSON_BASE64,
 #       APP_STORE_CONNECT_KEY_ID, APP_STORE_CONNECT_ISSUER_ID,
-#       APP_STORE_CONNECT_P8_BASE64
+#       APP_STORE_CONNECT_P8_BASE64,
+#       FDROID_KEYSTORE_BASE64, FDROID_KEYSTORE_PASS,
+#       FDROID_KEY_ALIAS, FDROID_KEY_PASS
 #   * Replaces the old build_and_release.yml on the `release` branch
 #     (delete that file when merging).
 
@@ -140,6 +142,52 @@ jobs:
           name: namma-wallet-apk
           path: namma-wallet-v*.apk
           if-no-files-found: error
+
+  fdroid-repo:
+    name: Build F-Droid repo index
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: android
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install fdroidserver
+        run: pip install fdroidserver
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: namma-wallet-apk
+          path: fdroid/repo
+
+      - name: Decode F-Droid repo keystore
+        run: echo "${{ secrets.FDROID_KEYSTORE_BASE64 }}" | base64 --decode > fdroid/fdroid.keystore
+
+      - name: Write fdroid config
+        run: |
+          cat > fdroid/fdroid-config.yml <<'EOF'
+          repo_url: "${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/fdroid/repo"
+          repo_name: "Namma Wallet F-Droid Repo"
+          repo_icon: "fdroid-icon.png"
+          keystore: fdroid.keystore
+          repo_keyalias: ${{ secrets.FDROID_KEY_ALIAS }}
+          keystore_pass: ${{ secrets.FDROID_KEYSTORE_PASS }}
+          keypass: ${{ secrets.FDROID_KEY_PASS }}
+          archive_older: 100
+          EOF
+          sed -i 's/^          //' fdroid/fdroid-config.yml
+
+      - name: Build F-Droid repo index
+        working-directory: fdroid
+        run: fdroid update --config=fdroid-config.yml
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: fdroid-repo
+          path: fdroid/repo/
 
   ios:
     name: Build & Ship iOS
