@@ -80,7 +80,7 @@ jobs:
             ~/.pub-cache
             .dart_tool
             build
-          key: gate-${{ runner.os }}-${{ hashFiles('pubspec.lock') }}
+          key: gate-${{ runner.os }}-${{ hashFiles('pubspec.yaml', 'pubspec.lock') }}
 
       - uses: subosito/flutter-action@v2
         with:
@@ -109,7 +109,7 @@ jobs:
             ~/.pub-cache
             .dart_tool
             build
-          key: gate-${{ runner.os }}-${{ hashFiles('pubspec.lock') }}
+          key: gate-${{ runner.os }}-${{ hashFiles('pubspec.yaml', 'pubspec.lock') }}
           restore-keys: |
             gate-${{ runner.os }}-
 
@@ -157,10 +157,11 @@ jobs:
             ~/.pub-cache
             .dart_tool
             build
-          key: android-${{ runner.os }}-${{ hashFiles('pubspec.lock') }}
+          key: android-${{ runner.os }}-${{ hashFiles('pubspec.yaml', 'pubspec.lock') }}
           restore-keys: |
-            android-${{ runner.os }}-
+            gate-${{ runner.os }}-${{ hashFiles('pubspec.yaml', 'pubspec.lock') }}-
             gate-${{ runner.os }}-
+            android-${{ runner.os }}-
 
       - uses: subosito/flutter-action@v2
         with:
@@ -233,10 +234,9 @@ jobs:
             ~/.pub-cache
             .dart_tool
             build
-          key: ios-${{ runner.os }}-${{ hashFiles('pubspec.lock') }}
+          key: ios-${{ runner.os }}-${{ hashFiles('pubspec.yaml', 'pubspec.lock') }}
           restore-keys: |
             ios-${{ runner.os }}-
-            gate-${{ runner.os }}-
 
       - uses: actions/cache@v4
         with:
