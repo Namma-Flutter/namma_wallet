@@ -110,9 +110,6 @@ jobs:
       - name: Generate code files
         run: dart run build_runner build --delete-conflicting-outputs
 
-      - name: Remove WASM modules for mobile build
-        run: dart run pdfrx:remove_wasm_modules
-
       - name: Set up Ruby for fastlane
         if: env.STAGE == 'beta'
         uses: ruby/setup-ruby@v1
@@ -175,9 +172,6 @@ jobs:
 
       - name: Generate code files
         run: dart run build_runner build --delete-conflicting-outputs
-
-      - name: Remove WASM modules for mobile build
-        run: dart run pdfrx:remove_wasm_modules
 
       - name: Build and upload to TestFlight
         if: env.STAGE == 'beta'
