@@ -79,5 +79,34 @@ void main() {
       }),
       isNull,
     );
+    expect(
+      BookingReminder.fromMap({
+        'id': 'x',
+        'provider': 'TNSTC',
+        'window': 'normal',
+        'journeyDeparture': 0,
+        'remindAt': 0,
+        'notificationId': 'bad',
+      }),
+      isNull,
+    );
+  });
+
+  test('fromMap accepts absent or null notificationId', () {
+    const base = {
+      'id': 'x',
+      'provider': 'TNSTC',
+      'window': 'normal',
+      'journeyDeparture': 0,
+      'remindAt': 0,
+    };
+    expect(BookingReminder.fromMap(base)!.notificationId, isNull);
+    expect(
+      BookingReminder.fromMap({
+        ...base,
+        'notificationId': null,
+      })!.notificationId,
+      isNull,
+    );
   });
 }

@@ -64,13 +64,16 @@ class BookingReminder {
       return null;
     }
     final notificationId = map['notificationId'];
+    if (notificationId != null && notificationId is! int) {
+      return null;
+    }
     return BookingReminder(
       id: id,
       provider: provider,
       window: window,
       journeyDeparture: DateTime.fromMillisecondsSinceEpoch(journeyMillis),
       remindAt: DateTime.fromMillisecondsSinceEpoch(reminderMillis),
-      notificationId: notificationId is int ? notificationId : null,
+      notificationId: notificationId as int?,
     );
   }
 
