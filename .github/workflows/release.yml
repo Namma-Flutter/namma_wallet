@@ -53,6 +53,16 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.pub-cache
+            .dart_tool
+            build
+          key: gate-${{ runner.os }}-${{ hashFiles('pubspec.lock') }}
+          restore-keys: |
+            gate-${{ runner.os }}-
+
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
@@ -90,6 +100,17 @@ jobs:
           distribution: temurin
           java-version: "17"
 
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.pub-cache
+            .dart_tool
+            build
+          key: android-${{ runner.os }}-${{ hashFiles('pubspec.lock') }}
+          restore-keys: |
+            android-${{ runner.os }}-
+            gate-${{ runner.os }}-
+
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
@@ -112,6 +133,9 @@ jobs:
       - name: Generate code files
         run: dart run build_runner build --delete-conflicting-outputs
 
+      - name: Build signed release APK
+        run: flutter build apk --release
+
       - name: Set up Ruby for fastlane
         if: env.STAGE == 'beta'
         uses: ruby/setup-ruby@v1
@@ -120,13 +144,10 @@ jobs:
           bundler-cache: true
           working-directory: android
 
-      - name: Upload AAB to Play internal track
+      - name: Build AAB and upload to Play internal track
         if: env.STAGE == 'beta'
         working-directory: android
         run: bundle exec fastlane beta
-
-      - name: Build signed release APK
-        run: flutter build apk --release
 
       - name: Version APK artifact
         run: |
@@ -152,6 +173,17 @@ jobs:
       FLUTTER_CMD: flutter
     steps:
       - uses: actions/checkout@v5
+
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.pub-cache
+            .dart_tool
+            build
+          key: ios-${{ runner.os }}-${{ hashFiles('pubspec.lock') }}
+          restore-keys: |
+            ios-${{ runner.os }}-
+            gate-${{ runner.os }}-
 
       - uses: subosito/flutter-action@v2
         with:
