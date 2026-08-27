@@ -206,38 +206,6 @@ jobs:
             echo "### ⏭️ iOS Build Skipped" >> $GITHUB_STEP_SUMMARY
             echo "iOS version already exists on TestFlight. The iOS build step will be skipped." >> $GITHUB_STEP_SUMMARY
           fi
-
-  check-app-store:
-    name: Check App Store Version
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    outputs:
-      skip_build: ${{ steps.check.outputs.skip_build }}
-    env:
-      APP_STORE_CONNECT_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
-      APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
-      APP_STORE_CONNECT_KEY_PATH: ./AuthKey.p8
-    steps:
-      - uses: actions/checkout@v6
-
-      - name: Decode App Store Connect API key
-        run: echo "${{ secrets.APP_STORE_CONNECT_P8_BASE64 }}" | base64 --decode > ios/fastlane/AuthKey.p8
-
-      - name: Set up Ruby for fastlane
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: "3.3.10"
-          bundler-cache: true
-          working-directory: ios
-
-      - name: Check if version exists on TestFlight
-        id: check
-        working-directory: ios
-        run: |
-          bundle exec fastlane check_version
-          SKIP=$(cat ../skip_ios_build.txt 2>/dev/null || echo "false")
-          echo "skip_build=$SKIP" >> $GITHUB_OUTPUT
-
   android:
     name: Build & Ship Android
     runs-on: ubuntu-latest
