@@ -5,11 +5,14 @@ on:
     branches:
       - main
     paths:
-      - .github/workflows/android-lint.yml
       - android/app/src/**
       - android/app/build.gradle*
       - android/build.gradle*
       - android/settings.gradle*
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   android-lint:

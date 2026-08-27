@@ -104,18 +104,72 @@ jobs:
       - name: Test
         run: flutter test
 
+  check-play-store:
+    name: Check Play Store Version
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      skip_build: ${{ steps.check.outputs.skip_build }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Decode Play Store service account
+        run: echo "${{ secrets.PLAY_STORE_JSON_KEY }}" | base64 --decode > play-store-key.json
+
+      - name: Authenticate with service account
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.PLAY_STORE_JSON_KEY }}
+
+      - name: Check if version exists on Play Store
+        id: check
+        run: |
+          VERSION_CODE=$(grep 'versionCode' android/app/build.gradle | head -1 | grep -oP '\d+')
+          echo "Version code: $VERSION_CODE"
+
+          ACCESS_TOKEN=$(gcloud auth print-access-token)
+          PACKAGE="com.nammaflutter.nammawallet"
+
+          EDIT_ID=$(curl -s \
+            -H "Authorization: Bearer $ACCESS_TOKEN" \
+            "https://androidpublisher.googleapis.com/androidpublisher/v3/applications/$PACKAGE/edits" \
+            -X POST -H "Content-Type: application/json" -d '{}' \
+            | jq -r '.id')
+
+          TRACKS=$(curl -s \
+            -H "Authorization: Bearer $ACCESS_TOKEN" \
+            "https://androidpublisher.googleapis.com/androidpublisher/v3/applications/$PACKAGE/edits/$EDIT_ID/tracks")
+
+          EXISTS=$(echo "$TRACKS" | jq "[.tracks[].releases[].versionCodes[]? | select(. == $VERSION_CODE)] | length > 0")
+
+          curl -s \
+            -H "Authorization: Bearer $ACCESS_TOKEN" \
+            "https://androidpublisher.googleapis.com/androidpublisher/v3/applications/$PACKAGE/edits/$EDIT_ID" \
+            -X DELETE > /dev/null
+
+          if [ "$EXISTS" = "true" ]; then
+            echo "skip_build=true" >> $GITHUB_OUTPUT
+            echo "Version $VERSION_CODE already on Play Store. Skipping build."
+          else
+            echo "skip_build=false" >> $GITHUB_OUTPUT
+            echo "Version $VERSION_CODE not found. Will build."
+          fi
+
   android:
     name: Build & Ship Android
     runs-on: ubuntu-latest
     timeout-minutes: 60
-    needs: [changes, gate]
-    if: needs.changes.outputs.code == 'true'
+    needs: [changes, gate, check-play-store]
+    if: needs.changes.outputs.code == 'true' && needs.check-play-store.outputs.skip_build != 'true'
     env:
       ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
       ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
       ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
       PLAY_STORE_JSON_PATH: ${{ github.workspace }}/play-store-key.json
       FLUTTER_CMD: flutter
+      GRADLE_OPTS: -Dorg.gradle.jvmargs="-Xmx4G -XX:MaxMetaspaceSize=2G --add-opens=java.base/java.lang.ref=ALL-UNNAMED"
     steps:
       - uses: actions/checkout@v5
 
@@ -189,7 +243,7 @@ jobs:
 
   ios:
     name: Build & Ship iOS
-    runs-on: macos-latest-xlarge
+    runs-on: macos-latest
     timeout-minutes: 90
     needs: [changes, gate]
     if: needs.changes.outputs.code == 'true'
@@ -267,10 +321,10 @@ jobs:
 
   promote:
     name: Promote to Production
-    if: ${{ (github.event_name == 'pull_request' && github.base_ref == 'release') || (github.event_name == 'workflow_dispatch' && inputs.stage == 'release') }}
+    if: ${{ !cancelled() && (github.event_name == 'pull_request' && github.base_ref == 'release') || (github.event_name == 'workflow_dispatch' && inputs.stage == 'release') }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
-    needs: [changes, android, ios]
+    needs: [changes, android, ios, check-play-store]
     env:
       PLAY_STORE_JSON_PATH: ${{ github.workspace }}/play-store-key.json
       APP_STORE_CONNECT_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
@@ -293,6 +347,7 @@ jobs:
           working-directory: android
 
       - name: Promote Android build to Production
+        if: needs.android.result == 'success'
         working-directory: android
         run: bundle exec fastlane production
 
@@ -312,7 +367,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     needs: [changes, android, ios, promote]
-    if: ${{ !cancelled() && needs.changes.outputs.code == 'true' && needs.android.result == 'success' && needs.ios.result == 'success' && (needs.promote.result == 'success' || needs.promote.result == 'skipped') }}
+    if: ${{ !cancelled() && needs.changes.outputs.code == 'true' && (needs.android.result == 'success' || needs.android.result == 'skipped') && needs.ios.result == 'success' && (needs.promote.result == 'success' || needs.promote.result == 'skipped') }}
     permissions:
       contents: write
       id-token: write
@@ -339,6 +394,7 @@ jobs:
           } >> "$GITHUB_OUTPUT"
 
       - name: Attest APK provenance
+        if: needs.android.result == 'success'
         uses: actions/attest-build-provenance@v2
         with:
           subject-path: dist/namma-wallet-v*.apk
@@ -359,18 +415,19 @@ jobs:
           body_path: release_body.md
           prerelease: ${{ steps.meta.outputs.prerelease }}
           files: dist/namma-wallet-v*
-          fail_on_unmatched_files: true
+          fail_on_unmatched_files: false
 
   ci-ok:
     name: CI Status
     if: always()
-    needs: [changes, gate, android, ios, promote]
+    needs: [changes, gate, check-play-store, android, ios, promote]
     runs-on: ubuntu-latest
     steps:
       - name: Check all jobs
         run: |
           echo "changes: ${{ needs.changes.result }}"
           echo "gate: ${{ needs.gate.result }}"
+          echo "check-play-store: ${{ needs.check-play-store.result }}"
           echo "android: ${{ needs.android.result }}"
           echo "ios: ${{ needs.ios.result }}"
           echo "promote: ${{ needs.promote.result }}"
