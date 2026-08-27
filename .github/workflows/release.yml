@@ -121,9 +121,24 @@ jobs:
             exit 0
           fi
           bundle exec fastlane check_version || true
-          SKIP=$(cat ../skip_android_build.txt 2>/dev/null || echo "false")
-          REASON=$(cat ../skip_android_reason.txt 2>/dev/null || echo "Android version already exists on Play Store.")
+          SKIP="false"
+          if [ -f "skip_android_build.txt" ]; then
+            SKIP=$(cat skip_android_build.txt)
+          elif [ -f "fastlane/skip_android_build.txt" ]; then
+            SKIP=$(cat fastlane/skip_android_build.txt)
+          elif [ -f "../skip_android_build.txt" ]; then
+            SKIP=$(cat ../skip_android_build.txt)
+          fi
+          REASON="Android version code already exists on Google Play."
+          if [ -f "skip_android_reason.txt" ]; then
+            REASON=$(cat skip_android_reason.txt)
+          elif [ -f "fastlane/skip_android_reason.txt" ]; then
+            REASON=$(cat fastlane/skip_android_reason.txt)
+          elif [ -f "../skip_android_reason.txt" ]; then
+            REASON=$(cat ../skip_android_reason.txt)
+          fi
           echo "skip_build=$SKIP" >> $GITHUB_OUTPUT
+          echo "Detected skip_build: $SKIP"
           if [ "$SKIP" = "true" ]; then
             echo "### ⏭️ Android Build Skipped" >> $GITHUB_STEP_SUMMARY
             echo "$REASON" >> $GITHUB_STEP_SUMMARY
@@ -176,8 +191,16 @@ jobs:
             exit 0
           fi
           bundle exec fastlane check_version || true
-          SKIP=$(cat ../skip_ios_build.txt 2>/dev/null || echo "false")
+          SKIP="false"
+          if [ -f "skip_ios_build.txt" ]; then
+            SKIP=$(cat skip_ios_build.txt)
+          elif [ -f "fastlane/skip_ios_build.txt" ]; then
+            SKIP=$(cat fastlane/skip_ios_build.txt)
+          elif [ -f "../skip_ios_build.txt" ]; then
+            SKIP=$(cat ../skip_ios_build.txt)
+          fi
           echo "skip_build=$SKIP" >> $GITHUB_OUTPUT
+          echo "Detected skip_build: $SKIP"
           if [ "$SKIP" = "true" ]; then
             echo "### ⏭️ iOS Build Skipped" >> $GITHUB_STEP_SUMMARY
             echo "iOS version already exists on TestFlight. The iOS build step will be skipped." >> $GITHUB_STEP_SUMMARY

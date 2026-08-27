@@ -96,9 +96,17 @@ platform :ios do
     if latest_build && latest_build.to_i >= build_number
       UI.message("Version #{version}+#{build_number} already exists on TestFlight (latest build for v#{version}: #{latest_build}).")
       File.write(File.expand_path("../skip_ios_build.txt", __dir__), "true")
+      File.write("skip_ios_build.txt", "true")
+      if ENV["GITHUB_OUTPUT"]
+        open(ENV["GITHUB_OUTPUT"], "a") { |f| f.puts("skip_build=true") }
+      end
     else
       UI.success("✓ Version validation passed - #{version}+#{build_number} (TestFlight latest for v#{version}: #{latest_build || 'none'})")
       File.write(File.expand_path("../skip_ios_build.txt", __dir__), "false")
+      File.write("skip_ios_build.txt", "false")
+      if ENV["GITHUB_OUTPUT"]
+        open(ENV["GITHUB_OUTPUT"], "a") { |f| f.puts("skip_build=false") }
+      end
     end
   end
 

@@ -58,9 +58,18 @@ platform :android do
       UI.important("⏩ #{reason}")
       File.write(File.expand_path("../skip_android_build.txt", __dir__), "true")
       File.write(File.expand_path("../skip_android_reason.txt", __dir__), reason)
+      File.write("skip_android_build.txt", "true")
+      File.write("skip_android_reason.txt", reason)
+      if ENV["GITHUB_OUTPUT"]
+        open(ENV["GITHUB_OUTPUT"], "a") { |f| f.puts("skip_build=true") }
+      end
     else
       UI.success("✓ Version validation passed - #{version}+#{version_code} not found on any Play Store track")
       File.write(File.expand_path("../skip_android_build.txt", __dir__), "false")
+      File.write("skip_android_build.txt", "false")
+      if ENV["GITHUB_OUTPUT"]
+        open(ENV["GITHUB_OUTPUT"], "a") { |f| f.puts("skip_build=false") }
+      end
     end
   end
 
