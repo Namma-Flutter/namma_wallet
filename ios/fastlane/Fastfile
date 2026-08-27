@@ -71,6 +71,35 @@ platform :ios do
     UI.error("#{lane} failed: #{exception.message}")
   end
 
+  desc "Check if iOS version already exists on TestFlight"
+  lane :check_version do
+    info = pubspec_version_info
+    version = info[:version]
+    build_number = info[:build_number].to_i
+
+    UI.message("Checking TestFlight for v#{version}+#{build_number}")
+
+    latest_build = begin
+      app_store_build_number(
+        api_key: api_key,
+        app_identifier: app_identifier,
+        live: false,
+        version: version
+      )
+    rescue => e
+      UI.message("⚠️  Could not verify existing builds on TestFlight: #{e.message}. Proceeding...")
+      nil
+    end
+
+    if latest_build && latest_build.to_i >= build_number
+      UI.message("Version #{version}+#{build_number} already exists on TestFlight (latest build for v#{version}: #{latest_build}).")
+      File.write(File.expand_path("../skip_ios_build.txt", __dir__), "true")
+    else
+      UI.success("✓ Version validation passed - #{version}+#{build_number} (TestFlight latest for v#{version}: #{latest_build || 'none'})")
+      File.write(File.expand_path("../skip_ios_build.txt", __dir__), "false")
+    end
+  end
+
   desc "Build and upload to TestFlight"
   lane :beta do
     info = pubspec_version_info
