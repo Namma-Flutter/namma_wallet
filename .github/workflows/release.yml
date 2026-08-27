@@ -87,7 +87,7 @@ jobs:
     outputs:
       skip_build: ${{ steps.check.outputs.skip_build }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: Decode Play Store service account
         run: echo "${{ secrets.PLAY_STORE_JSON_KEY }}" | base64 --decode > play-store-key.json
@@ -130,6 +130,37 @@ jobs:
             echo "skip_build=false" >> $GITHUB_OUTPUT
             echo "Version $VERSION_CODE not found. Will build."
           fi
+
+  check-app-store:
+    name: Check App Store Version
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      skip_build: ${{ steps.check.outputs.skip_build }}
+    env:
+      APP_STORE_CONNECT_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+      APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+      APP_STORE_CONNECT_KEY_PATH: ./AuthKey.p8
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Decode App Store Connect API key
+        run: echo "${{ secrets.APP_STORE_CONNECT_P8_BASE64 }}" | base64 --decode > ios/fastlane/AuthKey.p8
+
+      - name: Set up Ruby for fastlane
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.3.10"
+          bundler-cache: true
+          working-directory: ios
+
+      - name: Check if version exists on TestFlight
+        id: check
+        working-directory: ios
+        run: |
+          bundle exec fastlane check_version
+          SKIP=$(cat ../skip_ios_build.txt 2>/dev/null || echo "false")
+          echo "skip_build=$SKIP" >> $GITHUB_OUTPUT
 
   android:
     name: Build & Ship Android
@@ -219,7 +250,8 @@ jobs:
     name: Build & Ship iOS
     runs-on: macos-latest
     timeout-minutes: 90
-    needs: [gate]
+    needs: [gate, check-app-store]
+    if: needs.check-app-store.outputs.skip_build != 'true'
     env:
       APP_STORE_CONNECT_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
       APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
@@ -297,7 +329,7 @@ jobs:
     if: ${{ !cancelled() && (github.event_name == 'pull_request' && github.base_ref == 'release') || (github.event_name == 'workflow_dispatch' && inputs.stage == 'release') }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
-    needs: [android, ios, check-play-store]
+    needs: [android, ios, check-play-store, check-app-store]
     env:
       PLAY_STORE_JSON_PATH: ${{ github.workspace }}/play-store-key.json
       APP_STORE_CONNECT_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
@@ -393,13 +425,14 @@ jobs:
   ci-ok:
     name: CI Status
     if: always()
-    needs: [gate, check-play-store, android, ios, promote]
+    needs: [gate, check-play-store, check-app-store, android, ios, promote]
     runs-on: ubuntu-latest
     steps:
       - name: Check all jobs
         run: |
           echo "gate: ${{ needs.gate.result }}"
           echo "check-play-store: ${{ needs.check-play-store.result }}"
+          echo "check-app-store: ${{ needs.check-app-store.result }}"
           echo "android: ${{ needs.android.result }}"
           echo "ios: ${{ needs.ios.result }}"
           echo "promote: ${{ needs.promote.result }}"
