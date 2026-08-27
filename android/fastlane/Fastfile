@@ -25,6 +25,30 @@ platform :android do
     File.exist?(changelog_path) ? File.read(changelog_path) : "Beta build v#{version} (#{version_code})"
   end
 
+  desc "Check if Android version already exists on Play Store"
+  lane :check_version do
+    info = pubspec_version_info
+    version = info[:version]
+    version_code = info[:version_code]
+
+    UI.message("Checking Play Store for v#{version}+#{version_code}")
+
+    existing_versions = begin
+      google_play_track_version_codes(track: "namma-flutter-int-track")
+    rescue => e
+      UI.message("⚠️  Could not verify existing versions: #{e.message}. Proceeding...")
+      []
+    end
+
+    if existing_versions.include?(version_code)
+      UI.message("Version code #{version_code} already exists on namma-flutter-int-track.")
+      File.write(File.expand_path("../skip_android_build.txt", __dir__), "true")
+    else
+      UI.success("✓ Version validation passed - #{version}+#{version_code}")
+      File.write(File.expand_path("../skip_android_build.txt", __dir__), "false")
+    end
+  end
+
   desc "Build and upload to namma-flutter-int-track"
   lane :beta do
     info = pubspec_version_info

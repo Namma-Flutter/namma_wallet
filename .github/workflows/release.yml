@@ -86,6 +86,9 @@ jobs:
     timeout-minutes: 5
     outputs:
       skip_build: ${{ steps.check.outputs.skip_build }}
+    env:
+      PLAY_STORE_JSON_PATH: ${{ github.workspace }}/play-store-key.json
+      PACKAGE_NAME: com.nammaflutter.nammawallet
     steps:
       - uses: actions/checkout@v6
 
@@ -93,65 +96,33 @@ jobs:
         env:
           KEY_DATA: ${{ secrets.PLAY_STORE_JSON_KEY }}
         run: |
-          if [ -z "$KEY_DATA" ]; then
-            echo "::warning::PLAY_STORE_JSON_KEY secret is empty"
-            exit 0
-          fi
-          if echo "$KEY_DATA" | grep -q "^{"; then
-            echo "$KEY_DATA" > play-store-key.json
-          else
-            echo "$KEY_DATA" | base64 -d -i > play-store-key.json 2>/dev/null || echo "$KEY_DATA" | base64 --decode > play-store-key.json 2>/dev/null || echo "$KEY_DATA" > play-store-key.json
+          if [ -n "$KEY_DATA" ]; then
+            if echo "$KEY_DATA" | grep -q "^{"; then
+              echo "$KEY_DATA" > play-store-key.json
+            else
+              echo "$KEY_DATA" | base64 -d -i > play-store-key.json 2>/dev/null || echo "$KEY_DATA" | base64 --decode > play-store-key.json 2>/dev/null || echo "$KEY_DATA" > play-store-key.json
+            fi
           fi
 
-      - name: Authenticate with service account
-        uses: google-github-actions/auth@v2
+      - name: Set up Ruby for fastlane
+        uses: ruby/setup-ruby@v1
         with:
-          credentials_json: ${{ secrets.PLAY_STORE_JSON_KEY }}
+          ruby-version: "3.4.7"
+          bundler-cache: true
+          working-directory: android
 
       - name: Check if version exists on Play Store
         id: check
+        working-directory: android
         run: |
-          VERSION_CODE=$(awk -F'+' '/^version:/{print $2}' pubspec.yaml | tr -d ' "')
-          echo "Version code: $VERSION_CODE"
-
-          ACCESS_TOKEN=$(gcloud auth print-access-token 2>/dev/null || true)
-          if [ -z "$ACCESS_TOKEN" ]; then
-            echo "Could not obtain access token from gcloud. Proceeding with build."
+          if [ ! -s "${PLAY_STORE_JSON_PATH}" ]; then
+            echo "⚠️ play-store-key.json not present or empty. Proceeding with build."
             echo "skip_build=false" >> $GITHUB_OUTPUT
             exit 0
           fi
-
-          PACKAGE="com.nammaflutter.nammawallet"
-          EDIT_ID=$(curl -s \
-            -H "Authorization: Bearer $ACCESS_TOKEN" \
-            "https://androidpublisher.googleapis.com/androidpublisher/v3/applications/$PACKAGE/edits" \
-            -X POST -H "Content-Type: application/json" -d '{}' \
-            | jq -r '.id // empty' 2>/dev/null || true)
-
-          if [ -z "$EDIT_ID" ]; then
-            echo "Could not create edit with Play Store API. Proceeding with build."
-            echo "skip_build=false" >> $GITHUB_OUTPUT
-            exit 0
-          fi
-
-          TRACKS=$(curl -s \
-            -H "Authorization: Bearer $ACCESS_TOKEN" \
-            "https://androidpublisher.googleapis.com/androidpublisher/v3/applications/$PACKAGE/edits/$EDIT_ID/tracks" 2>/dev/null || echo "{}")
-
-          EXISTS=$(echo "$TRACKS" | jq "[.tracks[]?.releases[]?.versionCodes[]? | select(. == $VERSION_CODE)] | length > 0" 2>/dev/null || echo "false")
-
-          curl -s \
-            -H "Authorization: Bearer $ACCESS_TOKEN" \
-            "https://androidpublisher.googleapis.com/androidpublisher/v3/applications/$PACKAGE/edits/$EDIT_ID" \
-            -X DELETE > /dev/null 2>&1 || true
-
-          if [ "$EXISTS" = "true" ]; then
-            echo "skip_build=true" >> $GITHUB_OUTPUT
-            echo "Version $VERSION_CODE already on Play Store. Skipping build."
-          else
-            echo "skip_build=false" >> $GITHUB_OUTPUT
-            echo "Version $VERSION_CODE not found. Will build."
-          fi
+          bundle exec fastlane check_version || true
+          SKIP=$(cat ../skip_android_build.txt 2>/dev/null || echo "false")
+          echo "skip_build=$SKIP" >> $GITHUB_OUTPUT
 
   check-app-store:
     name: Check App Store Version
