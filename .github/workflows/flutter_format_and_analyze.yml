@@ -4,10 +4,16 @@ on:
   pull_request:
     branches:
       - main
+    paths:
+      - 'lib/**'
+      - 'test/**'
+      - 'pubspec.yaml'
+      - 'pubspec.lock'
 
 jobs:
   flutter-format-and-analyze:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     permissions:
       contents: read
       issues: write

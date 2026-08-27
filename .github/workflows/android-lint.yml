@@ -6,11 +6,15 @@ on:
       - main
     paths:
       - .github/workflows/android-lint.yml
-      - android/**
+      - android/app/src/**
+      - android/app/build.gradle*
+      - android/build.gradle*
+      - android/settings.gradle*
 
 jobs:
   android-lint:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - name: Checkout code
         uses: actions/checkout@v6.0.2

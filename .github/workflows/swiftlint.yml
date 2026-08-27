@@ -7,14 +7,16 @@ on:
     paths:
       - .github/workflows/swiftlint.yml
       - .swiftlint-version
-      - ios/**
+      - 'ios/**/*.swift'
+      - 'ios/**/.swiftlint.yml'
 
 jobs:
   swiftlint:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Read SwiftLint version
         id: swiftlint_version
