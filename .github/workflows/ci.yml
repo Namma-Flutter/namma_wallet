@@ -9,6 +9,8 @@ on:
       - 'test/**'
       - 'pubspec.yaml'
       - 'pubspec.lock'
+      - '.github/workflows/ci.yml'
+      - 'build.yaml'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -50,16 +52,43 @@ jobs:
           echo "exit_code=$?" >> $GITHUB_OUTPUT
           exit 0
 
+      - name: Check build runner code generation
+        id: build_runner_check
+        run: |
+          set +e
+          dart run build_runner build --delete-conflicting-outputs 2>&1 | tee build_runner.log
+          BUILD_RUNNER_EXIT=${PIPESTATUS[0]}
+          if [ $BUILD_RUNNER_EXIT -ne 0 ]; then
+            echo "exit_code=$BUILD_RUNNER_EXIT" >> $GITHUB_OUTPUT
+            echo "drift=0" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          CHANGED=$(git status --porcelain)
+          if [ -n "$CHANGED" ]; then
+            echo "exit_code=0" >> $GITHUB_OUTPUT
+            echo "drift=1" >> $GITHUB_OUTPUT
+            echo "::group::Uncommitted Code Generation Changes"
+            git status --short
+            git diff
+            echo "::endgroup::"
+          else
+            echo "exit_code=0" >> $GITHUB_OUTPUT
+            echo "drift=0" >> $GITHUB_OUTPUT
+          fi
+          exit 0
+
       - name: Run flutter analyze (write log)
-        if: ${{ steps.format_check.outputs.exit_code == '0' }}
+        if: ${{ steps.format_check.outputs.exit_code == '0' && steps.build_runner_check.outputs.exit_code == '0' && steps.build_runner_check.outputs.drift == '0' }}
         run: flutter analyze --write=flutter_analyze.log
 
-      - name: Prepare PR comments
+      - name: Prepare PR comments & step summary
         if: always()
         run: |
           mkdir -p pr-comments
           echo "${{ github.event.pull_request.number }}" > pr-comments/pr_number
 
+          # 1. Format check summary
           if [ "${{ steps.format_check.outputs.exit_code }}" != "0" ]; then
             cat << 'EOF' > pr-comments/format_comment.txt
           ❌ **Formatting check failed**
@@ -73,11 +102,73 @@ jobs:
           ```
           Then push the updated files.
           EOF
+            echo "### ❌ Dart Format Check Failed" >> $GITHUB_STEP_SUMMARY
+            echo "Run \`fvm dart format .\` to fix code formatting." >> $GITHUB_STEP_SUMMARY
           else
             echo "DELETE" > pr-comments/format_comment.txt
+            echo "### ✅ Dart Format Passed" >> $GITHUB_STEP_SUMMARY
           fi
 
-          if [ "${{ steps.format_check.outputs.exit_code }}" == "0" ]; then
+          # 2. Build runner check summary
+          if [ "${{ steps.build_runner_check.outputs.exit_code }}" != "0" ]; then
+            BUILD_ERRORS=""
+            if [ -f build_runner.log ]; then
+              BUILD_ERRORS=$(tail -n 30 build_runner.log)
+            fi
+            {
+              echo "❌ **Build runner failed**"
+              echo ""
+              echo "Code generation failed with errors:"
+              echo '```'
+              echo "$BUILD_ERRORS"
+              echo '```'
+              echo ""
+              echo "Please fix the errors and run:"
+              echo "```bash"
+              echo "fvm dart run build_runner build --delete-conflicting-outputs"
+              echo "```"
+            } > pr-comments/build_runner_comment.txt
+            {
+              echo "### ❌ Build Runner Execution Failed"
+              echo "```"
+              echo "$BUILD_ERRORS"
+              echo "```"
+            } >> $GITHUB_STEP_SUMMARY
+          elif [ "${{ steps.build_runner_check.outputs.drift }}" == "1" ]; then
+            DIFF_SUMMARY=$(git status --short)
+            {
+              echo "❌ **Generated files are missing or out of date**"
+              echo ""
+              echo "Running \`build_runner\` produced uncommitted changes:"
+              echo '```'
+              echo "$DIFF_SUMMARY"
+              echo '```'
+              echo ""
+              echo "Please run code generation and commit the changes:"
+              echo "```bash"
+              echo "fvm dart run build_runner build --delete-conflicting-outputs"
+              echo "```"
+              echo "or"
+              echo "```bash"
+              echo "make codegen"
+              echo "```"
+              echo "Then commit and push the updated files."
+            } > pr-comments/build_runner_comment.txt
+            {
+              echo "### ❌ Generated Code Drift Detected"
+              echo "The following files were created or modified during code generation:"
+              echo "```"
+              echo "$DIFF_SUMMARY"
+              echo "```"
+              echo "Run \`make codegen\` and commit the changes."
+            } >> $GITHUB_STEP_SUMMARY
+          else
+            echo "DELETE" > pr-comments/build_runner_comment.txt
+            echo "### ✅ Build Runner Code Generation Passed" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          # 3. Analyze summary
+          if [ "${{ steps.format_check.outputs.exit_code }}" == "0" ] && [ "${{ steps.build_runner_check.outputs.exit_code }}" == "0" ] && [ "${{ steps.build_runner_check.outputs.drift }}" == "0" ]; then
             if [ -f flutter_analyze.log ] && [ -s flutter_analyze.log ]; then
               content=$(cat flutter_analyze.log)
               {
@@ -86,8 +177,15 @@ jobs:
                 echo "$content"
                 echo '```'
               } > pr-comments/analyze_comment.txt
+              {
+                echo "### ❌ Flutter Analyze Found Issues"
+                echo "```"
+                echo "$content"
+                echo "```"
+              } >> $GITHUB_STEP_SUMMARY
             else
               echo "✅ **Flutter analysis passed** — no issues found." > pr-comments/analyze_comment.txt
+              echo "### ✅ Flutter Analysis Passed" >> $GITHUB_STEP_SUMMARY
             fi
           fi
 
@@ -98,11 +196,31 @@ jobs:
           name: pr-comments-format-analyze
           path: pr-comments/
 
-      - name: Check format results
+      - name: Check format, codegen, and analysis results
         if: always()
         run: |
+          FAILED=0
           if [ "${{ steps.format_check.outputs.exit_code }}" != "0" ]; then
-            echo "Formatting check failed with exit code ${{ steps.format_check.outputs.exit_code }}"
+            echo "::error::Dart formatting check failed"
+            FAILED=1
+          fi
+          if [ "${{ steps.build_runner_check.outputs.exit_code }}" != "0" ]; then
+            echo "::error::Build runner execution failed"
+            FAILED=1
+          fi
+          if [ "${{ steps.build_runner_check.outputs.drift }}" == "1" ]; then
+            echo "::error::Generated files are missing or out of date"
+            git status --porcelain
+            git diff
+            FAILED=1
+          fi
+          if [ "${{ steps.format_check.outputs.exit_code }}" == "0" ] && [ "${{ steps.build_runner_check.outputs.exit_code }}" == "0" ] && [ "${{ steps.build_runner_check.outputs.drift }}" == "0" ]; then
+            if [ -f flutter_analyze.log ] && [ -s flutter_analyze.log ]; then
+              echo "::error::Flutter analyze found issues"
+              FAILED=1
+            fi
+          fi
+          if [ $FAILED -ne 0 ]; then
             exit 1
           fi
 

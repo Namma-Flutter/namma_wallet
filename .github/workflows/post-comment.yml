@@ -112,7 +112,45 @@ jobs:
                 }
               }
 
-              // 2. Analyze comment
+              // 2. Build runner comment
+              const buildRunnerCommentPath = path.join(dirPath, 'build_runner_comment.txt');
+              if (fs.existsSync(buildRunnerCommentPath)) {
+                const body = fs.readFileSync(buildRunnerCommentPath, 'utf8').trim();
+                const existing = await findComment('Build runner') || await findComment('Generated files are missing');
+                
+                if (body === 'DELETE') {
+                  if (existing) {
+                    await github.rest.issues.deleteComment({
+                      owner: context.repo.owner,
+                      repo: context.repo.repo,
+                      comment_id: existing.id,
+                    });
+                    console.log('Deleted build runner comment');
+                  } else {
+                    console.log('No build runner comment to delete');
+                  }
+                } else if (body) {
+                  if (existing) {
+                    await github.rest.issues.updateComment({
+                      owner: context.repo.owner,
+                      repo: context.repo.repo,
+                      comment_id: existing.id,
+                      body: body,
+                    });
+                    console.log('Updated build runner comment');
+                  } else {
+                    await github.rest.issues.createComment({
+                      owner: context.repo.owner,
+                      repo: context.repo.repo,
+                      issue_number: prNumber,
+                      body: body,
+                    });
+                    console.log('Created build runner comment');
+                  }
+                }
+              }
+
+              // 3. Analyze comment
               const analyzeCommentPath = path.join(dirPath, 'analyze_comment.txt');
               if (fs.existsSync(analyzeCommentPath)) {
                 const body = fs.readFileSync(analyzeCommentPath, 'utf8').trim();
@@ -138,7 +176,7 @@ jobs:
                 }
               }
 
-              // 3. Test comment
+              // 4. Test comment
               const testCommentPath = path.join(dirPath, 'test_comment.txt');
               if (fs.existsSync(testCommentPath)) {
                 const body = fs.readFileSync(testCommentPath, 'utf8').trim();
@@ -164,7 +202,7 @@ jobs:
                 }
               }
 
-              // 4. Greenlight comment
+              // 5. Greenlight comment
               const greenlightCommentPath = path.join(dirPath, 'greenlight_comment.txt');
               if (fs.existsSync(greenlightCommentPath)) {
                 const body = fs.readFileSync(greenlightCommentPath, 'utf8').trim();
