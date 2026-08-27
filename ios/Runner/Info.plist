@@ -32,8 +32,6 @@
 	<string>Camera access is required to scan QR codes</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>This app needs photo library access to scan barcodes from images.</string>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Location access is used to provide relevant travel details, station directions, and ticket locations.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

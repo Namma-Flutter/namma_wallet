@@ -65,6 +65,23 @@ post_install do |installer|
       if target.name.include?("Pods-Share Extension") || target.name.include?("share_handler_ios_models")
         config.build_settings['APPLICATION_EXTENSION_API_ONLY'] = 'YES'
       end
+
+      # Strip unused permissions from permission_handler to avoid App Store ITMS-90683 warnings
+      config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] ||= [
+        '$(inherited)',
+        'PERMISSION_CAMERA=1',
+        'PERMISSION_PHOTOS=1',
+        'PERMISSION_NOTIFICATIONS=1',
+        'PERMISSION_LOCATION=0',
+        'PERMISSION_EVENTS=0',
+        'PERMISSION_REMINDERS=0',
+        'PERMISSION_CONTACTS=0',
+        'PERMISSION_MICROPHONE=0',
+        'PERMISSION_SPEECH_RECOGNIZER=0',
+        'PERMISSION_BLUETOOTH=0',
+        'PERMISSION_APP_TRACKING_TRANSPARENCY=0',
+        'PERMISSION_CRITICAL_ALERTS=0',
+      ]
     end
   end
 
