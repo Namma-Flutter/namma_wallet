@@ -100,7 +100,7 @@ jobs:
       - name: Check if version exists on Play Store
         id: check
         run: |
-          VERSION_CODE=$(grep 'versionCode' android/app/build.gradle | head -1 | grep -oP '\d+')
+          VERSION_CODE=$(awk -F'+' '/^version:/{print $2}' pubspec.yaml | tr -d ' "')
           echo "Version code: $VERSION_CODE"
 
           ACCESS_TOKEN=$(gcloud auth print-access-token)
