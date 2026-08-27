@@ -52,7 +52,7 @@ platform :ios do
     UI.message("Building signed IPA v#{info[:version]}+#{info[:build_number]}")
 
     sh("pod repo update || true")
-    sh("cd .. && pod install --repo-update || true")
+    sh("cd .. && (pod update GoogleMLKit/TextRecognition --repo-update || pod install --repo-update) || true")
     sh("cd ../.. && #{flutter} build ipa --release")
 
     update_code_signing_settings(use_automatic_signing: true)

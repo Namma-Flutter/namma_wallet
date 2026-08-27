@@ -374,7 +374,7 @@ jobs:
         working-directory: ios
         run: |
           pod repo update || true
-          pod install --repo-update || true
+          pod update GoogleMLKit/TextRecognition --repo-update || pod install --repo-update || true
 
       - name: Build and upload to TestFlight
         if: env.STAGE == 'beta'
