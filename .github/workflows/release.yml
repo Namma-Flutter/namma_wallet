@@ -54,8 +54,8 @@ jobs:
     outputs:
       code: ${{ steps.filter.outputs.code }}
     steps:
-      - uses: actions/checkout@v5
-      - uses: dorny/paths-filter@v3
+      - uses: actions/checkout@v6
+      - uses: dorny/paths-filter@v4
         id: filter
         with:
           filters: |
@@ -74,9 +74,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
-      - uses: actions/cache@v4
+      - uses: actions/cache@v6
         with:
           path: |
             ~/.pub-cache
@@ -113,7 +113,7 @@ jobs:
     outputs:
       skip_build: ${{ steps.check.outputs.skip_build }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: Decode Play Store service account
         run: echo "${{ secrets.PLAY_STORE_JSON_KEY }}" | base64 --decode > play-store-key.json
@@ -138,20 +138,14 @@ jobs:
             -X POST -H "Content-Type: application/json" -d '{}' \
             | jq -r '.id')
 
-          TRACKS=$(curl -s \
+          STATUS=$(curl -s \
             -H "Authorization: Bearer $ACCESS_TOKEN" \
-            "https://androidpublisher.googleapis.com/androidpublisher/v3/applications/$PACKAGE/edits/$EDIT_ID/tracks")
+            "https://androidpublisher.googleapis.com/androidpublisher/v3/applications/$PACKAGE/edits/$EDIT_ID/tracks/namma-flutter-int-track" \
+            | jq -r --arg vc "$VERSION_CODE" '.releases[]? | select(.versionCodes[]? == $vc) | .status')
 
-          EXISTS=$(echo "$TRACKS" | jq "[.tracks[].releases[].versionCodes[]? | select(. == $VERSION_CODE)] | length > 0")
-
-          curl -s \
-            -H "Authorization: Bearer $ACCESS_TOKEN" \
-            "https://androidpublisher.googleapis.com/androidpublisher/v3/applications/$PACKAGE/edits/$EDIT_ID" \
-            -X DELETE > /dev/null
-
-          if [ "$EXISTS" = "true" ]; then
+          if [ "$STATUS" = "completed" ] || [ "$STATUS" = "inProgress" ]; then
             echo "skip_build=true" >> $GITHUB_OUTPUT
-            echo "Version $VERSION_CODE already on Play Store. Skipping build."
+            echo "Version $VERSION_CODE already on Play Store. Skipping Android build."
           else
             echo "skip_build=false" >> $GITHUB_OUTPUT
             echo "Version $VERSION_CODE not found. Will build."
@@ -171,14 +165,14 @@ jobs:
       FLUTTER_CMD: flutter
       GRADLE_OPTS: -Dorg.gradle.jvmargs="-Xmx4G -XX:MaxMetaspaceSize=2G --add-opens=java.base/java.lang.ref=ALL-UNNAMED"
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
-      - uses: actions/setup-java@v5
+      - uses: actions/setup-java@v6
         with:
           distribution: temurin
           java-version: "17"
 
-      - uses: actions/cache@v4
+      - uses: actions/cache@v6
         with:
           path: |
             ~/.pub-cache
@@ -253,9 +247,9 @@ jobs:
       APP_STORE_CONNECT_KEY_PATH: ./AuthKey.p8
       FLUTTER_CMD: flutter
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
-      - uses: actions/cache@v4
+      - uses: actions/cache@v6
         with:
           path: |
             ~/.pub-cache
@@ -265,7 +259,7 @@ jobs:
           restore-keys: |
             ios-${{ runner.os }}-
 
-      - uses: actions/cache@v4
+      - uses: actions/cache@v6
         with:
           path: |
             ios/Pods
@@ -331,7 +325,7 @@ jobs:
       APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
       APP_STORE_CONNECT_KEY_PATH: ./AuthKey.p8
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: Decode Play Store service account
         run: echo "${{ secrets.PLAY_STORE_JSON_KEY }}" | base64 --decode > play-store-key.json
@@ -373,7 +367,7 @@ jobs:
       id-token: write
       attestations: write
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: Download build artifacts
         uses: actions/download-artifact@v4
