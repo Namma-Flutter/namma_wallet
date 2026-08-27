@@ -73,11 +73,18 @@ platform :ios do
       "-allowProvisioningUpdates -authenticationKeyPath '#{key_path}' -authenticationKeyID '#{key_id}' -authenticationKeyIssuerID '#{issuer_id}'"
     end
 
+    team_id_val = ENV.fetch("TEAM_ID", "TG8RN284Q4")
+
     build_app(
       clean: false,
       scheme: "Runner",
       workspace: "Runner.xcworkspace",
       export_method: "app-store",
+      export_team_id: team_id_val,
+      export_options: {
+        signingStyle: "automatic",
+        teamID: team_id_val
+      },
       output_directory: "../build/ios/ipa",
       skip_build_archive: true,
       archive_path: "../build/ios/archive/Runner.xcarchive",

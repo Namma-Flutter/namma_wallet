@@ -43,6 +43,7 @@ env:
   STAGE: ${{ (github.event_name == 'pull_request' && github.base_ref) || inputs.stage }}
   APP_IDENTIFIER: com.nammaflutter.nammawallet
   PACKAGE_NAME: com.nammaflutter.nammawallet
+  TEAM_ID: TG8RN284Q4
 
 jobs:
   gate:
