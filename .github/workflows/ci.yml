@@ -1,8 +1,9 @@
-name: Upload coverage reports to Codecov
+name: CI
 
 on:
   pull_request:
-    branches: [main]
+    branches:
+      - main
     paths:
       - 'lib/**'
       - 'test/**'
@@ -14,7 +15,99 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  run:
+  format-analyze:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Read Flutter version from pubspec.yaml
+        id: flutter_version
+        run: |
+          VERSION=$(grep '^  flutter:' pubspec.yaml | awk -F'"' '{print $2}')
+          echo "flutter_version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2
+        with:
+          channel: stable
+          flutter-version: ${{ steps.flutter_version.outputs.flutter_version }}
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Check dart format
+        id: format_check
+        run: |
+          set +e
+          dart format --set-exit-if-changed .
+          echo "exit_code=$?" >> $GITHUB_OUTPUT
+          exit 0
+
+      - name: Run flutter analyze (write log)
+        if: ${{ steps.format_check.outputs.exit_code == '0' }}
+        run: flutter analyze --write=flutter_analyze.log
+
+      - name: Prepare PR comments
+        if: always()
+        run: |
+          mkdir -p pr-comments
+          echo "${{ github.event.pull_request.number }}" > pr-comments/pr_number
+
+          if [ "${{ steps.format_check.outputs.exit_code }}" != "0" ]; then
+            cat << 'EOF' > pr-comments/format_comment.txt
+          ❌ **Formatting check failed**
+          Please run:
+          ```bash
+          fvm dart format .
+          ```
+          or
+          ```bash
+          dart format .
+          ```
+          Then push the updated files.
+          EOF
+          else
+            echo "DELETE" > pr-comments/format_comment.txt
+          fi
+
+          if [ "${{ steps.format_check.outputs.exit_code }}" == "0" ]; then
+            if [ -f flutter_analyze.log ] && [ -s flutter_analyze.log ]; then
+              content=$(cat flutter_analyze.log)
+              {
+                echo "❌ **Flutter analysis found issues:**"
+                echo '```'
+                echo "$content"
+                echo '```'
+              } > pr-comments/analyze_comment.txt
+            else
+              echo "✅ **Flutter analysis passed** — no issues found." > pr-comments/analyze_comment.txt
+            fi
+          fi
+
+      - name: Upload PR comments artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr-comments-format-analyze
+          path: pr-comments/
+
+      - name: Check format results
+        if: always()
+        run: |
+          if [ "${{ steps.format_check.outputs.exit_code }}" != "0" ]; then
+            echo "Formatting check failed with exit code ${{ steps.format_check.outputs.exit_code }}"
+            exit 1
+          fi
+
+  test-coverage:
+    needs: format-analyze
     runs-on: ubuntu-latest
     timeout-minutes: 20
     permissions:
@@ -64,7 +157,6 @@ jobs:
           echo "${{ github.event.pull_request.number }}" > pr-comments/pr_number
 
           if [ "${{ steps.test_run.outputs.exit_code }}" != "0" ]; then
-            # Extract failures
             if [ -f test_output.log ]; then
               FAILURES=$(grep -A 50 "Some tests failed" test_output.log || grep -A 50 "FAILED" test_output.log || tail -n 30 test_output.log)
               if [ ${#FAILURES} -gt 4500 ]; then
@@ -100,7 +192,6 @@ jobs:
           name: pr-comments-coverage
           path: pr-comments/
 
-      # Fail the workflow if tests failed
       - name: Check test results
         if: always()
         run: |
@@ -118,7 +209,6 @@ jobs:
       - name: Convert coverage to lcov format
         if: ${{ steps.test_run.outputs.exit_code == '0' }}
         run: |
-          # Flutter generates lcov.info by default, but we may need to ensure it's in the right format
           lcov --list-coverage coverage/lcov.info || true
 
       - name: Upload coverage to Codecov

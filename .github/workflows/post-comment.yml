@@ -2,7 +2,7 @@ name: Post PR Comments
 
 on:
   workflow_run:
-    workflows: ["flutter-format-and-analyze", "Upload coverage reports to Codecov", "greenlight"]
+    workflows: ["CI", "greenlight"]
     types:
       - completed
 

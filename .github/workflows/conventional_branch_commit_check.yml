@@ -3,6 +3,10 @@ name: Conventional Commits & Branch Naming
 on:
   pull_request:
     branches: [main]
+    paths-ignore:
+      - '*.md'
+      - 'docs/**'
+      - 'LICENSE'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
