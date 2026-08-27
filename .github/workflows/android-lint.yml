@@ -11,6 +11,10 @@ on:
       - android/build.gradle*
       - android/settings.gradle*
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   android-lint:
     runs-on: ubuntu-latest

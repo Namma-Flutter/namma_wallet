@@ -10,6 +10,10 @@ on:
       - 'ios/**/*.swift'
       - 'ios/**/.swiftlint.yml'
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   swiftlint:
     runs-on: ubuntu-latest
