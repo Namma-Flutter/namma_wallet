@@ -51,8 +51,7 @@ platform :ios do
     flutter = ENV.fetch("FLUTTER_CMD", "flutter")
     UI.message("Building signed IPA v#{info[:version]}+#{info[:build_number]}")
 
-    sh("pod repo update || true")
-    sh("cd .. && (pod update GoogleMLKit/TextRecognition MLKitVision MLKitTextRecognition MLKitCommon MLKitTextRecognitionCommon --repo-update || pod update --repo-update || pod install --repo-update) || true")
+    sh("cd .. && pod update --repo-update || true")
     sh("cd ../.. && #{flutter} build ipa --release")
 
     update_code_signing_settings(use_automatic_signing: true)

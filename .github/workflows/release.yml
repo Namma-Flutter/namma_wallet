@@ -370,11 +370,10 @@ jobs:
       - name: Generate code files
         run: dart run build_runner build --delete-conflicting-outputs
 
-      - name: Update CocoaPods repo and install pods
+      - name: Update CocoaPods dependencies
         working-directory: ios
         run: |
-          pod repo update || true
-          pod update GoogleMLKit/TextRecognition MLKitVision MLKitTextRecognition MLKitCommon MLKitTextRecognitionCommon --repo-update || pod update --repo-update || pod install --repo-update || true
+          pod update --repo-update || pod install --repo-update || true
 
       - name: Build and upload to TestFlight
         if: env.STAGE == 'beta'
