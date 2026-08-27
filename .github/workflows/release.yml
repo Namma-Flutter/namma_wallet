@@ -122,7 +122,14 @@ jobs:
           fi
           bundle exec fastlane check_version || true
           SKIP=$(cat ../skip_android_build.txt 2>/dev/null || echo "false")
+          REASON=$(cat ../skip_android_reason.txt 2>/dev/null || echo "Android version already exists on Play Store.")
           echo "skip_build=$SKIP" >> $GITHUB_OUTPUT
+          if [ "$SKIP" = "true" ]; then
+            echo "### ⏭️ Android Build Skipped" >> $GITHUB_STEP_SUMMARY
+            echo "$REASON" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "The Android build step will be skipped because this build number is already published." >> $GITHUB_STEP_SUMMARY
+          fi
 
   check-app-store:
     name: Check App Store Version
@@ -171,6 +178,10 @@ jobs:
           bundle exec fastlane check_version || true
           SKIP=$(cat ../skip_ios_build.txt 2>/dev/null || echo "false")
           echo "skip_build=$SKIP" >> $GITHUB_OUTPUT
+          if [ "$SKIP" = "true" ]; then
+            echo "### ⏭️ iOS Build Skipped" >> $GITHUB_STEP_SUMMARY
+            echo "iOS version already exists on TestFlight. The iOS build step will be skipped." >> $GITHUB_STEP_SUMMARY
+          fi
 
   android:
     name: Build & Ship Android
