@@ -11,17 +11,28 @@ platform :ios do
 
   # Shared helpers
 
+  def key_path
+    File.expand_path(ENV.fetch("APP_STORE_CONNECT_KEY_PATH", "./AuthKey.p8"), __dir__)
+  end
+
+  def key_id
+    ENV.fetch("APP_STORE_CONNECT_KEY_ID", "")
+  end
+
+  def issuer_id
+    ENV.fetch("APP_STORE_CONNECT_ISSUER_ID", "")
+  end
+
   def api_key
-    key_path = File.expand_path(ENV["APP_STORE_CONNECT_KEY_PATH"], __dir__)
     app_store_connect_api_key(
-      key_id: ENV["APP_STORE_CONNECT_KEY_ID"],
-      issuer_id: ENV["APP_STORE_CONNECT_ISSUER_ID"],
+      key_id: key_id,
+      issuer_id: issuer_id,
       key_filepath: key_path
     )
   end
 
   def app_identifier
-    CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)
+    CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier) || ENV.fetch("APP_IDENTIFIER", "com.nammaflutter.nammawallet")
   end
 
   def pubspec_version_info
@@ -51,19 +62,33 @@ platform :ios do
     flutter = ENV.fetch("FLUTTER_CMD", "flutter")
     UI.message("Building signed IPA v#{info[:version]}+#{info[:build_number]}")
 
-    sh("cd ../.. && #{flutter} build ipa --release")
+    sh("cd .. && pod update --repo-update || true")
+    sh("cd ../.. && #{flutter} build ipa --release --no-codesign")
 
     update_code_signing_settings(use_automatic_signing: true)
+
+    auth_xcargs = if key_id.empty?
+      "-allowProvisioningUpdates"
+    else
+      "-allowProvisioningUpdates -authenticationKeyPath '#{key_path}' -authenticationKeyID '#{key_id}' -authenticationKeyIssuerID '#{issuer_id}'"
+    end
+
+    team_id_val = ENV.fetch("TEAM_ID", "TG8RN284Q4")
 
     build_app(
       clean: false,
       scheme: "Runner",
       workspace: "Runner.xcworkspace",
       export_method: "app-store",
+      export_team_id: team_id_val,
+      export_options: {
+        signingStyle: "automatic",
+        teamID: team_id_val
+      },
       output_directory: "../build/ios/ipa",
       skip_build_archive: true,
       archive_path: "../build/ios/archive/Runner.xcarchive",
-      xcargs: "-allowProvisioningUpdates"
+      export_xcargs: auth_xcargs
     )
   end
 
@@ -94,9 +119,17 @@ platform :ios do
     if latest_build && latest_build.to_i >= build_number
       UI.message("Version #{version}+#{build_number} already exists on TestFlight (latest build for v#{version}: #{latest_build}).")
       File.write(File.expand_path("../skip_ios_build.txt", __dir__), "true")
+      File.write("skip_ios_build.txt", "true")
+      if ENV["GITHUB_OUTPUT"]
+        open(ENV["GITHUB_OUTPUT"], "a") { |f| f.puts("skip_build=true") }
+      end
     else
       UI.success("✓ Version validation passed - #{version}+#{build_number} (TestFlight latest for v#{version}: #{latest_build || 'none'})")
       File.write(File.expand_path("../skip_ios_build.txt", __dir__), "false")
+      File.write("skip_ios_build.txt", "false")
+      if ENV["GITHUB_OUTPUT"]
+        open(ENV["GITHUB_OUTPUT"], "a") { |f| f.puts("skip_build=false") }
+      end
     end
   end
 
