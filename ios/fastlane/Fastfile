@@ -52,7 +52,7 @@ platform :ios do
     UI.message("Building signed IPA v#{info[:version]}+#{info[:build_number]}")
 
     sh("cd .. && pod update --repo-update || true")
-    sh("cd ../.. && #{flutter} build ipa --release")
+    sh("cd ../.. && #{flutter} build ipa --release --no-codesign")
 
     update_code_signing_settings(use_automatic_signing: true)
 
@@ -64,6 +64,7 @@ platform :ios do
       output_directory: "../build/ios/ipa",
       skip_build_archive: true,
       archive_path: "../build/ios/archive/Runner.xcarchive",
+      api_key: api_key,
       xcargs: "-allowProvisioningUpdates"
     )
   end
