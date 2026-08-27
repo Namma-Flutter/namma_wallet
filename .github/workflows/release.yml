@@ -45,38 +45,14 @@ env:
   PACKAGE_NAME: com.nammaflutter.nammawallet
 
 jobs:
-  changes:
-    name: Detect Changes
-    if: github.event.pull_request.merged == true || github.event_name == 'workflow_dispatch'
-    runs-on: ubuntu-latest
-    permissions:
-      pull-requests: read
-    outputs:
-      code: ${{ steps.filter.outputs.code }}
-    steps:
-      - uses: actions/checkout@v5
-      - uses: dorny/paths-filter@v3
-        id: filter
-        with:
-          filters: |
-            code:
-              - 'lib/**'
-              - 'android/**'
-              - 'ios/**'
-              - 'pubspec.yaml'
-              - 'pubspec.lock'
-              - '.github/workflows/**'
-
   gate:
     name: Analyze & Test
-    needs: changes
-    if: needs.changes.outputs.code == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
-      - uses: actions/cache@v4
+      - uses: actions/cache@v6
         with:
           path: |
             ~/.pub-cache
@@ -106,8 +82,6 @@ jobs:
 
   check-play-store:
     name: Check Play Store Version
-    needs: changes
-    if: needs.changes.outputs.code == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     outputs:
@@ -161,8 +135,8 @@ jobs:
     name: Build & Ship Android
     runs-on: ubuntu-latest
     timeout-minutes: 60
-    needs: [changes, gate, check-play-store]
-    if: needs.changes.outputs.code == 'true' && needs.check-play-store.outputs.skip_build != 'true'
+    needs: [gate, check-play-store]
+    if: needs.check-play-store.outputs.skip_build != 'true'
     env:
       ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
       ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
@@ -171,14 +145,14 @@ jobs:
       FLUTTER_CMD: flutter
       GRADLE_OPTS: -Dorg.gradle.jvmargs="-Xmx4G -XX:MaxMetaspaceSize=2G --add-opens=java.base/java.lang.ref=ALL-UNNAMED"
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
-      - uses: actions/setup-java@v5
+      - uses: actions/setup-java@v6
         with:
           distribution: temurin
           java-version: "17"
 
-      - uses: actions/cache@v4
+      - uses: actions/cache@v6
         with:
           path: |
             ~/.pub-cache
@@ -245,17 +219,16 @@ jobs:
     name: Build & Ship iOS
     runs-on: macos-latest
     timeout-minutes: 90
-    needs: [changes, gate]
-    if: needs.changes.outputs.code == 'true'
+    needs: [gate]
     env:
       APP_STORE_CONNECT_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
       APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
       APP_STORE_CONNECT_KEY_PATH: ./AuthKey.p8
       FLUTTER_CMD: flutter
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
-      - uses: actions/cache@v4
+      - uses: actions/cache@v6
         with:
           path: |
             ~/.pub-cache
@@ -265,7 +238,7 @@ jobs:
           restore-keys: |
             ios-${{ runner.os }}-
 
-      - uses: actions/cache@v4
+      - uses: actions/cache@v6
         with:
           path: |
             ios/Pods
@@ -324,14 +297,14 @@ jobs:
     if: ${{ !cancelled() && (github.event_name == 'pull_request' && github.base_ref == 'release') || (github.event_name == 'workflow_dispatch' && inputs.stage == 'release') }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
-    needs: [changes, android, ios, check-play-store]
+    needs: [android, ios, check-play-store]
     env:
       PLAY_STORE_JSON_PATH: ${{ github.workspace }}/play-store-key.json
       APP_STORE_CONNECT_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
       APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
       APP_STORE_CONNECT_KEY_PATH: ./AuthKey.p8
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: Decode Play Store service account
         run: echo "${{ secrets.PLAY_STORE_JSON_KEY }}" | base64 --decode > play-store-key.json
@@ -366,14 +339,14 @@ jobs:
     name: Publish GitHub Release
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    needs: [changes, android, ios, promote]
-    if: ${{ !cancelled() && needs.changes.outputs.code == 'true' && (needs.android.result == 'success' || needs.android.result == 'skipped') && needs.ios.result == 'success' && (needs.promote.result == 'success' || needs.promote.result == 'skipped') }}
+    needs: [android, ios, promote]
+    if: ${{ !cancelled() && (needs.android.result == 'success' || needs.android.result == 'skipped') && needs.ios.result == 'success' && (needs.promote.result == 'success' || needs.promote.result == 'skipped') }}
     permissions:
       contents: write
       id-token: write
       attestations: write
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: Download build artifacts
         uses: actions/download-artifact@v4
@@ -420,12 +393,11 @@ jobs:
   ci-ok:
     name: CI Status
     if: always()
-    needs: [changes, gate, check-play-store, android, ios, promote]
+    needs: [gate, check-play-store, android, ios, promote]
     runs-on: ubuntu-latest
     steps:
       - name: Check all jobs
         run: |
-          echo "changes: ${{ needs.changes.result }}"
           echo "gate: ${{ needs.gate.result }}"
           echo "check-play-store: ${{ needs.check-play-store.result }}"
           echo "android: ${{ needs.android.result }}"
