@@ -11,17 +11,28 @@ platform :ios do
 
   # Shared helpers
 
+  def key_path
+    File.expand_path(ENV.fetch("APP_STORE_CONNECT_KEY_PATH", "./AuthKey.p8"), __dir__)
+  end
+
+  def key_id
+    ENV.fetch("APP_STORE_CONNECT_KEY_ID", "")
+  end
+
+  def issuer_id
+    ENV.fetch("APP_STORE_CONNECT_ISSUER_ID", "")
+  end
+
   def api_key
-    key_path = File.expand_path(ENV["APP_STORE_CONNECT_KEY_PATH"], __dir__)
     app_store_connect_api_key(
-      key_id: ENV["APP_STORE_CONNECT_KEY_ID"],
-      issuer_id: ENV["APP_STORE_CONNECT_ISSUER_ID"],
+      key_id: key_id,
+      issuer_id: issuer_id,
       key_filepath: key_path
     )
   end
 
   def app_identifier
-    CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)
+    CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier) || ENV.fetch("APP_IDENTIFIER", "com.nammaflutter.nammawallet")
   end
 
   def pubspec_version_info
@@ -56,6 +67,12 @@ platform :ios do
 
     update_code_signing_settings(use_automatic_signing: true)
 
+    auth_xcargs = if key_id.empty?
+      "-allowProvisioningUpdates"
+    else
+      "-allowProvisioningUpdates -authenticationKeyPath '#{key_path}' -authenticationKeyID '#{key_id}' -authenticationKeyIssuerID '#{issuer_id}'"
+    end
+
     build_app(
       clean: false,
       scheme: "Runner",
@@ -64,8 +81,7 @@ platform :ios do
       output_directory: "../build/ios/ipa",
       skip_build_archive: true,
       archive_path: "../build/ios/archive/Runner.xcarchive",
-      api_key: api_key,
-      xcargs: "-allowProvisioningUpdates"
+      export_xcargs: auth_xcargs
     )
   end
 
