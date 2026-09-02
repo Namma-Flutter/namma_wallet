@@ -39,7 +39,7 @@ dependencies:
   path: ^1.9.1
   path_provider: ^2.1.6
   pdf_barcode_decoder: ^0.0.2
-  pdfrx: ^2.4.4
+  pdfrx: ^2.4.8
   permission_handler: ^12.0.3
   pkpass: ^2.2.0
   provider: ^6.1.5+1
