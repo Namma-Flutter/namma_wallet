@@ -31,7 +31,7 @@ dependencies:
   home_widget: ^0.9.3
   html: ^0.15.6
   http: ^1.6.0
-  image: ^4.7.2
+  image: ^4.9.2
   image_picker: ^1.2.3
   intl: ^0.20.2
   meta: ^1.18.0
