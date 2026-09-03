@@ -52,7 +52,7 @@ dependencies:
   sqflite_common_ffi_web: ^1.1.2
   stack_trace: ^1.12.1
   syncfusion_flutter_pdf: ^33.2.13
-  table_calendar: ^3.2.0
+  table_calendar: ^3.2.1
   talker_flutter: ^5.1.15
   timezone: ^0.11.1
   url_launcher: ^6.3.2
