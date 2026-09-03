@@ -18,7 +18,7 @@ jobs:
     name: Validate Branch Name
     runs-on: ubuntu-latest
     timeout-minutes: 5
-    if: github.actor != 'imgbot[bot]' && github.actor != 'ImgBotApp' && !startsWith(github.head_ref, 'imgbot')
+    if: github.actor != 'dependabot[bot]' && !startsWith(github.head_ref, 'dependabot') && github.actor != 'imgbot[bot]' && github.actor != 'ImgBotApp' && !startsWith(github.head_ref, 'imgbot')
     permissions:
       contents: read
       pull-requests: read
@@ -55,7 +55,7 @@ jobs:
     name: Conventional Commits
     runs-on: ubuntu-latest
     timeout-minutes: 5
-    if: github.actor != 'imgbot[bot]' && github.actor != 'ImgBotApp' && !startsWith(github.head_ref, 'imgbot')
+    if: github.actor != 'dependabot[bot]' && !startsWith(github.head_ref, 'dependabot') && github.actor != 'imgbot[bot]' && github.actor != 'ImgBotApp' && !startsWith(github.head_ref, 'imgbot')
     needs: branch-name
     permissions:
       contents: read
