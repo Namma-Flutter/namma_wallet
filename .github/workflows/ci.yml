@@ -17,8 +17,26 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  cooldown-gate:
+    name: Cooldown & Debounce Gate
+    if: github.actor != 'dependabot[bot]' && !github.event.pull_request.draft
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      actions: read
+      contents: read
+      pull-requests: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Enforce 10-minute cooldown
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: bash scripts/ci_cooldown_gate.sh ci.yml 600
+
   format-analyze:
     if: github.actor != 'dependabot[bot]'
+    needs: cooldown-gate
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
