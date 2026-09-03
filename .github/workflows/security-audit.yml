@@ -1,0 +1,142 @@
+name: Security & Architecture Audit
+
+on:
+  push:
+    branches: [main, beta]
+  pull_request:
+    branches: [main, beta]
+  schedule:
+    - cron: '0 2 * * 1' # Weekly on Monday
+
+permissions:
+  contents: read
+  security-events: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  cooldown-gate:
+    name: Cooldown & Debounce Gate
+    if: github.event_name == 'pull_request' && github.actor != 'dependabot[bot]' && !github.event.pull_request.draft
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      actions: read
+      contents: read
+      pull-requests: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Enforce 10-minute cooldown
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: bash scripts/ci_cooldown_gate.sh security-audit.yml 600
+
+  trufflehog:
+    name: Secret Scanning (TruffleHog)
+    needs: [cooldown-gate]
+    if: always() && (needs.cooldown-gate.result == 'success' || github.event_name != 'pull_request')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: TruffleHog OSS
+        uses: trufflesecurity/trufflehog@main
+        with:
+          extra_args: --only-verified
+        continue-on-error: true
+
+  owasp-and-policy:
+    name: OWASP Mobile & Data Policy Audit
+    needs: [cooldown-gate]
+    if: always() && (needs.cooldown-gate.result == 'success' || github.event_name != 'pull_request')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+      - name: Check Parser Data Policy (No Fallback Defaults)
+        run: bash scripts/check_no_default_values.sh
+
+      - name: Run OWASP Mobile Security Scanners
+        run: |
+          mkdir -p owasp-reports
+          echo "### 🛡️ OWASP Mobile Security Scan Results" >> $GITHUB_STEP_SUMMARY
+
+          # 1. Hardcoded Secrets Scan
+          python3 .agents/skills/owasp-mobile-security-checker/scripts/scan_hardcoded_secrets.py || true
+          if [ -f owasp_m1_secrets_scan.json ]; then
+            mv owasp_m1_secrets_scan.json owasp-reports/
+            SECRETS_FOUND=$(jq '.secrets_found // 0' owasp-reports/owasp_m1_secrets_scan.json)
+            echo "- **M1 Hardcoded Secrets**: $SECRETS_FOUND potential issues" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          # 2. Dependency Vulnerability Scan
+          python3 .agents/skills/owasp-mobile-security-checker/scripts/check_dependencies.py || true
+          if [ -f owasp_m2_dependencies_scan.json ]; then
+            mv owasp_m2_dependencies_scan.json owasp-reports/
+            DEP_ISSUES=$(jq '.total_issues // 0' owasp-reports/owasp_m2_dependencies_scan.json)
+            echo "- **M2 Dependency Check**: $DEP_ISSUES issue(s) identified" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          # 3. Storage Security Analysis
+          python3 .agents/skills/owasp-mobile-security-checker/scripts/analyze_storage_security.py || true
+          if [ -f owasp_m9_storage_scan.json ]; then
+            mv owasp_m9_storage_scan.json owasp-reports/
+            STORAGE_ISSUES=$(jq '.total_issues // 0' owasp-reports/owasp_m9_storage_scan.json)
+            echo "- **M9 Storage Security**: $STORAGE_ISSUES note(s)/finding(s)" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          # 4. Network Security Analysis
+          python3 .agents/skills/owasp-mobile-security-checker/scripts/check_network_security.py || true
+          if [ -f owasp_m5_network_scan.json ]; then
+            mv owasp_m5_network_scan.json owasp-reports/
+            NETWORK_ISSUES=$(jq '.total_issues // 0' owasp-reports/owasp_m5_network_scan.json)
+            echo "- **M5 Network Security**: $NETWORK_ISSUES note(s)/finding(s)" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Upload OWASP Audit Reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: owasp-security-reports
+          path: owasp-reports/
+          retention-days: 14
+
+  zizmor:
+    name: GitHub Actions Security Audit (zizmor)
+    needs: [cooldown-gate]
+    if: always() && (needs.cooldown-gate.result == 'success' || github.event_name != 'pull_request')
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      contents: read
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install zizmor
+        run: pip install zizmor
+
+      - name: Run zizmor
+        run: zizmor .github/workflows/
+        continue-on-error: true

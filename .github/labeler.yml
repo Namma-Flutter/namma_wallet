@@ -1,0 +1,61 @@
+"platform: android":
+  - changed-files:
+      - any-glob-to-any-file: 'android/**'
+
+"platform: ios":
+  - changed-files:
+      - any-glob-to-any-file: 'ios/**'
+
+"platform: web":
+  - changed-files:
+      - any-glob-to-any-file: 'web/**'
+
+"feature: travel":
+  - changed-files:
+      - any-glob-to-any-file: 'lib/src/features/travel/**'
+
+"feature: tnstc":
+  - changed-files:
+      - any-glob-to-any-file: 'lib/src/features/tnstc/**'
+
+"feature: irctc":
+  - changed-files:
+      - any-glob-to-any-file: 'lib/src/features/irctc/**'
+
+"feature: ai":
+  - changed-files:
+      - any-glob-to-any-file: 'lib/src/features/ai/**'
+
+"feature: calendar":
+  - changed-files:
+      - any-glob-to-any-file: 'lib/src/features/calendar/**'
+
+"feature: import":
+  - changed-files:
+      - any-glob-to-any-file: 'lib/src/features/import/**'
+
+"ci / cd":
+  - changed-files:
+      - any-glob-to-any-file:
+          - '.github/**'
+          - 'Makefile'
+          - 'scripts/**'
+
+"dependencies":
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'pubspec.yaml'
+          - 'pubspec.lock'
+          - 'android/build.gradle*'
+          - 'android/app/build.gradle*'
+          - 'ios/Podfile*'
+
+"testing":
+  - changed-files:
+      - any-glob-to-any-file: 'test/**'
+
+"documentation":
+  - changed-files:
+      - any-glob-to-any-file:
+          - '*.md'
+          - 'docs/**'
