@@ -29,7 +29,7 @@ dependencies:
   google_fonts: ^8.2.1
   google_mlkit_text_recognition: ^0.17.1
   home_widget: ^0.9.3
-  html: ^0.15.6
+  html: ^0.15.7
   http: ^1.6.0
   image: ^4.9.2
   image_picker: ^1.2.3
