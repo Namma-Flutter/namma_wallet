@@ -9,6 +9,12 @@ targets:
   - Share Extension
   - TicketWidgetExtension
 
+build_arguments:
+  - "-sdk"
+  - "iphonesimulator"
+  - "CODE_SIGNING_ALLOWED=NO"
+  - "CODE_SIGNING_REQUIRED=NO"
+
 # Retain declarations needed by Flutter and Objective-C bridge
 retain_public: true
 retain_objc_accessible: true
