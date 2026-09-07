@@ -68,7 +68,7 @@ jobs:
     name: CodeQL (Swift)
     needs: [cooldown-gate]
     if: always() && (needs.cooldown-gate.result == 'success' || github.event_name != 'pull_request')
-    runs-on: macos-14
+    runs-on: macos-15
     timeout-minutes: 30
     permissions:
       security-events: write
@@ -78,6 +78,16 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Select Xcode 16
+        run: |
+          XCODE_PATH=$(find /Applications -maxdepth 1 -name "Xcode_16*.app" | sort -V | tail -n 1)
+          if [ -n "$XCODE_PATH" ]; then
+            echo "Selecting $XCODE_PATH"
+            sudo xcode-select -s "$XCODE_PATH/Contents/Developer"
+            echo "DEVELOPER_DIR=$XCODE_PATH/Contents/Developer" >> $GITHUB_ENV
+          fi
+          xcodebuild -version
 
       - name: Read Flutter version from pubspec.yaml
         id: flutter_version
@@ -105,7 +115,7 @@ jobs:
       - name: Build iOS project for CodeQL extraction
         run: |
           cd ios
-          pod install || pod update MLKitVision --no-repo-update || pod update MLKitVision || (rm -f Podfile.lock && pod install)
+          pod update --repo-update || pod install --repo-update || true
           xcodebuild -workspace Runner.xcworkspace -scheme Runner -configuration Debug -sdk iphonesimulator CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO clean build
 
       - name: Perform CodeQL Analysis
