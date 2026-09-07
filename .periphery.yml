@@ -10,8 +10,6 @@ targets:
   - TicketWidgetExtension
 
 build_arguments:
-  - "-sdk"
-  - "iphonesimulator"
   - "CODE_SIGNING_ALLOWED=NO"
   - "CODE_SIGNING_REQUIRED=NO"
 
