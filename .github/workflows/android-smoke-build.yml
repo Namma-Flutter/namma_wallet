@@ -10,6 +10,9 @@ on:
       - 'pubspec.lock'
       - '.github/workflows/android-smoke-build.yml'
 
+permissions:
+  contents: read
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
@@ -25,7 +28,9 @@ jobs:
       contents: read
       pull-requests: read
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
       - name: Enforce 10-minute cooldown
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -42,10 +47,10 @@ jobs:
       contents: read
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
       - name: Setup Java
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@3a4f6e1af504cf6a31855fa899c6aa5355ba6c12 # v4.7.0
         with:
           distribution: "temurin"
           java-version: "17"
@@ -58,7 +63,7 @@ jobs:
           echo "flutter_version=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Set up Flutter
-        uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2
+        uses: subosito/flutter-action@f2c4f6686ca8e8d6e6d0f28410eeef506ed66aff # v2.18.0
         with:
           channel: stable
           flutter-version: ${{ steps.flutter_version.outputs.flutter_version }}

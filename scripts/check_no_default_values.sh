@@ -9,10 +9,7 @@ echo "=================================================="
 
 VIOLATIONS=0
 
-# Find all parser files in lib/
-PARSER_FILES=$(find lib/src/features -type f -name "*parser*.dart")
-
-for file in $PARSER_FILES; do
+while IFS= read -r -d '' file; do
   # 1. Check for fallback to DateTime.now() on parsing failure (e.g., ?? DateTime.now())
   FALLBACK_DATE=$(grep -nE '\?\?\s*DateTime\.now\(\)' "$file" || true)
   if [ -n "$FALLBACK_DATE" ]; then
@@ -39,7 +36,7 @@ for file in $PARSER_FILES; do
     echo ""
     VIOLATIONS=$((VIOLATIONS + 1))
   fi
-done
+done < <(find lib/src/features -type f -name "*parser*.dart" -print0)
 
 if [ "$VIOLATIONS" -gt 0 ]; then
   echo "❌ Data policy check failed with $VIOLATIONS violation(s)."

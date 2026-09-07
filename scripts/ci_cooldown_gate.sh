@@ -37,8 +37,30 @@ if [ -z "$HEAD_BRANCH" ] || [ -z "$REPO" ]; then
   exit 0
 fi
 
-# Fetch the last completed run timestamp for this workflow and branch
-LAST_COMPLETED=$(gh api "repos/${REPO}/actions/workflows/${WORKFLOW_FILE}/runs?event=pull_request&branch=${HEAD_BRANCH}&status=completed&per_page=1" --jq '.workflow_runs[0].updated_at' 2>/dev/null || echo "")
+# Fetch the last completed run timestamp for this workflow and branch with retry
+MAX_RETRIES=3
+RETRY_COUNT=0
+API_SUCCESS=false
+API_OUTPUT=""
+
+while [ "$RETRY_COUNT" -lt "$MAX_RETRIES" ]; do
+  if API_OUTPUT=$(gh api "repos/${REPO}/actions/workflows/${WORKFLOW_FILE}/runs?event=pull_request&branch=${HEAD_BRANCH}&status=completed&per_page=1" 2>&1); then
+    API_SUCCESS=true
+    break
+  fi
+  RETRY_COUNT=$((RETRY_COUNT + 1))
+  echo "⚠️ gh api request failed (attempt $RETRY_COUNT/$MAX_RETRIES). Retrying in 2s..."
+  sleep 2
+done
+
+if [ "$API_SUCCESS" = false ]; then
+  echo "⚠️ Unable to query GitHub API after $MAX_RETRIES attempts: $API_OUTPUT"
+  echo "Applying conservative cooldown of 60 seconds before proceeding..."
+  sleep 60
+  exit 0
+fi
+
+LAST_COMPLETED=$(echo "$API_OUTPUT" | jq -r '.workflow_runs[0].updated_at // empty' 2>/dev/null || echo "")
 
 if [ -z "$LAST_COMPLETED" ] || [ "$LAST_COMPLETED" == "null" ]; then
   echo "No previous completed run found for this branch. Proceeding immediately."

@@ -10,7 +10,6 @@ on:
 
 permissions:
   contents: read
-  security-events: write
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -27,7 +26,9 @@ jobs:
       contents: read
       pull-requests: read
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
       - name: Enforce 10-minute cooldown
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -39,14 +40,16 @@ jobs:
     needs: [cooldown-gate]
     if: always() && (needs.cooldown-gate.result == 'success' || github.event_name != 'pull_request')
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           fetch-depth: 0
 
       - name: TruffleHog OSS
-        uses: trufflesecurity/trufflehog@main
+        uses: trufflesecurity/trufflehog@ca270a7e14a3542229c2cadf1d408ecac1455815 # v3.88.15
         with:
           extra_args: --only-verified
         continue-on-error: true
@@ -56,12 +59,14 @@ jobs:
     needs: [cooldown-gate]
     if: always() && (needs.cooldown-gate.result == 'success' || github.event_name != 'pull_request')
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38 # v5.4.0
         with:
           python-version: '3.11'
 
@@ -111,7 +116,7 @@ jobs:
           fi
 
       - name: Upload OWASP Audit Reports
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 # v4.6.1
         with:
           name: owasp-security-reports
           path: owasp-reports/
@@ -123,14 +128,13 @@ jobs:
     if: always() && (needs.cooldown-gate.result == 'success' || github.event_name != 'pull_request')
     runs-on: ubuntu-latest
     permissions:
-      security-events: write
       contents: read
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38 # v5.4.0
         with:
           python-version: '3.11'
 

@@ -28,10 +28,14 @@ jobs:
   build:
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v5
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
       - name: Read Flutter version from pubspec.yaml
         id: flutter_version
@@ -40,7 +44,7 @@ jobs:
           echo "flutter_version=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Set up Flutter
-        uses: subosito/flutter-action@fd55f4c5af5b953cc57a2be44cb082c8f6635e8e # v2.21.0
+        uses: subosito/flutter-action@f2c4f6686ca8e8d6e6d0f28410eeef506ed66aff # v2.18.0
         with:
           channel: stable
           flutter-version: ${{ steps.flutter_version.outputs.flutter_version }}
@@ -53,7 +57,7 @@ jobs:
         run: flutter build web --release --wasm --base-href "/${{ github.event.repository.name }}/"
 
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3.0.1
         with:
           path: 'build/web'
 
@@ -64,7 +68,11 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     needs: build
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4.0.5
