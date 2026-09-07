@@ -59,9 +59,8 @@ jobs:
 
       - name: Setup CocoaPods
         run: |
+          rm -f ios/Podfile.lock
           flutter build ios --config-only --no-codesign
-          cd ios
-          pod update --repo-update || pod install --repo-update || true
 
       - name: Install Periphery
         run: |
