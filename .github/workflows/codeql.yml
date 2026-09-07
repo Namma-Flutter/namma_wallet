@@ -122,8 +122,7 @@ jobs:
         uses: google/osv-scanner-action/osv-scanner-action@v1.9.2
         with:
           scan-args: |-
-            --recursive
-            ./
+            --lockfile=pubspec.lock
 
   semgrep-scan:
     name: Semgrep SAST Scan (Dart / Multi-language)
