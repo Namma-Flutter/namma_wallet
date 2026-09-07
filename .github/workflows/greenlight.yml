@@ -24,20 +24,16 @@ jobs:
 
       - name: Install Greenlight
         run: |
-          curl -fsSL https://revyl.com/install.sh | sh
-          echo "$HOME/.revyl/bin" >> $GITHUB_PATH
-          ln -sf "$HOME/.revyl/bin/revyl" "$HOME/.revyl/bin/greenlight"
+          VERSION="v0.2.0"
+          curl -fsSL "https://github.com/RevylAI/greenlight/releases/download/${VERSION}/greenlight_${VERSION#v}_linux_amd64.tar.gz" | tar -xz -C /tmp
+          sudo mv /tmp/greenlight /usr/local/bin/greenlight
+          chmod +x /usr/local/bin/greenlight
 
       - name: Run preflight scan
         id: scan
         run: |
           set +e
-          export PATH="$HOME/.revyl/bin:$PATH"
-          if command -v revyl &>/dev/null; then
-            revyl preflight . --format json --output greenlight-report.json
-          else
-            greenlight preflight . --format json --output greenlight-report.json
-          fi
+          greenlight preflight . --format json --output greenlight-report.json
           echo "exit_code=$?" >> $GITHUB_OUTPUT
           exit 0
 
