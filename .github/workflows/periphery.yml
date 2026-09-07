@@ -63,8 +63,7 @@ jobs:
           pod update --repo-update || pod install --repo-update || true
 
       - name: Build iOS project for Index Store
-        run: |
-          xcodebuild -workspace ios/Runner.xcworkspace -scheme Runner -configuration Debug -sdk iphonesimulator -derivedDataPath build/DerivedData CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO build
+        run: flutter build ios --simulator --no-codesign
 
       - name: Install Periphery
         run: |
@@ -73,9 +72,12 @@ jobs:
 
       - name: Run Periphery Analysis
         run: |
-          INDEX_STORE=$(find build/DerivedData -type d -name "DataStore" | head -n 1)
+          INDEX_STORE=$(find build/ -type d -name "DataStore" 2>/dev/null | head -n 1)
           if [ -z "$INDEX_STORE" ]; then
-            echo "::error::Index store DataStore not found in build/DerivedData"
+            INDEX_STORE=$(find ~/Library/Developer/Xcode/DerivedData -type d -name "DataStore" 2>/dev/null | head -n 1)
+          fi
+          if [ -z "$INDEX_STORE" ]; then
+            echo "::error::Index store DataStore not found"
             exit 1
           fi
           echo "Using Index Store: $INDEX_STORE"

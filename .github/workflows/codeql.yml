@@ -113,10 +113,7 @@ jobs:
           queries: security-extended,security-and-quality
 
       - name: Build iOS project for CodeQL extraction
-        run: |
-          cd ios
-          pod update --repo-update || pod install --repo-update || true
-          xcodebuild -workspace Runner.xcworkspace -scheme Runner -configuration Debug -sdk iphonesimulator CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO clean build
+        run: flutter build ios --simulator --no-codesign
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@a65a038433a26f4363cf9f029e3b9ceac831ad5d # v3.28.10
