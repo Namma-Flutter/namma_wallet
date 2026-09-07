@@ -1,0 +1,24 @@
+# Periphery configuration for Namma Wallet (iOS Swift)
+# https://github.com/peripheryapp/periphery
+
+workspace: ios/Runner.xcworkspace
+schemes:
+  - Runner
+targets:
+  - Runner
+  - Share Extension
+  - TicketWidgetExtension
+
+# Retain declarations needed by Flutter and Objective-C bridge
+retain_public: true
+retain_objc_accessible: true
+retain_unused_protocol_func_params: true
+
+# Exclude CocoaPods, Flutter engine, and generated plugin code
+report_exclude:
+  - "**/Pods/**"
+  - "**/.symlinks/**"
+  - "**/Flutter/**"
+  - "ios/Flutter/**"
+  - "ios/Pods/**"
+  - "**/GeneratedPluginRegistrant.*"
