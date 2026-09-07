@@ -1,5 +1,6 @@
 // A dedicated, reusable widget for rendering the content of a wallet card.
 import 'package:flutter/material.dart';
+import 'package:namma_wallet/src/common/constants/string_extension.dart';
 import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 import 'package:namma_wallet/src/common/enums/ticket_type.dart';
 import 'package:namma_wallet/src/common/helper/date_time_converter.dart';
@@ -146,12 +147,12 @@ class TravelTicketCardWidget extends StatelessWidget {
                           const SizedBox(width: 8),
                           Expanded(
                             child: Text(
-                              from,
+                              from.toStationAbbreviation,
                               style: Paragraph02(
                                 color: Theme.of(context).colorScheme.onSurface,
                               ).semiBold,
                               overflow: TextOverflow.ellipsis,
-                              maxLines: 2,
+                              maxLines: 1,
                             ),
                           ),
                         ],
@@ -207,12 +208,12 @@ class TravelTicketCardWidget extends StatelessWidget {
                           const SizedBox(width: 8),
                           Expanded(
                             child: Text(
-                              to,
+                              to.toStationAbbreviation,
                               style: Paragraph02(
                                 color: Theme.of(context).colorScheme.onSurface,
                               ).semiBold,
                               overflow: TextOverflow.ellipsis,
-                              maxLines: 2,
+                              maxLines: 1,
                             ),
                           ),
                         ],

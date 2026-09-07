@@ -644,4 +644,31 @@ class StationRegistry {
     if (stationCode == null) return false;
     return _stations.containsKey(stationCode.toUpperCase().trim());
   }
+
+  /// If not found, returns the original input.
+  static String getCode(String? nameOrCode) {
+    if (nameOrCode == null || nameOrCode.trim().isEmpty) return '';
+    final clean = nameOrCode.trim().toUpperCase();
+
+    // 1. If it's already a valid code key
+    if (_stations.containsKey(clean)) {
+      return clean;
+    }
+
+    // 2. Exact match against station full names (values)
+    for (final entry in _stations.entries) {
+      if (entry.value.toUpperCase() == clean) {
+        return entry.key;
+      }
+    }
+
+    // 3. Partial match if input contains full station name
+    for (final entry in _stations.entries) {
+      if (clean.contains(entry.value.toUpperCase())) {
+        return entry.key;
+      }
+    }
+
+    return nameOrCode.trim();
+  }
 }
