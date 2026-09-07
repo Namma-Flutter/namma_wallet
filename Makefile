@@ -77,7 +77,8 @@ ios-production:
 
 # Periphery dead code detection for iOS
 ios-periphery:
-	periphery scan
+	xcodebuild -workspace ios/Runner.xcworkspace -scheme Runner -configuration Debug -sdk iphonesimulator -derivedDataPath build/DerivedData CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO build
+	periphery scan --skip-build --index-store-path $$(find build/DerivedData -type d -name "DataStore" | head -n 1)
 
 # Combined Deployment Targets
 .PHONY: deploy-beta deploy-release-candidate deploy-production coverage
