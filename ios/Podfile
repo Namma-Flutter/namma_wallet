@@ -107,7 +107,7 @@ post_install do |installer|
   end
 
   # Workaround for workmanager_apple 0.9.10+ compiler bug on iOS SDK (unsupported BGContinuedProcessingTask)
-  patch_script = File.expand_path(File.join('..', 'scripts', 'patch_workmanager_apple.sh'), __FILE__)
+  patch_script = File.expand_path('../scripts/patch_workmanager_apple.sh', __dir__)
   if File.exist?(patch_script)
     system('bash', patch_script)
   end

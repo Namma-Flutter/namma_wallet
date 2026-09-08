@@ -16,7 +16,9 @@ concurrency:
 
 permissions:
   contents: read
-  pull-requests: read
+  pull-requests: write
+  issues: write
+
 
 jobs:
   periphery-scan:
@@ -110,4 +112,50 @@ jobs:
         with:
           name: pr-comments-periphery
           path: pr-comments/
+
+      - name: Post or update PR comment
+        if: always() && github.event_name == 'pull_request'
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
+        with:
+          script: |
+            const fs = require('fs');
+            const commentPath = 'pr-comments/periphery_comment.txt';
+            if (!fs.existsSync(commentPath)) return;
+
+            const body = fs.readFileSync(commentPath, 'utf8').trim();
+            if (!body) return;
+
+            const prNumber = context.payload.pull_request?.number || context.issue.number;
+            if (!prNumber) {
+              console.log('No PR number found');
+              return;
+            }
+            const comments = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+            });
+
+            const existing = comments.data.find(c =>
+              c.user?.login === 'github-actions[bot]' && c.body?.includes('Periphery Swift Dead Code')
+            );
+
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body: body,
+              });
+              console.log('Updated Periphery PR comment');
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: prNumber,
+                body: body,
+              });
+              console.log('Created Periphery PR comment');
+            }
+
 
