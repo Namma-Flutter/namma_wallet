@@ -10,6 +10,10 @@ targets:
   - TicketWidgetExtension
 
 build_arguments:
+  - "-destination"
+  - "generic/platform=iOS"
+  - "-sdk"
+  - "iphoneos"
   - "CODE_SIGNING_ALLOWED=NO"
   - "CODE_SIGNING_REQUIRED=NO"
 
