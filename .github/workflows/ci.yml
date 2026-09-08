@@ -37,6 +37,7 @@ jobs:
         run: bash scripts/ci_cooldown_gate.sh ci.yml 600
 
   format-analyze:
+    name: flutter-format-and-analyze
     if: github.actor != 'dependabot[bot]'
     needs: cooldown-gate
     runs-on: ubuntu-latest
@@ -47,13 +48,13 @@ jobs:
       pull-requests: write
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
       - name: Read Flutter version from pubspec.yaml
         id: flutter_version
         run: |
           VERSION=$(grep '^  flutter:' pubspec.yaml | awk -F'"' '{print $2}')
-          echo "flutter_version=$VERSION" >> $GITHUB_OUTPUT
+          echo "flutter_version=$VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Set up Flutter
         uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2
@@ -212,7 +213,7 @@ jobs:
 
       - name: Upload PR comments artifact
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 # v4.6.1
         with:
           name: pr-comments-format-analyze
           path: pr-comments/
@@ -254,10 +255,10 @@ jobs:
       contents: read
       pull-requests: write
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
       - name: Setup Java
-        uses: actions/setup-java@v5
+        uses: actions/setup-java@3a4f6e1af504cf6a31855fa899c6aa5355ba6c12 # v4.7.0
         with:
           distribution: "temurin"
           java-version: "17"
@@ -266,7 +267,7 @@ jobs:
         id: flutter_version
         run: |
           VERSION=$(grep '^  flutter:' pubspec.yaml | awk -F'"' '{print $2}')
-          echo "flutter_version=$VERSION" >> $GITHUB_OUTPUT
+          echo "flutter_version=$VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Set up Flutter
         uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2
@@ -327,7 +328,7 @@ jobs:
 
       - name: Upload PR comments artifact
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 # v4.6.1
         with:
           name: pr-comments-coverage
           path: pr-comments/
