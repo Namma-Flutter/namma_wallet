@@ -69,4 +69,45 @@ jobs:
           periphery version
 
       - name: Run Periphery Analysis
-        run: periphery scan --verbose --format github-actions --relative-results
+        run: |
+          set -o pipefail
+          periphery scan --verbose --format github-actions --relative-results 2>&1 | tee periphery_output.txt || true
+
+      - name: Prepare PR comments & step summary
+        if: always() && github.event_name == 'pull_request'
+        run: |
+          mkdir -p pr-comments
+          echo "${{ github.event.pull_request.number }}" > pr-comments/pr_number
+
+          WARNINGS=$(grep -E "warning: |Warning: " periphery_output.txt || true)
+          WARNING_COUNT=$(echo "$WARNINGS" | grep -v '^\s*$' | wc -l | tr -d ' ')
+
+          if [ "$WARNING_COUNT" -gt 0 ]; then
+            {
+              echo "### 🔍 Periphery Swift Dead Code Analysis"
+              echo ""
+              echo "⚠️ Found **$WARNING_COUNT** unused declarations in iOS Swift codebase:"
+              echo ""
+              echo '```text'
+              echo "$WARNINGS"
+              echo '```'
+              echo ""
+              echo "_Run \`periphery scan\` locally to inspect._"
+            } > pr-comments/periphery_comment.txt
+          else
+            {
+              echo "### 🔍 Periphery Swift Dead Code Analysis"
+              echo ""
+              echo "✅ **No dead Swift code detected!**"
+            } > pr-comments/periphery_comment.txt
+          fi
+
+          cat pr-comments/periphery_comment.txt >> $GITHUB_STEP_SUMMARY
+
+      - name: Upload PR comments artifact
+        if: always() && github.event_name == 'pull_request'
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr-comments-periphery
+          path: pr-comments/
+
