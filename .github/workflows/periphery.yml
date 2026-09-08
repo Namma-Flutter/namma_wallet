@@ -61,6 +61,7 @@ jobs:
         run: |
           rm -f ios/Podfile.lock
           flutter build ios --config-only --no-codesign
+          bash scripts/patch_workmanager_apple.sh
 
       - name: Install Periphery
         run: |

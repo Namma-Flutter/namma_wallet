@@ -105,5 +105,11 @@ post_install do |installer|
       puts "Cleaned up #{xcconfig_path}"
     end
   end
+
+  # Workaround for workmanager_apple 0.9.10+ compiler bug on iOS SDK (unsupported BGContinuedProcessingTask)
+  patch_script = File.expand_path(File.join('..', 'scripts', 'patch_workmanager_apple.sh'), __FILE__)
+  if File.exist?(patch_script)
+    system('bash', patch_script)
+  end
 end
 
