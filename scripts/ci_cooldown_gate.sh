@@ -44,7 +44,7 @@ API_SUCCESS=false
 API_OUTPUT=""
 
 while [ "$RETRY_COUNT" -lt "$MAX_RETRIES" ]; do
-  if API_OUTPUT=$(gh api "repos/${REPO}/actions/workflows/${WORKFLOW_FILE}/runs?event=pull_request&branch=${HEAD_BRANCH}&status=completed&per_page=1" 2>&1); then
+  if API_OUTPUT=$(gh api --method GET "repos/${REPO}/actions/workflows/${WORKFLOW_FILE}/runs" -f event=pull_request -f branch="${HEAD_BRANCH}" -f status=completed -F per_page=1 2>&1); then
     API_SUCCESS=true
     break
   fi

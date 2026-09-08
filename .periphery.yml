@@ -18,7 +18,6 @@ build_arguments:
   - "CODE_SIGNING_REQUIRED=NO"
 
 # Retain declarations needed by Flutter and Objective-C bridge
-retain_public: true
 retain_objc_accessible: true
 retain_unused_protocol_func_params: true
 

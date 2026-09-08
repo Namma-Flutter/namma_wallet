@@ -82,18 +82,20 @@ jobs:
       - name: Select Xcode 16
         run: |
           XCODE_PATH=$(find /Applications -maxdepth 1 -name "Xcode_16*.app" | sort -V | tail -n 1)
-          if [ -n "$XCODE_PATH" ]; then
-            echo "Selecting $XCODE_PATH"
-            sudo xcode-select -s "$XCODE_PATH/Contents/Developer"
-            echo "DEVELOPER_DIR=$XCODE_PATH/Contents/Developer" >> $GITHUB_ENV
+          if [ -z "$XCODE_PATH" ]; then
+            echo "Error: Xcode 16 not found on runner" >&2
+            exit 1
           fi
-          xcodebuild -version
+          echo "Selecting $XCODE_PATH"
+          sudo xcode-select -s "$XCODE_PATH/Contents/Developer"
+          echo "DEVELOPER_DIR=$XCODE_PATH/Contents/Developer" >> "$GITHUB_ENV"
+          xcodebuild -version | grep -E '^Xcode 16' || { echo "Active Xcode is not Xcode 16"; exit 1; }
 
       - name: Read Flutter version from pubspec.yaml
         id: flutter_version
         run: |
           VERSION=$(grep '^  flutter:' pubspec.yaml | awk -F'"' '{print $2}')
-          echo "flutter_version=$VERSION" >> $GITHUB_OUTPUT
+          echo "flutter_version=$VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Set up Flutter
         uses: subosito/flutter-action@f2c4f6686ca8e8d6e6d0f28410eeef506ed66aff # v2.18.0
