@@ -120,7 +120,17 @@ jobs:
 
 
       - name: Build iOS project for CodeQL extraction
-        run: flutter build ios --no-codesign
+        run: |
+          xcodebuild clean build \
+            -workspace ios/Runner.xcworkspace \
+            -scheme Runner \
+            -configuration Debug \
+            -destination "generic/platform=iOS" \
+            -sdk iphoneos \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            COMPILER_INDEX_STORE_ENABLE=YES
+
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@a65a038433a26f4363cf9f029e3b9ceac831ad5d # v3.28.10

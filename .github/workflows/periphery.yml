@@ -69,4 +69,4 @@ jobs:
           periphery version
 
       - name: Run Periphery Analysis
-        run: periphery scan --verbose --format github-actions
+        run: periphery scan --verbose --format github-actions --relative-results
