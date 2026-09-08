@@ -69,7 +69,12 @@ jobs:
 
       - name: Install Periphery
         run: |
-          brew install peripheryapp/periphery/periphery
+          PERIPHERY_VERSION="2.21.2"
+          curl -fsSL "https://github.com/peripheryapp/periphery/releases/download/${PERIPHERY_VERSION}/periphery-${PERIPHERY_VERSION}.zip" -o /tmp/periphery.zip
+          unzip -q -o /tmp/periphery.zip -d /tmp
+          sudo mv /tmp/periphery /usr/local/bin/periphery
+          chmod +x /usr/local/bin/periphery
+          rm -f /tmp/periphery.zip
           periphery version
 
       - name: Run Periphery Analysis
