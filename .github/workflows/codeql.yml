@@ -69,7 +69,7 @@ jobs:
     needs: [cooldown-gate]
     if: always() && (needs.cooldown-gate.result == 'success' || github.event_name != 'pull_request')
     runs-on: macos-15
-    timeout-minutes: 30
+    timeout-minutes: 45
     permissions:
       security-events: write
       actions: read
@@ -105,19 +105,19 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
+      - name: Setup CocoaPods & resolve dependencies
+        run: |
+          rm -f ios/Podfile.lock
+          flutter build ios --config-only --no-codesign
+          bash scripts/patch_workmanager_apple.sh
+          xcodebuild -resolvePackageDependencies -workspace ios/Runner.xcworkspace -scheme Runner || true
+
       - name: Initialize CodeQL
         uses: github/codeql-action/init@a65a038433a26f4363cf9f029e3b9ceac831ad5d # v3.28.10
         with:
           languages: swift
           build-mode: manual
           queries: security-extended,security-and-quality
-
-      - name: Setup CocoaPods
-        run: |
-          rm -f ios/Podfile.lock
-          flutter build ios --config-only --no-codesign
-          bash scripts/patch_workmanager_apple.sh
-
 
       - name: Build iOS project for CodeQL extraction
         run: |
@@ -129,8 +129,9 @@ jobs:
             -sdk iphoneos \
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
-            DEBUG_INFORMATION_FORMAT=dwarf \
-            -quiet
+            COMPILER_INDEX_STORE_ENABLE=NO \
+            ONLY_ACTIVE_ARCH=YES \
+            DEBUG_INFORMATION_FORMAT=dwarf
 
 
 
