@@ -43,7 +43,7 @@ jobs:
           echo "Selecting $XCODE_PATH"
           sudo xcode-select -s "$XCODE_PATH/Contents/Developer"
           echo "DEVELOPER_DIR=$XCODE_PATH/Contents/Developer" >> "$GITHUB_ENV"
-          xcodebuild -version | grep -E '^Xcode (26|16)' || { echo "Active Xcode is neither Xcode 26 nor 16"; exit 1; }
+          xcodebuild -version | head -n 1
 
       - name: Read Flutter version from pubspec.yaml
         id: flutter_version

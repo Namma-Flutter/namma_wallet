@@ -70,7 +70,7 @@ fi
 echo "Last completed run timestamp: $LAST_COMPLETED"
 
 # Calculate elapsed time (normalize ISO timestamp by stripping fractional seconds for portable parsing)
-LAST_COMPLETED_CLEAN=$(echo "$LAST_COMPLETED" | sed -E 's/\.[0-9]+Z$/Z/')
+LAST_COMPLETED_CLEAN=$(echo "$LAST_COMPLETED" | sed -E 's/\.[0-9]+//')
 LAST_EPOCH=$(date -d "$LAST_COMPLETED_CLEAN" +%s 2>/dev/null || date -jf "%Y-%m-%dT%H:%M:%SZ" "$LAST_COMPLETED_CLEAN" +%s 2>/dev/null || echo "0")
 NOW_EPOCH=$(date +%s)
 
