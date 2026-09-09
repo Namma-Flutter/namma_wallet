@@ -2,7 +2,7 @@ name: Post PR Comments
 
 on:
   workflow_run:
-    workflows: ["CI", "greenlight"]
+    workflows: ["CI", "greenlight", "Periphery (iOS Dead Code)"]
     types:
       - completed
 
@@ -224,6 +224,32 @@ jobs:
                       body: body,
                     });
                     console.log('Created greenlight comment');
+                  }
+                }
+              }
+
+              // 6. Periphery comment
+              const peripheryCommentPath = path.join(dirPath, 'periphery_comment.txt');
+              if (fs.existsSync(peripheryCommentPath)) {
+                const body = fs.readFileSync(peripheryCommentPath, 'utf8').trim();
+                if (body) {
+                  const existing = await findComment('Periphery Swift Dead Code');
+                  if (existing) {
+                    await github.rest.issues.updateComment({
+                      owner: context.repo.owner,
+                      repo: context.repo.repo,
+                      comment_id: existing.id,
+                      body: body,
+                    });
+                    console.log('Updated periphery comment');
+                  } else {
+                    await github.rest.issues.createComment({
+                      owner: context.repo.owner,
+                      repo: context.repo.repo,
+                      issue_number: prNumber,
+                      body: body,
+                    });
+                    console.log('Created periphery comment');
                   }
                 }
               }
