@@ -33,17 +33,17 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.sha }}
 
-      - name: Select Xcode 16
+      - name: Select Xcode (26 or 16)
         run: |
-          XCODE_PATH=$(find /Applications -maxdepth 1 -name "Xcode_16*.app" | sort -V | tail -n 1)
+          XCODE_PATH=$(find /Applications -maxdepth 1 \( -name "Xcode_26*.app" -o -name "Xcode_16*.app" \) | sort -V | tail -n 1)
           if [ -z "$XCODE_PATH" ]; then
-            echo "Error: Xcode 16 not found on runner" >&2
+            echo "Error: Neither Xcode 26 nor Xcode 16 found on runner" >&2
             exit 1
           fi
           echo "Selecting $XCODE_PATH"
           sudo xcode-select -s "$XCODE_PATH/Contents/Developer"
           echo "DEVELOPER_DIR=$XCODE_PATH/Contents/Developer" >> "$GITHUB_ENV"
-          xcodebuild -version | grep -E '^Xcode 16' || { echo "Active Xcode is not Xcode 16"; exit 1; }
+          xcodebuild -version | grep -E '^Xcode (26|16)' || { echo "Active Xcode is neither Xcode 26 nor 16"; exit 1; }
 
       - name: Read Flutter version from pubspec.yaml
         id: flutter_version

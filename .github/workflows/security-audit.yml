@@ -139,7 +139,7 @@ jobs:
           python-version: '3.11'
 
       - name: Install zizmor
-        run: pip install zizmor
+        run: pip install zizmor==1.4.1
 
       - name: Run zizmor
         run: zizmor .github/workflows/
