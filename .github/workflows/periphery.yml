@@ -1,0 +1,168 @@
+name: Periphery (iOS Dead Code)
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/periphery.yml'
+      - '.periphery.yml'
+      - 'ios/**'
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+
+jobs:
+  periphery-scan:
+    name: Periphery Swift Code Scan
+    if: github.actor != 'dependabot[bot]'
+    runs-on: macos-15
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Select Xcode 16
+        run: |
+          XCODE_PATH=$(find /Applications -maxdepth 1 -name "Xcode_16*.app" | sort -V | tail -n 1)
+          if [ -z "$XCODE_PATH" ]; then
+            echo "Error: Xcode 16 not found on runner" >&2
+            exit 1
+          fi
+          echo "Selecting $XCODE_PATH"
+          sudo xcode-select -s "$XCODE_PATH/Contents/Developer"
+          echo "DEVELOPER_DIR=$XCODE_PATH/Contents/Developer" >> "$GITHUB_ENV"
+          xcodebuild -version | grep -E '^Xcode 16' || { echo "Active Xcode is not Xcode 16"; exit 1; }
+
+      - name: Read Flutter version from pubspec.yaml
+        id: flutter_version
+        run: |
+          VERSION=$(grep '^  flutter:' pubspec.yaml | awk -F'"' '{print $2}')
+          echo "flutter_version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@f2c4f6686ca8e8d6e6d0f28410eeef506ed66aff # v2.18.0
+        with:
+          channel: stable
+          flutter-version: ${{ steps.flutter_version.outputs.flutter_version }}
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Setup CocoaPods
+        run: |
+          rm -f ios/Podfile.lock
+          flutter build ios --config-only --no-codesign
+          bash scripts/patch_workmanager_apple.sh
+
+      - name: Install Periphery
+        run: |
+          PERIPHERY_VERSION="2.21.2"
+          curl -fsSL "https://github.com/peripheryapp/periphery/releases/download/${PERIPHERY_VERSION}/periphery-${PERIPHERY_VERSION}.zip" -o /tmp/periphery.zip
+          unzip -q -o /tmp/periphery.zip -d /tmp
+          sudo mv /tmp/periphery /usr/local/bin/periphery
+          chmod +x /usr/local/bin/periphery
+          rm -f /tmp/periphery.zip
+          periphery version
+
+      - name: Run Periphery Analysis
+        run: |
+          set -o pipefail
+          periphery scan --verbose --format github-actions --relative-results 2>&1 | tee periphery_output.txt || true
+
+      - name: Prepare PR comments & step summary
+        if: always() && github.event_name == 'pull_request'
+        run: |
+          mkdir -p pr-comments
+          echo "${{ github.event.pull_request.number }}" > pr-comments/pr_number
+
+          WARNINGS=$(grep -E "(::warning|warning: |Warning: )" periphery_output.txt || true)
+          WARNING_COUNT=$(echo "$WARNINGS" | grep -v '^\s*$' | wc -l | tr -d ' ')
+
+          if [ "$WARNING_COUNT" -gt 0 ]; then
+            {
+              echo "### 🔍 Periphery Swift Dead Code Analysis"
+              echo ""
+              echo "⚠️ Found **$WARNING_COUNT** unused declarations in iOS Swift codebase:"
+              echo ""
+              echo '```text'
+              echo "$WARNINGS"
+              echo '```'
+              echo ""
+              echo "_Run \`periphery scan\` locally to inspect._"
+            } > pr-comments/periphery_comment.txt
+          else
+            {
+              echo "### 🔍 Periphery Swift Dead Code Analysis"
+              echo ""
+              echo "✅ **No dead Swift code detected!**"
+            } > pr-comments/periphery_comment.txt
+          fi
+
+          cat pr-comments/periphery_comment.txt >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload PR comments artifact
+        if: always() && github.event_name == 'pull_request'
+        uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 # v4.6.1
+        with:
+          name: pr-comments-periphery
+          path: pr-comments/
+
+      - name: Post or update PR comment
+        if: always() && github.event_name == 'pull_request'
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
+        with:
+          script: |
+            const fs = require('fs');
+            const commentPath = 'pr-comments/periphery_comment.txt';
+            if (!fs.existsSync(commentPath)) return;
+
+            const body = fs.readFileSync(commentPath, 'utf8').trim();
+            if (!body) return;
+
+            const prNumber = context.payload.pull_request?.number || context.issue.number;
+            if (!prNumber) {
+              console.log('No PR number found');
+              return;
+            }
+            const comments = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+            });
+
+            const existing = comments.data.find(c =>
+              c.user?.login === 'github-actions[bot]' && c.body?.includes('Periphery Swift Dead Code')
+            );
+
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body: body,
+              });
+              console.log('Updated Periphery PR comment');
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: prNumber,
+                body: body,
+              });
+              console.log('Created Periphery PR comment');
+            }
+
+
