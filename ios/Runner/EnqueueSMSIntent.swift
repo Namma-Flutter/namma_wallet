@@ -6,6 +6,7 @@ import UIKit
 @available(iOS 16.0, *)
 struct EnqueueSMSIntent: AppIntent {
   static var title: LocalizedStringResource = "Add SMS to Namma Wallet"
+  // periphery:ignore
   static var description: IntentDescription =
     "Queues an SMS text message and opens Namma Wallet to parse it."
   static var openAppWhenRun: Bool = true

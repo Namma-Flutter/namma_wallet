@@ -1,6 +1,7 @@
 import AppIntents
 
 @available(iOS 16.0, *)
+// periphery:ignore
 struct NammaWalletShortcuts: AppShortcutsProvider {
   static var appShortcuts: [AppShortcut] {
     AppShortcut(
