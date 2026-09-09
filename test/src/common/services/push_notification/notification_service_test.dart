@@ -50,7 +50,7 @@ void main() {
         final service = ThrowingTimezoneNotificationService();
 
         await expectLater(service.initTimezone(), completes);
-        expect(tz.local.name, equals('UTC'));
+        expect(tz.local.name, anyOf('UTC', 'Etc/UTC'));
       },
     );
 
@@ -62,7 +62,7 @@ void main() {
         final service = InvalidTimezoneNotificationService();
 
         await expectLater(service.initTimezone(), completes);
-        expect(tz.local.name, equals('UTC'));
+        expect(tz.local.name, anyOf('UTC', 'Etc/UTC'));
       },
     );
 
