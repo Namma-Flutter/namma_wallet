@@ -3,7 +3,7 @@ FLUTTER ?= fvm flutter
 # Dart command - use 'fvm dart' if using FVM, otherwise 'dart'
 DART ?= fvm dart
 
-.PHONY: help clean get codegen check-codegen release-android release-ios release-apk release-appbundle release-ipa ios-test ios-beta ios-release-candidate ios-production android-release-candidate setup-hooks uninstall-hooks
+.PHONY: help clean get codegen check-codegen release-android release-ios release-apk release-appbundle release-ipa ios-test ios-beta ios-release-candidate ios-production ios-periphery android-release-candidate setup-hooks uninstall-hooks
 
 help:
 	@echo "Available targets:"
@@ -16,6 +16,7 @@ help:
 	@echo "  release-apk        - Build Android release APK"
 	@echo "  release-appbundle  - Build Android release App Bundle"
 	@echo "  release-ipa        - Build iOS release IPA"
+	@echo "  ios-periphery      - Scan iOS Swift codebase for unused code"
 	@echo ""
 	@echo "Fastlane iOS targets:"
 	@echo "  ios-test           - Run tests via fastlane"
@@ -73,6 +74,10 @@ ios-release-candidate:
 
 ios-production:
 	cd ios && bundle exec fastlane production
+
+# Periphery dead code detection for iOS
+ios-periphery:
+	periphery scan
 
 # Combined Deployment Targets
 .PHONY: deploy-beta deploy-release-candidate deploy-production coverage
