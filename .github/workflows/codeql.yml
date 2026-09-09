@@ -128,7 +128,7 @@ jobs:
 
       - name: Setup CocoaPods & resolve dependencies
         run: |
-          cd ios && (pod update MLKitVision MLKitCommon MLKitTextRecognition --no-repo-update || true) && cd ..
+          rm -f ios/Podfile.lock
           flutter build ios --config-only --no-codesign
           bash scripts/patch_workmanager_apple.sh
           xcodebuild -resolvePackageDependencies -workspace ios/Runner.xcworkspace -scheme Runner || true

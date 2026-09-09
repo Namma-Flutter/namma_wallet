@@ -20,7 +20,7 @@ concurrency:
   cancel-in-progress: true
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   periphery-scan:
@@ -33,7 +33,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
-          ref: ${{ github.event.pull_request.head.sha }}
+          ref: ${{ github.head_ref || github.ref }}
 
       - name: Select Xcode (26 or 16)
         run: |
@@ -75,9 +75,21 @@ jobs:
 
       - name: Setup CocoaPods
         run: |
-          cd ios && (pod update MLKitVision MLKitCommon MLKitTextRecognition --no-repo-update || true) && cd ..
+          rm -f ios/Podfile.lock
           flutter build ios --config-only --no-codesign
           bash scripts/patch_workmanager_apple.sh
+
+      - name: Commit updated Podfile.lock back to branch
+        if: github.event_name == 'pull_request' && !github.event.pull_request.draft
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if [ -f ios/Podfile.lock ] && ! git diff --quiet ios/Podfile.lock; then
+            echo "Committing updated ios/Podfile.lock from macOS runner..."
+            git add ios/Podfile.lock
+            git commit -m "chore(ios): update Podfile.lock via macOS runner"
+            git push
+          fi
 
       - name: Install Periphery
         run: |
