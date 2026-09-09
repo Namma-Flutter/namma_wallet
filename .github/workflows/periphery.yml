@@ -33,6 +33,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
+          repository: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
           ref: ${{ github.head_ref || github.ref }}
 
       - name: Select Xcode (26 or 16)
@@ -75,12 +76,11 @@ jobs:
 
       - name: Setup CocoaPods
         run: |
-          rm -f ios/Podfile.lock
-          flutter build ios --config-only --no-codesign
+          flutter build ios --config-only --no-codesign || (rm -f ios/Podfile.lock && flutter build ios --config-only --no-codesign)
           bash scripts/patch_workmanager_apple.sh
 
       - name: Commit updated Podfile.lock back to branch
-        if: github.event_name == 'pull_request' && !github.event.pull_request.draft
+        if: github.event_name == 'pull_request' && !github.event.pull_request.draft && github.event.pull_request.head.repo.full_name == github.repository
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"

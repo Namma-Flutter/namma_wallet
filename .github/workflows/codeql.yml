@@ -128,8 +128,7 @@ jobs:
 
       - name: Setup CocoaPods & resolve dependencies
         run: |
-          rm -f ios/Podfile.lock
-          flutter build ios --config-only --no-codesign
+          flutter build ios --config-only --no-codesign || (rm -f ios/Podfile.lock && flutter build ios --config-only --no-codesign)
           bash scripts/patch_workmanager_apple.sh
           xcodebuild -resolvePackageDependencies -workspace ios/Runner.xcworkspace -scheme Runner || true
 
@@ -209,7 +208,7 @@ jobs:
 
       - name: Upload SARIF to GitHub Code Scanning
         uses: github/codeql-action/upload-sarif@6f5948dfacef28e207b48d0905cf90c03365536d # v3.37.9
-        if: always()
+        if: always() && !cancelled() && hashFiles('semgrep.sarif') != ''
         with:
           sarif_file: semgrep.sarif
           category: "semgrep"
