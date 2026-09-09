@@ -5,6 +5,11 @@ on:
     branches: [ "main", "beta" ]
   pull_request:
     branches: [ "main", "beta" ]
+    types: [opened, synchronize, reopened, ready_for_review]
+    paths-ignore:
+      - '**/*.md'
+      - 'docs/**'
+      - 'LICENSE'
   schedule:
     - cron: '30 1 * * 0'
 
@@ -16,29 +21,33 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  cooldown-gate:
-    name: Cooldown & Debounce Gate
-    if: github.event_name == 'pull_request' && github.actor != 'dependabot[bot]' && !github.event.pull_request.draft
+  detect-changes:
+    name: Detect Code Changes
+    if: github.event_name != 'pull_request' || (github.actor != 'dependabot[bot]' && !github.event.pull_request.draft)
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 5
     permissions:
-      actions: read
       contents: read
       pull-requests: read
+    outputs:
+      swift: ${{ steps.filter.outputs.swift }}
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: Check for Swift & iOS File Changes
+        uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36 # v3.0.2
+        id: filter
+        if: github.event_name == 'pull_request'
         with:
-          ref: ${{ github.event.pull_request.head.sha }}
-      - name: Enforce 10-minute cooldown
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
-        run: bash scripts/ci_cooldown_gate.sh codeql.yml 600
+          filters: |
+            swift:
+              - 'ios/**'
+              - '**/*.swift'
+              - '.github/workflows/codeql.yml'
+              - 'scripts/patch_workmanager_apple.sh'
 
   codeql-interpreted:
     name: CodeQL (${{ matrix.language }})
-    needs: [cooldown-gate]
-    if: always() && (needs.cooldown-gate.result == 'success' || github.event_name != 'pull_request')
+    needs: [detect-changes]
+    if: github.event_name != 'pull_request' || (github.actor != 'dependabot[bot]' && !github.event.pull_request.draft)
     runs-on: ubuntu-latest
     permissions:
       security-events: write
@@ -66,8 +75,8 @@ jobs:
 
   codeql-swift:
     name: CodeQL (Swift)
-    needs: [cooldown-gate]
-    if: always() && (needs.cooldown-gate.result == 'success' || github.event_name != 'pull_request')
+    needs: [detect-changes]
+    if: github.event_name != 'pull_request' || (needs.detect-changes.outputs.swift == 'true' && github.actor != 'dependabot[bot]' && !github.event.pull_request.draft)
     runs-on: macos-15
     timeout-minutes: 45
     permissions:
@@ -107,9 +116,18 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
+      - name: Cache CocoaPods
+        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf # v4.2.2
+        with:
+          path: |
+            ios/Pods
+            ~/Library/Caches/CocoaPods
+          key: cocoapods-${{ runner.os }}-${{ hashFiles('ios/Podfile.lock') }}
+          restore-keys: |
+            cocoapods-${{ runner.os }}-
+
       - name: Setup CocoaPods & resolve dependencies
         run: |
-          rm -f ios/Podfile.lock
           flutter build ios --config-only --no-codesign
           bash scripts/patch_workmanager_apple.sh
           xcodebuild -resolvePackageDependencies -workspace ios/Runner.xcworkspace -scheme Runner || true
@@ -135,9 +153,6 @@ jobs:
             ONLY_ACTIVE_ARCH=YES \
             DEBUG_INFORMATION_FORMAT=dwarf
 
-
-
-
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@6f5948dfacef28e207b48d0905cf90c03365536d # v3.37.9
         with:
@@ -145,8 +160,8 @@ jobs:
 
   osv-dependency-scan:
     name: OSV Vulnerability Scanner (Dart / Pub)
-    needs: [cooldown-gate]
-    if: always() && (needs.cooldown-gate.result == 'success' || github.event_name != 'pull_request')
+    needs: [detect-changes]
+    if: github.event_name != 'pull_request' || (github.actor != 'dependabot[bot]' && !github.event.pull_request.draft)
     runs-on: ubuntu-latest
     permissions:
       security-events: write
@@ -165,8 +180,8 @@ jobs:
 
   semgrep-scan:
     name: Semgrep SAST Scan (Dart / Multi-language)
-    needs: [cooldown-gate]
-    if: always() && (needs.cooldown-gate.result == 'success' || github.event_name != 'pull_request')
+    needs: [detect-changes]
+    if: github.event_name != 'pull_request' || (github.actor != 'dependabot[bot]' && !github.event.pull_request.draft)
     runs-on: ubuntu-latest
     permissions:
       security-events: write
@@ -181,6 +196,8 @@ jobs:
         uses: actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38 # v5.4.0
         with:
           python-version: '3.11'
+          cache: 'pip'
+          cache-dependency-path: .github/workflows/codeql.yml
 
       - name: Install Semgrep
         run: pip install semgrep==1.109.0
