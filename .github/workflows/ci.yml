@@ -20,7 +20,7 @@ permissions:
 jobs:
   format-analyze:
     name: flutter-format-and-analyze
-    if: github.actor != 'dependabot[bot]' && !github.event.pull_request.draft
+    if: "!github.event.pull_request.draft"
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:

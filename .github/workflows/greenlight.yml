@@ -19,7 +19,7 @@ permissions:
 
 jobs:
   greenlight:
-    if: github.actor != 'dependabot[bot]' && !github.event.pull_request.draft
+    if: "!github.event.pull_request.draft"
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
@@ -38,14 +38,14 @@ jobs:
               - 'pubspec.yaml'
               - '.github/workflows/greenlight.yml'
 
-      - name: Fast Pass-Through (Unaffected PR)
-        if: steps.filter.outputs.ios != 'true'
+      - name: Fast Pass-Through (Unaffected PR or Bot)
+        if: steps.filter.outputs.ios != 'true' || github.actor == 'dependabot[bot]'
         run: |
           echo "### 🟢 Greenlight Preflight Scan" >> $GITHUB_STEP_SUMMARY
-          echo "No iOS or store configuration files modified. Greenlight check passed (fast pass-through)." >> $GITHUB_STEP_SUMMARY
+          echo "No iOS changes or bot PR. Greenlight check passed (fast pass-through)." >> $GITHUB_STEP_SUMMARY
 
       - name: Install Greenlight
-        if: steps.filter.outputs.ios == 'true'
+        if: steps.filter.outputs.ios == 'true' && github.actor != 'dependabot[bot]'
         run: |
           VERSION="v0.2.0"
           curl -fsSL "https://github.com/RevylAI/greenlight/releases/download/${VERSION}/greenlight_${VERSION#v}_linux_amd64.tar.gz" -o "/tmp/greenlight_${VERSION#v}_linux_amd64.tar.gz"
@@ -56,7 +56,7 @@ jobs:
           chmod +x /usr/local/bin/greenlight
 
       - name: Run preflight scan
-        if: steps.filter.outputs.ios == 'true'
+        if: steps.filter.outputs.ios == 'true' && github.actor != 'dependabot[bot]'
         id: scan
         run: |
           set +e
@@ -65,7 +65,7 @@ jobs:
           exit 0
 
       - name: Parse scan results
-        if: steps.filter.outputs.ios == 'true'
+        if: steps.filter.outputs.ios == 'true' && github.actor != 'dependabot[bot]'
         id: results
         run: |
           mkdir -p pr-comments
@@ -119,14 +119,14 @@ jobs:
           } > pr-comments/greenlight_comment.txt
 
       - name: Upload PR comments artifact
-        if: always() && steps.filter.outputs.ios == 'true'
+        if: always() && steps.filter.outputs.ios == 'true' && github.actor != 'dependabot[bot]'
         uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 # v4.6.1
         with:
           name: pr-comments-greenlight
           path: pr-comments/
 
       - name: Print blocking findings
-        if: steps.filter.outputs.ios == 'true' && steps.results.outputs.has_blocks == 'true'
+        if: steps.filter.outputs.ios == 'true' && steps.results.outputs.has_blocks == 'true' && github.actor != 'dependabot[bot]'
         run: |
           echo "=== Greenlight Blocking Findings ==="
           jq -r '
@@ -143,7 +143,7 @@ jobs:
           exit 1
 
       - name: Print warn and info findings
-        if: always() && steps.filter.outputs.ios == 'true'
+        if: always() && steps.filter.outputs.ios == 'true' && github.actor != 'dependabot[bot]'
         run: |
           warns=$(jq -r '.summary.warns // 0' greenlight-report.json 2>/dev/null || echo 0)
           infos=$(jq -r '.summary.infos // 0' greenlight-report.json 2>/dev/null || echo 0)
