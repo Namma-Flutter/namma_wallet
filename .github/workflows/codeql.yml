@@ -1,0 +1,197 @@
+name: "Code Scanning & Security"
+
+on:
+  push:
+    branches: [ "main", "beta" ]
+  pull_request:
+    branches: [ "main", "beta" ]
+  schedule:
+    - cron: '30 1 * * 0'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  cooldown-gate:
+    name: Cooldown & Debounce Gate
+    if: github.event_name == 'pull_request' && github.actor != 'dependabot[bot]' && !github.event.pull_request.draft
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      actions: read
+      contents: read
+      pull-requests: read
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - name: Enforce 10-minute cooldown
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: bash scripts/ci_cooldown_gate.sh codeql.yml 600
+
+  codeql-interpreted:
+    name: CodeQL (${{ matrix.language }})
+    needs: [cooldown-gate]
+    if: always() && (needs.cooldown-gate.result == 'success' || github.event_name != 'pull_request')
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      actions: read
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [ 'actions', 'javascript-typescript', 'python', 'ruby' ]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@a65a038433a26f4363cf9f029e3b9ceac831ad5d # v3.28.10
+        with:
+          languages: ${{ matrix.language }}
+          queries: security-extended,security-and-quality
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@a65a038433a26f4363cf9f029e3b9ceac831ad5d # v3.28.10
+        with:
+          category: "/language:${{ matrix.language }}"
+
+  codeql-swift:
+    name: CodeQL (Swift)
+    needs: [cooldown-gate]
+    if: always() && (needs.cooldown-gate.result == 'success' || github.event_name != 'pull_request')
+    runs-on: macos-15
+    timeout-minutes: 45
+    permissions:
+      security-events: write
+      actions: read
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Select Xcode 16
+        run: |
+          XCODE_PATH=$(find /Applications -maxdepth 1 -name "Xcode_16*.app" | sort -V | tail -n 1)
+          if [ -z "$XCODE_PATH" ]; then
+            echo "Error: Xcode 16 not found on runner" >&2
+            exit 1
+          fi
+          echo "Selecting $XCODE_PATH"
+          sudo xcode-select -s "$XCODE_PATH/Contents/Developer"
+          echo "DEVELOPER_DIR=$XCODE_PATH/Contents/Developer" >> "$GITHUB_ENV"
+          xcodebuild -version | grep -E '^Xcode 16' || { echo "Active Xcode is not Xcode 16"; exit 1; }
+
+      - name: Read Flutter version from pubspec.yaml
+        id: flutter_version
+        run: |
+          VERSION=$(grep '^  flutter:' pubspec.yaml | awk -F'"' '{print $2}')
+          echo "flutter_version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@f2c4f6686ca8e8d6e6d0f28410eeef506ed66aff # v2.18.0
+        with:
+          channel: stable
+          flutter-version: ${{ steps.flutter_version.outputs.flutter_version }}
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Setup CocoaPods & resolve dependencies
+        run: |
+          rm -f ios/Podfile.lock
+          flutter build ios --config-only --no-codesign
+          bash scripts/patch_workmanager_apple.sh
+          xcodebuild -resolvePackageDependencies -workspace ios/Runner.xcworkspace -scheme Runner || true
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@a65a038433a26f4363cf9f029e3b9ceac831ad5d # v3.28.10
+        with:
+          languages: swift
+          build-mode: manual
+          queries: security-extended,security-and-quality
+
+      - name: Build iOS project for CodeQL extraction
+        run: |
+          xcodebuild build \
+            -workspace ios/Runner.xcworkspace \
+            -scheme Runner \
+            -parallelizeTargets \
+            -destination "generic/platform=iOS" \
+            -sdk iphoneos \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            COMPILER_INDEX_STORE_ENABLE=NO \
+            ONLY_ACTIVE_ARCH=YES \
+            DEBUG_INFORMATION_FORMAT=dwarf
+
+
+
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@a65a038433a26f4363cf9f029e3b9ceac831ad5d # v3.28.10
+        with:
+          category: "/language:swift"
+
+  osv-dependency-scan:
+    name: OSV Vulnerability Scanner (Dart / Pub)
+    needs: [cooldown-gate]
+    if: always() && (needs.cooldown-gate.result == 'success' || github.event_name != 'pull_request')
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      actions: read
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Run OSV-Scanner
+        uses: google/osv-scanner-action/osv-scanner-action@764c91816374ff2d8fc2095dab36eecd42d61638 # v1.9.2
+        with:
+          scan-args: |-
+            --lockfile=pubspec.lock
+
+  semgrep-scan:
+    name: Semgrep SAST Scan (Dart / Multi-language)
+    needs: [cooldown-gate]
+    if: always() && (needs.cooldown-gate.result == 'success' || github.event_name != 'pull_request')
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      actions: read
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Set up Python
+        uses: actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38 # v5.4.0
+        with:
+          python-version: '3.11'
+
+      - name: Install Semgrep
+        run: pip install semgrep
+
+      - name: Run Semgrep scan
+        run: semgrep scan --sarif --output=semgrep.sarif --config=auto
+        continue-on-error: true
+
+      - name: Upload SARIF to GitHub Code Scanning
+        uses: github/codeql-action/upload-sarif@a65a038433a26f4363cf9f029e3b9ceac831ad5d # v3.28.10
+        if: always()
+        with:
+          sarif_file: semgrep.sarif
+          category: "semgrep"
