@@ -3,18 +3,14 @@ name: Conventional Commits & Branch Naming
 on:
   pull_request:
     branches: [main]
-    types:
-      - opened
-      - synchronize
-      - reopened
-      - ready_for_review
+    paths-ignore:
+      - '*.md'
+      - 'docs/**'
+      - 'LICENSE'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
-
-permissions:
-  contents: read
 
 
 jobs:
@@ -22,6 +18,7 @@ jobs:
     name: Validate Branch Name
     runs-on: ubuntu-latest
     timeout-minutes: 5
+    if: github.actor != 'dependabot[bot]' && !startsWith(github.head_ref, 'dependabot') && github.actor != 'imgbot[bot]' && github.actor != 'ImgBotApp' && !startsWith(github.head_ref, 'imgbot')
     permissions:
       contents: read
       pull-requests: read
@@ -29,13 +26,7 @@ jobs:
       - name: Validate
         env:
           BRANCH: ${{ github.head_ref }}
-          ACTOR: ${{ github.actor }}
         run: |
-          if [[ "$ACTOR" == "dependabot[bot]" || "$BRANCH" =~ ^dependabot\/ || "$ACTOR" == "imgbot[bot]" || "$ACTOR" == "ImgBotApp" || "$BRANCH" =~ ^imgbot\/ ]]; then
-            echo "Skipping branch name validation for bot: $ACTOR ($BRANCH)"
-            exit 0
-          fi
-
           echo "Branch: $BRANCH"
 
           # Allowed:
@@ -64,29 +55,15 @@ jobs:
     name: Conventional Commits
     runs-on: ubuntu-latest
     timeout-minutes: 5
+    if: github.actor != 'dependabot[bot]' && !startsWith(github.head_ref, 'dependabot') && github.actor != 'imgbot[bot]' && github.actor != 'ImgBotApp' && !startsWith(github.head_ref, 'imgbot')
     needs: branch-name
     permissions:
       contents: read
       pull-requests: read
     steps:
-      - name: Check if bot PR
-        id: bot_check
-        env:
-          BRANCH: ${{ github.head_ref }}
-          ACTOR: ${{ github.actor }}
-        run: |
-          if [[ "$ACTOR" == "dependabot[bot]" || "$BRANCH" =~ ^dependabot\/ || "$ACTOR" == "imgbot[bot]" || "$ACTOR" == "ImgBotApp" || "$BRANCH" =~ ^imgbot\/ ]]; then
-            echo "is_bot=true" >> "$GITHUB_OUTPUT"
-            echo "Skipping commit linting for bot: $ACTOR"
-          else
-            echo "is_bot=false" >> "$GITHUB_OUTPUT"
-          fi
+      - uses: actions/checkout@v5
 
-      - uses: actions/checkout@v4
-        if: steps.bot_check.outputs.is_bot != 'true'
-
-      - uses: webiny/action-conventional-commits@8bc41ff4e7d423d56fa4905f6ff79209a78776c7 # v1.3.0
-        if: steps.bot_check.outputs.is_bot != 'true'
+      - uses: webiny/action-conventional-commits@v1.3.0
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           allowed-commit-types: "feat,fix,docs,style,refactor,perf,test,build,ci,chore,revert"

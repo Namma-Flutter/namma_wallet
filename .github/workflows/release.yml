@@ -51,17 +51,19 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
-      - name: Cache pub dependencies
-        uses: actions/cache@v4
+      - uses: actions/cache@v6
         with:
-          path: ~/.pub-cache
+          path: |
+            ~/.pub-cache
+            .dart_tool
+            build
           key: gate-${{ runner.os }}-${{ hashFiles('pubspec.yaml', 'pubspec.lock') }}
           restore-keys: |
             gate-${{ runner.os }}-
 
-      - uses: subosito/flutter-action@f2c4f6686ca8e8d6e6d0f28410eeef506ed66aff # v2.18.0
+      - uses: subosito/flutter-action@v2
         with:
           channel: stable
           flutter-version-file: pubspec.yaml
@@ -89,7 +91,7 @@ jobs:
       PLAY_STORE_JSON_PATH: ${{ github.workspace }}/play-store-key.json
       PACKAGE_NAME: com.nammaflutter.nammawallet
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Decode Play Store service account
         env:
@@ -104,7 +106,7 @@ jobs:
           fi
 
       - name: Set up Ruby for fastlane
-        uses: ruby/setup-ruby@28233a011b6bb8633ea908d76c6d23aab6518b5c # v1.223.0
+        uses: ruby/setup-ruby@v1
         with:
           ruby-version: "3.4.7"
           bundler-cache: true
@@ -156,7 +158,7 @@ jobs:
       APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
       APP_STORE_CONNECT_KEY_PATH: ./AuthKey.p8
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Decode App Store Connect API key
         env:
@@ -174,7 +176,7 @@ jobs:
           fi
 
       - name: Set up Ruby for fastlane
-        uses: ruby/setup-ruby@28233a011b6bb8633ea908d76c6d23aab6518b5c # v1.223.0
+        uses: ruby/setup-ruby@v1
         with:
           ruby-version: "3.3.10"
           bundler-cache: true
@@ -218,31 +220,32 @@ jobs:
       FLUTTER_CMD: flutter
       GRADLE_OPTS: -Dorg.gradle.jvmargs="-Xmx4G -XX:MaxMetaspaceSize=2G --add-opens=java.base/java.lang.ref=ALL-UNNAMED"
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v6
         with:
           distribution: temurin
           java-version: "17"
 
-      - name: Cache pub dependencies
-        uses: actions/cache@v4
+      - uses: actions/cache@v6
         with:
-          path: ~/.pub-cache
+          path: |
+            ~/.pub-cache
+            .dart_tool
+            build
           key: android-${{ runner.os }}-${{ hashFiles('pubspec.yaml', 'pubspec.lock') }}
           restore-keys: |
             gate-${{ runner.os }}-${{ hashFiles('pubspec.yaml', 'pubspec.lock') }}-
             gate-${{ runner.os }}-
             android-${{ runner.os }}-
 
-      - uses: subosito/flutter-action@f2c4f6686ca8e8d6e6d0f28410eeef506ed66aff # v2.18.0
+      - uses: subosito/flutter-action@v2
         with:
           channel: stable
           flutter-version-file: pubspec.yaml
           cache: true
 
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@18f1c6724d5bcb313b5c5ef536430a31e5c5b455 # v4.4.0
+      - uses: burrunan/gradle-cache-action@v3
         with:
           build-root-directory: ${{ github.workspace }}/android
 
@@ -278,7 +281,7 @@ jobs:
 
       - name: Set up Ruby for fastlane
         if: env.STAGE == 'beta'
-        uses: ruby/setup-ruby@28233a011b6bb8633ea908d76c6d23aab6518b5c # v1.223.0
+        uses: ruby/setup-ruby@v1
         with:
           ruby-version: "3.4.7"
           bundler-cache: true
@@ -314,34 +317,35 @@ jobs:
       APP_STORE_CONNECT_KEY_PATH: ./AuthKey.p8
       FLUTTER_CMD: flutter
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
-      - name: Cache pub dependencies
-        uses: actions/cache@v4
+      - uses: actions/cache@v6
         with:
-          path: ~/.pub-cache
+          path: |
+            ~/.pub-cache
+            .dart_tool
+            build
           key: ios-${{ runner.os }}-${{ hashFiles('pubspec.yaml', 'pubspec.lock') }}
           restore-keys: |
             ios-${{ runner.os }}-
 
-      - name: Cache CocoaPods
-        uses: actions/cache@v4
+      - uses: actions/cache@v6
         with:
           path: |
             ios/Pods
             ~/Library/Caches/CocoaPods
-          key: cocoapods-${{ runner.os }}-${{ hashFiles('ios/Podfile.lock') }}
+          key: ${{ runner.os }}-pods-${{ hashFiles('ios/Podfile.lock') }}
           restore-keys: |
-            cocoapods-${{ runner.os }}-
+            ${{ runner.os }}-pods-
 
-      - uses: subosito/flutter-action@f2c4f6686ca8e8d6e6d0f28410eeef506ed66aff # v2.18.0
+      - uses: subosito/flutter-action@v2
         with:
           channel: stable
           flutter-version-file: pubspec.yaml
           cache: true
 
       - name: Set up Ruby for fastlane
-        uses: ruby/setup-ruby@28233a011b6bb8633ea908d76c6d23aab6518b5c # v1.223.0
+        uses: ruby/setup-ruby@v1
         with:
           ruby-version: "3.3.10"
           bundler-cache: true
@@ -366,9 +370,10 @@ jobs:
       - name: Generate code files
         run: dart run build_runner build --delete-conflicting-outputs
 
-      - name: Install CocoaPods dependencies
+      - name: Update CocoaPods dependencies
         working-directory: ios
-        run: pod install
+        run: |
+          pod update --repo-update || pod install --repo-update || true
 
       - name: Build and upload to TestFlight
         if: env.STAGE == 'beta'
@@ -405,7 +410,7 @@ jobs:
       APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
       APP_STORE_CONNECT_KEY_PATH: ./AuthKey.p8
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Decode Play Store service account
         env:
@@ -433,7 +438,7 @@ jobs:
           fi
 
       - name: Set up Ruby for Android fastlane
-        uses: ruby/setup-ruby@28233a011b6bb8633ea908d76c6d23aab6518b5c # v1.223.0
+        uses: ruby/setup-ruby@v1
         with:
           ruby-version: "3.4.7"
           bundler-cache: true
@@ -445,7 +450,7 @@ jobs:
         run: bundle exec fastlane production
 
       - name: Set up Ruby for iOS fastlane
-        uses: ruby/setup-ruby@28233a011b6bb8633ea908d76c6d23aab6518b5c # v1.223.0
+        uses: ruby/setup-ruby@v1
         with:
           ruby-version: "3.3.10"
           bundler-cache: true
@@ -466,7 +471,7 @@ jobs:
       id-token: write
       attestations: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Download build artifacts
         uses: actions/download-artifact@v4
@@ -488,12 +493,12 @@ jobs:
 
       - name: Attest APK provenance
         if: needs.android.result == 'success'
-        uses: actions/attest-build-provenance@c074443f1aee8d4aeeae555aebba3282517141b2 # v2.2.3
+        uses: actions/attest-build-provenance@v2
         with:
           subject-path: dist/namma-wallet-v*.apk
 
       - name: Attest IPA provenance
-        uses: actions/attest-build-provenance@c074443f1aee8d4aeeae555aebba3282517141b2 # v2.2.3
+        uses: actions/attest-build-provenance@v2
         with:
           subject-path: dist/namma-wallet-v*.ipa
 
@@ -501,7 +506,7 @@ jobs:
         run: cat ios/fastlane/metadata/en-US/release_notes.txt > release_body.md
 
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@c95fe1489396fe8a9eb87c0abf8aa5b2ef267fda # v2.2.1
+        uses: softprops/action-gh-release@v2
         with:
           tag_name: v${{ steps.meta.outputs.version }}
           name: Namma Wallet v${{ steps.meta.outputs.version }}

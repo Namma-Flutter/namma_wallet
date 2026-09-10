@@ -4,73 +4,69 @@ on:
   pull_request:
     branches:
       - main
-    types:
-      - opened
-      - synchronize
-      - reopened
-      - ready_for_review
+    paths:
+      - 'lib/**'
+      - 'test/**'
+      - 'pubspec.yaml'
+      - 'pubspec.lock'
+      - '.github/workflows/ci.yml'
+      - 'build.yaml'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
-permissions:
-  contents: read
-
 jobs:
+  cooldown-gate:
+    name: Cooldown & Debounce Gate
+    if: github.actor != 'dependabot[bot]' && !github.event.pull_request.draft
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      actions: read
+      contents: read
+      pull-requests: read
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - name: Enforce 10-minute cooldown
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: bash scripts/ci_cooldown_gate.sh ci.yml 600
+
   format-analyze:
     name: flutter-format-and-analyze
-    if: "!github.event.pull_request.draft"
+    if: github.actor != 'dependabot[bot]'
+    needs: cooldown-gate
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
       contents: read
-    outputs:
-      dart: ${{ steps.filter.outputs.dart }}
+      issues: write
+      pull-requests: write
 
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Check for Dart & CI Changes
-        uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36 # v3.0.2
-        id: filter
-        with:
-          filters: |
-            dart:
-              - 'lib/**'
-              - 'test/**'
-              - 'pubspec.yaml'
-              - 'pubspec.lock'
-              - 'build.yaml'
-              - '.github/workflows/ci.yml'
-
-      - name: Fast Pass-Through (Unaffected PR)
-        if: steps.filter.outputs.dart != 'true'
-        run: |
-          echo "### ⚡ Fast Pass-Through" >> $GITHUB_STEP_SUMMARY
-          echo "No Dart or CI workflow files modified. Skipping formatting and static analysis." >> $GITHUB_STEP_SUMMARY
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
       - name: Read Flutter version from pubspec.yaml
-        if: steps.filter.outputs.dart == 'true'
         id: flutter_version
         run: |
           VERSION=$(grep '^  flutter:' pubspec.yaml | awk -F'"' '{print $2}')
           echo "flutter_version=$VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Set up Flutter
-        if: steps.filter.outputs.dart == 'true'
-        uses: subosito/flutter-action@f2c4f6686ca8e8d6e6d0f28410eeef506ed66aff # v2.18.0
+        uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2
         with:
           channel: stable
           flutter-version: ${{ steps.flutter_version.outputs.flutter_version }}
           cache: true
 
       - name: Install dependencies
-        if: steps.filter.outputs.dart == 'true'
         run: flutter pub get
 
       - name: Check dart format
-        if: steps.filter.outputs.dart == 'true'
         id: format_check
         run: |
           set +e
@@ -78,18 +74,7 @@ jobs:
           echo "exit_code=$?" >> $GITHUB_OUTPUT
           exit 0
 
-      - name: Cache build_runner asset graph
-        if: steps.filter.outputs.dart == 'true'
-        uses: actions/cache@v4
-        with:
-          path: .dart_tool/build
-          key: build-runner-${{ runner.os }}-${{ hashFiles('pubspec.lock') }}-${{ hashFiles('lib/**/*.dart') }}
-          restore-keys: |
-            build-runner-${{ runner.os }}-${{ hashFiles('pubspec.lock') }}-
-            build-runner-${{ runner.os }}-
-
       - name: Check build runner code generation
-        if: steps.filter.outputs.dart == 'true'
         id: build_runner_check
         run: |
           set +e
@@ -116,11 +101,11 @@ jobs:
           exit 0
 
       - name: Run flutter analyze (write log)
-        if: steps.filter.outputs.dart == 'true' && steps.format_check.outputs.exit_code == '0' && steps.build_runner_check.outputs.exit_code == '0' && steps.build_runner_check.outputs.drift == '0'
+        if: ${{ steps.format_check.outputs.exit_code == '0' && steps.build_runner_check.outputs.exit_code == '0' && steps.build_runner_check.outputs.drift == '0' }}
         run: flutter analyze --write=flutter_analyze.log
 
       - name: Prepare PR comments & step summary
-        if: always() && steps.filter.outputs.dart == 'true'
+        if: always()
         run: |
           mkdir -p pr-comments
           echo "${{ github.event.pull_request.number }}" > pr-comments/pr_number
@@ -226,22 +211,15 @@ jobs:
             fi
           fi
 
-      - name: Prepare placeholder for fast paths
-        if: always() && steps.filter.outputs.dart != 'true' && github.event_name == 'pull_request'
-        run: |
-          mkdir -p pr-comments
-          echo "${{ github.event.pull_request.number }}" > pr-comments/pr_number
-          echo "DELETE" > pr-comments/analyze_comment.txt
-
       - name: Upload PR comments artifact
-        if: always() && github.event_name == 'pull_request'
-        uses: actions/upload-artifact@v4
+        if: always()
+        uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 # v4.6.1
         with:
           name: pr-comments-format-analyze
           path: pr-comments/
 
       - name: Check format, codegen, and analysis results
-        if: always() && steps.filter.outputs.dart == 'true'
+        if: always()
         run: |
           FAILED=0
           if [ "${{ steps.format_check.outputs.exit_code }}" != "0" ]; then
@@ -269,14 +247,21 @@ jobs:
           fi
 
   test-coverage:
+    if: github.actor != 'dependabot[bot]'
     needs: format-analyze
-    if: github.actor != 'dependabot[bot]' && !github.event.pull_request.draft && needs.format-analyze.outputs.dart == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     permissions:
       contents: read
+      pull-requests: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Setup Java
+        uses: actions/setup-java@3a4f6e1af504cf6a31855fa899c6aa5355ba6c12 # v4.7.0
+        with:
+          distribution: "temurin"
+          java-version: "17"
 
       - name: Read Flutter version from pubspec.yaml
         id: flutter_version
@@ -285,7 +270,7 @@ jobs:
           echo "flutter_version=$VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Set up Flutter
-        uses: subosito/flutter-action@f2c4f6686ca8e8d6e6d0f28410eeef506ed66aff # v2.18.0
+        uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2
         with:
           channel: stable
           flutter-version: ${{ steps.flutter_version.outputs.flutter_version }}
@@ -293,15 +278,6 @@ jobs:
 
       - name: Get dependencies
         run: flutter pub get
-
-      - name: Cache build_runner asset graph
-        uses: actions/cache@v4
-        with:
-          path: .dart_tool/build
-          key: build-runner-${{ runner.os }}-${{ hashFiles('pubspec.lock') }}-${{ hashFiles('lib/**/*.dart') }}
-          restore-keys: |
-            build-runner-${{ runner.os }}-${{ hashFiles('pubspec.lock') }}-
-            build-runner-${{ runner.os }}-
 
       - name: Generate code files
         run: dart run build_runner build --delete-conflicting-outputs
@@ -352,7 +328,7 @@ jobs:
 
       - name: Upload PR comments artifact
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 # v4.6.1
         with:
           name: pr-comments-coverage
           path: pr-comments/
@@ -365,12 +341,23 @@ jobs:
             exit 1
           fi
 
+      - name: Install lcov
+        if: ${{ steps.test_run.outputs.exit_code == '0' }}
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y lcov
+
+      - name: Convert coverage to lcov format
+        if: ${{ steps.test_run.outputs.exit_code == '0' }}
+        run: |
+          lcov --list-coverage coverage/lcov.info || true
+
       - name: Upload coverage to Codecov
         if: ${{ steps.test_run.outputs.exit_code == '0' }}
-        uses: codecov/codecov-action@0565863a31f2c772f9f0395002a31e3f06189574 # v5.4.0
+        uses: codecov/codecov-action@v5
         with:
           directory: ./coverage
-          fail_ci_if_error: false
+          fail_ci_if_error: true
           files: ./coverage/lcov.info
           flags: unittests
           name: codecov-umbrella

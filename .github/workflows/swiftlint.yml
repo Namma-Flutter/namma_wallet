@@ -4,11 +4,6 @@ on:
   pull_request:
     branches:
       - main
-    types:
-      - opened
-      - synchronize
-      - reopened
-      - ready_for_review
     paths:
       - .github/workflows/swiftlint.yml
       - .swiftlint-version
@@ -19,24 +14,21 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
-permissions:
-  contents: read
-
 jobs:
   swiftlint:
-    if: github.actor != 'dependabot[bot]' && !github.event.pull_request.draft
+    if: github.actor != 'dependabot[bot]'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Read SwiftLint version
         id: swiftlint_version
         run: echo "version=$(cat .swiftlint-version)" >> "$GITHUB_OUTPUT"
 
       - name: Run SwiftLint
-        uses: cirruslabs/swiftlint-action@37b78e658ba6bcb1679df34819a4a8d8c269a940 # v1.1.0
+        uses: cirruslabs/swiftlint-action@v1
         with:
           version: ${{ steps.swiftlint_version.outputs.version }}
           args: --strict ios
