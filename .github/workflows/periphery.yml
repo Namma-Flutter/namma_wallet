@@ -4,6 +4,11 @@ on:
   pull_request:
     branches:
       - main
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - ready_for_review
     paths:
       - '.github/workflows/periphery.yml'
       - '.periphery.yml'
@@ -15,15 +20,12 @@ concurrency:
   cancel-in-progress: true
 
 permissions:
-  contents: read
-  pull-requests: write
-  issues: write
-
+  contents: write
 
 jobs:
-  periphery-scan:
-    name: Periphery Swift Code Scan
-    if: github.actor != 'dependabot[bot]'
+  update-lockfile:
+    name: Update Podfile.lock
+    if: github.actor != 'dependabot[bot]' && (github.event_name != 'pull_request' || !github.event.pull_request.draft)
     runs-on: macos-15
     timeout-minutes: 30
 
@@ -31,19 +33,20 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
-          ref: ${{ github.event.pull_request.head.sha }}
+          repository: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
+          ref: ${{ github.head_ref || github.ref }}
 
-      - name: Select Xcode 16
+      - name: Select Xcode (26 or 16)
         run: |
-          XCODE_PATH=$(find /Applications -maxdepth 1 -name "Xcode_16*.app" | sort -V | tail -n 1)
+          XCODE_PATH=$(find /Applications -maxdepth 1 \( -name "Xcode_26*.app" -o -name "Xcode_16*.app" \) | sort -V | tail -n 1)
           if [ -z "$XCODE_PATH" ]; then
-            echo "Error: Xcode 16 not found on runner" >&2
+            echo "Error: Neither Xcode 26 nor Xcode 16 found on runner" >&2
             exit 1
           fi
           echo "Selecting $XCODE_PATH"
           sudo xcode-select -s "$XCODE_PATH/Contents/Developer"
           echo "DEVELOPER_DIR=$XCODE_PATH/Contents/Developer" >> "$GITHUB_ENV"
-          xcodebuild -version | grep -E '^Xcode 16' || { echo "Active Xcode is not Xcode 16"; exit 1; }
+          xcodebuild -version | head -n 1
 
       - name: Read Flutter version from pubspec.yaml
         id: flutter_version
@@ -61,10 +64,62 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
+      - name: Cache CocoaPods
+        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf # v4.2.2
+        with:
+          path: |
+            ios/Pods
+            ~/Library/Caches/CocoaPods
+          key: cocoapods-${{ runner.os }}-${{ hashFiles('ios/Podfile.lock') }}
+          restore-keys: |
+            cocoapods-${{ runner.os }}-
+
       - name: Setup CocoaPods
         run: |
-          rm -f ios/Podfile.lock
-          flutter build ios --config-only --no-codesign
+          flutter build ios --config-only --no-codesign || (rm -f ios/Podfile.lock && flutter build ios --config-only --no-codesign)
+
+      - name: Commit updated Podfile.lock back to branch
+        if: github.event_name == 'pull_request' && !github.event.pull_request.draft && github.event.pull_request.head.repo.full_name == github.repository
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if [ -f ios/Podfile.lock ] && ! git diff --quiet ios/Podfile.lock; then
+            echo "Committing updated ios/Podfile.lock from macOS runner..."
+            git add ios/Podfile.lock
+            git commit -m "chore(ios): update Podfile.lock via macOS runner" || true
+            git push || true
+          fi
+
+  periphery-scan:
+    name: Periphery Swift Code Scan
+    needs: [update-lockfile]
+    if: github.actor != 'dependabot[bot]' && (github.event_name != 'pull_request' || !github.event.pull_request.draft)
+    runs-on: macos-15
+    timeout-minutes: 30
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          repository: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
+          ref: ${{ github.head_ref || github.ref }}
+
+      - name: Select Xcode (26 or 16)
+        run: |
+          XCODE_PATH=$(find /Applications -maxdepth 1 \( -name "Xcode_26*.app" -o -name "Xcode_16*.app" \) | sort -V | tail -n 1)
+          if [ -z "$XCODE_PATH" ]; then
+            echo "Error: Neither Xcode 26 nor Xcode 16 found on runner" >&2
+            exit 1
+          fi
+          echo "Selecting $XCODE_PATH"
+          sudo xcode-select -s "$XCODE_PATH/Contents/Developer"
+          echo "DEVELOPER_DIR=$XCODE_PATH/Contents/Developer" >> "$GITHUB_ENV"
+          xcodebuild -version | head -n 1
+
+      - name: Setup CocoaPods
+        run: |
           bash scripts/patch_workmanager_apple.sh
 
       - name: Install Periphery
@@ -80,7 +135,7 @@ jobs:
       - name: Run Periphery Analysis
         run: |
           set -o pipefail
-          periphery scan --verbose --format github-actions --relative-results 2>&1 | tee periphery_output.txt || true
+          periphery scan --verbose --format github-actions --relative-results 2>&1 | tee periphery_output.txt
 
       - name: Prepare PR comments & step summary
         if: always() && github.event_name == 'pull_request'
@@ -119,50 +174,5 @@ jobs:
         with:
           name: pr-comments-periphery
           path: pr-comments/
-
-      - name: Post or update PR comment
-        if: always() && github.event_name == 'pull_request'
-        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
-        with:
-          script: |
-            const fs = require('fs');
-            const commentPath = 'pr-comments/periphery_comment.txt';
-            if (!fs.existsSync(commentPath)) return;
-
-            const body = fs.readFileSync(commentPath, 'utf8').trim();
-            if (!body) return;
-
-            const prNumber = context.payload.pull_request?.number || context.issue.number;
-            if (!prNumber) {
-              console.log('No PR number found');
-              return;
-            }
-            const comments = await github.rest.issues.listComments({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: prNumber,
-            });
-
-            const existing = comments.data.find(c =>
-              c.user?.login === 'github-actions[bot]' && c.body?.includes('Periphery Swift Dead Code')
-            );
-
-            if (existing) {
-              await github.rest.issues.updateComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                comment_id: existing.id,
-                body: body,
-              });
-              console.log('Updated Periphery PR comment');
-            } else {
-              await github.rest.issues.createComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: prNumber,
-                body: body,
-              });
-              console.log('Created Periphery PR comment');
-            }
 
 
