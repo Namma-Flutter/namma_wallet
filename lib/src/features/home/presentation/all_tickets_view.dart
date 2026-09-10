@@ -511,15 +511,24 @@ class TravelTicketListCardWidget extends StatelessWidget {
                   const SizedBox(height: 4),
                   // Date and time
                   if (ticket.startTime != null)
-                    Text(
-                      '${DateTimeConverter.instance.formatDate(ticket.startTime!)}'
-                      ' • ${DateTimeConverter.instance.formatTime(ticket.startTime!)}',
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: Theme.of(
-                          context,
-                        ).colorScheme.onSurface.withValues(alpha: 0.5),
-                      ),
+                    Builder(
+                      builder: (context) {
+                        final dt = DateTimeConverter.instance.formatDate(
+                          ticket.startTime!,
+                        );
+                        final tm = DateTimeConverter.instance.formatTime(
+                          ticket.startTime!,
+                        );
+                        return Text(
+                          '$dt • $tm',
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurface.withValues(alpha: 0.5),
+                          ),
+                        );
+                      },
                     ),
                 ],
               ),
