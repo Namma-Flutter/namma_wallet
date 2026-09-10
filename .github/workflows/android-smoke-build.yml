@@ -26,7 +26,7 @@ jobs:
       contents: read
 
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/checkout@v4
 
       - name: Check for Android & App Changes
         uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36 # v3.0.2
@@ -48,7 +48,7 @@ jobs:
 
       - name: Setup Java
         if: steps.filter.outputs.android == 'true' && github.actor != 'dependabot[bot]'
-        uses: actions/setup-java@3a4f6e1af504cf6a31855fa899c6aa5355ba6c12 # v4.7.0
+        uses: actions/setup-java@v4
         with:
           distribution: "temurin"
           java-version: "17"

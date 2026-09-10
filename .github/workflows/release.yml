@@ -51,10 +51,10 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/checkout@v4
 
       - name: Cache pub dependencies
-        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf # v4.2.2
+        uses: actions/cache@v4
         with:
           path: ~/.pub-cache
           key: gate-${{ runner.os }}-${{ hashFiles('pubspec.yaml', 'pubspec.lock') }}
@@ -89,7 +89,7 @@ jobs:
       PLAY_STORE_JSON_PATH: ${{ github.workspace }}/play-store-key.json
       PACKAGE_NAME: com.nammaflutter.nammawallet
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/checkout@v4
 
       - name: Decode Play Store service account
         env:
@@ -156,7 +156,7 @@ jobs:
       APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
       APP_STORE_CONNECT_KEY_PATH: ./AuthKey.p8
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/checkout@v4
 
       - name: Decode App Store Connect API key
         env:
@@ -218,15 +218,15 @@ jobs:
       FLUTTER_CMD: flutter
       GRADLE_OPTS: -Dorg.gradle.jvmargs="-Xmx4G -XX:MaxMetaspaceSize=2G --add-opens=java.base/java.lang.ref=ALL-UNNAMED"
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/checkout@v4
 
-      - uses: actions/setup-java@3a4f6e1af504cf6a31855fa899c6aa5355ba6c12 # v4.7.0
+      - uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: "17"
 
       - name: Cache pub dependencies
-        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf # v4.2.2
+        uses: actions/cache@v4
         with:
           path: ~/.pub-cache
           key: android-${{ runner.os }}-${{ hashFiles('pubspec.yaml', 'pubspec.lock') }}
@@ -295,7 +295,7 @@ jobs:
           mv build/app/outputs/flutter-apk/app-release.apk "namma-wallet-v${VERSION}.apk"
 
       - name: Upload APK workflow artifact
-        uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 # v4.6.1
+        uses: actions/upload-artifact@v4
         with:
           name: namma-wallet-apk
           path: namma-wallet-v*.apk
@@ -314,10 +314,10 @@ jobs:
       APP_STORE_CONNECT_KEY_PATH: ./AuthKey.p8
       FLUTTER_CMD: flutter
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/checkout@v4
 
       - name: Cache pub dependencies
-        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf # v4.2.2
+        uses: actions/cache@v4
         with:
           path: ~/.pub-cache
           key: ios-${{ runner.os }}-${{ hashFiles('pubspec.yaml', 'pubspec.lock') }}
@@ -325,7 +325,7 @@ jobs:
             ios-${{ runner.os }}-
 
       - name: Cache CocoaPods
-        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf # v4.2.2
+        uses: actions/cache@v4
         with:
           path: |
             ios/Pods
@@ -386,7 +386,7 @@ jobs:
           mv build/ios/ipa/*.ipa "namma-wallet-v${VERSION}.ipa"
 
       - name: Upload IPA workflow artifact
-        uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 # v4.6.1
+        uses: actions/upload-artifact@v4
         with:
           name: namma-wallet-ipa
           path: namma-wallet-v*.ipa
@@ -405,7 +405,7 @@ jobs:
       APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
       APP_STORE_CONNECT_KEY_PATH: ./AuthKey.p8
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/checkout@v4
 
       - name: Decode Play Store service account
         env:
@@ -466,10 +466,10 @@ jobs:
       id-token: write
       attestations: write
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/checkout@v4
 
       - name: Download build artifacts
-        uses: actions/download-artifact@cc203385981b70ca67e1cc392babf9cc229d5806 # v4.1.9
+        uses: actions/download-artifact@v4
         with:
           pattern: namma-wallet-*
           merge-multiple: true
