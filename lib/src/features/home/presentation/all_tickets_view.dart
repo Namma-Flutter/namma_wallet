@@ -215,6 +215,7 @@ class _AllTicketsViewState extends State<AllTicketsView> {
 
                         return InkWell(
                           onTap: () async {
+                            _hapticService.triggerHaptic(HapticType.selection);
                             if (ticket.ticketId == null) return;
 
                             final wasDeleted = await context.pushNamed<bool>(
@@ -507,12 +508,8 @@ class TravelTicketListCardWidget extends StatelessWidget {
                   // Date and time
                   if (ticket.startTime != null)
                     Text(
-                      '${DateTimeConverter.instance.formatDate(
-                        ticket.startTime!,
-                      )} • '
-                      '${DateTimeConverter.instance.formatTime(
-                        ticket.startTime!,
-                      )}',
+                      '${DateTimeConverter.instance.formatDate(ticket.startTime!)} • '
+                      '${DateTimeConverter.instance.formatTime(ticket.startTime!)}',
                       style: TextStyle(
                         fontSize: 11,
                         color: Theme.of(
