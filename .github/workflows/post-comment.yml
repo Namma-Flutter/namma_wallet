@@ -24,7 +24,7 @@ jobs:
       issues: write
     steps:
       - name: Download comment artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@cc203385981b70ca67e1cc392babf9cc229d5806 # v4.1.9
         with:
           run-id: ${{ github.event.workflow_run.id }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -58,7 +58,7 @@ jobs:
               const dirPath = path.join(prCommentsDir, subdir);
               const prNumberPath = path.join(dirPath, 'pr_number');
               const artifactPrNumber = fs.existsSync(prNumberPath) ? parseInt(fs.readFileSync(prNumberPath, 'utf8').trim(), 10) : NaN;
-              const prNumber = context.payload.workflow_run.head_repository.full_name === context.payload.repository.full_name ? (trustedPrNumber || artifactPrNumber) : trustedPrNumber;
+              const prNumber = trustedPrNumber || artifactPrNumber;
               if (!prNumber || isNaN(prNumber)) {
                 console.log(`No valid PR number found in ${subdir}`);
                 continue;

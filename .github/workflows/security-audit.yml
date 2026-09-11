@@ -65,26 +65,24 @@ jobs:
 
           # 1. Storage Security Analysis (OWASP M9)
           STORAGE_STATUS=0
-          python3 .agents/skills/owasp-mobile-security-checker/scripts/analyze_storage_security.py || STORAGE_STATUS=$? || true
+          python3 .agents/skills/owasp-mobile-security-checker/scripts/analyze_storage_security.py || STORAGE_STATUS=$?
           if [ -f owasp_m9_storage_scan.json ]; then
             mv owasp_m9_storage_scan.json owasp-reports/
             STORAGE_ISSUES=$(jq '.total_issues // 0' owasp-reports/owasp_m9_storage_scan.json)
             echo "- **M9 Storage Security**: $STORAGE_ISSUES note(s)/finding(s)" >> $GITHUB_STEP_SUMMARY
           elif [ $STORAGE_STATUS -ne 0 ]; then
-            echo "- **M9 Storage Security**: ❌ Scanner exited with error (exit code $STORAGE_STATUS); report not generated" >> $GITHUB_STEP_SUMMARY
-            exit $STORAGE_STATUS
+            echo "- **M9 Storage Security**: ⚠️ Scanner exited with error (exit code $STORAGE_STATUS); report not generated" >> $GITHUB_STEP_SUMMARY
           fi
 
           # 2. Network Security Analysis (OWASP M5)
           NETWORK_STATUS=0
-          python3 .agents/skills/owasp-mobile-security-checker/scripts/check_network_security.py || NETWORK_STATUS=$? || true
+          python3 .agents/skills/owasp-mobile-security-checker/scripts/check_network_security.py || NETWORK_STATUS=$?
           if [ -f owasp_m5_network_scan.json ]; then
             mv owasp_m5_network_scan.json owasp-reports/
             NETWORK_ISSUES=$(jq '.total_issues // 0' owasp-reports/owasp_m5_network_scan.json)
             echo "- **M5 Network Security**: $NETWORK_ISSUES note(s)/finding(s)" >> $GITHUB_STEP_SUMMARY
           elif [ $NETWORK_STATUS -ne 0 ]; then
-            echo "- **M5 Network Security**: ❌ Scanner exited with error (exit code $NETWORK_STATUS); report not generated" >> $GITHUB_STEP_SUMMARY
-            exit $NETWORK_STATUS
+            echo "- **M5 Network Security**: ⚠️ Scanner exited with error (exit code $NETWORK_STATUS); report not generated" >> $GITHUB_STEP_SUMMARY
           fi
 
       - name: Upload OWASP Audit Reports

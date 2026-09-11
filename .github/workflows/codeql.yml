@@ -33,7 +33,7 @@ jobs:
       swift: ${{ steps.filter.outputs.swift }}
     steps:
       - name: Check for Swift & iOS File Changes
-        uses: dorny/paths-filter@v3
+        uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36 # v3.0.2
         id: filter
         if: github.event_name == 'pull_request'
         with:
@@ -117,7 +117,7 @@ jobs:
         run: flutter pub get
 
       - name: Cache CocoaPods
-        uses: actions/cache@v4
+        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf # v4.2.2
         with:
           path: |
             ios/Pods
@@ -208,7 +208,7 @@ jobs:
 
       - name: Upload SARIF to GitHub Code Scanning
         uses: github/codeql-action/upload-sarif@6f5948dfacef28e207b48d0905cf90c03365536d # v3.37.9
-        if: always() && hashFiles('semgrep.sarif') != ''
+        if: always() && !cancelled() && hashFiles('semgrep.sarif') != ''
         with:
           sarif_file: semgrep.sarif
           category: "semgrep"
