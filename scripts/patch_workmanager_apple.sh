@@ -5,15 +5,20 @@ set -e
 # BGContinuedProcessingTask is only available on iOS 26+ and does not exist in iOS 17/18 SDKs.
 echo "Running patch_workmanager_apple.sh..."
 
-DIRS=$(find "${HOME}/.pub-cache" ios/.symlinks .symlinks -type d -path "*/workmanager_apple/Sources/workmanager_apple" 2>/dev/null || true)
+if [ -f "pubspec.lock" ]; then
+  WM_VERSION=$(grep -A 5 "workmanager_apple:" pubspec.lock | grep "version:" | awk -F '"' '{print $2}' || true)
+  if [ -n "$WM_VERSION" ] && [ "$WM_VERSION" != "0.9.10" ] && [ "$WM_VERSION" != "0.9.11" ]; then
+    echo "workmanager_apple version is $WM_VERSION. Patch is only for 0.9.10 and 0.9.11. Skipping."
+  else
+    DIRS=$(find ios/.symlinks -type d -path "*/workmanager_apple/Sources/workmanager_apple" 2>/dev/null || true)
 
-for dir in $DIRS; do
-  echo "Found workmanager_apple directory: $dir"
+    for dir in $DIRS; do
+      echo "Found workmanager_apple directory: $dir"
 
-  scheduler="$dir/BGContinuedProcessingTaskScheduler.swift"
-  if [ -f "$scheduler" ]; then
-    chmod u+w "$scheduler" 2>/dev/null || true
-    cat << 'SWIFTEOF' > "$scheduler"
+      scheduler="$dir/BGContinuedProcessingTaskScheduler.swift"
+      if [ -f "$scheduler" ]; then
+        chmod u+w "$scheduler" 2>/dev/null || true
+        cat << 'SWIFTEOF' > "$scheduler"
 import Foundation
 
 extension WorkmanagerPlugin {
@@ -35,15 +40,36 @@ extension WorkmanagerPlugin {
 #endif
 }
 SWIFTEOF
-    echo "Successfully patched $scheduler"
-  fi
+        echo "Successfully patched $scheduler"
+      fi
 
-  plugin="$dir/WorkmanagerPlugin.swift"
-  if [ -f "$plugin" ]; then
-    chmod u+w "$plugin" 2>/dev/null || true
-    grep -v "BGContinuedProcessingTask" "$plugin" | grep -v "handleBGContinuedProcessingTask" > "$plugin.tmp" && mv "$plugin.tmp" "$plugin"
-    echo "Successfully patched $plugin"
+      plugin="$dir/WorkmanagerPlugin.swift"
+      if [ -f "$plugin" ]; then
+        chmod u+w "$plugin" 2>/dev/null || true
+
+        awk '
+        BEGIN { skip = 0 }
+        /\} else if #available\(iOS 26\.0, \*\), request\.type == \.continuedProcessingTask \{/ {
+          skip = 1
+          next
+        }
+        /self\.handleBGContinuedProcessingTask\(request: request, completion: completion\)/ {
+          if (skip) next
+        }
+        /^\s*\}/ {
+          if (skip) {
+            skip = 0
+            next
+          }
+        }
+        { print }
+        ' "$plugin" > "$plugin.tmp"
+
+        mv "$plugin.tmp" "$plugin"
+        echo "Successfully patched $plugin"
+      fi
+    done
   fi
-done
+fi
 
 echo "patch_workmanager_apple.sh finished."
