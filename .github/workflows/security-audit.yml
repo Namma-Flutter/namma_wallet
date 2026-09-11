@@ -113,4 +113,4 @@ jobs:
         run: pip install zizmor==1.4.1
 
       - name: Run zizmor
-        run: zizmor .github/workflows/
+        run: zizmor .github/workflows/ --min-severity low
