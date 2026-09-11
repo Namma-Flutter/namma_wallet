@@ -5,6 +5,11 @@ on:
     branches: [main, beta]
   pull_request:
     branches: [main, beta]
+    types: [opened, synchronize, reopened, ready_for_review]
+    paths-ignore:
+      - '**/*.md'
+      - 'docs/**'
+      - 'LICENSE'
   schedule:
     - cron: '0 2 * * 1' # Weekly on Monday
 
@@ -16,35 +21,15 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  cooldown-gate:
-    name: Cooldown & Debounce Gate
-    if: github.event_name == 'pull_request' && github.actor != 'dependabot[bot]' && !github.event.pull_request.draft
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    permissions:
-      actions: read
-      contents: read
-      pull-requests: read
-    steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-        with:
-          ref: ${{ github.event.pull_request.head.sha }}
-      - name: Enforce 10-minute cooldown
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
-        run: bash scripts/ci_cooldown_gate.sh security-audit.yml 600
-
   trufflehog:
     name: Secret Scanning (TruffleHog)
-    needs: [cooldown-gate]
-    if: always() && (needs.cooldown-gate.result == 'success' || github.event_name != 'pull_request')
+    if: github.event_name != 'pull_request' || (github.actor != 'dependabot[bot]' && !github.event.pull_request.draft)
     runs-on: ubuntu-latest
     permissions:
       contents: read
     steps:
       - name: Checkout code
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -52,28 +37,21 @@ jobs:
         uses: trufflesecurity/trufflehog@ca270a7e14a3542229c2cadf1d408ecac1455815 # v3.88.15
         with:
           extra_args: --only-verified
-        continue-on-error: true
 
   owasp-and-policy:
     name: OWASP Mobile & Data Policy Audit
-    needs: [cooldown-gate]
-    if: always() && (needs.cooldown-gate.result == 'success' || github.event_name != 'pull_request')
+    if: github.event_name != 'pull_request' || (github.actor != 'dependabot[bot]' && !github.event.pull_request.draft)
     runs-on: ubuntu-latest
     permissions:
       contents: read
     steps:
       - name: Checkout code
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38 # v5.4.0
+        uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
       - name: Check Parser Data Policy (No Fallback Defaults)
         run: bash scripts/check_no_default_values.sh
@@ -82,41 +60,35 @@ jobs:
         run: |
           mkdir -p owasp-reports
           echo "### 🛡️ OWASP Mobile Security Scan Results" >> $GITHUB_STEP_SUMMARY
+          echo "- **M1 Hardcoded Secrets**: Handled via TruffleHog verified secrets job" >> $GITHUB_STEP_SUMMARY
+          echo "- **M2 Dependency Check**: Handled via OSV-Scanner (Google OSV vulnerability database)" >> $GITHUB_STEP_SUMMARY
 
-          # 1. Hardcoded Secrets Scan
-          python3 .agents/skills/owasp-mobile-security-checker/scripts/scan_hardcoded_secrets.py || true
-          if [ -f owasp_m1_secrets_scan.json ]; then
-            mv owasp_m1_secrets_scan.json owasp-reports/
-            SECRETS_FOUND=$(jq '.secrets_found // 0' owasp-reports/owasp_m1_secrets_scan.json)
-            echo "- **M1 Hardcoded Secrets**: $SECRETS_FOUND potential issues" >> $GITHUB_STEP_SUMMARY
-          fi
-
-          # 2. Dependency Vulnerability Scan
-          python3 .agents/skills/owasp-mobile-security-checker/scripts/check_dependencies.py || true
-          if [ -f owasp_m2_dependencies_scan.json ]; then
-            mv owasp_m2_dependencies_scan.json owasp-reports/
-            DEP_ISSUES=$(jq '.total_issues // 0' owasp-reports/owasp_m2_dependencies_scan.json)
-            echo "- **M2 Dependency Check**: $DEP_ISSUES issue(s) identified" >> $GITHUB_STEP_SUMMARY
-          fi
-
-          # 3. Storage Security Analysis
-          python3 .agents/skills/owasp-mobile-security-checker/scripts/analyze_storage_security.py || true
+          # 1. Storage Security Analysis (OWASP M9)
+          STORAGE_STATUS=0
+          python3 .agents/skills/owasp-mobile-security-checker/scripts/analyze_storage_security.py || STORAGE_STATUS=$? || true
           if [ -f owasp_m9_storage_scan.json ]; then
             mv owasp_m9_storage_scan.json owasp-reports/
             STORAGE_ISSUES=$(jq '.total_issues // 0' owasp-reports/owasp_m9_storage_scan.json)
             echo "- **M9 Storage Security**: $STORAGE_ISSUES note(s)/finding(s)" >> $GITHUB_STEP_SUMMARY
+          elif [ $STORAGE_STATUS -ne 0 ]; then
+            echo "- **M9 Storage Security**: ❌ Scanner exited with error (exit code $STORAGE_STATUS); report not generated" >> $GITHUB_STEP_SUMMARY
+            exit $STORAGE_STATUS
           fi
 
-          # 4. Network Security Analysis
-          python3 .agents/skills/owasp-mobile-security-checker/scripts/check_network_security.py || true
+          # 2. Network Security Analysis (OWASP M5)
+          NETWORK_STATUS=0
+          python3 .agents/skills/owasp-mobile-security-checker/scripts/check_network_security.py || NETWORK_STATUS=$? || true
           if [ -f owasp_m5_network_scan.json ]; then
             mv owasp_m5_network_scan.json owasp-reports/
             NETWORK_ISSUES=$(jq '.total_issues // 0' owasp-reports/owasp_m5_network_scan.json)
             echo "- **M5 Network Security**: $NETWORK_ISSUES note(s)/finding(s)" >> $GITHUB_STEP_SUMMARY
+          elif [ $NETWORK_STATUS -ne 0 ]; then
+            echo "- **M5 Network Security**: ❌ Scanner exited with error (exit code $NETWORK_STATUS); report not generated" >> $GITHUB_STEP_SUMMARY
+            exit $NETWORK_STATUS
           fi
 
       - name: Upload OWASP Audit Reports
-        uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 # v4.6.1
+        uses: actions/upload-artifact@v4
         with:
           name: owasp-security-reports
           path: owasp-reports/
@@ -124,23 +96,23 @@ jobs:
 
   zizmor:
     name: GitHub Actions Security Audit (zizmor)
-    needs: [cooldown-gate]
-    if: always() && (needs.cooldown-gate.result == 'success' || github.event_name != 'pull_request')
+    if: github.event_name != 'pull_request' || (github.actor != 'dependabot[bot]' && !github.event.pull_request.draft)
     runs-on: ubuntu-latest
     permissions:
       contents: read
     steps:
       - name: Checkout code
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38 # v5.4.0
+        uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+          cache: 'pip'
+          cache-dependency-path: .github/workflows/security-audit.yml
 
       - name: Install zizmor
-        run: pip install zizmor
+        run: pip install zizmor==1.4.1
 
       - name: Run zizmor
         run: zizmor .github/workflows/
-        continue-on-error: true
