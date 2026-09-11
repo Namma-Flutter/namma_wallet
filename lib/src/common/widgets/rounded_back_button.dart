@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:namma_wallet/src/common/di/locator.dart';
+import 'package:namma_wallet/src/common/services/haptic/haptic_service_extension.dart';
+import 'package:namma_wallet/src/common/services/haptic/haptic_service_interface.dart';
 
 class RoundedBackButton extends StatelessWidget {
-  const RoundedBackButton({
-    super.key,
-    this.onPressed,
-  });
+  const RoundedBackButton({super.key, this.onPressed});
 
   final VoidCallback? onPressed;
 
@@ -18,16 +18,19 @@ class RoundedBackButton extends StatelessWidget {
           radius: 24,
           backgroundColor: Theme.of(context).colorScheme.primary,
           child: InkWell(
-            onTap:
-                onPressed ??
-                () {
-                  if (context.canPop()) {
-                    context.pop();
-                  } else {
-                    // No navigation history (e.g., deep link), go to home
-                    context.go('/');
-                  }
-                },
+            onTap: () {
+              getIt<IHapticService>().triggerHaptic(HapticType.selection);
+              if (onPressed != null) {
+                onPressed!();
+              } else {
+                if (context.canPop()) {
+                  context.pop();
+                } else {
+                  // No navigation history (e.g., deep link), go to home
+                  context.go('/');
+                }
+              }
+            },
             child: const Icon(
               Icons.chevron_left,
               size: 28,

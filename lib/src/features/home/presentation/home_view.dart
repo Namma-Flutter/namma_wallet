@@ -324,22 +324,21 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
                             final eventTicket = _eventTickets[index];
                             return InkWell(
                               onTap: () async {
+                                _hapticService.triggerHaptic(
+                                  HapticType.selection,
+                                );
                                 if (eventTicket.ticketId == null) return;
 
                                 await context.pushNamed(
                                   AppRoute.ticketView.name,
-                                  pathParameters: {
-                                    'id': eventTicket.ticketId!,
-                                  },
+                                  pathParameters: {'id': eventTicket.ticketId!},
                                 );
 
                                 if (mounted) {
                                   await _loadTicketData();
                                 }
                               },
-                              child: EventTicketCardWidget(
-                                ticket: eventTicket,
-                              ),
+                              child: EventTicketCardWidget(ticket: eventTicket),
                             );
                           },
                         ),
