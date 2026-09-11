@@ -31,7 +31,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2 # zizmor: ignore[artipacked]
         with:
           repository: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
           ref: ${{ github.head_ref || github.ref }}
@@ -139,7 +139,7 @@ jobs:
 
       - name: Upload PR comments artifact
         if: always() && github.event_name == 'pull_request'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4.6.0
         with:
           name: pr-comments-periphery
           path: pr-comments/
