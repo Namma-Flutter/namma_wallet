@@ -29,7 +29,26 @@ jobs:
       dart: ${{ steps.filter.outputs.dart }}
 
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/checkout@v4
+
+      - name: Check for Dart & CI Changes
+        uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            dart:
+              - 'lib/**'
+              - 'test/**'
+              - 'pubspec.yaml'
+              - 'pubspec.lock'
+              - 'build.yaml'
+              - '.github/workflows/ci.yml'
+
+      - name: Fast Pass-Through (Unaffected PR)
+        if: steps.filter.outputs.dart != 'true'
+        run: |
+          echo "### ⚡ Fast Pass-Through" >> $GITHUB_STEP_SUMMARY
+          echo "No Dart or CI workflow files modified. Skipping formatting and static analysis." >> $GITHUB_STEP_SUMMARY
 
       - name: Check for Dart & CI Changes
         uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36 # v3.0.2
@@ -226,6 +245,13 @@ jobs:
             fi
           fi
 
+      - name: Prepare placeholder for fast paths
+        if: always() && steps.filter.outputs.dart != 'true' && github.event_name == 'pull_request'
+        run: |
+          mkdir -p pr-comments
+          echo "${{ github.event.pull_request.number }}" > pr-comments/pr_number
+          echo "DELETE" > pr-comments/analyze_comment.txt
+
       - name: Upload PR comments artifact
         if: always() && steps.filter.outputs.dart == 'true'
         uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 # v4.6.1
@@ -345,7 +371,7 @@ jobs:
 
       - name: Upload PR comments artifact
         if: always()
-        uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 # v4.6.1
+        uses: actions/upload-artifact@v4
         with:
           name: pr-comments-coverage
           path: pr-comments/
