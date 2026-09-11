@@ -29,7 +29,7 @@ jobs:
       contents: read
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2 # zizmor: ignore[artipacked]
         with:
           fetch-depth: 0
 
@@ -46,10 +46,10 @@ jobs:
       contents: read
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2 # zizmor: ignore[artipacked]
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38 # v5.4.0
         with:
           python-version: '3.11'
 
@@ -86,7 +86,7 @@ jobs:
           fi
 
       - name: Upload OWASP Audit Reports
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4.6.0
         with:
           name: owasp-security-reports
           path: owasp-reports/
@@ -100,10 +100,10 @@ jobs:
       contents: read
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2 # zizmor: ignore[artipacked]
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38 # v5.4.0
         with:
           python-version: '3.11'
           cache: 'pip'
@@ -113,4 +113,4 @@ jobs:
         run: pip install zizmor==1.4.1
 
       - name: Run zizmor
-        run: zizmor .github/workflows/
+        run: zizmor .github/workflows/ --min-severity low

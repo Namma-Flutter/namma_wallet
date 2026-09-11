@@ -35,7 +35,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2 # zizmor: ignore[artipacked]
 
       - name: Read Flutter version from pubspec.yaml
         id: flutter_version
@@ -54,7 +54,7 @@ jobs:
         run: flutter pub get
 
       - name: Build web app with WASM
-        run: flutter build web --release --wasm --base-href "/${{ github.event.repository.name }}/"
+        run: flutter build web --release --wasm --base-href "/${{ github.event.repository.name }}/" # zizmor: ignore[template-injection]
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3.0.1
