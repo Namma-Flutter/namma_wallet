@@ -56,7 +56,7 @@ dependencies:
   talker_flutter: ^5.1.20
   timezone: ^0.11.1
   url_launcher: ^6.3.2
-  uuid: ^4.5.3
+  uuid: ^4.6.0
   workmanager: ^0.10.9
 
 dev_dependencies:
