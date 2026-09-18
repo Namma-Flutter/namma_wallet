@@ -30,9 +30,12 @@ class _AllTicketsViewState extends State<AllTicketsView> {
   String _selectedFilter = 'All';
   bool _showingArchived = false;
 
+  late final IHapticService _hapticService;
+
   @override
   void initState() {
     super.initState();
+    _hapticService = getIt<IHapticService>();
     _showingArchived = widget.showArchived;
     unawaited(_loadTicketData());
   }
@@ -216,6 +219,7 @@ class _AllTicketsViewState extends State<AllTicketsView> {
                         return InkWell(
                           onTap: () async {
                             if (ticket.ticketId == null) return;
+                            _hapticService.triggerHaptic(HapticType.selection);
 
                             final wasDeleted = await context.pushNamed<bool>(
                               AppRoute.ticketView.name,
@@ -507,12 +511,8 @@ class TravelTicketListCardWidget extends StatelessWidget {
                   // Date and time
                   if (ticket.startTime != null)
                     Text(
-                      '${DateTimeConverter.instance.formatDate(
-                        ticket.startTime!,
-                      )} • '
-                      '${DateTimeConverter.instance.formatTime(
-                        ticket.startTime!,
-                      )}',
+                      '${DateTimeConverter.instance.formatDate(ticket.startTime!)} • '
+                      '${DateTimeConverter.instance.formatTime(ticket.startTime!)}',
                       style: TextStyle(
                         fontSize: 11,
                         color: Theme.of(
