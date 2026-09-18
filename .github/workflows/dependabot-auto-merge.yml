@@ -8,10 +8,6 @@ on:
       - synchronize
       - ready_for_review
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
-
 permissions:
   contents: write
   pull-requests: write
@@ -24,7 +20,7 @@ jobs:
     steps:
       - name: Fetch Dependabot metadata
         id: metadata
-        uses: dependabot/fetch-metadata@d7267f607e9d3fb96fc2fbe83e0af444713e90b7 # v2.3.0
+        uses: dependabot/fetch-metadata@v2
         with:
           github-token: ${{ secrets.AUTOMERGE_PAT || secrets.GITHUB_TOKEN }}
 

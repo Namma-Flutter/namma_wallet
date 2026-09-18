@@ -5,9 +5,16 @@ import 'package:namma_wallet/src/common/services/haptic/haptic_service_extension
 import 'package:namma_wallet/src/common/services/haptic/haptic_service_interface.dart';
 
 class RoundedBackButton extends StatelessWidget {
-  const RoundedBackButton({super.key, this.onPressed});
+  const RoundedBackButton({
+    super.key,
+    this.onPressed,
+    @visibleForTesting this.hapticService,
+  });
 
   final VoidCallback? onPressed;
+  final IHapticService? hapticService;
+
+  IHapticService get _hapticService => hapticService ?? getIt<IHapticService>();
 
   @override
   Widget build(BuildContext context) {
@@ -19,9 +26,9 @@ class RoundedBackButton extends StatelessWidget {
           backgroundColor: Theme.of(context).colorScheme.primary,
           child: InkWell(
             onTap: () {
-              getIt<IHapticService>().triggerHaptic(HapticType.selection);
+              _hapticService.triggerHaptic(HapticType.selection);
               if (onPressed != null) {
-                onPressed!();
+                onPressed?.call();
               } else {
                 if (context.canPop()) {
                   context.pop();
