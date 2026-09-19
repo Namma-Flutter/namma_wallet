@@ -2,6 +2,7 @@ name: Post PR Comments
 
 on:
   workflow_run: # zizmor: ignore[dangerous-triggers]
+    # Zizmor correctly flags workflow_run as highly privileged, however, we use it correctly by downloading securely scoped artifacts and not checking out PR code.
     workflows: ["CI", "greenlight", "Periphery (iOS Dead Code)"]
     types:
       - completed
