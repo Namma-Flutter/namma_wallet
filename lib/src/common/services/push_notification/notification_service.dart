@@ -227,10 +227,7 @@ class NotificationService implements INotificationService {
 
     const iosDetails = DarwinNotificationDetails();
 
-    return const NotificationDetails(
-      android: androidDetails,
-      iOS: iosDetails,
-    );
+    return const NotificationDetails(android: androidDetails, iOS: iosDetails);
   }
 
   String _formatTime12(DateTime dt) {
@@ -307,9 +304,7 @@ class NotificationService implements INotificationService {
       if (_logger != null) {
         _logger?.error('Error scheduling ticket reminders', e, stackTrace);
       } else {
-        debugPrint(
-          'Error scheduling ticket reminders: $e\n$stackTrace',
-        );
+        debugPrint('Error scheduling ticket reminders: $e\n$stackTrace');
       }
     }
   }
@@ -499,9 +494,7 @@ class NotificationService implements INotificationService {
       if (_logger != null) {
         _logger?.error('Error scheduling ticket reminders', e, stackTrace);
       } else {
-        debugPrint(
-          'Error scheduling ticket reminders: $e\n$stackTrace',
-        );
+        debugPrint('Error scheduling ticket reminders: $e\n$stackTrace');
       }
     }
   }
@@ -576,21 +569,26 @@ class NotificationService implements INotificationService {
       final safeBase = baseHash.abs() % maxBase;
 
       // Cancel all possible reminder IDs for this ticket (fixed range 0-99)
+      final cancelFutures = <Future<void>>[];
       for (var i = 0; i < 100; i++) {
         final notificationId = safeBase * 100 + i;
-        try {
-          await cancelTicketReminder(notificationId);
-        } on Exception catch (e, st) {
-          if (_logger != null) {
-            _logger?.error(
-              '[NotificationService] Failed to cancel notification '
-              '$notificationId for ticket $ticketId',
-              e,
-              st,
-            );
-          }
-        }
+        cancelFutures.add(
+          cancelTicketReminder(notificationId).catchError((
+            Object e,
+            StackTrace st,
+          ) {
+            if (_logger != null) {
+              _logger?.error(
+                '[NotificationService] Failed to cancel notification '
+                '$notificationId for ticket $ticketId',
+                e as Exception,
+                st,
+              );
+            }
+          }, test: (e) => e is Exception),
+        );
       }
+      await Future.wait(cancelFutures);
 
       // Attempt to delete stored reminder preferences if they exist
       // (only customized tickets have stored preferences)
