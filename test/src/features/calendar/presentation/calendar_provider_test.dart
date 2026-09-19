@@ -5,6 +5,8 @@ import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
 import 'package:namma_wallet/src/features/calendar/application/calendar_provider.dart';
+import 'package:namma_wallet/src/features/events/domain/event_dao_interface.dart';
+import 'package:namma_wallet/src/features/events/domain/event_model.dart';
 
 import '../../../../helpers/fake_logger.dart';
 
@@ -50,20 +52,48 @@ class StubTicketDAO implements ITicketDAO {
   Future<int> purgeOldArchivedTickets({int retentionDays = 30}) async => 0;
 }
 
+class StubEventDAO implements IEventDAO {
+  List<Event> events = [];
+
+  @override
+  Future<int> deleteEvent(int id) async => 0;
+
+  @override
+  Future<List<Event>> getAllEvents() async => events;
+
+  @override
+  Future<Event?> getEventById(int id) async => null;
+
+  @override
+  Future<List<Event>> getEventsByDate(DateTime date) async => [];
+
+  @override
+  Future<List<Event>> getEventsByDateRange(DateTime start, DateTime end) async => [];
+
+  @override
+  Future<int> insertEvent(Event event) async => 0;
+
+  @override
+  Future<int> updateEventById(int id, Event event) async => 0;
+}
+
 void main() {
   late FakeLogger fakeLogger;
   late StubTicketDAO stubTicketDao;
+  late StubEventDAO stubEventDao;
   late CalendarProvider provider;
 
   setUp(() async {
     fakeLogger = FakeLogger();
     stubTicketDao = StubTicketDAO();
+    stubEventDao = StubEventDAO();
 
     // Setup locator
     await getIt.reset();
     getIt
       ..registerSingleton<ILogger>(fakeLogger)
-      ..registerSingleton<ITicketDAO>(stubTicketDao);
+      ..registerSingleton<ITicketDAO>(stubTicketDao)
+      ..registerSingleton<IEventDAO>(stubEventDao);
 
     provider = CalendarProvider(logger: fakeLogger);
   });
@@ -272,7 +302,8 @@ void main() {
         await getIt.reset();
         getIt
           ..registerSingleton<ILogger>(fakeLogger)
-          ..registerSingleton<ITicketDAO>(throwing);
+          ..registerSingleton<ITicketDAO>(throwing)
+          ..registerSingleton<IEventDAO>(stubEventDao);
         provider = CalendarProvider(logger: fakeLogger);
 
         await provider.loadTickets();
