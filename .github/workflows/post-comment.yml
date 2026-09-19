@@ -1,61 +1,70 @@
 name: Post PR Comments
 
 on:
-  workflow_run:
+  workflow_run: # zizmor: ignore[dangerous-triggers]
     workflows: ["CI", "greenlight", "Periphery (iOS Dead Code)"]
     types:
       - completed
 
-concurrency:
-  group: post-comment-${{ github.event.workflow_run.pull_requests[0].number || github.event.workflow_run.head_branch }}
-  cancel-in-progress: true
-
 permissions:
-  contents: read
+  pull-requests: write
+  issues: write
 
 jobs:
   post-comments:
-    if: github.event.workflow_run.head_repository.full_name == github.repository
+    name: Post Comments to PR
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    if: >
+      github.event.workflow_run.event == 'pull_request' &&
+      github.event.workflow_run.head_repository.full_name == github.repository
     permissions:
-      actions: read
       pull-requests: write
       issues: write
     steps:
-      - name: Download comment artifacts
-        uses: actions/download-artifact@cc203385981b70ca67e1cc392babf9cc229d5806 # v4.1.9
+      - name: Download PR Comments Artifact
+        uses: actions/download-artifact@v4
         with:
           run-id: ${{ github.event.workflow_run.id }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          path: pr-comments
+          path: artifacts
+          merge-multiple: true
+          pattern: pr-comments-*
+        continue-on-error: true
 
-      - name: Post or update comments
-        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
+      - name: Post Comments
+        uses: actions/github-script@v7
         with:
           script: |
             const fs = require('fs');
             const path = require('path');
+            const artifactsDir = 'artifacts';
 
-            const prCommentsDir = path.join(process.env.GITHUB_WORKSPACE, 'pr-comments');
-            if (!fs.existsSync(prCommentsDir)) {
-              console.log('No comments directory found.');
+            if (!fs.existsSync(artifactsDir)) {
+              console.log('No artifacts found.');
               return;
             }
 
-            const subdirs = fs.readdirSync(prCommentsDir).filter(f => {
-              return fs.statSync(path.join(prCommentsDir, f)).isDirectory();
-            });
-
-            if (subdirs.length === 0) {
-              console.log('No comment artifacts found.');
-              return;
+            // We know the PR number from workflow_run, but the artifact might contain it as a double check
+            // For workflow_run on pull_request, we can extract PR number from pull_requests array
+            const pullRequests = context.payload.workflow_run.pull_requests;
+            if (!pullRequests || pullRequests.length === 0) {
+              console.log('No pull request found in workflow_run payload.');
+              // Try to find it from artifacts
             }
 
-            const trustedPrNumber = context.payload.workflow_run?.pull_requests?.[0]?.number;
+            const trustedPrNumber = pullRequests && pullRequests.length > 0 ? pullRequests[0].number : null;
+
+            const subdirs = fs.readdirSync(artifactsDir).filter(f => fs.statSync(path.join(artifactsDir, f)).isDirectory());
+            // If merge-multiple is true, files might be directly in artifactsDir
+            const hasFilesDirectly = fs.readdirSync(artifactsDir).some(f => fs.statSync(path.join(artifactsDir, f)).isFile());
+
+            if (hasFilesDirectly) {
+               subdirs.push(''); // Represent the root of artifactsDir
+            }
 
             for (const subdir of subdirs) {
-              const dirPath = path.join(prCommentsDir, subdir);
+              const dirPath = path.join(artifactsDir, subdir);
+
               const prNumberPath = path.join(dirPath, 'pr_number');
               const artifactPrNumber = fs.existsSync(prNumberPath) ? parseInt(fs.readFileSync(prNumberPath, 'utf8').trim(), 10) : NaN;
               const prNumber = trustedPrNumber || artifactPrNumber;
