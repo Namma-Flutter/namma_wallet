@@ -517,18 +517,25 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check all jobs
+        env:
+          GATE_RESULT: ${{ needs.gate.result }}
+          CHECK_PLAY_STORE_RESULT: ${{ needs.check-play-store.result }}
+          CHECK_APP_STORE_RESULT: ${{ needs.check-app-store.result }}
+          ANDROID_RESULT: ${{ needs.android.result }}
+          IOS_RESULT: ${{ needs.ios.result }}
+          PROMOTE_RESULT: ${{ needs.promote.result }}
         run: |
-          echo "gate: ${{ needs.gate.result }}"
-          echo "check-play-store: ${{ needs.check-play-store.result }}"
-          echo "check-app-store: ${{ needs.check-app-store.result }}"
-          echo "android: ${{ needs.android.result }}"
-          echo "ios: ${{ needs.ios.result }}"
-          echo "promote: ${{ needs.promote.result }}"
-          if [[ "${{ needs.gate.result }}" == "failure" || "${{ needs.android.result }}" == "failure" || "${{ needs.ios.result }}" == "failure" || "${{ needs.promote.result }}" == "failure" ]]; then
+          echo "gate: $GATE_RESULT"
+          echo "check-play-store: $CHECK_PLAY_STORE_RESULT"
+          echo "check-app-store: $CHECK_APP_STORE_RESULT"
+          echo "android: $ANDROID_RESULT"
+          echo "ios: $IOS_RESULT"
+          echo "promote: $PROMOTE_RESULT"
+          if [[ "$GATE_RESULT" == "failure" || "$ANDROID_RESULT" == "failure" || "$IOS_RESULT" == "failure" || "$PROMOTE_RESULT" == "failure" ]]; then
             echo "One or more jobs failed"
             exit 1
           fi
-          if [[ "${{ needs.gate.result }}" == "cancelled" || "${{ needs.android.result }}" == "cancelled" || "${{ needs.ios.result }}" == "cancelled" ]]; then
+          if [[ "$GATE_RESULT" == "cancelled" || "$ANDROID_RESULT" == "cancelled" || "$IOS_RESULT" == "cancelled" ]]; then
             echo "One or more jobs was cancelled"
             exit 1
           fi
