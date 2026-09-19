@@ -26,9 +26,6 @@ class ClipboardRepository implements IClipboardRepository {
         '${e.message}',
       );
       return false;
-    } on Exception catch (e) {
-      _logger.error('Unexpected exception checking clipboard content: $e');
-      return false;
     }
   }
 
@@ -47,9 +44,6 @@ class ClipboardRepository implements IClipboardRepository {
       _logger.error(
         'Platform exception reading clipboard: ${e.code} - ${e.message}',
       );
-      return null;
-    } on Exception catch (e) {
-      _logger.error('Unexpected exception reading clipboard: $e');
       return null;
     }
   }
