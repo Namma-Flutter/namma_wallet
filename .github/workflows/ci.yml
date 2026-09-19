@@ -29,7 +29,7 @@ jobs:
       dart: ${{ steps.filter.outputs.dart }}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4.2.0
 
       - name: Check for Dart & CI Changes
         uses: dorny/paths-filter@v3
