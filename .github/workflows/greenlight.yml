@@ -27,6 +27,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       - name: Check for iOS & App Store Changes
         uses: dorny/paths-filter@v3
