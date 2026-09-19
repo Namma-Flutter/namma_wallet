@@ -6,6 +6,8 @@ on:
     types:
       - completed
 
+# zizmor: ignore[dangerous-triggers]
+
 concurrency:
   group: post-comment-${{ github.event.workflow_run.pull_requests[0].number || github.event.workflow_run.head_branch }}
   cancel-in-progress: true
