@@ -44,6 +44,7 @@ class ShareHandler {
             title: 'Ticket Updated',
             subtitle: updateType,
             date: 'Just Now',
+            isUpdate: true,
           ),
         );
 

@@ -14,12 +14,6 @@ class ShareSuccessView extends StatelessWidget {
 
   final TicketCreatedResult result;
 
-  /// Determine if this is an update operation
-  // TODO(KV): This `isUpdate` is only specified for TNSTC, need to work on this
-  bool get isUpdate =>
-      result.title == 'Ticket Updated' ||
-      result.subtitle == 'Conductor Details';
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -39,15 +33,15 @@ class ShareSuccessView extends StatelessWidget {
                 width: 120,
                 height: 120,
                 decoration: BoxDecoration(
-                  color: isUpdate
+                  color: result.isUpdate
                       ? theme.colorScheme.primary.withValues(alpha: 0.1)
                       : theme.colorScheme.secondary.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
-                  isUpdate ? Icons.update : Icons.check_circle,
+                  result.isUpdate ? Icons.update : Icons.check_circle,
                   size: 80,
-                  color: isUpdate
+                  color: result.isUpdate
                       ? theme.colorScheme.primary
                       : theme.colorScheme.secondary,
                 ),
@@ -55,7 +49,7 @@ class ShareSuccessView extends StatelessWidget {
               const SizedBox(height: 32),
 
               Text(
-                isUpdate
+                result.isUpdate
                     ? 'Ticket Updated Successfully!'
                     : 'Ticket Added Successfully!',
                 style: HeadingH3(color: theme.colorScheme.onSurface).bold,
@@ -64,8 +58,8 @@ class ShareSuccessView extends StatelessWidget {
               const SizedBox(height: 12),
 
               Text(
-                isUpdate
-                    ? 'Conductor details have been updated for your ticket'
+                result.isUpdate
+                    ? 'Your ticket details have been updated'
                     : 'Your ticket has been saved to your wallet',
                 style: Paragraph02(
                   color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
@@ -74,7 +68,7 @@ class ShareSuccessView extends StatelessWidget {
               ),
               const SizedBox(height: 40),
 
-              if (!isUpdate)
+              if (!result.isUpdate)
                 Container(
                   width: double.infinity,
                   padding: const EdgeInsets.all(20),
@@ -124,7 +118,7 @@ class ShareSuccessView extends StatelessWidget {
                   ),
                 ),
 
-              if (isUpdate)
+              if (result.isUpdate)
                 Container(
                   width: double.infinity,
                   padding: const EdgeInsets.all(20),
@@ -187,7 +181,7 @@ class ShareSuccessView extends StatelessWidget {
                         elevation: 0,
                       ),
                       child: Text(
-                        isUpdate ? 'View Updated Ticket' : 'View My Tickets',
+                        result.isUpdate ? 'View Updated Ticket' : 'View My Tickets',
                         style: Paragraph01(color: Colors.white).semiBold,
                       ),
                     ),
