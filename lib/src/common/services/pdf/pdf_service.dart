@@ -9,10 +9,7 @@ import 'package:namma_wallet/src/common/services/pdf/pdf_service_interface.dart'
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 
 class PDFService implements IPDFService {
-  PDFService({
-    required this._ocrService,
-    required this._logger,
-  });
+  PDFService({required this._ocrService, required this._logger});
 
   final IOCRService _ocrService;
   final ILogger _logger;
@@ -231,12 +228,11 @@ class PDFService implements IPDFService {
   }
 
   /// Extracts structured data from a PDF file using layout analysis.
-  ///
-  /// NOTE: This implementation is currently optimized for TNSTC-style documents
-  // TODO(harish): Consider accepting field-mapping configuration or delegating
-  // to type-specific extractors as more ticket types are added.
   @override
-  Future<Map<String, dynamic>> extractStructuredData(XFile pdf) async {
+  Future<Map<String, dynamic>> extractStructuredData(
+    XFile pdf, {
+    Map<String, List<String>>? fieldMappings,
+  }) async {
     try {
       _logger.debug('[PDFService] Starting structured data extraction');
 
@@ -246,24 +242,37 @@ class PDFService implements IPDFService {
       // Use layout extractor to get structured data
       final extractor = LayoutExtractor(blocks);
 
-      // Extract common fields (can be customized per ticket type)
-      final structuredData = <String, dynamic>{
-        'pnr': extractor.findValueForKey('PNR Number'),
-        'date': extractor.findValueForKey('Date of Journey'),
-        'route': extractor.findValueForKey('Route No'),
-        'from':
-            extractor.findValueForKey('Service Start Place') ??
-            extractor.findValueForKey('Passenger Start Place'),
-        'to':
-            extractor.findValueForKey('Service End Place') ??
-            extractor.findValueForKey('Passenger End Place'),
-        'fare': extractor.findValueForKey('Total Fare'),
-        'seat': extractor.findValueForKey('Seat No'),
-        // Add more fields as needed
-      };
+      // Default TNSTC-style mappings
+      final effectiveMappings =
+          fieldMappings ??
+          {
+            'pnr': ['PNR Number'],
+            'date': ['Date of Journey'],
+            'route': ['Route No'],
+            'from': ['Service Start Place', 'Passenger Start Place'],
+            'to': ['Service End Place', 'Passenger End Place'],
+            'fare': ['Total Fare'],
+            'seat': ['Seat No'],
+          };
 
-      // Remove null values
-      return structuredData..removeWhere((key, value) => value == null);
+      final structuredData = <String, dynamic>{};
+
+      for (final entry in effectiveMappings.entries) {
+        final fieldName = entry.key;
+        final labels = entry.value;
+
+        String? extractedValue;
+        for (final label in labels) {
+          extractedValue = extractor.findValueForKey(label);
+          if (extractedValue != null) break;
+        }
+
+        if (extractedValue != null) {
+          structuredData[fieldName] = extractedValue;
+        }
+      }
+
+      return structuredData;
     } on Object catch (e, stackTrace) {
       if (e is UnsupportedError) {
         _logger.warning('[PDFService] $e');
