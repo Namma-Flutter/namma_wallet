@@ -48,7 +48,7 @@ jobs:
           #
           # slug = lowercase letters, numbers, dots, underscores, dashes
 
-          if [[ ! "$BRANCH" =~ ^((main|master|develop)|((feature|feat|bugfix|fix|hotfix|release|chore)\/[a-z0-9._-]+))$ ]]; then
+          if [[ ! "$BRANCH" =~ ^((main|master|develop)|((feature|feat|bugfix|fix|hotfix|release|chore|test)\/[a-z0-9._-]+))$ ]]; then
             echo "::error title=Invalid branch name::'$BRANCH' does not follow required naming rules."
             echo "Allowed formats:"
             echo "  main | master | develop"
