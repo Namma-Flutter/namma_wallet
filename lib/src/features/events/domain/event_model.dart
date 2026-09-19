@@ -6,12 +6,16 @@ part 'event_model.mapper.dart';
 @MappableClass()
 class Event with EventMappable {
   const Event({
+    this.id,
     required this.iconName,
     required this.title,
     required this.subtitle,
     required this.date,
     required this.price,
   });
+
+  @MappableField(key: 'id')
+  final int? id;
 
   /// Icon name as string for serialization
   @MappableField(key: 'icon_name')
