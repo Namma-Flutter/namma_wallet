@@ -60,7 +60,10 @@ class FakePDFService implements IPDFService {
   }
 
   @override
-  Future<Map<String, dynamic>> extractStructuredData(XFile file) async {
+  Future<Map<String, dynamic>> extractStructuredData(
+    XFile file, {
+    Map<String, List<String>>? fieldMappings,
+  }) async {
     return {};
   }
 }
