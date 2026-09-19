@@ -91,14 +91,18 @@ class SMSQueueService extends ISMSQueueService with WidgetsBindingObserver {
             smsText,
             SharedContentType.sms,
           );
-          if (result is! ProcessingErrorResult) {
-            successCount++;
-            _logger.info('SMSQueueService: processed entry successfully');
-          } else {
-            failedEntries.add(smsText);
-            _logger.warning(
-              'SMSQueueService: entry failed — ${result.error}',
-            );
+
+          switch (result) {
+            case TicketCreatedResult():
+            case TicketUpdatedResult():
+            case TicketNotFoundResult():
+              successCount++;
+              _logger.info('SMSQueueService: processed entry successfully');
+            case ProcessingErrorResult(:final error):
+              failedEntries.add(smsText);
+              _logger.warning(
+                'SMSQueueService: entry failed — $error',
+              );
           }
         } on Object catch (e, st) {
           failedEntries.add(smsText);
