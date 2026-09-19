@@ -30,6 +30,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       - name: Check for Dart & CI Changes
         uses: dorny/paths-filter@v3
@@ -140,12 +142,17 @@ jobs:
 
       - name: Prepare PR comments & step summary
         if: always() && steps.filter.outputs.dart == 'true'
+        env:
+          FORMAT_EXIT_CODE: $FORMAT_EXIT_CODE
+          BUILD_EXIT_CODE: $BUILD_EXIT_CODE
+          BUILD_DRIFT: $BUILD_DRIFT
+          PR_NUMBER: ${{ github.event.pull_request.number }}
         run: |
           mkdir -p pr-comments
-          echo "${{ github.event.pull_request.number }}" > pr-comments/pr_number
+          echo "$PR_NUMBER" > pr-comments/pr_number
 
           # 1. Format check summary
-          if [ "${{ steps.format_check.outputs.exit_code }}" != "0" ]; then
+          if [ "$FORMAT_EXIT_CODE" != "0" ]; then
             cat << 'EOF' > pr-comments/format_comment.txt
           ❌ **Formatting check failed**
           Please run:
@@ -166,7 +173,7 @@ jobs:
           fi
 
           # 2. Build runner check summary
-          if [ "${{ steps.build_runner_check.outputs.exit_code }}" != "0" ]; then
+          if [ "$BUILD_EXIT_CODE" != "0" ]; then
             BUILD_ERRORS=""
             if [ -f build_runner.log ]; then
               BUILD_ERRORS=$(tail -n 30 build_runner.log)
@@ -190,7 +197,7 @@ jobs:
               echo "$BUILD_ERRORS"
               echo "```"
             } >> $GITHUB_STEP_SUMMARY
-          elif [ "${{ steps.build_runner_check.outputs.drift }}" == "1" ]; then
+          elif [ "$BUILD_DRIFT" == "1" ]; then
             DIFF_SUMMARY=$(git status --short)
             {
               echo "❌ **Generated files are missing or out of date**"
@@ -224,7 +231,7 @@ jobs:
           fi
 
           # 3. Analyze summary
-          if [ "${{ steps.format_check.outputs.exit_code }}" == "0" ] && [ "${{ steps.build_runner_check.outputs.exit_code }}" == "0" ] && [ "${{ steps.build_runner_check.outputs.drift }}" == "0" ]; then
+          if [ "$FORMAT_EXIT_CODE" == "0" ] && [ "$BUILD_EXIT_CODE" == "0" ] && [ "$BUILD_DRIFT" == "0" ]; then
             if [ -f flutter_analyze.log ] && [ -s flutter_analyze.log ]; then
               content=$(cat flutter_analyze.log)
               {
@@ -261,23 +268,27 @@ jobs:
 
       - name: Check format, codegen, and analysis results
         if: always() && steps.filter.outputs.dart == 'true'
+        env:
+          FORMAT_EXIT_CODE: ${{ steps.format_check.outputs.exit_code }}
+          BUILD_EXIT_CODE: ${{ steps.build_runner_check.outputs.exit_code }}
+          BUILD_DRIFT: ${{ steps.build_runner_check.outputs.drift }}
         run: |
           FAILED=0
-          if [ "${{ steps.format_check.outputs.exit_code }}" != "0" ]; then
+          if [ "$FORMAT_EXIT_CODE" != "0" ]; then
             echo "::error::Dart formatting check failed"
             FAILED=1
           fi
-          if [ "${{ steps.build_runner_check.outputs.exit_code }}" != "0" ]; then
+          if [ "$BUILD_EXIT_CODE" != "0" ]; then
             echo "::error::Build runner execution failed"
             FAILED=1
           fi
-          if [ "${{ steps.build_runner_check.outputs.drift }}" == "1" ]; then
+          if [ "$BUILD_DRIFT" == "1" ]; then
             echo "::error::Generated files are missing or out of date"
             git status --porcelain
             git diff
             FAILED=1
           fi
-          if [ "${{ steps.format_check.outputs.exit_code }}" == "0" ] && [ "${{ steps.build_runner_check.outputs.exit_code }}" == "0" ] && [ "${{ steps.build_runner_check.outputs.drift }}" == "0" ]; then
+          if [ "$FORMAT_EXIT_CODE" == "0" ] && [ "$BUILD_EXIT_CODE" == "0" ] && [ "$BUILD_DRIFT" == "0" ]; then
             if [ -f flutter_analyze.log ] && [ -s flutter_analyze.log ]; then
               echo "::error::Flutter analyze found issues"
               FAILED=1
@@ -296,6 +307,8 @@ jobs:
       contents: read
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
 
       - name: Read Flutter version from pubspec.yaml
         id: flutter_version
@@ -336,11 +349,14 @@ jobs:
 
       - name: Prepare PR comments
         if: always()
+        env:
+          TEST_EXIT_CODE: ${{ steps.test_run.outputs.exit_code }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
         run: |
           mkdir -p pr-comments
-          echo "${{ github.event.pull_request.number }}" > pr-comments/pr_number
+          echo "$PR_NUMBER" > pr-comments/pr_number
 
-          if [ "${{ steps.test_run.outputs.exit_code }}" != "0" ]; then
+          if [ "$TEST_EXIT_CODE" != "0" ]; then
             if [ -f test_output.log ]; then
               FAILURES=$(grep -A 50 "Some tests failed" test_output.log || grep -A 50 "FAILED" test_output.log || tail -n 30 test_output.log)
               if [ ${#FAILURES} -gt 4500 ]; then
@@ -378,9 +394,11 @@ jobs:
 
       - name: Check test results
         if: always()
+        env:
+          TEST_EXIT_CODE: ${{ steps.test_run.outputs.exit_code }}
         run: |
-          if [ "${{ steps.test_run.outputs.exit_code }}" != "0" ]; then
-            echo "Tests failed with exit code ${{ steps.test_run.outputs.exit_code }}"
+          if [ "$TEST_EXIT_CODE" != "0" ]; then
+            echo "Tests failed with exit code $TEST_EXIT_CODE"
             exit 1
           fi
 
