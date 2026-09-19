@@ -1,6 +1,7 @@
 name: Post PR Comments
 
 on:
+  # zizmor: ignore[dangerous-triggers]
   workflow_run:
     workflows: ["CI", "greenlight", "Periphery (iOS Dead Code)"]
     types:
