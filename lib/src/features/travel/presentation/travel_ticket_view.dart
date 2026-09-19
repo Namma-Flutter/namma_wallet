@@ -821,9 +821,19 @@ class _TravelTicketViewState extends State<TravelTicketView> {
                                 widget.ticket.directionsUrl!,
                               );
 
-                              final allowedSchemes = ['http', 'https', 'geo', 'maps', 'intent'];
-                              if (!allowedSchemes.contains(uri.scheme.toLowerCase())) {
-                                throw const FormatException('Invalid URI scheme');
+                              final allowedSchemes = [
+                                'http',
+                                'https',
+                                'geo',
+                                'maps',
+                                'intent',
+                              ];
+                              if (!allowedSchemes.contains(
+                                uri.scheme.toLowerCase(),
+                              )) {
+                                throw const FormatException(
+                                  'Invalid URI scheme',
+                                );
                               }
 
                               if (await canLaunchUrl(uri)) {
