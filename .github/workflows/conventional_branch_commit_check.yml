@@ -48,7 +48,7 @@ jobs:
           #
           # slug = lowercase letters, numbers, dots, underscores, dashes
 
-          if [[ ! "$BRANCH" =~ ^((main|master|develop)|((feature|feat|bugfix|fix|hotfix|release|chore|perf)\/[a-z0-9._-]+))$ ]]; then
+          if [[ ! "$BRANCH" =~ ^((main|master|develop)|((feature|feat|bugfix|fix|hotfix|release|chore)\/[a-z0-9._-]+))$ ]]; then
             echo "::error title=Invalid branch name::'$BRANCH' does not follow required naming rules."
             echo "Allowed formats:"
             echo "  main | master | develop"
@@ -57,7 +57,6 @@ jobs:
             echo "  hotfix/<slug>"
             echo "  release/<slug>"
             echo "  chore/<slug>"
-            echo "  perf/<slug>"
             exit 1
           fi
 
@@ -84,8 +83,6 @@ jobs:
           fi
 
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-        with:
-          persist-credentials: false
         if: steps.bot_check.outputs.is_bot != 'true'
 
       - uses: webiny/action-conventional-commits@8bc41ff4e7d423d56fa4905f6ff79209a78776c7 # v1.3.0

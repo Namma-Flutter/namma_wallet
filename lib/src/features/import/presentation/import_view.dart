@@ -317,26 +317,24 @@ class _ImportViewState extends State<ImportView> {
     }
   }
 
-  Future<Ticket?> _handlePNRFetch(BuildContext snackbarContext) async {
+  Future<Ticket?> _handlePNRFetch() async {
     if (_isFetchingPNR) return null;
 
     final pnr = _pnrController.text.trim();
     final phoneNumber = _phoneController.text.trim();
     if (pnr.isEmpty) {
       showSnackbar(
-        snackbarContext,
+        context,
         'Please enter a PNR number',
         isError: true,
-        bottomMargin: 24,
       );
       return null;
     }
     if (phoneNumber.isEmpty) {
       showSnackbar(
-        snackbarContext,
+        context,
         'Please enter your phone number',
         isError: true,
-        bottomMargin: 24,
       );
       return null;
     }
@@ -355,7 +353,7 @@ class _ImportViewState extends State<ImportView> {
         phoneNumber,
       );
 
-      if (!mounted || !snackbarContext.mounted) return null;
+      if (!mounted) return null;
 
       if (ticket != null) {
         _pnrController.clear();
@@ -363,19 +361,17 @@ class _ImportViewState extends State<ImportView> {
         return ticket;
       } else {
         showSnackbar(
-          snackbarContext,
+          context,
           'Unable to fetch ticket. Verify PNR and phone number.',
           isError: true,
-          bottomMargin: 24,
         );
       }
     } on Exception catch (e) {
-      if (snackbarContext.mounted) {
+      if (mounted) {
         showSnackbar(
-          snackbarContext,
+          context,
           'Error fetching ticket. Please try again.',
           isError: true,
-          bottomMargin: 24,
         );
       }
       _logger.error('PNR fetch error: $e');
@@ -415,102 +411,81 @@ class _ImportViewState extends State<ImportView> {
       context: rootContext,
       builder: (dialogContext) => StatefulBuilder(
         builder: (context, setDialogState) {
-          return ScaffoldMessenger(
-            child: Builder(
-              builder: (snackbarContext) {
-                Future<void> submit() async {
-                  if (isFetchingDialog) return;
+          Future<void> submit() async {
+            if (isFetchingDialog) return;
+            setDialogState(() => isFetchingDialog = true);
 
-                  setDialogState(() => isFetchingDialog = true);
+            final ticket = await _handlePNRFetch();
 
-                  final ticket = await _handlePNRFetch(snackbarContext);
+            if (context.mounted) {
+              setDialogState(() => isFetchingDialog = false);
+            }
 
-                  if (context.mounted) {
-                    setDialogState(() => isFetchingDialog = false);
-                  }
+            if (ticket == null || !rootContext.mounted) {
+              return;
+            }
 
-                  if (ticket == null || !rootContext.mounted) {
-                    return;
-                  }
+            if (dialogContext.mounted) {
+              dialogContext.pop();
+            }
 
-                  if (dialogContext.mounted) {
-                    dialogContext.pop();
-                  }
+            final id = ticket.ticketId;
+            if (id != null) {
+              await _openImportedTicket(
+                ticket,
+                context: rootContext,
+              );
+            } else {
+              showSnackbar(
+                rootContext,
+                'TNSTC ticket imported successfully!',
+              );
+            }
+          }
 
-                  final id = ticket.ticketId;
-                  if (id != null) {
-                    await _openImportedTicket(
-                      ticket,
-                      context: rootContext,
-                    );
-                  } else {
-                    showSnackbar(
-                      rootContext,
-                      'TNSTC ticket imported successfully!',
-                    );
-                  }
-                }
-
-                return Scaffold(
-                  backgroundColor: Colors.transparent,
-                  resizeToAvoidBottomInset: true,
-                  body: SafeArea(
-                    child: Center(
-                      child: AlertDialog(
-                        title: const Text('Enter PNR and Phone Number'),
-                        content: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            TextField(
-                              controller: _pnrController,
-                              decoration: const InputDecoration(
-                                labelText: 'PNR Number',
-                                hintText: 'e.g., T76296906',
-                              ),
-                              autofocus: true,
-                              textInputAction: TextInputAction.next,
-                            ),
-                            const SizedBox(height: 12),
-                            TextField(
-                              controller: _phoneController,
-                              decoration: const InputDecoration(
-                                labelText: 'Phone Number',
-                                hintText: 'e.g., 9876543210',
-                              ),
-                              keyboardType: TextInputType.phone,
-                              textInputAction: TextInputAction.done,
-                              onSubmitted: (_) async => submit(),
-                            ),
-                          ],
-                        ),
-                        actions: [
-                          TextButton(
-                            onPressed: isFetchingDialog
-                                ? null
-                                : () => dialogContext.pop(),
-                            child: const Text('Cancel'),
-                          ),
-                          FilledButton(
-                            onPressed: isFetchingDialog
-                                ? null
-                                : () async => submit(),
-                            child: isFetchingDialog
-                                ? const SizedBox(
-                                    width: 16,
-                                    height: 16,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                    ),
-                                  )
-                                : const Text('Fetch'),
-                          ),
-                        ],
-                      ),
-                    ),
+          return AlertDialog(
+            title: const Text('Enter PNR and Phone Number'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: _pnrController,
+                  decoration: const InputDecoration(
+                    labelText: 'PNR Number',
+                    hintText: 'e.g., T76296906',
                   ),
-                );
-              },
+                  autofocus: true,
+                  textInputAction: TextInputAction.next,
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: _phoneController,
+                  decoration: const InputDecoration(
+                    labelText: 'Phone Number',
+                    hintText: 'e.g., 9876543210',
+                  ),
+                  keyboardType: TextInputType.phone,
+                  textInputAction: TextInputAction.done,
+                  onSubmitted: (_) async => submit(),
+                ),
+              ],
             ),
+            actions: [
+              TextButton(
+                onPressed: isFetchingDialog ? null : () => dialogContext.pop(),
+                child: const Text('Cancel'),
+              ),
+              FilledButton(
+                onPressed: isFetchingDialog ? null : () async => submit(),
+                child: isFetchingDialog
+                    ? const SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Text('Fetch'),
+              ),
+            ],
           );
         },
       ),

@@ -124,13 +124,6 @@ class TicketCreatedResultMapper extends ClassMapperBase<TicketCreatedResult> {
     opt: true,
     def: false,
   );
-  static bool _$isUpdate(TicketCreatedResult v) => v.isUpdate;
-  static const Field<TicketCreatedResult, bool> _f$isUpdate = Field(
-    'isUpdate',
-    _$isUpdate,
-    opt: true,
-    def: false,
-  );
 
   @override
   final MappableFields<TicketCreatedResult> fields = const {
@@ -141,7 +134,6 @@ class TicketCreatedResultMapper extends ClassMapperBase<TicketCreatedResult> {
     #date: _f$date,
     #warning: _f$warning,
     #isArchived: _f$isArchived,
-    #isUpdate: _f$isUpdate,
   };
 
   static TicketCreatedResult _instantiate(DecodingData data) {
@@ -153,7 +145,6 @@ class TicketCreatedResultMapper extends ClassMapperBase<TicketCreatedResult> {
       date: data.dec(_f$date),
       warning: data.dec(_f$warning),
       isArchived: data.dec(_f$isArchived),
-      isUpdate: data.dec(_f$isUpdate),
     );
   }
 
@@ -236,7 +227,6 @@ abstract class TicketCreatedResultCopyWith<
     String? date,
     String? warning,
     bool? isArchived,
-    bool? isUpdate,
   });
   TicketCreatedResultCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
     Then<$Out2, $R2> t,
@@ -260,7 +250,6 @@ class _TicketCreatedResultCopyWithImpl<$R, $Out>
     Object? date = $none,
     Object? warning = $none,
     bool? isArchived,
-    bool? isUpdate,
   }) => $apply(
     FieldCopyWithData({
       if (ticketId != $none) #ticketId: ticketId,
@@ -270,7 +259,6 @@ class _TicketCreatedResultCopyWithImpl<$R, $Out>
       if (date != $none) #date: date,
       if (warning != $none) #warning: warning,
       if (isArchived != null) #isArchived: isArchived,
-      if (isUpdate != null) #isUpdate: isUpdate,
     }),
   );
   @override
@@ -282,7 +270,6 @@ class _TicketCreatedResultCopyWithImpl<$R, $Out>
     date: data.get(#date, or: $value.date),
     warning: data.get(#warning, or: $value.warning),
     isArchived: data.get(#isArchived, or: $value.isArchived),
-    isUpdate: data.get(#isUpdate, or: $value.isUpdate),
   );
 
   @override

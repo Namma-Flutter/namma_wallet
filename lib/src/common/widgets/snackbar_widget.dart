@@ -20,7 +20,6 @@ class CustomSnackBar extends SnackBar {
     required BuildContext context,
     super.key,
     Duration? duration,
-    double? bottomMargin,
   }) : super(
          content: Row(
            children: [
@@ -55,11 +54,10 @@ class CustomSnackBar extends SnackBar {
          // hiding behind the keyboard
          margin: EdgeInsets.only(
            bottom:
-               bottomMargin ??
                MediaQuery.of(context).padding.bottom +
-                   MediaQuery.of(context).viewInsets.bottom +
-                   80 +
-                   16,
+               MediaQuery.of(context).viewInsets.bottom +
+               80 +
+               16,
            left: 16,
            right: 16,
          ),
@@ -85,7 +83,6 @@ void showSnackbar(
   String message, {
   bool isError = false,
   Duration? duration,
-  double? bottomMargin,
 }) {
   // Show custom snackbar above bottom navigation bar
   // Note: Logging is intentionally removed to avoid logging potentially
@@ -97,7 +94,6 @@ void showSnackbar(
       isError: isError,
       context: context,
       duration: duration,
-      bottomMargin: bottomMargin,
     ),
   );
 }
