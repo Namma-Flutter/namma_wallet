@@ -11,7 +11,11 @@ class Event with EventMappable {
     required this.subtitle,
     required this.date,
     required this.price,
+    this.id,
   });
+
+  @MappableField(key: 'id')
+  final int? id;
 
   /// Icon name as string for serialization
   @MappableField(key: 'icon_name')
