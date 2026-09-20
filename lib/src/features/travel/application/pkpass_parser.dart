@@ -16,9 +16,7 @@ import 'package:pkpass/pkpass.dart';
 import 'package:uuid/uuid.dart';
 
 class PKPassParser implements IPKPassParser {
-  PKPassParser({
-    required this._logger,
-  });
+  PKPassParser({required this._logger});
 
   final ILogger _logger;
 
@@ -107,9 +105,7 @@ class PKPassParser implements IPKPassParser {
         ],
       );
 
-      final headers = {
-        'Authorization': 'ApplePass $authenticationToken',
-      };
+      final headers = {'Authorization': 'ApplePass $authenticationToken'};
 
       if (modifiedSince != null) {
         headers['If-Modified-Since'] = HttpDate.format(modifiedSince);
@@ -345,12 +341,7 @@ class PKPassParser implements IPKPassParser {
         }
 
         if (displayValue != null && displayValue.isNotEmpty) {
-          extras.add(
-            ExtrasModel(
-              title: label,
-              value: displayValue,
-            ),
-          );
+          extras.add(ExtrasModel(title: label, value: displayValue));
         }
       }
     }
@@ -435,7 +426,7 @@ class PKPassParser implements IPKPassParser {
       // The properties are known based on pkpass package source code.
       // ignore: avoid_dynamic_calls
       return dynamicVal.number;
-    // ignore: avoid_catching_errors, as dynamic property access throws it
+      // ignore: avoid_catching_errors, as dynamic property access throws it
     } on NoSuchMethodError {
       // Ignore
     }
@@ -444,7 +435,7 @@ class PKPassParser implements IPKPassParser {
       // The properties are known based on pkpass package source code.
       // ignore: avoid_dynamic_calls
       return dynamicVal.dateTime;
-    // ignore: avoid_catching_errors, as dynamic property access throws it
+      // ignore: avoid_catching_errors, as dynamic property access throws it
     } on NoSuchMethodError {
       // Ignore
     }
@@ -453,7 +444,7 @@ class PKPassParser implements IPKPassParser {
       // Fallback for any other types or if types are not exactly matched
       // ignore: avoid_dynamic_calls
       return dynamicVal.value;
-    // ignore: avoid_catching_errors, as dynamic property access throws it
+      // ignore: avoid_catching_errors, as dynamic property access throws it
     } on NoSuchMethodError {
       return null;
     } on Object catch (_) {
