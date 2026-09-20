@@ -406,47 +406,13 @@ class PKPassParser implements IPKPassParser {
   /// Helper to extract raw value from DictionaryValue subclasses
   dynamic _getDictionaryValue(dynamic val) {
     if (val == null) return null;
-
-    // We cannot use 'is StringDictionaryValue' etc. because these types
-    // are not exported by the pkpass package, causing dead code warnings.
-    // Instead, we safely try to access the known properties via
-    // dynamic dispatch.
-    final dynamic dynamicVal = val;
-
     try {
-      // The properties are known based on pkpass package source code.
-      // ignore: avoid_dynamic_calls
-      return dynamicVal.string;
-      // ignore: avoid_catching_errors, as dynamic property access throws it
-    } on NoSuchMethodError {
-      // Ignore
-    }
+      if (val is StringDictionaryValue) return val.string;
+      if (val is NumberDictionaryValue) return val.number;
+      if (val is DateTimeDictionaryValue) return val.dateTime;
 
-    try {
-      // The properties are known based on pkpass package source code.
-      // ignore: avoid_dynamic_calls
-      return dynamicVal.number;
-      // ignore: avoid_catching_errors, as dynamic property access throws it
-    } on NoSuchMethodError {
-      // Ignore
-    }
-
-    try {
-      // The properties are known based on pkpass package source code.
-      // ignore: avoid_dynamic_calls
-      return dynamicVal.dateTime;
-      // ignore: avoid_catching_errors, as dynamic property access throws it
-    } on NoSuchMethodError {
-      // Ignore
-    }
-
-    try {
       // Fallback for any other types or if types are not exactly matched
-      // ignore: avoid_dynamic_calls
-      return dynamicVal.value;
-      // ignore: avoid_catching_errors, as dynamic property access throws it
-    } on NoSuchMethodError {
-      return null;
+      return (val as dynamic).value;
     } on Object catch (_) {
       return null;
     }

@@ -36,8 +36,6 @@ class EventMapper extends ClassMapperBase<Event> {
   static const Field<Event, DateTime> _f$date = Field('date', _$date);
   static String _$price(Event v) => v.price;
   static const Field<Event, String> _f$price = Field('price', _$price);
-  static int? _$id(Event v) => v.id;
-  static const Field<Event, int> _f$id = Field('id', _$id, opt: true);
 
   @override
   final MappableFields<Event> fields = const {
@@ -46,7 +44,6 @@ class EventMapper extends ClassMapperBase<Event> {
     #subtitle: _f$subtitle,
     #date: _f$date,
     #price: _f$price,
-    #id: _f$id,
   };
 
   static Event _instantiate(DecodingData data) {
@@ -56,7 +53,6 @@ class EventMapper extends ClassMapperBase<Event> {
       subtitle: data.dec(_f$subtitle),
       date: data.dec(_f$date),
       price: data.dec(_f$price),
-      id: data.dec(_f$id),
     );
   }
 
@@ -112,7 +108,6 @@ abstract class EventCopyWith<$R, $In extends Event, $Out>
     String? subtitle,
     DateTime? date,
     String? price,
-    int? id,
   });
   EventCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
@@ -130,7 +125,6 @@ class _EventCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Event, $Out>
     String? subtitle,
     DateTime? date,
     String? price,
-    Object? id = $none,
   }) => $apply(
     FieldCopyWithData({
       if (iconName != null) #iconName: iconName,
@@ -138,7 +132,6 @@ class _EventCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Event, $Out>
       if (subtitle != null) #subtitle: subtitle,
       if (date != null) #date: date,
       if (price != null) #price: price,
-      if (id != $none) #id: id,
     }),
   );
   @override
@@ -148,7 +141,6 @@ class _EventCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Event, $Out>
     subtitle: data.get(#subtitle, or: $value.subtitle),
     date: data.get(#date, or: $value.date),
     price: data.get(#price, or: $value.price),
-    id: data.get(#id, or: $value.id),
   );
 
   @override

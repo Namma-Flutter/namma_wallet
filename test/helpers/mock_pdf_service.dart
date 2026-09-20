@@ -47,10 +47,7 @@ class MockPDFService implements IPDFService {
   }
 
   @override
-  Future<Map<String, dynamic>> extractStructuredData(
-    XFile pdf, {
-    Map<String, List<String>>? fieldMappings,
-  }) async {
+  Future<Map<String, dynamic>> extractStructuredData(XFile pdf) async {
     if (shouldThrowError) {
       throw Exception('Mock PDF extraction error');
     }

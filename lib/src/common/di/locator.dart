@@ -37,8 +37,6 @@ import 'package:namma_wallet/src/features/clipboard/application/clipboard_servic
 import 'package:namma_wallet/src/features/clipboard/data/clipboard_repository.dart';
 import 'package:namma_wallet/src/features/clipboard/domain/clipboard_repository_interface.dart';
 import 'package:namma_wallet/src/features/events/application/event_parser_service.dart';
-import 'package:namma_wallet/src/features/events/data/event_dao.dart';
-import 'package:namma_wallet/src/features/events/domain/event_dao_interface.dart';
 import 'package:namma_wallet/src/features/import/application/deep_link_service.dart';
 import 'package:namma_wallet/src/features/import/application/deep_link_service_interface.dart';
 import 'package:namma_wallet/src/features/import/application/import_service.dart';
@@ -81,7 +79,6 @@ void setupLocator() {
     // DAOs
     ..registerLazySingleton<ITicketDAO>(TicketDao.new)
     ..registerLazySingleton<IUserDAO>(UserDao.new)
-    ..registerLazySingleton<IEventDAO>(EventDao.new)
     // Archive service
     ..registerLazySingleton<IArchiveService>(ArchiveService.new)
     // Core services
