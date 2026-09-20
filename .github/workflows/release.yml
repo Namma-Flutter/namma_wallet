@@ -106,7 +106,7 @@ jobs:
       - name: Set up Ruby for fastlane
         uses: ruby/setup-ruby@28233a011b6bb8633ea908d76c6d23aab6518b5c # v1.223.0
         with:
-          ruby-version: "3.4.7"
+          ruby-version: "3.4.2"
           bundler-cache: true
           working-directory: android
 
@@ -176,7 +176,7 @@ jobs:
       - name: Set up Ruby for fastlane
         uses: ruby/setup-ruby@28233a011b6bb8633ea908d76c6d23aab6518b5c # v1.223.0
         with:
-          ruby-version: "3.3.10"
+          ruby-version: "3.3.7"
           bundler-cache: true
           working-directory: ios
 
@@ -280,7 +280,7 @@ jobs:
         if: env.STAGE == 'beta'
         uses: ruby/setup-ruby@28233a011b6bb8633ea908d76c6d23aab6518b5c # v1.223.0
         with:
-          ruby-version: "3.4.7"
+          ruby-version: "3.4.2"
           bundler-cache: true
           working-directory: android
 
@@ -343,7 +343,7 @@ jobs:
       - name: Set up Ruby for fastlane
         uses: ruby/setup-ruby@28233a011b6bb8633ea908d76c6d23aab6518b5c # v1.223.0
         with:
-          ruby-version: "3.3.10"
+          ruby-version: "3.3.7"
           bundler-cache: true
           working-directory: ios
 
@@ -435,7 +435,7 @@ jobs:
       - name: Set up Ruby for Android fastlane
         uses: ruby/setup-ruby@28233a011b6bb8633ea908d76c6d23aab6518b5c # v1.223.0
         with:
-          ruby-version: "3.4.7"
+          ruby-version: "3.4.2"
           bundler-cache: true
           working-directory: android
 
@@ -447,7 +447,7 @@ jobs:
       - name: Set up Ruby for iOS fastlane
         uses: ruby/setup-ruby@28233a011b6bb8633ea908d76c6d23aab6518b5c # v1.223.0
         with:
-          ruby-version: "3.3.10"
+          ruby-version: "3.3.7"
           bundler-cache: true
           working-directory: ios
 
