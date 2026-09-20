@@ -22,8 +22,6 @@ class EventMapper extends ClassMapperBase<Event> {
   @override
   final String id = 'Event';
 
-  static int? _$id(Event v) => v.id;
-  static const Field<Event, int> _f$id = Field('id', _$id, opt: true);
   static String _$iconName(Event v) => v.iconName;
   static const Field<Event, String> _f$iconName = Field(
     'iconName',
@@ -38,25 +36,27 @@ class EventMapper extends ClassMapperBase<Event> {
   static const Field<Event, DateTime> _f$date = Field('date', _$date);
   static String _$price(Event v) => v.price;
   static const Field<Event, String> _f$price = Field('price', _$price);
+  static int? _$id(Event v) => v.id;
+  static const Field<Event, int> _f$id = Field('id', _$id, opt: true);
 
   @override
   final MappableFields<Event> fields = const {
-    #id: _f$id,
     #iconName: _f$iconName,
     #title: _f$title,
     #subtitle: _f$subtitle,
     #date: _f$date,
     #price: _f$price,
+    #id: _f$id,
   };
 
   static Event _instantiate(DecodingData data) {
     return Event(
-      id: data.dec(_f$id),
       iconName: data.dec(_f$iconName),
       title: data.dec(_f$title),
       subtitle: data.dec(_f$subtitle),
       date: data.dec(_f$date),
       price: data.dec(_f$price),
+      id: data.dec(_f$id),
     );
   }
 
@@ -107,12 +107,12 @@ extension EventValueCopy<$R, $Out> on ObjectCopyWith<$R, Event, $Out> {
 abstract class EventCopyWith<$R, $In extends Event, $Out>
     implements ClassCopyWith<$R, $In, $Out> {
   $R call({
-    int? id,
     String? iconName,
     String? title,
     String? subtitle,
     DateTime? date,
     String? price,
+    int? id,
   });
   EventCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
@@ -125,30 +125,30 @@ class _EventCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Event, $Out>
   late final ClassMapperBase<Event> $mapper = EventMapper.ensureInitialized();
   @override
   $R call({
-    Object? id = $none,
     String? iconName,
     String? title,
     String? subtitle,
     DateTime? date,
     String? price,
+    Object? id = $none,
   }) => $apply(
     FieldCopyWithData({
-      if (id != $none) #id: id,
       if (iconName != null) #iconName: iconName,
       if (title != null) #title: title,
       if (subtitle != null) #subtitle: subtitle,
       if (date != null) #date: date,
       if (price != null) #price: price,
+      if (id != $none) #id: id,
     }),
   );
   @override
   Event $make(CopyWithData data) => Event(
-    id: data.get(#id, or: $value.id),
     iconName: data.get(#iconName, or: $value.iconName),
     title: data.get(#title, or: $value.title),
     subtitle: data.get(#subtitle, or: $value.subtitle),
     date: data.get(#date, or: $value.date),
     price: data.get(#price, or: $value.price),
+    id: data.get(#id, or: $value.id),
   );
 
   @override
