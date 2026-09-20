@@ -15,7 +15,10 @@ class ShareSuccessView extends StatelessWidget {
   final TicketCreatedResult result;
 
   /// Determine if this is an update operation
-  bool get isUpdate => result.isUpdate;
+  // TODO(KV): This `isUpdate` is only specified for TNSTC, need to work on this
+  bool get isUpdate =>
+      result.title == 'Ticket Updated' ||
+      result.subtitle == 'Conductor Details';
 
   @override
   Widget build(BuildContext context) {
