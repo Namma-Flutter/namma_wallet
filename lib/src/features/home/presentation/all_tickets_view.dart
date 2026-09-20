@@ -8,6 +8,8 @@ import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 import 'package:namma_wallet/src/common/enums/ticket_type.dart';
 import 'package:namma_wallet/src/common/helper/date_time_converter.dart';
 import 'package:namma_wallet/src/common/routing/app_routes.dart';
+import 'package:namma_wallet/src/common/services/haptic/haptic_service_extension.dart';
+import 'package:namma_wallet/src/common/services/haptic/haptic_service_interface.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
 import 'package:namma_wallet/src/common/theme/styles.dart';
 import 'package:namma_wallet/src/common/widgets/snackbar_widget.dart';
@@ -366,6 +368,13 @@ class TravelTicketListCardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final startTime = ticket.startTime;
+    final formattedDate = startTime != null
+        ? DateTimeConverter.instance.formatDate(startTime)
+        : null;
+    final formattedTime = startTime != null
+        ? DateTimeConverter.instance.formatTime(startTime)
+        : null;
     return Opacity(
       opacity: isArchived ? 0.7 : 1.0,
       child: Container(
@@ -509,10 +518,9 @@ class TravelTicketListCardWidget extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   // Date and time
-                  if (ticket.startTime != null)
+                  if (formattedDate != null && formattedTime != null)
                     Text(
-                      '${DateTimeConverter.instance.formatDate(ticket.startTime!)} • '
-                      '${DateTimeConverter.instance.formatTime(ticket.startTime!)}',
+                      '$formattedDate • $formattedTime',
                       style: TextStyle(
                         fontSize: 11,
                         color: Theme.of(

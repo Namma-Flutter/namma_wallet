@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:namma_wallet/src/common/di/locator.dart';
-import 'package:namma_wallet/src/common/services/haptic/haptic_service_interface.dart';
-import 'package:namma_wallet/src/common/services/haptic/haptic_service_extension.dart';
-import 'package:namma_wallet/src/common/widgets/rounded_back_button.dart';
 import 'package:mockito/mockito.dart';
+import 'package:namma_wallet/src/common/di/locator.dart';
+import 'package:namma_wallet/src/common/services/haptic/haptic_service_extension.dart';
+import 'package:namma_wallet/src/common/services/haptic/haptic_service_interface.dart';
+import 'package:namma_wallet/src/common/widgets/rounded_back_button.dart';
 
 class MockHapticService extends Mock implements IHapticService {
-  @override
   void triggerHaptic(HapticType type) {
     super.noSuchMethod(
       Invocation.method(#triggerHaptic, [type]),
@@ -17,15 +16,13 @@ class MockHapticService extends Mock implements IHapticService {
 }
 
 void main() {
-  setUp(() {
-    getIt.reset();
-  });
+  setUp(getIt.reset);
 
   testWidgets('RoundedBackButton triggers haptic on tap', (tester) async {
     final mockHapticService = MockHapticService();
     getIt.registerSingleton<IHapticService>(mockHapticService);
 
-    bool wasPressed = false;
+    var wasPressed = false;
 
     await tester.pumpWidget(
       MaterialApp(
