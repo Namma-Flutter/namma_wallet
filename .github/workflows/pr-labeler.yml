@@ -4,6 +4,8 @@ on:
   pull_request_target: # zizmor: ignore[dangerous-triggers]
     types: [opened, synchronize, reopened]
 
+# zizmor: ignore[dangerous-triggers]
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
