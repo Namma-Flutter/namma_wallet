@@ -34,6 +34,7 @@ jobs:
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2 # zizmor: ignore[artipacked]
         with:
           repository: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
+          persist-credentials: false
           ref: ${{ github.head_ref || github.ref }}
 
       - name: Select Xcode (26 or 16)
