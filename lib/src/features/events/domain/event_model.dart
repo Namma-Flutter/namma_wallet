@@ -6,12 +6,12 @@ part 'event_model.mapper.dart';
 @MappableClass()
 class Event with EventMappable {
   const Event({
-    this.id,
     required this.iconName,
     required this.title,
     required this.subtitle,
     required this.date,
     required this.price,
+    this.id,
   });
 
   @MappableField(key: 'id')

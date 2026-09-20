@@ -6,8 +6,6 @@ import 'package:namma_wallet/src/common/database/ticket_dao_interface.dart';
 import 'package:namma_wallet/src/common/database/user_dao.dart';
 import 'package:namma_wallet/src/common/database/user_dao_interface.dart';
 import 'package:namma_wallet/src/common/database/wallet_database.dart';
-import 'package:namma_wallet/src/features/events/data/event_dao.dart';
-import 'package:namma_wallet/src/features/events/domain/event_dao_interface.dart';
 import 'package:namma_wallet/src/common/database/wallet_database_interface.dart';
 import 'package:namma_wallet/src/common/services/archive/archive_service.dart';
 import 'package:namma_wallet/src/common/services/archive/archive_service_interface.dart';
@@ -39,6 +37,8 @@ import 'package:namma_wallet/src/features/clipboard/application/clipboard_servic
 import 'package:namma_wallet/src/features/clipboard/data/clipboard_repository.dart';
 import 'package:namma_wallet/src/features/clipboard/domain/clipboard_repository_interface.dart';
 import 'package:namma_wallet/src/features/events/application/event_parser_service.dart';
+import 'package:namma_wallet/src/features/events/data/event_dao.dart';
+import 'package:namma_wallet/src/features/events/domain/event_dao_interface.dart';
 import 'package:namma_wallet/src/features/import/application/deep_link_service.dart';
 import 'package:namma_wallet/src/features/import/application/deep_link_service_interface.dart';
 import 'package:namma_wallet/src/features/import/application/import_service.dart';
