@@ -1,0 +1,28 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Users/harishanbalagan/.headroom-env/bin/python3.14 -m headroom.cli init hook ensure --profile init-namma_wallet-393bc366 --marker headroom-init-codex",
+            "timeout": 15
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Users/harishanbalagan/.headroom-env/bin/python3.14 -m headroom.cli init hook ensure --profile init-namma_wallet-393bc366 --marker headroom-init-codex",
+            "timeout": 15
+          }
+        ]
+      }
+    ]
+  }
+}

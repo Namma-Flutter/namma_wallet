@@ -3,10 +3,9 @@ enum AppRoute {
   home(path: '/', name: 'home'),
   import(path: '/import', name: 'import'),
   calendar(path: '/calendar', name: 'calendar'),
-  profile(path: '/profile', name: 'profile'),
 
   // Ticket related routes
-  ticketView(path: '/ticket', name: 'ticketView'),
+  ticketView(path: '/ticket/:id', name: 'ticketView'),
   allTickets(path: '/all-tickets', name: 'allTickets'),
 
   // Scanner related routes
@@ -20,11 +19,13 @@ enum AppRoute {
 
   // Settings and configuration
   settings(path: '/settings', name: 'settings'),
+  reminderSettings(path: '/reminder-settings', name: 'reminderSettings'),
   license(path: '/license', name: 'license'),
   contributors(path: '/contributors', name: 'contributors'),
 
   // Debug routes
-  dbViewer(path: '/db-viewer', name: 'dbViewer');
+  dbViewer(path: '/db-viewer', name: 'dbViewer'),
+  ocrDebug(path: '/ocr-debug', name: 'ocrDebug');
 
   const AppRoute({required this.path, required this.name});
 

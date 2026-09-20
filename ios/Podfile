@@ -1,5 +1,5 @@
 # Uncomment this line to define a global platform for your project
-platform :ios, '16.6'
+platform :ios, '17.6'
 
 # CocoaPods analytics sends network stats synchronously affecting flutter build latency.
 ENV['COCOAPODS_DISABLE_STATS'] = 'true'
@@ -32,17 +32,84 @@ target 'Runner' do
   use_modular_headers!
 
   flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
+
+  # share_handler addition start
+  target 'Share Extension' do
+    inherit! :search_paths
+    pod "share_handler_ios_models", :path => ".symlinks/plugins/share_handler_ios/ios/Models"
+  end
+  # share_handler addition end
+
   target 'RunnerTests' do
     inherit! :search_paths
   end
 end
 
+
+
+$iOSVersion = '17.6'
+
 post_install do |installer|
+  installer.pods_project.build_configurations.each do |config|
+    config.build_settings['EXCLUDED_ARCHS[sdk=iphonesimulator*]'] = 'arm64'
+    config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = $iOSVersion
+  end
   installer.pods_project.targets.each do |target|
     flutter_additional_ios_build_settings(target)
     target.build_configurations.each do |config|
-      config.build_settings['EXCLUDED_ARCHS[sdk=iphonesimulator*]'] = 'arm64'
+      # Ensure deployment target is high enough
+      if Gem::Version.new($iOSVersion) > Gem::Version.new(config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'])
+        config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = $iOSVersion
+      end
+      # Configure pods for app extension compatibility
+      if target.name.include?("Pods-Share Extension") || target.name.include?("share_handler_ios_models")
+        config.build_settings['APPLICATION_EXTENSION_API_ONLY'] = 'YES'
+      end
+
+      # Strip unused permissions from permission_handler to avoid App Store ITMS-90683 warnings
+      config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] ||= [
+        '$(inherited)',
+        'PERMISSION_CAMERA=1',
+        'PERMISSION_PHOTOS=1',
+        'PERMISSION_NOTIFICATIONS=1',
+        'PERMISSION_LOCATION=0',
+        'PERMISSION_EVENTS=0',
+        'PERMISSION_REMINDERS=0',
+        'PERMISSION_CONTACTS=0',
+        'PERMISSION_MICROPHONE=0',
+        'PERMISSION_SPEECH_RECOGNIZER=0',
+        'PERMISSION_BLUETOOTH=0',
+        'PERMISSION_APP_TRACKING_TRANSPARENCY=0',
+        'PERMISSION_CRITICAL_ALERTS=0',
+      ]
     end
+  end
+
+  # Remove MediaPipe/TensorFlow force_load directives from Share Extension xcconfig files
+  ['debug', 'release', 'profile'].each do |config|
+    xcconfig_path = File.join('Pods', 'Target Support Files', 'Pods-Share Extension', "Pods-Share Extension.#{config}.xcconfig")
+    if File.exist?(xcconfig_path)
+      xcconfig_content = File.read(xcconfig_path)
+
+      # Remove MediaPipe force_load lines
+      xcconfig_content.gsub!(/^OTHER_LDFLAGS\[sdk=iphoneos\*\] = .*MediaPipeTasksGenAIC.*$/, '')
+      xcconfig_content.gsub!(/^OTHER_LDFLAGS\[sdk=iphonesimulator\*\] = .*MediaPipeTasksGenAIC.*$/, '')
+
+      # Remove TensorFlow/MediaPipe/flutter_gemma from FRAMEWORK_SEARCH_PATHS
+      xcconfig_content.gsub!(/"[^"]*TensorFlowLite[^"]*"\s*/, '')
+      xcconfig_content.gsub!(/"[^"]*MediaPipe[^"]*"\s*/, '')
+      xcconfig_content.gsub!(/"[^"]*flutter_gemma[^"]*"\s*/, '')
+      xcconfig_content.gsub!(/"[^"]*google_mlkit[^"]*"\s*/, '')
+
+      File.write(xcconfig_path, xcconfig_content)
+      puts "Cleaned up #{xcconfig_path}"
+    end
+  end
+
+  # Workaround for workmanager_apple 0.9.10+ compiler bug on iOS SDK (unsupported BGContinuedProcessingTask)
+  patch_script = File.expand_path('../scripts/patch_workmanager_apple.sh', __dir__)
+  if File.exist?(patch_script)
+    system('bash', patch_script) || raise("Failed to execute #{patch_script}")
   end
 end
 

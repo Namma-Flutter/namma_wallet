@@ -2,6 +2,7 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // dart format off
 // ignore_for_file: type=lint
+// ignore_for_file: invalid_use_of_protected_member
 // ignore_for_file: unused_element, unnecessary_cast, override_on_non_overriding_member
 // ignore_for_file: strict_raw_type, inference_failure_on_untyped_parameter
 
@@ -24,22 +25,25 @@ class TicketMapper extends ClassMapperBase<Ticket> {
   @override
   final String id = 'Ticket';
 
-  static String _$primaryText(Ticket v) => v.primaryText;
+  static String? _$primaryText(Ticket v) => v.primaryText;
   static const Field<Ticket, String> _f$primaryText = Field(
     'primaryText',
     _$primaryText,
     key: r'primary_text',
+    opt: true,
   );
-  static String _$secondaryText(Ticket v) => v.secondaryText;
+  static String? _$secondaryText(Ticket v) => v.secondaryText;
   static const Field<Ticket, String> _f$secondaryText = Field(
     'secondaryText',
     _$secondaryText,
     key: r'secondary_text',
+    opt: true,
   );
-  static String _$location(Ticket v) => v.location;
+  static String? _$location(Ticket v) => v.location;
   static const Field<Ticket, String> _f$location = Field(
     'location',
     _$location,
+    opt: true,
   );
   static DateTime? _$startTime(Ticket v) => v.startTime;
   static const Field<Ticket, DateTime> _f$startTime = Field(
@@ -48,12 +52,11 @@ class TicketMapper extends ClassMapperBase<Ticket> {
     key: r'start_time',
     opt: true,
   );
-  static TicketType _$type(Ticket v) => v.type;
+  static TicketType? _$type(Ticket v) => v.type;
   static const Field<Ticket, TicketType> _f$type = Field(
     'type',
     _$type,
     opt: true,
-    def: TicketType.train,
   );
   static DateTime? _$endTime(Ticket v) => v.endTime;
   static const Field<Ticket, DateTime> _f$endTime = Field(
@@ -81,6 +84,34 @@ class TicketMapper extends ClassMapperBase<Ticket> {
     key: r'ticket_id',
     opt: true,
   );
+  static String? _$imagePath(Ticket v) => v.imagePath;
+  static const Field<Ticket, String> _f$imagePath = Field(
+    'imagePath',
+    _$imagePath,
+    key: r'image_path',
+    opt: true,
+  );
+  static String? _$directionsUrl(Ticket v) => v.directionsUrl;
+  static const Field<Ticket, String> _f$directionsUrl = Field(
+    'directionsUrl',
+    _$directionsUrl,
+    key: r'directions_url',
+    opt: true,
+  );
+  static DateTime? _$archivedAt(Ticket v) => v.archivedAt;
+  static const Field<Ticket, DateTime> _f$archivedAt = Field(
+    'archivedAt',
+    _$archivedAt,
+    key: r'archived_at',
+    opt: true,
+  );
+  static String? _$originalFilePath(Ticket v) => v.originalFilePath;
+  static const Field<Ticket, String> _f$originalFilePath = Field(
+    'originalFilePath',
+    _$originalFilePath,
+    key: r'original_file_path',
+    opt: true,
+  );
 
   @override
   final MappableFields<Ticket> fields = const {
@@ -93,6 +124,10 @@ class TicketMapper extends ClassMapperBase<Ticket> {
     #tags: _f$tags,
     #extras: _f$extras,
     #ticketId: _f$ticketId,
+    #imagePath: _f$imagePath,
+    #directionsUrl: _f$directionsUrl,
+    #archivedAt: _f$archivedAt,
+    #originalFilePath: _f$originalFilePath,
   };
 
   static Ticket _instantiate(DecodingData data) {
@@ -106,6 +141,10 @@ class TicketMapper extends ClassMapperBase<Ticket> {
       tags: data.dec(_f$tags),
       extras: data.dec(_f$extras),
       ticketId: data.dec(_f$ticketId),
+      imagePath: data.dec(_f$imagePath),
+      directionsUrl: data.dec(_f$directionsUrl),
+      archivedAt: data.dec(_f$archivedAt),
+      originalFilePath: data.dec(_f$originalFilePath),
     );
   }
 
@@ -173,6 +212,10 @@ abstract class TicketCopyWith<$R, $In extends Ticket, $Out>
     List<TagModel>? tags,
     List<ExtrasModel>? extras,
     String? ticketId,
+    String? imagePath,
+    String? directionsUrl,
+    DateTime? archivedAt,
+    String? originalFilePath,
   });
   TicketCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
@@ -207,26 +250,34 @@ class _TicketCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Ticket, $Out>
       : null;
   @override
   $R call({
-    String? primaryText,
-    String? secondaryText,
-    String? location,
+    Object? primaryText = $none,
+    Object? secondaryText = $none,
+    Object? location = $none,
     Object? startTime = $none,
-    TicketType? type,
+    Object? type = $none,
     Object? endTime = $none,
     Object? tags = $none,
     Object? extras = $none,
     Object? ticketId = $none,
+    Object? imagePath = $none,
+    Object? directionsUrl = $none,
+    Object? archivedAt = $none,
+    Object? originalFilePath = $none,
   }) => $apply(
     FieldCopyWithData({
-      if (primaryText != null) #primaryText: primaryText,
-      if (secondaryText != null) #secondaryText: secondaryText,
-      if (location != null) #location: location,
+      if (primaryText != $none) #primaryText: primaryText,
+      if (secondaryText != $none) #secondaryText: secondaryText,
+      if (location != $none) #location: location,
       if (startTime != $none) #startTime: startTime,
-      if (type != null) #type: type,
+      if (type != $none) #type: type,
       if (endTime != $none) #endTime: endTime,
       if (tags != $none) #tags: tags,
       if (extras != $none) #extras: extras,
       if (ticketId != $none) #ticketId: ticketId,
+      if (imagePath != $none) #imagePath: imagePath,
+      if (directionsUrl != $none) #directionsUrl: directionsUrl,
+      if (archivedAt != $none) #archivedAt: archivedAt,
+      if (originalFilePath != $none) #originalFilePath: originalFilePath,
     }),
   );
   @override
@@ -240,6 +291,10 @@ class _TicketCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Ticket, $Out>
     tags: data.get(#tags, or: $value.tags),
     extras: data.get(#extras, or: $value.extras),
     ticketId: data.get(#ticketId, or: $value.ticketId),
+    imagePath: data.get(#imagePath, or: $value.imagePath),
+    directionsUrl: data.get(#directionsUrl, or: $value.directionsUrl),
+    archivedAt: data.get(#archivedAt, or: $value.archivedAt),
+    originalFilePath: data.get(#originalFilePath, or: $value.originalFilePath),
   );
 
   @override

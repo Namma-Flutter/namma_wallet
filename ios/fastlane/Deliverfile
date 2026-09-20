@@ -12,14 +12,14 @@ skip_binary_upload true
 
 # Metadata settings
 skip_metadata false
-metadata_path "./metadata"
+# metadata_path "./metadata"
 
 # Screenshots settings
-skip_screenshots false
+skip_screenshots true
 screenshots_path "./screenshots"
 
 # Overwrite existing screenshots
-overwrite_screenshots true
+overwrite_screenshots false
 
 # Force upload without confirmation prompts
 force true

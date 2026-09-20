@@ -2,6 +2,7 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // dart format off
 // ignore_for_file: type=lint
+// ignore_for_file: invalid_use_of_protected_member
 // ignore_for_file: unused_element, unnecessary_cast, override_on_non_overriding_member
 // ignore_for_file: strict_raw_type, inference_failure_on_untyped_parameter
 
@@ -30,12 +31,16 @@ class SourceTypeMapper extends EnumMapper<SourceType> {
         return SourceType.sms;
       case 'PDF':
         return SourceType.pdf;
+      case 'IMAGE':
+        return SourceType.image;
       case 'MANUAL':
         return SourceType.manual;
       case 'CLIPBOARD':
         return SourceType.clipboard;
       case 'QR':
         return SourceType.qr;
+      case 'PKPASS':
+        return SourceType.pkpass;
       default:
         throw MapperException.unknownEnumValue(value);
     }
@@ -48,12 +53,16 @@ class SourceTypeMapper extends EnumMapper<SourceType> {
         return 'SMS';
       case SourceType.pdf:
         return 'PDF';
+      case SourceType.image:
+        return 'IMAGE';
       case SourceType.manual:
         return 'MANUAL';
       case SourceType.clipboard:
         return 'CLIPBOARD';
       case SourceType.qr:
         return 'QR';
+      case SourceType.pkpass:
+        return 'PKPASS';
     }
   }
 }

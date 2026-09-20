@@ -2,6 +2,7 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // dart format off
 // ignore_for_file: type=lint
+// ignore_for_file: invalid_use_of_protected_member
 // ignore_for_file: unused_element, unnecessary_cast, override_on_non_overriding_member
 // ignore_for_file: strict_raw_type, inference_failure_on_untyped_parameter
 
@@ -121,13 +122,6 @@ class TNSTCTicketModelMapper extends ClassMapperBase<TNSTCTicketModel> {
     _$numberOfSeats,
     opt: true,
   );
-  static String? _$bankTransactionNumber(TNSTCTicketModel v) =>
-      v.bankTransactionNumber;
-  static const Field<TNSTCTicketModel, String> _f$bankTransactionNumber = Field(
-    'bankTransactionNumber',
-    _$bankTransactionNumber,
-    opt: true,
-  );
   static String? _$busIdNumber(TNSTCTicketModel v) => v.busIdNumber;
   static const Field<TNSTCTicketModel, String> _f$busIdNumber = Field(
     'busIdNumber',
@@ -143,18 +137,6 @@ class TNSTCTicketModelMapper extends ClassMapperBase<TNSTCTicketModel> {
   static List<PassengerInfo> _$passengers(TNSTCTicketModel v) => v.passengers;
   static const Field<TNSTCTicketModel, List<PassengerInfo>> _f$passengers =
       Field('passengers', _$passengers, opt: true, def: const []);
-  static String? _$idCardType(TNSTCTicketModel v) => v.idCardType;
-  static const Field<TNSTCTicketModel, String> _f$idCardType = Field(
-    'idCardType',
-    _$idCardType,
-    opt: true,
-  );
-  static String? _$idCardNumber(TNSTCTicketModel v) => v.idCardNumber;
-  static const Field<TNSTCTicketModel, String> _f$idCardNumber = Field(
-    'idCardNumber',
-    _$idCardNumber,
-    opt: true,
-  );
   static double? _$totalFare(TNSTCTicketModel v) => v.totalFare;
   static const Field<TNSTCTicketModel, double> _f$totalFare = Field(
     'totalFare',
@@ -204,12 +186,9 @@ class TNSTCTicketModelMapper extends ClassMapperBase<TNSTCTicketModel> {
     #tripCode: _f$tripCode,
     #obReferenceNumber: _f$obReferenceNumber,
     #numberOfSeats: _f$numberOfSeats,
-    #bankTransactionNumber: _f$bankTransactionNumber,
     #busIdNumber: _f$busIdNumber,
     #passengerCategory: _f$passengerCategory,
     #passengers: _f$passengers,
-    #idCardType: _f$idCardType,
-    #idCardNumber: _f$idCardNumber,
     #totalFare: _f$totalFare,
     #boardingPoint: _f$boardingPoint,
     #conductorMobileNo: _f$conductorMobileNo,
@@ -235,12 +214,9 @@ class TNSTCTicketModelMapper extends ClassMapperBase<TNSTCTicketModel> {
       tripCode: data.dec(_f$tripCode),
       obReferenceNumber: data.dec(_f$obReferenceNumber),
       numberOfSeats: data.dec(_f$numberOfSeats),
-      bankTransactionNumber: data.dec(_f$bankTransactionNumber),
       busIdNumber: data.dec(_f$busIdNumber),
       passengerCategory: data.dec(_f$passengerCategory),
       passengers: data.dec(_f$passengers),
-      idCardType: data.dec(_f$idCardType),
-      idCardNumber: data.dec(_f$idCardNumber),
       totalFare: data.dec(_f$totalFare),
       boardingPoint: data.dec(_f$boardingPoint),
       conductorMobileNo: data.dec(_f$conductorMobileNo),
@@ -334,12 +310,9 @@ abstract class TNSTCTicketModelCopyWith<$R, $In extends TNSTCTicketModel, $Out>
     String? tripCode,
     String? obReferenceNumber,
     int? numberOfSeats,
-    String? bankTransactionNumber,
     String? busIdNumber,
     String? passengerCategory,
     List<PassengerInfo>? passengers,
-    String? idCardType,
-    String? idCardNumber,
     double? totalFare,
     String? boardingPoint,
     String? conductorMobileNo,
@@ -388,12 +361,9 @@ class _TNSTCTicketModelCopyWithImpl<$R, $Out>
     Object? tripCode = $none,
     Object? obReferenceNumber = $none,
     Object? numberOfSeats = $none,
-    Object? bankTransactionNumber = $none,
     Object? busIdNumber = $none,
     Object? passengerCategory = $none,
     List<PassengerInfo>? passengers,
-    Object? idCardType = $none,
-    Object? idCardNumber = $none,
     Object? totalFare = $none,
     Object? boardingPoint = $none,
     Object? conductorMobileNo = $none,
@@ -420,13 +390,9 @@ class _TNSTCTicketModelCopyWithImpl<$R, $Out>
       if (tripCode != $none) #tripCode: tripCode,
       if (obReferenceNumber != $none) #obReferenceNumber: obReferenceNumber,
       if (numberOfSeats != $none) #numberOfSeats: numberOfSeats,
-      if (bankTransactionNumber != $none)
-        #bankTransactionNumber: bankTransactionNumber,
       if (busIdNumber != $none) #busIdNumber: busIdNumber,
       if (passengerCategory != $none) #passengerCategory: passengerCategory,
       if (passengers != null) #passengers: passengers,
-      if (idCardType != $none) #idCardType: idCardType,
-      if (idCardNumber != $none) #idCardNumber: idCardNumber,
       if (totalFare != $none) #totalFare: totalFare,
       if (boardingPoint != $none) #boardingPoint: boardingPoint,
       if (conductorMobileNo != $none) #conductorMobileNo: conductorMobileNo,
@@ -470,18 +436,12 @@ class _TNSTCTicketModelCopyWithImpl<$R, $Out>
       or: $value.obReferenceNumber,
     ),
     numberOfSeats: data.get(#numberOfSeats, or: $value.numberOfSeats),
-    bankTransactionNumber: data.get(
-      #bankTransactionNumber,
-      or: $value.bankTransactionNumber,
-    ),
     busIdNumber: data.get(#busIdNumber, or: $value.busIdNumber),
     passengerCategory: data.get(
       #passengerCategory,
       or: $value.passengerCategory,
     ),
     passengers: data.get(#passengers, or: $value.passengers),
-    idCardType: data.get(#idCardType, or: $value.idCardType),
-    idCardNumber: data.get(#idCardNumber, or: $value.idCardNumber),
     totalFare: data.get(#totalFare, or: $value.totalFare),
     boardingPoint: data.get(#boardingPoint, or: $value.boardingPoint),
     conductorMobileNo: data.get(
@@ -514,37 +474,47 @@ class PassengerInfoMapper extends ClassMapperBase<PassengerInfo> {
 
   static String _$name(PassengerInfo v) => v.name;
   static const Field<PassengerInfo, String> _f$name = Field('name', _$name);
-  static int _$age(PassengerInfo v) => v.age;
-  static const Field<PassengerInfo, int> _f$age = Field('age', _$age);
-  static String _$type(PassengerInfo v) => v.type;
-  static const Field<PassengerInfo, String> _f$type = Field('type', _$type);
-  static String _$gender(PassengerInfo v) => v.gender;
+  static String? _$type(PassengerInfo v) => v.type;
+  static const Field<PassengerInfo, String> _f$type = Field(
+    'type',
+    _$type,
+    opt: true,
+  );
+  static String? _$gender(PassengerInfo v) => v.gender;
   static const Field<PassengerInfo, String> _f$gender = Field(
     'gender',
     _$gender,
+    opt: true,
   );
-  static String _$seatNumber(PassengerInfo v) => v.seatNumber;
+  static String? _$seatNumber(PassengerInfo v) => v.seatNumber;
   static const Field<PassengerInfo, String> _f$seatNumber = Field(
     'seatNumber',
     _$seatNumber,
+    opt: true,
+  );
+  static int? _$age(PassengerInfo v) => v.age;
+  static const Field<PassengerInfo, int> _f$age = Field(
+    'age',
+    _$age,
+    opt: true,
   );
 
   @override
   final MappableFields<PassengerInfo> fields = const {
     #name: _f$name,
-    #age: _f$age,
     #type: _f$type,
     #gender: _f$gender,
     #seatNumber: _f$seatNumber,
+    #age: _f$age,
   };
 
   static PassengerInfo _instantiate(DecodingData data) {
     return PassengerInfo(
       name: data.dec(_f$name),
-      age: data.dec(_f$age),
       type: data.dec(_f$type),
       gender: data.dec(_f$gender),
       seatNumber: data.dec(_f$seatNumber),
+      age: data.dec(_f$age),
     );
   }
 
@@ -612,10 +582,10 @@ abstract class PassengerInfoCopyWith<$R, $In extends PassengerInfo, $Out>
     implements ClassCopyWith<$R, $In, $Out> {
   $R call({
     String? name,
-    int? age,
     String? type,
     String? gender,
     String? seatNumber,
+    int? age,
   });
   PassengerInfoCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
@@ -631,26 +601,26 @@ class _PassengerInfoCopyWithImpl<$R, $Out>
   @override
   $R call({
     String? name,
-    int? age,
-    String? type,
-    String? gender,
-    String? seatNumber,
+    Object? type = $none,
+    Object? gender = $none,
+    Object? seatNumber = $none,
+    Object? age = $none,
   }) => $apply(
     FieldCopyWithData({
       if (name != null) #name: name,
-      if (age != null) #age: age,
-      if (type != null) #type: type,
-      if (gender != null) #gender: gender,
-      if (seatNumber != null) #seatNumber: seatNumber,
+      if (type != $none) #type: type,
+      if (gender != $none) #gender: gender,
+      if (seatNumber != $none) #seatNumber: seatNumber,
+      if (age != $none) #age: age,
     }),
   );
   @override
   PassengerInfo $make(CopyWithData data) => PassengerInfo(
     name: data.get(#name, or: $value.name),
-    age: data.get(#age, or: $value.age),
     type: data.get(#type, or: $value.type),
     gender: data.get(#gender, or: $value.gender),
     seatNumber: data.get(#seatNumber, or: $value.seatNumber),
+    age: data.get(#age, or: $value.age),
   );
 
   @override

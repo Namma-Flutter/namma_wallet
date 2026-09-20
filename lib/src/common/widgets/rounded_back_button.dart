@@ -18,7 +18,16 @@ class RoundedBackButton extends StatelessWidget {
           radius: 24,
           backgroundColor: Theme.of(context).colorScheme.primary,
           child: InkWell(
-            onTap: onPressed ?? () => context.pop(),
+            onTap:
+                onPressed ??
+                () {
+                  if (context.canPop()) {
+                    context.pop();
+                  } else {
+                    // No navigation history (e.g., deep link), go to home
+                    context.go('/');
+                  }
+                },
             child: const Icon(
               Icons.chevron_left,
               size: 28,

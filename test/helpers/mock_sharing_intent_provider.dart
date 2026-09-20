@@ -1,14 +1,14 @@
 import 'dart:async';
 
-import 'package:listen_sharing_intent/listen_sharing_intent.dart';
 import 'package:namma_wallet/src/features/receive/application/sharing_intent_provider.dart';
+import 'package:share_handler/share_handler.dart';
 
 class MockSharingIntentProvider implements ISharingIntentProvider {
-  final StreamController<List<SharedMediaFile>> _controller =
-      StreamController<List<SharedMediaFile>>.broadcast();
-  List<SharedMediaFile> initialMedia = [];
+  final StreamController<SharedMedia?> _controller =
+      StreamController<SharedMedia?>.broadcast();
+  SharedMedia? initialMedia;
 
-  void emitMedia(List<SharedMediaFile> media) {
+  void emitMedia(SharedMedia? media) {
     _controller.add(media);
   }
 
@@ -17,12 +17,12 @@ class MockSharingIntentProvider implements ISharingIntentProvider {
   }
 
   @override
-  Stream<List<SharedMediaFile>> getMediaStream() {
+  Stream<SharedMedia?> getMediaStream() {
     return _controller.stream;
   }
 
   @override
-  Future<List<SharedMediaFile>> getInitialMedia() async {
+  Future<SharedMedia?> getInitialSharing() async {
     return initialMedia;
   }
 

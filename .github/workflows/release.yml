@@ -1,0 +1,535 @@
+name: Release Pipeline
+
+# Ships Namma Wallet to the stores and publishes GitHub release artifacts.
+#
+# Branch semantics (matches the Fastlane 3-stage pipeline):
+#   beta    -> build + upload to TestFlight and Play internal track,
+#              attach signed APK/IPA to a GitHub pre-release tagged v{version}
+#   release -> promote the already-uploaded build to App Store / Play
+#              production, attach signed APK/IPA to a stable GitHub release
+#
+# Prerequisites:
+#   * This file must exist on both `beta` and `release` branches —
+#     GitHub evaluates workflows from the pushed ref.
+#   * Required repository secrets:
+#       ANDROID_KEYSTORE, ANDROID_KEYSTORE_PASSWORD,
+#       ANDROID_KEY_ALIAS, ANDROID_KEY_PASSWORD,
+#       PLAY_STORE_JSON_KEY,
+#       APP_STORE_CONNECT_KEY_ID, APP_STORE_CONNECT_ISSUER_ID,
+#       APP_STORE_CONNECT_P8_BASE64
+#   * Replaces the old build_and_release.yml on the `release` branch
+#     (delete that file when merging).
+
+on:
+  pull_request:
+    types: [closed]
+    branches: [beta, release]
+  workflow_dispatch:
+    inputs:
+      stage:
+        description: Deployment stage
+        type: choice
+        options: [beta, release]
+        default: beta
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  STAGE: ${{ (github.event_name == 'pull_request' && github.base_ref) || inputs.stage }}
+  APP_IDENTIFIER: com.nammaflutter.nammawallet
+  PACKAGE_NAME: com.nammaflutter.nammawallet
+  TEAM_ID: TG8RN284Q4
+
+jobs:
+  gate:
+    name: Analyze & Test
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Cache pub dependencies
+        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf # v4.2.2
+        with:
+          path: ~/.pub-cache
+          key: gate-${{ runner.os }}-${{ hashFiles('pubspec.yaml', 'pubspec.lock') }}
+          restore-keys: |
+            gate-${{ runner.os }}-
+
+      - uses: subosito/flutter-action@f2c4f6686ca8e8d6e6d0f28410eeef506ed66aff # v2.18.0
+        with:
+          channel: stable
+          flutter-version-file: pubspec.yaml
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Generate code files
+        run: dart run build_runner build --delete-conflicting-outputs
+
+      - name: Analyze
+        run: flutter analyze
+
+      - name: Test
+        run: flutter test
+
+  check-play-store:
+    name: Check Play Store Version
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      skip_build: ${{ steps.check.outputs.skip_build }}
+    env:
+      PLAY_STORE_JSON_PATH: ${{ github.workspace }}/play-store-key.json
+      PACKAGE_NAME: com.nammaflutter.nammawallet
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Decode Play Store service account
+        env:
+          KEY_DATA: ${{ secrets.PLAY_STORE_JSON_KEY }}
+        run: |
+          if [ -n "$KEY_DATA" ]; then
+            if echo "$KEY_DATA" | grep -q "^{"; then
+              echo "$KEY_DATA" > play-store-key.json
+            else
+              echo "$KEY_DATA" | base64 -d -i > play-store-key.json 2>/dev/null || echo "$KEY_DATA" | base64 --decode > play-store-key.json 2>/dev/null || echo "$KEY_DATA" > play-store-key.json
+            fi
+          fi
+
+      - name: Set up Ruby for fastlane
+        uses: ruby/setup-ruby@28233a011b6bb8633ea908d76c6d23aab6518b5c # v1.223.0
+        with:
+          ruby-version: "3.4.7"
+          bundler-cache: true
+          working-directory: android
+
+      - name: Check if version exists on Play Store
+        id: check
+        working-directory: android
+        run: |
+          if [ ! -s "${PLAY_STORE_JSON_PATH}" ]; then
+            echo "⚠️ play-store-key.json not present or empty. Proceeding with build."
+            echo "skip_build=false" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          bundle exec fastlane check_version || true
+          SKIP="false"
+          if [ -f "skip_android_build.txt" ]; then
+            SKIP=$(cat skip_android_build.txt)
+          elif [ -f "fastlane/skip_android_build.txt" ]; then
+            SKIP=$(cat fastlane/skip_android_build.txt)
+          elif [ -f "../skip_android_build.txt" ]; then
+            SKIP=$(cat ../skip_android_build.txt)
+          fi
+          REASON="Android version code already exists on Google Play."
+          if [ -f "skip_android_reason.txt" ]; then
+            REASON=$(cat skip_android_reason.txt)
+          elif [ -f "fastlane/skip_android_reason.txt" ]; then
+            REASON=$(cat fastlane/skip_android_reason.txt)
+          elif [ -f "../skip_android_reason.txt" ]; then
+            REASON=$(cat ../skip_android_reason.txt)
+          fi
+          echo "skip_build=$SKIP" >> $GITHUB_OUTPUT
+          echo "Detected skip_build: $SKIP"
+          if [ "$SKIP" = "true" ]; then
+            echo "### ⏭️ Android Build Skipped" >> $GITHUB_STEP_SUMMARY
+            echo "$REASON" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "The Android build step will be skipped because this build number is already published." >> $GITHUB_STEP_SUMMARY
+          fi
+
+  check-app-store:
+    name: Check App Store Version
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      skip_build: ${{ steps.check.outputs.skip_build }}
+    env:
+      APP_STORE_CONNECT_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+      APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+      APP_STORE_CONNECT_KEY_PATH: ./AuthKey.p8
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Decode App Store Connect API key
+        env:
+          KEY_DATA: ${{ secrets.APP_STORE_CONNECT_P8_BASE64 }}
+        run: |
+          mkdir -p ios/fastlane
+          if [ -z "$KEY_DATA" ]; then
+            echo "::warning::APP_STORE_CONNECT_P8_BASE64 secret is empty"
+            exit 0
+          fi
+          if echo "$KEY_DATA" | grep -q "BEGIN PRIVATE KEY"; then
+            echo "$KEY_DATA" > ios/fastlane/AuthKey.p8
+          else
+            echo "$KEY_DATA" | base64 -d -i > ios/fastlane/AuthKey.p8 2>/dev/null || echo "$KEY_DATA" | base64 --decode > ios/fastlane/AuthKey.p8 2>/dev/null || echo "$KEY_DATA" > ios/fastlane/AuthKey.p8
+          fi
+
+      - name: Set up Ruby for fastlane
+        uses: ruby/setup-ruby@28233a011b6bb8633ea908d76c6d23aab6518b5c # v1.223.0
+        with:
+          ruby-version: "3.3.10"
+          bundler-cache: true
+          working-directory: ios
+
+      - name: Check if version exists on TestFlight
+        id: check
+        working-directory: ios
+        run: |
+          if [ ! -s fastlane/AuthKey.p8 ]; then
+            echo "⚠️ AuthKey.p8 not present or empty. Proceeding with build."
+            echo "skip_build=false" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          bundle exec fastlane check_version || true
+          SKIP="false"
+          if [ -f "skip_ios_build.txt" ]; then
+            SKIP=$(cat skip_ios_build.txt)
+          elif [ -f "fastlane/skip_ios_build.txt" ]; then
+            SKIP=$(cat fastlane/skip_ios_build.txt)
+          elif [ -f "../skip_ios_build.txt" ]; then
+            SKIP=$(cat ../skip_ios_build.txt)
+          fi
+          echo "skip_build=$SKIP" >> $GITHUB_OUTPUT
+          echo "Detected skip_build: $SKIP"
+          if [ "$SKIP" = "true" ]; then
+            echo "### ⏭️ iOS Build Skipped" >> $GITHUB_STEP_SUMMARY
+            echo "iOS version already exists on TestFlight. The iOS build step will be skipped." >> $GITHUB_STEP_SUMMARY
+          fi
+  android:
+    name: Build & Ship Android
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    needs: [gate, check-play-store]
+    if: needs.check-play-store.outputs.skip_build != 'true'
+    env:
+      ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+      ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+      ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+      PLAY_STORE_JSON_PATH: ${{ github.workspace }}/play-store-key.json
+      FLUTTER_CMD: flutter
+      GRADLE_OPTS: -Dorg.gradle.jvmargs="-Xmx4G -XX:MaxMetaspaceSize=2G --add-opens=java.base/java.lang.ref=ALL-UNNAMED"
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - uses: actions/setup-java@3a4f6e1af504cf6a31855fa899c6aa5355ba6c12 # v4.7.0
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Cache pub dependencies
+        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf # v4.2.2
+        with:
+          path: ~/.pub-cache
+          key: android-${{ runner.os }}-${{ hashFiles('pubspec.yaml', 'pubspec.lock') }}
+          restore-keys: |
+            gate-${{ runner.os }}-${{ hashFiles('pubspec.yaml', 'pubspec.lock') }}-
+            gate-${{ runner.os }}-
+            android-${{ runner.os }}-
+
+      - uses: subosito/flutter-action@f2c4f6686ca8e8d6e6d0f28410eeef506ed66aff # v2.18.0
+        with:
+          channel: stable
+          flutter-version-file: pubspec.yaml
+          cache: true
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@18f1c6724d5bcb313b5c5ef536430a31e5c5b455 # v4.4.0
+        with:
+          build-root-directory: ${{ github.workspace }}/android
+
+      - name: Decode signing keystore
+        env:
+          KEY_DATA: ${{ secrets.ANDROID_KEYSTORE }}
+        run: |
+          mkdir -p android/app
+          if [ -n "$KEY_DATA" ]; then
+            echo "$KEY_DATA" | base64 -d -i > android/app/namma-wallet.keystore 2>/dev/null || echo "$KEY_DATA" | base64 --decode > android/app/namma-wallet.keystore
+          fi
+
+      - name: Decode Play Store service account
+        env:
+          KEY_DATA: ${{ secrets.PLAY_STORE_JSON_KEY }}
+        run: |
+          if [ -n "$KEY_DATA" ]; then
+            if echo "$KEY_DATA" | grep -q "^{"; then
+              echo "$KEY_DATA" > play-store-key.json
+            else
+              echo "$KEY_DATA" | base64 -d -i > play-store-key.json 2>/dev/null || echo "$KEY_DATA" | base64 --decode > play-store-key.json 2>/dev/null || echo "$KEY_DATA" > play-store-key.json
+            fi
+          fi
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Generate code files
+        run: dart run build_runner build --delete-conflicting-outputs
+
+      - name: Build signed release APK
+        run: flutter build apk --release
+
+      - name: Set up Ruby for fastlane
+        if: env.STAGE == 'beta'
+        uses: ruby/setup-ruby@28233a011b6bb8633ea908d76c6d23aab6518b5c # v1.223.0
+        with:
+          ruby-version: "3.4.7"
+          bundler-cache: true
+          working-directory: android
+
+      - name: Build AAB and upload to Play internal track
+        if: env.STAGE == 'beta'
+        working-directory: android
+        run: bundle exec fastlane beta
+
+      - name: Version APK artifact
+        run: |
+          VERSION="$(awk '/^version:/ {print $2}' pubspec.yaml)"
+          mv build/app/outputs/flutter-apk/app-release.apk "namma-wallet-v${VERSION}.apk"
+
+      - name: Upload APK workflow artifact
+        uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 # v4.6.1
+        with:
+          name: namma-wallet-apk
+          path: namma-wallet-v*.apk
+          retention-days: 7
+          if-no-files-found: error
+
+  ios:
+    name: Build & Ship iOS
+    runs-on: macos-latest
+    timeout-minutes: 90
+    needs: [gate, check-app-store]
+    if: needs.check-app-store.outputs.skip_build != 'true'
+    env:
+      APP_STORE_CONNECT_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+      APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+      APP_STORE_CONNECT_KEY_PATH: ./AuthKey.p8
+      FLUTTER_CMD: flutter
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Cache pub dependencies
+        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf # v4.2.2
+        with:
+          path: ~/.pub-cache
+          key: ios-${{ runner.os }}-${{ hashFiles('pubspec.yaml', 'pubspec.lock') }}
+          restore-keys: |
+            ios-${{ runner.os }}-
+
+      - name: Cache CocoaPods
+        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf # v4.2.2
+        with:
+          path: |
+            ios/Pods
+            ~/Library/Caches/CocoaPods
+          key: cocoapods-${{ runner.os }}-${{ hashFiles('ios/Podfile.lock') }}
+          restore-keys: |
+            cocoapods-${{ runner.os }}-
+
+      - uses: subosito/flutter-action@f2c4f6686ca8e8d6e6d0f28410eeef506ed66aff # v2.18.0
+        with:
+          channel: stable
+          flutter-version-file: pubspec.yaml
+          cache: true
+
+      - name: Set up Ruby for fastlane
+        uses: ruby/setup-ruby@28233a011b6bb8633ea908d76c6d23aab6518b5c # v1.223.0
+        with:
+          ruby-version: "3.3.10"
+          bundler-cache: true
+          working-directory: ios
+
+      - name: Decode App Store Connect API key
+        env:
+          KEY_DATA: ${{ secrets.APP_STORE_CONNECT_P8_BASE64 }}
+        run: |
+          mkdir -p ios/fastlane
+          if [ -n "$KEY_DATA" ]; then
+            if echo "$KEY_DATA" | grep -q "BEGIN PRIVATE KEY"; then
+              echo "$KEY_DATA" > ios/fastlane/AuthKey.p8
+            else
+              echo "$KEY_DATA" | base64 -d -i > ios/fastlane/AuthKey.p8 2>/dev/null || echo "$KEY_DATA" | base64 --decode > ios/fastlane/AuthKey.p8 2>/dev/null || echo "$KEY_DATA" > ios/fastlane/AuthKey.p8
+            fi
+          fi
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Generate code files
+        run: dart run build_runner build --delete-conflicting-outputs
+
+      - name: Install CocoaPods dependencies
+        working-directory: ios
+        run: pod install
+
+      - name: Build and upload to TestFlight
+        if: env.STAGE == 'beta'
+        working-directory: ios
+        run: bundle exec fastlane beta
+
+      - name: Build signed IPA only
+        if: env.STAGE == 'release'
+        working-directory: ios
+        run: bundle exec fastlane build_ipa
+
+      - name: Version IPA artifact
+        run: |
+          VERSION="$(awk '/^version:/ {print $2}' pubspec.yaml)"
+          mv build/ios/ipa/*.ipa "namma-wallet-v${VERSION}.ipa"
+
+      - name: Upload IPA workflow artifact
+        uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 # v4.6.1
+        with:
+          name: namma-wallet-ipa
+          path: namma-wallet-v*.ipa
+          retention-days: 7
+          if-no-files-found: error
+
+  promote:
+    name: Promote to Production
+    if: ${{ !cancelled() && (github.event_name == 'pull_request' && github.base_ref == 'release') || (github.event_name == 'workflow_dispatch' && inputs.stage == 'release') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs: [android, ios, check-play-store, check-app-store]
+    env:
+      PLAY_STORE_JSON_PATH: ${{ github.workspace }}/play-store-key.json
+      APP_STORE_CONNECT_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+      APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+      APP_STORE_CONNECT_KEY_PATH: ./AuthKey.p8
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Decode Play Store service account
+        env:
+          KEY_DATA: ${{ secrets.PLAY_STORE_JSON_KEY }}
+        run: |
+          if [ -n "$KEY_DATA" ]; then
+            if echo "$KEY_DATA" | grep -q "^{"; then
+              echo "$KEY_DATA" > play-store-key.json
+            else
+              echo "$KEY_DATA" | base64 -d -i > play-store-key.json 2>/dev/null || echo "$KEY_DATA" | base64 --decode > play-store-key.json 2>/dev/null || echo "$KEY_DATA" > play-store-key.json
+            fi
+          fi
+
+      - name: Decode App Store Connect API key
+        env:
+          KEY_DATA: ${{ secrets.APP_STORE_CONNECT_P8_BASE64 }}
+        run: |
+          mkdir -p ios/fastlane
+          if [ -n "$KEY_DATA" ]; then
+            if echo "$KEY_DATA" | grep -q "BEGIN PRIVATE KEY"; then
+              echo "$KEY_DATA" > ios/fastlane/AuthKey.p8
+            else
+              echo "$KEY_DATA" | base64 -d -i > ios/fastlane/AuthKey.p8 2>/dev/null || echo "$KEY_DATA" | base64 --decode > ios/fastlane/AuthKey.p8 2>/dev/null || echo "$KEY_DATA" > ios/fastlane/AuthKey.p8
+            fi
+          fi
+
+      - name: Set up Ruby for Android fastlane
+        uses: ruby/setup-ruby@28233a011b6bb8633ea908d76c6d23aab6518b5c # v1.223.0
+        with:
+          ruby-version: "3.4.7"
+          bundler-cache: true
+          working-directory: android
+
+      - name: Promote Android build to Production
+        if: needs.android.result == 'success'
+        working-directory: android
+        run: bundle exec fastlane production
+
+      - name: Set up Ruby for iOS fastlane
+        uses: ruby/setup-ruby@28233a011b6bb8633ea908d76c6d23aab6518b5c # v1.223.0
+        with:
+          ruby-version: "3.3.10"
+          bundler-cache: true
+          working-directory: ios
+
+      - name: Promote iOS build to App Store
+        working-directory: ios
+        run: bundle exec fastlane production
+
+  github-release:
+    name: Publish GitHub Release
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: [android, ios, promote]
+    if: ${{ !cancelled() && (needs.android.result == 'success' || needs.android.result == 'skipped') && needs.ios.result == 'success' && (needs.promote.result == 'success' || needs.promote.result == 'skipped') }}
+    permissions:
+      contents: write
+      id-token: write
+      attestations: write
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@cc203385981b70ca67e1cc392babf9cc229d5806 # v4.1.9
+        with:
+          pattern: namma-wallet-*
+          merge-multiple: true
+          path: dist
+
+      - name: Resolve version
+        id: meta
+        run: |
+          VERSION="$(awk '/^version:/ {print $2}' pubspec.yaml)"
+          PRERELEASE="true"
+          [ "$STAGE" = "release" ] && PRERELEASE="false"
+          {
+            echo "version=${VERSION}"
+            echo "prerelease=${PRERELEASE}"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Attest APK provenance
+        if: needs.android.result == 'success'
+        uses: actions/attest-build-provenance@c074443f1aee8d4aeeae555aebba3282517141b2 # v2.2.3
+        with:
+          subject-path: dist/namma-wallet-v*.apk
+
+      - name: Attest IPA provenance
+        uses: actions/attest-build-provenance@c074443f1aee8d4aeeae555aebba3282517141b2 # v2.2.3
+        with:
+          subject-path: dist/namma-wallet-v*.ipa
+
+      - name: Prepare release notes
+        run: cat ios/fastlane/metadata/en-US/release_notes.txt > release_body.md
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@c95fe1489396fe8a9eb87c0abf8aa5b2ef267fda # v2.2.1
+        with:
+          tag_name: v${{ steps.meta.outputs.version }}
+          name: Namma Wallet v${{ steps.meta.outputs.version }}
+          body_path: release_body.md
+          prerelease: ${{ steps.meta.outputs.prerelease }}
+          files: dist/namma-wallet-v*
+          fail_on_unmatched_files: false
+
+  ci-ok:
+    name: CI Status
+    if: always()
+    needs: [gate, check-play-store, check-app-store, android, ios, promote]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check all jobs
+        run: |
+          echo "gate: ${{ needs.gate.result }}"
+          echo "check-play-store: ${{ needs.check-play-store.result }}"
+          echo "check-app-store: ${{ needs.check-app-store.result }}"
+          echo "android: ${{ needs.android.result }}"
+          echo "ios: ${{ needs.ios.result }}"
+          echo "promote: ${{ needs.promote.result }}"
+          if [[ "${{ needs.gate.result }}" == "failure" || "${{ needs.android.result }}" == "failure" || "${{ needs.ios.result }}" == "failure" || "${{ needs.promote.result }}" == "failure" ]]; then
+            echo "One or more jobs failed"
+            exit 1
+          fi
+          if [[ "${{ needs.gate.result }}" == "cancelled" || "${{ needs.android.result }}" == "cancelled" || "${{ needs.ios.result }}" == "cancelled" ]]; then
+            echo "One or more jobs was cancelled"
+            exit 1
+          fi
+          echo "All checks passed or were skipped"

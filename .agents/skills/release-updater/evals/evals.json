@@ -1,0 +1,17 @@
+{
+  "skill_name": "release-updater",
+  "evals": [
+    {
+      "id": 0,
+      "prompt": "bump the app version and updates the technical changes in changelog.md and update the appstore and playstore changelog in non technical user friendly way. it should scan all the commits from last version till now",
+      "expected_output": "The version in pubspec.yaml is bumped to 0.3.5+11. CHANGELOG.md is updated with technical release notes. The App Store and Play Store release notes are updated in a user-friendly, non-technical way under 500 characters.",
+      "files": []
+    },
+    {
+      "id": 1,
+      "prompt": "We need to do a version bump for the next release. Scan git commits since version 0.3.3+9 and document the changes in the project changelog (technical summary) and write friendly App Store/Play Store whatsnew logs.",
+      "expected_output": "Version bumped, CHANGELOG.md updated, and platform release notes updated.",
+      "files": []
+    }
+  ]
+}

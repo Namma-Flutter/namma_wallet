@@ -1,3 +1,4 @@
+// coverage:ignore-file
 import 'package:gaimon/gaimon.dart';
 import 'package:namma_wallet/src/common/services/haptic/haptic_service_interface.dart';
 import 'package:shared_preferences/shared_preferences.dart';

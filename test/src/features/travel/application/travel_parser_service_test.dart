@@ -1,40 +1,123 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/enums/source_type.dart';
+import 'package:namma_wallet/src/common/enums/ticket_type.dart';
+import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
 import 'package:namma_wallet/src/features/travel/application/travel_parser_service.dart';
 
+import '../../../../fixtures/tnstc_layout_fixtures.dart';
 import '../../../../fixtures/tnstc_sms_fixtures.dart';
 import '../../../../helpers/fake_logger.dart';
 
 void main() {
+  setUpAll(() async {
+    final fakeLogger = FakeLogger();
+    getIt.registerLazySingleton<ILogger>(() => fakeLogger);
+  });
+
   group('TravelParserService Tests', () {
     late TravelParserService service;
     late FakeLogger fakeLogger;
 
-    setUp(() {
-      fakeLogger = FakeLogger();
+    setUp(() async {
+      fakeLogger = getIt<ILogger>() as FakeLogger;
       service = TravelParserService(logger: fakeLogger);
+      getIt.pushNewScope();
     });
 
-    group('TNSTC Parser - SMS Format', () {
+    tearDown(() async {
+      await getIt.popScope();
+    });
+
+    group('TNSTC Parser - PDF (Layout) Format', () {
+      test(
+        'Given SETC PDF OCR blocks, When parsing ticket, '
+        'Then returns valid SETC ticket',
+        () {
+          // Arrange
+          final blocks = TnstcLayoutFixtures.t73266848;
+
+          // Act
+          final ticket = service.parseTicketFromBlocks(blocks);
+
+          // Assert
+          expect(ticket, isNotNull);
+          expect(ticket!.ticketId, equals('T73266848'));
+          expect(ticket.type, equals(TicketType.bus));
+          expect(
+            ticket.startTime,
+            isNotNull,
+            reason: 'startTime (journey date) should not be null',
+          );
+
+          // Verify passenger details
+          expect(ticket.extras, isNotNull);
+          final passengerExtra = ticket.extras
+              ?.where((e) => e.title == 'Passenger')
+              .toList();
+          expect(
+            passengerExtra,
+            isNotEmpty,
+            reason: 'Passenger info should be extracted',
+          );
+          expect(passengerExtra![0].value, contains('TEST PASSENGER 5'));
+          expect(passengerExtra[0].child, isNotNull);
+          final seatExtra = passengerExtra[0].child
+              ?.where((e) => e.title == 'Seat')
+              .firstOrNull;
+          expect(seatExtra?.value, equals('10UB'));
+
+          // Verify missing fields reported by user
+          // Note: We check the ticket's derived fields or extras
+          expect(ticket.location, contains('CHENNAI-PT Dr.M.G.R. BS'));
+
+          final extrasMap = {for (final e in ticket.extras!) e.title: e.value};
+          expect(
+            extrasMap['Departure'],
+            contains('11:30 PM'),
+          ); // From serviceStartTime
+          expect(
+            extrasMap['Pickup Time'],
+            contains('11:30 PM'),
+          ); // From passengerPickupTime
+          expect(extrasMap['Platform'], equals('2'));
+          expect(extrasMap['Service Class'], equals('AC SLEEPER SEATER'));
+          expect(extrasMap['Booking Ref'], equals('OB31464175'));
+          expect(extrasMap['Bus ID'], equals('E-3269'));
+
+          final providerExtra = ticket.extras?.firstWhere(
+            (e) => e.title == 'Provider',
+          );
+          expect(providerExtra?.value, equals('SETC'));
+        },
+      );
+    });
+
+    group('TNSTC / SETC Parser - SMS Format', () {
       test(
         'Given TNSTC SMS format text, When parsing ticket, '
-        'Then returns valid TNSTC ticket',
+        'Then returns valid TNSTC ticket with TNSTC provider',
         () {
-          // Arrange (Given) - Using real TNSTC SMS data
-          const smsText = TnstcSmsFixtures.setcKumbakonamToChennai;
+          const smsText = '''
+TNSTC Corporation:TNSTC , PNR NO.:U70109781 , From:MADURAI To CHENNAI , Trip Code:0400MADCHE , Journey Date:30/08/2025 , Time:,04:00 , Seat No.:24 .Class:DELUXE 3X2 , Boarding at:MADURAI
+''';
 
           // Act (When)
           final ticket = service.parseTicketFromText(smsText);
 
           // Assert (Then)
           expect(ticket, isNotNull);
-          expect(ticket!.ticketId, equals('T73309927'));
+          expect(ticket!.ticketId, equals('U70109781'));
+          final providerExtra = ticket.extras?.firstWhere(
+            (e) => e.title == 'Provider',
+          );
+          expect(providerExtra?.value, equals('TNSTC'));
         },
       );
 
       test(
         'Given SETC SMS format text, When parsing ticket, '
-        'Then returns valid SETC ticket',
+        'Then returns valid SETC ticket with SETC provider',
         () {
           // Arrange (Given) - Using real SETC SMS data
           const smsText = TnstcSmsFixtures.setcChennaiToKumbakonam;
@@ -45,6 +128,33 @@ void main() {
           // Assert (Then)
           expect(ticket, isNotNull);
           expect(ticket!.ticketId, equals('T69704790'));
+          final providerExtra = ticket.extras?.firstWhere(
+            (e) => e.title == 'Provider',
+          );
+          expect(providerExtra?.value, equals('SETC'));
+        },
+      );
+
+      test(
+        'Given text with State Express Transport Corporation, '
+        'When parsing ticket, '
+        'Then classifies provider as SETC',
+        () {
+          const text = '''
+State Express Transport Corporation
+PNR NO. : T12345678
+From : CHENNAI To MADURAI
+Time : 22:00
+DOJ : 20/08/2025
+''';
+
+          final ticket = service.parseTicketFromText(text);
+
+          expect(ticket, isNotNull);
+          final providerExtra = ticket!.extras?.firstWhere(
+            (e) => e.title == 'Provider',
+          );
+          expect(providerExtra?.value, equals('SETC'));
         },
       );
     });
@@ -73,7 +183,7 @@ Scheduled Departure : 14:30
           // Assert (Then)
           expect(ticket, isNotNull);
           expect(ticket!.ticketId, equals('1234567890'));
-          expect(ticket.primaryText, contains('Chennai Express'));
+          expect(ticket.secondaryText, contains('Chennai Express'));
         },
       );
 
@@ -116,10 +226,10 @@ Reservation Upto : Kolkata
           // Assert (Then)
           expect(ticket, isNotNull);
           expect(ticket!.ticketId, equals('9876543210'));
-          // Should use sentinel value (epoch 1970)
+          // Should be null instead of a sentinel value
           expect(
             ticket.startTime,
-            equals(IRCTCTrainParser.invalidDateSentinel),
+            isNull,
           );
         },
       );
@@ -348,7 +458,7 @@ PNR NO. : T123456789
     group('Error Handling', () {
       test(
         'Given malformed text that matches pattern, When parsing fails, '
-        'Then returns ticket with empty ticketId',
+        'Then returns ticket with null ticketId',
         () {
           // Arrange (Given)
           const malformedText = '''
@@ -361,9 +471,9 @@ Train No. :
           final ticket = service.parseTicketFromText(malformedText);
 
           // Assert (Then)
-          // Should still parse but with empty ticketId
+          // Should still parse but with null ticketId (PNR absent)
           expect(ticket, isNotNull);
-          expect(ticket!.ticketId, isEmpty);
+          expect(ticket!.ticketId, isNull);
         },
       );
 

@@ -90,7 +90,7 @@ class MockTicketDAO implements ITicketDAO {
     if (shouldThrow) throw Exception('Mock get error');
     // Assuming TicketType is an enum,
     // we compare names or convert string to enum
-    return insertedTickets.where((t) => t.type.name == type).toList();
+    return insertedTickets.where((t) => (t.type?.name ?? '') == type).toList();
   }
 
   @override
@@ -104,5 +104,29 @@ class MockTicketDAO implements ITicketDAO {
     final initialLength = insertedTickets.length;
     insertedTickets.removeWhere((t) => t.ticketId == ticketId);
     return initialLength - insertedTickets.length;
+  }
+
+  @override
+  Future<List<Ticket>> getActiveTickets() async {
+    if (shouldThrow) throw Exception('Mock get error');
+    return insertedTickets;
+  }
+
+  @override
+  Future<List<Ticket>> getArchivedTickets() async {
+    if (shouldThrow) throw Exception('Mock get error');
+    return [];
+  }
+
+  @override
+  Future<int> archivePastTickets() async {
+    if (shouldThrow) throw Exception('Mock archive error');
+    return 0;
+  }
+
+  @override
+  Future<int> purgeOldArchivedTickets({int retentionDays = 30}) async {
+    if (shouldThrow) throw Exception('Mock purge error');
+    return 0;
   }
 }

@@ -21,12 +21,10 @@ class TNSTCTicketModel with TNSTCTicketModelMappable {
     this.tripCode,
     this.obReferenceNumber,
     this.numberOfSeats,
-    this.bankTransactionNumber,
+
     this.busIdNumber,
     this.passengerCategory,
     this.passengers = const [],
-    this.idCardType,
-    this.idCardNumber,
     this.totalFare,
     this.boardingPoint,
     this.conductorMobileNo,
@@ -49,12 +47,10 @@ class TNSTCTicketModel with TNSTCTicketModelMappable {
   final String? tripCode;
   final String? obReferenceNumber;
   final int? numberOfSeats;
-  final String? bankTransactionNumber;
+
   final String? busIdNumber;
   final String? passengerCategory;
   final List<PassengerInfo> passengers;
-  final String? idCardType;
-  final String? idCardNumber;
   final double? totalFare;
   final String? boardingPoint;
   final String? conductorMobileNo;
@@ -81,12 +77,9 @@ Class of Service: $classOfService,
 Trip Code: $tripCode,
 OB Reference No: $obReferenceNumber,
 Number of Seats: $numberOfSeats,
-Bank Transaction No: $bankTransactionNumber,
 Bus ID No: $busIdNumber,
 Passenger Category: $passengerCategory,
 Passengers: ${passengers.map((p) => p.toString()).join(', ')},
-ID Card Type: $idCardType,
-ID Card Number: $idCardNumber,
 Total Fare: ₹$totalFare,
 Boarding Point: $boardingPoint
 )''';
@@ -120,7 +113,7 @@ Boarding Point: $boardingPoint
     // Otherwise, extract from passenger info (from PDF parsing)
     return passengers
         .map((p) => p.seatNumber)
-        .where((s) => s.isNotEmpty)
+        .where((s) => s != null && s.isNotEmpty)
         .join(', ');
   }
 }
@@ -129,16 +122,16 @@ Boarding Point: $boardingPoint
 class PassengerInfo with PassengerInfoMappable {
   const PassengerInfo({
     required this.name,
-    required this.age,
-    required this.type,
-    required this.gender,
-    required this.seatNumber,
+    this.type,
+    this.gender,
+    this.seatNumber,
+    this.age,
   });
   final String name;
-  final int age;
-  final String type; // "Adult" or "Child"
-  final String gender; // "M" or "F"
-  final String seatNumber;
+  final int? age;
+  final String? type; // "Adult" or "Child"
+  final String? gender; // "M" or "F"
+  final String? seatNumber;
 
   @override
   String toString() {

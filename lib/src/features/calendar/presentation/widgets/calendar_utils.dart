@@ -3,7 +3,7 @@ import 'package:namma_wallet/src/common/enums/ticket_type.dart';
 import 'package:namma_wallet/src/common/theme/styles.dart';
 
 class CalendarUtils {
-  static Color getTicketTypeColor(TicketType type) {
+  static Color getTicketTypeColor(TicketType? type) {
     switch (type) {
       case TicketType.bus:
         return AppColor.busTicketColor;
@@ -15,10 +15,12 @@ class CalendarUtils {
         return AppColor.eventTicketColor;
       case TicketType.metro:
         return AppColor.metroTicketColor;
+      case null:
+        return AppColor.primaryBlue;
     }
   }
 
-  static IconData getTicketTypeIcon(TicketType type) {
+  static IconData getTicketTypeIcon(TicketType? type) {
     switch (type) {
       case TicketType.bus:
         return Icons.directions_bus;
@@ -30,6 +32,8 @@ class CalendarUtils {
         return Icons.event;
       case TicketType.metro:
         return Icons.subway;
+      case null:
+        return Icons.confirmation_number_outlined;
     }
   }
 }

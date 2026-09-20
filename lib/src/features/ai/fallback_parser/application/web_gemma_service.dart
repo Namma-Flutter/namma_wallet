@@ -1,3 +1,4 @@
+// coverage:ignore-file
 import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/features/ai/fallback_parser/application/ai_service_interface.dart';
 import 'package:namma_wallet/src/features/settings/application/ai_service_status.dart';

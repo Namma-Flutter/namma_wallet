@@ -1,0 +1,378 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - ready_for_review
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  format-analyze:
+    name: flutter-format-and-analyze
+    if: "!github.event.pull_request.draft"
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    outputs:
+      dart: ${{ steps.filter.outputs.dart }}
+
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Check for Dart & CI Changes
+        uses: dorny/paths-filter@0e4a8c6effa4802afeda77dc8d303f8176d7dfad # v3
+        id: filter
+        with:
+          filters: |
+            dart:
+              - 'lib/**'
+              - 'test/**'
+              - 'pubspec.yaml'
+              - 'pubspec.lock'
+              - 'build.yaml'
+              - '.github/workflows/ci.yml'
+
+      - name: Fast Pass-Through (Unaffected PR)
+        if: steps.filter.outputs.dart != 'true'
+        run: |
+          echo "### ⚡ Fast Pass-Through" >> $GITHUB_STEP_SUMMARY
+          echo "No Dart or CI workflow files modified. Skipping formatting and static analysis." >> $GITHUB_STEP_SUMMARY
+
+      - name: Read Flutter version from pubspec.yaml
+        if: steps.filter.outputs.dart == 'true'
+        id: flutter_version
+        run: |
+          VERSION=$(grep '^  flutter:' pubspec.yaml | awk -F'"' '{print $2}')
+          echo "flutter_version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Set up Flutter
+        if: steps.filter.outputs.dart == 'true'
+        uses: subosito/flutter-action@f2c4f6686ca8e8d6e6d0f28410eeef506ed66aff # v2.18.0
+        with:
+          channel: stable
+          flutter-version: ${{ steps.flutter_version.outputs.flutter_version }}
+          cache: true
+
+      - name: Install dependencies
+        if: steps.filter.outputs.dart == 'true'
+        run: flutter pub get
+
+      - name: Check dart format
+        if: steps.filter.outputs.dart == 'true'
+        id: format_check
+        run: |
+          set +e
+          dart format --set-exit-if-changed .
+          echo "exit_code=$?" >> $GITHUB_OUTPUT
+          exit 0
+
+      - name: Cache build_runner asset graph
+        if: steps.filter.outputs.dart == 'true'
+        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf # v4.2.2
+        with:
+          path: .dart_tool/build
+          key: build-runner-${{ runner.os }}-${{ hashFiles('pubspec.lock') }}-${{ hashFiles('lib/**/*.dart') }}
+          restore-keys: |
+            build-runner-${{ runner.os }}-${{ hashFiles('pubspec.lock') }}-
+            build-runner-${{ runner.os }}-
+
+      - name: Check build runner code generation
+        if: steps.filter.outputs.dart == 'true'
+        id: build_runner_check
+        run: |
+          set +e
+          dart run build_runner build --delete-conflicting-outputs 2>&1 | tee build_runner.log
+          BUILD_RUNNER_EXIT=${PIPESTATUS[0]}
+          if [ $BUILD_RUNNER_EXIT -ne 0 ]; then
+            echo "exit_code=$BUILD_RUNNER_EXIT" >> $GITHUB_OUTPUT
+            echo "drift=0" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          CHANGED=$(git status --porcelain)
+          if [ -n "$CHANGED" ]; then
+            echo "exit_code=0" >> $GITHUB_OUTPUT
+            echo "drift=1" >> $GITHUB_OUTPUT
+            echo "::group::Uncommitted Code Generation Changes"
+            git status --short
+            git diff
+            echo "::endgroup::"
+          else
+            echo "exit_code=0" >> $GITHUB_OUTPUT
+            echo "drift=0" >> $GITHUB_OUTPUT
+          fi
+          exit 0
+
+      - name: Run flutter analyze (write log)
+        if: steps.filter.outputs.dart == 'true' && steps.format_check.outputs.exit_code == '0' && steps.build_runner_check.outputs.exit_code == '0' && steps.build_runner_check.outputs.drift == '0'
+        run: flutter analyze --write=flutter_analyze.log
+
+      - name: Prepare PR comments & step summary
+        if: always() && steps.filter.outputs.dart == 'true'
+        run: |
+          mkdir -p pr-comments
+          echo "${{ github.event.pull_request.number }}" > pr-comments/pr_number
+
+          # 1. Format check summary
+          if [ "${{ steps.format_check.outputs.exit_code }}" != "0" ]; then
+            cat << 'EOF' > pr-comments/format_comment.txt
+          ❌ **Formatting check failed**
+          Please run:
+          ```bash
+          fvm dart format .
+          ```
+          or
+          ```bash
+          dart format .
+          ```
+          Then push the updated files.
+          EOF
+            echo "### ❌ Dart Format Check Failed" >> $GITHUB_STEP_SUMMARY
+            echo "Run \`fvm dart format .\` to fix code formatting." >> $GITHUB_STEP_SUMMARY
+          else
+            echo "DELETE" > pr-comments/format_comment.txt
+            echo "### ✅ Dart Format Passed" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          # 2. Build runner check summary
+          if [ "${{ steps.build_runner_check.outputs.exit_code }}" != "0" ]; then
+            BUILD_ERRORS=""
+            if [ -f build_runner.log ]; then
+              BUILD_ERRORS=$(tail -n 30 build_runner.log)
+            fi
+            {
+              echo "❌ **Build runner failed**"
+              echo ""
+              echo "Code generation failed with errors:"
+              echo '```'
+              echo "$BUILD_ERRORS"
+              echo '```'
+              echo ""
+              echo "Please fix the errors and run:"
+              echo "```bash"
+              echo "fvm dart run build_runner build --delete-conflicting-outputs"
+              echo "```"
+            } > pr-comments/build_runner_comment.txt
+            {
+              echo "### ❌ Build Runner Execution Failed"
+              echo "```"
+              echo "$BUILD_ERRORS"
+              echo "```"
+            } >> $GITHUB_STEP_SUMMARY
+          elif [ "${{ steps.build_runner_check.outputs.drift }}" == "1" ]; then
+            DIFF_SUMMARY=$(git status --short)
+            {
+              echo "❌ **Generated files are missing or out of date**"
+              echo ""
+              echo "Running \`build_runner\` produced uncommitted changes:"
+              echo '```'
+              echo "$DIFF_SUMMARY"
+              echo '```'
+              echo ""
+              echo "Please run code generation and commit the changes:"
+              echo "```bash"
+              echo "fvm dart run build_runner build --delete-conflicting-outputs"
+              echo "```"
+              echo "or"
+              echo "```bash"
+              echo "make codegen"
+              echo "```"
+              echo "Then commit and push the updated files."
+            } > pr-comments/build_runner_comment.txt
+            {
+              echo "### ❌ Generated Code Drift Detected"
+              echo "The following files were created or modified during code generation:"
+              echo "```"
+              echo "$DIFF_SUMMARY"
+              echo "```"
+              echo "Run \`make codegen\` and commit the changes."
+            } >> $GITHUB_STEP_SUMMARY
+          else
+            echo "DELETE" > pr-comments/build_runner_comment.txt
+            echo "### ✅ Build Runner Code Generation Passed" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          # 3. Analyze summary
+          if [ "${{ steps.format_check.outputs.exit_code }}" == "0" ] && [ "${{ steps.build_runner_check.outputs.exit_code }}" == "0" ] && [ "${{ steps.build_runner_check.outputs.drift }}" == "0" ]; then
+            if [ -f flutter_analyze.log ] && [ -s flutter_analyze.log ]; then
+              content=$(cat flutter_analyze.log)
+              {
+                echo "❌ **Flutter analysis found issues:**"
+                echo '```'
+                echo "$content"
+                echo '```'
+              } > pr-comments/analyze_comment.txt
+              {
+                echo "### ❌ Flutter Analyze Found Issues"
+                echo "```"
+                echo "$content"
+                echo "```"
+              } >> $GITHUB_STEP_SUMMARY
+            else
+              echo "✅ **Flutter analysis passed** — no issues found." > pr-comments/analyze_comment.txt
+              echo "### ✅ Flutter Analysis Passed" >> $GITHUB_STEP_SUMMARY
+            fi
+          fi
+
+      - name: Prepare placeholder for fast paths
+        if: always() && steps.filter.outputs.dart != 'true' && github.event_name == 'pull_request'
+        run: |
+          mkdir -p pr-comments
+          echo "${{ github.event.pull_request.number }}" > pr-comments/pr_number
+          echo "DELETE" > pr-comments/analyze_comment.txt
+
+      - name: Upload PR comments artifact
+        if: always() && steps.filter.outputs.dart == 'true'
+        uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 # v4.6.1
+        with:
+          name: pr-comments-format-analyze
+          path: pr-comments/
+
+      - name: Check format, codegen, and analysis results
+        if: always() && steps.filter.outputs.dart == 'true'
+        run: |
+          FAILED=0
+          if [ "${{ steps.format_check.outputs.exit_code }}" != "0" ]; then
+            echo "::error::Dart formatting check failed"
+            FAILED=1
+          fi
+          if [ "${{ steps.build_runner_check.outputs.exit_code }}" != "0" ]; then
+            echo "::error::Build runner execution failed"
+            FAILED=1
+          fi
+          if [ "${{ steps.build_runner_check.outputs.drift }}" == "1" ]; then
+            echo "::error::Generated files are missing or out of date"
+            git status --porcelain
+            git diff
+            FAILED=1
+          fi
+          if [ "${{ steps.format_check.outputs.exit_code }}" == "0" ] && [ "${{ steps.build_runner_check.outputs.exit_code }}" == "0" ] && [ "${{ steps.build_runner_check.outputs.drift }}" == "0" ]; then
+            if [ -f flutter_analyze.log ] && [ -s flutter_analyze.log ]; then
+              echo "::error::Flutter analyze found issues"
+              FAILED=1
+            fi
+          fi
+          if [ $FAILED -ne 0 ]; then
+            exit 1
+          fi
+
+  test-coverage:
+    needs: format-analyze
+    if: github.actor != 'dependabot[bot]' && !github.event.pull_request.draft && needs.format-analyze.outputs.dart == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Read Flutter version from pubspec.yaml
+        id: flutter_version
+        run: |
+          VERSION=$(grep '^  flutter:' pubspec.yaml | awk -F'"' '{print $2}')
+          echo "flutter_version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@f2c4f6686ca8e8d6e6d0f28410eeef506ed66aff # v2.18.0
+        with:
+          channel: stable
+          flutter-version: ${{ steps.flutter_version.outputs.flutter_version }}
+          cache: true
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Cache build_runner asset graph
+        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf # v4.2.2
+        with:
+          path: .dart_tool/build
+          key: build-runner-${{ runner.os }}-${{ hashFiles('pubspec.lock') }}-${{ hashFiles('lib/**/*.dart') }}
+          restore-keys: |
+            build-runner-${{ runner.os }}-${{ hashFiles('pubspec.lock') }}-
+            build-runner-${{ runner.os }}-
+
+      - name: Generate code files
+        run: dart run build_runner build --delete-conflicting-outputs
+
+      - name: Run tests with coverage
+        id: test_run
+        run: |
+          set +e
+          set -o pipefail
+          flutter test --coverage 2>&1 | tee test_output.log
+          echo "exit_code=$?" >> $GITHUB_OUTPUT
+          exit 0
+
+      - name: Prepare PR comments
+        if: always()
+        run: |
+          mkdir -p pr-comments
+          echo "${{ github.event.pull_request.number }}" > pr-comments/pr_number
+
+          if [ "${{ steps.test_run.outputs.exit_code }}" != "0" ]; then
+            if [ -f test_output.log ]; then
+              FAILURES=$(grep -A 50 "Some tests failed" test_output.log || grep -A 50 "FAILED" test_output.log || tail -n 30 test_output.log)
+              if [ ${#FAILURES} -gt 4500 ]; then
+                FAILURES="${FAILURES:0:4500}... (truncated)"
+              fi
+            else
+              FAILURES="Could not find test output log"
+            fi
+            
+            {
+              echo "❌ **Test run failed**"
+              echo ""
+              echo "Some tests did not pass. Please review the failures below:"
+              echo ""
+              echo "```"
+              echo "$FAILURES"
+              echo "```"
+              echo ""
+              echo "Please fix the failing tests and push the updated code."
+            } > pr-comments/test_comment.txt
+          else
+            {
+              echo "✅ **All tests passed!**"
+              echo ""
+              echo "The previously failing tests are now fixed."
+            } > pr-comments/test_comment.txt
+          fi
+
+      - name: Upload PR comments artifact
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: pr-comments-coverage
+          path: pr-comments/
+
+      - name: Check test results
+        if: always()
+        run: |
+          if [ "${{ steps.test_run.outputs.exit_code }}" != "0" ]; then
+            echo "Tests failed with exit code ${{ steps.test_run.outputs.exit_code }}"
+            exit 1
+          fi
+
+      - name: Upload coverage to Codecov
+        if: ${{ steps.test_run.outputs.exit_code == '0' }}
+        uses: codecov/codecov-action@0565863a31f2c772f9f0395002a31e3f06189574 # v5.4.0
+        with:
+          directory: ./coverage
+          fail_ci_if_error: false
+          files: ./coverage/lcov.info
+          flags: unittests
+          name: codecov-umbrella
+          token: ${{ secrets.CODECOV_TOKEN }}
+          verbose: true

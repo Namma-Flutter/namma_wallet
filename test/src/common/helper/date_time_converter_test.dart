@@ -34,14 +34,14 @@ void main() {
           final result = converter.formatTime(dt);
 
           // Assert
-          expect(result, equals('12:00 am'));
+          expect(result, equals('12:00 AM'));
         },
       );
 
       test(
         'Given a DateTime at noon, '
         'When formatTime is called, '
-        'Then returns 12:00 pm',
+        'Then returns 12:00 AM',
         () {
           // Arrange
           final dt = DateTime(2026, 1, 18, 12);
@@ -50,7 +50,7 @@ void main() {
           final result = converter.formatTime(dt);
 
           // Assert
-          expect(result, equals('12:00 pm'));
+          expect(result, equals('12:00 PM'));
         },
       );
 
@@ -66,7 +66,7 @@ void main() {
           final result = converter.formatTime(dt);
 
           // Assert
-          expect(result, equals('09:30 am'));
+          expect(result, equals('09:30 AM'));
         },
       );
 
@@ -82,7 +82,7 @@ void main() {
           final result = converter.formatTime(dt);
 
           // Assert
-          expect(result, equals('01:15 pm'));
+          expect(result, equals('01:15 PM'));
         },
       );
 
@@ -98,7 +98,7 @@ void main() {
           final result = converter.formatTime(dt);
 
           // Assert
-          expect(result, equals('11:59 pm'));
+          expect(result, equals('11:59 PM'));
         },
       );
 
@@ -120,7 +120,7 @@ void main() {
               ? (local.hour - 12).toString().padLeft(2, '0')
               : local.hour.toString().padLeft(2, '0');
           final minute = local.minute.toString().padLeft(2, '0');
-          final period = local.hour >= 12 ? 'pm' : 'am';
+          final period = local.hour >= 12 ? 'PM' : 'AM';
           final expected = '$hour12:$minute $period';
           expect(result, equals(expected));
         },
@@ -138,7 +138,7 @@ void main() {
           final result = converter.formatTime(dt);
 
           // Assert
-          expect(result, equals('01:05 am'));
+          expect(result, equals('01:05 AM'));
         },
       );
     });
@@ -635,7 +635,7 @@ void main() {
           final result = DateTimeConverter.instance.formatTime(dt);
 
           // Assert
-          expect(result, equals('01:15 pm'));
+          expect(result, equals('01:15 PM'));
         },
       );
 
@@ -651,7 +651,7 @@ void main() {
           final result = DateTimeConverter.instance.formatTime(dt);
 
           // Assert
-          expect(result, equals('12:00 am'));
+          expect(result, equals('12:00 AM'));
         },
       );
     });
@@ -816,7 +816,7 @@ void main() {
 
         // Assert
         expect(dateResult, equals('01/01/1900'));
-        expect(timeResult, equals('12:00 pm'));
+        expect(timeResult, equals('12:00 PM'));
         expect(fullResult, equals('01-01-1900 12:00 PM'));
       },
     );
@@ -836,7 +836,7 @@ void main() {
 
         // Assert
         expect(dateResult, equals('31/12/2100'));
-        expect(timeResult, equals('11:59 pm'));
+        expect(timeResult, equals('11:59 PM'));
         expect(fullResult, equals('31-12-2100 11:59 PM'));
       },
     );

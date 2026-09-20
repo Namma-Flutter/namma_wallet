@@ -1,23 +1,23 @@
-import 'package:listen_sharing_intent/listen_sharing_intent.dart';
+import 'package:share_handler/share_handler.dart';
 
 /// Interface for Sharing Intent Provider
 abstract class ISharingIntentProvider {
   /// Get the media stream for sharing intents
-  Stream<List<SharedMediaFile>> getMediaStream();
+  Stream<SharedMedia?> getMediaStream();
 
   /// Get the initial media when the app is launched via sharing
-  Future<List<SharedMediaFile>> getInitialMedia();
+  Future<SharedMedia?> getInitialSharing();
 }
 
 /// Concrete implementation of Sharing Intent Provider
 class SharingIntentProvider implements ISharingIntentProvider {
   @override
-  Stream<List<SharedMediaFile>> getMediaStream() {
-    return ReceiveSharingIntent.instance.getMediaStream();
+  Stream<SharedMedia?> getMediaStream() {
+    return ShareHandlerPlatform.instance.sharedMediaStream;
   }
 
   @override
-  Future<List<SharedMediaFile>> getInitialMedia() {
-    return ReceiveSharingIntent.instance.getInitialMedia();
+  Future<SharedMedia?> getInitialSharing() {
+    return ShareHandlerPlatform.instance.getInitialSharedMedia();
   }
 }

@@ -3,18 +3,29 @@ FLUTTER ?= fvm flutter
 # Dart command - use 'fvm dart' if using FVM, otherwise 'dart'
 DART ?= fvm dart
 
-.PHONY: help clean get codegen release-android release-ios release-apk release-appbundle release-ipa
+.PHONY: help clean get codegen check-codegen release-android release-ios release-apk release-appbundle release-ipa ios-test ios-beta ios-release-candidate ios-production ios-periphery android-release-candidate setup-hooks uninstall-hooks
 
 help:
 	@echo "Available targets:"
 	@echo "  clean              - Clean the project"
 	@echo "  get                - Get dependencies"
 	@echo "  codegen            - Run code generation"
+	@echo "  check-codegen      - Run code generation and verify git status is clean"
 	@echo "  release-android    - Build Android release APK"
 	@echo "  release-ios        - Build iOS release app"
 	@echo "  release-apk        - Build Android release APK"
 	@echo "  release-appbundle  - Build Android release App Bundle"
 	@echo "  release-ipa        - Build iOS release IPA"
+	@echo "  ios-periphery      - Scan iOS Swift codebase for unused code"
+	@echo ""
+	@echo "Fastlane iOS targets:"
+	@echo "  ios-test           - Run tests via fastlane"
+	@echo "  ios-beta           - Build and deploy to TestFlight"
+	@echo "  ios-production     - Promote TestFlight build to App Store"
+	@echo ""
+	@echo "Dev setup:"
+	@echo "  setup-hooks        - Install git pre-commit hook (dart format)"
+	@echo "  uninstall-hooks    - Remove the installed pre-commit hook"
 
 clean:
 	$(FLUTTER) clean
@@ -25,15 +36,74 @@ get:
 codegen:
 	$(DART) run build_runner build --delete-conflicting-outputs
 
-# Release builds (with WASM module removal for pdfrx)
+check-codegen: codegen
+	@if [ -n "$$(git status --porcelain)" ]; then \
+		echo "❌ Generated files are missing or out of date:"; \
+		git status --short; \
+		exit 1; \
+	else \
+		echo "✅ Code generation is clean and up to date."; \
+	fi
+
+# Release builds
 release-apk: get codegen
-	$(DART) run pdfrx:remove_wasm_modules
 	$(FLUTTER) build apk --release
 
 release-appbundle: get codegen
-	$(DART) run pdfrx:remove_wasm_modules
 	$(FLUTTER) build appbundle --release
 
 release-ipa: get codegen
-	$(DART) run pdfrx:remove_wasm_modules
 	$(FLUTTER) build ipa --release
+
+# Fastlane android targets
+android-beta:
+	cd android && bundle exec fastlane beta
+
+android-release-candidate:
+	cd android && bundle exec fastlane release-candidate
+
+android-production:
+	cd android && bundle exec fastlane production
+
+# Fastlane iOS targets
+ios-beta:
+	cd ios && bundle exec fastlane beta
+
+ios-release-candidate:
+	cd ios && bundle exec fastlane release-candidate
+
+ios-production:
+	cd ios && bundle exec fastlane production
+
+# Periphery dead code detection for iOS
+ios-periphery:
+	periphery scan
+
+# Combined Deployment Targets
+.PHONY: deploy-beta deploy-release-candidate deploy-production coverage
+
+# Beta: Deploy to TestFlight beta and Play Store internal
+deploy-beta: ios-beta android-beta
+
+# Release Candidate: Promote both iOS and Android to Release Candidate
+deploy-release-candidate: ios-release-candidate android-release-candidate
+
+# Production: Promote both iOS and Android to production
+deploy-production: ios-production android-production
+
+# Git hooks — install/remove the shared pre-commit script
+setup-hooks:
+	@cp scripts/pre-commit .git/hooks/pre-commit
+	@chmod +x .git/hooks/pre-commit
+	@echo "pre-commit hook installed (.git/hooks/pre-commit)"
+
+uninstall-hooks:
+	@rm -f .git/hooks/pre-commit
+	@echo "pre-commit hook removed"
+
+# Runs tests with coverage and generates HTML coverage report,
+# excluding all generated *.g.dart files (Riverpod, Freezed, JSON, etc.)
+coverage:
+	$(FLUTTER) test --coverage
+	lcov --remove coverage/lcov.info '**/*.g.dart' -o coverage/lcov.info
+	genhtml coverage/lcov.info -o coverage/html

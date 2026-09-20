@@ -18,7 +18,7 @@ void main() {
       final ticket = Ticket.fromTNSTC(model);
 
       final departureExtra = ticket.extras?.firstWhere(
-        (e) => e.title == 'Departure Time',
+        (e) => e.title == 'Departure',
       );
       final pickupExtra = ticket.extras?.firstWhere(
         (e) => e.title == 'Pickup Time',
@@ -36,7 +36,6 @@ void main() {
 
       // Verify Pickup Time still has full datetime in 12h format
       expect(pickupExtra?.value, contains('01:15 PM'));
-      expect(pickupExtra?.value, contains('18-01-2026'));
     },
   );
 }

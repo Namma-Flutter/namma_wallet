@@ -1,29 +1,111 @@
+import 'dart:io';
+import 'dart:typed_data';
+import 'dart:ui';
+
 import 'package:cross_file/cross_file.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:namma_wallet/src/common/database/ticket_dao_interface.dart';
+import 'package:namma_wallet/src/common/domain/models/extras_model.dart';
 import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 import 'package:namma_wallet/src/common/enums/source_type.dart';
+import 'package:namma_wallet/src/common/enums/ticket_type.dart';
+import 'package:namma_wallet/src/common/helper/original_file_storage.dart';
+import 'package:namma_wallet/src/common/services/image/image_service.dart';
+import 'package:namma_wallet/src/common/services/ocr/ocr_block.dart';
 import 'package:namma_wallet/src/common/services/pdf/pdf_service_interface.dart';
+import 'package:namma_wallet/src/features/events/application/event_parser_service.dart';
 import 'package:namma_wallet/src/features/import/application/import_service.dart';
 import 'package:namma_wallet/src/features/irctc/application/irctc_qr_parser_interface.dart';
 import 'package:namma_wallet/src/features/irctc/application/irctc_scanner_service.dart';
 import 'package:namma_wallet/src/features/irctc/application/irctc_scanner_service_interface.dart';
 import 'package:namma_wallet/src/features/irctc/domain/irctc_ticket_model.dart';
+import 'package:namma_wallet/src/features/tnstc/application/tnstc_api_ticket_parser.dart';
+import 'package:namma_wallet/src/features/tnstc/data/remote/tnstc_pnr_fetcher_interface.dart';
+import 'package:namma_wallet/src/features/tnstc/domain/tnstc_model.dart';
+import 'package:namma_wallet/src/features/travel/application/pkpass_parser_interface.dart';
 import 'package:namma_wallet/src/features/travel/application/travel_parser_interface.dart';
+import 'package:namma_wallet/src/features/travel/domain/ticket_update_info.dart';
+import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
+import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
 import '../../../../helpers/fake_logger.dart';
 
+class FakePathProvider extends PathProviderPlatform
+    with MockPlatformInterfaceMixin {
+  @override
+  Future<String?> getApplicationDocumentsPath() async {
+    return 'test/temp_import_docs';
+  }
+}
+
 class FakePDFService implements IPDFService {
   String? extractedText;
+  List<OCRBlock>? extractedBlocks;
 
   @override
-  Future<String> extractTextFrom(XFile file) async {
+  Future<String> extractTextForDisplay(XFile file) async {
     return extractedText ?? '';
+  }
+
+  @override
+  Future<String> extractTextFrom(XFile file) => extractTextForDisplay(file);
+
+  @override
+  Future<List<OCRBlock>> extractBlocks(XFile file) async {
+    // If blocks are provided, return them
+    if (extractedBlocks != null) return extractedBlocks!;
+
+    // Otherwise, convert text to pseudo-blocks
+    return OCRBlock.fromPlainText(extractedText ?? '');
+  }
+
+  @override
+  Future<Map<String, dynamic>> extractStructuredData(XFile file) async {
+    return {};
+  }
+}
+
+class FakeImageService implements ImageService {
+  List<OCRBlock>? extractedBlocks;
+
+  @override
+  Future<List<OCRBlock>> extractBlocks(XFile image) async {
+    return extractedBlocks ?? [];
+  }
+}
+
+class FakeEventParser implements EventParserService {
+  Ticket? parsedTicket;
+
+  @override
+  Future<Ticket?> parseTicketFromBlocks(
+    List<OCRBlock> blocks,
+    String imagePath, {
+    SourceType? sourceType,
+  }) {
+    return Future.value(parsedTicket);
+  }
+
+  @override
+  Future<Ticket?> parseTicketFromBlocksForPDF(
+    List<OCRBlock> blocks, {
+    SourceType? sourceType,
+    String? filePath,
+  }) {
+    return Future.value(parsedTicket);
   }
 }
 
 class FakeTravelParser implements ITravelParser {
   Ticket? parsedTicket;
+
+  @override
+  Ticket? parseTicketFromBlocks(
+    List<OCRBlock> blocks, {
+    SourceType? sourceType,
+  }) {
+    return parsedTicket;
+  }
 
   @override
   Ticket? parseTicketFromText(String text, {SourceType? sourceType}) {
@@ -64,44 +146,67 @@ class FakeIRCTCScannerService implements IIRCTCScannerService {
   }
 }
 
+class FakePKPassParser implements IPKPassParser {
+  Ticket? parsedTicket;
+
+  @override
+  Future<Ticket?> parsePKPass(Uint8List data) async {
+    return parsedTicket;
+  }
+
+  @override
+  Future<Uint8List?> fetchLatestPass(
+    Uint8List currentPassData, {
+    DateTime? modifiedSince,
+  }) async {
+    return null;
+  }
+}
+
+class FakeTNSTCPNRFetcher implements ITNSTCPNRFetcher {
+  TNSTCTicketModel? fetchedTicket;
+  bool shouldThrow = false;
+  String? lastFetchedPnr;
+  String? lastFetchedPhoneNumber;
+
+  @override
+  Future<TNSTCTicketModel?> fetchTicketByPNR(
+    String pnr,
+    String phoneNumber,
+  ) async {
+    lastFetchedPnr = pnr;
+    lastFetchedPhoneNumber = phoneNumber;
+
+    if (shouldThrow) {
+      throw Exception('Network error');
+    }
+    return fetchedTicket;
+  }
+}
+
 class FakeTicketDAO implements ITicketDAO {
-  // State for assertions
   Ticket? handledTicket;
   bool shouldThrowError = false;
 
   @override
   Future<int> handleTicket(Ticket ticket) async {
-    // 1. Simulate Error
     if (shouldThrowError) {
       throw Exception('Database error');
     }
-
-    // 2. Capture State (Test Spy behavior)
-    // We rename this from 'insertedTicket' to 'handledTicket'
-    // to match the method name, though 'insertedTicket' is fine too.
     handledTicket = ticket;
-
-    // 3. Return Success
     return 1;
   }
 
   @override
   Future<int> insertTicket(Ticket ticket) async {
-    // If legacy tests still rely on this, keep the logic,
-    // otherwise, you can now delegate to handleTicket
-    // or keep it as a simple backing store.
     return handleTicket(ticket);
   }
 
   @override
   Future<int> updateTicketById(String id, Ticket ticket) async {
-    // If your logic distinguishes between insert/update,
-    // you might want to capture this separately.
     handledTicket = ticket;
     return 1;
   }
-
-  // --- Boilerplate stubs ---
 
   @override
   Future<List<Ticket>> getAllTickets() async => [];
@@ -114,39 +219,86 @@ class FakeTicketDAO implements ITicketDAO {
 
   @override
   Future<List<Ticket>> getTicketsByType(String type) async => [];
+
+  @override
+  Future<List<Ticket>> getActiveTickets() async => [];
+
+  @override
+  Future<List<Ticket>> getArchivedTickets() async => [];
+
+  @override
+  Future<int> archivePastTickets() async => 0;
+
+  @override
+  Future<int> purgeOldArchivedTickets({int retentionDays = 30}) async => 0;
+}
+
+class FakeTNSTCApiTicketParser extends TNSTCApiTicketParser {
+  Ticket? parsedTicket;
+  TNSTCTicketModel? lastInputModel;
+
+  @override
+  Ticket parse(TNSTCTicketModel model) {
+    lastInputModel = model;
+    return parsedTicket ?? Ticket.fromTNSTC(model, sourceType: 'API');
+  }
 }
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
   group('ImportService', () {
     late ImportService importService;
     late FakeLogger fakeLogger;
     late FakePDFService fakePDFService;
+    late FakeImageService fakeImageService;
+    late FakeEventParser fakeEventParser;
     late FakeTravelParser fakeTravelParser;
     late FakeIRCTCQRParser fakeIRCTCQRParser;
     late FakeIRCTCScannerService fakeIRCTCScannerService;
+    late FakePKPassParser fakePKPassParser;
+    late FakeTNSTCPNRFetcher fakeTNSTCPNRFetcher;
+    late FakeTNSTCApiTicketParser fakeTNSTCApiTicketParser;
     late FakeTicketDAO fakeTicketDAO;
+    late Directory tempDocs;
 
     setUp(() {
+      PathProviderPlatform.instance = FakePathProvider();
+      tempDocs = Directory('test/temp_import_docs');
+      if (!tempDocs.existsSync()) {
+        tempDocs.createSync(recursive: true);
+      }
+
       fakeLogger = FakeLogger();
       fakePDFService = FakePDFService();
+      fakeImageService = FakeImageService();
+      fakeEventParser = FakeEventParser();
       fakeTravelParser = FakeTravelParser();
       fakeIRCTCQRParser = FakeIRCTCQRParser();
       fakeIRCTCScannerService = FakeIRCTCScannerService();
+      fakePKPassParser = FakePKPassParser();
+      fakeTNSTCPNRFetcher = FakeTNSTCPNRFetcher();
+      fakeTNSTCApiTicketParser = FakeTNSTCApiTicketParser();
       fakeTicketDAO = FakeTicketDAO();
       importService = ImportService(
         logger: fakeLogger,
         pdfService: fakePDFService,
+        imageService: fakeImageService,
+        eventParser: fakeEventParser,
         travelParser: fakeTravelParser,
         qrParser: fakeIRCTCQRParser,
         irctcScannerService: fakeIRCTCScannerService,
+        pkpassParser: fakePKPassParser,
+        tnstcPnrFetcher: fakeTNSTCPNRFetcher,
+        tnstcApiTicketParser: fakeTNSTCApiTicketParser,
         ticketDao: fakeTicketDAO,
       );
     });
 
     tearDown(() {
-      // Reset exception throwing flags
-      fakeIRCTCScannerService.shouldThrow = false;
-      fakeTicketDAO.shouldThrowError = false;
+      if (tempDocs.existsSync()) {
+        tempDocs.deleteSync(recursive: true);
+      }
     });
 
     final testIrctcTicket = IRCTCTicket(
@@ -171,145 +323,414 @@ void main() {
 
     final testTicket = Ticket.fromIRCTC(testIrctcTicket);
 
-    group('supportedExtensions', () {
-      test('should return a list containing only "pdf"', () {
-        expect(importService.supportedExtensions, ['pdf']);
+    group('importAndSavePKPassFile', () {
+      const testPKPassPath = 'test/assets/pkpass/Flutter Devcon.pkpass';
+
+      test('should return empty result when ticket cannot be parsed', () async {
+        fakePKPassParser.parsedTicket = null;
+        final result = await importService.importAndSavePKPassFile(
+          XFile(testPKPassPath),
+        );
+        expect(result.ticket, isNull);
+        expect(result.warning, isNull);
       });
+
+      test(
+        'should return no warning when provider is not Luma but type is known',
+        () async {
+          final nonLumaTicket = testTicket.copyWith(
+            extras: [ExtrasModel(title: 'Provider', value: 'Other')],
+          );
+          fakePKPassParser.parsedTicket = nonLumaTicket;
+
+          final result = await importService.importAndSavePKPassFile(
+            XFile(testPKPassPath),
+          );
+
+          expect(result.ticket, nonLumaTicket);
+          // No warning because the ticket type is known (train)
+          expect(result.warning, isNull);
+          expect(fakeTicketDAO.handledTicket, nonLumaTicket);
+        },
+      );
+
+      test('should return no warning when provider contains Luma', () async {
+        final lumaTicket = testTicket.copyWith(
+          extras: [ExtrasModel(title: 'Provider', value: 'Luma Events')],
+        );
+        fakePKPassParser.parsedTicket = lumaTicket;
+
+        final result = await importService.importAndSavePKPassFile(
+          XFile(testPKPassPath),
+        );
+
+        expect(result.ticket, lumaTicket);
+        expect(result.warning, isNull);
+        expect(fakeTicketDAO.handledTicket, lumaTicket);
+      });
+
+      test(
+        'should return no warning when provider is missing but type is known',
+        () async {
+          final noProviderTicket = testTicket.copyWith(extras: []);
+          fakePKPassParser.parsedTicket = noProviderTicket;
+
+          final result = await importService.importAndSavePKPassFile(
+            XFile(testPKPassPath),
+          );
+
+          expect(result.ticket, noProviderTicket);
+          // No warning because the ticket type is known (train)
+          expect(result.warning, isNull);
+        },
+      );
+
+      test(
+        'should return warning when ticket type is null (unsupported pass)',
+        () async {
+          // Create a ticket with null type to trigger the new warning
+          final unknownTypeTicket = testTicket.copyWith(type: null);
+          fakePKPassParser.parsedTicket = unknownTypeTicket;
+
+          final result = await importService.importAndSavePKPassFile(
+            XFile(testPKPassPath),
+          );
+
+          expect(result.ticket, unknownTypeTicket);
+          expect(
+            result.warning,
+            equals('Imported pass type may not be fully supported'),
+          );
+        },
+      );
+
+      test(
+        'should return null ticket result when an exception occurs',
+        () async {
+          fakePKPassParser.parsedTicket = testTicket;
+          fakeTicketDAO.shouldThrowError = true;
+          final result = await importService.importAndSavePKPassFile(
+            XFile(testPKPassPath),
+          );
+          expect(result.ticket, isNull);
+        },
+      );
     });
 
-    group('isSupportedQRCode', () {
-      test('should return true if QR parser supports it', () {
-        // Arrange
-        fakeIRCTCQRParser.isIRCTC = true;
-        // Act
-        final result = importService.isSupportedQRCode('some-data');
-        // Assert
-        expect(result, isTrue);
+    group('importTNSTCByPNR', () {
+      final testTnstcTicket = TNSTCTicketModel(
+        pnrNumber: 'T76296906',
+        corporation: 'TNSTC',
+        tripCode: 'TRP123',
+        serviceStartPlace: 'Chennai',
+        serviceEndPlace: 'Bangalore',
+        classOfService: 'Sleeper',
+        journeyDate: DateTime(2025, 1, 20),
+        serviceStartTime: '22:00',
+        boardingPoint: 'CMBT',
+        smsSeatNumbers: 'L1, L2',
+        conductorMobileNo: '9876543210',
+        vehicleNumber: 'TN01AB1234',
+      );
+
+      test('should successfully import and save TNSTC ticket', () async {
+        fakeTNSTCPNRFetcher.fetchedTicket = testTnstcTicket;
+
+        final result = await importService.importTNSTCByPNR(
+          'T76296906',
+          '9876543210',
+        );
+
+        expect(result, isNotNull);
+        expect(result!.ticketId, equals('T76296906'));
+        expect(fakeTicketDAO.handledTicket, isNotNull);
+        expect(fakeTicketDAO.handledTicket!.ticketId, equals('T76296906'));
+        expect(fakeTNSTCPNRFetcher.lastFetchedPnr, equals('T76296906'));
+        expect(
+          fakeTNSTCPNRFetcher.lastFetchedPhoneNumber,
+          equals('9876543210'),
+        );
       });
 
-      test('should return false if QR parser does not support it', () {
-        // Arrange
-        fakeIRCTCQRParser.isIRCTC = false;
-        // Act
-        final result = importService.isSupportedQRCode('some-data');
-        // Assert
-        expect(result, isFalse);
+      test('should return null when PNR fetcher returns null', () async {
+        fakeTNSTCPNRFetcher.fetchedTicket = null;
+
+        final result = await importService.importTNSTCByPNR(
+          'INVALID',
+          '9876543210',
+        );
+
+        expect(result, isNull);
+        expect(fakeTicketDAO.handledTicket, isNull);
+      });
+
+      test('should return null when PNR fetcher throws exception', () async {
+        fakeTNSTCPNRFetcher.shouldThrow = true;
+
+        final result = await importService.importTNSTCByPNR(
+          'T76296906',
+          '9876543210',
+        );
+
+        expect(result, isNull);
+        expect(fakeTicketDAO.handledTicket, isNull);
+      });
+
+      test('should return null when database operation fails', () async {
+        fakeTNSTCPNRFetcher.fetchedTicket = testTnstcTicket;
+        fakeTicketDAO.shouldThrowError = true;
+
+        final result = await importService.importTNSTCByPNR(
+          'T76296906',
+          '9876543210',
+        );
+
+        expect(result, isNull);
+      });
+
+      test('should convert TNSTC ticket to generic Ticket model', () async {
+        fakeTNSTCPNRFetcher.fetchedTicket = testTnstcTicket;
+
+        final result = await importService.importTNSTCByPNR(
+          'T76296906',
+          '9876543210',
+        );
+
+        expect(result, isNotNull);
+        expect(
+          fakeTNSTCApiTicketParser.lastInputModel,
+          equals(testTnstcTicket),
+        );
+        expect(result!.primaryText, equals('Chennai → Bangalore'));
+        expect(result.location, equals('CMBT'));
+        expect(result.type, equals(TicketType.bus));
+
+        // Verify source type in extras
+        final sourceExtras = result.extras
+            ?.where((e) => e.title == 'Source Type')
+            .toList();
+        final sourceExtra = (sourceExtras != null && sourceExtras.isNotEmpty)
+            ? sourceExtras.first
+            : null;
+        expect(sourceExtra?.value, equals('API'));
       });
     });
 
     group('importAndSavePDFFile', () {
-      const testPdfPath = 'test.pdf';
+      const path = 'test/assets/some.pdf';
 
-      test('should return null when no text is extracted', () async {
-        // Arrange
-        fakePDFService.extractedText = '';
-        // Act
-        final result = await importService.importAndSavePDFFile(
-          XFile(testPdfPath),
-        );
-        // Assert
+      test('returns null when no OCR blocks are extracted', () async {
+        fakePDFService.extractedBlocks = [];
+
+        final result = await importService.importAndSavePDFFile(XFile(path));
+
         expect(result, isNull);
+        expect(fakeTicketDAO.handledTicket, isNull);
       });
 
-      test('should return null when ticket cannot be parsed', () async {
-        // Arrange
-        fakePDFService.extractedText = 'some text';
+      test('returns null when parser cannot interpret the blocks', () async {
+        fakePDFService.extractedText = 'plain text';
         fakeTravelParser.parsedTicket = null;
-        // Act
-        final result = await importService.importAndSavePDFFile(
-          XFile(testPdfPath),
-        );
-        // Assert
+
+        final result = await importService.importAndSavePDFFile(XFile(path));
+
         expect(result, isNull);
       });
 
-      test('should save and return ticket on successful import', () async {
-        // Arrange
-        fakePDFService.extractedText = 'some text';
-        fakeTravelParser.parsedTicket = testTicket;
-        // Act
-        final result = await importService.importAndSavePDFFile(
-          XFile(testPdfPath),
+      test('saves and returns parsed ticket on success', () async {
+        fakePDFService.extractedText = 'plain text';
+        const parsed = Ticket(
+          ticketId: 'PDF001',
+          primaryText: 'A → B',
+          type: TicketType.bus,
         );
-        // Assert
-        expect(result, testTicket);
-        expect(fakeTicketDAO.handledTicket, testTicket);
+        fakeTravelParser.parsedTicket = parsed;
+
+        final result = await importService.importAndSavePDFFile(XFile(path));
+
+        expect(result, equals(parsed));
+        expect(fakeTicketDAO.handledTicket, equals(parsed));
       });
 
       test(
-        'should return null and log error when an exception occurs',
+        'persists a copy of the original PDF file and attaches its path',
         () async {
-          // Arrange
-          fakePDFService.extractedText = 'some text';
-          fakeTravelParser.parsedTicket = testTicket;
-          fakeTicketDAO.shouldThrowError = true;
-          // Act
-          final result = await importService.importAndSavePDFFile(
-            XFile(testPdfPath),
+          final sourceFile = File('test/temp_import_docs/source.pdf')
+            ..createSync(recursive: true)
+            ..writeAsBytesSync([1, 2, 3]);
+
+          fakePDFService.extractedText = 'plain text';
+          const parsed = Ticket(
+            ticketId: 'PDF002',
+            primaryText: 'A → B',
+            type: TicketType.bus,
           );
-          // Assert
-          expect(result, isNull);
-          expect(fakeLogger.errorLogs, isNotEmpty);
+          fakeTravelParser.parsedTicket = parsed;
+
+          final result = await importService.importAndSavePDFFile(
+            XFile(sourceFile.path),
+          );
+
+          expect(result, isNotNull);
+          expect(result!.originalFilePath, isNotNull);
+          final resolvedPath = await resolveOriginalFilePath(
+            result.originalFilePath!,
+          );
+          expect(File(resolvedPath).existsSync(), isTrue);
+          expect(File(resolvedPath).readAsBytesSync(), equals([1, 2, 3]));
+          expect(fakeTicketDAO.handledTicket, equals(result));
+        },
+      );
+    });
+
+    group('importAndSaveImageFile', () {
+      const path = 'test/assets/some.jpg';
+
+      test('returns null when no OCR blocks are extracted', () async {
+        fakeImageService.extractedBlocks = [];
+
+        final result = await importService.importAndSaveImageFile(XFile(path));
+
+        expect(result, isNull);
+        expect(fakeTicketDAO.handledTicket, isNull);
+      });
+
+      test('returns null when parser cannot interpret the blocks', () async {
+        fakeImageService.extractedBlocks = [
+          OCRBlock(
+            text: 'some text',
+            boundingBox: const Rect.fromLTRB(0, 0, 100, 100),
+            page: 0,
+          ),
+        ];
+        fakeEventParser.parsedTicket = null;
+
+        final result = await importService.importAndSaveImageFile(XFile(path));
+
+        expect(result, isNull);
+      });
+
+      test('saves and returns parsed ticket on success', () async {
+        fakeImageService.extractedBlocks = [
+          OCRBlock(
+            text: 'some text',
+            boundingBox: const Rect.fromLTRB(0, 0, 100, 100),
+            page: 0,
+          ),
+        ];
+        const parsed = Ticket(
+          ticketId: 'NWBYNF',
+          primaryText: 'Movie',
+          type: TicketType.event,
+        );
+        fakeEventParser.parsedTicket = parsed;
+
+        final result = await importService.importAndSaveImageFile(XFile(path));
+
+        expect(result, equals(parsed));
+        expect(fakeTicketDAO.handledTicket, equals(parsed));
+      });
+
+      test(
+        'persists a copy of the original Image file and attaches its path',
+        () async {
+          final sourceFile = File('test/temp_import_docs/source.jpg')
+            ..createSync(recursive: true)
+            ..writeAsBytesSync([1, 2, 3]);
+
+          fakeImageService.extractedBlocks = [
+            OCRBlock(
+              text: 'some text',
+              boundingBox: const Rect.fromLTRB(0, 0, 100, 100),
+              page: 0,
+            ),
+          ];
+          const parsed = Ticket(
+            ticketId: 'NWBYNF',
+            primaryText: 'Movie',
+            type: TicketType.event,
+          );
+          fakeEventParser.parsedTicket = parsed;
+
+          final result = await importService.importAndSaveImageFile(
+            XFile(sourceFile.path),
+          );
+
+          expect(result, isNotNull);
+          expect(result!.originalFilePath, isNotNull);
+          final resolvedPath = await resolveOriginalFilePath(
+            result.originalFilePath!,
+          );
+          expect(File(resolvedPath).existsSync(), isTrue);
+          expect(File(resolvedPath).readAsBytesSync(), equals([1, 2, 3]));
+          expect(fakeTicketDAO.handledTicket, equals(result));
         },
       );
     });
 
     group('importQRCode', () {
-      const qrData = 'some-qr-data';
-      test('should return null for unsupported QR code format', () async {
-        // Arrange
+      test('returns null for unsupported QR data', () async {
         fakeIRCTCQRParser.isIRCTC = false;
-        // Act
-        final result = await importService.importQRCode(qrData);
-        // Assert
+
+        final result = await importService.importQRCode('garbage');
+
         expect(result, isNull);
       });
 
-      test('should return null when IRCTC scanner service fails', () async {
-        // Arrange
+      test('returns null when scanner reports failure', () async {
         fakeIRCTCQRParser.isIRCTC = true;
         fakeIRCTCScannerService.scanResult = IRCTCScannerResult.error(
-          'Scan failed',
+          'parse failed',
         );
-        // Act
-        final result = await importService.importQRCode(qrData);
-        // Assert
+
+        final result = await importService.importQRCode('PNR No.:1');
+
         expect(result, isNull);
       });
 
-      test('should return ticket on successful QR code import', () async {
-        // Arrange
+      test('returns the saved travel ticket on success', () async {
         fakeIRCTCQRParser.isIRCTC = true;
+        const parsed = Ticket(
+          ticketId: 'QR001',
+          primaryText: 'A → B',
+          type: TicketType.train,
+        );
         fakeIRCTCScannerService.scanResult = IRCTCScannerResult.success(
           IRCTCScannerContentType.irctcTicket,
-          qrData,
-          travelTicket: testTicket,
+          'PNR No.:1',
+          travelTicket: parsed,
           irctcTicket: testIrctcTicket,
         );
-        // Act
-        final result = await importService.importQRCode(qrData);
-        // Assert
-        expect(result, testTicket);
+
+        final result = await importService.importQRCode('PNR No.:1');
+
+        expect(result, equals(parsed));
       });
 
-      test(
-        'should return null and log error when an exception occurs',
-        () async {
-          // Arrange
-          fakeIRCTCQRParser.isIRCTC = true;
-          // Force an exception in the scanner service
-          fakeIRCTCScannerService.shouldThrow = true;
-          // Act
-          final result = await importService.importQRCode(qrData);
-          // Assert
-          expect(result, isNull);
-          expect(fakeLogger.errorLogs, isNotEmpty);
-          expect(
-            fakeLogger.errorLogs.first,
-            contains('Error importing QR code'),
-          );
-        },
-      );
+      test('returns null and logs when scanner throws', () async {
+        fakeIRCTCQRParser.isIRCTC = true;
+        fakeIRCTCScannerService.shouldThrow = true;
+
+        final result = await importService.importQRCode('PNR No.:1');
+
+        expect(result, isNull);
+      });
+    });
+
+    group('misc', () {
+      test('supportedExtensions includes pdf and pkpass', () {
+        expect(
+          importService.supportedExtensions,
+          containsAll(['pdf', 'pkpass']),
+        );
+      });
+
+      test('isSupportedQRCode delegates to the QR parser', () {
+        fakeIRCTCQRParser.isIRCTC = true;
+        expect(importService.isSupportedQRCode('any'), isTrue);
+        fakeIRCTCQRParser.isIRCTC = false;
+        expect(importService.isSupportedQRCode('any'), isFalse);
+      });
     });
   });
 }

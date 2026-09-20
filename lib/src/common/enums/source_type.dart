@@ -8,10 +8,14 @@ enum SourceType {
   sms,
   @MappableValue('PDF')
   pdf,
+  @MappableValue('IMAGE')
+  image,
   @MappableValue('MANUAL')
   manual,
   @MappableValue('CLIPBOARD')
   clipboard,
   @MappableValue('QR')
   qr,
+  @MappableValue('PKPASS')
+  pkpass,
 }

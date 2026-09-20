@@ -2,6 +2,7 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // dart format off
 // ignore_for_file: type=lint
+// ignore_for_file: invalid_use_of_protected_member
 // ignore_for_file: unused_element, unnecessary_cast, override_on_non_overriding_member
 // ignore_for_file: strict_raw_type, inference_failure_on_untyped_parameter
 
@@ -21,54 +22,67 @@ class IRCTCTicketMapper extends ClassMapperBase<IRCTCTicket> {
   @override
   final String id = 'IRCTCTicket';
 
-  static String _$pnrNumber(IRCTCTicket v) => v.pnrNumber;
+  static String? _$pnrNumber(IRCTCTicket v) => v.pnrNumber;
   static const Field<IRCTCTicket, String> _f$pnrNumber = Field(
     'pnrNumber',
     _$pnrNumber,
+    opt: true,
   );
-  static String _$passengerName(IRCTCTicket v) => v.passengerName;
+  static String? _$passengerName(IRCTCTicket v) => v.passengerName;
   static const Field<IRCTCTicket, String> _f$passengerName = Field(
     'passengerName',
     _$passengerName,
+    opt: true,
   );
-  static int _$age(IRCTCTicket v) => v.age;
-  static const Field<IRCTCTicket, int> _f$age = Field('age', _$age);
-  static String _$status(IRCTCTicket v) => v.status;
-  static const Field<IRCTCTicket, String> _f$status = Field('status', _$status);
-  static String _$trainNumber(IRCTCTicket v) => v.trainNumber;
+  static int? _$age(IRCTCTicket v) => v.age;
+  static const Field<IRCTCTicket, int> _f$age = Field('age', _$age, opt: true);
+  static String? _$status(IRCTCTicket v) => v.status;
+  static const Field<IRCTCTicket, String> _f$status = Field(
+    'status',
+    _$status,
+    opt: true,
+  );
+  static String? _$trainNumber(IRCTCTicket v) => v.trainNumber;
   static const Field<IRCTCTicket, String> _f$trainNumber = Field(
     'trainNumber',
     _$trainNumber,
+    opt: true,
   );
-  static String _$trainName(IRCTCTicket v) => v.trainName;
+  static String? _$trainName(IRCTCTicket v) => v.trainName;
   static const Field<IRCTCTicket, String> _f$trainName = Field(
     'trainName',
     _$trainName,
+    opt: true,
   );
-  static String _$boardingStation(IRCTCTicket v) => v.boardingStation;
+  static String? _$boardingStation(IRCTCTicket v) => v.boardingStation;
   static const Field<IRCTCTicket, String> _f$boardingStation = Field(
     'boardingStation',
     _$boardingStation,
+    opt: true,
   );
-  static String _$fromStation(IRCTCTicket v) => v.fromStation;
+  static String? _$fromStation(IRCTCTicket v) => v.fromStation;
   static const Field<IRCTCTicket, String> _f$fromStation = Field(
     'fromStation',
     _$fromStation,
+    opt: true,
   );
-  static String _$toStation(IRCTCTicket v) => v.toStation;
+  static String? _$toStation(IRCTCTicket v) => v.toStation;
   static const Field<IRCTCTicket, String> _f$toStation = Field(
     'toStation',
     _$toStation,
+    opt: true,
   );
   static double? _$ticketFare(IRCTCTicket v) => v.ticketFare;
   static const Field<IRCTCTicket, double> _f$ticketFare = Field(
     'ticketFare',
     _$ticketFare,
+    opt: true,
   );
   static double? _$irctcFee(IRCTCTicket v) => v.irctcFee;
   static const Field<IRCTCTicket, double> _f$irctcFee = Field(
     'irctcFee',
     _$irctcFee,
+    opt: true,
   );
   static String? _$transactionId(IRCTCTicket v) => v.transactionId;
   static const Field<IRCTCTicket, String> _f$transactionId = Field(
@@ -106,6 +120,30 @@ class IRCTCTicketMapper extends ClassMapperBase<IRCTCTicket> {
     _$dateOfJourney,
     opt: true,
   );
+  static String? _$arrivalTime(IRCTCTicket v) => v.arrivalTime;
+  static const Field<IRCTCTicket, String> _f$arrivalTime = Field(
+    'arrivalTime',
+    _$arrivalTime,
+    opt: true,
+  );
+  static int? _$distance(IRCTCTicket v) => v.distance;
+  static const Field<IRCTCTicket, int> _f$distance = Field(
+    'distance',
+    _$distance,
+    opt: true,
+  );
+  static DateTime? _$bookingDate(IRCTCTicket v) => v.bookingDate;
+  static const Field<IRCTCTicket, DateTime> _f$bookingDate = Field(
+    'bookingDate',
+    _$bookingDate,
+    opt: true,
+  );
+  static String? _$seatNumber(IRCTCTicket v) => v.seatNumber;
+  static const Field<IRCTCTicket, String> _f$seatNumber = Field(
+    'seatNumber',
+    _$seatNumber,
+    opt: true,
+  );
 
   @override
   final MappableFields<IRCTCTicket> fields = const {
@@ -126,6 +164,10 @@ class IRCTCTicketMapper extends ClassMapperBase<IRCTCTicket> {
     #travelClass: _f$travelClass,
     #scheduledDeparture: _f$scheduledDeparture,
     #dateOfJourney: _f$dateOfJourney,
+    #arrivalTime: _f$arrivalTime,
+    #distance: _f$distance,
+    #bookingDate: _f$bookingDate,
+    #seatNumber: _f$seatNumber,
   };
 
   static IRCTCTicket _instantiate(DecodingData data) {
@@ -147,6 +189,10 @@ class IRCTCTicketMapper extends ClassMapperBase<IRCTCTicket> {
       travelClass: data.dec(_f$travelClass),
       scheduledDeparture: data.dec(_f$scheduledDeparture),
       dateOfJourney: data.dec(_f$dateOfJourney),
+      arrivalTime: data.dec(_f$arrivalTime),
+      distance: data.dec(_f$distance),
+      bookingDate: data.dec(_f$bookingDate),
+      seatNumber: data.dec(_f$seatNumber),
     );
   }
 
@@ -228,6 +274,10 @@ abstract class IRCTCTicketCopyWith<$R, $In extends IRCTCTicket, $Out>
     String? travelClass,
     DateTime? scheduledDeparture,
     DateTime? dateOfJourney,
+    String? arrivalTime,
+    int? distance,
+    DateTime? bookingDate,
+    String? seatNumber,
   });
   IRCTCTicketCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
@@ -242,15 +292,15 @@ class _IRCTCTicketCopyWithImpl<$R, $Out>
       IRCTCTicketMapper.ensureInitialized();
   @override
   $R call({
-    String? pnrNumber,
-    String? passengerName,
-    int? age,
-    String? status,
-    String? trainNumber,
-    String? trainName,
-    String? boardingStation,
-    String? fromStation,
-    String? toStation,
+    Object? pnrNumber = $none,
+    Object? passengerName = $none,
+    Object? age = $none,
+    Object? status = $none,
+    Object? trainNumber = $none,
+    Object? trainName = $none,
+    Object? boardingStation = $none,
+    Object? fromStation = $none,
+    Object? toStation = $none,
     Object? ticketFare = $none,
     Object? irctcFee = $none,
     Object? transactionId = $none,
@@ -259,17 +309,21 @@ class _IRCTCTicketCopyWithImpl<$R, $Out>
     Object? travelClass = $none,
     Object? scheduledDeparture = $none,
     Object? dateOfJourney = $none,
+    Object? arrivalTime = $none,
+    Object? distance = $none,
+    Object? bookingDate = $none,
+    Object? seatNumber = $none,
   }) => $apply(
     FieldCopyWithData({
-      if (pnrNumber != null) #pnrNumber: pnrNumber,
-      if (passengerName != null) #passengerName: passengerName,
-      if (age != null) #age: age,
-      if (status != null) #status: status,
-      if (trainNumber != null) #trainNumber: trainNumber,
-      if (trainName != null) #trainName: trainName,
-      if (boardingStation != null) #boardingStation: boardingStation,
-      if (fromStation != null) #fromStation: fromStation,
-      if (toStation != null) #toStation: toStation,
+      if (pnrNumber != $none) #pnrNumber: pnrNumber,
+      if (passengerName != $none) #passengerName: passengerName,
+      if (age != $none) #age: age,
+      if (status != $none) #status: status,
+      if (trainNumber != $none) #trainNumber: trainNumber,
+      if (trainName != $none) #trainName: trainName,
+      if (boardingStation != $none) #boardingStation: boardingStation,
+      if (fromStation != $none) #fromStation: fromStation,
+      if (toStation != $none) #toStation: toStation,
       if (ticketFare != $none) #ticketFare: ticketFare,
       if (irctcFee != $none) #irctcFee: irctcFee,
       if (transactionId != $none) #transactionId: transactionId,
@@ -278,6 +332,10 @@ class _IRCTCTicketCopyWithImpl<$R, $Out>
       if (travelClass != $none) #travelClass: travelClass,
       if (scheduledDeparture != $none) #scheduledDeparture: scheduledDeparture,
       if (dateOfJourney != $none) #dateOfJourney: dateOfJourney,
+      if (arrivalTime != $none) #arrivalTime: arrivalTime,
+      if (distance != $none) #distance: distance,
+      if (bookingDate != $none) #bookingDate: bookingDate,
+      if (seatNumber != $none) #seatNumber: seatNumber,
     }),
   );
   @override
@@ -302,6 +360,10 @@ class _IRCTCTicketCopyWithImpl<$R, $Out>
       or: $value.scheduledDeparture,
     ),
     dateOfJourney: data.get(#dateOfJourney, or: $value.dateOfJourney),
+    arrivalTime: data.get(#arrivalTime, or: $value.arrivalTime),
+    distance: data.get(#distance, or: $value.distance),
+    bookingDate: data.get(#bookingDate, or: $value.bookingDate),
+    seatNumber: data.get(#seatNumber, or: $value.seatNumber),
   );
 
   @override

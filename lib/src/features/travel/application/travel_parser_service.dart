@@ -5,15 +5,27 @@ import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 import 'package:namma_wallet/src/common/enums/source_type.dart';
 import 'package:namma_wallet/src/common/enums/ticket_type.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
-import 'package:namma_wallet/src/features/irctc/application/irctc_pdf_parser.dart';
+import 'package:namma_wallet/src/common/services/ocr/layout_extractor.dart';
+import 'package:namma_wallet/src/common/services/ocr/ocr_block.dart';
+import 'package:namma_wallet/src/features/irctc/application/irctc_layout_parser.dart';
 import 'package:namma_wallet/src/features/irctc/application/irctc_sms_parser.dart';
-import 'package:namma_wallet/src/features/tnstc/application/tnstc_pdf_parser.dart';
+import 'package:namma_wallet/src/features/tnstc/application/tnstc_layout_parser.dart';
 import 'package:namma_wallet/src/features/tnstc/application/tnstc_sms_parser.dart';
 import 'package:namma_wallet/src/features/travel/application/travel_parser_interface.dart';
+import 'package:namma_wallet/src/features/travel/domain/ticket_update_info.dart';
 
 abstract class TravelTicketParser {
   bool canParse(String text);
 
+  /// Parse ticket from OCR blocks (preferred for PDFs)
+  Ticket parseTicketFromBlocks(List<OCRBlock> blocks) {
+    // Default implementation: convert blocks to text and use text parser
+    final extractor = LayoutExtractor(blocks);
+    final text = extractor.toPlainText();
+    return parseTicket(text);
+  }
+
+  /// Parse ticket from plain text (for SMS or legacy support)
   Ticket parseTicket(String text);
 
   bool isSMSFormat(String text);
@@ -25,8 +37,8 @@ abstract class TravelTicketParser {
   TicketType get ticketType;
 }
 
-class TNSTCBusParser implements TravelTicketParser {
-  TNSTCBusParser({required ILogger logger}) : _logger = logger;
+class TNSTCBusParser extends TravelTicketParser {
+  TNSTCBusParser({required this._logger});
   final ILogger _logger;
 
   @override
@@ -37,21 +49,33 @@ class TNSTCBusParser implements TravelTicketParser {
 
   @override
   bool canParse(String text) {
+    final lowerText = text.toLowerCase();
+
+    // Check for SETC identifiers first (SETC takes precedence)
+    final setcKeywords = [
+      'SETC',
+      'State Express Transport Corporation',
+    ];
+
+    final hasSETCKeyword = setcKeywords.any(
+      (pattern) => lowerText.contains(pattern.toLowerCase()),
+    );
+    if (hasSETCKeyword) return false;
+
     // Must have at least one TNSTC-specific keyword
     final tnstcKeywords = [
       'TNSTC',
-      'Tamil Nadu',
-      'Corporation',
+      'Tamil Nadu State Transport',
       'Service Start Place',
       'Trip Code',
     ];
 
     final hasTNSTCKeyword = tnstcKeywords.any(
-      (pattern) => text.toLowerCase().contains(pattern.toLowerCase()),
+      (pattern) => lowerText.contains(pattern.toLowerCase()),
     );
 
     // And should not have IRCTC keyword
-    final hasIRCTCKeyword = text.toLowerCase().contains('irctc');
+    final hasIRCTCKeyword = lowerText.contains('irctc');
 
     return hasTNSTCKeyword && !hasIRCTCKeyword;
   }
@@ -93,6 +117,13 @@ class TNSTCBusParser implements TravelTicketParser {
   }
 
   @override
+  Ticket parseTicketFromBlocks(List<OCRBlock> blocks) {
+    // Use layout parser for PDFs (with geometry)
+    final layoutParser = TNSTCLayoutParser(logger: _logger);
+    return layoutParser.parseTicketFromBlocks(blocks);
+  }
+
+  @override
   Ticket parseTicket(String text) {
     // Detect if this is SMS or PDF format
     final isSMS = isSMSFormat(text);
@@ -102,8 +133,10 @@ class TNSTCBusParser implements TravelTicketParser {
       final smsParser = TNSTCSMSParser();
       return smsParser.parseTicket(text);
     } else {
-      final pdfParser = TNSTCPDFParser(logger: _logger);
-      return pdfParser.parseTicket(text);
+      // Use the layout parser via pseudo-blocks for plain text.
+      // This ensures consistent parsing logic regardless of input source.
+      final layoutParser = TNSTCLayoutParser(logger: _logger);
+      return layoutParser.parseTicket(text);
     }
   }
 
@@ -184,13 +217,12 @@ class TNSTCBusParser implements TravelTicketParser {
   }
 }
 
-class IRCTCTrainParser implements TravelTicketParser {
-  IRCTCTrainParser({required ILogger logger}) : _logger = logger;
+/// IRCTC train ticket parser.
+///
+/// Uses layout-based extraction for PDF parsing and SMS parser for SMS format.
+class IRCTCTrainParser extends TravelTicketParser {
+  IRCTCTrainParser({required this._logger});
   final ILogger _logger;
-
-  /// Sentinel value for invalid/missing journey dates
-  /// This is UTC(1970,1,1) - epoch start time
-  static final DateTime invalidDateSentinel = DateTime.utc(1970);
 
   @override
   String get providerName => 'IRCTC';
@@ -244,6 +276,12 @@ class IRCTCTrainParser implements TravelTicketParser {
   }
 
   @override
+  Ticket parseTicketFromBlocks(List<OCRBlock> blocks) {
+    final layoutParser = IRCTCLayoutParser(logger: _logger);
+    return layoutParser.parseTicketFromBlocks(blocks);
+  }
+
+  @override
   Ticket parseTicket(String text) {
     final isSMS = isSMSFormat(text);
 
@@ -251,8 +289,8 @@ class IRCTCTrainParser implements TravelTicketParser {
       final smsParser = IRCTCSMSParser();
       return smsParser.parseTicket(text);
     } else {
-      final pdfParser = IRCTCPDFParser(logger: _logger);
-      return pdfParser.parseTicket(text);
+      final layoutParser = IRCTCLayoutParser(logger: _logger);
+      return layoutParser.parseTicket(text);
     }
   }
 
@@ -260,7 +298,10 @@ class IRCTCTrainParser implements TravelTicketParser {
   TicketUpdateInfo? parseUpdate(String text) => null;
 }
 
-class SETCBusParser implements TravelTicketParser {
+/// SETC bus ticket parser.
+class SETCBusParser extends TravelTicketParser {
+  SETCBusParser({required this._logger});
+  final ILogger _logger;
   @override
   String get providerName => 'SETC';
 
@@ -272,46 +313,76 @@ class SETCBusParser implements TravelTicketParser {
     // SETC-specific patterns (without TNSTC)
     final setcPatterns = [
       'SETC',
-      'South Tamil Nadu',
+      'State Express Transport Corporation',
     ];
 
     // Check if it contains SETC but not TNSTC
     final hasSETC = setcPatterns.any(
       (pattern) => text.toUpperCase().contains(pattern.toUpperCase()),
     );
-    final hasTNSTC = text.toUpperCase().contains('TNSTC');
+    return hasSETC;
+  }
 
-    return hasSETC && !hasTNSTC;
+  @override
+  Ticket parseTicketFromBlocks(List<OCRBlock> blocks) {
+    // Use layout parser for PDFs (with geometry).
+    // SETC layout is identical to TNSTC.
+    final layoutParser = TNSTCLayoutParser(logger: _logger);
+    return layoutParser.parseTicketFromBlocks(blocks);
   }
 
   @override
   Ticket parseTicket(String text) {
-    // SETC tickets use the same format as TNSTC SMS
-    // Just delegate to the existing TNSTC SMS parser
-    final smsParser = TNSTCSMSParser();
-    final ticket = smsParser.parseTicket(text);
+    // Detect if this is SMS or PDF format
+    final isSMS = isSMSFormat(text);
 
-    // Update the provider name to SETC
-    return ticket.copyWith(
-      extras: [
-        ...?ticket.extras?.where((e) => e.title != 'Provider'),
-        ExtrasModel(title: 'Provider', value: 'SETC'),
-      ],
-    );
+    // Use appropriate parser based on format
+    if (isSMS) {
+      final smsParser = TNSTCSMSParser();
+      return smsParser.parseTicket(text);
+    } else {
+      // Use the layout parser via pseudo-blocks for plain text.
+      final layoutParser = TNSTCLayoutParser(logger: _logger);
+      return layoutParser.parseTicket(text);
+    }
   }
 
   @override
-  TicketUpdateInfo? parseUpdate(String text) => null;
+  bool isSMSFormat(String text) {
+    // SMS contains SETC SMS-style patterns (same as TNSTC)
+    final smsPatterns = [
+      r'From\s*:\s*[A-Z]',
+      r'To\s*[A-Z]',
+      r'Trip\s*:\s*',
+      r'Time\s*:\s*,?\s*\d{1,2}:\d{2}',
+      r'Boarding at\s*:',
+    ];
 
-  @override
-  bool isSMSFormat(String text) => true;
+    final pdfPatterns = [
+      'Service Start Place',
+      'Service End Place',
+      'Passenger Pickup Point',
+      'PNR Number',
+      'Bank Txn',
+    ];
+
+    final hasSmsPattern = smsPatterns.any(
+      (pattern) => RegExp(pattern, caseSensitive: false).hasMatch(text),
+    );
+
+    final hasPdfPattern = pdfPatterns.any(
+      (pattern) => text.toLowerCase().contains(pattern.toLowerCase()),
+    );
+
+    return hasSmsPattern && !hasPdfPattern;
+  }
 }
 
 class TravelParserService implements ITravelParser {
   TravelParserService({required ILogger logger})
     : _logger = logger,
       _parsers = [
-        SETCBusParser(),
+        SETCBusParser(logger: logger),
         TNSTCBusParser(logger: logger),
         IRCTCTrainParser(logger: logger),
       ];
@@ -328,6 +399,66 @@ class TravelParserService implements ITravelParser {
       }
     }
     return null;
+  }
+
+  @override
+  Ticket? parseTicketFromBlocks(
+    List<OCRBlock> blocks, {
+    SourceType? sourceType,
+  }) {
+    try {
+      // Convert blocks to text for canParse check
+      final extractor = LayoutExtractor(blocks);
+      final text = extractor.toPlainText();
+
+      for (final parser in _parsers) {
+        if (parser.canParse(text)) {
+          // Log metadata only (no PII)
+          _logger
+            ..debug(
+              '[TravelParserService] Parsing with ${parser.providerName} '
+              'using ${blocks.length} OCR blocks',
+            )
+            ..info(
+              '[TravelParserService] Attempting to parse with '
+              '${parser.providerName} parser (layout-based)',
+            );
+
+          final ticket = parser.parseTicketFromBlocks(blocks);
+          final augmentedTicket = _augmentTicket(
+            ticket,
+            parser.providerName,
+            sourceType,
+          );
+
+          _logger.info(
+            '[TravelParserService] Successfully parsed ticket with '
+            '${parser.providerName} (layout-based)',
+          );
+
+          return augmentedTicket;
+        }
+      }
+
+      _logger.warning(
+        '[TravelParserService] No parser could handle the OCR blocks',
+      );
+      return null;
+    } on FormatException catch (e, stackTrace) {
+      _logger.error(
+        '[TravelParserService] Format error during ticket parsing',
+        e,
+        stackTrace,
+      );
+      return null;
+    } on Exception catch (e, stackTrace) {
+      _logger.error(
+        '[TravelParserService] Unexpected error during ticket parsing',
+        e,
+        stackTrace,
+      );
+      return null;
+    }
   }
 
   @override
@@ -352,30 +483,18 @@ class TravelParserService implements ITravelParser {
             );
 
           final ticket = parser.parseTicket(text);
+          final augmentedTicket = _augmentTicket(
+            ticket,
+            parser.providerName,
+            sourceType,
+          );
 
           _logger.info(
             '[TravelParserService] Successfully parsed ticket with '
             '${parser.providerName}',
           );
 
-          if (sourceType != null) {
-            // Check if Source Type already exists
-            final hasSourceType =
-                ticket.extras?.any(
-                  (e) => e.title == 'Source Type',
-                ) ??
-                false;
-
-            if (!hasSourceType) {
-              return ticket.copyWith(
-                extras: [
-                  ...?ticket.extras,
-                  ExtrasModel(title: 'Source Type', value: sourceType.name),
-                ],
-              );
-            }
-          }
-          return ticket;
+          return augmentedTicket;
         }
       }
 
@@ -402,6 +521,44 @@ class TravelParserService implements ITravelParser {
 
   List<String> getSupportedProviders() {
     return _parsers.map((parser) => parser.providerName).toList();
+  }
+
+  /// Adds "Provider" and "Source Type" extras if not already present.
+  Ticket _augmentTicket(
+    Ticket ticket,
+    String providerName,
+    SourceType? sourceType,
+  ) {
+    var updated = ticket;
+
+    // 1. Add Provider extra if missing
+    final hasProvider =
+        updated.extras?.any((e) => e.title == 'Provider') ?? false;
+    if (!hasProvider) {
+      updated = updated.copyWith(
+        extras: [
+          ...?updated.extras,
+          ExtrasModel(title: 'Provider', value: providerName),
+        ],
+      );
+    }
+
+    // 2. Add Source Type extra if provided and missing
+    if (sourceType != null) {
+      final hasSourceType =
+          updated.extras?.any((e) => e.title == 'Source Type') ?? false;
+
+      if (!hasSourceType) {
+        updated = updated.copyWith(
+          extras: [
+            ...?updated.extras,
+            ExtrasModel(title: 'Source Type', value: sourceType.name),
+          ],
+        );
+      }
+    }
+
+    return updated;
   }
 
   bool isTicketText(String text) {

@@ -8,8 +8,14 @@ abstract interface class ITicketDAO {
   /// Get Ticket by ID
   Future<Ticket?> getTicketById(String id);
 
-  /// Get all tickets
+  /// Get all tickets (both active and archived)
   Future<List<Ticket>> getAllTickets();
+
+  /// Get only active (non-archived) tickets
+  Future<List<Ticket>> getActiveTickets();
+
+  /// Get only archived tickets
+  Future<List<Ticket>> getArchivedTickets();
 
   /// Get ticket by type
   Future<List<Ticket>> getTicketsByType(String type);
@@ -21,4 +27,10 @@ abstract interface class ITicketDAO {
 
   /// Delete a ticket
   Future<int> deleteTicket(String id);
+
+  /// Archive all tickets whose date has passed
+  Future<int> archivePastTickets();
+
+  /// Delete archived tickets older than [retentionDays]
+  Future<int> purgeOldArchivedTickets({int retentionDays = 30});
 }

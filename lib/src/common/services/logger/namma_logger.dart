@@ -1,6 +1,15 @@
 import 'package:flutter/foundation.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
+import 'package:stack_trace/stack_trace.dart';
 import 'package:talker_flutter/talker_flutter.dart';
+
+class _CompactStackTrace implements StackTrace {
+  const _CompactStackTrace(this._raw);
+  final StackTrace _raw;
+
+  @override
+  String toString() => Trace.format(_raw);
+}
 
 /// Logger service using Talker for comprehensive logging throughout the app
 class NammaLogger implements ILogger {
@@ -70,7 +79,11 @@ class NammaLogger implements ILogger {
   /// Log an error with optional exception and stack trace
   @override
   void error(String message, [Object? error, StackTrace? stackTrace]) {
-    _talker.error(message, error, stackTrace);
+    _talker.error(
+      message,
+      error,
+      stackTrace != null ? _CompactStackTrace(stackTrace) : null,
+    );
   }
 
   /// Log a critical error
@@ -80,7 +93,11 @@ class NammaLogger implements ILogger {
     Object? error,
     StackTrace? stackTrace,
   ]) {
-    _talker.critical(message, error, stackTrace);
+    _talker.critical(
+      message,
+      error,
+      stackTrace != null ? _CompactStackTrace(stackTrace) : null,
+    );
   }
 
   /// Log a success message

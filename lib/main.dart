@@ -1,19 +1,41 @@
+// import 'dart:convert';
+
+import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_gemma/core/api/flutter_gemma.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'package:home_widget/home_widget.dart';
 import 'package:namma_wallet/src/app.dart';
 import 'package:namma_wallet/src/common/database/wallet_database_interface.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/platform_utils/platform_utils.dart';
+import 'package:namma_wallet/src/common/services/archive/archive_service_interface.dart';
 import 'package:namma_wallet/src/common/services/haptic/haptic_service_interface.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
+import 'package:namma_wallet/src/common/services/push_notification/notification_service_interface.dart';
+import 'package:namma_wallet/src/common/services/widget/widget_service_interface.dart';
 import 'package:namma_wallet/src/common/theme/theme_provider.dart';
 import 'package:namma_wallet/src/features/ai/fallback_parser/application/ai_service_interface.dart';
 import 'package:pdfrx/pdfrx.dart';
 import 'package:provider/provider.dart';
 
 Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+  final widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+
+  if (!kIsWeb) {
+    try {
+      await HomeWidget.setAppGroupId('group.com.nammaflutter.nammawallet');
+    } on Exception catch (e, stackTrace) {
+      // Continue app startup if app group setup fails
+      debugPrint('Failed to set HomeWidget app group id: $e\n$stackTrace');
+    } on Object catch (e, stackTrace) {
+      // Catch any other throwables
+      debugPrint('Failed to set HomeWidget app group id: $e\n$stackTrace');
+    }
+  }
 
   /// This is required by the new mediapipe requirement made by flutter gemma
   try {
@@ -56,8 +78,9 @@ Future<void> main() async {
   } on Object catch (e, s) {
     // Fallback to print if logger initialization fails,
     // as logger is not available.
-    // ignore: avoid_print
-    print('Error initializing logger or logging start message: $e\n$s');
+    if (kDebugMode) {
+      print('Error initializing logger or logging start message: $e\n$s');
+    }
   }
 
   // Log PDF initialization status with full context
@@ -74,10 +97,11 @@ Future<void> main() async {
       // Fallback: ensure error is visible even if logger is unavailable
       logCriticalError(pdfInitError, pdfInitStackTrace ?? StackTrace.current);
       // fallback print to debug console
-      // ignore: avoid_print
-      print(
-        'PDF INITIALIZATION FAILED on ${getPlatformInfo()}: $pdfInitError',
-      );
+      if (kDebugMode) {
+        print(
+          'PDF INITIALIZATION FAILED on ${getPlatformInfo()}: $pdfInitError',
+        );
+      }
     }
   } else if (pdfFeaturesEnabled && logger != null) {
     logger.info('PDF features enabled successfully');
@@ -85,7 +109,7 @@ Future<void> main() async {
 
   // Set up global error handling
   // ignore: no-empty-block
-  FlutterError.onError = (FlutterErrorDetails details) {
+  FlutterError.onError = (details) {
     if (logger != null) {
       logger.error(
         'Flutter Error: ${details.exceptionAsString()}',
@@ -95,10 +119,11 @@ Future<void> main() async {
     } else {
       // Fallback to print if logger is not available,
       // to ensure error messages are still visible.
-      // ignore: avoid_print
-      print(
-        '''FALLBACK LOGGER - Flutter Error: ${details.exceptionAsString()}\n${details.stack}''',
-      );
+      if (kDebugMode) {
+        print(
+          '''FALLBACK LOGGER - Flutter Error: ${details.exceptionAsString()}\n${details.stack}''',
+        );
+      }
     }
   };
 
@@ -113,8 +138,7 @@ Future<void> main() async {
     } else {
       // Fallback to print if logger is not available,
       // to ensure error messages are still visible.
-      // ignore: avoid_print
-      print('FALLBACK LOGGER - Platform Error: $error\n$stack');
+      if (kDebugMode) print('FALLBACK LOGGER - Platform Error: $error\n$stack');
     }
     return true;
   };
@@ -132,6 +156,16 @@ Future<void> main() async {
     await getIt<IAIService>().init();
     logger?.success('AI service initialized');
 
+    logger?.info('Initializing widget service...');
+    await getIt<IWidgetService>().initialize();
+    logger?.success('Widget service initialized');
+
+    if (!kIsWeb) {
+      logger?.info('Initializing notification service...');
+      await getIt<INotificationService>().initialize();
+      logger?.success('Notification service initialized');
+    }
+
     logger?.success('All services initialized successfully');
   } on Object catch (e, stackTrace) {
     // Log error using logger if available
@@ -147,17 +181,29 @@ Future<void> main() async {
       logCriticalError(e, stackTrace);
 
       // Also print for debug console visibility
-      // Print statements are necessary here as logger is unavailable
-      // ignore: avoid_print
-      print('CRITICAL INITIALIZATION ERROR: $e');
-      // Print statements are necessary here as logger is unavailable
-      // ignore: avoid_print
-      print('Stack trace: $stackTrace');
+      if (kDebugMode) print('CRITICAL INITIALIZATION ERROR: $e');
+      if (kDebugMode) print('Stack trace: $stackTrace');
     }
 
     // Always rethrow to prevent app from starting in broken state
     rethrow;
   }
+
+  FlutterNativeSplash.remove();
+
+  // Restore system UI (status bar & navigation bar) after splash
+  unawaited(SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge));
+
+  // Optional: set colors for status & navigation bar
+  SystemChrome.setSystemUIOverlayStyle(
+    const SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      systemNavigationBarColor: Colors.transparent,
+      systemNavigationBarDividerColor: Colors.transparent,
+      statusBarIconBrightness: Brightness.dark,
+      systemNavigationBarIconBrightness: Brightness.dark,
+    ),
+  );
 
   runApp(
     ChangeNotifierProvider.value(
@@ -165,4 +211,18 @@ Future<void> main() async {
       child: const NammaWalletApp(),
     ),
   );
+
+  // Run archive maintenance to ensure up-to-date data on startup.
+  // We do this after runApp to avoid delaying the first frame.
+  unawaited(() async {
+    try {
+      final archiveService = getIt<IArchiveService>();
+      await archiveService.runArchiveMaintenance();
+    } on Object catch (e, stackTrace) {
+      // Archive maintenance failures should not crash the app.
+      // Note: runArchiveMaintenance already handles its own internal errors,
+      // this block primarily catches potential resolution errors from getIt.
+      logger?.error('Startup archive maintenance failed', e, stackTrace);
+    }
+  }());
 }

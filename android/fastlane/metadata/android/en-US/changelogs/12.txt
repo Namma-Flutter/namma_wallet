@@ -1,0 +1,4 @@
+• Improved SMS ticket processing for TNSTC buses
+• Enhanced notifications and automation features
+• Better ticket archiving system
+• Bug fixes and stability improvements

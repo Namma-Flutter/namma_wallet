@@ -1,0 +1,1 @@
+An offline wallet that reads SMS & notifications to create tickets and events

@@ -1,28 +1,24 @@
+// coverage:ignore-file
 import 'dart:async';
 import 'dart:io';
 
 import 'package:cross_file/cross_file.dart';
-import 'package:listen_sharing_intent/listen_sharing_intent.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
-import 'package:namma_wallet/src/common/services/pdf/pdf_service_interface.dart';
 import 'package:namma_wallet/src/features/receive/application/sharing_intent_provider.dart';
 import 'package:namma_wallet/src/features/receive/domain/shared_content_type.dart';
 import 'package:namma_wallet/src/features/receive/domain/sharing_intent_service_interface.dart';
 import 'package:path/path.dart' as path;
+import 'package:share_handler/share_handler.dart';
 
 /// Service to handle sharing intents from other apps
 class SharingIntentService implements ISharingIntentService {
   SharingIntentService({
-    required ILogger logger,
-    required IPDFService pdfService,
+    required this._logger,
     ISharingIntentProvider? sharingIntentProvider,
-  }) : _logger = logger,
-       _pdfService = pdfService,
-       _sharingIntentProvider =
+  }) : _sharingIntentProvider =
            sharingIntentProvider ?? SharingIntentProvider();
 
   final ILogger _logger;
-  final IPDFService _pdfService;
   final ISharingIntentProvider _sharingIntentProvider;
 
   StreamSubscription<void>? _intentDataStreamSubscription;
@@ -35,11 +31,12 @@ class SharingIntentService implements ISharingIntentService {
   }) async {
     _intentDataStreamSubscription = _sharingIntentProvider
         .getMediaStream()
-        .asyncMap((files) async {
-          await _handleSharedContent(files, onContentReceived, onError);
-        })
         .listen(
-          (_) {},
+          (media) async {
+            if (media != null) {
+              await _handleSharedContent(media, onContentReceived, onError);
+            }
+          },
           onError: (Object err) {
             _logger.error('Error in sharing intent stream: $err');
             onError('Error receiving shared content: $err');
@@ -47,10 +44,10 @@ class SharingIntentService implements ISharingIntentService {
         );
 
     try {
-      final files = await _sharingIntentProvider.getInitialMedia();
-      if (files.isNotEmpty) {
-        _logger.info('App launched with shared content: ${files.length}');
-        await _handleSharedContent(files, onContentReceived, onError);
+      final media = await _sharingIntentProvider.getInitialSharing();
+      if (media != null) {
+        _logger.info('App launched with shared content');
+        await _handleSharedContent(media, onContentReceived, onError);
       }
     } on Object catch (error, stackTrace) {
       _logger.error(
@@ -63,70 +60,111 @@ class SharingIntentService implements ISharingIntentService {
   }
 
   Future<void> _handleSharedContent(
-    List<SharedMediaFile> files,
+    SharedMedia media,
     void Function(String content, SharedContentType type) onContentReceived,
     void Function(String) onError,
   ) async {
     _logger.info('SHARING INTENT TRIGGERED');
 
-    for (var i = 0; i < files.length; i++) {
-      final file = files[i];
-      try {
-        _logger.info('SHARED CONTENT ${i + 1}/${files.length} DETAILS');
-        _printFileDetails(file);
+    try {
+      // Handle text content if present
+      if (media.content != null && media.content!.isNotEmpty) {
+        _logger.info('Text content received: ${media.content}');
+        onContentReceived(media.content!, SharedContentType.sms);
+        return;
+      }
 
-        // Check if this is actually a file or text content
-        File fileObj;
-        if (file.path.startsWith('file://') ||
-            (Uri.tryParse(file.path)?.hasScheme ?? false)) {
-          fileObj = File.fromUri(Uri.parse(file.path));
-        } else {
-          fileObj = File(file.path);
-        }
+      // Handle file attachments
+      final attachments = media.attachments ?? [];
+      if (attachments.isEmpty) {
+        _logger.warning('No content or attachments found in shared media');
+        return;
+      }
 
-        if (fileObj.existsSync()) {
-          // It's a real file, extract content based on file type
-          _logger.info(
-            'File received: ${fileObj.path.split(Platform.pathSeparator).last}',
-          );
+      _logger.info('Processing ${attachments.length} attachment(s)');
+
+      for (var i = 0; i < attachments.length; i++) {
+        final attachment = attachments[i];
+        if (attachment == null) continue;
+
+        try {
+          _logger
+            ..info('ATTACHMENT ${i + 1}/${attachments.length} DETAILS')
+            ..debug('Path: ${attachment.path}')
+            ..debug('Type: ${attachment.type}');
+
+          final filePath = attachment.path;
+          if (filePath.isEmpty) {
+            _logger.warning('Attachment has no path, skipping');
+            continue;
+          }
+
+          final file = File(filePath);
+          if (!file.existsSync()) {
+            _logger.warning('File does not exist: $filePath');
+            onError('Shared file not found: $filePath');
+            continue;
+          }
 
           // Determine content type based on file extension
-          final fileExtension = path.extension(fileObj.path).toLowerCase();
+          final fileExtension = path.extension(filePath).toLowerCase();
 
           // Check if file type is supported
-          if (fileExtension != '.pdf' && !_isSupportedTextFile(fileExtension)) {
+          if (fileExtension != '.pdf' &&
+              fileExtension != '.pkpass' &&
+              !_isSupportedTextFile(fileExtension) &&
+              !_isSupportedImageFile(fileExtension)) {
             _logger.warning(
               'Skipping unsupported file type: $fileExtension',
             );
             onError(
               'File type $fileExtension is not supported. '
-              'Please share PDF or text files.',
+              'Please share PDF, PKPASS, text or image(PNG, JPG, JPEG) files.',
             );
             continue;
           }
 
           final contentType = fileExtension == '.pdf'
               ? SharedContentType.pdf
-              : SharedContentType.sms;
+              : (fileExtension == '.pkpass'
+                    ? SharedContentType.pkpass
+                    : (_isSupportedImageFile(fileExtension)
+                          ? SharedContentType.image
+                          : SharedContentType.sms));
 
-          final content = await extractContentFromFile(XFile(fileObj.path));
+          final content = await extractContentFromFile(XFile(filePath));
           onContentReceived(content, contentType);
-        } else {
-          // It's text content (like SMS), pass the text directly
-          _logger.info('Text content received');
-          onContentReceived(file.path, SharedContentType.sms);
+        } on Object catch (e, stackTrace) {
+          _logger.error(
+            'Error handling attachment ${i + 1}: $e',
+            e,
+            stackTrace,
+          );
+          onError('Error processing shared file: $e');
         }
-      } on Object catch (e, stackTrace) {
-        _logger.error(
-          'Error handling shared content ${i + 1}: $e',
-          e,
-          stackTrace,
-        );
-        onError('Error processing shared content: $e');
       }
+    } on Object catch (e, stackTrace) {
+      _logger.error(
+        'Error handling shared content: $e',
+        e,
+        stackTrace,
+      );
+      onError('Error processing shared content: $e');
     }
 
     _logger.info('END SHARING INTENT ANALYSIS');
+  }
+
+  /// Supported image file extensions (case-insensitive)
+  static const _supportedImageExtensions = {
+    '.jpg',
+    '.jpeg',
+    '.png',
+  };
+
+  /// Check if a file extension is a supported image type
+  bool _isSupportedImageFile(String extension) {
+    return _supportedImageExtensions.contains(extension.toLowerCase());
   }
 
   /// Supported text file extensions (case-insensitive)
@@ -149,17 +187,22 @@ class SharingIntentService implements ISharingIntentService {
     final fileExtension = path.extension(file.path).toLowerCase();
 
     if (fileExtension == '.pdf') {
-      // Extract text from PDF using PDFService
-      _logger.info('Extracting text from PDF: ${file.path}');
-      final content = await _pdfService.extractTextFrom(file);
-      _logger.info('Successfully extracted text from PDF');
-      return content;
+      // For PDF, we pass the file path as the content
+      return file.path;
+    } else if (_isSupportedImageFile(fileExtension)) {
+      // For image files, return the file path (OCR would happen downstream)
+      _logger.info('Returning file path for image: ${file.path}');
+      return file.path;
     } else if (_isSupportedTextFile(fileExtension)) {
       // Read as text file
       _logger.info('Reading text file: ${file.path}');
       final content = await file.readAsString();
       _logger.info('Successfully read text file');
       return content;
+    } else if (fileExtension == '.pkpass') {
+      // For pkpass, we pass the file path as the content
+      _logger.info('Returning file path for PKPass: ${file.path}');
+      return file.path;
     } else {
       // Unsupported file type
       _logger.warning(
@@ -167,69 +210,13 @@ class SharingIntentService implements ISharingIntentService {
       );
       throw UnsupportedError(
         'File type $fileExtension is not supported. '
-        'Supported types: PDF, TXT, SMS',
+        'Supported types: PDF, TXT, SMS, Image (JPG, JPEG, PNG) and PKPASS.',
       );
     }
   }
 
-  /// Print detailed file information to console
-  void _printFileDetails(SharedMediaFile file) {
-    _logger
-      ..debug('File Path: ${file.path}')
-      ..debug('File Name: ${file.path.split('/').last}')
-      ..debug('File Extension: ${file.path.split('.').last.toLowerCase()}')
-      ..debug('MIME Type: ${file.type}');
-
-    final fileObj = File(file.path);
-    if (fileObj.existsSync()) {
-      try {
-        final stats = fileObj.statSync();
-        _logger
-          ..debug(
-            'File Size: ${stats.size} bytes (${_formatFileSize(stats.size)})',
-          )
-          ..debug('Last Modified: ${stats.modified}')
-          ..debug('File Accessible: Yes');
-
-        // Try to read text files for content preview (Copilot code)
-        if (_isTextFile(file)) {
-          try {
-            final content = fileObj.readAsStringSync();
-            final preview = content.length > 200
-                ? '${content.substring(0, 200)}...'
-                : content;
-            _logger.debug('Content Preview: $preview');
-          } on Object catch (e, stackTrace) {
-            _logger.error('Could not read text content: $e', e, stackTrace);
-          }
-        }
-      } on Object catch (e, stackTrace) {
-        _logger.error('Error reading file stats: $e', e, stackTrace);
-      }
-    } else {
-      _logger.error('File Accessible: No - File not found at path');
-    }
-  }
-
-  /// Check if file is a text file
-  bool _isTextFile(SharedMediaFile file) {
-    final extension = file.path.toLowerCase().split('.').last;
-    return file.type.toString().contains('text') ||
-        extension == 'txt' ||
-        extension == 'sms';
-  }
-
-  /// Format file size in readable format (Copilot code)
-  String _formatFileSize(int bytes) {
-    if (bytes < 1024) return '$bytes B';
-    if (bytes < 1024 * 1024) return '${(bytes / 1024).toStringAsFixed(1)} KB';
-    if (bytes < 1024 * 1024 * 1024) {
-      return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
-    }
-    return '${(bytes / (1024 * 1024 * 1024)).toStringAsFixed(1)} GB';
-  }
-
   /// Dispose resources
+
   @override
   Future<void> dispose() async {
     await _intentDataStreamSubscription?.cancel();

@@ -63,14 +63,15 @@ class EventTicketCardWidget extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       //* ticket title
-                      Text(
-                        ticket.primaryText,
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.onSurface,
+                      if (ticket.primaryText?.isNotEmpty ?? false)
+                        Text(
+                          ticket.primaryText!,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurface,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 2,
                         ),
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 2,
-                      ),
 
                       //* Date & Time
                       if (ticket.startTime != null)
@@ -110,27 +111,29 @@ class EventTicketCardWidget extends StatelessWidget {
               ],
             ),
             //* Address
-            Text(
-              ticket.location,
-              style: TextStyle(
-                color: Theme.of(context).colorScheme.onSurface,
+            if (ticket.location != null)
+              Text(
+                ticket.location!,
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
               ),
-              overflow: TextOverflow.ellipsis,
-              maxLines: 1,
-            ),
           ],
         ),
       ),
     );
   }
 
-  IconData _getTicketIcon(TicketType type) {
+  IconData _getTicketIcon(TicketType? type) {
     return switch (type) {
       TicketType.bus => Icons.airport_shuttle_outlined,
       TicketType.train => Icons.tram_outlined,
       TicketType.flight => Icons.flight_outlined,
       TicketType.metro => Icons.subway_outlined,
       TicketType.event => Icons.event_outlined,
+      null => Icons.confirmation_number_outlined,
     };
   }
 }
