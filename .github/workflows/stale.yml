@@ -5,6 +5,10 @@ on:
     - cron: '0 0 * * *' # Daily at midnight
   workflow_dispatch:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   issues: write
   pull-requests: write
