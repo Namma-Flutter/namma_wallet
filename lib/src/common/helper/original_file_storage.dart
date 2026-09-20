@@ -14,5 +14,5 @@ const originalFilesDirName = 'ticket_originals';
 /// absolute paths pointing at a directory that no longer exists.
 Future<String> resolveOriginalFilePath(String fileName) async {
   final appDocDir = await getApplicationDocumentsDirectory();
-  return p.join(appDocDir.path, originalFilesDirName, p.basename(fileName));
+  return p.join(appDocDir.path, originalFilesDirName, fileName);
 }

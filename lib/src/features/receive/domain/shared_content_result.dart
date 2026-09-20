@@ -25,7 +25,6 @@ class TicketCreatedResult extends SharedContentResult
     this.date,
     this.warning,
     this.isArchived = false,
-    this.isUpdate = false,
   });
 
   /// The unique ticket identifier used for navigation.
@@ -49,9 +48,6 @@ class TicketCreatedResult extends SharedContentResult
   // Drives navigation to the archived list — independent of `warning` so
   // that wording changes never break control flow.
   final bool isArchived;
-
-  /// Whether this is an update to an existing ticket.
-  final bool isUpdate;
 }
 
 /// Result when an existing ticket is updated

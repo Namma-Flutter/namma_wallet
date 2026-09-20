@@ -78,52 +78,31 @@ class SMSQueueService extends ISMSQueueService with WidgetsBindingObserver {
         return;
       }
 
-      _logger.info('SMSQueueService: draining ${queue.length} SMS entry(ies)');
+      _logger.info(
+        'SMSQueueService: draining ${queue.length} SMS entry(ies)',
+      );
       _isParsing.value = true;
       var successCount = 0;
       final failedEntries = <String>[];
 
-      final results = await Future.wait(
-        queue.map((smsText) async {
-          try {
-            final result = await _contentProcessor.processContent(
-              smsText,
-              SharedContentType.sms,
-            );
-            return (smsText, result, null, null);
-          } on Object catch (e, st) {
-            return (smsText, null, e, st);
-          }
-        }),
-      );
-
-      for (final res in results) {
-        final smsText = res.$1;
-        final result = res.$2;
-        final error = res.$3;
-        final stackTrace = res.$4;
-
-        if (error != null) {
-          failedEntries.add(smsText);
-          _logger.error(
-            'SMSQueueService: error processing entry',
-            error,
-            stackTrace,
+      for (final smsText in queue) {
+        try {
+          final result = await _contentProcessor.processContent(
+            smsText,
+            SharedContentType.sms,
           );
-          continue;
-        }
-        switch (result) {
-          case TicketCreatedResult():
-          case TicketUpdatedResult():
-          case TicketNotFoundResult():
+          if (result is! ProcessingErrorResult) {
             successCount++;
             _logger.info('SMSQueueService: processed entry successfully');
-          case ProcessingErrorResult(:final error):
+          } else {
             failedEntries.add(smsText);
-            _logger.warning('SMSQueueService: entry failed — $error');
-          case null:
-            failedEntries.add(smsText);
-            _logger.warning('SMSQueueService: entry missing result');
+            _logger.warning(
+              'SMSQueueService: entry failed — ${result.error}',
+            );
+          }
+        } on Object catch (e, st) {
+          failedEntries.add(smsText);
+          _logger.error('SMSQueueService: error processing entry', e, st);
         }
       }
 
@@ -208,7 +187,11 @@ class SMSQueueService extends ISMSQueueService with WidgetsBindingObserver {
     final plural = count > 1 ? 's' : '';
     final body = '$count new ticket$plural added from TNSTC SMS automation';
     try {
-      await _notificationHelper.show(_notificationId, 'Namma Wallet', body);
+      await _notificationHelper.show(
+        _notificationId,
+        'Namma Wallet',
+        body,
+      );
       _logger.info('SMSQueueService: success notification posted ($body)');
     } on Object catch (e, st) {
       _logger.error(

@@ -1,3 +1,4 @@
+// coverage:ignore-file
 import 'package:cross_file/cross_file.dart';
 import 'package:namma_wallet/src/features/receive/domain/shared_content_type.dart';
 import 'package:namma_wallet/src/features/receive/domain/sharing_intent_service_interface.dart';

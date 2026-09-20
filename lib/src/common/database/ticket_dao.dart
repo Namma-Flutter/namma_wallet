@@ -492,7 +492,9 @@ class TicketDao implements ITicketDAO {
 
       if (count > 0) {
         _logger.logDatabase('Success', 'Purged $count old archived ticket(s)');
-        await Future.wait(originalFilePaths.map(_deleteOriginalFile));
+        for (final fileName in originalFilePaths) {
+          await _deleteOriginalFile(fileName);
+        }
       } else {
         _logger.logDatabase('Info', 'No archived tickets to purge');
       }
