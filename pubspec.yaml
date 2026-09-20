@@ -33,7 +33,7 @@ dependencies:
   http: ^1.6.0
   image: ^4.9.2
   image_picker: ^1.2.3
-  intl: ^0.20.2
+  intl: ^0.20.3
   meta: ^1.18.0
   package_info_plus: ^10.2.1
   path: ^1.9.1
