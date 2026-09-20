@@ -55,8 +55,7 @@ done
 
 if [ "$API_SUCCESS" = false ]; then
   echo "⚠️ Unable to query GitHub API after $MAX_RETRIES attempts: $API_OUTPUT"
-  echo "Applying conservative cooldown of 60 seconds before proceeding..."
-  sleep 60
+  echo "Proceeding immediately (native GitHub concurrency handles cancellation)."
   exit 0
 fi
 
@@ -69,8 +68,9 @@ fi
 
 echo "Last completed run timestamp: $LAST_COMPLETED"
 
-# Calculate elapsed time
-LAST_EPOCH=$(date -d "$LAST_COMPLETED" +%s 2>/dev/null || date -jf "%Y-%m-%dT%H:%M:%SZ" "$LAST_COMPLETED" +%s 2>/dev/null || echo "0")
+# Calculate elapsed time (normalize ISO timestamp by stripping fractional seconds for portable parsing)
+LAST_COMPLETED_CLEAN=$(echo "$LAST_COMPLETED" | sed -E 's/\.[0-9]+//')
+LAST_EPOCH=$(date -d "$LAST_COMPLETED_CLEAN" +%s 2>/dev/null || date -jf "%Y-%m-%dT%H:%M:%SZ" "$LAST_COMPLETED_CLEAN" +%s 2>/dev/null || echo "0")
 NOW_EPOCH=$(date +%s)
 
 if [ "$LAST_EPOCH" -eq 0 ]; then
@@ -82,12 +82,10 @@ ELAPSED=$((NOW_EPOCH - LAST_EPOCH))
 echo "Elapsed since last completed run: $ELAPSED seconds ($((ELAPSED / 60)) minutes)"
 
 if [ "$ELAPSED" -lt "$COOLDOWN_SECONDS" ]; then
-  REMAINING=$((COOLDOWN_SECONDS - ELAPSED))
-  echo "⏳ Cooldown active: A run completed $ELAPSED seconds ago (< $COOLDOWN_SECONDS s)."
-  echo "Sleeping for remaining $REMAINING seconds ($((REMAINING / 60)) min $((REMAINING % 60)) s)..."
-  echo "Note: If you push new commits during this window, this run will be cancelled and reset."
-  sleep "$REMAINING"
-  echo "✅ Cooldown elapsed. Proceeding with workflow execution."
+  echo "ℹ️ Notice: A previous run completed $ELAPSED seconds ago (< $COOLDOWN_SECONDS s)."
+  echo "GitHub Actions native concurrency (cancel-in-progress: true) manages debounce."
+  echo "Proceeding immediately without active runner sleep."
 else
   echo "✅ More than $((COOLDOWN_SECONDS / 60)) minutes elapsed ($ELAPSED seconds). Proceeding immediately."
 fi
+exit 0
