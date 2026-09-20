@@ -15,7 +15,7 @@ class WalletDatabase implements IWalletDatabase {
   final ILogger _logger;
 
   static const String _dbName = 'namma_wallet.db';
-  static const int _dbVersion = 7;
+  static const int _dbVersion = 6;
 
   Database? _database;
 
@@ -132,12 +132,6 @@ class WalletDatabase implements IWalletDatabase {
             'Database migrated to v6: Added original_file_path column',
           );
         }
-        if (oldVersion < 7) {
-          await _createEventTable(db);
-          _logger.success(
-            'Database migrated to v7: Created events table',
-          );
-        }
       },
     );
   }
@@ -156,7 +150,6 @@ class WalletDatabase implements IWalletDatabase {
   ''');
 
     await _createTicketTable(db);
-    await _createEventTable(db);
   }
 
   /// function [_createTicketTable] will helps to create
@@ -195,26 +188,6 @@ class WalletDatabase implements IWalletDatabase {
     await db.execute(
       'CREATE INDEX IF NOT EXISTS idx_tickets_archived_at ON tickets '
       '(archived_at);',
-    );
-  }
-
-  Future<void> _createEventTable(Database db) async {
-    const query = '''
-      CREATE TABLE events (
-         id INTEGER PRIMARY KEY AUTOINCREMENT,
-         icon_name TEXT NOT NULL,
-         title TEXT NOT NULL,
-         subtitle TEXT NOT NULL,
-         date TEXT NOT NULL,
-         price TEXT NOT NULL,
-         created_at TEXT DEFAULT CURRENT_TIMESTAMP
-      );
-    ''';
-
-    await db.execute(query);
-
-    await db.execute(
-      'CREATE INDEX IF NOT EXISTS idx_events_date ON events (date);',
     );
   }
 

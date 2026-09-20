@@ -45,17 +45,9 @@ abstract interface class IPDFService {
   /// This is a higher-level method that returns a structured map of key-value
   /// pairs extracted from the PDF using layout analysis.
   ///
-  /// [fieldMappings] maps logical field names (e.g. 'from', 'to') to a list of
-  /// possible label names in the document
-  /// (e.g. ['Service Start Place', 'Passenger Start Place']).
-  /// If null, a default mapping is used.
-  ///
   /// Returns a map with field names as keys and extracted values.
   /// The exact fields depend on the document type.
   ///
   /// Throws an exception if extraction fails.
-  Future<Map<String, dynamic>> extractStructuredData(
-    XFile pdf, {
-    Map<String, List<String>>? fieldMappings,
-  });
+  Future<Map<String, dynamic>> extractStructuredData(XFile pdf);
 }

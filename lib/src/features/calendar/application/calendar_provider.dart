@@ -5,7 +5,6 @@ import 'package:namma_wallet/src/common/database/ticket_dao_interface.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
-import 'package:namma_wallet/src/features/events/domain/event_dao_interface.dart';
 import 'package:namma_wallet/src/features/events/domain/event_model.dart';
 import 'package:table_calendar/table_calendar.dart';
 
@@ -13,11 +12,9 @@ class CalendarProvider extends ChangeNotifier {
   CalendarProvider({
     ILogger? logger,
     ITicketDAO? ticketDao,
-    IEventDAO? eventDao,
     DateTime? initialSelectedDay,
   }) : _logger = logger ?? getIt<ILogger>(),
        _ticketDao = ticketDao ?? getIt<ITicketDAO>(),
-       _eventDao = eventDao ?? getIt<IEventDAO>(),
        _selectedDay = initialSelectedDay ?? _todayAtMidnight();
 
   static DateTime _todayAtMidnight() {
@@ -31,7 +28,6 @@ class CalendarProvider extends ChangeNotifier {
 
   final ILogger _logger;
   final ITicketDAO _ticketDao;
-  final IEventDAO _eventDao;
 
   DateTime _selectedDay;
   List<Event> _events = [];
@@ -59,16 +55,10 @@ class CalendarProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  // TODO(harish): Wire to IEventDAO when events feature is implemented
   Future<void> loadEvents() async {
-    _errorMessage = null; // Clear any previous error
-    try {
-      _events = await _eventDao.getAllEvents();
-      notifyListeners();
-    } on Exception catch (e, st) {
-      _logger.error('Error loading events: $e\n$st');
-      _errorMessage = 'Failed to load events: $e';
-      notifyListeners();
-    }
+    // Initialize empty events list (no mocked data)
+    _events = [];
 
     // Load tickets from database
     await loadTickets();

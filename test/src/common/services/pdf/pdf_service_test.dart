@@ -49,7 +49,7 @@ void main() {
   });
 
   group('PDFService extractStructuredData tests', () {
-    test('uses default mappings when fieldMappings is null', () async {
+    test('extracts fields using default mappings', () async {
       const text = '''
 PNR Number : 123456789
 Date of Journey : 01/01/2026
@@ -71,64 +71,5 @@ Seat No : 1, 2
       expect(result['fare'], '1000');
       expect(result['seat'], '1, 2');
     });
-
-    test('uses custom fieldMappings when provided', () async {
-      const text = '''
-Booking Ref: ABC987
-Journey Date: 15-08-2025
-Bus Route: 55B
-Boarding: Madurai
-Destination: Trichy
-Cost: 500
-Seats: 5
-''';
-      pdfService.mockBlocks = OCRBlock.fromPlainText(text);
-
-      final customMappings = {
-        'pnr': ['Booking Ref'],
-        'date': ['Journey Date'],
-        'route': ['Bus Route'],
-        'from': ['Boarding'],
-        'to': ['Destination'],
-        'fare': ['Cost'],
-        'seat': ['Seats'],
-      };
-
-      final result = await pdfService.extractStructuredData(
-        FakeXFile(),
-        fieldMappings: customMappings,
-      );
-
-      expect(result['pnr'], 'ABC987');
-      expect(result['date'], '15-08-2025');
-      expect(result['route'], '55B');
-      expect(result['from'], 'Madurai');
-      expect(result['to'], 'Trichy');
-      expect(result['fare'], '500');
-      expect(result['seat'], '5');
-    });
-
-    test(
-      'extracts only mapped fields and ignores defaults if custom is provided',
-      () async {
-        const text = '''
-PNR Number : 123456789
-Custom PNR : ABC987
-''';
-        pdfService.mockBlocks = OCRBlock.fromPlainText(text);
-
-        final customMappings = {
-          'pnr': ['Custom PNR'],
-        };
-
-        final result = await pdfService.extractStructuredData(
-          FakeXFile(),
-          fieldMappings: customMappings,
-        );
-
-        expect(result['pnr'], 'ABC987');
-        expect(result.containsKey('from'), isFalse);
-      },
-    );
   });
 }
