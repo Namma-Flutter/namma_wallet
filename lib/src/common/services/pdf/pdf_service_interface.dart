@@ -46,7 +46,8 @@ abstract interface class IPDFService {
   /// pairs extracted from the PDF using layout analysis.
   ///
   /// [fieldMappings] maps logical field names (e.g. 'from', 'to') to a list of
-  /// possible label names in the document (e.g. ['Service Start Place', 'Passenger Start Place']).
+  /// possible label names in the document
+  /// (e.g. ['Service Start Place', 'Passenger Start Place']).
   /// If null, a default mapping is used.
   ///
   /// Returns a map with field names as keys and extracted values.

@@ -1,8 +1,5 @@
-import 'dart:io';
-
 import 'package:cross_file/cross_file.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
 import 'package:namma_wallet/src/common/services/ocr/ocr_block.dart';
 import 'package:namma_wallet/src/common/services/ocr/ocr_service_interface.dart';
 import 'package:namma_wallet/src/common/services/pdf/pdf_service.dart';
@@ -53,7 +50,7 @@ void main() {
 
   group('PDFService extractStructuredData tests', () {
     test('uses default mappings when fieldMappings is null', () async {
-      final text = '''
+      const text = '''
 PNR Number : 123456789
 Date of Journey : 01/01/2026
 Route No : 100A
@@ -76,7 +73,7 @@ Seat No : 1, 2
     });
 
     test('uses custom fieldMappings when provided', () async {
-      final text = '''
+      const text = '''
 Booking Ref: ABC987
 Journey Date: 15-08-2025
 Bus Route: 55B
@@ -114,7 +111,7 @@ Seats: 5
     test(
       'extracts only mapped fields and ignores defaults if custom is provided',
       () async {
-        final text = '''
+        const text = '''
 PNR Number : 123456789
 Custom PNR : ABC987
 ''';

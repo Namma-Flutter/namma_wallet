@@ -7,10 +7,7 @@ import 'package:namma_wallet/src/features/receive/domain/shared_content_result.d
 
 /// Success screen displayed when data is successfully shared to the application
 class ShareSuccessView extends StatelessWidget {
-  const ShareSuccessView({
-    required this.result,
-    super.key,
-  });
+  const ShareSuccessView({required this.result, super.key});
 
   final TicketCreatedResult result;
 
@@ -181,7 +178,9 @@ class ShareSuccessView extends StatelessWidget {
                         elevation: 0,
                       ),
                       child: Text(
-                        result.isUpdate ? 'View Updated Ticket' : 'View My Tickets',
+                        result.isUpdate
+                            ? 'View Updated Ticket'
+                            : 'View My Tickets',
                         style: Paragraph01(color: Colors.white).semiBold,
                       ),
                     ),
