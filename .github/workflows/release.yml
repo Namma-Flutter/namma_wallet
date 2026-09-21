@@ -461,7 +461,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     needs: [android, ios, promote]
-    if: ${{ !cancelled() && (needs.android.result == 'success' || needs.android.result == 'skipped') && (needs.ios.result == 'success' || needs.ios.result == 'skipped') && (needs.promote.result == 'success' || needs.promote.result == 'skipped') }}
+    if: ${{ !cancelled() && (needs.android.result == 'success' || needs.ios.result == 'success') && (needs.promote.result == 'success' || needs.promote.result == 'skipped') }}
     permissions:
       contents: write
       id-token: write
