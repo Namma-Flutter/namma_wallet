@@ -55,7 +55,7 @@ jobs:
 
       - name: Setup Gradle
         if: steps.filter.outputs.android == 'true' && github.actor != 'dependabot[bot]'
-        uses: gradle/actions/setup-gradle@18f1c6724d5bcb313b5c5ef536430a31e5c5b455 # v4.4.0
+        uses: gradle/actions/setup-gradle@8379f6a1328ee0e06e2bb424dadb7b159856a326 # v4.4.0
 
       - name: Read Flutter version from pubspec.yaml
         if: steps.filter.outputs.android == 'true' && github.actor != 'dependabot[bot]'
