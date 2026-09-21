@@ -330,8 +330,5 @@ CHECKSUMS
   xcpretty (0.4.1) sha256=b14c50e721f6589ee3d6f5353e2c2cfcd8541fa1ea16d6c602807dd7327f3892
   xcpretty-travis-formatter (1.0.1) sha256=aacc332f17cb7b2cba222994e2adc74223db88724fe76341483ad3098e232f93
 
-RUBY VERSION
-   ruby 3.4.2p58
-
 BUNDLED WITH
    2.7.2
