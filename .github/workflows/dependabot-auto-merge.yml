@@ -34,6 +34,16 @@ jobs:
           PR_URL: ${{ github.event.pull_request.html_url }}
           GITHUB_TOKEN: ${{ secrets.AUTOMERGE_PAT || secrets.GITHUB_TOKEN }}
 
+      - name: Update branch if behind
+        run: |
+          gh api \
+            --method PUT \
+            -H "Accept: application/vnd.github+json" \
+            "/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/update-branch" \
+            || echo "Branch already up to date or update not needed"
+        env:
+          GITHUB_TOKEN: ${{ secrets.AUTOMERGE_PAT || secrets.GITHUB_TOKEN }}
+
       - name: Enable Auto-Merge
         run: |
           gh pr merge --auto --squash "$PR_URL" || gh pr merge --squash "$PR_URL"
