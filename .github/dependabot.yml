@@ -37,11 +37,3 @@ updates:
       - "dependencies"
       - "ci"
 
-  - package-ecosystem: "cocoapods"
-    directory: "/ios"
-    schedule:
-      interval: "weekly"
-    open-pull-requests-limit: 5
-    labels:
-      - "dependencies"
-      - "ios"
