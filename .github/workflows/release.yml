@@ -489,13 +489,13 @@ jobs:
 
       - name: Attest APK provenance
         if: needs.android.result == 'success'
-        uses: actions/attest-build-provenance@c074443f1aee8d4aeeae555aebba3282517141b2 # v2.2.3
+        uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
         with:
           subject-path: dist/namma-wallet-v*.apk
 
       - name: Attest IPA provenance
         if: needs.ios.result == 'success'
-        uses: actions/attest-build-provenance@c074443f1aee8d4aeeae555aebba3282517141b2 # v2.2.3
+        uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
         with:
           subject-path: dist/namma-wallet-v*.ipa
 
