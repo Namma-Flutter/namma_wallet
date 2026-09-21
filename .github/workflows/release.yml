@@ -44,6 +44,7 @@ env:
   APP_IDENTIFIER: com.nammaflutter.nammawallet
   PACKAGE_NAME: com.nammaflutter.nammawallet
   TEAM_ID: TG8RN284Q4
+  BUNDLE_FROZEN: "false"
 
 jobs:
   gate:
