@@ -49,6 +49,8 @@
           - 'android/build.gradle*'
           - 'android/app/build.gradle*'
           - 'ios/Podfile*'
+          - 'package.json'
+          - 'package-lock.json'
 
 "testing":
   - changed-files:
