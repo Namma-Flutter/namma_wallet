@@ -47,7 +47,8 @@ class FakeDatabase implements IWalletDatabase {
             directions_url TEXT,
             created_at TEXT DEFAULT CURRENT_TIMESTAMP,
             updated_at TEXT DEFAULT NULL,
-            archived_at TEXT DEFAULT NULL
+            archived_at TEXT DEFAULT NULL,
+            original_file_path TEXT
           );
         ''');
 

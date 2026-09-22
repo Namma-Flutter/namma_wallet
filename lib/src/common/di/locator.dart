@@ -11,11 +11,13 @@ import 'package:namma_wallet/src/common/services/archive/archive_service.dart';
 import 'package:namma_wallet/src/common/services/archive/archive_service_interface.dart';
 import 'package:namma_wallet/src/common/services/haptic/haptic_service_interface.dart';
 import 'package:namma_wallet/src/common/services/haptic/haptic_services.dart';
+import 'package:namma_wallet/src/common/services/image/image_service.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
 import 'package:namma_wallet/src/common/services/logger/namma_logger.dart';
 import 'package:namma_wallet/src/common/services/booking_reminder/booking_reminder_preferences_service.dart';
 import 'package:namma_wallet/src/common/services/booking_reminder/booking_reminder_preferences_service_interface.dart';
-import 'package:namma_wallet/src/common/services/booking_reminder/booking_reminder_service.dart';
+import 'package:namma_wallet/src/common/services/booking_reminder/booking_reminder_service.dart'
+    as common_booking;
 import 'package:namma_wallet/src/common/services/notification/reminder_preferences_service.dart';
 import 'package:namma_wallet/src/common/services/ocr/google_mlkit_ocr.dart';
 import 'package:namma_wallet/src/common/services/ocr/ocr_service_interface.dart';
@@ -33,10 +35,12 @@ import 'package:namma_wallet/src/common/theme/theme_provider.dart';
 import 'package:namma_wallet/src/features/ai/fallback_parser/application/ai_service_interface.dart';
 import 'package:namma_wallet/src/features/ai/fallback_parser/application/gemma_service.dart';
 import 'package:namma_wallet/src/features/ai/fallback_parser/application/web_gemma_service.dart';
+import 'package:namma_wallet/src/features/calendar/application/booking_reminder_service.dart';
 import 'package:namma_wallet/src/features/clipboard/application/clipboard_service.dart';
 import 'package:namma_wallet/src/features/clipboard/application/clipboard_service_interface.dart';
 import 'package:namma_wallet/src/features/clipboard/data/clipboard_repository.dart';
 import 'package:namma_wallet/src/features/clipboard/domain/clipboard_repository_interface.dart';
+import 'package:namma_wallet/src/features/events/application/event_parser_service.dart';
 import 'package:namma_wallet/src/features/import/application/deep_link_service.dart';
 import 'package:namma_wallet/src/features/import/application/deep_link_service_interface.dart';
 import 'package:namma_wallet/src/features/import/application/import_service.dart';
@@ -91,6 +95,12 @@ void setupLocator() {
         logger: getIt<ILogger>(),
       ),
     )
+    ..registerLazySingleton<ImageService>(
+      () => ImageService(
+        ocrService: getIt<IOCRService>(),
+        logger: getIt<ILogger>(),
+      ),
+    )
     ..registerLazySingleton<IAIService>(
       () => kIsWeb ? WebGemmaService() : GemmaService(logger: getIt<ILogger>()),
     )
@@ -108,11 +118,16 @@ void setupLocator() {
     ..registerLazySingleton<IBookingReminderPreferencesService>(
       () => BookingReminderPreferencesService(logger: getIt<ILogger>()),
     )
-    ..registerLazySingleton<BookingReminderService>(
-      () => BookingReminderService(
+    ..registerLazySingleton<common_booking.BookingReminderService>(
+      () => common_booking.BookingReminderService(
         logger: getIt<ILogger>(),
         notificationService: getIt<INotificationService>(),
         preferencesService: getIt<IBookingReminderPreferencesService>(),
+      ),
+    )
+    ..registerLazySingleton<IBookingReminderService>(
+      () => BookingReminderService(
+        notificationService: getIt<INotificationService>(),
       ),
     )
     // Parsers
@@ -120,12 +135,14 @@ void setupLocator() {
     ..registerLazySingleton<ITravelParser>(
       () => TravelParserService(logger: getIt<ILogger>()),
     )
+    ..registerLazySingleton<EventParserService>(
+      () => EventParserService(logger: getIt<ILogger>()),
+    )
     ..registerLazySingleton<ISharingIntentService>(
       () => kIsWeb
           ? WebSharingIntentService()
           : SharingIntentService(
               logger: getIt<ILogger>(),
-              pdfService: getIt<IPDFService>(),
             ),
     )
     ..registerLazySingleton<ISharedContentProcessor>(
@@ -163,7 +180,9 @@ void setupLocator() {
       () => ImportService(
         logger: getIt<ILogger>(),
         pdfService: getIt<IPDFService>(),
+        imageService: getIt<ImageService>(),
         travelParser: getIt<ITravelParser>(),
+        eventParser: getIt<EventParserService>(),
         qrParser: getIt<IIRCTCQRParser>(),
         irctcScannerService: getIt<IIRCTCScannerService>(),
         pkpassParser: getIt<IPKPassParser>(),

@@ -6,6 +6,8 @@ import 'package:namma_wallet/src/common/domain/models/tag_model.dart';
 import 'package:namma_wallet/src/common/enums/ticket_type.dart';
 import 'package:namma_wallet/src/common/helper/date_time_converter.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
+import 'package:namma_wallet/src/features/events/domain/konfhub_ticket_model.dart';
+import 'package:namma_wallet/src/features/events/domain/movie_ticket_model.dart';
 import 'package:namma_wallet/src/features/irctc/domain/irctc_ticket_model.dart';
 import 'package:namma_wallet/src/features/tnstc/domain/tnstc_model.dart';
 
@@ -27,7 +29,101 @@ class Ticket with TicketMappable {
     this.imagePath,
     this.directionsUrl,
     this.archivedAt,
+    this.originalFilePath,
   });
+
+  factory Ticket.fromMovie(
+    MovieTicketModel model, {
+    String sourceType = 'IMAGE',
+  }) {
+    return Ticket(
+      ticketId: model.bookingId,
+      primaryText: model.movieName,
+      secondaryText: () {
+        final parts = [
+          if (model.theatreName != null)
+            model.theatreName!.split(',').first.trim(),
+          if (model.screen != null) 'Screen ${model.screen}',
+        ].whereType<String>().join(' · ');
+        return parts.isEmpty ? null : parts;
+      }(),
+      startTime: model.showDateTime,
+      location: model.theatreName,
+      type: TicketType.event,
+      tags: [
+        if (model.seats.isNotNullOrEmpty)
+          TagModel(value: model.seats, icon: 'event_seat'),
+        if (model.language.isNotNullOrEmpty)
+          TagModel(value: model.language, icon: 'language'),
+        if (model.certificate.isNotNullOrEmpty)
+          TagModel(value: model.certificate, icon: 'grade'),
+        if (model.format.isNotNullOrEmpty)
+          TagModel(value: model.format, icon: 'movie'),
+        if (model.price != null)
+          TagModel(
+            value: '₹${model.price!.toStringAsFixed(2)}',
+            icon: 'attach_money',
+          ),
+        if (model.provider.isNotNullOrEmpty)
+          TagModel(value: model.provider, icon: 'store'),
+      ],
+      extras: [
+        if (model.bookingId.isNotNullOrEmpty)
+          ExtrasModel(title: 'Booking ID', value: model.bookingId),
+        if (model.certificate.isNotNullOrEmpty)
+          ExtrasModel(title: 'Certificate', value: model.certificate),
+        if (model.screen.isNotNullOrEmpty)
+          ExtrasModel(title: 'Screen', value: model.screen),
+        if (model.seats.isNotNullOrEmpty)
+          ExtrasModel(title: 'Seats', value: model.seats),
+        if (model.qrData.isNotNullOrEmpty)
+          ExtrasModel(title: 'QR Data', value: model.qrData),
+        ExtrasModel(title: 'Source Type', value: sourceType),
+      ],
+    );
+  }
+
+  factory Ticket.fromKonfHub(
+    KonfHubTicketModel model, {
+    String sourceType = 'PDF',
+  }) {
+    return Ticket(
+      ticketId: model.bookingId,
+      primaryText: model.eventName,
+      secondaryText: model.ticketName,
+      startTime: model.eventStartTime,
+      endTime: model.eventEndTime,
+      location: model.location,
+      type: TicketType.event,
+      tags: [
+        if (model.attendeeName.isNotNullOrEmpty)
+          TagModel(value: model.attendeeName, icon: 'person'),
+        if (model.ticketName.isNotNullOrEmpty)
+          TagModel(value: model.ticketName, icon: 'confirmation_number'),
+      ],
+      extras: [
+        if (model.bookingId.isNotNullOrEmpty)
+          ExtrasModel(title: 'Booking ID', value: model.bookingId),
+        if (model.attendeeName.isNotNullOrEmpty)
+          ExtrasModel(title: 'Attendee', value: model.attendeeName),
+        if (model.organization.isNotNullOrEmpty)
+          ExtrasModel(title: 'Organization', value: model.organization),
+        if (model.ticketName.isNotNullOrEmpty)
+          ExtrasModel(title: 'Ticket Type', value: model.ticketName),
+        if (model.bookingDate != null)
+          ExtrasModel(
+            title: 'Booking Date',
+            value: DateTimeConverter.instance.formatDate(model.bookingDate!),
+          ),
+        ...?model.additionalDetails?.entries.map(
+          (e) => ExtrasModel(title: e.key, value: e.value),
+        ),
+        if (model.qrData.isNotNullOrEmpty)
+          ExtrasModel(title: 'QR Data', value: model.qrData),
+        ExtrasModel(title: 'Source Type', value: sourceType),
+      ],
+    );
+  }
 
   factory Ticket.fromTNSTC(
     TNSTCTicketModel model, {
@@ -211,10 +307,7 @@ class Ticket with TicketMappable {
         if (model.busIdNumber?.trim().isNotNullOrEmpty ?? false)
           ExtrasModel(title: 'Bus ID', value: model.busIdNumber!.trim()),
         if (model.vehicleNumber?.trim().isNotNullOrEmpty ?? false)
-          ExtrasModel(
-            title: 'Bus Number',
-            value: model.vehicleNumber!.trim(),
-          ),
+          ExtrasModel(title: 'Bus Number', value: model.vehicleNumber!.trim()),
         if (model.obReferenceNumber != null &&
             model.obReferenceNumber!.trim().isNotNullOrEmpty)
           ExtrasModel(
@@ -265,10 +358,7 @@ class Ticket with TicketMappable {
         if (seatNumber != null && seatNumber.isNotNullOrEmpty)
           ExtrasModel(title: 'Seat Number', value: seatNumber),
         if (model.numberOfSeats != null)
-          ExtrasModel(
-            title: 'Seats',
-            value: model.numberOfSeats.toString(),
-          ),
+          ExtrasModel(title: 'Seats', value: model.numberOfSeats.toString()),
         if (model.conductorMobileNo != null &&
             model.conductorMobileNo!.isNotNullOrEmpty)
           ExtrasModel(
@@ -281,10 +371,7 @@ class Ticket with TicketMappable {
             value: '₹${model.totalFare!.toStringAsFixed(2)}',
           ),
         if (model.corporation != null && model.corporation!.isNotNullOrEmpty)
-          ExtrasModel(
-            title: 'Provider',
-            value: model.corporation,
-          ),
+          ExtrasModel(title: 'Provider', value: model.corporation),
         if (model.tripCode != null && model.tripCode!.isNotNullOrEmpty)
           ExtrasModel(title: 'Trip Code', value: model.tripCode),
         if (model.routeNo != null && model.routeNo!.trim().isNotNullOrEmpty)
@@ -323,13 +410,11 @@ class Ticket with TicketMappable {
       imagePath: incoming.imagePath ?? existing.imagePath,
       directionsUrl: incoming.directionsUrl ?? existing.directionsUrl,
       archivedAt: incoming.archivedAt ?? existing.archivedAt,
+      originalFilePath: incoming.originalFilePath ?? existing.originalFilePath,
     );
   }
 
-  factory Ticket.fromIRCTC(
-    IRCTCTicket model, {
-    bool isUpdate = false,
-  }) {
+  factory Ticket.fromIRCTC(IRCTCTicket model, {bool isUpdate = false}) {
     // If dateOfJourney or scheduledDeparture are null,startTime will be null
     final hasValidDateTime =
         model.dateOfJourney != null && model.scheduledDeparture != null;
@@ -506,6 +591,8 @@ class Ticket with TicketMappable {
   final String? directionsUrl;
   @MappableField(key: 'archived_at')
   final DateTime? archivedAt;
+  @MappableField(key: 'original_file_path')
+  final String? originalFilePath;
 
   Map<String, Object?> toEntity() {
     final map = toMap()..removeWhere((key, value) => value == null);

@@ -49,21 +49,33 @@ class TNSTCBusParser extends TravelTicketParser {
 
   @override
   bool canParse(String text) {
+    final lowerText = text.toLowerCase();
+
+    // Check for SETC identifiers first (SETC takes precedence)
+    final setcKeywords = [
+      'SETC',
+      'State Express Transport Corporation',
+    ];
+
+    final hasSETCKeyword = setcKeywords.any(
+      (pattern) => lowerText.contains(pattern.toLowerCase()),
+    );
+    if (hasSETCKeyword) return false;
+
     // Must have at least one TNSTC-specific keyword
     final tnstcKeywords = [
       'TNSTC',
-      'Tamil Nadu',
-      'Corporation',
+      'Tamil Nadu State Transport',
       'Service Start Place',
       'Trip Code',
     ];
 
     final hasTNSTCKeyword = tnstcKeywords.any(
-      (pattern) => text.toLowerCase().contains(pattern.toLowerCase()),
+      (pattern) => lowerText.contains(pattern.toLowerCase()),
     );
 
     // And should not have IRCTC keyword
-    final hasIRCTCKeyword = text.toLowerCase().contains('irctc');
+    final hasIRCTCKeyword = lowerText.contains('irctc');
 
     return hasTNSTCKeyword && !hasIRCTCKeyword;
   }
@@ -301,7 +313,7 @@ class SETCBusParser extends TravelTicketParser {
     // SETC-specific patterns (without TNSTC)
     final setcPatterns = [
       'SETC',
-      'South Tamil Nadu',
+      'State Express Transport Corporation',
     ];
 
     // Check if it contains SETC but not TNSTC

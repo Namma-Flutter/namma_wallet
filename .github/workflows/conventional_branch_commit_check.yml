@@ -3,12 +3,25 @@ name: Conventional Commits & Branch Naming
 on:
   pull_request:
     branches: [main]
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - ready_for_review
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
 
 jobs:
   branch-name:
     name: Validate Branch Name
     runs-on: ubuntu-latest
-    if: github.actor != 'imgbot[bot]' && github.actor != 'ImgBotApp' && !startsWith(github.head_ref, 'imgbot')
+    timeout-minutes: 5
     permissions:
       contents: read
       pull-requests: read
@@ -16,7 +29,13 @@ jobs:
       - name: Validate
         env:
           BRANCH: ${{ github.head_ref }}
+          ACTOR: ${{ github.actor }}
         run: |
+          if [[ "$ACTOR" == "dependabot[bot]" || "$BRANCH" =~ ^dependabot\/ || "$ACTOR" == "imgbot[bot]" || "$ACTOR" == "ImgBotApp" || "$BRANCH" =~ ^imgbot\/ ]]; then
+            echo "Skipping branch name validation for bot: $ACTOR ($BRANCH)"
+            exit 0
+          fi
+
           echo "Branch: $BRANCH"
 
           # Allowed:
@@ -44,15 +63,30 @@ jobs:
   commitlint:
     name: Conventional Commits
     runs-on: ubuntu-latest
-    if: github.actor != 'imgbot[bot]' && github.actor != 'ImgBotApp' && !startsWith(github.head_ref, 'imgbot')
+    timeout-minutes: 5
     needs: branch-name
     permissions:
       contents: read
       pull-requests: read
     steps:
-      - uses: actions/checkout@v5
+      - name: Check if bot PR
+        id: bot_check
+        env:
+          BRANCH: ${{ github.head_ref }}
+          ACTOR: ${{ github.actor }}
+        run: |
+          if [[ "$ACTOR" == "dependabot[bot]" || "$BRANCH" =~ ^dependabot\/ || "$ACTOR" == "imgbot[bot]" || "$ACTOR" == "ImgBotApp" || "$BRANCH" =~ ^imgbot\/ ]]; then
+            echo "is_bot=true" >> "$GITHUB_OUTPUT"
+            echo "Skipping commit linting for bot: $ACTOR"
+          else
+            echo "is_bot=false" >> "$GITHUB_OUTPUT"
+          fi
 
-      - uses: webiny/action-conventional-commits@v1.3.0
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        if: steps.bot_check.outputs.is_bot != 'true'
+
+      - uses: webiny/action-conventional-commits@7f91b1595ca1951cdb671ddc9f07a49081ec5b69 # v1.4.2
+        if: steps.bot_check.outputs.is_bot != 'true'
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           allowed-commit-types: "feat,fix,docs,style,refactor,perf,test,build,ci,chore,revert"

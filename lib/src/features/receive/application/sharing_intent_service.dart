@@ -4,7 +4,6 @@ import 'dart:io';
 
 import 'package:cross_file/cross_file.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
-import 'package:namma_wallet/src/common/services/pdf/pdf_service_interface.dart';
 import 'package:namma_wallet/src/features/receive/application/sharing_intent_provider.dart';
 import 'package:namma_wallet/src/features/receive/domain/shared_content_type.dart';
 import 'package:namma_wallet/src/features/receive/domain/sharing_intent_service_interface.dart';
@@ -15,13 +14,11 @@ import 'package:share_handler/share_handler.dart';
 class SharingIntentService implements ISharingIntentService {
   SharingIntentService({
     required this._logger,
-    required this._pdfService,
     ISharingIntentProvider? sharingIntentProvider,
   }) : _sharingIntentProvider =
            sharingIntentProvider ?? SharingIntentProvider();
 
   final ILogger _logger;
-  final IPDFService _pdfService;
   final ISharingIntentProvider _sharingIntentProvider;
 
   StreamSubscription<void>? _intentDataStreamSubscription;
@@ -115,13 +112,14 @@ class SharingIntentService implements ISharingIntentService {
           // Check if file type is supported
           if (fileExtension != '.pdf' &&
               fileExtension != '.pkpass' &&
-              !_isSupportedTextFile(fileExtension)) {
+              !_isSupportedTextFile(fileExtension) &&
+              !_isSupportedImageFile(fileExtension)) {
             _logger.warning(
               'Skipping unsupported file type: $fileExtension',
             );
             onError(
               'File type $fileExtension is not supported. '
-              'Please share PDF, PKPASS or text files.',
+              'Please share PDF, PKPASS, text or image(PNG, JPG, JPEG) files.',
             );
             continue;
           }
@@ -130,7 +128,9 @@ class SharingIntentService implements ISharingIntentService {
               ? SharedContentType.pdf
               : (fileExtension == '.pkpass'
                     ? SharedContentType.pkpass
-                    : SharedContentType.sms);
+                    : (_isSupportedImageFile(fileExtension)
+                          ? SharedContentType.image
+                          : SharedContentType.sms));
 
           final content = await extractContentFromFile(XFile(filePath));
           onContentReceived(content, contentType);
@@ -155,6 +155,18 @@ class SharingIntentService implements ISharingIntentService {
     _logger.info('END SHARING INTENT ANALYSIS');
   }
 
+  /// Supported image file extensions (case-insensitive)
+  static const _supportedImageExtensions = {
+    '.jpg',
+    '.jpeg',
+    '.png',
+  };
+
+  /// Check if a file extension is a supported image type
+  bool _isSupportedImageFile(String extension) {
+    return _supportedImageExtensions.contains(extension.toLowerCase());
+  }
+
   /// Supported text file extensions (case-insensitive)
   static const _supportedTextExtensions = {
     '.txt',
@@ -175,11 +187,12 @@ class SharingIntentService implements ISharingIntentService {
     final fileExtension = path.extension(file.path).toLowerCase();
 
     if (fileExtension == '.pdf') {
-      // Extract text from PDF using PDFService
-      _logger.info('Extracting text from PDF: ${file.path}');
-      final content = await _pdfService.extractTextForDisplay(file);
-      _logger.info('Successfully extracted text from PDF');
-      return content;
+      // For PDF, we pass the file path as the content
+      return file.path;
+    } else if (_isSupportedImageFile(fileExtension)) {
+      // For image files, return the file path (OCR would happen downstream)
+      _logger.info('Returning file path for image: ${file.path}');
+      return file.path;
     } else if (_isSupportedTextFile(fileExtension)) {
       // Read as text file
       _logger.info('Reading text file: ${file.path}');
@@ -197,7 +210,7 @@ class SharingIntentService implements ISharingIntentService {
       );
       throw UnsupportedError(
         'File type $fileExtension is not supported. '
-        'Supported types: PDF, TXT, SMS',
+        'Supported types: PDF, TXT, SMS, Image (JPG, JPEG, PNG) and PKPASS.',
       );
     }
   }

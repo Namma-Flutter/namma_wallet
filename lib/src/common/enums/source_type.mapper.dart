@@ -31,6 +31,8 @@ class SourceTypeMapper extends EnumMapper<SourceType> {
         return SourceType.sms;
       case 'PDF':
         return SourceType.pdf;
+      case 'IMAGE':
+        return SourceType.image;
       case 'MANUAL':
         return SourceType.manual;
       case 'CLIPBOARD':
@@ -51,6 +53,8 @@ class SourceTypeMapper extends EnumMapper<SourceType> {
         return 'SMS';
       case SourceType.pdf:
         return 'PDF';
+      case SourceType.image:
+        return 'IMAGE';
       case SourceType.manual:
         return 'MANUAL';
       case SourceType.clipboard:

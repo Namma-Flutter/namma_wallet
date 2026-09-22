@@ -59,9 +59,9 @@ void main() {
           // Assert (Then)
           expect(result, isA<TicketCreatedResult>());
           final ticketResult = result as TicketCreatedResult;
-          expect(ticketResult.pnrNumber, equals('T12345678'));
-          expect(ticketResult.from, contains('CHENNAI'));
-          expect(ticketResult.to, contains('BANGALORE'));
+          expect(ticketResult.ticketId, equals('T12345678'));
+          expect(ticketResult.title, contains('CHENNAI'));
+          // In the mock ticket, primary text might be 'Chennai → Bangalore'
         },
       );
 
@@ -433,7 +433,7 @@ void main() {
       );
 
       test(
-        'Given a PDF whose content only matches the update SMS pattern '
+        'Given SMS content that only matches the update SMS pattern '
         'and the original ticket exists, '
         'Then returns TicketUpdatedResult via the secondary update path',
         () async {
@@ -458,7 +458,7 @@ void main() {
 
           final result = await processor.processContent(
             'random pdf text',
-            SharedContentType.pdf,
+            SharedContentType.sms,
           );
 
           expect(result, isA<TicketUpdatedResult>());
@@ -469,7 +469,7 @@ void main() {
       );
 
       test(
-        'Given a PDF whose update path finds no original ticket, '
+        'Given SMS content whose update path finds no original ticket, '
         'Then returns TicketNotFoundResult via the secondary update path',
         () async {
           final mockUpdateInfo = TicketUpdateInfo(
@@ -489,7 +489,7 @@ void main() {
 
           final result = await processor.processContent(
             'random pdf text',
-            SharedContentType.pdf,
+            SharedContentType.sms,
           );
 
           expect(result, isA<TicketNotFoundResult>());
@@ -688,19 +688,19 @@ void main() {
         () {
           // Arrange (Given)
           const result = TicketCreatedResult(
-            pnrNumber: 'T12345678',
-            from: 'Chennai',
-            to: 'Bangalore',
-            fare: '500.00',
+            ticketId: 'T12345678',
+            ticketType: TicketType.bus,
+            title: 'Chennai → Bangalore',
+            subtitle: 'SETC',
             date: '2024-12-15',
           );
 
           // Assert (Then)
-          expect(result.pnrNumber, equals('T12345678'));
-          expect(result.from, equals('Chennai'));
-          expect(result.to, equals('Bangalore'));
-          expect(result.fare, equals('500.00'));
+          expect(result.ticketId, equals('T12345678'));
+          expect(result.title, equals('Chennai → Bangalore'));
+          expect(result.subtitle, equals('SETC'));
           expect(result.date, equals('2024-12-15'));
+          expect(result.ticketType, equals(TicketType.bus));
         },
       );
 
@@ -757,10 +757,10 @@ void main() {
           // Arrange (Given) & Assert (Then)
           expect(
             const TicketCreatedResult(
-              pnrNumber: '',
-              from: '',
-              to: '',
-              fare: '',
+              ticketId: '',
+              ticketType: null,
+              title: '',
+              subtitle: '',
               date: '',
             ),
             isA<SharedContentResult>(),
@@ -786,12 +786,10 @@ void main() {
         () {
           // Arrange (Given)
           const result = TicketCreatedResult(
-            pnrNumber: 'T12345678',
-            from: 'Chennai',
-            to: 'Bangalore',
-            fare: '500.00',
-            date: '2024-12-15',
             ticketId: 'TICKET-UUID-001',
+            ticketType: TicketType.bus,
+            title: 'Chennai → Bangalore',
+            date: '2024-12-15',
           );
 
           // Act (When)
@@ -913,8 +911,8 @@ void main() {
           final result1 = results[0] as TicketCreatedResult;
           final result2 = results[1] as TicketCreatedResult;
 
-          expect(result1.pnrNumber, equals('T11111111'));
-          expect(result2.pnrNumber, equals('T22222222'));
+          expect(result1.ticketId, equals('T11111111'));
+          expect(result2.ticketId, equals('T22222222'));
         },
       );
     });

@@ -1,9 +1,12 @@
 import 'dart:convert';
+import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:namma_wallet/src/common/database/ticket_dao_interface.dart';
 import 'package:namma_wallet/src/common/database/wallet_database_interface.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/domain/models/ticket.dart';
+import 'package:namma_wallet/src/common/helper/original_file_storage.dart';
 import 'package:namma_wallet/src/common/services/archive/ticket_archive.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
 import 'package:sqflite/sqflite.dart';
@@ -142,6 +145,18 @@ class TicketDao implements ITicketDAO {
 
       final db = await _database.database;
 
+      // Read the currently-stored original file path so we can clean it up
+      // below if this update supersedes it with a different one.
+      final existingRows = await db.query(
+        'tickets',
+        columns: ['original_file_path'],
+        where: 'ticket_id = ?',
+        whereArgs: [ticketId],
+      );
+      final previousOriginalFilePath = existingRows.isNotEmpty
+          ? existingRows.first['original_file_path'] as String?
+          : null;
+
       // Prepare updates map from the Ticket object
       final updates = ticket.toEntity()
         // Remove fields we don't strictly want to overwrite blindly
@@ -195,6 +210,13 @@ class TicketDao implements ITicketDAO {
           'Success',
           'Updated ticket with ID: ${_maskTicketId(ticketId)}',
         );
+
+        // If the update replaced the original file with a different one
+        // (or removed it), delete the now-orphaned file from disk.
+        if (previousOriginalFilePath != null &&
+            previousOriginalFilePath != ticket.originalFilePath) {
+          await _deleteOriginalFile(previousOriginalFilePath);
+        }
       } else {
         _logger.warning('No ticket found with ID: ${_maskTicketId(ticketId)}');
       }
@@ -300,6 +322,18 @@ class TicketDao implements ITicketDAO {
 
       final db = await _database.database;
 
+      // Read only the original_file_path column so corrupted JSON in
+      // other columns (tags/extras) can't block deletion.
+      final rows = await db.query(
+        'tickets',
+        columns: ['original_file_path'],
+        where: 'ticket_id = ?',
+        whereArgs: [id],
+      );
+      final originalFilePath = rows.isNotEmpty
+          ? rows.first['original_file_path'] as String?
+          : null;
+
       final count = await db.delete(
         'tickets',
         where: 'ticket_id = ?',
@@ -311,6 +345,7 @@ class TicketDao implements ITicketDAO {
           'Success',
           'Deleted ticket with ID: ${_maskTicketId(id)}',
         );
+        await _deleteOriginalFile(originalFilePath);
       }
       return count;
     } catch (e, stackTrace) {
@@ -407,10 +442,7 @@ class TicketDao implements ITicketDAO {
       );
 
       if (count > 0) {
-        _logger.logDatabase(
-          'Success',
-          'Archived $count past ticket(s)',
-        );
+        _logger.logDatabase('Success', 'Archived $count past ticket(s)');
       } else {
         _logger.logDatabase('Info', 'No tickets to archive');
       }
@@ -439,6 +471,19 @@ class TicketDao implements ITicketDAO {
 
       final db = await _database.database;
 
+      // Read the original file names for the rows about to be purged so
+      // their files can be cleaned up after the rows are deleted.
+      final purgedRows = await db.query(
+        'tickets',
+        columns: ['original_file_path'],
+        where: 'archived_at IS NOT NULL AND archived_at < ?',
+        whereArgs: [cutoff],
+      );
+      final originalFilePaths = purgedRows
+          .map((row) => row['original_file_path'] as String?)
+          .whereType<String>()
+          .toList();
+
       final count = await db.delete(
         'tickets',
         where: 'archived_at IS NOT NULL AND archived_at < ?',
@@ -446,10 +491,10 @@ class TicketDao implements ITicketDAO {
       );
 
       if (count > 0) {
-        _logger.logDatabase(
-          'Success',
-          'Purged $count old archived ticket(s)',
-        );
+        _logger.logDatabase('Success', 'Purged $count old archived ticket(s)');
+        for (final fileName in originalFilePaths) {
+          await _deleteOriginalFile(fileName);
+        }
       } else {
         _logger.logDatabase('Info', 'No archived tickets to purge');
       }
@@ -483,5 +528,22 @@ class TicketDao implements ITicketDAO {
     return shouldArchiveTicket(ticket, now: now)
         ? now.toUtc().toIso8601String()
         : null;
+  }
+
+  /// Removes the original PDF/image file stored alongside a deleted ticket.
+  /// [fileName] is the relative filename stored in the database (see
+  /// [resolveOriginalFilePath] for why the full path isn't stored).
+  Future<void> _deleteOriginalFile(String? fileName) async {
+    if (fileName == null || fileName.isEmpty || kIsWeb) return;
+
+    try {
+      final path = await resolveOriginalFilePath(fileName);
+      final file = File(path);
+      if (file.existsSync()) {
+        await file.delete();
+      }
+    } on Exception catch (e, stackTrace) {
+      _logger.error('Failed to delete original ticket file', e, stackTrace);
+    }
   }
 }

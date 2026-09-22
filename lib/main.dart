@@ -78,8 +78,9 @@ Future<void> main() async {
   } on Object catch (e, s) {
     // Fallback to print if logger initialization fails,
     // as logger is not available.
-    // ignore: avoid_print
-    print('Error initializing logger or logging start message: $e\n$s');
+    if (kDebugMode) {
+      print('Error initializing logger or logging start message: $e\n$s');
+    }
   }
 
   // Log PDF initialization status with full context
@@ -96,10 +97,11 @@ Future<void> main() async {
       // Fallback: ensure error is visible even if logger is unavailable
       logCriticalError(pdfInitError, pdfInitStackTrace ?? StackTrace.current);
       // fallback print to debug console
-      // ignore: avoid_print
-      print(
-        'PDF INITIALIZATION FAILED on ${getPlatformInfo()}: $pdfInitError',
-      );
+      if (kDebugMode) {
+        print(
+          'PDF INITIALIZATION FAILED on ${getPlatformInfo()}: $pdfInitError',
+        );
+      }
     }
   } else if (pdfFeaturesEnabled && logger != null) {
     logger.info('PDF features enabled successfully');
@@ -117,10 +119,11 @@ Future<void> main() async {
     } else {
       // Fallback to print if logger is not available,
       // to ensure error messages are still visible.
-      // ignore: avoid_print
-      print(
-        '''FALLBACK LOGGER - Flutter Error: ${details.exceptionAsString()}\n${details.stack}''',
-      );
+      if (kDebugMode) {
+        print(
+          '''FALLBACK LOGGER - Flutter Error: ${details.exceptionAsString()}\n${details.stack}''',
+        );
+      }
     }
   };
 
@@ -135,8 +138,7 @@ Future<void> main() async {
     } else {
       // Fallback to print if logger is not available,
       // to ensure error messages are still visible.
-      // ignore: avoid_print
-      print('FALLBACK LOGGER - Platform Error: $error\n$stack');
+      if (kDebugMode) print('FALLBACK LOGGER - Platform Error: $error\n$stack');
     }
     return true;
   };
@@ -179,12 +181,8 @@ Future<void> main() async {
       logCriticalError(e, stackTrace);
 
       // Also print for debug console visibility
-      // Print statements are necessary here as logger is unavailable
-      // ignore: avoid_print
-      print('CRITICAL INITIALIZATION ERROR: $e');
-      // Print statements are necessary here as logger is unavailable
-      // ignore: avoid_print
-      print('Stack trace: $stackTrace');
+      if (kDebugMode) print('CRITICAL INITIALIZATION ERROR: $e');
+      if (kDebugMode) print('Stack trace: $stackTrace');
     }
 
     // Always rethrow to prevent app from starting in broken state

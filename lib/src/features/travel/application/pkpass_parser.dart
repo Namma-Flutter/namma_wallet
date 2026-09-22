@@ -16,9 +16,7 @@ import 'package:pkpass/pkpass.dart';
 import 'package:uuid/uuid.dart';
 
 class PKPassParser implements IPKPassParser {
-  PKPassParser({
-    required this._logger,
-  });
+  PKPassParser({required this._logger});
 
   final ILogger _logger;
 
@@ -107,9 +105,7 @@ class PKPassParser implements IPKPassParser {
         ],
       );
 
-      final headers = {
-        'Authorization': 'ApplePass $authenticationToken',
-      };
+      final headers = {'Authorization': 'ApplePass $authenticationToken'};
 
       if (modifiedSince != null) {
         headers['If-Modified-Since'] = HttpDate.format(modifiedSince);
@@ -345,12 +341,7 @@ class PKPassParser implements IPKPassParser {
         }
 
         if (displayValue != null && displayValue.isNotEmpty) {
-          extras.add(
-            ExtrasModel(
-              title: label,
-              value: displayValue,
-            ),
-          );
+          extras.add(ExtrasModel(title: label, value: displayValue));
         }
       }
     }
