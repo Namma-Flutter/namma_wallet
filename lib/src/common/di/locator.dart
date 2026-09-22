@@ -14,6 +14,10 @@ import 'package:namma_wallet/src/common/services/haptic/haptic_services.dart';
 import 'package:namma_wallet/src/common/services/image/image_service.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
 import 'package:namma_wallet/src/common/services/logger/namma_logger.dart';
+import 'package:namma_wallet/src/common/services/booking_reminder/booking_reminder_preferences_service.dart';
+import 'package:namma_wallet/src/common/services/booking_reminder/booking_reminder_preferences_service_interface.dart';
+import 'package:namma_wallet/src/common/services/booking_reminder/booking_reminder_service.dart'
+    as common_booking;
 import 'package:namma_wallet/src/common/services/notification/reminder_preferences_service.dart';
 import 'package:namma_wallet/src/common/services/ocr/google_mlkit_ocr.dart';
 import 'package:namma_wallet/src/common/services/ocr/ocr_service_interface.dart';
@@ -110,6 +114,16 @@ void setupLocator() {
     )
     ..registerLazySingleton<INotificationService>(
       () => kIsWeb ? WebNotificationService() : NotificationService(),
+    )
+    ..registerLazySingleton<IBookingReminderPreferencesService>(
+      () => BookingReminderPreferencesService(logger: getIt<ILogger>()),
+    )
+    ..registerLazySingleton<common_booking.BookingReminderService>(
+      () => common_booking.BookingReminderService(
+        logger: getIt<ILogger>(),
+        notificationService: getIt<INotificationService>(),
+        preferencesService: getIt<IBookingReminderPreferencesService>(),
+      ),
     )
     ..registerLazySingleton<IBookingReminderService>(
       () => BookingReminderService(
