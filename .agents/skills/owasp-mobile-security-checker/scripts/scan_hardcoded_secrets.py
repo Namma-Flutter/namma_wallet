@@ -10,7 +10,7 @@ import re
 import os
 import json
 from pathlib import Path
-from typing import List, Dict, Tuple
+from typing import List, Dict
 
 # Patterns for detecting hardcoded secrets
 SECRET_PATTERNS = [
@@ -118,7 +118,7 @@ def scan_project(project_root: str) -> Dict:
     all_findings = []
 
     # Directories to scan
-    scan_dirs = ['lib', 'android', 'ios']
+    scan_dirs = ['lib', 'android', 'ios']  # noqa: F841
 
     # File extensions to check
     dart_files = list(project_path.glob('lib/**/*.dart'))
@@ -176,7 +176,7 @@ def main():
         for i, finding in enumerate(results['findings'], 1):
             print(f"{i}. [{finding['severity']}] {finding['type']}")
             print(f"   File: {finding['file']}:{finding['line']}")
-            print(f"   Code: {finding['pattern']}")
+            print(f"   Code: <redacted>")
             print()
 
     # Save results to JSON

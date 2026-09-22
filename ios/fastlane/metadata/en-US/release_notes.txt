@@ -1,4 +1,5 @@
-- Improved SMS ticket processing for TNSTC buses
-- Enhanced notifications and automation features
-- Better ticket archiving system
+- Import tickets directly from photos with image recognition
+- Event ticket support for movie and event bookings
+- Booking reminder improvements with better timing
+- Original file storage for imported tickets
 - Bug fixes and stability improvements
