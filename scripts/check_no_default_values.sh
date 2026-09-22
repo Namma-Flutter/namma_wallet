@@ -29,7 +29,7 @@ while IFS= read -r -d '' file; do
   fi
 
   # 3. Check for fallback placeholders like ?? "Unknown", ?? "N/A", or ?? ""
-  PLACEHOLDERS=$(grep -nE '\?\?\s*(""|\x27\x27|"(Unknown|N/A|NA|unknown)"|\x27(Unknown|N/A|NA|unknown)\x27)' "$file" || true)
+  PLACEHOLDERS=$(grep -nE '\?\?\s*["\x27](Unknown|N/A|NA|unknown|)["\x27]' "$file" || true)
   if [ -n "$PLACEHOLDERS" ]; then
     echo "❌ Forbidden fallback placeholder in $file (parsers must return null):"
     echo "$PLACEHOLDERS"

@@ -33,10 +33,7 @@ final GlobalKey<NavigatorState> _shellNavigatorKey = GlobalKey<NavigatorState>(
 final router = GoRouter(
   navigatorKey: rootNavigatorKey,
   onException: (context, state, _) {
-    getIt<ILogger>().error(
-      'Navigation exception: ${state.uri}',
-      state.error,
-    );
+    getIt<ILogger>().error('Navigation exception: ${state.uri}', state.error);
   },
   redirect: (context, state) {
     // Handle deep links with custom scheme (e.g., nammawallet://ticket/123)
@@ -46,9 +43,7 @@ final router = GoRouter(
       // Reconstruct path from host and path
       // nammawallet://ticket/T75229210 -> /ticket/T75229210
       final redirectPath = '/${uri.host}${uri.path}';
-      getIt<ILogger>().info(
-        'Deep link redirect: $uri -> $redirectPath',
-      );
+      getIt<ILogger>().info('Deep link redirect: $uri -> $redirectPath');
       return redirectPath;
     }
     return null;
@@ -94,9 +89,7 @@ final router = GoRouter(
           );
         }
 
-        return const Scaffold(
-          body: Center(child: Text('Invalid ticket ID')),
-        );
+        return const Scaffold(body: Center(child: Text('Invalid ticket ID')));
       },
     ),
     GoRoute(
@@ -161,20 +154,13 @@ final router = GoRouter(
       path: AppRoute.shareSuccess.path,
       name: AppRoute.shareSuccess.name,
       builder: (context, state) {
-        if (state.extra != null && state.extra is! TicketCreatedResult) {
+        if (state.extra is! TicketCreatedResult) {
           return const Scaffold(
             body: Center(child: Text('Invalid share data')),
           );
         }
-        final result = state.extra as TicketCreatedResult?;
-        if (result == null) {
-          return const Scaffold(
-            body: Center(child: Text('Invalid share data')),
-          );
-        }
-        return ShareSuccessView(
-          result: result,
-        );
+        final result = state.extra! as TicketCreatedResult;
+        return ShareSuccessView(result: result);
       },
     ),
   ],
@@ -211,9 +197,7 @@ class _TicketViewLoader extends StatelessWidget {
 
         final ticket = snapshot.data;
         if (ticket == null) {
-          return const Scaffold(
-            body: Center(child: Text('Ticket not found')),
-          );
+          return const Scaffold(body: Center(child: Text('Ticket not found')));
         }
 
         return TravelTicketView(

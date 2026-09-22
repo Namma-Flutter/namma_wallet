@@ -29,10 +29,10 @@ jobs:
       dart: ${{ steps.filter.outputs.dart }}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Check for Dart & CI Changes
-        uses: dorny/paths-filter@v3
+        uses: dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d # v4.0.3
         id: filter
         with:
           filters: |
@@ -59,7 +59,7 @@ jobs:
 
       - name: Set up Flutter
         if: steps.filter.outputs.dart == 'true'
-        uses: subosito/flutter-action@f2c4f6686ca8e8d6e6d0f28410eeef506ed66aff # v2.18.0
+        uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
         with:
           channel: stable
           flutter-version: ${{ steps.flutter_version.outputs.flutter_version }}
@@ -80,7 +80,7 @@ jobs:
 
       - name: Cache build_runner asset graph
         if: steps.filter.outputs.dart == 'true'
-        uses: actions/cache@v4
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: .dart_tool/build
           key: build-runner-${{ runner.os }}-${{ hashFiles('pubspec.lock') }}-${{ hashFiles('lib/**/*.dart') }}
@@ -234,8 +234,8 @@ jobs:
           echo "DELETE" > pr-comments/analyze_comment.txt
 
       - name: Upload PR comments artifact
-        if: always() && github.event_name == 'pull_request'
-        uses: actions/upload-artifact@v4
+        if: always() && steps.filter.outputs.dart == 'true'
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: pr-comments-format-analyze
           path: pr-comments/
@@ -276,7 +276,7 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Read Flutter version from pubspec.yaml
         id: flutter_version
@@ -285,7 +285,7 @@ jobs:
           echo "flutter_version=$VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Set up Flutter
-        uses: subosito/flutter-action@f2c4f6686ca8e8d6e6d0f28410eeef506ed66aff # v2.18.0
+        uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
         with:
           channel: stable
           flutter-version: ${{ steps.flutter_version.outputs.flutter_version }}
@@ -295,7 +295,7 @@ jobs:
         run: flutter pub get
 
       - name: Cache build_runner asset graph
-        uses: actions/cache@v4
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: .dart_tool/build
           key: build-runner-${{ runner.os }}-${{ hashFiles('pubspec.lock') }}-${{ hashFiles('lib/**/*.dart') }}
@@ -352,7 +352,7 @@ jobs:
 
       - name: Upload PR comments artifact
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: pr-comments-coverage
           path: pr-comments/
@@ -367,7 +367,7 @@ jobs:
 
       - name: Upload coverage to Codecov
         if: ${{ steps.test_run.outputs.exit_code == '0' }}
-        uses: codecov/codecov-action@0565863a31f2c772f9f0395002a31e3f06189574 # v5.4.0
+        uses: codecov/codecov-action@0b35c9ecc4f0529d0eb674914510c22f85b196b4 # v7.1.0
         with:
           directory: ./coverage
           fail_ci_if_error: false
