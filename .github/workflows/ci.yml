@@ -29,29 +29,10 @@ jobs:
       dart: ${{ steps.filter.outputs.dart }}
 
     steps:
-      - uses: actions/checkout@v4.2.0
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Check for Dart & CI Changes
-        uses: dorny/paths-filter@v3
-        id: filter
-        with:
-          filters: |
-            dart:
-              - 'lib/**'
-              - 'test/**'
-              - 'pubspec.yaml'
-              - 'pubspec.lock'
-              - 'build.yaml'
-              - '.github/workflows/ci.yml'
-
-      - name: Fast Pass-Through (Unaffected PR)
-        if: steps.filter.outputs.dart != 'true'
-        run: |
-          echo "### ⚡ Fast Pass-Through" >> $GITHUB_STEP_SUMMARY
-          echo "No Dart or CI workflow files modified. Skipping formatting and static analysis." >> $GITHUB_STEP_SUMMARY
-
-      - name: Check for Dart & CI Changes
-        uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36 # v3.0.2
+        uses: dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d # v4.0.3
         id: filter
         with:
           filters: |
@@ -78,7 +59,7 @@ jobs:
 
       - name: Set up Flutter
         if: steps.filter.outputs.dart == 'true'
-        uses: subosito/flutter-action@f2c4f6686ca8e8d6e6d0f28410eeef506ed66aff # v2.18.0
+        uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
         with:
           channel: stable
           flutter-version: ${{ steps.flutter_version.outputs.flutter_version }}
@@ -99,7 +80,7 @@ jobs:
 
       - name: Cache build_runner asset graph
         if: steps.filter.outputs.dart == 'true'
-        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf # v4.2.2
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: .dart_tool/build
           key: build-runner-${{ runner.os }}-${{ hashFiles('pubspec.lock') }}-${{ hashFiles('lib/**/*.dart') }}
@@ -254,7 +235,7 @@ jobs:
 
       - name: Upload PR comments artifact
         if: always() && steps.filter.outputs.dart == 'true'
-        uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 # v4.6.1
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: pr-comments-format-analyze
           path: pr-comments/
@@ -295,7 +276,7 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Read Flutter version from pubspec.yaml
         id: flutter_version
@@ -304,7 +285,7 @@ jobs:
           echo "flutter_version=$VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Set up Flutter
-        uses: subosito/flutter-action@f2c4f6686ca8e8d6e6d0f28410eeef506ed66aff # v2.18.0
+        uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
         with:
           channel: stable
           flutter-version: ${{ steps.flutter_version.outputs.flutter_version }}
@@ -314,7 +295,7 @@ jobs:
         run: flutter pub get
 
       - name: Cache build_runner asset graph
-        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf # v4.2.2
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: .dart_tool/build
           key: build-runner-${{ runner.os }}-${{ hashFiles('pubspec.lock') }}-${{ hashFiles('lib/**/*.dart') }}
@@ -371,7 +352,7 @@ jobs:
 
       - name: Upload PR comments artifact
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: pr-comments-coverage
           path: pr-comments/
@@ -386,7 +367,7 @@ jobs:
 
       - name: Upload coverage to Codecov
         if: ${{ steps.test_run.outputs.exit_code == '0' }}
-        uses: codecov/codecov-action@0565863a31f2c772f9f0395002a31e3f06189574 # v5.4.0
+        uses: codecov/codecov-action@0b35c9ecc4f0529d0eb674914510c22f85b196b4 # v7.1.0
         with:
           directory: ./coverage
           fail_ci_if_error: false

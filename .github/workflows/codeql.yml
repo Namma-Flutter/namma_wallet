@@ -33,7 +33,7 @@ jobs:
       swift: ${{ steps.filter.outputs.swift }}
     steps:
       - name: Check for Swift & iOS File Changes
-        uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36 # v3.0.2
+        uses: dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d # v4.0.3
         id: filter
         if: github.event_name == 'pull_request'
         with:
@@ -60,16 +60,16 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4.2.0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@6f5948dfacef28e207b48d0905cf90c03365536d # v3.37.9
+        uses: github/codeql-action/init@b96794f015dfd88f77b49b1c93e0fa7110f94c63 # v4.38.0
         with:
           languages: ${{ matrix.language }}
           queries: security-extended,security-and-quality
 
       - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@6f5948dfacef28e207b48d0905cf90c03365536d # v3.37.9
+        uses: github/codeql-action/analyze@b96794f015dfd88f77b49b1c93e0fa7110f94c63 # v4.38.0
         with:
           category: "/language:${{ matrix.language }}"
 
@@ -86,7 +86,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4.2.0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Select Xcode (26 or 16)
         run: |
@@ -107,7 +107,7 @@ jobs:
           echo "flutter_version=$VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Set up Flutter
-        uses: subosito/flutter-action@f2c4f6686ca8e8d6e6d0f28410eeef506ed66aff # v2.18.0
+        uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
         with:
           channel: stable
           flutter-version: ${{ steps.flutter_version.outputs.flutter_version }}
@@ -117,7 +117,7 @@ jobs:
         run: flutter pub get
 
       - name: Cache CocoaPods
-        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf # v4.2.2
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: |
             ios/Pods
@@ -133,7 +133,7 @@ jobs:
           xcodebuild -resolvePackageDependencies -workspace ios/Runner.xcworkspace -scheme Runner || true
 
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@6f5948dfacef28e207b48d0905cf90c03365536d # v3.37.9
+        uses: github/codeql-action/init@b96794f015dfd88f77b49b1c93e0fa7110f94c63 # v4.38.0
         with:
           languages: swift
           build-mode: manual
@@ -154,7 +154,7 @@ jobs:
             DEBUG_INFORMATION_FORMAT=dwarf
 
       - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@6f5948dfacef28e207b48d0905cf90c03365536d # v3.37.9
+        uses: github/codeql-action/analyze@b96794f015dfd88f77b49b1c93e0fa7110f94c63 # v4.38.0
         with:
           category: "/language:swift"
 
@@ -170,7 +170,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4.2.0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Run OSV-Scanner
         uses: google/osv-scanner-action/osv-scanner-action@764c91816374ff2d8fc2095dab36eecd42d61638 # v1.9.2
@@ -190,10 +190,10 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4.2.0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Set up Python
-        uses: actions/setup-python@v5.2.0
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: '3.11'
           cache: 'pip'
@@ -207,7 +207,7 @@ jobs:
         continue-on-error: true
 
       - name: Upload SARIF to GitHub Code Scanning
-        uses: github/codeql-action/upload-sarif@6f5948dfacef28e207b48d0905cf90c03365536d # v3.37.9
+        uses: github/codeql-action/upload-sarif@b96794f015dfd88f77b49b1c93e0fa7110f94c63 # v4.38.0
         if: always() && !cancelled() && hashFiles('semgrep.sarif') != ''
         with:
           sarif_file: semgrep.sarif
