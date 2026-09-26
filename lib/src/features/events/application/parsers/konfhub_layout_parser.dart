@@ -250,16 +250,18 @@ class KonfHubLayoutParser extends EventLayoutParser {
       ).firstMatch(eventDateRaw);
       if (timeMatch != null && eventDate != null) {
         var startHour = int.parse(timeMatch.group(1)!);
-        final startMinute =
-            timeMatch.group(2) != null ? int.parse(timeMatch.group(2)!) : 0;
+        final startMinute = timeMatch.group(2) != null
+            ? int.parse(timeMatch.group(2)!)
+            : 0;
         final startAmPm = timeMatch.group(3)!.toUpperCase();
 
         if (startAmPm == 'PM' && startHour < 12) startHour += 12;
         if (startAmPm == 'AM' && startHour == 12) startHour = 0;
 
         var endHour = int.parse(timeMatch.group(4)!);
-        final endMinute =
-            timeMatch.group(5) != null ? int.parse(timeMatch.group(5)!) : 0;
+        final endMinute = timeMatch.group(5) != null
+            ? int.parse(timeMatch.group(5)!)
+            : 0;
         final endAmPm = timeMatch.group(6)!.toUpperCase();
 
         if (endAmPm == 'PM' && endHour < 12) endHour += 12;
@@ -356,8 +358,9 @@ class KonfHubLayoutParser extends EventLayoutParser {
       }
 
       if (bullets.isNotEmpty) {
-        additionalDetails['Additional Venue Details'] =
-            bullets.map((b) => '• $b').join('\n');
+        additionalDetails['Additional Venue Details'] = bullets
+            .map((b) => '• $b')
+            .join('\n');
       }
     }
 
