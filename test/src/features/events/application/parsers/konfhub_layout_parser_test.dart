@@ -1,8 +1,10 @@
+import 'dart:ui';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:namma_wallet/src/common/domain/models/extras_model.dart';
 import 'package:namma_wallet/src/common/enums/ticket_type.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
+import 'package:namma_wallet/src/common/services/ocr/ocr_block.dart';
 import 'package:namma_wallet/src/features/events/application/parsers/konfhub_layout_parser.dart';
 import '../../../../../fixtures/konfhub_layout_fixtures.dart';
 import '../../../../../helpers/fake_logger.dart';
@@ -191,6 +193,86 @@ void main() {
         expect(tagValues, contains(expected['attendeeName']));
         expect(tagValues, contains(expected['ticketName']));
       });
+
+      test(
+        'correctly parses attendee and ticket when booking id and date are '
+        'separate blocks',
+        () async {
+          final blocks = <OCRBlock>[
+            OCRBlock(
+              text: 'Booking ID:',
+              boundingBox: const Rect.fromLTRB(100, 20, 150, 40),
+              page: 0,
+            ),
+            OCRBlock(
+              text: '870ef2aa',
+              boundingBox: const Rect.fromLTRB(160, 20, 200, 40),
+              page: 0,
+            ),
+            OCRBlock(
+              text: 'Booking Date:',
+              boundingBox: const Rect.fromLTRB(100, 40, 150, 60),
+              page: 0,
+            ),
+            OCRBlock(
+              text: 'Sep 06, 2026',
+              boundingBox: const Rect.fromLTRB(160, 40, 200, 60),
+              page: 0,
+            ),
+            OCRBlock(
+              text: 'Professional - IDC Exclusive',
+              boundingBox: const Rect.fromLTRB(0, 60, 100, 80),
+              page: 0,
+            ),
+            OCRBlock(
+              text: 'Keerthivasan S',
+              boundingBox: const Rect.fromLTRB(0, 100, 100, 120),
+              page: 0,
+            ),
+            OCRBlock(
+              text: 'Thiran Technologies',
+              boundingBox: const Rect.fromLTRB(0, 140, 100, 160),
+              page: 0,
+            ),
+            OCRBlock(
+              text: 'Event Name',
+              boundingBox: const Rect.fromLTRB(0, 180, 100, 200),
+              page: 0,
+            ),
+            OCRBlock(
+              text: 'DevFest 2026 Chennai',
+              boundingBox: const Rect.fromLTRB(0, 220, 100, 240),
+              page: 0,
+            ),
+            OCRBlock(
+              text: 'Date & Time',
+              boundingBox: const Rect.fromLTRB(0, 260, 100, 280),
+              page: 0,
+            ),
+            OCRBlock(
+              text: 'Oct 17, 2026 (08:30 AM to 6PM IST)',
+              boundingBox: const Rect.fromLTRB(0, 300, 100, 320),
+              page: 0,
+            ),
+          ];
+
+          final ticket = await parser.parseTicketFromBlocks(blocks, '');
+          expect(ticket, isNotNull);
+          expect(ticket!.ticketId, '870ef2aa');
+          expect(ticket.secondaryText, 'Professional - IDC Exclusive');
+          expect(
+            ticket.tags?.map((t) => t.value),
+            containsAll(['Keerthivasan S', 'Professional - IDC Exclusive']),
+          );
+          final extrasMap = <String, String>{
+            for (final e in ticket.extras ?? <ExtrasModel>[])
+              if (e.title != null) e.title!: e.value ?? '',
+          };
+          expect(extrasMap['Attendee'], 'Keerthivasan S');
+          expect(extrasMap['Organization'], 'Thiran Technologies');
+          expect(extrasMap['Ticket Type'], 'Professional - IDC Exclusive');
+        },
+      );
 
       test('returns null when critical fields are missing', () async {
         final blocks = [

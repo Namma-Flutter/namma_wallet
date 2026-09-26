@@ -30,8 +30,7 @@ class KonfHubLayoutParser extends EventLayoutParser {
             (lower.contains('date & time') ||
                 lower.contains('date and time') ||
                 lower.contains('venue') ||
-                (lower.contains('event date') &&
-                    lower.contains('location'))));
+                (lower.contains('event date') && lower.contains('location'))));
   }
 
   @override
@@ -124,15 +123,39 @@ class KonfHubLayoutParser extends EventLayoutParser {
             (a, b) => a.boundingBox.top.compareTo(b.boundingBox.top),
           );
 
-      if (beforeBlocks.length >= 3) {
-        ticketName ??= beforeBlocks[0].text.trim();
-        attendeeName = beforeBlocks[1].text.trim();
-        organization = beforeBlocks[2].text.trim();
-      } else if (beforeBlocks.length == 2) {
-        ticketName ??= beforeBlocks[0].text.trim();
-        attendeeName = beforeBlocks[1].text.trim();
-      } else if (beforeBlocks.length == 1) {
-        attendeeName = beforeBlocks[0].text.trim();
+      final filteredBlocks = beforeBlocks.where((b) {
+        final text = b.text.trim();
+        final textLower = text.toLowerCase();
+        if (bookingId != null && bookingId.isNotEmpty) {
+          final idLower = bookingId.toLowerCase().trim();
+          if (textLower == idLower ||
+              textLower.contains(idLower) ||
+              (idLower.contains(textLower) && textLower.length >= 3)) {
+            return false;
+          }
+        }
+        if (bookingDateStr != null && bookingDateStr.isNotEmpty) {
+          final dateLower = bookingDateStr.toLowerCase().trim();
+          if (textLower == dateLower ||
+              textLower.contains(dateLower) ||
+              (dateLower.contains(textLower) &&
+                  (RegExp(r'\d').hasMatch(textLower) ||
+                      textLower.length >= 3))) {
+            return false;
+          }
+        }
+        return true;
+      }).toList();
+
+      if (filteredBlocks.length >= 3) {
+        ticketName ??= filteredBlocks[0].text.trim();
+        attendeeName = filteredBlocks[1].text.trim();
+        organization = filteredBlocks[2].text.trim();
+      } else if (filteredBlocks.length == 2) {
+        ticketName ??= filteredBlocks[0].text.trim();
+        attendeeName = filteredBlocks[1].text.trim();
+      } else if (filteredBlocks.length == 1) {
+        attendeeName = filteredBlocks[0].text.trim();
       }
     }
 
