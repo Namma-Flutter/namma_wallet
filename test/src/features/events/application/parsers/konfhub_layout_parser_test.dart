@@ -35,6 +35,22 @@ void main() {
           ),
           isTrue,
         );
+        expect(
+          parser.canParse(
+            'Booking ID: 870ef2aa\n'
+            'Event Name: DevFest 2026\n'
+            'Date & Time: Oct 17',
+          ),
+          isTrue,
+        );
+        expect(
+          parser.canParse(
+            'Booking ID: 870ef2aa\n'
+            'Event Name: DevFest 2026\n'
+            'Venue: IIT Madras',
+          ),
+          isTrue,
+        );
       });
 
       test('returns false for unrelated text', () {
@@ -79,6 +95,92 @@ void main() {
         expect(extrasMap['Attendee'], expected['attendeeName']);
         expect(extrasMap['Organization'], expected['organization']);
         expect(extrasMap['Ticket Type'], expected['ticketName']);
+      });
+
+      test('parses devfest 2026 ticket (new layout)', () async {
+        final blocks = KonfHubLayoutFixtures.devfest2026;
+        final ticket = await parser.parseTicketFromBlocks(blocks, '');
+        const expected = KonfHubLayoutFixtures.devfest2026Expected;
+
+        expect(ticket, isNotNull);
+        expect(ticket!.ticketId, expected['bookingId']);
+        expect(ticket.primaryText, expected['eventName']);
+        expect(ticket.secondaryText, expected['ticketName']);
+        expect(ticket.type, TicketType.event);
+        expect(ticket.location, expected['location']);
+
+        expect(ticket.startTime, isNotNull);
+        expect(ticket.startTime?.year, expected['eventYear']);
+        expect(ticket.startTime?.month, expected['eventMonth']);
+        expect(ticket.startTime?.day, expected['eventDay']);
+        expect(ticket.startTime?.hour, expected['startHour']);
+        expect(ticket.startTime?.minute, expected['startMinute']);
+
+        expect(ticket.endTime, isNotNull);
+        expect(ticket.endTime?.year, expected['eventYear']);
+        expect(ticket.endTime?.month, expected['eventMonth']);
+        expect(ticket.endTime?.day, expected['eventDay']);
+        expect(ticket.endTime?.hour, expected['endHour']);
+        expect(ticket.endTime?.minute, expected['endMinute']);
+
+        final extrasMap = <String, String>{
+          for (final e in ticket.extras ?? <ExtrasModel>[])
+            if (e.title != null) e.title!: e.value ?? '',
+        };
+
+        expect(extrasMap['Booking ID'], expected['bookingId']);
+        expect(extrasMap['Attendee'], expected['attendeeName']);
+        expect(extrasMap['Organization'], expected['organization']);
+        expect(extrasMap['Ticket Type'], expected['ticketName']);
+        expect(extrasMap['Add-ons'], expected['addOns']);
+        expect(
+          extrasMap['Additional Venue Details'],
+          expected['additionalVenueDetails'],
+        );
+
+        final tagValues = ticket.tags?.map((t) => t.value).toList();
+        expect(tagValues, contains(expected['attendeeName']));
+        expect(tagValues, contains(expected['ticketName']));
+      });
+
+      test('parses Flutter South India 2026 ticket', () async {
+        final blocks = KonfHubLayoutFixtures.flutterSouthIndia2026;
+        final ticket = await parser.parseTicketFromBlocks(blocks, '');
+        const expected = KonfHubLayoutFixtures.flutterSouthIndia2026Expected;
+
+        expect(ticket, isNotNull);
+        expect(ticket!.ticketId, expected['bookingId']);
+        expect(ticket.primaryText, expected['eventName']);
+        expect(ticket.secondaryText, expected['ticketName']);
+        expect(ticket.type, TicketType.event);
+        expect(ticket.location, expected['location']);
+
+        expect(ticket.startTime, isNotNull);
+        expect(ticket.startTime?.year, expected['eventYear']);
+        expect(ticket.startTime?.month, expected['eventMonth']);
+        expect(ticket.startTime?.day, expected['eventDay']);
+        expect(ticket.startTime?.hour, expected['startHour']);
+        expect(ticket.startTime?.minute, expected['startMinute']);
+
+        expect(ticket.endTime, isNotNull);
+        expect(ticket.endTime?.year, expected['eventYear']);
+        expect(ticket.endTime?.month, expected['eventMonth']);
+        expect(ticket.endTime?.day, expected['eventDay']);
+        expect(ticket.endTime?.hour, expected['endHour']);
+        expect(ticket.endTime?.minute, expected['endMinute']);
+
+        final extrasMap = <String, String>{
+          for (final e in ticket.extras ?? <ExtrasModel>[])
+            if (e.title != null) e.title!: e.value ?? '',
+        };
+
+        expect(extrasMap['Booking ID'], expected['bookingId']);
+        expect(extrasMap['Attendee'], expected['attendeeName']);
+        expect(extrasMap['Ticket Type'], expected['ticketName']);
+
+        final tagValues = ticket.tags?.map((t) => t.value).toList();
+        expect(tagValues, contains(expected['attendeeName']));
+        expect(tagValues, contains(expected['ticketName']));
       });
 
       test('returns null when critical fields are missing', () async {
