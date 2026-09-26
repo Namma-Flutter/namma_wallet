@@ -362,13 +362,15 @@ class KonfHubLayoutParser extends EventLayoutParser {
         if (text.isEmpty) continue;
 
         final isBulletSymbol = text == '•' || text == '-' || text == '*';
-        final startsWithBullet = text.startsWith('•') ||
+        final startsWithBullet =
+            text.startsWith('•') ||
             text.startsWith('- ') ||
             text.startsWith('* ');
 
         if (!isBulletSymbol && !startsWithBullet && !justSawBullet) {
           final lower = text.toLowerCase();
-          final isBoundary = knownKeys.any(
+          final isBoundary =
+              knownKeys.any(
                 (k) =>
                     lower == k ||
                     lower.startsWith('$k:') ||
