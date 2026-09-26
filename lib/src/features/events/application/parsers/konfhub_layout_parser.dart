@@ -354,28 +354,52 @@ class KonfHubLayoutParser extends EventLayoutParser {
     if (additionalVenueIndex != -1) {
       final bullets = <String>[];
       var current = StringBuffer();
+      var justSawBullet = false;
 
       for (var i = additionalVenueIndex + 1; i < sortedBlocks.length; i++) {
         final b = sortedBlocks[i];
         final text = b.text.trim();
         if (text.isEmpty) continue;
 
-        if (text == '•' || text == '-' || text == '*') {
+        final isBulletSymbol = text == '•' || text == '-' || text == '*';
+        final startsWithBullet = text.startsWith('•') ||
+            text.startsWith('- ') ||
+            text.startsWith('* ');
+
+        if (!isBulletSymbol && !startsWithBullet && !justSawBullet) {
+          final lower = text.toLowerCase();
+          final isBoundary = knownKeys.any(
+                (k) =>
+                    lower == k ||
+                    lower.startsWith('$k:') ||
+                    lower.startsWith('$k -'),
+              ) ||
+              _isSectionHeader(lower);
+
+          if (isBoundary) {
+            break;
+          }
+        }
+
+        if (isBulletSymbol) {
           if (current.isNotEmpty) {
             bullets.add(current.toString().trim());
             current = StringBuffer();
           }
-        } else if (text.startsWith('•') || text.startsWith('- ')) {
+          justSawBullet = true;
+        } else if (startsWithBullet) {
           if (current.isNotEmpty) {
             bullets.add(current.toString().trim());
             current = StringBuffer();
           }
           current.write(text.replaceFirst(RegExp(r'^[•\-\*]\s*'), ''));
+          justSawBullet = false;
         } else {
           if (current.isNotEmpty) {
             current.write(' ');
           }
           current.write(text);
+          justSawBullet = false;
         }
       }
       if (current.isNotEmpty) {
@@ -557,5 +581,34 @@ class KonfHubLayoutParser extends EventLayoutParser {
       'december': 12,
     };
     return map[name.toLowerCase()];
+  }
+
+  static bool _isSectionHeader(String textLower) {
+    const headers = [
+      'terms',
+      'instruction',
+      'note',
+      'cancellation',
+      'refund',
+      'disclaimer',
+      'guideline',
+      'rule',
+      'faq',
+      'contact',
+      'organizer',
+      'organized by',
+      'about',
+    ];
+    for (final h in headers) {
+      if (textLower == h ||
+          textLower.startsWith('$h ') ||
+          textLower.startsWith('$h:') ||
+          textLower.startsWith('$h -') ||
+          textLower.startsWith('important $h') ||
+          textLower.startsWith('general $h')) {
+        return true;
+      }
+    }
+    return false;
   }
 }

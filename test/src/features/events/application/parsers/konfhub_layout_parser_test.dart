@@ -274,6 +274,43 @@ void main() {
         },
       );
 
+      test(
+        'stops collecting additional venue details at section boundary',
+        () async {
+          final blocks = <OCRBlock>[
+            ...KonfHubLayoutFixtures.devfest2026,
+            OCRBlock(
+              text: 'Terms & Conditions',
+              boundingBox: const Rect.fromLTRB(0, 180, 100, 200),
+              page: 1,
+            ),
+            OCRBlock(
+              text: 'Tickets once booked cannot be exchanged or refunded.',
+              boundingBox: const Rect.fromLTRB(0, 200, 100, 220),
+              page: 1,
+            ),
+          ];
+
+          final ticket = await parser.parseTicketFromBlocks(blocks, '');
+          expect(ticket, isNotNull);
+          final extrasMap = <String, String>{
+            for (final e in ticket!.extras ?? <ExtrasModel>[])
+              if (e.title != null) e.title!: e.value ?? '',
+          };
+          final venueDetails = extrasMap['Additional Venue Details'];
+          expect(venueDetails, isNotNull);
+          expect(
+            venueDetails,
+            equals(
+              KonfHubLayoutFixtures
+                  .devfest2026Expected['additionalVenueDetails'],
+            ),
+          );
+          expect(venueDetails, isNot(contains('Terms & Conditions')));
+          expect(venueDetails, isNot(contains('refunded')));
+        },
+      );
+
       test('returns null when critical fields are missing', () async {
         final blocks = [
           ...KonfHubLayoutFixtures.devfest2025.where(
