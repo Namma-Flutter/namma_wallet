@@ -51,6 +51,15 @@ void main() {
           ),
           isTrue,
         );
+        expect(
+          parser.canParse(
+            'Booking ID: cdda2c1f\n'
+            'Event Name: DevFest 2025\n'
+            'Event Date: Nov 08\n'
+            'Location: IIT Madras',
+          ),
+          isTrue,
+        );
       });
 
       test('returns false for unrelated text', () {

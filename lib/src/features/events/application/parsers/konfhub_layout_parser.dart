@@ -29,7 +29,9 @@ class KonfHubLayoutParser extends EventLayoutParser {
             lower.contains('event name') &&
             (lower.contains('date & time') ||
                 lower.contains('date and time') ||
-                lower.contains('venue')));
+                lower.contains('venue') ||
+                (lower.contains('event date') &&
+                    lower.contains('location'))));
   }
 
   @override
