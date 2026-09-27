@@ -378,6 +378,7 @@ class _OCRDebugViewState extends State<OCRDebugView> {
       showDialog<void>(
         context: context,
         builder: (context) => Dialog(
+          clipBehavior: Clip.hardEdge,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -399,8 +400,7 @@ class _OCRDebugViewState extends State<OCRDebugView> {
                   ),
                 ],
               ),
-              SizedBox(
-                height: MediaQuery.of(context).size.height * 0.8,
+              Expanded(
                 child: SingleChildScrollView(
                   padding: const EdgeInsets.all(16),
                   child: SelectableText(
