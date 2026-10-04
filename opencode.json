@@ -7,7 +7,47 @@
   },
   "formatter": {
     "dart": {
+<<<<<<< Updated upstream
       "command": ["fvm", "dart", "format", "$FILE"]
+=======
+      "command": [
+        "fvm",
+        "dart",
+        "format",
+        "$FILE"
+      ]
+    },
+    "gofmt": {
+      "disabled": true
+    },
+    "swift": {
+      "command": [
+        "swiftformat",
+        "$FILE"
+      ]
+    },
+    "ktlint": {
+      "command": [
+        "ktlint",
+        "-F",
+        "$FILE"
+      ]
+    }
+  },
+  "mcp": {
+    "servers": {
+      "dart": {
+        "type": "local",
+        "command": [
+          "fvm",
+          "dart",
+          "mcp-server",
+          "--flutter-sdk",
+          ".fvm/flutter_sdk"
+        ],
+        "disabled": false
+      }
+>>>>>>> Stashed changes
     }
   }
 }
