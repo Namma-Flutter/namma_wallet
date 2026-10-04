@@ -25,6 +25,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "13.0.0"
+  android_file_picker:
+    dependency: transitive
+    description:
+      name: android_file_picker
+      sha256: "14ab27769b54c48d5a8a71aa9858372b7a3ae77572ea0a8aee744643c5d8c53d"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.0"
   ansicolor:
     dependency: transitive
     description:
@@ -229,10 +237,10 @@ packages:
     dependency: "direct main"
     description:
       name: cross_file
-      sha256: "28bb3ae56f117b5aec029d702a90f57d285cd975c3c5c281eaca38dbc47c5937"
+      sha256: f141ea4f277af142a0356955707f6556f37b03947d39d55585981a06ca437bd6
       url: "https://pub.dev"
     source: hosted
-    version: "0.3.5+2"
+    version: "0.3.5+5"
   crypto:
     dependency: transitive
     description:
@@ -293,10 +301,10 @@ packages:
     dependency: transitive
     description:
       name: dbus
-      sha256: "79e0c23480ff85dc68de79e2cd6334add97e48f7f4865d17686dd6ea81a47e8c"
+      sha256: a48d5da28e89bd02196e80d81ed8d7954923d00a0f4a68cc20b575038f023383
       url: "https://pub.dev"
     source: hosted
-    version: "0.7.11"
+    version: "0.7.15"
   dev_build:
     dependency: transitive
     description:
@@ -349,10 +357,42 @@ packages:
     dependency: "direct main"
     description:
       name: file_picker
-      sha256: "1d4afa261268e59863af47b9f9dd9a230502d4c702b9d9183353646fe6d5b6e1"
+      sha256: "98c0b156b6380ba55bc767a14e2e6b3feb246e713ad40092424596fa79005bea"
       url: "https://pub.dev"
     source: hosted
-    version: "12.0.0-beta.1"
+    version: "13.1.0"
+  file_picker_darwin:
+    dependency: transitive
+    description:
+      name: file_picker_darwin
+      sha256: "51aef9f4c80449c736e7cc02198675fda73689f0bd45a84da642cfeab0250d46"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.1.2"
+  file_picker_linux:
+    dependency: transitive
+    description:
+      name: file_picker_linux
+      sha256: e7db600f50672ce5ebbe422ac0906e0f3d2a476188cc93e7126afee12bf08063
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.0"
+  file_picker_platform_interface:
+    dependency: transitive
+    description:
+      name: file_picker_platform_interface
+      sha256: bbdc085a6f168e63f147e9ce8988f79fa0800a58e7f25a48f762c60837107ba5
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.0.0"
+  file_picker_web:
+    dependency: transitive
+    description:
+      name: file_picker_web
+      sha256: b3004268da0c1b52baa18df430e7ec4438194de855a807d26b447cbf07ef3496
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.0.0"
   file_selector_linux:
     dependency: transitive
     description:
@@ -524,10 +564,10 @@ packages:
     dependency: "direct main"
     description:
       name: get_it
-      sha256: "568d62f0e68666fb5d95519743b3c24a34c7f19d834b0658c46e26d778461f66"
+      sha256: "2b5c6b077aad30bba9782178baff6076a2044141f1d5f2f15b43bca3fbe74874"
       url: "https://pub.dev"
     source: hosted
-    version: "9.2.1"
+    version: "9.3.0"
   glob:
     dependency: transitive
     description:
@@ -596,10 +636,10 @@ packages:
     dependency: "direct main"
     description:
       name: home_widget
-      sha256: fece84c7464099873c3ace38394ad7053509a4b0e36e57a1105a6aa31f47f23c
+      sha256: "1dbfdfbb3b47de24639adfba352050d85d66af112b9cc3ec5bf7627a7813abcb"
       url: "https://pub.dev"
     source: hosted
-    version: "0.9.3"
+    version: "0.10.0"
   hooks:
     dependency: transitive
     description:
@@ -1321,10 +1361,10 @@ packages:
     dependency: transitive
     description:
       name: sqflite_common
-      sha256: "5bf6a55c166e73bf651ba7ec3ed486e577620e3dc8f3a9c6a258a8031b624590"
+      sha256: "077e38e82c099534146a2fb31b608c2a3a4489a0f21d9af6b2f5c87b566a1ea0"
       url: "https://pub.dev"
     source: hosted
-    version: "2.5.11"
+    version: "2.5.13"
   sqflite_common_ffi:
     dependency: "direct dev"
     description:
@@ -1337,10 +1377,10 @@ packages:
     dependency: "direct main"
     description:
       name: sqflite_common_ffi_web
-      sha256: "32dc484518fec883cf0d1aa85c767f7cde6757729480b3d8d20e0fac247ef161"
+      sha256: "8e9cc4bb519ff421985f719a652930eb6eee77a19a33612f589314984dab9312"
       url: "https://pub.dev"
     source: hosted
-    version: "1.1.2"
+    version: "1.2.0"
   sqflite_darwin:
     dependency: transitive
     description:
@@ -1669,6 +1709,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.4.0"
+  windows_file_picker:
+    dependency: transitive
+    description:
+      name: windows_file_picker
+      sha256: "9f3aa833068b09e380fdc59560ad260a4a14e9397173abb533699f967443602e"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.0"
   workmanager:
     dependency: "direct main"
     description:
