@@ -7,6 +7,46 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.7+14] - 2026-09-20
+
+### Added
+
+- KonfHub event ticket parser with QR data extraction from PDFs
+- Event ticket support for movie and district events
+- Booking horizon reminder with configurable time intervals
+- Image-to-ticket OCR capability for importing tickets from photos
+- Store original PDF and image files alongside imported tickets
+- QR data field added to ticket model
+- Dependabot auto-merge for Flutter ecosystem dependencies
+- CI/CD pre-flight checks for Play Store and App Store version conflicts
+- Periphery static analysis integration for Swift dead code detection
+
+### Fixed
+
+- iOS workmanager_apple update to fix iOS 18 BackgroundTasks build error
+- iOS missing NSLocationWhenInUseUsageDescription permission string
+- Android Gradle configuration cache issue blocking assembleRelease
+- IRCTC Tatkal opening times for booking reminders
+- Booking reminder hash and mounted state usage
+- TNSTC/SETC keyword matching to avoid overly strict parsing
+- Timezone initialization errors with graceful fallback
+- KonfHub date parsing requiring explicit year validation
+- Share success screen routing state validation
+- Event ticket icon, date header, and extras filtering
+
+### Changed
+
+- Refactored PDF processing from SharingIntent to SharedContentProcessor
+- Introduced EventLayoutParser interface for event ticket parsing
+- CI/CD pipeline optimizations with build caching and runner economy
+- Updated all CocoaPods dependencies via pod update
+
+### Chores
+
+- Dependency bumps: pdfrx, package_info_plus, talker_flutter, share_plus, file_picker, google_mlkit_text_recognition, table_calendar, permission_handler, flutter_local_notifications, google_fonts, gaimon, image, timezone, workmanager
+- Image optimization via ImgBot
+- Code formatting and analysis cleanup
+
 ## [0.0.6+12] - 2026-06-22
 
 ### Added

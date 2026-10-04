@@ -165,10 +165,7 @@ void main() {
     test('setSelectedDay updates the selected day and clears range', () {
       provider
         ..setSelectedRange(
-          DateTimeRange(
-            start: DateTime(2024),
-            end: DateTime(2024, 1, 5),
-          ),
+          DateTimeRange(start: DateTime(2024), end: DateTime(2024, 1, 5)),
         )
         ..setSelectedDay(DateTime(2024, 6, 15));
 
@@ -263,24 +260,21 @@ void main() {
   });
 
   group('CalendarProvider error handling', () {
-    test(
-      'loadTickets sets errorMessage when DAO throws',
-      () async {
-        stubTicketDao.tickets = [];
+    test('loadTickets sets errorMessage when DAO throws', () async {
+      stubTicketDao.tickets = [];
 
-        final throwing = _ThrowingTicketDao();
-        await getIt.reset();
-        getIt
-          ..registerSingleton<ILogger>(fakeLogger)
-          ..registerSingleton<ITicketDAO>(throwing);
-        provider = CalendarProvider(logger: fakeLogger);
+      final throwing = _ThrowingTicketDao();
+      await getIt.reset();
+      getIt
+        ..registerSingleton<ILogger>(fakeLogger)
+        ..registerSingleton<ITicketDAO>(throwing);
+      provider = CalendarProvider(logger: fakeLogger);
 
-        await provider.loadTickets();
+      await provider.loadTickets();
 
-        expect(provider.errorMessage, contains('Failed to load tickets'));
-        expect(provider.tickets, isEmpty);
-      },
-    );
+      expect(provider.errorMessage, contains('Failed to load tickets'));
+      expect(provider.tickets, isEmpty);
+    });
   });
 }
 

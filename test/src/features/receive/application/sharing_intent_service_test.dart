@@ -8,24 +8,20 @@ import 'package:namma_wallet/src/features/receive/domain/sharing_intent_service_
 import 'package:share_handler/share_handler.dart';
 
 import '../../../../helpers/fake_logger.dart';
-import '../../../../helpers/mock_pdf_service.dart';
 import '../../../../helpers/mock_sharing_intent_provider.dart';
 
 void main() {
   group('SharingIntentService', () {
     late ISharingIntentService service;
     late MockSharingIntentProvider mockProvider;
-    late MockPDFService mockPdfService;
     late FakeLogger fakeLogger;
 
     setUp(() {
       mockProvider = MockSharingIntentProvider();
-      mockPdfService = MockPDFService();
       fakeLogger = FakeLogger();
 
       service = SharingIntentService(
         logger: fakeLogger,
-        pdfService: mockPdfService,
         sharingIntentProvider: mockProvider,
       );
     });
@@ -98,8 +94,6 @@ void main() {
         final pdfFile = File('${tempDir.path}/test.pdf');
         await pdfFile.writeAsString('dummy content');
 
-        mockPdfService.mockPdfText = 'Extracted PDF Text';
-
         final media = SharedMedia(
           attachments: [
             SharedAttachment(
@@ -114,7 +108,8 @@ void main() {
         await service.initialize(
           onContentReceived: (content, type) {
             contentReceived = true;
-            expect(content, equals('Extracted PDF Text'));
+            // PDF file path is passed through; extraction happens downstream
+            expect(content, equals(pdfFile.path));
             expect(type, equals(SharedContentType.pdf));
           },
           onError: (error) => fail('Should not error: $error'),
@@ -153,10 +148,8 @@ void main() {
         await tempDir.delete(recursive: true);
       });
 
-      test('should handle unsupported file types', () async {
-        final tempDir = await Directory.systemTemp.createTemp(
-          'test_unsupported',
-        );
+      test('should handle image file correctly', () async {
+        final tempDir = await Directory.systemTemp.createTemp('test_image');
         final imgFile = File('${tempDir.path}/image.jpg');
         await imgFile.writeAsString('image data');
 
@@ -165,6 +158,38 @@ void main() {
             SharedAttachment(
               path: imgFile.path,
               type: SharedAttachmentType.image,
+            ),
+          ],
+        );
+        mockProvider.initialMedia = media;
+
+        var contentReceived = false;
+        await service.initialize(
+          onContentReceived: (content, type) {
+            contentReceived = true;
+            // Image path is passed through; OCR happens downstream
+            expect(content, contains(imgFile.path));
+            expect(type, equals(SharedContentType.image));
+          },
+          onError: (error) => fail('Should not error: $error'),
+        );
+
+        expect(contentReceived, isTrue);
+        await tempDir.delete(recursive: true);
+      });
+
+      test('should handle unsupported file types', () async {
+        final tempDir = await Directory.systemTemp.createTemp(
+          'test_unsupported',
+        );
+        final imgFile = File('${tempDir.path}/image.docx');
+        await imgFile.writeAsString('document data');
+
+        final media = SharedMedia(
+          attachments: [
+            SharedAttachment(
+              path: imgFile.path,
+              type: SharedAttachmentType.file,
             ),
           ],
         );
@@ -202,19 +227,18 @@ void main() {
     });
 
     group('extractContentFromFile', () {
-      test('should extract text from PDF', () async {
+      test('should return file path for PDF', () async {
         final tempDir = await Directory.systemTemp.createTemp(
           'test_pdf_extract',
         );
         final pdfFile = File('${tempDir.path}/test.pdf');
         await pdfFile.writeAsString('dummy');
 
-        mockPdfService.mockPdfText = 'PDF Content';
-
         final content = await service.extractContentFromFile(
           XFile(pdfFile.path),
         );
-        expect(content, equals('PDF Content'));
+        // PDF file path is passed through; extraction happens downstream
+        expect(content, equals(pdfFile.path));
 
         await tempDir.delete(recursive: true);
       });
@@ -234,11 +258,26 @@ void main() {
         await tempDir.delete(recursive: true);
       });
 
+      test('should return path for image file', () async {
+        final tempDir = await Directory.systemTemp.createTemp(
+          'test_image_extract',
+        );
+        final imgFile = File('${tempDir.path}/image.jpg');
+        await imgFile.writeAsString('image data');
+
+        final content = await service.extractContentFromFile(
+          XFile(imgFile.path),
+        );
+        expect(content, equals(imgFile.path));
+
+        await tempDir.delete(recursive: true);
+      });
+
       test('should throw on unsupported file', () async {
         final tempDir = await Directory.systemTemp.createTemp(
           'test_bad_extract',
         );
-        final badFile = File('${tempDir.path}/test.jpg');
+        final badFile = File('${tempDir.path}/test.docx');
         await badFile.writeAsString('dummy');
 
         expect(

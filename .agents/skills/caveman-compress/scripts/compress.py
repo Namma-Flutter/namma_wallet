@@ -308,6 +308,7 @@ def compress_file(filepath: Path) -> bool:
         try:
             backup_path.unlink()
         except OSError:
+            # Backup unlink may fail on Windows or permission errors; safe to ignore
             pass
         return False
     filepath.write_text(compressed)

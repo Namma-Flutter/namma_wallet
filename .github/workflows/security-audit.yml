@@ -1,0 +1,116 @@
+name: Security & Architecture Audit
+
+on:
+  push:
+    branches: [main, beta]
+  pull_request:
+    branches: [main, beta]
+    types: [opened, synchronize, reopened, ready_for_review]
+    paths-ignore:
+      - '**/*.md'
+      - 'docs/**'
+      - 'LICENSE'
+  schedule:
+    - cron: '0 2 * * 1' # Weekly on Monday
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  trufflehog:
+    name: Secret Scanning (TruffleHog)
+    if: github.event_name != 'pull_request' || (github.actor != 'dependabot[bot]' && !github.event.pull_request.draft)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+
+      - name: TruffleHog OSS
+        uses: trufflesecurity/trufflehog@363923b901c911a9164f50b6c423f47c15372b1c # v3.97.4
+        with:
+          extra_args: --only-verified
+
+  owasp-and-policy:
+    name: OWASP Mobile & Data Policy Audit
+    if: github.event_name != 'pull_request' || (github.actor != 'dependabot[bot]' && !github.event.pull_request.draft)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.11'
+
+      - name: Check Parser Data Policy (No Fallback Defaults)
+        run: bash scripts/check_no_default_values.sh
+
+      - name: Run OWASP Mobile Security Scanners
+        run: |
+          mkdir -p owasp-reports
+          echo "### 🛡️ OWASP Mobile Security Scan Results" >> $GITHUB_STEP_SUMMARY
+          echo "- **M1 Hardcoded Secrets**: Handled via TruffleHog verified secrets job" >> $GITHUB_STEP_SUMMARY
+          echo "- **M2 Dependency Check**: Handled via OSV-Scanner (Google OSV vulnerability database)" >> $GITHUB_STEP_SUMMARY
+
+          # 1. Storage Security Analysis (OWASP M9)
+          STORAGE_STATUS=0
+          python3 .agents/skills/owasp-mobile-security-checker/scripts/analyze_storage_security.py || STORAGE_STATUS=$?
+          if [ -f owasp_m9_storage_scan.json ]; then
+            mv owasp_m9_storage_scan.json owasp-reports/
+            STORAGE_ISSUES=$(jq '.total_issues // 0' owasp-reports/owasp_m9_storage_scan.json)
+            echo "- **M9 Storage Security**: $STORAGE_ISSUES note(s)/finding(s)" >> $GITHUB_STEP_SUMMARY
+          elif [ $STORAGE_STATUS -ne 0 ]; then
+            echo "- **M9 Storage Security**: ⚠️ Scanner exited with error (exit code $STORAGE_STATUS); report not generated" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          # 2. Network Security Analysis (OWASP M5)
+          NETWORK_STATUS=0
+          python3 .agents/skills/owasp-mobile-security-checker/scripts/check_network_security.py || NETWORK_STATUS=$?
+          if [ -f owasp_m5_network_scan.json ]; then
+            mv owasp_m5_network_scan.json owasp-reports/
+            NETWORK_ISSUES=$(jq '.total_issues // 0' owasp-reports/owasp_m5_network_scan.json)
+            echo "- **M5 Network Security**: $NETWORK_ISSUES note(s)/finding(s)" >> $GITHUB_STEP_SUMMARY
+          elif [ $NETWORK_STATUS -ne 0 ]; then
+            echo "- **M5 Network Security**: ⚠️ Scanner exited with error (exit code $NETWORK_STATUS); report not generated" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Upload OWASP Audit Reports
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: owasp-security-reports
+          path: owasp-reports/
+          retention-days: 14
+
+  zizmor:
+    name: GitHub Actions Security Audit (zizmor)
+    if: github.event_name != 'pull_request' || (github.actor != 'dependabot[bot]' && !github.event.pull_request.draft)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+          cache-dependency-path: .github/workflows/security-audit.yml
+
+      - name: Install zizmor
+        run: pip install zizmor==1.4.1
+
+      - name: Run zizmor
+        run: zizmor .github/workflows/ --no-exit-codes

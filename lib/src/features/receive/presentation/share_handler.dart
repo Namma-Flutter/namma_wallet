@@ -6,10 +6,7 @@ import 'package:namma_wallet/src/features/receive/domain/shared_content_result.d
 
 /// Handles share result navigation and UI feedback
 class ShareHandler {
-  ShareHandler({
-    required this.router,
-    required this.scaffoldMessengerKey,
-  });
+  ShareHandler({required this.router, required this.scaffoldMessengerKey});
 
   final GoRouter router;
   final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey;
@@ -17,11 +14,7 @@ class ShareHandler {
   /// Handle the result of shared content processing
   Future<void> handleResult(SharedContentResult result) async {
     switch (result) {
-      case TicketCreatedResult(
-        :final ticketId,
-        :final warning,
-        :final isArchived,
-      ):
+      case TicketCreatedResult(:final warning, :final isArchived):
         if (warning != null) {
           handleWarning(warning);
         }
@@ -30,26 +23,19 @@ class ShareHandler {
           await router.push(archivedTicketsLocation());
           return;
         }
-        if (ticketId != null) {
-          router.go(AppRoute.home.path);
-          await router.push('/ticket/$ticketId');
-        } else {
-          router.go(AppRoute.home.path);
-        }
+        // Navigate to success screen for user confirmation
+        router.go(AppRoute.shareSuccess.path, extra: result);
 
       case TicketUpdatedResult(:final pnrNumber, :final updateType):
-        // Reuse share success screen with update-specific values
-        // 'to' field displays the update type (e.g., 'Seat', 'Platform')
-        // to provide user feedback about what was updated
         router.go(
           AppRoute.shareSuccess.path,
-          extra: {
-            'pnrNumber': pnrNumber,
-            'from': 'Updated',
-            'to': updateType,
-            'fare': 'Updated',
-            'date': 'Just Now',
-          },
+          extra: TicketCreatedResult(
+            ticketId: pnrNumber,
+            ticketType: null,
+            title: 'Ticket Updated',
+            subtitle: updateType,
+            date: 'Just Now',
+          ),
         );
 
       case TicketNotFoundResult():
@@ -94,10 +80,7 @@ class ShareHandler {
   /// Handle warning messages
   void handleWarning(String message) {
     scaffoldMessengerKey.currentState?.showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.orange,
-      ),
+      SnackBar(content: Text(message), backgroundColor: Colors.orange),
     );
   }
 }

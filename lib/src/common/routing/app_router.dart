@@ -13,6 +13,7 @@ import 'package:namma_wallet/src/features/export/presentation/export_view.dart';
 import 'package:namma_wallet/src/features/home/presentation/all_tickets_view.dart';
 import 'package:namma_wallet/src/features/home/presentation/home_view.dart';
 import 'package:namma_wallet/src/features/import/presentation/import_view.dart';
+import 'package:namma_wallet/src/features/receive/domain/shared_content_result.dart';
 import 'package:namma_wallet/src/features/receive/presentation/share_success_view.dart';
 import 'package:namma_wallet/src/features/settings/presentation/contributors_view.dart';
 import 'package:namma_wallet/src/features/settings/presentation/db_viewer_view.dart';
@@ -32,10 +33,7 @@ final GlobalKey<NavigatorState> _shellNavigatorKey = GlobalKey<NavigatorState>(
 final router = GoRouter(
   navigatorKey: rootNavigatorKey,
   onException: (context, state, _) {
-    getIt<ILogger>().error(
-      'Navigation exception: ${state.uri}',
-      state.error,
-    );
+    getIt<ILogger>().error('Navigation exception: ${state.uri}', state.error);
   },
   redirect: (context, state) {
     // Handle deep links with custom scheme (e.g., nammawallet://ticket/123)
@@ -45,9 +43,7 @@ final router = GoRouter(
       // Reconstruct path from host and path
       // nammawallet://ticket/T75229210 -> /ticket/T75229210
       final redirectPath = '/${uri.host}${uri.path}';
-      getIt<ILogger>().info(
-        'Deep link redirect: $uri -> $redirectPath',
-      );
+      getIt<ILogger>().info('Deep link redirect: $uri -> $redirectPath');
       return redirectPath;
     }
     return null;
@@ -93,9 +89,7 @@ final router = GoRouter(
           );
         }
 
-        return const Scaffold(
-          body: Center(child: Text('Invalid ticket ID')),
-        );
+        return const Scaffold(body: Center(child: Text('Invalid ticket ID')));
       },
     ),
     GoRoute(
@@ -160,19 +154,13 @@ final router = GoRouter(
       path: AppRoute.shareSuccess.path,
       name: AppRoute.shareSuccess.name,
       builder: (context, state) {
-        final extra = state.extra as Map<String, dynamic>?;
-        if (extra == null) {
+        if (state.extra is! TicketCreatedResult) {
           return const Scaffold(
             body: Center(child: Text('Invalid share data')),
           );
         }
-        return ShareSuccessView(
-          pnrNumber: extra['pnrNumber'] as String?,
-          from: extra['from'] as String?,
-          to: extra['to'] as String?,
-          fare: extra['fare'] as String?,
-          date: extra['date'] as String?,
-        );
+        final result = state.extra! as TicketCreatedResult;
+        return ShareSuccessView(result: result);
       },
     ),
   ],
@@ -209,9 +197,7 @@ class _TicketViewLoader extends StatelessWidget {
 
         final ticket = snapshot.data;
         if (ticket == null) {
-          return const Scaffold(
-            body: Center(child: Text('Ticket not found')),
-          );
+          return const Scaffold(body: Center(child: Text('Ticket not found')));
         }
 
         return TravelTicketView(

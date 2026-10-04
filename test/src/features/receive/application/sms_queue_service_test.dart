@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:namma_wallet/src/common/enums/ticket_type.dart';
 import 'package:namma_wallet/src/features/receive/application/sms_queue_service.dart';
 import 'package:namma_wallet/src/features/receive/domain/shared_content_result.dart';
 import 'package:namma_wallet/src/features/receive/domain/shared_content_type.dart';
@@ -71,10 +72,9 @@ void main() {
       test('calls processContent for each SMS entry in queue', () async {
         fakeQueue = ['SMS text 1', 'SMS text 2'];
         fakeProcessor.resultToReturn = const TicketCreatedResult(
-          pnrNumber: '12345',
-          from: 'Chennai',
-          to: 'Madurai',
-          fare: '200',
+          ticketId: '12345',
+          ticketType: TicketType.bus,
+          title: 'Chennai → Madurai',
           date: '2026-06-15',
         );
 
@@ -94,10 +94,9 @@ void main() {
       test('clears queue after successful processing', () async {
         fakeQueue = ['SMS text 1'];
         fakeProcessor.resultToReturn = const TicketCreatedResult(
-          pnrNumber: '12345',
-          from: 'A',
-          to: 'B',
-          fare: '100',
+          ticketId: '12345',
+          ticketType: TicketType.bus,
+          title: 'A → B',
           date: '2026-06-15',
         );
 
@@ -141,10 +140,9 @@ void main() {
         fakeProcessor.onProcessContent = (content, type) async {
           if (content == 'valid SMS') {
             return const TicketCreatedResult(
-              pnrNumber: '99999',
-              from: 'A',
-              to: 'B',
-              fare: '50',
+              ticketId: '99999',
+              ticketType: TicketType.bus,
+              title: 'A → B',
               date: '2026-06-15',
             );
           }
@@ -164,10 +162,9 @@ void main() {
       test('posts notification when at least one entry succeeds', () async {
         fakeQueue = ['valid SMS'];
         fakeProcessor.resultToReturn = const TicketCreatedResult(
-          pnrNumber: '99999',
-          from: 'A',
-          to: 'B',
-          fare: '50',
+          ticketId: '99999',
+          ticketType: TicketType.bus,
+          title: 'A → B',
           date: '2026-06-15',
         );
 
@@ -191,10 +188,9 @@ void main() {
         // Simulate async work
         await Future<void>.delayed(const Duration(milliseconds: 10));
         return const TicketCreatedResult(
-          pnrNumber: '1',
-          from: 'A',
-          to: 'B',
-          fare: '0',
+          ticketId: '1',
+          ticketType: TicketType.bus,
+          title: 'A → B',
           date: '2026-06-15',
         );
       };
@@ -216,10 +212,9 @@ void main() {
       test('calls drainQueue when state is resumed', () async {
         fakeQueue = ['SMS'];
         fakeProcessor.resultToReturn = const TicketCreatedResult(
-          pnrNumber: '1',
-          from: 'A',
-          to: 'B',
-          fare: '0',
+          ticketId: '1',
+          ticketType: TicketType.bus,
+          title: 'A → B',
           date: '2026-06-15',
         );
 

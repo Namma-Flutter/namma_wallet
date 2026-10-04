@@ -38,8 +38,7 @@ def scan_http_usage(file_path: Path) -> List[Dict]:
                     continue
 
                 for pattern, issue_type in http_patterns:
-                    matches = re.finditer(pattern, line, re.IGNORECASE)
-                    for match in matches:
+                    for _ in re.finditer(pattern, line, re.IGNORECASE):
                         findings.append({
                             'file': str(file_path),
                             'line': line_num,

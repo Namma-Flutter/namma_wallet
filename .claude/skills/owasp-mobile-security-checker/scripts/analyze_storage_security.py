@@ -25,7 +25,7 @@ def scan_shared_preferences_usage(file_path: Path) -> List[Dict]:
 
             # Check for SharedPreferences import
             has_shared_prefs = 'package:shared_preferences' in content
-            has_secure_storage = 'package:flutter_secure_storage' in content
+            has_secure_storage = 'package:flutter_secure_storage' in content  # noqa: F841
 
             if has_shared_prefs:
                 # Look for sensitive data being stored

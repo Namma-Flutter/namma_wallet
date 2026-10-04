@@ -1,12 +1,13 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:cross_file/cross_file.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
+import 'package:namma_wallet/src/common/services/image/image_service.dart';
 import 'package:namma_wallet/src/common/services/ocr/ocr_block.dart';
 import 'package:namma_wallet/src/common/services/pdf/pdf_service_interface.dart';
 import 'package:namma_wallet/src/common/widgets/rounded_back_button.dart';
@@ -15,7 +16,7 @@ import 'package:namma_wallet/src/common/widgets/snackbar_widget.dart';
 /// Debug page to view OCR blocks from uploaded PDFs.
 ///
 /// This page helps developers:
-/// - Extract OCR blocks from PDF tickets
+/// - Extract OCR blocks from PDFs and Images
 /// - View text content and bounding box coordinates
 /// - Copy OCR data to create test fixtures
 ///
@@ -29,13 +30,15 @@ class OCRDebugView extends StatefulWidget {
 
 class _OCRDebugViewState extends State<OCRDebugView> {
   final IPDFService _pdfService = getIt<IPDFService>();
+  final ImageService _imageService = getIt<ImageService>();
   List<OCRBlock>? _ocrBlocks;
-  bool _isLoading = false;
+  bool _isLoadingPDF = false;
+  bool _isLoadingImage = false;
   String? _fileName;
 
   Future<void> _pickAndProcessPDF() async {
     setState(() {
-      _isLoading = true;
+      _isLoadingPDF = true;
       _ocrBlocks = null;
       _fileName = null;
     });
@@ -48,7 +51,7 @@ class _OCRDebugViewState extends State<OCRDebugView> {
       );
 
       if (result == null || result.files.isEmpty) {
-        setState(() => _isLoading = false);
+        setState(() => _isLoadingPDF = false);
         return;
       }
 
@@ -67,7 +70,7 @@ class _OCRDebugViewState extends State<OCRDebugView> {
         xFile = XFile(file.path!);
       } else {
         if (!mounted) return;
-        setState(() => _isLoading = false);
+        setState(() => _isLoadingPDF = false);
         showSnackbar(
           context,
           'Could not read the selected file. Please try again.',
@@ -82,18 +85,50 @@ class _OCRDebugViewState extends State<OCRDebugView> {
 
       setState(() {
         _ocrBlocks = blocks;
-        _isLoading = false;
+        _isLoadingPDF = false;
       });
     } on Object catch (e) {
       if (!mounted) return;
 
-      showSnackbar(
-        context,
-        'Failed to process PDF: $e',
-        isError: true,
-      );
+      showSnackbar(context, 'Failed to process PDF: $e', isError: true);
     } finally {
-      if (mounted) setState(() => _isLoading = false);
+      if (mounted) setState(() => _isLoadingPDF = false);
+    }
+  }
+
+  Future<void> _pickAndProcessImage() async {
+    setState(() {
+      _isLoadingImage = true;
+      _ocrBlocks = null;
+      _fileName = null;
+    });
+
+    try {
+      // Natively supports XFile format
+      final result = await ImagePicker().pickImage(
+        source: ImageSource.gallery,
+        imageQuality: 100,
+      );
+
+      if (result == null) {
+        setState(() => _isLoadingImage = false);
+        return;
+      }
+
+      final blocks = await _imageService.extractBlocks(result);
+
+      if (!mounted) return;
+
+      setState(() {
+        _ocrBlocks = blocks;
+        _isLoadingImage = false;
+      });
+    } on Object catch (e) {
+      if (!mounted) return;
+
+      showSnackbar(context, 'Failed to process image: $e', isError: true);
+    } finally {
+      if (mounted) setState(() => _isLoadingImage = false);
     }
   }
 
@@ -162,10 +197,7 @@ class _OCRDebugViewState extends State<OCRDebugView> {
     await Clipboard.setData(ClipboardData(text: content));
     if (!mounted) return;
 
-    showSnackbar(
-      context,
-      '$label copied to clipboard',
-    );
+    showSnackbar(context, '$label copied to clipboard');
   }
 
   @override
@@ -227,9 +259,16 @@ class _OCRDebugViewState extends State<OCRDebugView> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 ElevatedButton.icon(
-                  onPressed: _isLoading ? null : _pickAndProcessPDF,
+                  onPressed: _isLoadingPDF ? null : _pickAndProcessPDF,
                   icon: const Icon(Icons.upload_file),
-                  label: Text(_isLoading ? 'Processing...' : 'Upload PDF'),
+                  label: Text(_isLoadingPDF ? 'Processing...' : 'Upload PDF'),
+                ),
+                ElevatedButton.icon(
+                  onPressed: _isLoadingImage ? null : _pickAndProcessImage,
+                  icon: const Icon(Icons.image_search),
+                  label: Text(
+                    _isLoadingImage ? 'Processing...' : 'Upload Image',
+                  ),
                 ),
                 if (_fileName != null)
                   Padding(
@@ -243,12 +282,8 @@ class _OCRDebugViewState extends State<OCRDebugView> {
               ],
             ),
           ),
-          if (_isLoading)
-            const Expanded(
-              child: Center(
-                child: CircularProgressIndicator(),
-              ),
-            )
+          if (_isLoadingPDF || _isLoadingImage)
+            const Expanded(child: Center(child: CircularProgressIndicator()))
           else if (_ocrBlocks != null)
             Expanded(
               child: Column(
@@ -281,10 +316,7 @@ class _OCRDebugViewState extends State<OCRDebugView> {
                       itemCount: _ocrBlocks!.length,
                       itemBuilder: (context, index) {
                         final block = _ocrBlocks![index];
-                        return _OCRBlockCard(
-                          block: block,
-                          index: index,
-                        );
+                        return _OCRBlockCard(block: block, index: index);
                       },
                     ),
                   ),
@@ -304,7 +336,7 @@ class _OCRDebugViewState extends State<OCRDebugView> {
                     ),
                     const SizedBox(height: 16),
                     Text(
-                      'Upload a PDF to extract OCR blocks',
+                      'Upload a PDF or Image to extract OCR blocks',
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
                     const SizedBox(height: 8),
@@ -328,6 +360,7 @@ class _OCRDebugViewState extends State<OCRDebugView> {
       showDialog<void>(
         context: context,
         builder: (context) => Dialog(
+          clipBehavior: Clip.hardEdge,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -349,8 +382,7 @@ class _OCRDebugViewState extends State<OCRDebugView> {
                   ),
                 ],
               ),
-              SizedBox(
-                height: MediaQuery.of(context).size.height * 0.8,
+              Expanded(
                 child: SingleChildScrollView(
                   padding: const EdgeInsets.all(16),
                   child: SelectableText(
@@ -371,10 +403,7 @@ class _OCRDebugViewState extends State<OCRDebugView> {
 }
 
 class _OCRBlockCard extends StatelessWidget {
-  const _OCRBlockCard({
-    required this.block,
-    required this.index,
-  });
+  const _OCRBlockCard({required this.block, required this.index});
 
   final OCRBlock block;
   final int index;
@@ -420,14 +449,8 @@ class _OCRBlockCard extends StatelessWidget {
                 _InfoRow(label: 'Top', value: box.top.toStringAsFixed(2)),
                 _InfoRow(label: 'Right', value: box.right.toStringAsFixed(2)),
                 _InfoRow(label: 'Bottom', value: box.bottom.toStringAsFixed(2)),
-                _InfoRow(
-                  label: 'Width',
-                  value: box.width.toStringAsFixed(2),
-                ),
-                _InfoRow(
-                  label: 'Height',
-                  value: box.height.toStringAsFixed(2),
-                ),
+                _InfoRow(label: 'Width', value: box.width.toStringAsFixed(2)),
+                _InfoRow(label: 'Height', value: box.height.toStringAsFixed(2)),
               ],
             ),
           ),
@@ -438,10 +461,7 @@ class _OCRBlockCard extends StatelessWidget {
 }
 
 class _InfoRow extends StatelessWidget {
-  const _InfoRow({
-    required this.label,
-    required this.value,
-  });
+  const _InfoRow({required this.label, required this.value});
 
   final String label;
   final String value;

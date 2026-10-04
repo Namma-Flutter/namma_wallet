@@ -19,4 +19,12 @@ class WebOCRService implements IOCRService {
       'OCR text extraction from PDF is not supported on web platform.',
     );
   }
+
+  @override
+  Future<List<OCRBlock>> extractBlocksFromImage(XFile imageFile) async {
+    // OCR is not yet supported on web
+    throw UnsupportedError(
+      'OCR block extraction from Image is not supported on web platform.',
+    );
+  }
 }

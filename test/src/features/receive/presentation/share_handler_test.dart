@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
+import 'package:namma_wallet/src/common/enums/ticket_type.dart';
 import 'package:namma_wallet/src/common/services/archive/ticket_archive.dart';
 import 'package:namma_wallet/src/features/receive/domain/shared_content_result.dart';
 import 'package:namma_wallet/src/features/receive/presentation/share_handler.dart';
@@ -30,178 +31,146 @@ void main() {
     });
 
     group('handleResult - TicketCreatedResult', () {
-      test(
-        'Given TicketCreatedResult with ticketId, When handleResult called, '
-        'Then navigates to ticket view path',
-        () async {
-          // Arrange (Given)
-          const result = TicketCreatedResult(
-            pnrNumber: 'T12345678',
-            from: 'Chennai',
-            to: 'Bangalore',
-            fare: '500',
-            date: '15/12/2024',
-            ticketId: 'T12345678',
-          );
+      test('Given TicketCreatedResult with ticketId, When handleResult called, '
+          'Then navigates to ticket view path', () async {
+        // Arrange (Given)
+        const result = TicketCreatedResult(
+          ticketId: 'T12345678',
+          ticketType: TicketType.bus,
+          title: 'Chennai → Bangalore',
+          subtitle: 'SETC',
+          date: '15/12/2024',
+        );
 
-          // Act (When)
-          await handler.handleResult(result);
+        // Act (When)
+        await handler.handleResult(result);
 
-          // Assert (Then)
-          verify(fakeRouter.go('/')).called(1);
-          verify(fakeRouter.push('/ticket/T12345678')).called(1);
-        },
-      );
+        // Assert (Then)
+        verify(fakeRouter.go('/share-success', extra: result)).called(1);
+        verifyNever(fakeRouter.go('/'));
+      });
 
-      test(
-        'Given TicketCreatedResult with null ticketId, '
-        'When handleResult called, '
-        'Then navigates to home',
-        () async {
-          // Arrange (Given)
-          const result = TicketCreatedResult(
-            pnrNumber: 'T12345678',
-            from: 'Chennai',
-            to: 'Bangalore',
-            fare: '500',
-            date: '15/12/2024',
-          );
+      test('Given TicketCreatedResult with null ticketId, '
+          'When handleResult called, '
+          'Then navigates to home', () async {
+        // Arrange (Given)
+        const result = TicketCreatedResult(
+          ticketId: null,
+          ticketType: TicketType.bus,
+          title: 'Chennai → Bangalore',
+          date: '15/12/2024',
+        );
 
-          // Act (When)
-          await handler.handleResult(result);
+        // Act (When)
+        await handler.handleResult(result);
 
-          // Assert (Then)
-          verify(fakeRouter.go('/')).called(1);
-        },
-      );
+        // Assert (Then)
+        verify(fakeRouter.go('/share-success', extra: result)).called(1);
+      });
 
-      test(
-        'Given TicketCreatedResult with ticketId and warning, '
-        'When handleResult called, '
-        'Then navigates to ticket view and shows warning',
-        () async {
-          // Arrange (Given)
-          const result = TicketCreatedResult(
-            pnrNumber: 'T12345678',
-            from: 'Chennai',
-            to: 'Bangalore',
-            fare: '500',
-            date: '15/12/2024',
-            ticketId: 'T12345678',
-            warning: 'Some warning',
-          );
+      test('Given TicketCreatedResult with ticketId and warning, '
+          'When handleResult called, '
+          'Then navigates to ticket view and shows warning', () async {
+        // Arrange (Given)
+        const result = TicketCreatedResult(
+          ticketId: 'T12345678',
+          ticketType: TicketType.bus,
+          title: 'Chennai → Bangalore',
+          date: '15/12/2024',
+          warning: 'Some warning',
+        );
 
-          // Act (When)
-          await handler.handleResult(result);
+        // Act (When)
+        await handler.handleResult(result);
 
-          // Assert (Then)
-          verify(fakeRouter.go('/')).called(1);
-          verify(fakeRouter.push('/ticket/T12345678')).called(1);
-        },
-      );
+        // Assert (Then)
+        verify(fakeRouter.go('/share-success', extra: result)).called(1);
+        verifyNever(fakeRouter.go('/'));
+      });
 
-      test(
-        'Given archived TicketCreatedResult, When handleResult called, '
-        'Then pushes archived tickets over home',
-        () async {
-          const result = TicketCreatedResult(
-            pnrNumber: 'T12345678',
-            from: 'Chennai',
-            to: 'Bangalore',
-            fare: '500',
-            date: '15/12/2024',
-            ticketId: 'T12345678',
-            warning: archivedPastTicketMessage,
-            isArchived: true,
-          );
+      test('Given archived TicketCreatedResult, When handleResult called, '
+          'Then pushes archived tickets over home', () async {
+        const result = TicketCreatedResult(
+          ticketId: 'T12345678',
+          ticketType: TicketType.bus,
+          title: 'Chennai → Bangalore',
+          date: '15/12/2024',
+          warning: archivedPastTicketMessage,
+          isArchived: true,
+        );
 
-          await handler.handleResult(result);
+        await handler.handleResult(result);
 
-          verify(fakeRouter.go('/')).called(1);
-          verify(fakeRouter.push(archivedTicketsLocation())).called(1);
-          verifyNever(fakeRouter.push('/ticket/T12345678'));
-        },
-      );
+        verify(fakeRouter.go('/')).called(1);
+        verify(fakeRouter.push(archivedTicketsLocation())).called(1);
+        verifyNever(fakeRouter.push('/ticket/T12345678'));
+      });
 
-      test(
-        'Given archived TicketCreatedResult without warning, '
-        'When handleResult called, '
-        'Then still pushes archived tickets over home',
-        () async {
-          const result = TicketCreatedResult(
-            pnrNumber: 'T12345678',
-            from: 'Chennai',
-            to: 'Bangalore',
-            fare: '500',
-            date: '15/12/2024',
-            ticketId: 'T12345678',
-            isArchived: true,
-          );
+      test('Given archived TicketCreatedResult without warning, '
+          'When handleResult called, '
+          'Then still pushes archived tickets over home', () async {
+        const result = TicketCreatedResult(
+          ticketId: 'T12345678',
+          ticketType: TicketType.bus,
+          title: 'Chennai → Bangalore',
+          date: '15/12/2024',
+          isArchived: true,
+        );
 
-          await handler.handleResult(result);
+        await handler.handleResult(result);
 
-          verify(fakeRouter.go('/')).called(1);
-          verify(fakeRouter.push(archivedTicketsLocation())).called(1);
-          verifyNever(fakeRouter.push('/ticket/T12345678'));
-        },
-      );
+        verify(fakeRouter.go('/')).called(1);
+        verify(fakeRouter.push(archivedTicketsLocation())).called(1);
+        verifyNever(fakeRouter.push('/ticket/T12345678'));
+      });
     });
 
     group('handleResult - other branches', () {
-      test(
-        'Given TicketUpdatedResult, '
-        'When handleResult called, '
-        'Then navigates to share success with extras map',
-        () async {
-          const result = TicketUpdatedResult(
-            pnrNumber: 'T12345678',
-            updateType: 'Conductor Details',
-          );
+      test('Given TicketUpdatedResult, '
+          'When handleResult called, '
+          'Then navigates to share success with extras map', () async {
+        const result = TicketUpdatedResult(
+          pnrNumber: 'T12345678',
+          updateType: 'Conductor Details',
+        );
 
-          await handler.handleResult(result);
+        await handler.handleResult(result);
 
-          final captured =
-              verify(
-                    fakeRouter.go(
-                      '/share-success',
-                      extra: captureAnyNamed('extra'),
-                    ),
-                  ).captured.first
-                  as Map<String, dynamic>;
-          expect(captured['pnrNumber'], equals('T12345678'));
-          expect(captured['to'], equals('Conductor Details'));
-          expect(captured['from'], equals('Updated'));
-        },
-      );
+        final captured =
+            verify(
+                  fakeRouter.go(
+                    '/share-success',
+                    extra: captureAnyNamed('extra'),
+                  ),
+                ).captured.first
+                as TicketCreatedResult;
+        expect(captured.ticketId, equals('T12345678'));
+        expect(captured.subtitle, equals('Conductor Details'));
+        expect(captured.title, equals('Ticket Updated'));
+      });
 
-      test(
-        'Given TicketNotFoundResult, '
-        'When handleResult called, '
-        'Then navigates home',
-        () async {
-          const result = TicketNotFoundResult(pnrNumber: 'T-NOT-FOUND');
+      test('Given TicketNotFoundResult, '
+          'When handleResult called, '
+          'Then navigates home', () async {
+        const result = TicketNotFoundResult(pnrNumber: 'T-NOT-FOUND');
 
-          await handler.handleResult(result);
+        await handler.handleResult(result);
 
-          verify(fakeRouter.go('/')).called(1);
-        },
-      );
+        verify(fakeRouter.go('/')).called(1);
+      });
 
-      test(
-        'Given ProcessingErrorResult, '
-        'When handleResult called, '
-        'Then navigates home',
-        () async {
-          const result = ProcessingErrorResult(
-            message: 'failed',
-            error: 'parser exploded',
-          );
+      test('Given ProcessingErrorResult, '
+          'When handleResult called, '
+          'Then navigates home', () async {
+        const result = ProcessingErrorResult(
+          message: 'failed',
+          error: 'parser exploded',
+        );
 
-          await handler.handleResult(result);
+        await handler.handleResult(result);
 
-          verify(fakeRouter.go('/')).called(1);
-        },
-      );
+        verify(fakeRouter.go('/')).called(1);
+      });
     });
 
     group('handleError', () {

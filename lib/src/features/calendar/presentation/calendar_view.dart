@@ -7,6 +7,7 @@ import 'package:namma_wallet/src/common/services/haptic/haptic_service_extension
 import 'package:namma_wallet/src/common/services/haptic/haptic_service_interface.dart';
 import 'package:namma_wallet/src/common/theme/app_theme.dart';
 import 'package:namma_wallet/src/features/calendar/application/calendar_provider.dart';
+import 'package:namma_wallet/src/features/calendar/presentation/widgets/booking_reminder_dialog_widget.dart';
 import 'package:namma_wallet/src/features/calendar/presentation/widgets/calendar_list.dart';
 import 'package:namma_wallet/src/features/calendar/presentation/widgets/calendar_toggle_buttons.dart';
 import 'package:namma_wallet/src/features/calendar/presentation/widgets/calendar_widget.dart';
@@ -31,6 +32,27 @@ class CalendarView extends StatelessWidget {
             child: Text('Calendar'),
           ),
           centerTitle: false,
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.add_alert_outlined),
+              tooltip: 'Set booking reminder',
+              onPressed: () async {
+                final messenger = ScaffoldMessenger.of(context);
+                final now = DateTime.now();
+                final result = await showDialog<bool>(
+                  context: context,
+                  builder: (_) => BookingReminderDialogWidget(
+                    initialJourneyDate: DateTime(now.year, now.month, now.day),
+                  ),
+                );
+                if (result ?? false) {
+                  messenger.showSnackBar(
+                    const SnackBar(content: Text('Booking reminder set')),
+                  );
+                }
+              },
+            ),
+          ],
         ),
         body: const CalendarContent(),
       ),
@@ -55,10 +77,7 @@ class _CalendarContentState extends State<CalendarContent> {
 
     final initialRange =
         provider.selectedRange ??
-        DateTimeRange(
-          start: today,
-          end: today.add(const Duration(days: 7)),
-        );
+        DateTimeRange(start: today, end: today.add(const Duration(days: 7)));
 
     final pickedRange = await showDateRangePicker(
       context: context,
@@ -96,9 +115,7 @@ class _CalendarContentState extends State<CalendarContent> {
           CalendarToggleButtons(
             selectedFilter: _selectedFilter,
             onFilterChanged: (index) async {
-              getIt<IHapticService>().triggerHaptic(
-                HapticType.selection,
-              );
+              getIt<IHapticService>().triggerHaptic(HapticType.selection);
               setState(() {
                 if (index != 2) {
                   _selectedFilter = index;
@@ -120,10 +137,7 @@ class _CalendarContentState extends State<CalendarContent> {
           ),
           if (provider.selectedRange case final range?)
             Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 16,
-                vertical: 8,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: InkWell(
                 onTap: () async {
                   await _showDateRangePicker(provider);
@@ -141,9 +155,7 @@ class _CalendarContentState extends State<CalendarContent> {
                     children: [
                       Icon(
                         Icons.date_range,
-                        color: Theme.of(
-                          context,
-                        ).colorScheme.onSurfaceVariant,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
                         size: 20,
                       ),
                       const SizedBox(width: 8),
@@ -163,9 +175,7 @@ class _CalendarContentState extends State<CalendarContent> {
                         icon: Icon(
                           Icons.close,
                           size: 18,
-                          color: Theme.of(
-                            context,
-                          ).colorScheme.onSurfaceVariant,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
                         ),
                         onPressed: () {
                           provider.setSelectedRange(null);

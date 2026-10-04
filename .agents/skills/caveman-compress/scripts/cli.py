@@ -17,6 +17,7 @@ for _stream in (sys.stdout, sys.stderr):
         try:
             reconfigure(encoding="utf-8", errors="replace")
         except Exception:
+            # Reconfigure may not be available on all Python builds; safe to ignore
             pass
 
 from pathlib import Path

@@ -49,21 +49,30 @@ class TNSTCBusParser extends TravelTicketParser {
 
   @override
   bool canParse(String text) {
+    final lowerText = text.toLowerCase();
+
+    // Check for SETC identifiers first (SETC takes precedence)
+    final setcKeywords = ['SETC', 'State Express Transport Corporation'];
+
+    final hasSETCKeyword = setcKeywords.any(
+      (pattern) => lowerText.contains(pattern.toLowerCase()),
+    );
+    if (hasSETCKeyword) return false;
+
     // Must have at least one TNSTC-specific keyword
     final tnstcKeywords = [
       'TNSTC',
-      'Tamil Nadu',
-      'Corporation',
+      'Tamil Nadu State Transport',
       'Service Start Place',
       'Trip Code',
     ];
 
     final hasTNSTCKeyword = tnstcKeywords.any(
-      (pattern) => text.toLowerCase().contains(pattern.toLowerCase()),
+      (pattern) => lowerText.contains(pattern.toLowerCase()),
     );
 
     // And should not have IRCTC keyword
-    final hasIRCTCKeyword = text.toLowerCase().contains('irctc');
+    final hasIRCTCKeyword = lowerText.contains('irctc');
 
     return hasTNSTCKeyword && !hasIRCTCKeyword;
   }
@@ -299,10 +308,7 @@ class SETCBusParser extends TravelTicketParser {
   @override
   bool canParse(String text) {
     // SETC-specific patterns (without TNSTC)
-    final setcPatterns = [
-      'SETC',
-      'South Tamil Nadu',
-    ];
+    final setcPatterns = ['SETC', 'State Express Transport Corporation'];
 
     // Check if it contains SETC but not TNSTC
     final hasSETC = setcPatterns.any(
@@ -450,10 +456,7 @@ class TravelParserService implements ITravelParser {
   }
 
   @override
-  Ticket? parseTicketFromText(
-    String text, {
-    SourceType? sourceType,
-  }) {
+  Ticket? parseTicketFromText(String text, {SourceType? sourceType}) {
     try {
       for (final parser in _parsers) {
         if (parser.canParse(text)) {
@@ -486,9 +489,7 @@ class TravelParserService implements ITravelParser {
         }
       }
 
-      _logger.warning(
-        '[TravelParserService] No parser could handle the text',
-      );
+      _logger.warning('[TravelParserService] No parser could handle the text');
       return null;
     } on FormatException catch (e, stackTrace) {
       _logger.error(
