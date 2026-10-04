@@ -5,10 +5,7 @@ import 'package:namma_wallet/src/common/services/ocr/ocr_block.dart';
 import 'package:namma_wallet/src/common/services/ocr/ocr_service_interface.dart';
 
 class ImageService {
-  ImageService({
-    required this._ocrService,
-    required this._logger,
-  });
+  ImageService({required this._ocrService, required this._logger});
 
   final IOCRService _ocrService;
   final ILogger _logger;
@@ -26,9 +23,7 @@ class ImageService {
         );
       }
 
-      _logger.debug(
-        '[ImageService] Starting Image OCR block extraction',
-      );
+      _logger.debug('[ImageService] Starting Image OCR block extraction');
 
       // Extract blocks directly via the OCR vision engine
       final blocks = await _ocrService.extractBlocksFromImage(image);

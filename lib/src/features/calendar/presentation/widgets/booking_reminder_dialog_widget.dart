@@ -42,10 +42,7 @@ class _BookingReminderDialogWidgetState
   );
 
   DateTime get _remindAt => _window == BookingWindow.tatkal
-      ? BookingReminderSchedule.tatkalBookingOpens(
-          _journeyDate,
-          _tatkalClass,
-        )
+      ? BookingReminderSchedule.tatkalBookingOpens(_journeyDate, _tatkalClass)
       : BookingReminderSchedule.normalBookingOpens(_journeyDeparture);
 
   Future<void> _pickJourneyDate() async {

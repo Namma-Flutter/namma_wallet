@@ -130,11 +130,7 @@ Future<void> main() async {
   // Catch errors not caught by Flutter
   PlatformDispatcher.instance.onError = (error, stack) {
     if (logger != null) {
-      logger.error(
-        'Platform Error: $error',
-        error,
-        stack,
-      );
+      logger.error('Platform Error: $error', error, stack);
     } else {
       // Fallback to print if logger is not available,
       // to ensure error messages are still visible.
@@ -169,11 +165,7 @@ Future<void> main() async {
     logger?.success('All services initialized successfully');
   } on Object catch (e, stackTrace) {
     // Log error using logger if available
-    logger?.error(
-      'Error during initialization: $e',
-      e,
-      stackTrace,
-    );
+    logger?.error('Error during initialization: $e', e, stackTrace);
 
     // Fallback: ensure error is always visible even if logger is null
     if (logger == null) {

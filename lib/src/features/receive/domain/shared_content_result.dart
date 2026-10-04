@@ -74,10 +74,7 @@ class TicketUpdatedResult extends SharedContentResult
 @MappableClass()
 class ProcessingErrorResult extends SharedContentResult
     with ProcessingErrorResultMappable {
-  const ProcessingErrorResult({
-    required this.message,
-    required this.error,
-  });
+  const ProcessingErrorResult({required this.message, required this.error});
 
   final String message;
   final String error;
@@ -87,9 +84,7 @@ class ProcessingErrorResult extends SharedContentResult
 @MappableClass()
 class TicketNotFoundResult extends SharedContentResult
     with TicketNotFoundResultMappable {
-  const TicketNotFoundResult({
-    required this.pnrNumber,
-  });
+  const TicketNotFoundResult({required this.pnrNumber});
 
   final String pnrNumber;
 }

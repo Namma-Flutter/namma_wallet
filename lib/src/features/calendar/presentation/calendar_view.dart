@@ -77,10 +77,7 @@ class _CalendarContentState extends State<CalendarContent> {
 
     final initialRange =
         provider.selectedRange ??
-        DateTimeRange(
-          start: today,
-          end: today.add(const Duration(days: 7)),
-        );
+        DateTimeRange(start: today, end: today.add(const Duration(days: 7)));
 
     final pickedRange = await showDateRangePicker(
       context: context,
@@ -118,9 +115,7 @@ class _CalendarContentState extends State<CalendarContent> {
           CalendarToggleButtons(
             selectedFilter: _selectedFilter,
             onFilterChanged: (index) async {
-              getIt<IHapticService>().triggerHaptic(
-                HapticType.selection,
-              );
+              getIt<IHapticService>().triggerHaptic(HapticType.selection);
               setState(() {
                 if (index != 2) {
                   _selectedFilter = index;
@@ -142,10 +137,7 @@ class _CalendarContentState extends State<CalendarContent> {
           ),
           if (provider.selectedRange case final range?)
             Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 16,
-                vertical: 8,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: InkWell(
                 onTap: () async {
                   await _showDateRangePicker(provider);
@@ -163,9 +155,7 @@ class _CalendarContentState extends State<CalendarContent> {
                     children: [
                       Icon(
                         Icons.date_range,
-                        color: Theme.of(
-                          context,
-                        ).colorScheme.onSurfaceVariant,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
                         size: 20,
                       ),
                       const SizedBox(width: 8),
@@ -185,9 +175,7 @@ class _CalendarContentState extends State<CalendarContent> {
                         icon: Icon(
                           Icons.close,
                           size: 18,
-                          color: Theme.of(
-                            context,
-                          ).colorScheme.onSurfaceVariant,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
                         ),
                         onPressed: () {
                           provider.setSelectedRange(null);

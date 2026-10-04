@@ -6,10 +6,7 @@ import 'package:namma_wallet/src/features/receive/domain/shared_content_result.d
 
 /// Handles share result navigation and UI feedback
 class ShareHandler {
-  ShareHandler({
-    required this.router,
-    required this.scaffoldMessengerKey,
-  });
+  ShareHandler({required this.router, required this.scaffoldMessengerKey});
 
   final GoRouter router;
   final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey;
@@ -17,10 +14,7 @@ class ShareHandler {
   /// Handle the result of shared content processing
   Future<void> handleResult(SharedContentResult result) async {
     switch (result) {
-      case TicketCreatedResult(
-        :final warning,
-        :final isArchived,
-      ):
+      case TicketCreatedResult(:final warning, :final isArchived):
         if (warning != null) {
           handleWarning(warning);
         }
@@ -30,10 +24,7 @@ class ShareHandler {
           return;
         }
         // Navigate to success screen for user confirmation
-        router.go(
-          AppRoute.shareSuccess.path,
-          extra: result,
-        );
+        router.go(AppRoute.shareSuccess.path, extra: result);
 
       case TicketUpdatedResult(:final pnrNumber, :final updateType):
         router.go(
@@ -89,10 +80,7 @@ class ShareHandler {
   /// Handle warning messages
   void handleWarning(String message) {
     scaffoldMessengerKey.currentState?.showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.orange,
-      ),
+      SnackBar(content: Text(message), backgroundColor: Colors.orange),
     );
   }
 }

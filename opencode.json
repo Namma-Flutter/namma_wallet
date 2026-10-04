@@ -36,16 +36,18 @@
     }
   },
   "mcp": {
-    "dart": {
-      "type": "local",
-      "command": [
-        "fvm",
-        "dart",
-        "mcp-server",
-        "--flutter-sdk",
-        ".fvm/flutter_sdk"
-      ],
-      "enabled": true
+    "servers": {
+      "dart": {
+        "type": "local",
+        "command": [
+          "fvm",
+          "dart",
+          "mcp-server",
+          "--flutter-sdk",
+          ".fvm/flutter_sdk"
+        ],
+        "disabled": false
+      }
     }
   }
 }

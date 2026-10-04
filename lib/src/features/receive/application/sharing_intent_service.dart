@@ -114,9 +114,7 @@ class SharingIntentService implements ISharingIntentService {
               fileExtension != '.pkpass' &&
               !_isSupportedTextFile(fileExtension) &&
               !_isSupportedImageFile(fileExtension)) {
-            _logger.warning(
-              'Skipping unsupported file type: $fileExtension',
-            );
+            _logger.warning('Skipping unsupported file type: $fileExtension');
             onError(
               'File type $fileExtension is not supported. '
               'Please share PDF, PKPASS, text or image(PNG, JPG, JPEG) files.',
@@ -144,11 +142,7 @@ class SharingIntentService implements ISharingIntentService {
         }
       }
     } on Object catch (e, stackTrace) {
-      _logger.error(
-        'Error handling shared content: $e',
-        e,
-        stackTrace,
-      );
+      _logger.error('Error handling shared content: $e', e, stackTrace);
       onError('Error processing shared content: $e');
     }
 
@@ -156,11 +150,7 @@ class SharingIntentService implements ISharingIntentService {
   }
 
   /// Supported image file extensions (case-insensitive)
-  static const _supportedImageExtensions = {
-    '.jpg',
-    '.jpeg',
-    '.png',
-  };
+  static const _supportedImageExtensions = {'.jpg', '.jpeg', '.png'};
 
   /// Check if a file extension is a supported image type
   bool _isSupportedImageFile(String extension) {
@@ -168,11 +158,7 @@ class SharingIntentService implements ISharingIntentService {
   }
 
   /// Supported text file extensions (case-insensitive)
-  static const _supportedTextExtensions = {
-    '.txt',
-    '.sms',
-    '.text',
-  };
+  static const _supportedTextExtensions = {'.txt', '.sms', '.text'};
 
   /// Check if a file extension is a supported text type
   /// Empty extensions are treated as text files (common for SMS content)

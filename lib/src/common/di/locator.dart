@@ -141,9 +141,7 @@ void setupLocator() {
     ..registerLazySingleton<ISharingIntentService>(
       () => kIsWeb
           ? WebSharingIntentService()
-          : SharingIntentService(
-              logger: getIt<ILogger>(),
-            ),
+          : SharingIntentService(logger: getIt<ILogger>()),
     )
     ..registerLazySingleton<ISharedContentProcessor>(
       () => SharedContentProcessor(

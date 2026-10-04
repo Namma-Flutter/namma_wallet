@@ -90,11 +90,7 @@ class _OCRDebugViewState extends State<OCRDebugView> {
     } on Object catch (e) {
       if (!mounted) return;
 
-      showSnackbar(
-        context,
-        'Failed to process PDF: $e',
-        isError: true,
-      );
+      showSnackbar(context, 'Failed to process PDF: $e', isError: true);
     } finally {
       if (mounted) setState(() => _isLoadingPDF = false);
     }
@@ -130,11 +126,7 @@ class _OCRDebugViewState extends State<OCRDebugView> {
     } on Object catch (e) {
       if (!mounted) return;
 
-      showSnackbar(
-        context,
-        'Failed to process image: $e',
-        isError: true,
-      );
+      showSnackbar(context, 'Failed to process image: $e', isError: true);
     } finally {
       if (mounted) setState(() => _isLoadingImage = false);
     }
@@ -205,10 +197,7 @@ class _OCRDebugViewState extends State<OCRDebugView> {
     await Clipboard.setData(ClipboardData(text: content));
     if (!mounted) return;
 
-    showSnackbar(
-      context,
-      '$label copied to clipboard',
-    );
+    showSnackbar(context, '$label copied to clipboard');
   }
 
   @override
@@ -294,11 +283,7 @@ class _OCRDebugViewState extends State<OCRDebugView> {
             ),
           ),
           if (_isLoadingPDF || _isLoadingImage)
-            const Expanded(
-              child: Center(
-                child: CircularProgressIndicator(),
-              ),
-            )
+            const Expanded(child: Center(child: CircularProgressIndicator()))
           else if (_ocrBlocks != null)
             Expanded(
               child: Column(
@@ -331,10 +316,7 @@ class _OCRDebugViewState extends State<OCRDebugView> {
                       itemCount: _ocrBlocks!.length,
                       itemBuilder: (context, index) {
                         final block = _ocrBlocks![index];
-                        return _OCRBlockCard(
-                          block: block,
-                          index: index,
-                        );
+                        return _OCRBlockCard(block: block, index: index);
                       },
                     ),
                   ),
@@ -378,6 +360,7 @@ class _OCRDebugViewState extends State<OCRDebugView> {
       showDialog<void>(
         context: context,
         builder: (context) => Dialog(
+          clipBehavior: Clip.hardEdge,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -399,8 +382,7 @@ class _OCRDebugViewState extends State<OCRDebugView> {
                   ),
                 ],
               ),
-              SizedBox(
-                height: MediaQuery.of(context).size.height * 0.8,
+              Expanded(
                 child: SingleChildScrollView(
                   padding: const EdgeInsets.all(16),
                   child: SelectableText(
@@ -421,10 +403,7 @@ class _OCRDebugViewState extends State<OCRDebugView> {
 }
 
 class _OCRBlockCard extends StatelessWidget {
-  const _OCRBlockCard({
-    required this.block,
-    required this.index,
-  });
+  const _OCRBlockCard({required this.block, required this.index});
 
   final OCRBlock block;
   final int index;
@@ -470,14 +449,8 @@ class _OCRBlockCard extends StatelessWidget {
                 _InfoRow(label: 'Top', value: box.top.toStringAsFixed(2)),
                 _InfoRow(label: 'Right', value: box.right.toStringAsFixed(2)),
                 _InfoRow(label: 'Bottom', value: box.bottom.toStringAsFixed(2)),
-                _InfoRow(
-                  label: 'Width',
-                  value: box.width.toStringAsFixed(2),
-                ),
-                _InfoRow(
-                  label: 'Height',
-                  value: box.height.toStringAsFixed(2),
-                ),
+                _InfoRow(label: 'Width', value: box.width.toStringAsFixed(2)),
+                _InfoRow(label: 'Height', value: box.height.toStringAsFixed(2)),
               ],
             ),
           ),
@@ -488,10 +461,7 @@ class _OCRBlockCard extends StatelessWidget {
 }
 
 class _InfoRow extends StatelessWidget {
-  const _InfoRow({
-    required this.label,
-    required this.value,
-  });
+  const _InfoRow({required this.label, required this.value});
 
   final String label;
   final String value;

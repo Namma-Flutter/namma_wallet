@@ -31,97 +31,88 @@ void main() {
     });
 
     group('processContent - New Ticket Creation', () {
-      test(
-        'Given valid SMS content, When processing content, '
-        'Then returns TicketCreatedResult with ticket details',
-        () async {
-          // Arrange (Given)
-          final logger = getIt<ILogger>();
-          final processor = SharedContentProcessor(
-            logger: logger,
-            travelParser: MockTravelParserService(logger: logger),
-            ticketDao: MockTicketDAO(),
-            importService: MockImportService(),
-          );
+      test('Given valid SMS content, When processing content, '
+          'Then returns TicketCreatedResult with ticket details', () async {
+        // Arrange (Given)
+        final logger = getIt<ILogger>();
+        final processor = SharedContentProcessor(
+          logger: logger,
+          travelParser: MockTravelParserService(logger: logger),
+          ticketDao: MockTicketDAO(),
+          importService: MockImportService(),
+        );
 
-          const smsContent = '''
+        const smsContent = '''
             Corporation : SETC, From : CHENNAI To BANGALORE
             PNR NO. : T12345678, Trip Code : Trip123
             Journey Date : 15/12/2024, Time : 14:30
           ''';
 
-          // Act (When)
-          final result = await processor.processContent(
-            smsContent,
-            SharedContentType.sms,
-          );
+        // Act (When)
+        final result = await processor.processContent(
+          smsContent,
+          SharedContentType.sms,
+        );
 
-          // Assert (Then)
-          expect(result, isA<TicketCreatedResult>());
-          final ticketResult = result as TicketCreatedResult;
-          expect(ticketResult.ticketId, equals('T12345678'));
-          expect(ticketResult.title, contains('CHENNAI'));
-          // In the mock ticket, primary text might be 'Chennai → Bangalore'
-        },
-      );
+        // Assert (Then)
+        expect(result, isA<TicketCreatedResult>());
+        final ticketResult = result as TicketCreatedResult;
+        expect(ticketResult.ticketId, equals('T12345678'));
+        expect(ticketResult.title, contains('CHENNAI'));
+        // In the mock ticket, primary text might be 'Chennai → Bangalore'
+      });
 
-      test(
-        'Given empty content, When processing content, '
-        'Then returns ProcessingErrorResult',
-        () async {
-          // Arrange (Given)
-          final logger = getIt<ILogger>();
-          final processor = SharedContentProcessor(
-            logger: logger,
-            travelParser: MockTravelParserService(logger: logger),
-            ticketDao: MockTicketDAO(),
-            importService: MockImportService(),
-          );
+      test('Given empty content, When processing content, '
+          'Then returns ProcessingErrorResult', () async {
+        // Arrange (Given)
+        final logger = getIt<ILogger>();
+        final processor = SharedContentProcessor(
+          logger: logger,
+          travelParser: MockTravelParserService(logger: logger),
+          ticketDao: MockTicketDAO(),
+          importService: MockImportService(),
+        );
 
-          // Act (When)
-          final result = await processor.processContent(
-            '',
-            SharedContentType.sms,
-          );
+        // Act (When)
+        final result = await processor.processContent(
+          '',
+          SharedContentType.sms,
+        );
 
-          // Assert (Then)
-          expect(result, isA<ProcessingErrorResult>());
-          expect(
-            (result as ProcessingErrorResult).error,
-            contains('No supported ticket format found'),
-          );
-        },
-      );
+        // Assert (Then)
+        expect(result, isA<ProcessingErrorResult>());
+        expect(
+          (result as ProcessingErrorResult).error,
+          contains('No supported ticket format found'),
+        );
+      });
 
-      test(
-        'Given malformed content, When processing content, '
-        'Then handles gracefully and returns result',
-        () async {
-          // Arrange (Given)
-          final logger = getIt<ILogger>();
-          final processor = SharedContentProcessor(
-            logger: logger,
-            travelParser: MockTravelParserService(logger: logger),
-            ticketDao: MockTicketDAO(),
-            importService: MockImportService(),
-          );
+      test('Given malformed content, When processing content, '
+          'Then handles gracefully and returns result', () async {
+        // Arrange (Given)
+        final logger = getIt<ILogger>();
+        final processor = SharedContentProcessor(
+          logger: logger,
+          travelParser: MockTravelParserService(logger: logger),
+          ticketDao: MockTicketDAO(),
+          importService: MockImportService(),
+        );
 
-          const malformedContent = 'Random text without structure';
+        const malformedContent = 'Random text without structure';
 
-          // Act (When)
-          final result = await processor.processContent(
-            malformedContent,
-            SharedContentType.sms,
-          );
+        // Act (When)
+        final result = await processor.processContent(
+          malformedContent,
+          SharedContentType.sms,
+        );
 
-          // Assert (Then)
-          expect(result, isA<ProcessingErrorResult>());
-          expect(
-            (result as ProcessingErrorResult).error,
-            contains('No supported ticket format found'),
-          );
-        },
-      );
+        // Assert (Then)
+        expect(result, isA<ProcessingErrorResult>());
+        expect(
+          (result as ProcessingErrorResult).error,
+          contains('No supported ticket format found'),
+        );
+      });
 
       test(
         'Given valid SMS content with extractable PNR, '
@@ -194,243 +185,225 @@ void main() {
     });
 
     group('processContent - Archive Flag', () {
-      test(
-        'Given a past ticket, When processing SMS content, '
-        'Then result has isArchived=true and archived warning',
-        () async {
-          final logger = getIt<ILogger>();
-          final pastTicket = Ticket(
-            ticketId: 'PAST_SMS_001',
-            primaryText: 'Chennai → Bangalore',
-            secondaryText: 'SETC',
-            startTime: DateTime.now().subtract(const Duration(days: 1)),
-            location: 'Chennai',
-            type: TicketType.bus,
-          );
-          final processor = SharedContentProcessor(
+      test('Given a past ticket, When processing SMS content, '
+          'Then result has isArchived=true and archived warning', () async {
+        final logger = getIt<ILogger>();
+        final pastTicket = Ticket(
+          ticketId: 'PAST_SMS_001',
+          primaryText: 'Chennai → Bangalore',
+          secondaryText: 'SETC',
+          startTime: DateTime.now().subtract(const Duration(days: 1)),
+          location: 'Chennai',
+          type: TicketType.bus,
+        );
+        final processor = SharedContentProcessor(
+          logger: logger,
+          travelParser: MockTravelParserService(
             logger: logger,
-            travelParser: MockTravelParserService(
-              logger: logger,
-              mockTicket: pastTicket,
-            ),
-            ticketDao: MockTicketDAO(),
-            importService: MockImportService(),
-          );
+            mockTicket: pastTicket,
+          ),
+          ticketDao: MockTicketDAO(),
+          importService: MockImportService(),
+        );
 
-          final result = await processor.processContent(
-            'PNR NO. : PAST_SMS_001',
-            SharedContentType.sms,
-          );
+        final result = await processor.processContent(
+          'PNR NO. : PAST_SMS_001',
+          SharedContentType.sms,
+        );
 
-          expect(result, isA<TicketCreatedResult>());
-          final created = result as TicketCreatedResult;
-          expect(created.isArchived, isTrue);
-          expect(created.warning, equals(archivedPastTicketMessage));
-        },
-      );
+        expect(result, isA<TicketCreatedResult>());
+        final created = result as TicketCreatedResult;
+        expect(created.isArchived, isTrue);
+        expect(created.warning, equals(archivedPastTicketMessage));
+      });
 
-      test(
-        'Given a future ticket, When processing SMS content, '
-        'Then result has isArchived=false and no warning',
-        () async {
-          final logger = getIt<ILogger>();
-          final futureTicket = Ticket(
-            ticketId: 'FUTURE_SMS_001',
-            primaryText: 'Chennai → Bangalore',
-            secondaryText: 'SETC',
-            startTime: DateTime.now().add(const Duration(days: 7)),
-            location: 'Chennai',
-            type: TicketType.bus,
-          );
-          final processor = SharedContentProcessor(
+      test('Given a future ticket, When processing SMS content, '
+          'Then result has isArchived=false and no warning', () async {
+        final logger = getIt<ILogger>();
+        final futureTicket = Ticket(
+          ticketId: 'FUTURE_SMS_001',
+          primaryText: 'Chennai → Bangalore',
+          secondaryText: 'SETC',
+          startTime: DateTime.now().add(const Duration(days: 7)),
+          location: 'Chennai',
+          type: TicketType.bus,
+        );
+        final processor = SharedContentProcessor(
+          logger: logger,
+          travelParser: MockTravelParserService(
             logger: logger,
-            travelParser: MockTravelParserService(
-              logger: logger,
-              mockTicket: futureTicket,
-            ),
-            ticketDao: MockTicketDAO(),
-            importService: MockImportService(),
-          );
+            mockTicket: futureTicket,
+          ),
+          ticketDao: MockTicketDAO(),
+          importService: MockImportService(),
+        );
 
-          final result = await processor.processContent(
-            'PNR NO. : FUTURE_SMS_001',
-            SharedContentType.sms,
-          );
+        final result = await processor.processContent(
+          'PNR NO. : FUTURE_SMS_001',
+          SharedContentType.sms,
+        );
 
-          expect(result, isA<TicketCreatedResult>());
-          final created = result as TicketCreatedResult;
-          expect(created.isArchived, isFalse);
-          expect(created.warning, isNull);
-        },
-      );
+        expect(result, isA<TicketCreatedResult>());
+        final created = result as TicketCreatedResult;
+        expect(created.isArchived, isFalse);
+        expect(created.warning, isNull);
+      });
 
-      test(
-        'Given a past PKPass ticket, When processing PKPass content, '
-        'Then result has isArchived=true',
-        () async {
-          final logger = getIt<ILogger>();
-          final pastPkpass = Ticket(
-            ticketId: 'PKPASS_PAST_001',
-            primaryText: 'Chennai → Bangalore',
-            secondaryText: 'SETC',
-            endTime: DateTime.now().subtract(const Duration(hours: 1)),
-            location: 'Chennai',
-            type: TicketType.bus,
-          );
-          final processor = SharedContentProcessor(
-            logger: logger,
-            travelParser: MockTravelParserService(logger: logger),
-            ticketDao: MockTicketDAO(),
-            importService: MockImportService(mockTicket: pastPkpass),
-          );
+      test('Given a past PKPass ticket, When processing PKPass content, '
+          'Then result has isArchived=true', () async {
+        final logger = getIt<ILogger>();
+        final pastPkpass = Ticket(
+          ticketId: 'PKPASS_PAST_001',
+          primaryText: 'Chennai → Bangalore',
+          secondaryText: 'SETC',
+          endTime: DateTime.now().subtract(const Duration(hours: 1)),
+          location: 'Chennai',
+          type: TicketType.bus,
+        );
+        final processor = SharedContentProcessor(
+          logger: logger,
+          travelParser: MockTravelParserService(logger: logger),
+          ticketDao: MockTicketDAO(),
+          importService: MockImportService(mockTicket: pastPkpass),
+        );
 
-          final result = await processor.processContent(
-            '/mock/path/ticket.pkpass',
-            SharedContentType.pkpass,
-          );
+        final result = await processor.processContent(
+          '/mock/path/ticket.pkpass',
+          SharedContentType.pkpass,
+        );
 
-          expect(result, isA<TicketCreatedResult>());
-          final created = result as TicketCreatedResult;
-          expect(created.isArchived, isTrue);
-          expect(created.warning, equals(archivedPastTicketMessage));
-        },
-      );
+        expect(result, isA<TicketCreatedResult>());
+        final created = result as TicketCreatedResult;
+        expect(created.isArchived, isTrue);
+        expect(created.warning, equals(archivedPastTicketMessage));
+      });
     });
 
     group('processContent - Ticket Updates', () {
-      test(
-        'Given update SMS with conductor details, '
-        'When processing content and ticket exists, '
-        'Then returns TicketUpdatedResult',
-        () async {
-          // Arrange (Given)
-          final mockUpdateInfo = TicketUpdateInfo(
-            pnrNumber: 'T12345678',
-            providerName: 'TNSTC',
-            updates: {
-              'conductorContact': '9876543210',
-              'busNumber': 'TN01AB1234',
-            },
-          );
+      test('Given update SMS with conductor details, '
+          'When processing content and ticket exists, '
+          'Then returns TicketUpdatedResult', () async {
+        // Arrange (Given)
+        final mockUpdateInfo = TicketUpdateInfo(
+          pnrNumber: 'T12345678',
+          providerName: 'TNSTC',
+          updates: {
+            'conductorContact': '9876543210',
+            'busNumber': 'TN01AB1234',
+          },
+        );
 
-          final logger = getIt<ILogger>();
-          final mockDao = MockTicketDAO();
-          // Insert the ticket that we're going to update
-          await mockDao.insertTicket(
-            const Ticket(
-              ticketId: 'T12345678',
-              primaryText: 'CHENNAI → BANGALORE',
-              secondaryText: 'SETC - Bus',
-              location: 'CHENNAI',
-              type: TicketType.bus,
-            ),
-          );
+        final logger = getIt<ILogger>();
+        final mockDao = MockTicketDAO();
+        // Insert the ticket that we're going to update
+        await mockDao.insertTicket(
+          const Ticket(
+            ticketId: 'T12345678',
+            primaryText: 'CHENNAI → BANGALORE',
+            secondaryText: 'SETC - Bus',
+            location: 'CHENNAI',
+            type: TicketType.bus,
+          ),
+        );
 
-          final processor = SharedContentProcessor(
+        final processor = SharedContentProcessor(
+          logger: logger,
+          travelParser: MockTravelParserService(
             logger: logger,
-            travelParser: MockTravelParserService(
-              logger: logger,
-              mockUpdateInfo: mockUpdateInfo,
-            ),
-            ticketDao: mockDao,
-            importService: MockImportService(),
-          );
+            mockUpdateInfo: mockUpdateInfo,
+          ),
+          ticketDao: mockDao,
+          importService: MockImportService(),
+        );
 
-          const updateSms = '''
+        const updateSms = '''
             PNR NO. : T12345678, Journey Date : 15/12/2024,
             Conductor Mobile No: 9876543210, Vehicle No:TN01AB1234
           ''';
 
-          // Act (When)
-          final result = await processor.processContent(
-            updateSms,
-            SharedContentType.sms,
-          );
+        // Act (When)
+        final result = await processor.processContent(
+          updateSms,
+          SharedContentType.sms,
+        );
 
-          // Assert (Then)
-          expect(result, isA<TicketUpdatedResult>());
-          final updateResult = result as TicketUpdatedResult;
-          expect(updateResult.pnrNumber, equals('T12345678'));
-          expect(updateResult.updateType, equals('Conductor Details'));
-        },
-      );
+        // Assert (Then)
+        expect(result, isA<TicketUpdatedResult>());
+        final updateResult = result as TicketUpdatedResult;
+        expect(updateResult.pnrNumber, equals('T12345678'));
+        expect(updateResult.updateType, equals('Conductor Details'));
+      });
 
-      test(
-        'Given update SMS but ticket not found, '
-        'When processing content, '
-        'Then returns TicketNotFoundResult',
-        () async {
-          // Arrange (Given)
-          final mockUpdateInfo = TicketUpdateInfo(
-            pnrNumber: 'T99999999',
-            providerName: 'TNSTC',
-            updates: {'conductorContact': '9876543210'},
-          );
+      test('Given update SMS but ticket not found, '
+          'When processing content, '
+          'Then returns TicketNotFoundResult', () async {
+        // Arrange (Given)
+        final mockUpdateInfo = TicketUpdateInfo(
+          pnrNumber: 'T99999999',
+          providerName: 'TNSTC',
+          updates: {'conductorContact': '9876543210'},
+        );
 
-          final logger = getIt<ILogger>();
-          final processor = SharedContentProcessor(
+        final logger = getIt<ILogger>();
+        final processor = SharedContentProcessor(
+          logger: logger,
+          travelParser: MockTravelParserService(
             logger: logger,
-            travelParser: MockTravelParserService(
-              logger: logger,
-              mockUpdateInfo: mockUpdateInfo,
-            ),
-            ticketDao: MockTicketDAO(updateReturnCount: 0),
-            importService: MockImportService(),
-          );
+            mockUpdateInfo: mockUpdateInfo,
+          ),
+          ticketDao: MockTicketDAO(updateReturnCount: 0),
+          importService: MockImportService(),
+        );
 
-          const updateSms = '''
+        const updateSms = '''
             PNR NO. : T99999999,
             Conductor Mobile No: 9876543210
           ''';
 
-          // Act (When)
-          final result = await processor.processContent(
-            updateSms,
-            SharedContentType.sms,
-          );
+        // Act (When)
+        final result = await processor.processContent(
+          updateSms,
+          SharedContentType.sms,
+        );
 
-          // Assert (Then)
-          expect(result, isA<TicketNotFoundResult>());
-          final notFoundResult = result as TicketNotFoundResult;
-          expect(notFoundResult.pnrNumber, equals('T99999999'));
-        },
-      );
+        // Assert (Then)
+        expect(result, isA<TicketNotFoundResult>());
+        final notFoundResult = result as TicketNotFoundResult;
+        expect(notFoundResult.pnrNumber, equals('T99999999'));
+      });
 
-      test(
-        'Given existing ticket but DAO update returns 0, '
-        'When processing update SMS, '
-        'Then returns TicketNotFoundResult',
-        () async {
-          final mockUpdateInfo = TicketUpdateInfo(
-            pnrNumber: 'T_NO_ROW',
-            providerName: 'TNSTC',
-            updates: {'conductorContact': '9876543210'},
-          );
-          final mockDao = MockTicketDAO(updateReturnCount: 0);
-          // Insert the ticket so getTicketById returns it...
-          await mockDao.insertTicket(
-            const Ticket(ticketId: 'T_NO_ROW', primaryText: 'A → B'),
-          );
-          final processor = SharedContentProcessor(
+      test('Given existing ticket but DAO update returns 0, '
+          'When processing update SMS, '
+          'Then returns TicketNotFoundResult', () async {
+        final mockUpdateInfo = TicketUpdateInfo(
+          pnrNumber: 'T_NO_ROW',
+          providerName: 'TNSTC',
+          updates: {'conductorContact': '9876543210'},
+        );
+        final mockDao = MockTicketDAO(updateReturnCount: 0);
+        // Insert the ticket so getTicketById returns it...
+        await mockDao.insertTicket(
+          const Ticket(ticketId: 'T_NO_ROW', primaryText: 'A → B'),
+        );
+        final processor = SharedContentProcessor(
+          logger: getIt<ILogger>(),
+          travelParser: MockTravelParserService(
             logger: getIt<ILogger>(),
-            travelParser: MockTravelParserService(
-              logger: getIt<ILogger>(),
-              mockUpdateInfo: mockUpdateInfo,
-            ),
-            ticketDao: mockDao,
-            importService: MockImportService(),
-          );
+            mockUpdateInfo: mockUpdateInfo,
+          ),
+          ticketDao: mockDao,
+          importService: MockImportService(),
+        );
 
-          final result = await processor.processContent(
-            'PNR NO. : T_NO_ROW, Conductor: 9876543210',
-            SharedContentType.sms,
-          );
+        final result = await processor.processContent(
+          'PNR NO. : T_NO_ROW, Conductor: 9876543210',
+          SharedContentType.sms,
+        );
 
-          // ...but handleTicket → updateTicketById returns 0 →
-          // we should fall into the second TicketNotFoundResult branch.
-          expect(result, isA<TicketNotFoundResult>());
-        },
-      );
+        // ...but handleTicket → updateTicketById returns 0 →
+        // we should fall into the second TicketNotFoundResult branch.
+        expect(result, isA<TicketNotFoundResult>());
+      });
 
       test(
         'Given SMS content that only matches the update SMS pattern '
@@ -500,421 +473,380 @@ void main() {
         },
       );
 
-      test(
-        'Given update SMS with multiple updates, '
-        'When processing content, '
-        'Then all updates are passed to DAO',
-        () async {
-          // Arrange (Given)
-          final mockDao = MockTicketDAO();
-          final mockUpdateInfo = TicketUpdateInfo(
-            pnrNumber: 'T12345678',
-            providerName: 'TNSTC',
-            updates: {
-              'conductorContact': '9876543210',
-              'busNumber': 'TN01AB1234',
-              'platform': '5',
-            },
-          );
+      test('Given update SMS with multiple updates, '
+          'When processing content, '
+          'Then all updates are passed to DAO', () async {
+        // Arrange (Given)
+        final mockDao = MockTicketDAO();
+        final mockUpdateInfo = TicketUpdateInfo(
+          pnrNumber: 'T12345678',
+          providerName: 'TNSTC',
+          updates: {
+            'conductorContact': '9876543210',
+            'busNumber': 'TN01AB1234',
+            'platform': '5',
+          },
+        );
 
-          const mockTicket = Ticket(
-            ticketId: 'T12345678',
-            primaryText: 'Origin → Destination',
-            secondaryText: 'Other info',
-            location: 'Station',
-          );
-          await mockDao.insertTicket(mockTicket);
-          final processor = SharedContentProcessor(
+        const mockTicket = Ticket(
+          ticketId: 'T12345678',
+          primaryText: 'Origin → Destination',
+          secondaryText: 'Other info',
+          location: 'Station',
+        );
+        await mockDao.insertTicket(mockTicket);
+        final processor = SharedContentProcessor(
+          logger: getIt<ILogger>(),
+          travelParser: MockTravelParserService(
             logger: getIt<ILogger>(),
-            travelParser: MockTravelParserService(
-              logger: getIt<ILogger>(),
-              mockUpdateInfo: mockUpdateInfo,
-            ),
-            ticketDao: mockDao,
-            importService: MockImportService(),
-          );
+            mockUpdateInfo: mockUpdateInfo,
+          ),
+          ticketDao: mockDao,
+          importService: MockImportService(),
+        );
 
-          const updateSms = '''
+        const updateSms = '''
             PNR NO. : T12345678,
             Conductor Mobile No: 9876543210,
             Vehicle No:TN01AB1234,
             Platform: 5
           ''';
 
-          // Act (When)
-          await processor.processContent(
-            updateSms,
-            SharedContentType.sms,
-          );
+        // Act (When)
+        await processor.processContent(updateSms, SharedContentType.sms);
 
-          // Assert (Then)
-          expect(mockDao.updateCalls.length, equals(1));
-          expect(mockDao.updateCalls.first.key, equals('T12345678'));
-          final updatedTicket = mockDao.updateCalls.first.value;
-          expect(updatedTicket.extras, isNotNull);
-          // Verify that the extras list contains the expected updates
-          expect(
-            updatedTicket.extras!.any(
-              (extra) =>
-                  extra.title == 'conductorContact' &&
-                  extra.value == '9876543210',
-            ),
-            isTrue,
-          );
-          expect(
-            updatedTicket.extras!.any(
-              (extra) =>
-                  extra.title == 'busNumber' && extra.value == 'TN01AB1234',
-            ),
-            isTrue,
-          );
-        },
-      );
+        // Assert (Then)
+        expect(mockDao.updateCalls.length, equals(1));
+        expect(mockDao.updateCalls.first.key, equals('T12345678'));
+        final updatedTicket = mockDao.updateCalls.first.value;
+        expect(updatedTicket.extras, isNotNull);
+        // Verify that the extras list contains the expected updates
+        expect(
+          updatedTicket.extras!.any(
+            (extra) =>
+                extra.title == 'conductorContact' &&
+                extra.value == '9876543210',
+          ),
+          isTrue,
+        );
+        expect(
+          updatedTicket.extras!.any(
+            (extra) =>
+                extra.title == 'busNumber' && extra.value == 'TN01AB1234',
+          ),
+          isTrue,
+        );
+      });
     });
 
     group('processContent - Error Handling', () {
-      test(
-        'Given DAO throws exception, When processing content, '
-        'Then returns ProcessingErrorResult',
-        () async {
-          // Arrange (Given)
-          const mockTicket = Ticket(
-            ticketId: 'T12345678',
-            primaryText: 'Origin → Destination',
-            secondaryText: 'Other info',
-            location: 'Station',
-          );
-          final mockDao = MockTicketDAO(shouldThrowOnUpdate: true);
-          await mockDao.insertTicket(mockTicket);
+      test('Given DAO throws exception, When processing content, '
+          'Then returns ProcessingErrorResult', () async {
+        // Arrange (Given)
+        const mockTicket = Ticket(
+          ticketId: 'T12345678',
+          primaryText: 'Origin → Destination',
+          secondaryText: 'Other info',
+          location: 'Station',
+        );
+        final mockDao = MockTicketDAO(shouldThrowOnUpdate: true);
+        await mockDao.insertTicket(mockTicket);
 
-          final processor = SharedContentProcessor(
+        final processor = SharedContentProcessor(
+          logger: fakeLogger,
+          travelParser: MockTravelParserService(
             logger: fakeLogger,
-            travelParser: MockTravelParserService(
-              logger: fakeLogger,
-              mockUpdateInfo: TicketUpdateInfo(
-                pnrNumber: 'T12345678',
-                providerName: 'TNSTC',
-                updates: {'conductorMobileNo': '9876543210'},
-              ),
+            mockUpdateInfo: TicketUpdateInfo(
+              pnrNumber: 'T12345678',
+              providerName: 'TNSTC',
+              updates: {'conductorMobileNo': '9876543210'},
             ),
-            ticketDao: mockDao,
-            importService: MockImportService(),
-          );
+          ),
+          ticketDao: mockDao,
+          importService: MockImportService(),
+        );
 
-          const updateSms = 'PNR NO. : T12345678, Conductor: 9876543210';
+        const updateSms = 'PNR NO. : T12345678, Conductor: 9876543210';
 
-          // Act (When)
-          final result = await processor.processContent(
-            updateSms,
-            SharedContentType.sms,
-          );
+        // Act (When)
+        final result = await processor.processContent(
+          updateSms,
+          SharedContentType.sms,
+        );
 
-          // Assert (Then)
-          expect(result, isA<ProcessingErrorResult>());
-          final errorResult = result as ProcessingErrorResult;
-          expect(errorResult.message, contains('Failed to process'));
-          expect(errorResult.error, contains('Mock update error'));
-        },
-      );
+        // Assert (Then)
+        expect(result, isA<ProcessingErrorResult>());
+        final errorResult = result as ProcessingErrorResult;
+        expect(errorResult.message, contains('Failed to process'));
+        expect(errorResult.error, contains('Mock update error'));
+      });
 
-      test(
-        'Given very long content, When processing content, '
-        'Then processes without errors',
-        () async {
-          // Arrange (Given)
-          final logger = getIt<ILogger>();
-          final processor = SharedContentProcessor(
+      test('Given very long content, When processing content, '
+          'Then processes without errors', () async {
+        // Arrange (Given)
+        final logger = getIt<ILogger>();
+        final processor = SharedContentProcessor(
+          logger: logger,
+          travelParser: MockTravelParserService(logger: logger),
+          ticketDao: MockTicketDAO(),
+          importService: MockImportService(),
+        );
+
+        final longContent = 'A' * 100000;
+
+        // Act (When)
+        final result = await processor.processContent(
+          longContent,
+          SharedContentType.sms,
+        );
+
+        // Assert (Then)
+        expect(result, isA<ProcessingErrorResult>());
+      });
+      test('Given parsed ticket has missing ID, When processing content, '
+          'Then returns ProcessingErrorResult', () async {
+        // Arrange (Given)
+        final logger = getIt<ILogger>();
+        final processor = SharedContentProcessor(
+          logger: logger,
+          travelParser: MockTravelParserService(
             logger: logger,
-            travelParser: MockTravelParserService(logger: logger),
-            ticketDao: MockTicketDAO(),
-            importService: MockImportService(),
-          );
-
-          final longContent = 'A' * 100000;
-
-          // Act (When)
-          final result = await processor.processContent(
-            longContent,
-            SharedContentType.sms,
-          );
-
-          // Assert (Then)
-          expect(result, isA<ProcessingErrorResult>());
-        },
-      );
-      test(
-        'Given parsed ticket has missing ID, When processing content, '
-        'Then returns ProcessingErrorResult',
-        () async {
-          // Arrange (Given)
-          final logger = getIt<ILogger>();
-          final processor = SharedContentProcessor(
-            logger: logger,
-            travelParser: MockTravelParserService(
-              logger: logger,
-              // Return a ticket with null ticketId
-              mockTicket: Ticket(
-                primaryText: 'Test → Test',
-                secondaryText: 'Test Bus',
-                startTime: DateTime(2024),
-                location: 'Test',
-                type: TicketType.bus,
-              ),
+            // Return a ticket with null ticketId
+            mockTicket: Ticket(
+              primaryText: 'Test → Test',
+              secondaryText: 'Test Bus',
+              startTime: DateTime(2024),
+              location: 'Test',
+              type: TicketType.bus,
             ),
-            ticketDao: MockTicketDAO(),
-            importService: MockImportService(),
-          );
+          ),
+          ticketDao: MockTicketDAO(),
+          importService: MockImportService(),
+        );
 
-          // Act (When)
-          final result = await processor.processContent(
-            'content',
-            SharedContentType.sms,
-          );
+        // Act (When)
+        final result = await processor.processContent(
+          'content',
+          SharedContentType.sms,
+        );
 
-          // Assert (Then)
-          expect(result, isA<ProcessingErrorResult>());
-          expect(
-            (result as ProcessingErrorResult).error,
-            contains('Missing ticketId'),
-          );
-        },
-      );
+        // Assert (Then)
+        expect(result, isA<ProcessingErrorResult>());
+        expect(
+          (result as ProcessingErrorResult).error,
+          contains('Missing ticketId'),
+        );
+      });
     });
 
     group('processContent - Result Types', () {
-      test(
-        'Given TicketCreatedResult, When checking fields, '
-        'Then all required fields are present',
-        () {
-          // Arrange (Given)
-          const result = TicketCreatedResult(
-            ticketId: 'T12345678',
-            ticketType: TicketType.bus,
-            title: 'Chennai → Bangalore',
-            subtitle: 'SETC',
-            date: '2024-12-15',
-          );
+      test('Given TicketCreatedResult, When checking fields, '
+          'Then all required fields are present', () {
+        // Arrange (Given)
+        const result = TicketCreatedResult(
+          ticketId: 'T12345678',
+          ticketType: TicketType.bus,
+          title: 'Chennai → Bangalore',
+          subtitle: 'SETC',
+          date: '2024-12-15',
+        );
 
-          // Assert (Then)
-          expect(result.ticketId, equals('T12345678'));
-          expect(result.title, equals('Chennai → Bangalore'));
-          expect(result.subtitle, equals('SETC'));
-          expect(result.date, equals('2024-12-15'));
-          expect(result.ticketType, equals(TicketType.bus));
-        },
-      );
+        // Assert (Then)
+        expect(result.ticketId, equals('T12345678'));
+        expect(result.title, equals('Chennai → Bangalore'));
+        expect(result.subtitle, equals('SETC'));
+        expect(result.date, equals('2024-12-15'));
+        expect(result.ticketType, equals(TicketType.bus));
+      });
 
-      test(
-        'Given TicketUpdatedResult, When checking fields, '
-        'Then all required fields are present',
-        () {
-          // Arrange (Given)
-          const result = TicketUpdatedResult(
-            pnrNumber: 'T12345678',
-            updateType: 'Conductor Details',
-          );
+      test('Given TicketUpdatedResult, When checking fields, '
+          'Then all required fields are present', () {
+        // Arrange (Given)
+        const result = TicketUpdatedResult(
+          pnrNumber: 'T12345678',
+          updateType: 'Conductor Details',
+        );
 
-          // Assert (Then)
-          expect(result.pnrNumber, equals('T12345678'));
-          expect(result.updateType, equals('Conductor Details'));
-        },
-      );
+        // Assert (Then)
+        expect(result.pnrNumber, equals('T12345678'));
+        expect(result.updateType, equals('Conductor Details'));
+      });
 
-      test(
-        'Given ProcessingErrorResult, When checking fields, '
-        'Then all required fields are present',
-        () {
-          // Arrange (Given)
-          const result = ProcessingErrorResult(
-            message: 'Error message',
-            error: 'Error details',
-          );
+      test('Given ProcessingErrorResult, When checking fields, '
+          'Then all required fields are present', () {
+        // Arrange (Given)
+        const result = ProcessingErrorResult(
+          message: 'Error message',
+          error: 'Error details',
+        );
 
-          // Assert (Then)
-          expect(result.message, equals('Error message'));
-          expect(result.error, equals('Error details'));
-        },
-      );
+        // Assert (Then)
+        expect(result.message, equals('Error message'));
+        expect(result.error, equals('Error details'));
+      });
 
-      test(
-        'Given TicketNotFoundResult, When checking fields, '
-        'Then all required fields are present',
-        () {
-          // Arrange (Given)
-          const result = TicketNotFoundResult(
-            pnrNumber: 'T12345678',
-          );
+      test('Given TicketNotFoundResult, When checking fields, '
+          'Then all required fields are present', () {
+        // Arrange (Given)
+        const result = TicketNotFoundResult(pnrNumber: 'T12345678');
 
-          // Assert (Then)
-          expect(result.pnrNumber, equals('T12345678'));
-        },
-      );
+        // Assert (Then)
+        expect(result.pnrNumber, equals('T12345678'));
+      });
 
-      test(
-        'Given all result types, When checking inheritance, '
-        'Then all extend SharedContentResult',
-        () {
-          // Arrange (Given) & Assert (Then)
-          expect(
-            const TicketCreatedResult(
-              ticketId: '',
-              ticketType: null,
-              title: '',
-              subtitle: '',
-              date: '',
-            ),
-            isA<SharedContentResult>(),
-          );
-          expect(
-            const TicketUpdatedResult(pnrNumber: '', updateType: ''),
-            isA<SharedContentResult>(),
-          );
-          expect(
-            const ProcessingErrorResult(message: '', error: ''),
-            isA<SharedContentResult>(),
-          );
-          expect(
-            const TicketNotFoundResult(pnrNumber: ''),
-            isA<SharedContentResult>(),
-          );
-        },
-      );
+      test('Given all result types, When checking inheritance, '
+          'Then all extend SharedContentResult', () {
+        // Arrange (Given) & Assert (Then)
+        expect(
+          const TicketCreatedResult(
+            ticketId: '',
+            ticketType: null,
+            title: '',
+            subtitle: '',
+            date: '',
+          ),
+          isA<SharedContentResult>(),
+        );
+        expect(
+          const TicketUpdatedResult(pnrNumber: '', updateType: ''),
+          isA<SharedContentResult>(),
+        );
+        expect(
+          const ProcessingErrorResult(message: '', error: ''),
+          isA<SharedContentResult>(),
+        );
+        expect(
+          const TicketNotFoundResult(pnrNumber: ''),
+          isA<SharedContentResult>(),
+        );
+      });
 
-      test(
-        'Given TicketCreatedResult with ticketId, When checking fields, '
-        'Then ticketId is accessible',
-        () {
-          // Arrange (Given)
-          const result = TicketCreatedResult(
-            ticketId: 'TICKET-UUID-001',
-            ticketType: TicketType.bus,
-            title: 'Chennai → Bangalore',
-            date: '2024-12-15',
-          );
+      test('Given TicketCreatedResult with ticketId, When checking fields, '
+          'Then ticketId is accessible', () {
+        // Arrange (Given)
+        const result = TicketCreatedResult(
+          ticketId: 'TICKET-UUID-001',
+          ticketType: TicketType.bus,
+          title: 'Chennai → Bangalore',
+          date: '2024-12-15',
+        );
 
-          // Act (When)
-          final ticketId = result.ticketId;
+        // Act (When)
+        final ticketId = result.ticketId;
 
-          // Assert (Then)
-          expect(ticketId, equals('TICKET-UUID-001'));
-        },
-      );
+        // Assert (Then)
+        expect(ticketId, equals('TICKET-UUID-001'));
+      });
     });
 
     group('processContent - Integration Scenarios', () {
-      test(
-        'Given sequential ticket creation and update, '
-        'When processing both, '
-        'Then both operations succeed',
-        () async {
-          // Arrange (Given)
-          final mockDao = MockTicketDAO();
-          final logger = getIt<ILogger>();
-          final processor = SharedContentProcessor(
-            logger: logger,
-            travelParser: MockTravelParserService(logger: logger),
-            ticketDao: mockDao,
-            importService: MockImportService(),
-          );
+      test('Given sequential ticket creation and update, '
+          'When processing both, '
+          'Then both operations succeed', () async {
+        // Arrange (Given)
+        final mockDao = MockTicketDAO();
+        final logger = getIt<ILogger>();
+        final processor = SharedContentProcessor(
+          logger: logger,
+          travelParser: MockTravelParserService(logger: logger),
+          ticketDao: mockDao,
+          importService: MockImportService(),
+        );
 
-          const createSms = '''
+        const createSms = '''
             Corporation : SETC, From : CHENNAI To BANGALORE
             PNR NO. : T12345678
           ''';
 
-          // Act (When) - Create ticket
-          final createResult = await processor.processContent(
-            createSms,
-            SharedContentType.sms,
-          );
+        // Act (When) - Create ticket
+        final createResult = await processor.processContent(
+          createSms,
+          SharedContentType.sms,
+        );
 
-          // Assert (Then)
-          expect(createResult, isA<TicketCreatedResult>());
+        // Assert (Then)
+        expect(createResult, isA<TicketCreatedResult>());
 
-          // Arrange (Given)
-          const mockTicket = Ticket(
-            ticketId: 'T12345678',
-            primaryText: 'Origin → Destination',
-            secondaryText: 'Other info',
-            location: 'Station',
-          );
-          // Create a new mock DAO for the update step, pre-populated with
-          // the ticket
-          // that would have been created in the previous step.
-          final updateMockDao = MockTicketDAO();
-          await updateMockDao.insertTicket(mockTicket);
-          final updateProcessor = SharedContentProcessor(
+        // Arrange (Given)
+        const mockTicket = Ticket(
+          ticketId: 'T12345678',
+          primaryText: 'Origin → Destination',
+          secondaryText: 'Other info',
+          location: 'Station',
+        );
+        // Create a new mock DAO for the update step, pre-populated with
+        // the ticket
+        // that would have been created in the previous step.
+        final updateMockDao = MockTicketDAO();
+        await updateMockDao.insertTicket(mockTicket);
+        final updateProcessor = SharedContentProcessor(
+          logger: logger, // Using 'logger' as defined in the test scope
+          travelParser: MockTravelParserService(
             logger: logger, // Using 'logger' as defined in the test scope
-            travelParser: MockTravelParserService(
-              logger: logger, // Using 'logger' as defined in the test scope
-              mockUpdateInfo: TicketUpdateInfo(
-                pnrNumber: 'T12345678',
-                providerName: 'TNSTC',
-                updates: {'conductorMobileNo': '9876543210'},
-              ),
+            mockUpdateInfo: TicketUpdateInfo(
+              pnrNumber: 'T12345678',
+              providerName: 'TNSTC',
+              updates: {'conductorMobileNo': '9876543210'},
             ),
-            ticketDao: updateMockDao,
-            importService: MockImportService(),
-          );
+          ),
+          ticketDao: updateMockDao,
+          importService: MockImportService(),
+        );
 
-          const updateSms = 'PNR NO. : T12345678, Conductor: 9876543210';
+        const updateSms = 'PNR NO. : T12345678, Conductor: 9876543210';
 
-          // Act (When) - Update ticket
-          final updateResult = await updateProcessor.processContent(
-            updateSms,
+        // Act (When) - Update ticket
+        final updateResult = await updateProcessor.processContent(
+          updateSms,
+          SharedContentType.sms,
+        );
+
+        // Assert (Then)
+        expect(updateResult, isA<TicketUpdatedResult>());
+      });
+
+      test('Given multiple processors working concurrently, '
+          'When processing different content, '
+          'Then each processor works independently', () async {
+        // Arrange (Given)
+        final logger = getIt<ILogger>();
+        final processor1 = SharedContentProcessor(
+          logger: logger,
+          travelParser: MockTravelParserService(logger: logger),
+          ticketDao: MockTicketDAO(),
+          importService: MockImportService(),
+        );
+
+        final processor2 = SharedContentProcessor(
+          logger: logger,
+          travelParser: MockTravelParserService(logger: logger),
+          ticketDao: MockTicketDAO(),
+          importService: MockImportService(),
+        );
+
+        // Act (When) - Process concurrently with proper PNR format
+        final results = await Future.wait([
+          processor1.processContent(
+            'PNR NO: T11111111, From: Chennai To Bangalore',
             SharedContentType.sms,
-          );
+          ),
+          processor2.processContent(
+            'PNR NO: T22222222, From: Mumbai To Pune',
+            SharedContentType.sms,
+          ),
+        ]);
 
-          // Assert (Then)
-          expect(updateResult, isA<TicketUpdatedResult>());
-        },
-      );
+        // Assert (Then)
+        expect(results.length, equals(2));
+        expect(results[0], isA<TicketCreatedResult>());
+        expect(results[1], isA<TicketCreatedResult>());
 
-      test(
-        'Given multiple processors working concurrently, '
-        'When processing different content, '
-        'Then each processor works independently',
-        () async {
-          // Arrange (Given)
-          final logger = getIt<ILogger>();
-          final processor1 = SharedContentProcessor(
-            logger: logger,
-            travelParser: MockTravelParserService(logger: logger),
-            ticketDao: MockTicketDAO(),
-            importService: MockImportService(),
-          );
+        final result1 = results[0] as TicketCreatedResult;
+        final result2 = results[1] as TicketCreatedResult;
 
-          final processor2 = SharedContentProcessor(
-            logger: logger,
-            travelParser: MockTravelParserService(logger: logger),
-            ticketDao: MockTicketDAO(),
-            importService: MockImportService(),
-          );
-
-          // Act (When) - Process concurrently with proper PNR format
-          final results = await Future.wait([
-            processor1.processContent(
-              'PNR NO: T11111111, From: Chennai To Bangalore',
-              SharedContentType.sms,
-            ),
-            processor2.processContent(
-              'PNR NO: T22222222, From: Mumbai To Pune',
-              SharedContentType.sms,
-            ),
-          ]);
-
-          // Assert (Then)
-          expect(results.length, equals(2));
-          expect(results[0], isA<TicketCreatedResult>());
-          expect(results[1], isA<TicketCreatedResult>());
-
-          final result1 = results[0] as TicketCreatedResult;
-          final result2 = results[1] as TicketCreatedResult;
-
-          expect(result1.ticketId, equals('T11111111'));
-          expect(result2.ticketId, equals('T22222222'));
-        },
-      );
+        expect(result1.ticketId, equals('T11111111'));
+        expect(result2.ticketId, equals('T22222222'));
+      });
     });
   });
 }

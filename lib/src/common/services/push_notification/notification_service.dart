@@ -227,10 +227,7 @@ class NotificationService implements INotificationService {
 
     const iosDetails = DarwinNotificationDetails();
 
-    return const NotificationDetails(
-      android: androidDetails,
-      iOS: iosDetails,
-    );
+    return const NotificationDetails(android: androidDetails, iOS: iosDetails);
   }
 
   String _formatTime12(DateTime dt) {
@@ -307,9 +304,7 @@ class NotificationService implements INotificationService {
       if (_logger != null) {
         _logger?.error('Error scheduling ticket reminders', e, stackTrace);
       } else {
-        debugPrint(
-          'Error scheduling ticket reminders: $e\n$stackTrace',
-        );
+        debugPrint('Error scheduling ticket reminders: $e\n$stackTrace');
       }
     }
   }
@@ -499,9 +494,7 @@ class NotificationService implements INotificationService {
       if (_logger != null) {
         _logger?.error('Error scheduling ticket reminders', e, stackTrace);
       } else {
-        debugPrint(
-          'Error scheduling ticket reminders: $e\n$stackTrace',
-        );
+        debugPrint('Error scheduling ticket reminders: $e\n$stackTrace');
       }
     }
   }
