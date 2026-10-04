@@ -2,7 +2,7 @@
 
 **Last Updated: [22-11-2025]**
 
-Namma Wallet (“we”, “our”, “the app”) is an open-source Flutter application built by the Flutter Chennai Community. The app helps users automatically create tickets or events by processing SMS and notifications using an **on-device Large Language Model (LLM)**.
+Namma Wallet (“we”, “our”, “the app”) is an open-source Flutter application built by the Flutter Chennai Community. The app helps users automatically create tickets or events by processing SMS and notifications **entirely on your device**.
 We care about your privacy and are committed to transparency in how the app works and what data it handles.
 
 ---
@@ -12,7 +12,7 @@ We care about your privacy and are committed to transparency in how the app work
 ### **1.1 SMS Data**
 
 * The app reads selected SMS messages for the sole purpose of extracting relevant information to create tickets or events.
-* SMS content is processed **entirely on your device** using an **offline LLM**.
+* SMS content is processed **entirely on your device**.
 * **No SMS data is transmitted, stored on external servers, or shared with anyone.**
 
 ### **1.2 Notification Data**
@@ -28,8 +28,7 @@ We care about your privacy and are committed to transparency in how the app work
 
 ### **1.4 Internet Access**
 
-* The app uses the internet **only once** to download the required LLM model.
-* After the model is downloaded, **all processing happens offline**.
+* Ticket extraction and parsing work **fully offline** and require no network access. The app contacts the internet only for explicit user-initiated actions (TNSTC PNR status lookups, loading the contributors list, and fetching remote .pkpass files). It does **not** send SMS, notification, or ticket data anywhere.
 * The app does **not** send personal data over the internet.
 
 ---
@@ -37,7 +36,7 @@ We care about your privacy and are committed to transparency in how the app work
 ## **2. No Data Leaves Your Device**
 
 * All SMS, notification, and generated ticket/event data remains on your device.
-* All text processing is performed using an **on-device AI model**.
+* All text processing happens on your device.
 * The app does **not** use cloud servers, external APIs, analytics, tracking, or remote processing.
 * We do not collect, store, or transmit any personal information.
 
@@ -61,14 +60,14 @@ Anyone can review, verify, or contribute to the code, ensuring full transparency
 | **Read SMS**                | To extract details and create tickets/events        | No                   |
 | **Notification Access**     | To process relevant notifications                   | No                   |
 | **Camera**                  | For scanning-based features (if used)               | No                   |
-| **Internet**                | To download the LLM model once                      | No data sent         |
-| **Storage (if applicable)** | To store the downloaded model and generated tickets | No                   |
+| **Internet**                | For PNR lookups, contributors, and remote .pkpass fetches | No ticket/SMS data sent |
+| **Storage (if applicable)** | To store generated tickets                                | No                   |
 
 ---
 
 ## **5. Data Retention**
 
-* All data (SMS-derived fields, notifications, tickets, model files) remains stored locally on your device.
+* All data (SMS-derived fields, notifications, tickets) remains stored locally on your device.
 * You may clear the app’s data at any time to remove everything.
 
 ---

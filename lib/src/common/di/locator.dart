@@ -32,9 +32,6 @@ import 'package:namma_wallet/src/common/services/widget/home_widget_service.dart
 import 'package:namma_wallet/src/common/services/widget/web_widget_service.dart';
 import 'package:namma_wallet/src/common/services/widget/widget_service_interface.dart';
 import 'package:namma_wallet/src/common/theme/theme_provider.dart';
-import 'package:namma_wallet/src/features/ai/fallback_parser/application/ai_service_interface.dart';
-import 'package:namma_wallet/src/features/ai/fallback_parser/application/gemma_service.dart';
-import 'package:namma_wallet/src/features/ai/fallback_parser/application/web_gemma_service.dart';
 import 'package:namma_wallet/src/features/calendar/application/booking_reminder_service.dart';
 import 'package:namma_wallet/src/features/clipboard/application/clipboard_service.dart';
 import 'package:namma_wallet/src/features/clipboard/application/clipboard_service_interface.dart';
@@ -57,7 +54,6 @@ import 'package:namma_wallet/src/features/receive/application/sms_queue_service.
 import 'package:namma_wallet/src/features/receive/application/web_sharing_intent_service.dart';
 import 'package:namma_wallet/src/features/receive/domain/sharing_intent_service_interface.dart';
 import 'package:namma_wallet/src/features/receive/domain/sms_queue_service_interface.dart';
-import 'package:namma_wallet/src/features/settings/application/ai_service_status.dart';
 import 'package:namma_wallet/src/features/tnstc/application/tnstc_api_ticket_parser.dart';
 import 'package:namma_wallet/src/features/tnstc/application/tnstc_sms_parser.dart';
 import 'package:namma_wallet/src/features/tnstc/data/remote/tnstc_pnr_fetcher.dart';
@@ -77,7 +73,6 @@ void setupLocator() {
     ..registerSingleton<TicketChangeNotifier>(TicketChangeNotifier())
     // Providers
     ..registerSingleton<ThemeProvider>(ThemeProvider())
-    ..registerSingleton<AIServiceStatus>(AIServiceStatus())
     // Database - Initialize before DAOs
     ..registerSingleton<IWalletDatabase>(WalletDatabase())
     // DAOs
@@ -100,9 +95,6 @@ void setupLocator() {
         ocrService: getIt<IOCRService>(),
         logger: getIt<ILogger>(),
       ),
-    )
-    ..registerLazySingleton<IAIService>(
-      () => kIsWeb ? WebGemmaService() : GemmaService(logger: getIt<ILogger>()),
     )
     ..registerLazySingleton<IWidgetService>(
       () => kIsWeb
