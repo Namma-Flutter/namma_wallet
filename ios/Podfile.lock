@@ -106,9 +106,9 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/share_handler_ios/ios/Models"
 
 SPEC CHECKSUMS:
-  Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
-  google_mlkit_commons: 092da2f8e0a4a77d9a0475fd6eec56958e2b505d
-  google_mlkit_text_recognition: 960eec5194182c898881a83d2d70afcd4abbb88d
+  Flutter: 71a624a5bc0c04062bf19101d501e466baf2fb47
+  google_mlkit_commons: b2c0a76e7ef4ff555e70e5d71f21d66ce3d08a97
+  google_mlkit_text_recognition: 5a8cb8b73c765938fb7111de6f5f883b90f15d52
   GoogleDataTransport: a24e58982ab3ba2f64d79613e027fe7f57e88539
   GoogleMLKit: b1eee21a41c57704fe72483b15c85cb2c0cd7444
   GoogleToolboxForMac: d1a2cbf009c453f4d6ded37c105e2f67a32206d8
@@ -120,11 +120,11 @@ SPEC CHECKSUMS:
   MLKitTextRecognitionCommon: 234ceb1cfdfb5fceb4fd664943046609a2961cc2
   MLKitVision: 39a5a812db83c4a0794445088e567f3631c11961
   nanopb: fad817b59e0457d11a5dfbde799381cd727c1275
-  pdf_barcode_decoder: 484fbc6088ecf04ccee22aa85808676e3ff47f34
+  pdf_barcode_decoder: 6acdbef02bf7beb5f1479127afa5636993abb176
   PromisesObjC: 752c3227f599e3467650e47ea36f433eeb10c273
-  share_handler_ios: 6dd3a4ac5ca0d955274aec712ba0ecdcaf583e7c
+  share_handler_ios: e2244e990f826b2c8eaa291ac3831569438ba0fb
   share_handler_ios_models: fc638c9b4330dc7f082586c92aee9dfa0b87b871
 
-PODFILE CHECKSUM: 303f59ac31c4ef673977c6cecf62e0b14970ca5e
+PODFILE CHECKSUM: f8a83fff857e05bd4ba791268814c272ff16718f
 
 COCOAPODS: 1.17.0
