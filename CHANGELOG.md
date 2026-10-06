@@ -7,6 +7,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.8+15] - 2026-10-06
+
+### Added
+
+- Haptic feedback when navigating back and tapping event ticket cards
+- Support for modern KonfHub ticket layouts in event ticket parser
+
+### Fixed
+
+- Prevent setState invocation when unmounted after file picking
+- Cleaned up text formatting in OCRBlock fixtures and test cases
+- Added missing imports across unit and widget tests
+- Fixed branch naming and triggers in CI/CD workflows (string-extension coverage, Jules bot)
+
+### Changed
+
+- Streamlined app binary footprint by removing unused local AI pipeline (flutter_gemma / MediaPipe)
+- Updated iOS project configuration and document type declarations
+
+### Chores
+
+- Updated Flutter SDK to 3.47.6 and bumped project dependencies
+- Bumped core dependencies: file_picker to 13.1.0, home_widget to 0.10.0, get_it to 9.3.0, sqflite to 2.4.4, archive to 4.3.0, ai_barcode_scanner to 8.2.0, image to 4.10.1, flutter_local_notifications to 22.3.1
+- Updated Ruby and CocoaPods dependencies (Ruby 3.3.10, Fastlane 2.240.1, CocoaPods 1.17.0)
+- Optimized project images via ImgBot
+- Updated GitHub Actions and security scanning workflows (TruffleHog, CodeQL, Setup-Gradle)
+- Removed unused package.json and workspace root devDependencies
+
 ## [0.0.7+14] - 2026-09-20
 
 ### Added

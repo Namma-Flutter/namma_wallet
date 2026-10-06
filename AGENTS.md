@@ -71,7 +71,6 @@ lib/src/
 │   ├── theme/                   # Material 3 light/dark themes
 │   └── widgets/                 # Shared UI components
 └── features/
-    ├── ai/                      # Gemma AI fallback parser
     ├── bottom_navigation/       # Navigation bar
     ├── calendar/                # Calendar view (TableCalendar)
     ├── clipboard/               # Clipboard ticket parsing
@@ -114,7 +113,6 @@ Platform-specific implementations selected with `kIsWeb`:
 - `IWalletDatabase` → `WalletDatabase` (sqflite)
 - `IOCRService` → `GoogleMLKitOCR` / `WebOCRService`
 - `IPDFService` → `PDFService` (Syncfusion + OCR fallback)
-- `IAIService` → `GemmaService` / `WebGemmaService`
 - `IHapticService` → `HapticService`
 - `IWidgetService` → `HomeWidgetService` / `WebWidgetService`
 - Parsers: `ITravelParser`, `IPKPassParser`, `IIRCTCParser`
@@ -265,7 +263,6 @@ test/
 | `syncfusion_flutter_pdf` | PDF text extraction |
 | `google_mlkit_text_recognition` | OCR (mobile) |
 | `pkpass` | Apple Wallet pass parsing |
-| `flutter_gemma` | On-device AI model |
 | `table_calendar` | Calendar widget |
 | `talker_flutter` | Logging framework |
 | `home_widget` | Home screen widget |

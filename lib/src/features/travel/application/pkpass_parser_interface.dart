@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+
 import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 
 /// Parser for Apple Wallet (PKPass) files.

@@ -12,8 +12,7 @@ void main() {
         // This is the actual problematic OCR block from the t73910447 fixture
         final blocks = [
           OCRBlock(
-            text:
-                'Passenger Pickup Point : CHENNAI-PT Dr.M.G.R. BS Passenger Pickup Time: 12/12/2025 21:00 Hrs.',
+            text: 'Passenger Pickup Point : CHENNAI-PT Dr.M.G.R. BS Passenger Pickup Time: 12/12/2025 21:00 Hrs.',
             boundingBox: const Rect.fromLTRB(149, 343, 1002, 361),
             page: 0,
           ),

@@ -112,33 +112,39 @@ class _ImportViewState extends State<ImportView> {
     if (_isProcessingPDF) return;
 
     try {
-      final result = await FilePicker.pickFiles(
+      // pickFiles returns an empty list when the user cancels; `withData` was
+      // removed, so bytes for path-less (web) picks are read on demand below.
+      final files = await FilePicker.pickFiles(
         type: FileType.custom,
         allowedExtensions: ['pdf'],
-        withData: kIsWeb, // Ensure bytes are loaded on web
       );
+      if (!mounted) return;
 
       XFile? xFile;
-      if (result != null) {
+      if (files.isNotEmpty) {
         setState(() {
           _isProcessingPDF = true;
         });
 
-        final platformFile = result.files.single;
-        if (kIsWeb && platformFile.bytes != null) {
-          xFile = XFile.fromData(platformFile.bytes!, name: platformFile.name);
-        } else if (platformFile.path != null) {
+        final platformFile = files.single;
+        if (platformFile.path != null) {
           xFile = XFile(platformFile.path!);
         } else {
-          _logger.warning('File picked but no bytes or path available');
-          if (mounted) {
-            showSnackbar(
-              context,
-              'Could not read the selected file. Please try again.',
-              isError: true,
+          try {
+            xFile = XFile.fromData(
+              await platformFile.readAsBytes(),
+              name: platformFile.name,
             );
+          } on Object catch (e) {
+            _logger.warning('File picked but bytes could not be read: $e');
+            if (mounted) {
+              showSnackbar(
+                context,
+                'Could not read the selected file. Please try again.',
+                isError: true,
+              );
+            }
           }
-          return;
         }
       }
 

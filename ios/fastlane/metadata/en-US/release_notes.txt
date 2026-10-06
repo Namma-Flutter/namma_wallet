@@ -1,5 +1,4 @@
-- Import tickets directly from photos with image recognition
-- Event ticket support for movie and event bookings
-- Booking reminder improvements with better timing
-- Original file storage for imported tickets
+- Added subtle haptic feedback when navigating and interacting with tickets
+- Enhanced ticket parsing with support for newer layout styles
+- Significantly reduced app download size and improved performance
 - Bug fixes and stability improvements

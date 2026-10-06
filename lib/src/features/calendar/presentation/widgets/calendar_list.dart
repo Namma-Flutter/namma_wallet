@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
@@ -108,7 +110,7 @@ class _TicketCardWithBadgeState extends State<_TicketCardWithBadge> {
   @override
   void initState() {
     super.initState();
-    _checkReminder();
+    unawaited(_checkReminder());
   }
 
   Future<void> _checkReminder() async {

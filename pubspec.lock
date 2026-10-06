@@ -438,14 +438,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  flutter_gemma:
-    dependency: "direct main"
-    description:
-      name: flutter_gemma
-      sha256: "4178418fa3074d1207538c858fb4cd601694ebde4b99653a66ca36d4ca4cf8bc"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.1.0"
   flutter_gen_core:
     dependency: transitive
     description:
@@ -784,14 +776,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.9.0"
-  large_file_handler:
-    dependency: transitive
-    description:
-      name: large_file_handler
-      sha256: "234eda71f32b6a772349299d0ed185a5f3e10c59235576fd178f4d720dd956ec"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.5.0"
   leak_tracker:
     dependency: transitive
     description:
@@ -828,10 +812,10 @@ packages:
     dependency: transitive
     description:
       name: matcher
-      sha256: dc0b7dc7651697ea4ff3e69ef44b0407ea32c487a39fff6a4004fa585e901861
+      sha256: "31bd099b47c10cd1aeb55146a2d46ce0277630ecef3f7dae54ad7873f36696cd"
       url: "https://pub.dev"
     source: hosted
-    version: "0.12.19"
+    version: "0.12.20"
   material_color_utilities:
     dependency: transitive
     description:
@@ -844,10 +828,10 @@ packages:
     dependency: "direct main"
     description:
       name: meta
-      sha256: "1741988757a65eb6b36abe716829688cf01910bbf91c34354ff7ec1c3de2b349"
+      sha256: "307249ce4ff29d58a18e97f6345f539382eb9c9c29ecda628900f31de0443dd9"
       url: "https://pub.dev"
     source: hosted
-    version: "1.18.0"
+    version: "1.19.0"
   mime:
     dependency: transitive
     description:
@@ -872,14 +856,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "5.7.0"
-  mutex:
-    dependency: transitive
-    description:
-      name: mutex
-      sha256: "8827da25de792088eb33e572115a5eb0d61d61a3c01acbc8bcbe76ed78f1a1f2"
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.1.0"
   native_toolchain_c:
     dependency: transitive
     description:
@@ -1505,10 +1481,10 @@ packages:
     dependency: transitive
     description:
       name: test_api
-      sha256: "949a932224383300f01be9221c39180316445ecb8e7547f70a41a35bf421fb9e"
+      sha256: "2a122cbe059f8b610d3a5415f42e255b6c17b1f21eee1d960f31080237fb4f11"
       url: "https://pub.dev"
     source: hosted
-    version: "0.7.11"
+    version: "0.7.12"
   time:
     dependency: transitive
     description:
@@ -1649,10 +1625,10 @@ packages:
     dependency: transitive
     description:
       name: vector_math
-      sha256: d530bd74fea330e6e364cda7a85019c434070188383e1cd8d9777ee586914c5b
+      sha256: "92b9910f66ed1057fd4da7b040ae7c74cafacf885bdc81be496928d5049b032d"
       url: "https://pub.dev"
     source: hosted
-    version: "2.2.0"
+    version: "2.4.3"
   very_good_analysis:
     dependency: "direct dev"
     description:
@@ -1790,5 +1766,5 @@ packages:
     source: hosted
     version: "3.1.3"
 sdks:
-  dart: "3.12.2"
-  flutter: "3.44.9"
+  dart: "3.13.5"
+  flutter: "3.47.6"
