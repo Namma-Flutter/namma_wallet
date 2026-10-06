@@ -47,10 +47,10 @@ check-codegen: codegen
 
 # Release builds
 release-apk: get codegen
-	$(FLUTTER) build apk --release
+	$(FLUTTER) build apk --release --android-skip-build-dependency-validation
 
 release-appbundle: get codegen
-	$(FLUTTER) build appbundle --release
+	$(FLUTTER) build appbundle --release --android-skip-build-dependency-validation
 
 release-ipa: get codegen
 	$(FLUTTER) build ipa --release

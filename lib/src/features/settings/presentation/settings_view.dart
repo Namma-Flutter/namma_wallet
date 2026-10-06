@@ -11,7 +11,6 @@ import 'package:namma_wallet/src/common/services/haptic/haptic_service_interface
 import 'package:namma_wallet/src/common/theme/theme_provider.dart';
 import 'package:namma_wallet/src/common/widgets/rounded_back_button.dart';
 import 'package:namma_wallet/src/common/widgets/snackbar_widget.dart';
-import 'package:namma_wallet/src/features/settings/presentation/ai_status_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -66,8 +65,6 @@ class _SettingsViewState extends State<SettingsView> {
             child: Column(
               spacing: 8,
               children: [
-                const AIStatusWidget(),
-                const SizedBox(height: 8),
                 // Theme Settings Section
                 ThemeSectionWidget(themeProvider: themeProvider),
 

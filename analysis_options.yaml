@@ -8,5 +8,9 @@ analyzer:
     - "*/.gen.dart"
     - "*/.gr.dart"
     - "*/.config.dart"
+    - build/**
+    - android/**
+    - ios/**
+    - web/**
   errors:
     public_member_api_docs: ignore

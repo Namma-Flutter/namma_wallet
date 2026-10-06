@@ -1,4 +1,5 @@
 import 'dart:ui';
+
 import 'package:dart_mappable/dart_mappable.dart';
 
 part 'ocr_block.mapper.dart';

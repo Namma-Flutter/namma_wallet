@@ -13,9 +13,15 @@ class CalendarProvider extends ChangeNotifier {
   CalendarProvider({
     ILogger? logger,
     ITicketDAO? ticketDao,
+    BookingReminderService? bookingReminderService,
     DateTime? initialSelectedDay,
   }) : _logger = logger ?? getIt<ILogger>(),
        _ticketDao = ticketDao ?? getIt<ITicketDAO>(),
+       _bookingReminderService =
+           bookingReminderService ??
+           (getIt.isRegistered<BookingReminderService>()
+               ? getIt<BookingReminderService>()
+               : null),
        _selectedDay = initialSelectedDay ?? _todayAtMidnight();
 
   static DateTime _todayAtMidnight() {
@@ -29,6 +35,7 @@ class CalendarProvider extends ChangeNotifier {
 
   final ILogger _logger;
   final ITicketDAO _ticketDao;
+  final BookingReminderService? _bookingReminderService;
 
   DateTime _selectedDay;
   List<Event> _events = [];
@@ -82,10 +89,13 @@ class CalendarProvider extends ChangeNotifier {
   }
 
   void _computeBookingWindows() {
+    final reminderService = _bookingReminderService;
+    if (reminderService == null) return;
+
     final windows = <DateTime, ({List<Ticket> normal, List<Ticket> tatkal})>{};
 
     for (final ticket in _tickets) {
-      final dates = getIt<BookingReminderService>().computeBookingOpenDates(
+      final dates = reminderService.computeBookingOpenDates(
         ticket,
       );
       if (dates == null) continue;

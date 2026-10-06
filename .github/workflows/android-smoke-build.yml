@@ -82,7 +82,7 @@ jobs:
 
       - name: Build Debug APK
         if: steps.filter.outputs.android == 'true' && github.actor != 'dependabot[bot]'
-        run: flutter build apk --debug
+        run: flutter build apk --debug --android-skip-build-dependency-validation
 
       - name: Analyze APK Size
         if: steps.filter.outputs.android == 'true' && github.actor != 'dependabot[bot]'

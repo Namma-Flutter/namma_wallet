@@ -39,7 +39,7 @@ void main() {
     await tester.tap(find.byType(RoundedBackButton));
     await tester.pumpAndSettle();
 
-    verify(mockHapticService.triggerHaptic(HapticType.selection)).called(1);
+    verify(mockHapticService.selection()).called(1);
     expect(wasPressed, isTrue);
   });
 }

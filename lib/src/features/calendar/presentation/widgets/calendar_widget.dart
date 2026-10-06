@@ -1,9 +1,9 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/services/haptic/haptic_service_extension.dart';
 import 'package:namma_wallet/src/common/services/haptic/haptic_service_interface.dart';
-import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/features/calendar/application/calendar_provider.dart';
 import 'package:namma_wallet/src/features/calendar/presentation/widgets/booking_reminder/booking_reminder_popup.dart';
 import 'package:namma_wallet/src/features/calendar/presentation/widgets/themed_day_cell.dart';

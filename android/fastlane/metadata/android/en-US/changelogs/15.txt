@@ -1,0 +1,4 @@
+• Added subtle haptic feedback when navigating and interacting with tickets
+• Enhanced ticket parsing with support for newer layout styles
+• Significantly reduced app download size and improved performance
+• Bug fixes and stability improvements

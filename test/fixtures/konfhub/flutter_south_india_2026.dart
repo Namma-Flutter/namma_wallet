@@ -1,4 +1,5 @@
 import 'dart:ui';
+
 import 'package:namma_wallet/src/common/services/ocr/ocr_block.dart';
 
 // Generated fixture from: Ticket (2).pdf
