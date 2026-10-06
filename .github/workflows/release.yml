@@ -2,14 +2,16 @@ name: Release Pipeline
 
 # Ships Namma Wallet to the stores and publishes GitHub release artifacts.
 #
-# Branch semantics (matches the Fastlane 3-stage pipeline):
-#   beta    -> build + upload to TestFlight and Play internal track,
-#              attach signed APK/IPA to a GitHub pre-release tagged v{version}
-#   release -> promote the already-uploaded build to App Store / Play
-#              production, attach signed APK/IPA to a stable GitHub release
+# Branch semantics:
+#   PR merge into release -> auto-deploy to TestFlight and Play internal track (beta stage),
+#                            attach signed APK/IPA to a GitHub pre-release tagged v{version}
+#   workflow_dispatch     -> manual deploy with configurable stage:
+#                            - beta (default): build + upload to TestFlight & Play internal
+#                            - release: promote the already-uploaded build to App Store / Play
+#                              production, publish stable GitHub release
 #
 # Prerequisites:
-#   * This file must exist on both `beta` and `release` branches —
+#   * This file must exist on `release` branch —
 #     GitHub evaluates workflows from the pushed ref.
 #   * Required repository secrets:
 #       ANDROID_KEYSTORE, ANDROID_KEYSTORE_PASSWORD,
@@ -40,7 +42,7 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 env:
-  STAGE: ${{ (github.event_name == 'pull_request' && github.base_ref) || inputs.stage }}
+  STAGE: ${{ (github.event_name == 'pull_request' && 'beta') || inputs.stage }}
   APP_IDENTIFIER: com.nammaflutter.nammawallet
   PACKAGE_NAME: com.nammaflutter.nammawallet
   TEAM_ID: TG8RN284Q4
@@ -51,6 +53,7 @@ jobs:
     name: Analyze & Test
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    if: github.event_name != 'pull_request' || github.event.pull_request.merged == true
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
@@ -84,6 +87,7 @@ jobs:
     name: Check Play Store Version
     runs-on: ubuntu-latest
     timeout-minutes: 5
+    if: github.event_name != 'pull_request' || github.event.pull_request.merged == true
     outputs:
       skip_build: ${{ steps.check.outputs.skip_build }}
     env:
@@ -150,6 +154,7 @@ jobs:
     name: Check App Store Version
     runs-on: ubuntu-latest
     timeout-minutes: 5
+    if: github.event_name != 'pull_request' || github.event.pull_request.merged == true
     outputs:
       skip_build: ${{ steps.check.outputs.skip_build }}
     env:
@@ -396,7 +401,7 @@ jobs:
 
   promote:
     name: Promote to Production
-    if: ${{ !cancelled() && (github.event_name == 'pull_request' && github.base_ref == 'release') || (github.event_name == 'workflow_dispatch' && inputs.stage == 'release') }}
+    if: ${{ !cancelled() && github.event_name == 'workflow_dispatch' && inputs.stage == 'release' }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     needs: [android, ios, check-play-store, check-app-store]
