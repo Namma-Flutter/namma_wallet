@@ -2,7 +2,7 @@ name: namma_wallet
 description: "Namma Wallet is an open-source project developed by the community
   members of Namma Flutter"
 publish_to: "none"
-version: 0.0.7+14
+version: 0.0.8+15
 
 environment:
   sdk: 3.13.5
