@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
@@ -44,39 +43,31 @@ class _OCRDebugViewState extends State<OCRDebugView> {
     });
 
     try {
-      final result = await FilePicker.pickFiles(
+      // pickFiles returns an empty list when the user cancels; `withData` was
+      // removed, so bytes for path-less (web) picks are read on demand below.
+      final files = await FilePicker.pickFiles(
         type: FileType.custom,
         allowedExtensions: ['pdf'],
-        withData: kIsWeb, // Load bytes only on web
       );
 
-      if (result == null || result.files.isEmpty) {
+      if (files.isEmpty) {
         setState(() => _isLoadingPDF = false);
         return;
       }
 
-      final file = result.files.first;
+      final file = files.first;
       _fileName = file.name;
 
       // Create XFile based on platform
       final XFile xFile;
-      if (kIsWeb && file.bytes != null) {
+      if (file.path != null) {
+        xFile = XFile(file.path!);
+      } else {
         xFile = XFile.fromData(
-          file.bytes!,
+          await file.readAsBytes(),
           name: file.name,
           mimeType: 'application/pdf',
         );
-      } else if (file.path != null) {
-        xFile = XFile(file.path!);
-      } else {
-        if (!mounted) return;
-        setState(() => _isLoadingPDF = false);
-        showSnackbar(
-          context,
-          'Could not read the selected file. Please try again.',
-          isError: true,
-        );
-        return;
       }
 
       final blocks = await _pdfService.extractBlocks(xFile);
@@ -90,11 +81,7 @@ class _OCRDebugViewState extends State<OCRDebugView> {
     } on Object catch (e) {
       if (!mounted) return;
 
-      showSnackbar(
-        context,
-        'Failed to process PDF: $e',
-        isError: true,
-      );
+      showSnackbar(context, 'Failed to process PDF: $e', isError: true);
     } finally {
       if (mounted) setState(() => _isLoadingPDF = false);
     }
@@ -130,11 +117,7 @@ class _OCRDebugViewState extends State<OCRDebugView> {
     } on Object catch (e) {
       if (!mounted) return;
 
-      showSnackbar(
-        context,
-        'Failed to process image: $e',
-        isError: true,
-      );
+      showSnackbar(context, 'Failed to process image: $e', isError: true);
     } finally {
       if (mounted) setState(() => _isLoadingImage = false);
     }
@@ -205,10 +188,7 @@ class _OCRDebugViewState extends State<OCRDebugView> {
     await Clipboard.setData(ClipboardData(text: content));
     if (!mounted) return;
 
-    showSnackbar(
-      context,
-      '$label copied to clipboard',
-    );
+    showSnackbar(context, '$label copied to clipboard');
   }
 
   @override
@@ -294,11 +274,7 @@ class _OCRDebugViewState extends State<OCRDebugView> {
             ),
           ),
           if (_isLoadingPDF || _isLoadingImage)
-            const Expanded(
-              child: Center(
-                child: CircularProgressIndicator(),
-              ),
-            )
+            const Expanded(child: Center(child: CircularProgressIndicator()))
           else if (_ocrBlocks != null)
             Expanded(
               child: Column(
@@ -331,10 +307,7 @@ class _OCRDebugViewState extends State<OCRDebugView> {
                       itemCount: _ocrBlocks!.length,
                       itemBuilder: (context, index) {
                         final block = _ocrBlocks![index];
-                        return _OCRBlockCard(
-                          block: block,
-                          index: index,
-                        );
+                        return _OCRBlockCard(block: block, index: index);
                       },
                     ),
                   ),
@@ -378,6 +351,7 @@ class _OCRDebugViewState extends State<OCRDebugView> {
       showDialog<void>(
         context: context,
         builder: (context) => Dialog(
+          clipBehavior: Clip.hardEdge,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -399,8 +373,7 @@ class _OCRDebugViewState extends State<OCRDebugView> {
                   ),
                 ],
               ),
-              SizedBox(
-                height: MediaQuery.of(context).size.height * 0.8,
+              Expanded(
                 child: SingleChildScrollView(
                   padding: const EdgeInsets.all(16),
                   child: SelectableText(
@@ -421,10 +394,7 @@ class _OCRDebugViewState extends State<OCRDebugView> {
 }
 
 class _OCRBlockCard extends StatelessWidget {
-  const _OCRBlockCard({
-    required this.block,
-    required this.index,
-  });
+  const _OCRBlockCard({required this.block, required this.index});
 
   final OCRBlock block;
   final int index;
@@ -470,14 +440,8 @@ class _OCRBlockCard extends StatelessWidget {
                 _InfoRow(label: 'Top', value: box.top.toStringAsFixed(2)),
                 _InfoRow(label: 'Right', value: box.right.toStringAsFixed(2)),
                 _InfoRow(label: 'Bottom', value: box.bottom.toStringAsFixed(2)),
-                _InfoRow(
-                  label: 'Width',
-                  value: box.width.toStringAsFixed(2),
-                ),
-                _InfoRow(
-                  label: 'Height',
-                  value: box.height.toStringAsFixed(2),
-                ),
+                _InfoRow(label: 'Width', value: box.width.toStringAsFixed(2)),
+                _InfoRow(label: 'Height', value: box.height.toStringAsFixed(2)),
               ],
             ),
           ),
@@ -488,10 +452,7 @@ class _OCRBlockCard extends StatelessWidget {
 }
 
 class _InfoRow extends StatelessWidget {
-  const _InfoRow({
-    required this.label,
-    required this.value,
-  });
+  const _InfoRow({required this.label, required this.value});
 
   final String label;
   final String value;

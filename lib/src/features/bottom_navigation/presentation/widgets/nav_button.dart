@@ -52,7 +52,7 @@ class _NavButtonState extends State<NavButton>
   }
 
   void _onTapDown(TapDownDetails details) {
-    unawaited(_pressController.forward());
+    _pressController.forward();
   }
 
   void _onTapUp(TapUpDetails details) {
@@ -60,7 +60,7 @@ class _NavButtonState extends State<NavButton>
   }
 
   void _onTapCancel() {
-    unawaited(_pressController.reverse());
+    _pressController.reverse();
   }
 
   @override

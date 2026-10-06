@@ -178,9 +178,7 @@ class GoogleMLKitOCR implements IOCRService {
       final file = File(image.path);
 
       if (!file.existsSync()) {
-        _logger.warning(
-          '[OCRService] Image file does not exist',
-        );
+        _logger.warning('[OCRService] Image file does not exist');
         throw const FileSystemException('Image file does not exist');
       }
 

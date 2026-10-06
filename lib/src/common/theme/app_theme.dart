@@ -377,8 +377,7 @@ extension ColorSchemeExtension on ColorScheme {
   /// A container color for warning messages, with a semi-transparent effect
   /// in dark mode.
   ///
-  /// This design is intentional and is used by the AI status widget in
-  /// `lib/src/features/profile/presentation/ai_status_widget.dart` to blend
+  /// This design is intentional so that warning containers blend subtly
   /// into the background. The `onWarningContainer` color is fully opaque
   /// to ensure text contrast meets accessibility standards.
   Color get warningContainer => brightness == Brightness.light

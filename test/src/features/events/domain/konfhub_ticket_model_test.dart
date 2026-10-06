@@ -39,9 +39,7 @@ void main() {
       );
 
       final ticket = Ticket.fromKonfHub(model);
-      final qrExtra = ticket.extras?.firstWhere(
-        (e) => e.title == 'QR Data',
-      );
+      final qrExtra = ticket.extras?.firstWhere((e) => e.title == 'QR Data');
 
       expect(qrExtra, isNotNull);
       expect(qrExtra?.value, 'KONFHUB_TEST_QR_DATA_12345');

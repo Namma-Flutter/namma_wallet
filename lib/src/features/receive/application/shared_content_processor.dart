@@ -63,11 +63,7 @@ class SharedContentProcessor implements ISharedContentProcessor {
         } else {
           warning = result.warning;
         }
-        return _ticketToResult(
-          ticket,
-          warning: warning,
-          isArchived: archived,
-        );
+        return _ticketToResult(ticket, warning: warning, isArchived: archived);
       }
 
       if (contentType == SharedContentType.sms) {
@@ -210,11 +206,7 @@ class SharedContentProcessor implements ISharedContentProcessor {
         isArchived: archived,
       );
     } on Exception catch (e, stackTrace) {
-      _logger.error(
-        'Error processing shared content',
-        e,
-        stackTrace,
-      );
+      _logger.error('Error processing shared content', e, stackTrace);
 
       return ProcessingErrorResult(
         message: 'Failed to process shared content',

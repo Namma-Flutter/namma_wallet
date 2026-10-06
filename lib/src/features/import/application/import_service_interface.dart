@@ -3,10 +3,7 @@ import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 
 /// Result of a ticket import operation
 class TicketImportResult {
-  const TicketImportResult({
-    this.ticket,
-    this.warning,
-  });
+  const TicketImportResult({this.ticket, this.warning});
 
   final Ticket? ticket;
   final String? warning;

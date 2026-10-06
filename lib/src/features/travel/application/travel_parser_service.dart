@@ -52,10 +52,7 @@ class TNSTCBusParser extends TravelTicketParser {
     final lowerText = text.toLowerCase();
 
     // Check for SETC identifiers first (SETC takes precedence)
-    final setcKeywords = [
-      'SETC',
-      'State Express Transport Corporation',
-    ];
+    final setcKeywords = ['SETC', 'State Express Transport Corporation'];
 
     final hasSETCKeyword = setcKeywords.any(
       (pattern) => lowerText.contains(pattern.toLowerCase()),
@@ -311,10 +308,7 @@ class SETCBusParser extends TravelTicketParser {
   @override
   bool canParse(String text) {
     // SETC-specific patterns (without TNSTC)
-    final setcPatterns = [
-      'SETC',
-      'State Express Transport Corporation',
-    ];
+    final setcPatterns = ['SETC', 'State Express Transport Corporation'];
 
     // Check if it contains SETC but not TNSTC
     final hasSETC = setcPatterns.any(
@@ -462,10 +456,7 @@ class TravelParserService implements ITravelParser {
   }
 
   @override
-  Ticket? parseTicketFromText(
-    String text, {
-    SourceType? sourceType,
-  }) {
+  Ticket? parseTicketFromText(String text, {SourceType? sourceType}) {
     try {
       for (final parser in _parsers) {
         if (parser.canParse(text)) {
@@ -498,9 +489,7 @@ class TravelParserService implements ITravelParser {
         }
       }
 
-      _logger.warning(
-        '[TravelParserService] No parser could handle the text',
-      );
+      _logger.warning('[TravelParserService] No parser could handle the text');
       return null;
     } on FormatException catch (e, stackTrace) {
       _logger.error(

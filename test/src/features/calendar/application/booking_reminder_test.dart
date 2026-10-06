@@ -51,14 +51,8 @@ void main() {
   });
 
   test('fromMap returns null for invalid records', () {
-    expect(
-      BookingReminder.fromMap({'id': '', 'provider': 'TNSTC'}),
-      isNull,
-    );
-    expect(
-      BookingReminder.fromMap({'id': 'x', 'provider': ''}),
-      isNull,
-    );
+    expect(BookingReminder.fromMap({'id': '', 'provider': 'TNSTC'}), isNull);
+    expect(BookingReminder.fromMap({'id': 'x', 'provider': ''}), isNull);
     expect(
       BookingReminder.fromMap({
         'id': 'x',

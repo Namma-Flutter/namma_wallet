@@ -125,8 +125,8 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
         shadowColor: Colors.black26,
         child: InkWell(
           onTap: () async {
-            _hapticService.triggerHaptic(HapticType.selection);
             if (ticket.ticketId == null) return;
+            _hapticService.triggerHaptic(HapticType.selection);
 
             await context.pushNamed(
               AppRoute.ticketView.name,
@@ -216,75 +216,75 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
                 //* Top 3 card list
                 if (_isLoading)
                   const Center(child: CircularProgressIndicator())
+                else if (_travelTickets.isEmpty)
+                  Padding(
+                    padding: const EdgeInsets.all(32),
+                    child: Center(
+                      child: Column(
+                        children: [
+                          const Icon(
+                            Icons.airplane_ticket_outlined,
+                            size: 64,
+                            color: Colors.grey,
+                          ),
+                          const SizedBox(height: 16),
+                          const Text(
+                            'No travel tickets found',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.grey,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          const Text(
+                            'Paste travel SMS or add tickets manually',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.grey,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          if (_hasArchivedTickets) ...[
+                            const SizedBox(height: 24),
+                            TextButton.icon(
+                              onPressed: () async {
+                                await context.pushNamed(
+                                  AppRoute.allTickets.name,
+                                  queryParameters: {'archive': '1'},
+                                );
+                                if (mounted) {
+                                  await _loadTicketData();
+                                }
+                              },
+                              icon: const Icon(Icons.archive_outlined),
+                              label: const Text('View Archived Tickets'),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                  )
                 else
-                  _travelTickets.isEmpty
-                      ? Padding(
-                          padding: const EdgeInsets.all(32),
-                          child: Center(
-                            child: Column(
-                              children: [
-                                const Icon(
-                                  Icons.airplane_ticket_outlined,
-                                  size: 64,
-                                  color: Colors.grey,
-                                ),
-                                const SizedBox(height: 16),
-                                const Text(
-                                  'No travel tickets found',
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w500,
-                                    color: Colors.grey,
-                                  ),
-                                ),
-                                const SizedBox(height: 8),
-                                const Text(
-                                  'Paste travel SMS or add tickets manually',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.grey,
-                                  ),
-                                  textAlign: TextAlign.center,
-                                ),
-                                if (_hasArchivedTickets) ...[
-                                  const SizedBox(height: 24),
-                                  TextButton.icon(
-                                    onPressed: () async {
-                                      await context.pushNamed(
-                                        AppRoute.allTickets.name,
-                                        queryParameters: {'archive': '1'},
-                                      );
-                                      if (mounted) {
-                                        await _loadTicketData();
-                                      }
-                                    },
-                                    icon: const Icon(Icons.archive_outlined),
-                                    label: const Text('View Archived Tickets'),
-                                  ),
-                                ],
-                              ],
-                            ),
-                          ),
-                        )
-                      : Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          child: SizedBox(
-                            height: 500,
-                            child: CardStackWidget(
-                              cardList: cardStackList.take(3).toList(),
-                              opacityChangeOnDrag: true,
-                              swipeOrientation: CardOrientation.both,
-                              cardDismissOrientation: CardOrientation.both,
-                              positionFactor: 3,
-                              scaleFactor: 2,
-                              alignment: Alignment.center,
-                              animateCardScale: true,
-                              dismissedCardDuration: const Duration(
-                                milliseconds: 150,
-                              ),
-                            ),
-                          ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: SizedBox(
+                      height: 500,
+                      child: CardStackWidget(
+                        cardList: cardStackList.take(3).toList(),
+                        opacityChangeOnDrag: true,
+                        swipeOrientation: CardOrientation.both,
+                        cardDismissOrientation: CardOrientation.both,
+                        positionFactor: 3,
+                        scaleFactor: 2,
+                        alignment: Alignment.center,
+                        animateCardScale: true,
+                        dismissedCardDuration: const Duration(
+                          milliseconds: 150,
                         ),
+                      ),
+                    ),
+                  ),
 
                 //* Other Cards Section
                 Padding(
@@ -325,21 +325,20 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
                             return InkWell(
                               onTap: () async {
                                 if (eventTicket.ticketId == null) return;
+                                _hapticService.triggerHaptic(
+                                  HapticType.selection,
+                                );
 
                                 await context.pushNamed(
                                   AppRoute.ticketView.name,
-                                  pathParameters: {
-                                    'id': eventTicket.ticketId!,
-                                  },
+                                  pathParameters: {'id': eventTicket.ticketId!},
                                 );
 
                                 if (mounted) {
                                   await _loadTicketData();
                                 }
                               },
-                              child: EventTicketCardWidget(
-                                ticket: eventTicket,
-                              ),
+                              child: EventTicketCardWidget(ticket: eventTicket),
                             );
                           },
                         ),

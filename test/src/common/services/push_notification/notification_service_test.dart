@@ -66,28 +66,22 @@ void main() {
       },
     );
 
-    test(
-      'Given Asia/Calcutta timezone, '
-      'When initTimezone is called, '
-      'Then Asia/Kolkata is selected',
-      () async {
-        final service = CalcuttaTimezoneNotificationService();
+    test('Given Asia/Calcutta timezone, '
+        'When initTimezone is called, '
+        'Then Asia/Kolkata is selected', () async {
+      final service = CalcuttaTimezoneNotificationService();
 
-        await service.initTimezone();
-        expect(tz.local.name, equals('Asia/Kolkata'));
-      },
-    );
+      await service.initTimezone();
+      expect(tz.local.name, equals('Asia/Kolkata'));
+    });
 
-    test(
-      'Given valid timezone ID, '
-      'When initTimezone is called, '
-      'Then corresponding timezone location is set',
-      () async {
-        final service = ValidTimezoneNotificationService();
+    test('Given valid timezone ID, '
+        'When initTimezone is called, '
+        'Then corresponding timezone location is set', () async {
+      final service = ValidTimezoneNotificationService();
 
-        await service.initTimezone();
-        expect(tz.local.name, equals('America/New_York'));
-      },
-    );
+      await service.initTimezone();
+      expect(tz.local.name, equals('America/New_York'));
+    });
   });
 }

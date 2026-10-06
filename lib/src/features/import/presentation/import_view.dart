@@ -54,9 +54,7 @@ class _ImportViewState extends State<ImportView> {
       _isScanning = true;
     });
 
-    getIt<IHapticService>().triggerHaptic(
-      HapticType.selection,
-    );
+    getIt<IHapticService>().triggerHaptic(HapticType.selection);
 
     try {
       // Use import service to handle QR code
@@ -69,21 +67,14 @@ class _ImportViewState extends State<ImportView> {
           unawaited(
             getIt<INotificationService>()
                 .scheduleTicketReminderFor(ticket)
-                .catchError((
-                  Object e,
-                  StackTrace s,
-                ) {
+                .catchError((Object e, StackTrace s) {
                   _logger.error('Error scheduling notification', e, s);
                 }),
           );
         }
         await _openImportedTicket(ticket);
       } else {
-        showSnackbar(
-          context,
-          'QR code format not supported',
-          isError: true,
-        );
+        showSnackbar(context, 'QR code format not supported', isError: true);
       }
     } finally {
       if (mounted) {
@@ -121,43 +112,44 @@ class _ImportViewState extends State<ImportView> {
     if (_isProcessingPDF) return;
 
     try {
-      final result = await FilePicker.pickFiles(
+      // pickFiles returns an empty list when the user cancels; `withData` was
+      // removed, so bytes for path-less (web) picks are read on demand below.
+      final files = await FilePicker.pickFiles(
         type: FileType.custom,
         allowedExtensions: ['pdf'],
-        withData: kIsWeb, // Ensure bytes are loaded on web
       );
+      if (!mounted) return;
 
       XFile? xFile;
-      if (result != null) {
+      if (files.isNotEmpty) {
         setState(() {
           _isProcessingPDF = true;
         });
 
-        final platformFile = result.files.single;
-        if (kIsWeb && platformFile.bytes != null) {
-          xFile = XFile.fromData(
-            platformFile.bytes!,
-            name: platformFile.name,
-          );
-        } else if (platformFile.path != null) {
+        final platformFile = files.single;
+        if (platformFile.path != null) {
           xFile = XFile(platformFile.path!);
         } else {
-          _logger.warning('File picked but no bytes or path available');
-          if (mounted) {
-            showSnackbar(
-              context,
-              'Could not read the selected file. Please try again.',
-              isError: true,
+          try {
+            xFile = XFile.fromData(
+              await platformFile.readAsBytes(),
+              name: platformFile.name,
             );
+          } on Object catch (e) {
+            _logger.warning('File picked but bytes could not be read: $e');
+            if (mounted) {
+              showSnackbar(
+                context,
+                'Could not read the selected file. Please try again.',
+                isError: true,
+              );
+            }
           }
-          return;
         }
       }
 
       if (xFile != null) {
-        getIt<IHapticService>().triggerHaptic(
-          HapticType.selection,
-        );
+        getIt<IHapticService>().triggerHaptic(HapticType.selection);
 
         // Use import service to handle PDF
         final ticket = await _importService.importAndSavePDFFile(xFile);
@@ -169,10 +161,7 @@ class _ImportViewState extends State<ImportView> {
             unawaited(
               getIt<INotificationService>()
                   .scheduleTicketReminderFor(ticket)
-                  .catchError((
-                    Object e,
-                    StackTrace s,
-                  ) {
+                  .catchError((Object e, StackTrace s) {
                     _logger.error('Error scheduling notification', e, s);
                   }),
             );
@@ -213,9 +202,7 @@ class _ImportViewState extends State<ImportView> {
 
     try {
       // Returns XFile Natively
-      final result = await ImagePicker().pickImage(
-        source: ImageSource.gallery,
-      );
+      final result = await ImagePicker().pickImage(source: ImageSource.gallery);
 
       if (result == null) {
         _logger.info('No Image selected');
@@ -226,9 +213,7 @@ class _ImportViewState extends State<ImportView> {
         _isProcessingImage = true;
       });
 
-      getIt<IHapticService>().triggerHaptic(
-        HapticType.selection,
-      );
+      getIt<IHapticService>().triggerHaptic(HapticType.selection);
 
       // Use import service to handle Image
       final ticket = await _importService.importAndSaveImageFile(result);
@@ -280,9 +265,7 @@ class _ImportViewState extends State<ImportView> {
       _isPasting = true;
     });
 
-    getIt<IHapticService>().triggerHaptic(
-      HapticType.selection,
-    );
+    getIt<IHapticService>().triggerHaptic(HapticType.selection);
 
     try {
       final clipboardService = getIt<IClipboardService>();
@@ -300,11 +283,7 @@ class _ImportViewState extends State<ImportView> {
         }
       } on Exception catch (e) {
         if (mounted) {
-          showSnackbar(
-            context,
-            'Failed to read clipboard',
-            isError: true,
-          );
+          showSnackbar(context, 'Failed to read clipboard', isError: true);
         }
         _logger.error('Clipboard read error: $e');
       }
@@ -323,19 +302,11 @@ class _ImportViewState extends State<ImportView> {
     final pnr = _pnrController.text.trim();
     final phoneNumber = _phoneController.text.trim();
     if (pnr.isEmpty) {
-      showSnackbar(
-        context,
-        'Please enter a PNR number',
-        isError: true,
-      );
+      showSnackbar(context, 'Please enter a PNR number', isError: true);
       return null;
     }
     if (phoneNumber.isEmpty) {
-      showSnackbar(
-        context,
-        'Please enter your phone number',
-        isError: true,
-      );
+      showSnackbar(context, 'Please enter your phone number', isError: true);
       return null;
     }
 
@@ -343,15 +314,10 @@ class _ImportViewState extends State<ImportView> {
       _isFetchingPNR = true;
     });
 
-    getIt<IHapticService>().triggerHaptic(
-      HapticType.selection,
-    );
+    getIt<IHapticService>().triggerHaptic(HapticType.selection);
 
     try {
-      final ticket = await _importService.importTNSTCByPNR(
-        pnr,
-        phoneNumber,
-      );
+      final ticket = await _importService.importTNSTCByPNR(pnr, phoneNumber);
 
       if (!mounted) return null;
 
@@ -431,15 +397,9 @@ class _ImportViewState extends State<ImportView> {
 
             final id = ticket.ticketId;
             if (id != null) {
-              await _openImportedTicket(
-                ticket,
-                context: rootContext,
-              );
+              await _openImportedTicket(ticket, context: rootContext);
             } else {
-              showSnackbar(
-                rootContext,
-                'TNSTC ticket imported successfully!',
-              );
+              showSnackbar(rootContext, 'TNSTC ticket imported successfully!');
             }
           }
 
@@ -520,10 +480,7 @@ class _ImportViewState extends State<ImportView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Import Tickets'),
-        centerTitle: true,
-      ),
+      appBar: AppBar(title: const Text('Import Tickets'), centerTitle: true),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16),

@@ -1,10 +1,10 @@
 // import 'dart:convert';
 
 import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_gemma/core/api/flutter_gemma.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:namma_wallet/src/app.dart';
@@ -17,7 +17,6 @@ import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
 import 'package:namma_wallet/src/common/services/push_notification/notification_service_interface.dart';
 import 'package:namma_wallet/src/common/services/widget/widget_service_interface.dart';
 import 'package:namma_wallet/src/common/theme/theme_provider.dart';
-import 'package:namma_wallet/src/features/ai/fallback_parser/application/ai_service_interface.dart';
 import 'package:pdfrx/pdfrx.dart';
 import 'package:provider/provider.dart';
 
@@ -35,18 +34,6 @@ Future<void> main() async {
       // Catch any other throwables
       debugPrint('Failed to set HomeWidget app group id: $e\n$stackTrace');
     }
-  }
-
-  /// This is required by the new mediapipe requirement made by flutter gemma
-  try {
-    await FlutterGemma.initialize();
-  } on Exception catch (e, stackTrace) {
-    // Log initialization error - AI features may be unavailable
-    // Continue app startup to allow non-AI features to work
-    debugPrint('FlutterGemma initialization failed: $e\n$stackTrace');
-  } on Object catch (e, stackTrace) {
-    // Catch any other throwables
-    debugPrint('FlutterGemma initialization failed: $e\n$stackTrace');
   }
 
   // Initialize pdfrx (required when using PDF engine APIs before widgets)
@@ -130,11 +117,7 @@ Future<void> main() async {
   // Catch errors not caught by Flutter
   PlatformDispatcher.instance.onError = (error, stack) {
     if (logger != null) {
-      logger.error(
-        'Platform Error: $error',
-        error,
-        stack,
-      );
+      logger.error('Platform Error: $error', error, stack);
     } else {
       // Fallback to print if logger is not available,
       // to ensure error messages are still visible.
@@ -152,10 +135,6 @@ Future<void> main() async {
     await getIt<IHapticService>().loadPreference();
     logger?.success('Haptic service initialized');
 
-    logger?.info('Initializing AI service...');
-    await getIt<IAIService>().init();
-    logger?.success('AI service initialized');
-
     logger?.info('Initializing widget service...');
     await getIt<IWidgetService>().initialize();
     logger?.success('Widget service initialized');
@@ -169,11 +148,7 @@ Future<void> main() async {
     logger?.success('All services initialized successfully');
   } on Object catch (e, stackTrace) {
     // Log error using logger if available
-    logger?.error(
-      'Error during initialization: $e',
-      e,
-      stackTrace,
-    );
+    logger?.error('Error during initialization: $e', e, stackTrace);
 
     // Fallback: ensure error is always visible even if logger is null
     if (logger == null) {

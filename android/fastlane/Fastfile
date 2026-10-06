@@ -89,7 +89,7 @@ platform :android do
     UI.success("✓ Version validation passed - #{version}+#{version_code}")
 
     flutter = ENV.fetch('FLUTTER_CMD', 'flutter')
-    sh("cd ../.. && #{flutter} build appbundle --release")
+    sh("cd ../.. && #{flutter} build appbundle --release --android-skip-build-dependency-validation")
 
     # Write changelog to the path supply expects
     dest_changelog_dir = "./metadata/android/en-US/changelogs"

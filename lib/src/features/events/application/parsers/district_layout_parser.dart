@@ -44,9 +44,7 @@ class DistrictMovieParser extends EventLayoutParser {
 
     // Critical fields – never invent data
     if (movieName == null || showDateTime == null) {
-      logger.warning(
-        '[DistrictMovieParser] Missing movieName or showDateTime',
-      );
+      logger.warning('[DistrictMovieParser] Missing movieName or showDateTime');
       return null;
     }
 
@@ -64,9 +62,7 @@ class DistrictMovieParser extends EventLayoutParser {
       qrData: qrData,
     );
 
-    return Ticket.fromMovie(
-      model,
-    );
+    return Ticket.fromMovie(model);
   }
 
   // ── Extraction helpers ────────────────────────────────────────────
@@ -269,9 +265,7 @@ class DistrictMovieParser extends EventLayoutParser {
       }
       return null;
     } on Object {
-      logger.warning(
-        '[DistrictMovieParser] Failed to extract QR from image',
-      );
+      logger.warning('[DistrictMovieParser] Failed to extract QR from image');
       return null;
     } finally {
       await controller.dispose();
@@ -341,9 +335,7 @@ class DistrictMovieParser extends EventLayoutParser {
   }
 
   String? _extractCertificate(String plain) {
-    final m = RegExp(
-      r'\b(UA\d*\+?|U|A|S)\b',
-    ).firstMatch(plain);
+    final m = RegExp(r'\b(UA\d*\+?|U|A|S)\b').firstMatch(plain);
     return m?.group(1);
   }
 

@@ -65,9 +65,7 @@ class _TravelTicketViewState extends State<TravelTicketView> {
 
   /// Regex that matches clean label titles
   /// (alphabetic with spaces/hyphens, no digits).
-  static final _validExtraTitleRegex = RegExp(
-    r'^[A-Za-z][A-Za-z\s\-_/]+$',
-  );
+  static final _validExtraTitleRegex = RegExp(r'^[A-Za-z][A-Za-z\s\-_/]+$');
 
   List<ExtrasModel> getFilteredExtras(Ticket ticket) {
     if (ticket.extras == null) return [];
