@@ -105,6 +105,8 @@ cp public/app-icon.png "$PRESERVE_DIR/app-icon.png" 2>/dev/null || true
 
 # 3. Copy the current template over the old UI implementation.
 cp -R "<SKILL_DIR>/template/." "$PWD/"
+[ -f package.json.template ] && mv package.json.template package.json
+[ -f bun.lock.template ] && mv bun.lock.template bun.lock
 cp app-store-screenshots.json "$BACKUP_DIR/template-app-store-screenshots.json" 2>/dev/null || true
 
 # 4. Restore preserved user state/assets over template samples.
@@ -357,6 +359,8 @@ The template lives at `<this skill dir>/template/` — when the skill is install
 ```bash
 # Replace <SKILL_DIR> with the absolute path to this skill (the directory containing SKILL.md).
 cp -R "<SKILL_DIR>/template/." "$PWD/"
+[ -f package.json.template ] && mv package.json.template package.json
+[ -f bun.lock.template ] && mv bun.lock.template bun.lock
 ```
 
 If the target directory already has a `package.json`, ask the user before overwriting during a new scaffold. If Step 0 detected an old implementation and the user chose **Yes**, do not ask this again; follow the migration path, preserve recoverability with the backup directory, and merge package metadata after the template copy.
