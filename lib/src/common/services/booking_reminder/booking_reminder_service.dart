@@ -7,12 +7,10 @@ import 'package:namma_wallet/src/common/services/push_notification/notification_
 
 class BookingReminderService {
   BookingReminderService({
-    required ILogger logger,
-    required INotificationService notificationService,
-    required IBookingReminderPreferencesService preferencesService,
-  }) : _logger = logger,
-       _notificationService = notificationService,
-       _preferencesService = preferencesService;
+    required this._logger,
+    required this._notificationService,
+    required this._preferencesService,
+  });
 
   final ILogger _logger;
   final INotificationService _notificationService;
@@ -28,15 +26,15 @@ class BookingReminderService {
     switch (ticket.type) {
       case TicketType.bus:
         final normal = startTime.subtract(
-          Duration(days: _normalBookingOffsetDays),
+          const Duration(days: _normalBookingOffsetDays),
         );
         return (normal, null);
       case TicketType.train:
         final normal = startTime.subtract(
-          Duration(days: _normalBookingOffsetDays),
+          const Duration(days: _normalBookingOffsetDays),
         );
         final tatkal = startTime.subtract(
-          Duration(days: _tatkalBookingOffsetDays),
+          const Duration(days: _tatkalBookingOffsetDays),
         );
         return (normal, tatkal);
       case TicketType.event:
@@ -74,7 +72,6 @@ class BookingReminderService {
         normal.month,
         normal.day,
         8,
-        0,
       );
       if (!normalNotify.isBefore(now)) {
         await _notificationService.scheduleTicketReminder(
@@ -93,7 +90,6 @@ class BookingReminderService {
         tatkal.month,
         tatkal.day,
         8,
-        0,
       );
       if (!tatkalNotify.isBefore(now)) {
         await _notificationService.scheduleTicketReminder(
@@ -109,8 +105,6 @@ class BookingReminderService {
     final prefs = BookingReminderPreferences(
       ticketId: ticket.ticketId!,
       bookingOpenDateMillis: normal.millisecondsSinceEpoch,
-      isTatkal: false,
-      enabled: true,
     );
     await _preferencesService.saveReminder(prefs);
 
@@ -119,7 +113,6 @@ class BookingReminderService {
         ticketId: '${ticket.ticketId}_tatkal',
         bookingOpenDateMillis: tatkal.millisecondsSinceEpoch,
         isTatkal: true,
-        enabled: true,
       );
       await _preferencesService.saveReminder(tatkalPrefs);
     }
@@ -157,7 +150,7 @@ class BookingReminderService {
       final date = reminder.bookingOpenDate;
       if (date == null || date.isBefore(now)) continue;
 
-      final notifyTime = DateTime(date.year, date.month, date.day, 8, 0);
+      final notifyTime = DateTime(date.year, date.month, date.day, 8);
       if (notifyTime.isBefore(now)) continue;
 
       await _notificationService.scheduleTicketReminder(

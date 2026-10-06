@@ -677,8 +677,7 @@ final irctc_4937508934 = <OCRBlock>[
     page: 0,
   ),
   OCRBlock(
-    text:
-        'IRCTC Convenience Fee is charged per e-ticket irrespective of number of passengers',
+    text: 'IRCTC Convenience Fee is charged per e-ticket irrespective of number of passengers',
     boundingBox: const Rect.fromLTRB(
       0,
       1360,
@@ -698,8 +697,7 @@ final irctc_4937508934 = <OCRBlock>[
     page: 0,
   ),
   OCRBlock(
-    text:
-        '* The printed Departure and Arrival Times are liable to change. Please Check',
+    text: '* The printed Departure and Arrival Times are liable to change. Please Check',
     boundingBox: const Rect.fromLTRB(
       0,
       1400,
@@ -729,8 +727,7 @@ final irctc_4937508934 = <OCRBlock>[
     page: 0,
   ),
   OCRBlock(
-    text:
-        'This ticket is booked on a personal User ID, its sale/purchase is an offence u/s 143 of the Railways',
+    text: 'This ticket is booked on a personal User ID, its sale/purchase is an offence u/s 143 of the Railways',
     boundingBox: const Rect.fromLTRB(
       0,
       1460,
@@ -750,8 +747,7 @@ final irctc_4937508934 = <OCRBlock>[
     page: 0,
   ),
   OCRBlock(
-    text:
-        'Prescribed original ID proof is required while travelling along with SMS/ VRM/ ERS otherwise will be',
+    text: 'Prescribed original ID proof is required while travelling along with SMS/ VRM/ ERS otherwise will be',
     boundingBox: const Rect.fromLTRB(
       0,
       1500,
@@ -811,8 +807,7 @@ final irctc_4937508934 = <OCRBlock>[
     page: 0,
   ),
   OCRBlock(
-    text:
-        'Prescribed Original ID proofs are:- Voter Identity Card / Passport / PAN Card / Driving License /',
+    text: 'Prescribed Original ID proofs are:- Voter Identity Card / Passport / PAN Card / Driving License /',
     boundingBox: const Rect.fromLTRB(
       0,
       1620,
@@ -842,8 +837,7 @@ final irctc_4937508934 = <OCRBlock>[
     page: 0,
   ),
   OCRBlock(
-    text:
-        'Government ,District Administrations , Municipal bodies and Panchayat Administrations which are',
+    text: 'Government ,District Administrations , Municipal bodies and Panchayat Administrations which are',
     boundingBox: const Rect.fromLTRB(
       0,
       1680,
@@ -853,8 +847,7 @@ final irctc_4937508934 = <OCRBlock>[
     page: 0,
   ),
   OCRBlock(
-    text:
-        'having serial number / Student Identity Card with photograph issued by recognized School or College',
+    text: 'having serial number / Student Identity Card with photograph issued by recognized School or College',
     boundingBox: const Rect.fromLTRB(
       0,
       1700,
@@ -884,8 +877,7 @@ final irctc_4937508934 = <OCRBlock>[
     page: 0,
   ),
   OCRBlock(
-    text:
-        'laminated photograph/Unique Identification Card "Aadhaar", m-Aadhaar, e-',
+    text: 'laminated photograph/Unique Identification Card "Aadhaar", m-Aadhaar, e-',
     boundingBox: const Rect.fromLTRB(
       0,
       1760,
@@ -905,8 +897,7 @@ final irctc_4937508934 = <OCRBlock>[
     page: 1,
   ),
   OCRBlock(
-    text:
-        'the Aadhaar/Driving Licence from the "Issued Document" section by logging into his/her DigiLocker',
+    text: 'the Aadhaar/Driving Licence from the "Issued Document" section by logging into his/her DigiLocker',
     boundingBox: const Rect.fromLTRB(
       0,
       20,
@@ -926,8 +917,7 @@ final irctc_4937508934 = <OCRBlock>[
     page: 1,
   ),
   OCRBlock(
-    text:
-        'considered as valid proof of identity. (Documents uploaded by the user i.e. the document in',
+    text: 'considered as valid proof of identity. (Documents uploaded by the user i.e. the document in',
     boundingBox: const Rect.fromLTRB(
       0,
       60,
@@ -977,8 +967,7 @@ final irctc_4937508934 = <OCRBlock>[
     page: 1,
   ),
   OCRBlock(
-    text:
-        'PNRs having fully waitlisted status will be dropped and automatic refund of the ticket amount after',
+    text: 'PNRs having fully waitlisted status will be dropped and automatic refund of the ticket amount after',
     boundingBox: const Rect.fromLTRB(
       0,
       160,
@@ -1008,8 +997,7 @@ final irctc_4937508934 = <OCRBlock>[
     page: 1,
   ),
   OCRBlock(
-    text:
-        'booking of the ticket. Passengers having fully waitlisted e-ticket are not allowed to',
+    text: 'booking of the ticket. Passengers having fully waitlisted e-ticket are not allowed to',
     boundingBox: const Rect.fromLTRB(
       0,
       220,
@@ -1029,8 +1017,7 @@ final irctc_4937508934 = <OCRBlock>[
     page: 1,
   ),
   OCRBlock(
-    text:
-        'train. However, the names of PARTIALLY waitlisted/confirmed and RAC ticket passenger will appear in',
+    text: 'train. However, the names of PARTIALLY waitlisted/confirmed and RAC ticket passenger will appear in',
     boundingBox: const Rect.fromLTRB(
       0,
       260,
@@ -1080,8 +1067,7 @@ final irctc_4937508934 = <OCRBlock>[
     page: 1,
   ),
   OCRBlock(
-    text:
-        'Passengers travelling on a fully waitlisted e-ticket will be treated as Ticketless.',
+    text: 'Passengers travelling on a fully waitlisted e-ticket will be treated as Ticketless.',
     boundingBox: const Rect.fromLTRB(
       0,
       360,
@@ -1111,8 +1097,7 @@ final irctc_4937508934 = <OCRBlock>[
     page: 1,
   ),
   OCRBlock(
-    text:
-        'Obtain certificate from the TTE /Conductor in case of (a) PARTIALLY waitlisted e-ticket when LESS',
+    text: 'Obtain certificate from the TTE /Conductor in case of (a) PARTIALLY waitlisted e-ticket when LESS',
     boundingBox: const Rect.fromLTRB(
       0,
       420,
@@ -1142,8 +1127,7 @@ final irctc_4937508934 = <OCRBlock>[
     page: 1,
   ),
   OCRBlock(
-    text:
-        'be sent to GGM (IT), IRCTC, Internet Ticketing Centre, 2nd Floor, Tower-D, World Trade',
+    text: 'be sent to GGM (IT), IRCTC, Internet Ticketing Centre, 2nd Floor, Tower-D, World Trade',
     boundingBox: const Rect.fromLTRB(
       0,
       480,
@@ -1163,8 +1147,7 @@ final irctc_4937508934 = <OCRBlock>[
     page: 1,
   ),
   OCRBlock(
-    text:
-        'Nauroji Nagar, New Delhi- 110029, after filing TDR online within prescribed time for claiming',
+    text: 'Nauroji Nagar, New Delhi- 110029, after filing TDR online within prescribed time for claiming',
     boundingBox: const Rect.fromLTRB(
       0,
       520,
@@ -1204,8 +1187,7 @@ final irctc_4937508934 = <OCRBlock>[
     page: 1,
   ),
   OCRBlock(
-    text:
-        'In case, on a party e-ticket or a family e-ticket issued for travel of more than one passenger,',
+    text: 'In case, on a party e-ticket or a family e-ticket issued for travel of more than one passenger,',
     boundingBox: const Rect.fromLTRB(
       0,
       600,
@@ -1235,8 +1217,7 @@ final irctc_4937508934 = <OCRBlock>[
     page: 1,
   ),
   OCRBlock(
-    text:
-        'fare, less clerkage, shall be admissible for confirmed passengers also subject to the condition that',
+    text: 'fare, less clerkage, shall be admissible for confirmed passengers also subject to the condition that',
     boundingBox: const Rect.fromLTRB(
       0,
       660,
@@ -1246,8 +1227,7 @@ final irctc_4937508934 = <OCRBlock>[
     page: 1,
   ),
   OCRBlock(
-    text:
-        'the ticket shall be cancelled online or online TDR shall be filed for all the passengers upto thirty',
+    text: 'the ticket shall be cancelled online or online TDR shall be filed for all the passengers upto thirty',
     boundingBox: const Rect.fromLTRB(
       0,
       680,
@@ -1297,8 +1277,7 @@ final irctc_4937508934 = <OCRBlock>[
     page: 1,
   ),
   OCRBlock(
-    text:
-        'In case train is late more than 3 hours, refund is admissible as per railway refund rules only when',
+    text: 'In case train is late more than 3 hours, refund is admissible as per railway refund rules only when',
     boundingBox: const Rect.fromLTRB(
       0,
       780,
@@ -1358,8 +1337,7 @@ final irctc_4937508934 = <OCRBlock>[
     page: 1,
   ),
   OCRBlock(
-    text:
-        'In case of train cancellation on its entire run, full refund is granted automatically by the',
+    text: 'In case of train cancellation on its entire run, full refund is granted automatically by the',
     boundingBox: const Rect.fromLTRB(
       0,
       900,
@@ -1389,8 +1367,7 @@ final irctc_4937508934 = <OCRBlock>[
     page: 1,
   ),
   OCRBlock(
-    text:
-        'boarding/destination station, passengers are required to file online TDR within 72 hours of',
+    text: 'boarding/destination station, passengers are required to file online TDR within 72 hours of',
     boundingBox: const Rect.fromLTRB(
       0,
       960,
@@ -1440,8 +1417,7 @@ final irctc_4937508934 = <OCRBlock>[
     page: 1,
   ),
   OCRBlock(
-    text:
-        'Never purchase e-ticket from unauthorized agents or persons using their personal IDs for commercial',
+    text: 'Never purchase e-ticket from unauthorized agents or persons using their personal IDs for commercial',
     boundingBox: const Rect.fromLTRB(
       0,
       1060,
@@ -1471,8 +1447,7 @@ final irctc_4937508934 = <OCRBlock>[
     page: 1,
   ),
   OCRBlock(
-    text:
-        'section (143) of the Indian Railway Act 1989. List of authorized agents are available',
+    text: 'section (143) of the Indian Railway Act 1989. List of authorized agents are available',
     boundingBox: const Rect.fromLTRB(
       0,
       1120,
@@ -1522,8 +1497,7 @@ final irctc_4937508934 = <OCRBlock>[
     page: 1,
   ),
   OCRBlock(
-    text:
-        'For detail, Rules, Refund rules, Terms & Conditions of E-Ticketing services, Travel Insurance',
+    text: 'For detail, Rules, Refund rules, Terms & Conditions of E-Ticketing services, Travel Insurance',
     boundingBox: const Rect.fromLTRB(
       0,
       1220,
@@ -1563,8 +1537,7 @@ final irctc_4937508934 = <OCRBlock>[
     page: 1,
   ),
   OCRBlock(
-    text:
-        'While booking this ticket, you have agreed of having read the Health Protocol of Destination State',
+    text: 'While booking this ticket, you have agreed of having read the Health Protocol of Destination State',
     boundingBox: const Rect.fromLTRB(
       0,
       1300,
@@ -1624,8 +1597,7 @@ final irctc_4937508934 = <OCRBlock>[
     page: 1,
   ),
   OCRBlock(
-    text:
-        'The FIR forms are available with on board ticket checking staff, train guard and train escorting',
+    text: 'The FIR forms are available with on board ticket checking staff, train guard and train escorting',
     boundingBox: const Rect.fromLTRB(
       0,
       1420,
@@ -1665,8 +1637,7 @@ final irctc_4937508934 = <OCRBlock>[
     page: 1,
   ),
   OCRBlock(
-    text:
-        'Variety of meals available in more than 1500 trains. For delivery of meal of your choice on your',
+    text: 'Variety of meals available in more than 1500 trains. For delivery of meal of your choice on your',
     boundingBox: const Rect.fromLTRB(
       0,
       1500,
@@ -1696,8 +1667,7 @@ final irctc_4937508934 = <OCRBlock>[
     page: 1,
   ),
   OCRBlock(
-    text:
-        'related to Catering services, contact Toll Free No. 1800-111-321 (07.00 hrs to 22.00 hrs)',
+    text: 'related to Catering services, contact Toll Free No. 1800-111-321 (07.00 hrs to 22.00 hrs)',
     boundingBox: const Rect.fromLTRB(
       0,
       1560,
@@ -1727,8 +1697,7 @@ final irctc_4937508934 = <OCRBlock>[
     page: 1,
   ),
   OCRBlock(
-    text:
-        'National Consumer Helpline (NCH) Toll Free Number: 1800-11-400 or 14404',
+    text: 'National Consumer Helpline (NCH) Toll Free Number: 1800-11-400 or 14404',
     boundingBox: const Rect.fromLTRB(
       0,
       1620,
@@ -1758,8 +1727,7 @@ final irctc_4937508934 = <OCRBlock>[
     page: 1,
   ),
   OCRBlock(
-    text:
-        'You can book unreserved ticket from UTS APP or ATVMs (Automatic Ticket Vending Machines) located in',
+    text: 'You can book unreserved ticket from UTS APP or ATVMs (Automatic Ticket Vending Machines) located in',
     boundingBox: const Rect.fromLTRB(
       0,
       1680,
@@ -1779,8 +1747,7 @@ final irctc_4937508934 = <OCRBlock>[
     page: 1,
   ),
   OCRBlock(
-    text:
-        'Contact us on: - care@irctc.co.in OR 24*7 Hrs Customer Support at 14646 OR',
+    text: 'Contact us on: - care@irctc.co.in OR 24*7 Hrs Customer Support at 14646 OR',
     boundingBox: const Rect.fromLTRB(
       0,
       1720,

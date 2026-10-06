@@ -7,8 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class BookingReminderPreferencesService
     implements IBookingReminderPreferencesService {
-  BookingReminderPreferencesService({required ILogger logger})
-    : _logger = logger {
+  BookingReminderPreferencesService({required this._logger}) {
     _initFuture = _init();
   }
 
@@ -75,9 +74,9 @@ class BookingReminderPreferencesService
 
   @override
   Future<void> saveReminder(BookingReminderPreferences preferences) async {
-    final all = await getAllReminders();
-    all.removeWhere((r) => r.ticketId == preferences.ticketId);
-    all.add(preferences);
+    final all = await getAllReminders()
+      ..removeWhere((r) => r.ticketId == preferences.ticketId)
+      ..add(preferences);
     await _saveAll(all);
   }
 

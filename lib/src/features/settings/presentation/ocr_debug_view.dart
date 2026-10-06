@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
@@ -44,39 +43,31 @@ class _OCRDebugViewState extends State<OCRDebugView> {
     });
 
     try {
-      final result = await FilePicker.pickFiles(
+      // pickFiles returns an empty list when the user cancels; `withData` was
+      // removed, so bytes for path-less (web) picks are read on demand below.
+      final files = await FilePicker.pickFiles(
         type: FileType.custom,
         allowedExtensions: ['pdf'],
-        withData: kIsWeb, // Load bytes only on web
       );
 
-      if (result == null || result.files.isEmpty) {
+      if (files.isEmpty) {
         setState(() => _isLoadingPDF = false);
         return;
       }
 
-      final file = result.files.first;
+      final file = files.first;
       _fileName = file.name;
 
       // Create XFile based on platform
       final XFile xFile;
-      if (kIsWeb && file.bytes != null) {
+      if (file.path != null) {
+        xFile = XFile(file.path!);
+      } else {
         xFile = XFile.fromData(
-          file.bytes!,
+          await file.readAsBytes(),
           name: file.name,
           mimeType: 'application/pdf',
         );
-      } else if (file.path != null) {
-        xFile = XFile(file.path!);
-      } else {
-        if (!mounted) return;
-        setState(() => _isLoadingPDF = false);
-        showSnackbar(
-          context,
-          'Could not read the selected file. Please try again.',
-          isError: true,
-        );
-        return;
       }
 
       final blocks = await _pdfService.extractBlocks(xFile);

@@ -28,7 +28,7 @@ We care about your privacy and are committed to transparency in how the app work
 
 ### **1.4 Internet Access**
 
-* Ticket extraction and parsing work **fully offline** and require no network access. The app contacts the internet only for explicit user-initiated actions (TNSTC PNR status lookups, loading the contributors list, and fetching remote .pkpass files). It does **not** send SMS, notification, or ticket data anywhere.
+* Ticket extraction and parsing work **fully offline** and require no network access. The app contacts the internet only for explicit user-initiated actions (user-initiated TNSTC PNR lookups send the supplied PNR to TNSTC, loading the contributors list, and fetching remote .pkpass files). It does **not** send SMS or notification data anywhere.
 * The app does **not** send personal data over the internet.
 
 ---
@@ -60,7 +60,7 @@ Anyone can review, verify, or contribute to the code, ensuring full transparency
 | **Read SMS**                | To extract details and create tickets/events        | No                   |
 | **Notification Access**     | To process relevant notifications                   | No                   |
 | **Camera**                  | For scanning-based features (if used)               | No                   |
-| **Internet**                | For PNR lookups, contributors, and remote .pkpass fetches | No ticket/SMS data sent |
+| **Internet**                | For PNR lookups, contributors, and remote .pkpass fetches | Only supplied PNR sent to TNSTC; no SMS or notification data sent |
 | **Storage (if applicable)** | To store generated tickets                                | No                   |
 
 ---

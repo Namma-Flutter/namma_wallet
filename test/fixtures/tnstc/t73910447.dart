@@ -139,8 +139,7 @@ final t73910447 = <OCRBlock>[
     confidence: 0.9,
   ),
   OCRBlock(
-    text:
-        'Passenger Pickup Point : CHENNAI-PT Dr.M.G.R. BS Passenger Pickup Time: 12/12/2025 21:00 Hrs.',
+    text: 'Passenger Pickup Point : CHENNAI-PT Dr.M.G.R. BS Passenger Pickup Time: 12/12/2025 21:00 Hrs.',
     boundingBox: const Rect.fromLTRB(
       149,
       343,
@@ -349,8 +348,7 @@ final t73910447 = <OCRBlock>[
     confidence: 0.9,
   ),
   OCRBlock(
-    text:
-        '• This e-ticket is valid only for the seat number and bus service specified herein.',
+    text: '• This e-ticket is valid only for the seat number and bus service specified herein.',
     boundingBox: const Rect.fromLTRB(
       184,
       785,
@@ -361,8 +359,7 @@ final t73910447 = <OCRBlock>[
     confidence: 0.9,
   ),
   OCRBlock(
-    text:
-        '• e-Ticket and Mobile Ticket Passengers must carry a printed/Soft copy of the ticket at the time of',
+    text: '• e-Ticket and Mobile Ticket Passengers must carry a printed/Soft copy of the ticket at the time of',
     boundingBox: const Rect.fromLTRB(
       184,
       806,
@@ -373,8 +370,7 @@ final t73910447 = <OCRBlock>[
     confidence: 0.9,
   ),
   OCRBlock(
-    text:
-        'journey. It is passengers responsibility to keep the Printout/Softcopy of the ticket till end of the',
+    text: 'journey. It is passengers responsibility to keep the Printout/Softcopy of the ticket till end of the',
     boundingBox: const Rect.fromLTRB(
       201,
       826,
@@ -396,8 +392,7 @@ final t73910447 = <OCRBlock>[
     confidence: 0.9,
   ),
   OCRBlock(
-    text:
-        "• If the passenger is traveling with 'e-Ticket/ Mobile Ticket', he will have to produce the Original",
+    text: "• If the passenger is traveling with 'e-Ticket/ Mobile Ticket', he will have to produce the Original",
     boundingBox: const Rect.fromLTRB(
       184,
       866,
@@ -408,8 +403,7 @@ final t73910447 = <OCRBlock>[
     confidence: 0.9,
   ),
   OCRBlock(
-    text:
-        "Identity Card mentioned in the 'e-Ticket / Mobile Ticket' at the time of journey.",
+    text: "Identity Card mentioned in the 'e-Ticket / Mobile Ticket' at the time of journey.",
     boundingBox: const Rect.fromLTRB(
       203,
       885,
@@ -420,8 +414,7 @@ final t73910447 = <OCRBlock>[
     confidence: 0.9,
   ),
   OCRBlock(
-    text:
-        '• Departure time, Running time and Arrival time mentioned in the website is subject to standard',
+    text: '• Departure time, Running time and Arrival time mentioned in the website is subject to standard',
     boundingBox: const Rect.fromLTRB(
       184,
       907,
@@ -432,8 +425,7 @@ final t73910447 = <OCRBlock>[
     confidence: 0.9,
   ),
   OCRBlock(
-    text:
-        'operating condition. These timings may get varied due to Road block, Traffic condition, Natural',
+    text: 'operating condition. These timings may get varied due to Road block, Traffic condition, Natural',
     boundingBox: const Rect.fromLTRB(
       203,
       927,
@@ -455,8 +447,7 @@ final t73910447 = <OCRBlock>[
     confidence: 0.9,
   ),
   OCRBlock(
-    text:
-        '• The Bus/Seat No. May be subject to change due to curtailment/clubbing of other services and',
+    text: '• The Bus/Seat No. May be subject to change due to curtailment/clubbing of other services and',
     boundingBox: const Rect.fromLTRB(
       184,
       968,
@@ -500,8 +491,7 @@ final t73910447 = <OCRBlock>[
     confidence: 0.9,
   ),
   OCRBlock(
-    text:
-        '• Corporation reserves the rights to change/cancel the class of service.',
+    text: '• Corporation reserves the rights to change/cancel the class of service.',
     boundingBox: const Rect.fromLTRB(
       184,
       1049,
@@ -523,8 +513,7 @@ final t73910447 = <OCRBlock>[
     confidence: 0.9,
   ),
   OCRBlock(
-    text:
-        '• Half ticket eligible for children between 5 to 12 years. Children above 130cms height will be charged',
+    text: '• Half ticket eligible for children between 5 to 12 years. Children above 130cms height will be charged',
     boundingBox: const Rect.fromLTRB(
       184,
       1089,
@@ -548,8 +537,7 @@ final t73910447 = <OCRBlock>[
     confidence: 0.9,
   ),
   OCRBlock(
-    text:
-        'Further, Full ticket fare will be charged for Sleeper Births for children.',
+    text: 'Further, Full ticket fare will be charged for Sleeper Births for children.',
     boundingBox: const Rect.fromLTRB(
       203,
       1130,
@@ -560,8 +548,7 @@ final t73910447 = <OCRBlock>[
     confidence: 0.9,
   ),
   OCRBlock(
-    text:
-        '• Cancellation of e-ticket / Mobile tickets is allowed only up to One (1) hour before the scheduled',
+    text: '• Cancellation of e-ticket / Mobile tickets is allowed only up to One (1) hour before the scheduled',
     boundingBox: const Rect.fromLTRB(
       184,
       1150,
@@ -572,8 +559,7 @@ final t73910447 = <OCRBlock>[
     confidence: 0.9,
   ),
   OCRBlock(
-    text:
-        'departure of the bus service from the Origin Point. After that cancellation will not be allowed. Further,',
+    text: 'departure of the bus service from the Origin Point. After that cancellation will not be allowed. Further,',
     boundingBox: const Rect.fromLTRB(
       203,
       1170,
@@ -584,8 +570,7 @@ final t73910447 = <OCRBlock>[
     confidence: 0.9,
   ),
   OCRBlock(
-    text:
-        'cancellation can be done only before 9 PM for the current date journey after 10 PM and next day',
+    text: 'cancellation can be done only before 9 PM for the current date journey after 10 PM and next day',
     boundingBox: const Rect.fromLTRB(
       203,
       1190,
@@ -607,8 +592,7 @@ final t73910447 = <OCRBlock>[
     confidence: 0.8699448704719543,
   ),
   OCRBlock(
-    text:
-        '• For more detail please see the rules & Regulations in www.tnstc.in website.',
+    text: '• For more detail please see the rules & Regulations in www.tnstc.in website.',
     boundingBox: const Rect.fromLTRB(
       184,
       1231,
@@ -619,8 +603,7 @@ final t73910447 = <OCRBlock>[
     confidence: 0.89,
   ),
   OCRBlock(
-    text:
-        '• For Refund Status please contact to TNSTC Toll Free Number 08066006572/9513948001 or can',
+    text: '• For Refund Status please contact to TNSTC Toll Free Number 08066006572/9513948001 or can',
     boundingBox: const Rect.fromLTRB(
       184,
       1251,
@@ -631,8 +614,7 @@ final t73910447 = <OCRBlock>[
     confidence: 0.89,
   ),
   OCRBlock(
-    text:
-        'contact for Bank Queries-Billdesk / Helpdesk: 044-49076316 / 49076326.',
+    text: 'contact for Bank Queries-Billdesk / Helpdesk: 044-49076316 / 49076326.',
     boundingBox: const Rect.fromLTRB(
       203,
       1268,

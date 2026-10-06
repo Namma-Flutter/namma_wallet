@@ -1,6 +1,7 @@
 // this is just fixtures and may contain more than 80 character
 
 import 'dart:ui';
+
 import 'package:namma_wallet/src/common/services/ocr/ocr_block.dart';
 
 const Map<String, Object?> tdahhpyExpected = {

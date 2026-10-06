@@ -1,4 +1,5 @@
 import 'dart:ui';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:namma_wallet/src/common/domain/models/extras_model.dart';
@@ -6,6 +7,7 @@ import 'package:namma_wallet/src/common/enums/ticket_type.dart';
 import 'package:namma_wallet/src/common/services/logger/logger_interface.dart';
 import 'package:namma_wallet/src/common/services/ocr/ocr_block.dart';
 import 'package:namma_wallet/src/features/events/application/parsers/konfhub_layout_parser.dart';
+
 import '../../../../../fixtures/konfhub_layout_fixtures.dart';
 import '../../../../../helpers/fake_logger.dart';
 

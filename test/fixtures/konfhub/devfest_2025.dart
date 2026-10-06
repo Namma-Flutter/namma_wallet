@@ -1,4 +1,5 @@
 import 'dart:ui';
+
 import 'package:namma_wallet/src/common/services/ocr/ocr_block.dart';
 
 final List<OCRBlock> devfest2025 = [

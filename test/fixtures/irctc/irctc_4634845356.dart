@@ -877,8 +877,7 @@ final irctc_4634845356 = <OCRBlock>[
     page: 0,
   ),
   OCRBlock(
-    text:
-        'Beware of fraudulent customer care number. For any assistance, use only the IRCTC e-ticketing Customer care',
+    text: 'Beware of fraudulent customer care number. For any assistance, use only the IRCTC e-ticketing Customer care',
     boundingBox: const Rect.fromLTRB(
       0,
       1820,
@@ -898,8 +897,7 @@ final irctc_4634845356 = <OCRBlock>[
     page: 0,
   ),
   OCRBlock(
-    text:
-        'IRCTC Convenience Fee is charged per e-ticket irrespective of number of passengers on the ticket.',
+    text: 'IRCTC Convenience Fee is charged per e-ticket irrespective of number of passengers on the ticket.',
     boundingBox: const Rect.fromLTRB(
       0,
       1860,
@@ -909,8 +907,7 @@ final irctc_4634845356 = <OCRBlock>[
     page: 0,
   ),
   OCRBlock(
-    text:
-        '* The printed Departure and Arrival Times are liable to change. Please Check correct departure, arrival from Railway Station',
+    text: '* The printed Departure and Arrival Times are liable to change. Please Check correct departure, arrival from Railway Station',
     boundingBox: const Rect.fromLTRB(
       0,
       1880,
@@ -930,8 +927,7 @@ final irctc_4634845356 = <OCRBlock>[
     page: 0,
   ),
   OCRBlock(
-    text:
-        'This ticket is booked on a personal User ID, its sale/purchase is an offence u/s 143 of the Railways Act,1989.',
+    text: 'This ticket is booked on a personal User ID, its sale/purchase is an offence u/s 143 of the Railways Act,1989.',
     boundingBox: const Rect.fromLTRB(
       0,
       1920,
@@ -941,8 +937,7 @@ final irctc_4634845356 = <OCRBlock>[
     page: 0,
   ),
   OCRBlock(
-    text:
-        'Prescribed original ID proof is required while travelling along with SMS/ VRM/ ERS otherwise will be treated as without ticket',
+    text: 'Prescribed original ID proof is required while travelling along with SMS/ VRM/ ERS otherwise will be treated as without ticket',
     boundingBox: const Rect.fromLTRB(
       0,
       1940,
@@ -1092,8 +1087,7 @@ final irctc_4634845356 = <OCRBlock>[
     page: 1,
   ),
   OCRBlock(
-    text:
-        'Prescribed Original ID proofs are:- Voter Identity Card / Passport / PAN Card / Driving License / Photo ID card issued by Central / State Govt. / Public',
+    text: 'Prescribed Original ID proofs are:- Voter Identity Card / Passport / PAN Card / Driving License / Photo ID card issued by Central / State Govt. / Public',
     boundingBox: const Rect.fromLTRB(
       0,
       200,
@@ -1103,8 +1097,7 @@ final irctc_4634845356 = <OCRBlock>[
     page: 1,
   ),
   OCRBlock(
-    text:
-        'Sector Undertakings of State / Central Government ,District Administrations , Municipal bodies and Panchayat Administrations which are having serial',
+    text: 'Sector Undertakings of State / Central Government ,District Administrations , Municipal bodies and Panchayat Administrations which are having serial',
     boundingBox: const Rect.fromLTRB(
       0,
       220,
@@ -1114,8 +1107,7 @@ final irctc_4634845356 = <OCRBlock>[
     page: 1,
   ),
   OCRBlock(
-    text:
-        'number / Student Identity Card with photograph issued by recognized School or College for their students / Nationalized Bank Passbook with photograph',
+    text: 'number / Student Identity Card with photograph issued by recognized School or College for their students / Nationalized Bank Passbook with photograph',
     boundingBox: const Rect.fromLTRB(
       0,
       240,
@@ -1125,8 +1117,7 @@ final irctc_4634845356 = <OCRBlock>[
     page: 1,
   ),
   OCRBlock(
-    text:
-        '/Credit Cards issued by Banks with laminated photograph/Unique Identification Card "Aadhaar", m-Aadhaar, e-Aadhaar. /Passenger showing the',
+    text: '/Credit Cards issued by Banks with laminated photograph/Unique Identification Card "Aadhaar", m-Aadhaar, e-Aadhaar. /Passenger showing the',
     boundingBox: const Rect.fromLTRB(
       0,
       260,
@@ -1136,8 +1127,7 @@ final irctc_4634845356 = <OCRBlock>[
     page: 1,
   ),
   OCRBlock(
-    text:
-        'Aadhaar/Driving Licence from the "Issued Document" section by logging into his/her DigiLocker account considered as valid proof of identity.',
+    text: 'Aadhaar/Driving Licence from the "Issued Document" section by logging into his/her DigiLocker account considered as valid proof of identity.',
     boundingBox: const Rect.fromLTRB(
       0,
       280,
@@ -1147,8 +1137,7 @@ final irctc_4634845356 = <OCRBlock>[
     page: 1,
   ),
   OCRBlock(
-    text:
-        '(Documents uploaded by the user i.e. the document in "Uploaded Document" section will not be considered as a valid proof of identity).',
+    text: '(Documents uploaded by the user i.e. the document in "Uploaded Document" section will not be considered as a valid proof of identity).',
     boundingBox: const Rect.fromLTRB(
       0,
       300,
@@ -1168,8 +1157,7 @@ final irctc_4634845356 = <OCRBlock>[
     page: 1,
   ),
   OCRBlock(
-    text:
-        'PNRs having fully waitlisted status will be dropped and automatic refund of the ticket amount after deducting the applicable CLERKAGE by Railway',
+    text: 'PNRs having fully waitlisted status will be dropped and automatic refund of the ticket amount after deducting the applicable CLERKAGE by Railway',
     boundingBox: const Rect.fromLTRB(
       0,
       340,
@@ -1179,8 +1167,7 @@ final irctc_4634845356 = <OCRBlock>[
     page: 1,
   ),
   OCRBlock(
-    text:
-        'shall be credited to the account used for payment for booking of the ticket. Passengers having fully waitlisted e-ticket are not allowed to board the train.',
+    text: 'shall be credited to the account used for payment for booking of the ticket. Passengers having fully waitlisted e-ticket are not allowed to board the train.',
     boundingBox: const Rect.fromLTRB(
       0,
       360,
@@ -1190,8 +1177,7 @@ final irctc_4634845356 = <OCRBlock>[
     page: 1,
   ),
   OCRBlock(
-    text:
-        'However, the names of PARTIALLY waitlisted/confirmed and RAC ticket passenger will appear in the chart.',
+    text: 'However, the names of PARTIALLY waitlisted/confirmed and RAC ticket passenger will appear in the chart.',
     boundingBox: const Rect.fromLTRB(
       0,
       380,
@@ -1211,8 +1197,7 @@ final irctc_4634845356 = <OCRBlock>[
     page: 1,
   ),
   OCRBlock(
-    text:
-        'A clerkage charge of Rs.60 per passenger plus GST for AC Classes and Rs.60 per passenger for Non AC classes will be deducted if the ticket remains',
+    text: 'A clerkage charge of Rs.60 per passenger plus GST for AC Classes and Rs.60 per passenger for Non AC classes will be deducted if the ticket remains',
     boundingBox: const Rect.fromLTRB(
       0,
       420,
@@ -1242,8 +1227,7 @@ final irctc_4634845356 = <OCRBlock>[
     page: 1,
   ),
   OCRBlock(
-    text:
-        'Passengers travelling on a fully waitlisted e-ticket will be treated as Ticketless.',
+    text: 'Passengers travelling on a fully waitlisted e-ticket will be treated as Ticketless.',
     boundingBox: const Rect.fromLTRB(
       0,
       480,
@@ -1263,8 +1247,7 @@ final irctc_4634845356 = <OCRBlock>[
     page: 1,
   ),
   OCRBlock(
-    text:
-        'Obtain certificate from the TTE /Conductor in case of (a) PARTIALLY waitlisted e-ticket when LESS NO. OF PASSENGERS travel, (b)A.C FAILURE,',
+    text: 'Obtain certificate from the TTE /Conductor in case of (a) PARTIALLY waitlisted e-ticket when LESS NO. OF PASSENGERS travel, (b)A.C FAILURE,',
     boundingBox: const Rect.fromLTRB(
       0,
       520,
@@ -1274,8 +1257,7 @@ final irctc_4634845356 = <OCRBlock>[
     page: 1,
   ),
   OCRBlock(
-    text:
-        '(c)TRAVEL IN LOWER CLASS. This original certificate must be sent to GGM (IT), IRCTC, Internet Ticketing Centre, 2nd Floor, Tower-D, World Trade',
+    text: '(c)TRAVEL IN LOWER CLASS. This original certificate must be sent to GGM (IT), IRCTC, Internet Ticketing Centre, 2nd Floor, Tower-D, World Trade',
     boundingBox: const Rect.fromLTRB(
       0,
       540,
@@ -1285,8 +1267,7 @@ final irctc_4634845356 = <OCRBlock>[
     page: 1,
   ),
   OCRBlock(
-    text:
-        'Centre, Nauroji Nagar, New Delhi- 110029, after filing TDR online within prescribed time for claiming refund.',
+    text: 'Centre, Nauroji Nagar, New Delhi- 110029, after filing TDR online within prescribed time for claiming refund.',
     boundingBox: const Rect.fromLTRB(
       0,
       560,
@@ -1306,8 +1287,7 @@ final irctc_4634845356 = <OCRBlock>[
     page: 1,
   ),
   OCRBlock(
-    text:
-        'In case, on a party e-ticket or a family e-ticket issued for travel of more than one passenger, some passengers have confirmed reservation and others are on',
+    text: 'In case, on a party e-ticket or a family e-ticket issued for travel of more than one passenger, some passengers have confirmed reservation and others are on',
     boundingBox: const Rect.fromLTRB(
       0,
       600,
@@ -1317,8 +1297,7 @@ final irctc_4634845356 = <OCRBlock>[
     page: 1,
   ),
   OCRBlock(
-    text:
-        'RAC or waiting list, full refund of fare, less clerkage, shall be admissible for confirmed passengers also subject to the condition that the ticket shall be',
+    text: 'RAC or waiting list, full refund of fare, less clerkage, shall be admissible for confirmed passengers also subject to the condition that the ticket shall be',
     boundingBox: const Rect.fromLTRB(
       0,
       620,
@@ -1328,8 +1307,7 @@ final irctc_4634845356 = <OCRBlock>[
     page: 1,
   ),
   OCRBlock(
-    text:
-        'cancelled online or online TDR shall be filed for all the passengers upto thirty minutes before the scheduled departure of the train.',
+    text: 'cancelled online or online TDR shall be filed for all the passengers upto thirty minutes before the scheduled departure of the train.',
     boundingBox: const Rect.fromLTRB(
       0,
       640,
@@ -1349,8 +1327,7 @@ final irctc_4634845356 = <OCRBlock>[
     page: 1,
   ),
   OCRBlock(
-    text:
-        'In case train is late more than 3 hours, refund is admissible as per railway refund rules only when TDR is filed by the user before the actual departure of the',
+    text: 'In case train is late more than 3 hours, refund is admissible as per railway refund rules only when TDR is filed by the user before the actual departure of the',
     boundingBox: const Rect.fromLTRB(
       0,
       680,
@@ -1380,8 +1357,7 @@ final irctc_4634845356 = <OCRBlock>[
     page: 1,
   ),
   OCRBlock(
-    text:
-        'In case of train cancellation on its entire run, full refund is granted automatically by the system. However, if the train is cancelled partially on its run or',
+    text: 'In case of train cancellation on its entire run, full refund is granted automatically by the system. However, if the train is cancelled partially on its run or',
     boundingBox: const Rect.fromLTRB(
       0,
       740,
@@ -1391,8 +1367,7 @@ final irctc_4634845356 = <OCRBlock>[
     page: 1,
   ),
   OCRBlock(
-    text:
-        'diverted and not touching boarding/destination station, passengers are required to file online TDR within 72 hours of scheduled departure of the train from',
+    text: 'diverted and not touching boarding/destination station, passengers are required to file online TDR within 72 hours of scheduled departure of the train from',
     boundingBox: const Rect.fromLTRB(
       0,
       760,
@@ -1422,8 +1397,7 @@ final irctc_4634845356 = <OCRBlock>[
     page: 1,
   ),
   OCRBlock(
-    text:
-        'Never purchase e-ticket from unauthorized agents or persons using their personal IDs for commercial purposes. Such tickets are liable to be cancelled and',
+    text: 'Never purchase e-ticket from unauthorized agents or persons using their personal IDs for commercial purposes. Such tickets are liable to be cancelled and',
     boundingBox: const Rect.fromLTRB(
       0,
       820,
@@ -1433,8 +1407,7 @@ final irctc_4634845356 = <OCRBlock>[
     page: 1,
   ),
   OCRBlock(
-    text:
-        'forfeited without any refund of money, under section (143) of the Indian Railway Act 1989. List of authorized agents are available on www.irctc.co.in',
+    text: 'forfeited without any refund of money, under section (143) of the Indian Railway Act 1989. List of authorized agents are available on www.irctc.co.in',
     boundingBox: const Rect.fromLTRB(
       0,
       840,
@@ -1464,8 +1437,7 @@ final irctc_4634845356 = <OCRBlock>[
     page: 1,
   ),
   OCRBlock(
-    text:
-        'For detail, Rules, Refund rules, Terms & Conditions of E-Ticketing services, Travel Insurance facility etc. Please visit www.irctc.co.in',
+    text: 'For detail, Rules, Refund rules, Terms & Conditions of E-Ticketing services, Travel Insurance facility etc. Please visit www.irctc.co.in',
     boundingBox: const Rect.fromLTRB(
       0,
       900,
@@ -1485,8 +1457,7 @@ final irctc_4634845356 = <OCRBlock>[
     page: 1,
   ),
   OCRBlock(
-    text:
-        'While booking this ticket, you have agreed of having read the Health Protocol of Destination State of your travel. You are again advised to clearly read the',
+    text: 'While booking this ticket, you have agreed of having read the Health Protocol of Destination State of your travel. You are again advised to clearly read the',
     boundingBox: const Rect.fromLTRB(
       0,
       940,
@@ -1496,8 +1467,7 @@ final irctc_4634845356 = <OCRBlock>[
     page: 1,
   ),
   OCRBlock(
-    text:
-        'Health Protocol advisory of destination state before start of your travel and follow them properly.',
+    text: 'Health Protocol advisory of destination state before start of your travel and follow them properly.',
     boundingBox: const Rect.fromLTRB(
       0,
       960,
@@ -1517,8 +1487,7 @@ final irctc_4634845356 = <OCRBlock>[
     page: 1,
   ),
   OCRBlock(
-    text:
-        'The FIR forms are available with on board ticket checking staff, train guard and train escorting RPF/GRP staff.',
+    text: 'The FIR forms are available with on board ticket checking staff, train guard and train escorting RPF/GRP staff.',
     boundingBox: const Rect.fromLTRB(
       0,
       1000,
@@ -1538,8 +1507,7 @@ final irctc_4634845356 = <OCRBlock>[
     page: 1,
   ),
   OCRBlock(
-    text:
-        'Variety of meals available in more than 1500 trains. For delivery of meal of your choice on your seat log on to www.ecatering.irctc.co.in or call 1323 Toll',
+    text: 'Variety of meals available in more than 1500 trains. For delivery of meal of your choice on your seat log on to www.ecatering.irctc.co.in or call 1323 Toll',
     boundingBox: const Rect.fromLTRB(
       0,
       1040,
@@ -1549,8 +1517,7 @@ final irctc_4634845356 = <OCRBlock>[
     page: 1,
   ),
   OCRBlock(
-    text:
-        'Free. For any suggestions/complaints related to Catering services, contact Toll Free No. 1800-111-321 (07.00 hrs to 22.00 hrs)',
+    text: 'Free. For any suggestions/complaints related to Catering services, contact Toll Free No. 1800-111-321 (07.00 hrs to 22.00 hrs)',
     boundingBox: const Rect.fromLTRB(
       0,
       1060,
@@ -1570,8 +1537,7 @@ final irctc_4634845356 = <OCRBlock>[
     page: 1,
   ),
   OCRBlock(
-    text:
-        'National Consumer Helpline (NCH) Toll Free Number: 1800-11-400 or 14404',
+    text: 'National Consumer Helpline (NCH) Toll Free Number: 1800-11-400 or 14404',
     boundingBox: const Rect.fromLTRB(
       0,
       1100,
@@ -1591,8 +1557,7 @@ final irctc_4634845356 = <OCRBlock>[
     page: 1,
   ),
   OCRBlock(
-    text:
-        'You can book unreserved ticket from UTS APP or ATVMs (Automatic Ticket Vending Machines) located in Railway Stations.',
+    text: 'You can book unreserved ticket from UTS APP or ATVMs (Automatic Ticket Vending Machines) located in Railway Stations.',
     boundingBox: const Rect.fromLTRB(
       0,
       1140,
@@ -1612,8 +1577,7 @@ final irctc_4634845356 = <OCRBlock>[
     page: 1,
   ),
   OCRBlock(
-    text:
-        'As per RBI guidelines, the refund of Ticket should be given in the same Bank account, which was used for booking. It is necessary that the Bank Account',
+    text: 'As per RBI guidelines, the refund of Ticket should be given in the same Bank account, which was used for booking. It is necessary that the Bank Account',
     boundingBox: const Rect.fromLTRB(
       0,
       1180,
@@ -1623,8 +1587,7 @@ final irctc_4634845356 = <OCRBlock>[
     page: 1,
   ),
   OCRBlock(
-    text:
-        'used for booking online ticket should not be closed at least up to 30 days beyond the date of the journey. If accounts are found closed at the time of',
+    text: 'used for booking online ticket should not be closed at least up to 30 days beyond the date of the journey. If accounts are found closed at the time of',
     boundingBox: const Rect.fromLTRB(
       0,
       1200,
@@ -1654,8 +1617,7 @@ final irctc_4634845356 = <OCRBlock>[
     page: 1,
   ),
   OCRBlock(
-    text:
-        'For e-ticket booking ,cancellation and refund assistance , Please contact us at 14646 / 08044647999 /08035734999 or raise query at',
+    text: 'For e-ticket booking ,cancellation and refund assistance , Please contact us at 14646 / 08044647999 /08035734999 or raise query at',
     boundingBox: const Rect.fromLTRB(
       0,
       1260,
@@ -1675,8 +1637,7 @@ final irctc_4634845356 = <OCRBlock>[
     page: 1,
   ),
   OCRBlock(
-    text:
-        'Just dial 139 from your landline, mobile & CDMA phones for railway enquiries as well as for giving suggestions/filing complaints on',
+    text: 'Just dial 139 from your landline, mobile & CDMA phones for railway enquiries as well as for giving suggestions/filing complaints on',
     boundingBox: const Rect.fromLTRB(
       0,
       1300,
@@ -1696,8 +1657,7 @@ final irctc_4634845356 = <OCRBlock>[
     page: 1,
   ),
   OCRBlock(
-    text:
-        'For e-catering, to book and get food delivered on your train berth, please contact us at 1323 (24*7 Hrs Toll Free) or log on to',
+    text: 'For e-catering, to book and get food delivered on your train berth, please contact us at 1323 (24*7 Hrs Toll Free) or log on to',
     boundingBox: const Rect.fromLTRB(
       0,
       1340,

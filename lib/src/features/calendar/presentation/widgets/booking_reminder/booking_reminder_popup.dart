@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
 import 'package:namma_wallet/src/common/domain/models/ticket.dart';
@@ -33,7 +35,7 @@ class BookingReminderPopup extends StatefulWidget {
 }
 
 class _BookingReminderPopupState extends State<BookingReminderPopup> {
-  final _service = getIt<BookingReminderService>();
+  final BookingReminderService _service = getIt<BookingReminderService>();
   final Map<String, bool> _normalEnabled = {};
   final Map<String, bool> _tatkalEnabled = {};
   bool _loading = true;
@@ -41,7 +43,7 @@ class _BookingReminderPopupState extends State<BookingReminderPopup> {
   @override
   void initState() {
     super.initState();
-    _loadStates();
+    unawaited(_loadStates());
   }
 
   Future<void> _loadStates() async {
@@ -73,7 +75,7 @@ class _BookingReminderPopupState extends State<BookingReminderPopup> {
           if (_loading)
             const Center(child: CircularProgressIndicator())
           else
-            ...widget.tickets.map((ticket) => _buildTicketTile(ticket)),
+            ...widget.tickets.map(_buildTicketTile),
           const SizedBox(height: 8),
         ],
       ),
