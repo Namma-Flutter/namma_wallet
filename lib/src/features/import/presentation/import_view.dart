@@ -118,6 +118,7 @@ class _ImportViewState extends State<ImportView> {
         type: FileType.custom,
         allowedExtensions: ['pdf'],
       );
+      if (!mounted) return;
 
       XFile? xFile;
       if (files.isNotEmpty) {
