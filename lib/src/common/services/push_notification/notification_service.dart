@@ -113,7 +113,7 @@ class NotificationService implements INotificationService {
   Future<void> initialize() async {
     await initTimezone();
     const androidSettings = AndroidInitializationSettings(
-      '@drawable/ic_notification_small',
+      'ic_notification_small',
     );
 
     const iosSettings = DarwinInitializationSettings(
