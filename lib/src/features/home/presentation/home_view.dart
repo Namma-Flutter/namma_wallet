@@ -163,6 +163,27 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
                 ),
                 UserProfileWidget(),
                 Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+                  child: TextField(
+                    key: const Key('homeTicketSearchField'),
+                    readOnly: true,
+                    onTap: () {
+                      context.pushNamed(AppRoute.ticketSearch.name);
+                    },
+                    decoration: InputDecoration(
+                      hintText: 'Search your tickets',
+                      prefixIcon: const Icon(Icons.search),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      filled: true,
+                      fillColor: Theme.of(context)
+                          .colorScheme
+                          .surfaceContainerLow,
+                    ),
+                  ),
+                ),
+                Padding(
                   padding: const EdgeInsets.all(16),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,

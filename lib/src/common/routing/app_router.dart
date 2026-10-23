@@ -12,6 +12,7 @@ import 'package:namma_wallet/src/features/calendar/presentation/calendar_view.da
 import 'package:namma_wallet/src/features/export/presentation/export_view.dart';
 import 'package:namma_wallet/src/features/home/presentation/all_tickets_view.dart';
 import 'package:namma_wallet/src/features/home/presentation/home_view.dart';
+import 'package:namma_wallet/src/features/home/presentation/ticket_search_view.dart';
 import 'package:namma_wallet/src/features/import/presentation/import_view.dart';
 import 'package:namma_wallet/src/features/receive/domain/shared_content_result.dart';
 import 'package:namma_wallet/src/features/receive/presentation/share_success_view.dart';
@@ -106,6 +107,11 @@ final router = GoRouter(
         showArchived:
             state.uri.queryParameters[archiveQueryKey] == archiveQueryValue,
       ),
+    ),
+    GoRoute(
+      path: AppRoute.ticketSearch.path,
+      name: AppRoute.ticketSearch.name,
+      builder: (context, state) => const TicketSearchView(),
     ),
     GoRoute(
       path: AppRoute.settings.path,
