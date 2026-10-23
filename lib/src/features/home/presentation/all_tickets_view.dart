@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:namma_wallet/src/common/database/ticket_dao_interface.dart';
 import 'package:namma_wallet/src/common/di/locator.dart';
+import 'package:namma_wallet/src/common/domain/models/extras_model.dart';
+import 'package:namma_wallet/src/common/domain/models/tag_model.dart';
 import 'package:namma_wallet/src/common/domain/models/ticket.dart';
 import 'package:namma_wallet/src/common/enums/ticket_type.dart';
 import 'package:namma_wallet/src/common/helper/date_time_converter.dart';
@@ -30,8 +32,10 @@ class _AllTicketsViewState extends State<AllTicketsView> {
   List<Ticket> _activeTickets = [];
   List<Ticket> _archivedTickets = [];
   String _selectedFilter = 'All';
+  String _searchQuery = '';
   bool _showingArchived = false;
 
+  final TextEditingController _searchController = TextEditingController();
   late final IHapticService _hapticService;
 
   @override
@@ -50,6 +54,12 @@ class _AllTicketsViewState extends State<AllTicketsView> {
         _showingArchived = widget.showArchived;
       });
     }
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
   }
 
   Future<void> _loadTicketData() async {
@@ -84,27 +94,61 @@ class _AllTicketsViewState extends State<AllTicketsView> {
   }
 
   List<Ticket> get _filteredTickets {
-    if (_showingArchived) {
-      return _archivedTickets;
-    }
+    final tickets = _showingArchived ? _archivedTickets : _activeTickets;
+    final query = _searchQuery.trim().toLowerCase();
 
-    if (_selectedFilter == 'All') {
-      return _activeTickets;
-    }
-
-    return _activeTickets.where((ticket) {
-      switch (_selectedFilter) {
-        case 'Travel':
-          return ticket.type == TicketType.bus ||
-              ticket.type == TicketType.train ||
-              ticket.type == TicketType.flight ||
-              ticket.type == TicketType.metro;
-        case 'Events':
-          return ticket.type == TicketType.event;
-        default:
-          return true;
+    return tickets.where((ticket) {
+      if (!_showingArchived && !_matchesSelectedFilter(ticket)) {
+        return false;
       }
+
+      if (query.isEmpty) return true;
+
+      return _searchableTicketValues(ticket).any(
+        (value) => value.toLowerCase().contains(query),
+      );
     }).toList();
+  }
+
+  bool _matchesSelectedFilter(Ticket ticket) {
+    return switch (_selectedFilter) {
+      'Travel' =>
+        ticket.type == TicketType.bus ||
+            ticket.type == TicketType.train ||
+            ticket.type == TicketType.flight ||
+            ticket.type == TicketType.metro,
+      'Events' => ticket.type == TicketType.event,
+      _ => true,
+    };
+  }
+
+  Iterable<String> _searchableTicketValues(Ticket ticket) sync* {
+    yield* [
+      ticket.primaryText,
+      ticket.secondaryText,
+      ticket.location,
+      ticket.ticketId,
+    ].whereType<String>();
+
+    for (final extra in ticket.extras ?? <ExtrasModel>[]) {
+      yield* _searchableExtraValues(extra);
+    }
+
+    for (final tag in ticket.tags ?? <TagModel>[]) {
+      final value = tag.value;
+      if (value != null) yield value;
+    }
+  }
+
+  Iterable<String> _searchableExtraValues(ExtrasModel extra) sync* {
+    final title = extra.title;
+    final value = extra.value;
+    if (title != null) yield title;
+    if (value != null) yield value;
+
+    for (final child in extra.child ?? <ExtrasModel>[]) {
+      yield* _searchableExtraValues(child);
+    }
   }
 
   @override
@@ -116,6 +160,41 @@ class _AllTicketsViewState extends State<AllTicketsView> {
       ),
       body: Column(
         children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+            child: TextField(
+              key: const Key('ticketSearchField'),
+              controller: _searchController,
+              onChanged: (value) {
+                setState(() {
+                  _searchQuery = value;
+                });
+              },
+              decoration: InputDecoration(
+                hintText: 'Search tickets',
+                prefixIcon: const Icon(Icons.search),
+                suffixIcon: _searchQuery.isEmpty
+                    ? null
+                    : IconButton(
+                        key: const Key('clearTicketSearchButton'),
+                        tooltip: 'Clear search',
+                        icon: const Icon(Icons.clear),
+                        onPressed: () {
+                          _searchController.clear();
+                          setState(() {
+                            _searchQuery = '';
+                          });
+                        },
+                      ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                filled: true,
+                fillColor: Theme.of(context).colorScheme.surfaceContainerLow,
+              ),
+            ),
+          ),
+
           // Filter chips
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -177,7 +256,9 @@ class _AllTicketsViewState extends State<AllTicketsView> {
                         ),
                         const SizedBox(height: 16),
                         Text(
-                          _showingArchived
+                          _searchQuery.trim().isNotEmpty
+                              ? 'No matching tickets'
+                              : _showingArchived
                               ? 'No archived tickets'
                               : 'No tickets found',
                           style: TextStyle(
@@ -190,7 +271,9 @@ class _AllTicketsViewState extends State<AllTicketsView> {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          _showingArchived
+                          _searchQuery.trim().isNotEmpty
+                              ? 'Try another route, location, or ticket ID'
+                              : _showingArchived
                               ? 'Past tickets will appear here'
                               : _selectedFilter == 'All'
                               ? 'Add tickets to get started'
